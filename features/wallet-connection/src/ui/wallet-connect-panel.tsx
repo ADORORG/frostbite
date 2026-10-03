@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useWalletConnection } from "@ador/wallet/client";
+import { ArcadeModal } from "@repo/ui/arcade";
+import {
+  useWalletConnection,
+  walletNetworkUnavailableReason,
+  classifyWalletConnectionError,
+  type WalletConnectionFailure,
+} from "@ador/wallet/client";
 import type { WalletCandidate } from "../config.ts";
 
 function abbreviated(address: string): string {
@@ -16,7 +22,12 @@ export function WalletConnectPanel({
   readonly candidates: readonly WalletCandidate[];
 }) {
   const wallet = useWalletConnection();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    readonly candidate: WalletCandidate;
+    readonly failure: WalletConnectionFailure;
+  } | null>(null);
+  const [pendingCandidate, setPendingCandidate] =
+    useState<WalletCandidate | null>(null);
 
   if (wallet.connected) {
     return (
@@ -30,7 +41,7 @@ export function WalletConnectPanel({
           session or prove wallet support.
         </p>
         <button
-          className="arcade-button arcade-button--yellow"
+          className="arcade-button arcade-button--cyan"
           onClick={wallet.disconnect}
           type="button"
         >
@@ -42,37 +53,81 @@ export function WalletConnectPanel({
 
   return (
     <div className="arcade-actions">
-      {candidates.map((candidate) =>
-        wallet.isInstalled(candidate.id) ? (
-          <button
-            className="arcade-button arcade-button--cyan"
-            disabled={wallet.connecting}
-            key={candidate.id}
-            onClick={() => {
-              setError(null);
-              void wallet.connect(candidate.id).catch(() => {
-                setError(
-                  `${candidate.label} connection was rejected or failed.`,
-                );
-              });
-            }}
-            type="button"
-          >
-            {wallet.connecting ? "Connecting…" : `Connect ${candidate.label}`}
-          </button>
-        ) : (
+      <ArcadeModal title="Choose your wallet" triggerLabel="Choose wallet">
+        <p className="arcade-wallet-help">Select a wallet · {wallet.network}</p>
+        <ul className="arcade-wallet-list">
+          {[...candidates]
+            .sort(
+              (left, right) =>
+                Number(wallet.isInstalled(right.id)) -
+                Number(wallet.isInstalled(left.id)),
+            )
+            .map((candidate) => (
+              <li key={candidate.id}>
+                <button
+                  className="arcade-wallet-tile"
+                  aria-label={`Connect ${candidate.label}`}
+                  aria-busy={pendingCandidate?.id === candidate.id}
+                  title={
+                    walletNetworkUnavailableReason(
+                      candidate.id,
+                      wallet.network,
+                    ) ?? candidate.label
+                  }
+                  disabled={
+                    wallet.connecting ||
+                    pendingCandidate !== null ||
+                    walletNetworkUnavailableReason(
+                      candidate.id,
+                      wallet.network,
+                    ) !== null
+                  }
+                  onClick={() => {
+                    setError(null);
+                    setPendingCandidate(candidate);
+                    void wallet
+                      .connect(candidate.id)
+                      .catch((failure) => {
+                        setError({
+                          candidate,
+                          failure: classifyWalletConnectionError(failure),
+                        });
+                      })
+                      .finally(() => setPendingCandidate(null));
+                  }}
+                  type="button"
+                >
+                  {pendingCandidate?.id === candidate.id
+                    ? "Connecting…"
+                    : candidate.label}
+                  {walletNetworkUnavailableReason(
+                    candidate.id,
+                    wallet.network,
+                  ) !== null ? (
+                    <small>Unavailable on {wallet.network}</small>
+                  ) : wallet.isInstalled(candidate.id) ? (
+                    <small>Detected</small>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+        </ul>
+        {error === null ? null : (
+          <p role="alert">
+            {error.candidate.label}: {error.failure.message}
+          </p>
+        )}
+        {error?.failure.kind === "provider-unavailable" ? (
           <a
-            className="arcade-button arcade-button--yellow"
-            href={wallet.installationUrl(candidate.id)}
-            key={candidate.id}
+            className="arcade-wallet-install"
+            href={wallet.installationUrl(error.candidate.id)}
             rel="noreferrer"
             target="_blank"
           >
-            Install {candidate.label}
+            Install {error.candidate.label}
           </a>
-        ),
-      )}
-      {error === null ? null : <p role="alert">{error}</p>}
+        ) : null}
+      </ArcadeModal>
     </div>
   );
 }

@@ -31,9 +31,20 @@ test("reaches every public surface from visible navigation", async ({
   await expect(
     page.getByRole("heading", { name: "Connect a candidate wallet" }),
   ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Choose wallet", exact: true })
+    .click();
   await expect(
-    page.getByRole("link", { name: "Install Xverse" }),
-  ).toHaveAttribute("href", "https://www.xverse.app/download");
+    page.getByRole("dialog", { name: "Choose your wallet" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Connect Xverse", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Choose wallet", exact: true }),
+  ).toBeFocused();
   await expect(
     page.getByText("Signing in remains disabled", { exact: false }),
   ).toBeVisible();

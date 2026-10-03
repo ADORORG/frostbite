@@ -1,9 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@ador/wallet/client", async () => {
+vi.mock("@ador/wallet/client", async (importOriginal) => {
   const React = await import("react");
   return {
+    ...(await importOriginal<typeof import("@ador/wallet/client")>()),
     WalletProvider: ({ children }: { readonly children: React.ReactNode }) =>
       React.createElement(React.Fragment, null, children),
     useWalletConnection: () => ({
@@ -37,6 +38,9 @@ describe("wallet connection entrypoint", () => {
     });
     const html = renderToStaticMarkup(content);
     expect(html).toContain("Connect Xverse");
+    expect(html).toMatch(
+      /<button[^>]*disabled=""[^>]*>Choose wallet<\/button>/u,
+    );
     expect(html).toContain("Signing in remains disabled");
     expect(html).not.toContain("Sign in");
   });

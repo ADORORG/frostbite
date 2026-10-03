@@ -1,5 +1,9 @@
 "use client";
 
+export { walletNetworkUnavailableReason } from "./network-availability.ts";
+export { classifyWalletConnectionError } from "./connection-error.ts";
+export type { WalletConnectionFailure } from "./connection-error.ts";
+
 import type {} from "../vendor/lasereyes-react.d.ts";
 
 import {

@@ -3,7 +3,7 @@
 Status: active  
 Milestone: Launchpad Beta  
 Canonical status source: this file  
-Last synchronized: 2026-09-14
+Last synchronized: 2026-10-03
 
 This ledger tracks every implementation task in the eight-week Launchpad Beta milestone. The
 milestone defines scope and acceptance criteria; this file records execution status. Task records
@@ -34,20 +34,20 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 ## Week 1 — Workspace and executable architecture
 
-| ID    | Task                                                                                                            | Status    | Evidence or blocker                                |
-| ----- | --------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------- |
-| W1-01 | Initialize pnpm, Turborepo, Cargo, and the target workspace structure                                           | completed | Repository history and workspace manifests         |
-| W1-02 | Enforce real per-workspace typecheck, unit, integration, and coverage scripts plus Playwright for runnable apps | completed | Repository policy tests and CI configuration       |
-| W1-03 | Implement typed environment validation, documented template parity, and `env:check` gates                       | completed | Environment package and parity tests               |
-| W1-04 | Enforce the 300-line handwritten source limit and record legacy exceptions                                      | completed | Repository policy package                          |
-| W1-05 | Build provider-neutral PostgreSQL and Drizzle foundations with real-database tests                              | completed | `references/task-record.md`                        |
-| W1-06 | Implement explicit feature/provider manifests and boot validation                                               | completed | `references/plugin-boot-task-record.md`            |
-| W1-07 | Build the portable HTTP operation boundary and thin `/api/v1` Next.js adapter                                   | completed | HTTP foundation commits                            |
-| W1-08 | Generate the framework-neutral OpenAPI contract from executable schemas                                         | completed | `references/openapi-task-record.md`                |
-| W1-09 | Implement the signed workflow boundary and transactional outbox foundation                                      | completed | `references/outbox-task-record.md`                 |
-| W1-10 | Add CI, dependency-boundary, coverage, build, migration, and E2E gates                                          | completed | Repository workflow and policy tests               |
-| W1-11 | Enforce unresolved product and security decisions as fail-closed runtime gates                                  | completed | `references/decision-gate-task-record.md`          |
-| W1-12 | Prove one-line detachable feature and provider composition                                                      | completed | `references/detachable-composition-task-record.md` |
+| ID    | Task                                                                                                            | Status    | Evidence or blocker                                                        |
+| ----- | --------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------- |
+| W1-01 | Initialize pnpm, Turborepo, Cargo, and the target workspace structure                                           | completed | Repository history and workspace manifests                                 |
+| W1-02 | Enforce real per-workspace typecheck, unit, integration, and coverage scripts plus Playwright for runnable apps | completed | Repository policy tests and CI configuration                               |
+| W1-03 | Implement typed environment validation, documented template parity, and `env:check` gates                       | completed | Environment package, app-local mirror, database commands, and parity tests |
+| W1-04 | Enforce the 300-line handwritten source limit and record legacy exceptions                                      | completed | Repository policy package                                                  |
+| W1-05 | Build provider-neutral PostgreSQL and Drizzle foundations with real-database tests                              | completed | `references/task-record.md`                                                |
+| W1-06 | Implement explicit feature/provider manifests and boot validation                                               | completed | `references/plugin-boot-task-record.md`                                    |
+| W1-07 | Build the portable HTTP operation boundary and thin `/api/v1` Next.js adapter                                   | completed | HTTP foundation commits                                                    |
+| W1-08 | Generate the framework-neutral OpenAPI contract from executable schemas                                         | completed | `references/openapi-task-record.md`                                        |
+| W1-09 | Implement the signed workflow boundary and transactional outbox foundation                                      | completed | `references/outbox-task-record.md`                                         |
+| W1-10 | Add CI, dependency-boundary, coverage, build, migration, and E2E gates                                          | completed | Repository workflow and policy tests                                       |
+| W1-11 | Enforce unresolved product and security decisions as fail-closed runtime gates                                  | completed | `references/decision-gate-task-record.md`                                  |
+| W1-12 | Prove one-line detachable feature and provider composition                                                      | completed | `references/detachable-composition-task-record.md`                         |
 
 ## Week 2 — Authentication, authorization, and shell
 
@@ -66,7 +66,7 @@ stored in `references/task-list.md`.
 | W2-08  | Implement the remaining public product route families                                     | completed   | `references/public-product-routes-task-record.md`; deep review converged after mutation proof               |
 | W2-09  | Add authenticated passkey linking with conflict and final-method protections              | completed   | `references/passkey-linking-task-record.md`; deep review converged after dynamic mutation proof             |
 | W2-10A | Implement automated fail-closed wallet conformance architecture                           | completed   | `references/wallet-device-conformance-task-record.md`; mutation-proven, 100% branch coverage                |
-| W2-10B | Qualify and enable supported wallets on real browsers and devices                         | in_progress | Xverse selected; qualification-only connection surface is being implemented                                 |
+| W2-10B | Qualify and enable supported wallets on real browsers and devices                         | in_progress | Xverse selected; `/connect` is implemented and automated checks pass; physical evidence remains required    |
 | W2-11  | Close the Week 2 visual, accessibility, keyboard, responsive, and reduced-motion matrix   | completed   | `references/week-two-experience-quality-task-record.md`; repaired and mutation-proven deep-review findings  |
 | W2-12  | Integrate manifest-driven links for every testable page and truthful authentication state | completed   | `references/integrated-navigation-task-record.md`; deep review converged with mutation and browser evidence |
 
