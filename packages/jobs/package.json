@@ -4,7 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/outbox-relay.ts"
+    ".": "./src/outbox-relay.ts",
+    "./activities": "./src/pipeline-activities.ts",
+    "./asset-pipeline": "./src/asset-pipeline.ts",
+    "./policy": "./src/workflow-policy.ts",
+    "./provider-service": "./src/provider-service.ts",
+    "./relay-loop": "./src/relay-loop.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -15,6 +20,7 @@
   },
   "dependencies": {
     "@ador/events": "workspace:*",
+    "@ador/plugin-kit": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {

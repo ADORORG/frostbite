@@ -1,4 +1,4 @@
-import { processImage } from "../../src/process-image.ts";
+import { processImage } from "../../src/worker.ts";
 
 export const limits = { maxDimension: 8_192, maxPixels: 40_000_000 };
 export const derivatives = [

@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/operation.ts",
     "./openapi": "./src/openapi.ts",
-    "./registered-operation": "./src/registered-operation.ts"
+    "./registered-operation": "./src/registered-operation.ts",
+    "./node-adapter": "./src/node-adapter.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

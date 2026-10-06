@@ -1,6 +1,6 @@
 # Gate record: signed workflow adapter
 
-Status: blocked from implementation and provider registration
+Status: lifted 2026-10-06 by the recorded exception in ADR-014; implementation tracked as `W3-05A`
 
 ## Reason
 
@@ -30,3 +30,10 @@ Implementation may resume only when all of the following are evidenced:
 
 This gate defers only the signed workflow-provider adapter. It does not reopen D06 or change
 ADR-003's accepted target architecture.
+
+## Resolution (2026-10-06)
+
+Re-entry criterion 1 was satisfied by an exception explicitly approved by the product and engineering
+owner and recorded in `docs/decisions/ADR-014-inngest-sdk-dependency-exception.md`, scoped to the two
+deprecated transitive packages that `inngest` 4.21.1 installs. Criteria 2-4 remain requirements of
+task `W3-05A` and are evidenced in `references/workflow-adapter-task-record.md`.

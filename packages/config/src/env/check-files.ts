@@ -12,7 +12,10 @@ export const environmentFiles = [
   ".env.production.example",
 ] as const;
 
-export const applicationEnvironmentFiles = ["apps/web/.env.example"] as const;
+export const applicationEnvironmentFiles = [
+  "apps/web/.env.example",
+  "apps/worker/.env.example",
+] as const;
 
 export const localEnvironmentFiles = [
   ".env",
@@ -25,6 +28,11 @@ export const localEnvironmentFiles = [
   "apps/web/.env.test",
   "apps/web/.env.preview",
   "apps/web/.env.production",
+  "apps/worker/.env",
+  "apps/worker/.env.local",
+  "apps/worker/.env.test",
+  "apps/worker/.env.preview",
+  "apps/worker/.env.production",
 ] as const;
 
 function extractKeys(contents: string): string[] {

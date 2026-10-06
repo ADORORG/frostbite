@@ -22,7 +22,8 @@ function required<T>(value: T | null): T {
 
 function outcomeOf(row: AssetRow): AssetValidationOutcome {
   const validatorVersion = required(row.validatorVersion);
-  return row.processingState === "validated"
+  // Every state after validation (validated, processed, unprocessable) keeps its validated outcome.
+  return row.processingState !== "rejected"
     ? {
         contentSha256: required(row.contentSha256),
         contentType: required(row.detectedContentType),

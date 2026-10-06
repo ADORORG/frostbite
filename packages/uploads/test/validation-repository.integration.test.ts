@@ -1,4 +1,5 @@
 import { assets } from "@ador/database";
+import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -62,6 +63,43 @@ describe("asset validation persistence", () => {
       widthPixels: 7,
     });
   });
+
+  it.each([
+    ["processed", { processingCompletedAt: now, processingState: "processed" }],
+    [
+      "unprocessable",
+      {
+        processingCompletedAt: now,
+        processingState: "unprocessable",
+        rejectionReason: "decode-failed",
+      },
+    ],
+  ] as const)(
+    "still reads the validated outcome of an asset that is now %s",
+    async (_name, values) => {
+      const { assetId } = await seed();
+      await repository.record({
+        assetId,
+        completedAt: now,
+        outcome: validated,
+      });
+      await database.update(assets).set(values).where(eq(assets.id, assetId));
+      expect(await repository.find(assetId)).toEqual({
+        kind: "final",
+        outcome: validated,
+      });
+      expect(
+        await repository.record({
+          assetId,
+          completedAt: now,
+          outcome: rejected,
+        }),
+      ).toEqual({
+        kind: "replayed",
+        outcome: validated,
+      });
+    },
+  );
 
   it("persists a rejection without hash or geometry", async () => {
     const { assetId } = await seed();

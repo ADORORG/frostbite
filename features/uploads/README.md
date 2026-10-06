@@ -10,3 +10,10 @@ state; it does not claim validation or publication. It has no UI yet; W3-06 owns
 
 Configuration uses the shared typed upload policy. Run `env:check`, `typecheck`, `test:unit`,
 `test:integration`, or `test:coverage`. Platform engineering owns this feature.
+
+## Asset pipeline composition
+
+`@ador/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and
+processing activities from the typed `object-storage:s3-compatible` and
+`media-processing:image-derivatives` capabilities and returns provider-neutral activities for a workflow
+host. A failed composition is not cached; the host may pass its own database client and clock.

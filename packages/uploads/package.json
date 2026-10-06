@@ -18,6 +18,7 @@
   "dependencies": {
     "@ador/database": "workspace:*",
     "@ador/events": "workspace:*",
+    "@ador/jobs": "workspace:*",
     "@ador/media": "workspace:*",
     "@ador/object-storage": "workspace:*",
     "@ador/shared": "workspace:*",

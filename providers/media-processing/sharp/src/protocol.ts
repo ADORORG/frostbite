@@ -10,21 +10,6 @@ export const maximumHeaderBytes = 65_536;
 
 const positiveInteger = z.number().int().positive();
 
-export const requestHeaderSchema = z.strictObject({
-  byteLength: z.number().int().nonnegative(),
-  derivatives: z
-    .array(
-      z.strictObject({ kind: derivativeKindSchema, maxSide: positiveInteger }),
-    )
-    .min(1),
-  expected: z.strictObject({ height: positiveInteger, width: positiveInteger }),
-  limits: z.strictObject({
-    maxDimension: positiveInteger,
-    maxPixels: positiveInteger,
-  }),
-  quality: z.number().int().min(1).max(100),
-});
-
 export const responseHeaderSchema = z.discriminatedUnion("ok", [
   z.strictObject({
     derivatives: z.array(
@@ -40,7 +25,6 @@ export const responseHeaderSchema = z.discriminatedUnion("ok", [
   z.strictObject({ ok: z.literal(false), reason: assetRejectionReasonSchema }),
 ]);
 
-export type RequestHeader = z.infer<typeof requestHeaderSchema>;
 export type ResponseHeader = z.infer<typeof responseHeaderSchema>;
 
 export function encodeFrame(header: object, payload: Uint8Array): Buffer {

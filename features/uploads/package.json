@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
-    "./entrypoint": "./src/entrypoint.ts"
+    "./entrypoint": "./src/entrypoint.ts",
+    "./pipeline": "./src/pipeline.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -19,6 +20,8 @@
   "dependencies": {
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
+    "@ador/jobs": "workspace:*",
+    "@ador/media": "workspace:*",
     "@ador/object-storage": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",

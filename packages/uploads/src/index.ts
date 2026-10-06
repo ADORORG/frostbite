@@ -7,3 +7,4 @@ export * from "./application/validation-service.ts";
 export * from "./adapters/drizzle-processing-repository.ts";
 export * from "./application/processing-repository.ts";
 export * from "./application/processing-service.ts";
+export * from "./application/pipeline-activities.ts";

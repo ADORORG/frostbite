@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { createIsolatedImageProcessor } from "../src/isolated-processor.ts";
-import {
-  decodeFrame,
-  encodeFrame,
-  requestHeaderSchema,
-} from "../src/protocol.ts";
+import { encodeFrame } from "../src/protocol.ts";
+import { parseRequest } from "../src/worker.ts";
 import { fakeLauncher, fakeSchedule } from "./support/fakes.ts";
 
 const policy = {
@@ -50,12 +47,9 @@ describe("isolated image processor orchestration", () => {
   it("launches a worker with the heap cap and sends the framed request", () => {
     const { launches, worker } = setup();
     expect(launches).toEqual([{ heapMegabytes: 256 }]);
-    const request = decodeFrame(
-      worker.sent ?? new Uint8Array(),
-      requestHeaderSchema,
-    );
-    expect(request?.header).toEqual({
-      byteLength: 3,
+    // The worker's own parser accepts exactly what the parent sent: a cross-contract check.
+    const request = parseRequest(Buffer.from(worker.sent ?? new Uint8Array()));
+    expect(request?.options).toEqual({
       derivatives: input.derivatives,
       expected: input.expected,
       limits: input.limits,

@@ -17,3 +17,9 @@ adapter without duplicating schemas, handlers, or route metadata.
 
 The package owns no business logic, authentication policy, database access, or provider calls.
 Adapters and feature operations are verified independently through conformance tests.
+
+`@ador/http/node-adapter` adapts a fetch-style handler to a `node:http` request listener. It buffers the
+request, runs the handler, and writes the response; a throwing handler yields a generic 500 and is
+reported only through an optional hook, never to the client. A body over `defaultMaxBodyBytes` (1 MiB, overridable) is refused with 413 before it is buffered,
+first from the declared length and otherwise as it streams. It is delivery plumbing for standalone
+services such as the worker, with no framework dependency.

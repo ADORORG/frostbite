@@ -1,28 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { handleRequest } from "../src/handle-request.ts";
 import {
   decodeFrame,
   encodeFrame,
   maximumHeaderBytes,
-  requestHeaderSchema,
   responseHeaderSchema,
 } from "../src/protocol.ts";
-import { makeImage } from "./support/images.ts";
 
-const request = {
-  byteLength: 3,
-  derivatives: [{ kind: "thumbnail", maxSide: 256 }],
-  expected: { height: 5, width: 7 },
-  limits: { maxDimension: 8_192, maxPixels: 40_000_000 },
-  quality: 80,
-} as const;
+const rejection = { ok: false, reason: "decode-failed" } as const;
 
 describe("frame protocol", () => {
   it("round-trips a header and payload", () => {
-    const frame = encodeFrame(request, Buffer.from([1, 2, 3]));
-    const decoded = decodeFrame(frame, requestHeaderSchema);
-    expect(decoded?.header).toEqual(request);
+    const frame = encodeFrame(rejection, Buffer.from([1, 2, 3]));
+    const decoded = decodeFrame(frame, responseHeaderSchema);
+    expect(decoded?.header).toEqual(rejection);
     expect([...(decoded?.payload ?? [])]).toEqual([1, 2, 3]);
   });
 
@@ -39,9 +30,7 @@ describe("frame protocol", () => {
     ],
     [
       "a header that is not JSON",
-      encodeFrame({}, Buffer.alloc(0)).subarray(0, 2).length === 2
-        ? Buffer.concat([Buffer.from([0, 0, 0, 3]), Buffer.from("{x}")])
-        : Buffer.alloc(0),
+      Buffer.concat([Buffer.from([0, 0, 0, 3]), Buffer.from("{x}")]),
     ],
     [
       "a header of the wrong shape",
@@ -52,7 +41,7 @@ describe("frame protocol", () => {
   });
 
   it("rejects a valid header that exceeds the size cap", () => {
-    const json = '{"ok":false,"reason":"decode-failed"}';
+    const json = JSON.stringify(rejection);
     const header = json + " ".repeat(maximumHeaderBytes + 1 - json.length);
     const prefix = Buffer.alloc(4);
     prefix.writeUInt32BE(header.length);
@@ -62,10 +51,7 @@ describe("frame protocol", () => {
   });
 
   it("rejects a frame whose prefix claims more header than was sent", () => {
-    const frame = encodeFrame(
-      { ok: false, reason: "decode-failed" },
-      Buffer.alloc(0),
-    );
+    const frame = encodeFrame(rejection, Buffer.alloc(0));
     frame.writeUInt32BE(frame.length, 0);
     expect(decodeFrame(frame, responseHeaderSchema)).toBeNull();
   });
@@ -79,52 +65,9 @@ describe("frame protocol", () => {
     ).toBeNull();
     expect(
       decodeFrame(
-        encodeFrame({ ...request, extra: true }, Buffer.alloc(3)),
-        requestHeaderSchema,
+        encodeFrame({ ...rejection, extra: true }, Buffer.alloc(0)),
+        responseHeaderSchema,
       ),
-    ).toBeNull();
-  });
-});
-
-describe("request handling", () => {
-  it("answers a valid request with derivatives", async () => {
-    const bytes = await makeImage({ format: "png", height: 30, width: 40 });
-    const reply = await handleRequest(
-      encodeFrame(
-        {
-          ...request,
-          byteLength: bytes.length,
-          expected: { height: 30, width: 40 },
-        },
-        bytes,
-      ),
-    );
-    const decoded = decodeFrame(reply ?? Buffer.alloc(0), responseHeaderSchema);
-    expect(decoded?.header).toMatchObject({
-      derivatives: [{ height: 30, kind: "thumbnail", width: 40 }],
-      ok: true,
-    });
-    expect(decoded?.payload.length).toBeGreaterThan(0);
-  });
-
-  it("answers an undecodable payload with a rejection and no payload", async () => {
-    const reply = await handleRequest(
-      encodeFrame(request, Buffer.from([1, 2, 3])),
-    );
-    const decoded = decodeFrame(reply ?? Buffer.alloc(0), responseHeaderSchema);
-    expect(decoded).toMatchObject({
-      header: { ok: false, reason: "decode-failed" },
-    });
-    expect(decoded?.payload.length).toBe(0);
-  });
-
-  it("refuses frames that violate the protocol", async () => {
-    expect(await handleRequest(Buffer.from("garbage"))).toBeNull();
-    expect(
-      await handleRequest(encodeFrame(request, Buffer.alloc(2))),
-    ).toBeNull();
-    expect(
-      await handleRequest(encodeFrame(request, Buffer.alloc(4))),
     ).toBeNull();
   });
 });

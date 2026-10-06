@@ -129,6 +129,45 @@ export const environmentDefinitions = [
     secret: false,
   },
   {
+    key: "INNGEST_APP_ID",
+    description:
+      "Inngest application identifier shown in the Inngest dashboard.",
+    exposure: "server",
+    required: true,
+    secret: false,
+  },
+  {
+    key: "INNGEST_DEV",
+    description:
+      "Use a local Inngest development server instead of Inngest Cloud: true or false. Must be false in preview and production.",
+    exposure: "server",
+    required: true,
+    secret: false,
+  },
+  {
+    key: "INNGEST_BASE_URL",
+    description:
+      "Inngest API base URL; blank uses Inngest Cloud, a development server uses http.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "INNGEST_EVENT_KEY",
+    description: "Server-only key used to publish workflow events to Inngest.",
+    exposure: "server",
+    required: true,
+    secret: true,
+  },
+  {
+    key: "INNGEST_SIGNING_KEY",
+    description:
+      "Server-only key that verifies requests Inngest sends to the app.",
+    exposure: "server",
+    required: true,
+    secret: true,
+  },
+  {
     key: "AUTH_SESSION_IDLE_TIMEOUT_MS",
     description:
       "Sliding idle lifetime for authenticated platform sessions in milliseconds.",

@@ -13,6 +13,7 @@
     "@ador/plugin-kit": "workspace:*",
     "@ador/provider-media-processing-sharp": "workspace:*",
     "@ador/provider-object-storage-r2": "workspace:*",
+    "@ador/provider-workflows-inngest": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/wallet": "workspace:*",
     "@repo/config": "workspace:*"
