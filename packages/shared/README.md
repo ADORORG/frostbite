@@ -10,6 +10,8 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
   manifest schema.
 - `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.
 - `@ador/shared/http` — HTTP headers, methods, idempotency policy, and the versioned error envelope.
+- `@ador/shared/wallet-qualification` — bounded diagnostic schemas, routes, and configurable
+  defaults. The strict result contract cannot carry a session or represent successful sign-in.
 - `@ador/shared/platform` — public platform-status input and output contracts.
 - `@ador/shared/providers` — provider identities and capability-bearing manifests.
 

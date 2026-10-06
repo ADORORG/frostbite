@@ -2,18 +2,45 @@
 
 Status: in progress
 Started: 2026-09-14
-Last synchronized: 2026-10-03
+Last synchronized: 2026-10-04
+
+## Message qualification implementation in progress
+
+The user approved qualification-only signing/verification on 2026-10-04. It remains part of
+W2-10B; the task has not been split or completed. Baseline: `828b3dcd34b79258066fa20f4b53cc4542ee6ff7`,
+with a clean working tree. Working branch: `feat/wallet-message-qualification`.
+
+Done for this portion means a configured connected candidate requests an expiring diagnostic
+challenge, approves/rejects a BIP-322 message, and receives independent server verification without
+creating a user, identity, session, cookie, or transaction. Expiry, altered messages, invalid input,
+replay, concurrency, wrong origin, and wallet changes during approval must fail safely.
+
+The flow composes existing feature registration, wallet client, shared schemas, framework-neutral
+HTTP operations, strict verifier, and Drizzle adapter. Challenges use a separate table and cannot
+be consumed by the authentication service. Only hashes and necessary temporary metadata are stored;
+messages and signatures are not persisted or logged. Removing the feature's registration removes
+its page, navigation, and operations. Authentication and PSBT enablement remain gated.
+
+The migration is generated, not applied to the user's database. Run `pnpm db:migrate` before
+physical testing. `/connect` exposes `Test message signing` after connection. A successful test is
+not complete conformance evidence: exact wallet/browser/device versions and explicit physical
+outcomes remain required. Diagnostic lifetime and attempt limits are configurable via
+`configs/wallet.ts`, with named defaults in the shared qualification contract.
+
+This is an internal qualification surface, not approval for public release. Public exposure still
+requires milestone rate-limiting and challenge-retention hardening. Review and gate evidence is
+recorded in `wallet-message-qualification-review.md`.
 
 ## Objective
 
-Qualify Xverse against the exact-pinned LaserEyes boundary on the configured signet network, then
+Qualify configured candidates against the exact-pinned LaserEyes boundary on signet, then
 enable only the capabilities supported by complete physical evidence.
 
 ## Implemented qualification surface
 
 - Register a detachable `wallet-connection` feature requiring the generic `wallet:connect`
   capability.
-- Expose `/connect` as a qualification-only page with Xverse selected in `configs/wallet.ts`.
+- Expose `/connect` with qualification candidates selected in `configs/wallet.ts`.
 - Keep all LaserEyes hooks, provider detection, and lifecycle calls inside `@ador/wallet/client`.
 - State explicitly that connection is neither authentication nor provider qualification.
 - Load the LaserEyes declaration augmentation as a type-only dependency so Next.js does not execute
@@ -29,12 +56,12 @@ On 2026-10-03 the user confirmed Oyl, Xverse, and UniSat connect successfully an
 address. This is user-reported connection approval and address-retrieval evidence. Browser,
 device, extension versions, and the network for each result were not supplied (the earlier Xverse
 report explicitly named signet). Rejection, account/network changes, message verification,
-PSBT verification, and the Alkanes fixture remain unverified; no signing capability is enabled.
+PSBT verification, and the Alkanes fixture remain unverified; no production signing capability is enabled.
 
 On 2026-10-03 the user reported a successful Xverse connection on signet and the connected address
 state. This covers a reported connection approval only; wallet/browser versions, rejection, change
-events, and signing evidence have not yet been supplied. The candidate picker now exposes all
-provider identifiers supported by the pinned LaserEyes adapter through `configs/wallet.ts`, with
+events, and signing evidence have not yet been supplied. The picker exposes configured browser
+candidates supported by the pinned LaserEyes adapter through `configs/wallet.ts`, with
 per-provider installed/unavailable detection. Each candidate still requires its own qualification.
 
 The wallet chooser now opens in a native modal with explicit detection labels and consistent

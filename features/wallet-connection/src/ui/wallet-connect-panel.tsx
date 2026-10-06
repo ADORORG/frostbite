@@ -9,6 +9,7 @@ import {
   type WalletConnectionFailure,
 } from "@ador/wallet/client";
 import type { WalletCandidate } from "../config.ts";
+import { WalletQualificationPanel } from "./wallet-qualification-panel.tsx";
 
 function abbreviated(address: string): string {
   return address.length <= 18
@@ -47,6 +48,10 @@ export function WalletConnectPanel({
         >
           Disconnect
         </button>
+        <WalletQualificationPanel
+          key={`${wallet.provider}:${wallet.network}:${wallet.address}`}
+          wallet={wallet}
+        />
       </div>
     );
   }

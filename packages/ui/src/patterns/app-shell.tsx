@@ -30,7 +30,11 @@ export function AppShell({
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
-      <div className="arcade-marquee" aria-label="Platform status">
+      <div
+        className="arcade-marquee"
+        role="region"
+        aria-label="Platform status"
+      >
         <div className="arcade-marquee__track">
           {notices.map((notice) => (
             <span key={notice}>{notice}</span>

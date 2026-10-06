@@ -22,6 +22,9 @@ export default defineConfig({
         test: {
           name: "integration",
           include: ["test/**/*.integration.test.ts"],
+          // This suite parses every workspace source under coverage, alongside Turbo workers.
+          // Keep a bounded budget for the full scan, not the unit-test default of five seconds.
+          testTimeout: 30_000,
         },
       },
     ],

@@ -1,4 +1,5 @@
 import type { WalletConnectionConfig } from "@ador/feature-wallet-connection";
+import { walletQualificationDefaults } from "@ador/shared/wallet-qualification";
 
 export const walletConnectionConfig = {
   candidates: [
@@ -17,4 +18,5 @@ export const walletConnectionConfig = {
     { id: "op_net", label: "OP_NET" },
   ],
   network: "signet",
+  qualification: walletQualificationDefaults,
 } as const satisfies WalletConnectionConfig;

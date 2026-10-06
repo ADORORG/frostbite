@@ -9,6 +9,8 @@ Server-only, provider-neutral PostgreSQL infrastructure for the platform.
 - Drizzle client construction and explicit migration application.
 - The shared `ador` PostgreSQL schema boundary.
 - UUIDv7 auth user, wallet identity, challenge, and hashed-session tables.
+- `@ador/database/schema/wallet-qualification` — separate diagnostic challenges, with message
+  hashes, attempt bounds, expiry, and single-use settlement owned by the auth qualification adapter.
 - Durable upload-intent and private asset-observation tables with explicit processing state.
 - Transactional outbox insertion, lease-based claiming, acknowledgement, retry, and exhausted
   failure transitions.

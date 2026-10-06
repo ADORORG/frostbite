@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validateWalletConnectionConfig } from "../src/config.ts";
+import { walletQualificationDefaults } from "@ador/shared/wallet-qualification";
 
 const valid = {
   candidates: [{ id: "xverse", label: "Xverse" }],
@@ -9,12 +10,36 @@ const valid = {
 describe("wallet connection configuration", () => {
   it("returns immutable validated configuration", () => {
     const config = validateWalletConnectionConfig(valid);
-    expect(config).toEqual(valid);
+    expect(config).toEqual({
+      ...valid,
+      qualification: walletQualificationDefaults,
+    });
     expect(Reflect.set(config, "network", "mainnet")).toBe(false);
     expect(Reflect.set(config.candidates, "0", null)).toBe(false);
     expect(Reflect.set(config.candidates[0] ?? {}, "label", "Changed")).toBe(
       false,
     );
+  });
+
+  it.each([
+    { lifetimeMs: 0, maximumAttempts: 3 },
+    { lifetimeMs: 300_000, maximumAttempts: 0 },
+    { lifetimeMs: 1.5, maximumAttempts: 3 },
+    { lifetimeMs: 300_000, maximumAttempts: 1.5 },
+    { lifetimeMs: 300_000, maximumAttempts: 2 ** 31 },
+  ])("rejects invalid qualification limits %j", (qualification) => {
+    expect(() =>
+      validateWalletConnectionConfig({ ...valid, qualification }),
+    ).toThrow("qualification limits");
+  });
+
+  it("accepts the largest attempt bound the database column can hold", () => {
+    expect(
+      validateWalletConnectionConfig({
+        ...valid,
+        qualification: { lifetimeMs: 300_000, maximumAttempts: 2 ** 31 - 1 },
+      }).qualification?.maximumAttempts,
+    ).toBe(2 ** 31 - 1);
   });
 
   it.each([

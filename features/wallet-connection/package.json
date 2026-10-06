@@ -17,9 +17,14 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/auth": "workspace:*",
+    "@ador/database": "workspace:*",
+    "@ador/http": "workspace:*",
+    "@ador/shared": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/wallet": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@repo/config": "workspace:*",
     "react": "19.2.8"
   },
   "devDependencies": {

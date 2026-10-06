@@ -16,6 +16,9 @@ import type { ReactNode } from "react";
 import type { WalletNetwork } from "../contracts.ts";
 import type { LaserEyesProviderId } from "../conformance/contracts.ts";
 
+// Core 0.0.85 maps this normalized protocol to UniSat's "bip322-simple" and Xverse BIP322.
+const laserEyesBip322Protocol = "bip322";
+
 export interface WalletConnectionClient {
   readonly address: string;
   readonly connected: boolean;
@@ -24,6 +27,7 @@ export interface WalletConnectionClient {
   readonly provider: LaserEyesProviderId | null;
   connect(provider: LaserEyesProviderId): Promise<void>;
   disconnect(): void;
+  signMessage(message: string): Promise<string>;
   isInstalled(provider: LaserEyesProviderId): boolean;
   installationUrl(provider: LaserEyesProviderId): string;
 }
@@ -68,6 +72,19 @@ export function useWalletConnection(): WalletConnectionClient {
     provider: state.provider ?? null,
     connect: state.connect,
     disconnect: state.disconnect,
+    signMessage: async (message) => {
+      if (
+        !state.connected ||
+        state.provider === undefined ||
+        state.address.length === 0
+      ) {
+        throw new Error("A connected wallet account is required.");
+      }
+      return state.signMessage(message, {
+        toSignAddress: state.address,
+        protocol: laserEyesBip322Protocol,
+      });
+    },
     isInstalled: (provider) => providerAvailability(state, provider),
     installationUrl,
   };

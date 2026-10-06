@@ -37,6 +37,7 @@ describe("arcade panel composition", () => {
     expect(markup).toContain('aria-label="Test arcade home"');
     expect(markup).toContain("arcade-button--yellow");
     expect(markup).toContain("Foundation in progress");
+    expect(markup).toContain('role="region" aria-label="Platform status"');
     expect(markup).toContain("Test foundation");
   });
 });

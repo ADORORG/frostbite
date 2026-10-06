@@ -32,6 +32,7 @@ const state = {
   connect,
   connected: false,
   disconnect,
+  signMessage: vi.fn(async () => "signature"),
   hasBinance: false,
   hasKeplr: false,
   hasLeather: false,
@@ -99,5 +100,29 @@ describe("normalized wallet connection client", () => {
     expect(() => captured?.installationUrl("xverse")).toThrow(
       "no installation URL",
     );
+  });
+
+  it("requires a connected account and signs only for its current address", async () => {
+    renderToStaticMarkup(<Probe />);
+    if (captured === null) throw new Error("Expected captured wallet client");
+    await expect(captured.signMessage("message")).rejects.toThrow(
+      "connected wallet",
+    );
+    Reflect.set(state, "connected", true);
+    await expect(captured.signMessage("message")).rejects.toThrow(
+      "connected wallet",
+    );
+    Reflect.set(state, "provider", "xverse");
+    Reflect.set(state, "address", "");
+    await expect(captured.signMessage("message")).rejects.toThrow(
+      "connected wallet",
+    );
+    Reflect.set(state, "address", "tb1qcandidate");
+    await expect(captured.signMessage("message")).resolves.toBe("signature");
+    expect(state.signMessage).toHaveBeenCalledWith("message", {
+      toSignAddress: "tb1qcandidate",
+      protocol: "bip322",
+    });
+    Reflect.set(state, "connected", false);
   });
 });

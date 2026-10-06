@@ -1,4 +1,5 @@
 {
+  "extends": "../../../../typescript-config/nextjs.json",
   "compilerOptions": {
     "allowJs": true,
     "esModuleInterop": true,

@@ -43,12 +43,13 @@ async function handle(request: Request, context: RouteContext) {
     );
   }
   let actorSession: ActiveSession | null = null;
-  if (operation.access.kind !== "public") {
+  // Origin protection also covers public qualification mutations; authentication is separate.
+  if (request.method !== "GET" && request.method === operation.route.method) {
     const requestOrigin = request.headers.get("origin");
     const canonicalOrigin = new URL(
       parseEnvironment(process.env).PUBLIC_BASE_URL,
     ).origin;
-    if (request.method !== "GET" && requestOrigin !== canonicalOrigin) {
+    if (requestOrigin !== canonicalOrigin) {
       const correlationId = randomUUID();
       return Response.json(
         httpErrorEnvelopeSchema.parse({
@@ -64,6 +65,8 @@ async function handle(request: Request, context: RouteContext) {
         },
       );
     }
+  }
+  if (operation.access.kind !== "public") {
     const token = (await cookies()).get(platformSessionCookieName)?.value;
     const access = await resolvePageAccess(
       operation.access,

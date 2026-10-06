@@ -48,6 +48,7 @@ describe("wallet connect panel", () => {
       connected: false,
       connecting: false,
       disconnect,
+      signMessage: vi.fn(),
       installationUrl: () => "https://www.xverse.app/",
       isInstalled: () => true,
       network: "signet",

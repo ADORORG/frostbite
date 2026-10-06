@@ -1,6 +1,7 @@
 import { defineFeature } from "@ador/plugin-kit";
 import type { WalletConnectionConfig } from "./config.ts";
 import { validateWalletConnectionConfig } from "./config.ts";
+import { qualificationRoutes } from "@ador/shared/wallet-qualification";
 
 export type { WalletConnectionConfig } from "./config.ts";
 
@@ -8,7 +9,7 @@ export function createWalletConnectionFeature(input: WalletConnectionConfig) {
   const config = validateWalletConnectionConfig(input);
   return defineFeature({
     manifest: {
-      capabilities: ["navigation", "public-page"],
+      capabilities: ["api-routes", "navigation", "public-page"],
       dependencies: [],
       id: "wallet-connection",
       navigation: [
@@ -16,8 +17,8 @@ export function createWalletConnectionFeature(input: WalletConnectionConfig) {
       ],
       pages: [{ access: { kind: "public" }, path: "/connect" }],
       requiredDecisionGates: [],
-      requiredProviderCapabilities: ["wallet:connect"],
-      routes: [],
+      requiredProviderCapabilities: ["wallet:connect", "wallet:message-sign"],
+      routes: Object.values(qualificationRoutes),
       version: "1.0.0",
     },
     load: async () =>
