@@ -31,6 +31,7 @@ const client = createR2Client(
   {
     ...credentials,
     endpoint,
+    environment: "test",
     privateBucket: bucket,
     publicBucket: "ador-conformance-public",
     region: "us-east-1",

@@ -51,10 +51,12 @@ async function existingPublishedVersion(
   }
 }
 
-function parsePresignedUrl(value: string): URL {
+// A signed URL must use https, or be served from the configured endpoint itself, which the
+// configuration has already restricted to https or loopback-only plain http.
+function parsePresignedUrl(value: string, endpoint: string): URL {
   try {
     const url = new URL(value);
-    if (url.protocol !== "https:")
+    if (url.protocol !== "https:" && url.origin !== new URL(endpoint).origin)
       throw new Error("Presigned URL must use HTTPS.");
     return url;
   } catch (error) {
@@ -133,7 +135,7 @@ export function createR2ObjectStorage(
           "content-type": values.contentType,
         }),
         method: "PUT",
-        url: parsePresignedUrl(url),
+        url: parsePresignedUrl(url, config.endpoint),
       };
     },
     read: async ({ key, scope }) =>

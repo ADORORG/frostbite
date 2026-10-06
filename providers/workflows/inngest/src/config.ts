@@ -1,17 +1,14 @@
 import { environmentSchema } from "@repo/config/env";
+import {
+  isHostedEnvironment,
+  isSecureOrLoopbackUrl,
+} from "@repo/config/transport";
 import { z } from "zod";
 
 // The adapter exclusively owns these keys (ADR-003): server-only, never in a client bundle.
 const booleanText = z
   .enum(["true", "false"])
   .transform((value) => value === "true");
-
-const loopbackHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
-
-function isSecureOrLoopback(value: string): boolean {
-  const url = new URL(value);
-  return url.protocol === "https:" || loopbackHosts.has(url.hostname);
-}
 
 export const inngestConfigSchema = z
   .object({
@@ -28,7 +25,7 @@ export const inngestConfigSchema = z
       dev ||
       baseUrl === undefined ||
       !URL.canParse(baseUrl) ||
-      isSecureOrLoopback(baseUrl),
+      isSecureOrLoopbackUrl(baseUrl),
     {
       message:
         "A non-development Inngest base URL must use https unless it is a loopback address.",
@@ -37,9 +34,6 @@ export const inngestConfigSchema = z
   );
 
 export type InngestConfig = z.infer<typeof inngestConfigSchema>;
-
-// Development mode skips request-signature verification, so it must never serve a hosted environment.
-const hostedEnvironments: readonly string[] = ["preview", "production"];
 
 function optional(value: string | undefined): string | undefined {
   return value === undefined || value.trim() === "" ? undefined : value.trim();
@@ -56,7 +50,8 @@ export function parseInngestEnvironment(
     signingKey: source.INNGEST_SIGNING_KEY,
   });
   const environment = environmentSchema.shape.APP_ENV.parse(source.APP_ENV);
-  if (config.dev && hostedEnvironments.includes(environment))
+  // Development mode skips request-signature verification, so it must never serve a hosted environment.
+  if (config.dev && isHostedEnvironment(environment))
     throw new Error(
       `INNGEST_DEV must be false when APP_ENV is ${environment}: development mode does not verify request signatures.`,
     );

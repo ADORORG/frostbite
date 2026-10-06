@@ -66,6 +66,9 @@ export function createR2Client(
         secretAccessKey: config.secretAccessKey,
       },
       endpoint: config.endpoint,
+      // A local S3 stand-in on a loopback address has no per-bucket DNS name, so it needs path-style
+      // addressing; Cloudflare's own hostname keeps the SDK's default virtual-hosted style.
+      forcePathStyle: new URL(config.endpoint).protocol === "http:",
       region: config.region,
       requestChecksumCalculation: "WHEN_REQUIRED",
       responseChecksumValidation: "WHEN_REQUIRED",

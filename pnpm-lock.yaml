@@ -1044,7 +1044,13 @@ importers:
       '@ador/jobs':
         specifier: workspace:*
         version: link:../jobs
+      '@aws-sdk/client-s3':
+        specifier: 3.1131.0
+        version: 3.1131.0
     devDependencies:
+      '@aws-sdk/s3-request-presigner':
+        specifier: 3.1131.0
+        version: 3.1131.0
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -1283,6 +1289,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: 3.1131.0
         version: 3.1131.0
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../../packages/config
       '@smithy/protocol-http':
         specifier: 5.3.1
         version: 5.3.1
@@ -1290,6 +1299,9 @@ importers:
         specifier: 4.5.4
         version: 4.5.4
     devDependencies:
+      '@ador/test-kit':
+        specifier: workspace:*
+        version: link:../../../packages/test-kit
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../../packages/eslint-config

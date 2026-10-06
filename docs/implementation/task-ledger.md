@@ -72,18 +72,18 @@ stored in `references/task-list.md`.
 
 ## Week 3 — Upload pipeline
 
-| ID     | Task                                                                              | Status    | Evidence or blocker                                                                                              |
-| ------ | --------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| W3-01  | Implement the provider-neutral object-storage port and R2 adapter                 | completed | `references/object-storage-task-record.md`                                                                       |
-| W3-01A | Expose typed provider runtime resolution without vendor imports in features       | completed | `references/provider-runtime-task-record.md`                                                                     |
-| W3-02  | Persist and authorize short-lived direct-upload intents before signing            | completed | `references/upload-intents-task-record.md`                                                                       |
-| W3-03  | Add asset persistence and idempotent processing jobs for completed uploads        | completed | `references/asset-processing-task-record.md`                                                                     |
-| W3-04  | Validate file signatures, MIME, size, decoded dimensions, and checksums           | completed | `references/media-validation-task-record.md`; structural validation; triggered by W3-05A                         |
-| W3-05  | Generate thumbnails and previews for PNG, JPEG, and WebP                          | completed | `references/thumbnail-derivatives-task-record.md`; provider-standard decoder; triggered by W3-05A                |
-| W3-05A | Implement the signed Inngest adapter and trigger upload validation and processing | completed | `references/workflow-adapter-task-record.md`; completed; all root gates green; review Converged (3 clean passes) |
-| W3-06  | Build upload progress, retry, validation-error, and asset-library UI              | pending   | Depends on W3-02 through W3-05A; no upload UI exists yet                                                         |
-| W3-07  | Enforce private draft access and abandoned-upload cleanup                         | pending   | Depends on W3-03 and authorization                                                                               |
-| W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests   | pending   | Depends on W3-01 through W3-07                                                                                   |
+| ID     | Task                                                                              | Status      | Evidence or blocker                                                                                              |
+| ------ | --------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| W3-01  | Implement the provider-neutral object-storage port and R2 adapter                 | completed   | `references/object-storage-task-record.md`                                                                       |
+| W3-01A | Expose typed provider runtime resolution without vendor imports in features       | completed   | `references/provider-runtime-task-record.md`                                                                     |
+| W3-02  | Persist and authorize short-lived direct-upload intents before signing            | completed   | `references/upload-intents-task-record.md`                                                                       |
+| W3-03  | Add asset persistence and idempotent processing jobs for completed uploads        | completed   | `references/asset-processing-task-record.md`                                                                     |
+| W3-04  | Validate file signatures, MIME, size, decoded dimensions, and checksums           | completed   | `references/media-validation-task-record.md`; structural validation; triggered by W3-05A                         |
+| W3-05  | Generate thumbnails and previews for PNG, JPEG, and WebP                          | completed   | `references/thumbnail-derivatives-task-record.md`; provider-standard decoder; triggered by W3-05A                |
+| W3-05A | Implement the signed Inngest adapter and trigger upload validation and processing | completed   | `references/workflow-adapter-task-record.md`; completed; all root gates green; review Converged (3 clean passes) |
+| W3-06  | Build upload progress, retry, validation-error, and asset-library UI              | in_progress | Local S3 stand-in and loopback transport policy done; read API, UI, e2e pending                                  |
+| W3-07  | Enforce private draft access and abandoned-upload cleanup                         | pending     | Depends on W3-03 and authorization                                                                               |
+| W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests   | pending     | Depends on W3-01 through W3-07                                                                                   |
 
 ## Week 4 — Collection and creator workflow
 

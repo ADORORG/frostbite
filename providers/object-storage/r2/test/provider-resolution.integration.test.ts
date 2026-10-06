@@ -8,6 +8,7 @@ import { ZodError } from "zod";
 import { createR2ObjectStorageProviderEntrypoint } from "../src/provider-entrypoint.ts";
 
 const environment = {
+  APP_ENV: "test",
   R2_ACCESS_KEY_ID: "access-key",
   R2_ENDPOINT: "https://account.r2.cloudflarestorage.com",
   R2_PRIVATE_BUCKET: "private-assets",

@@ -9,6 +9,7 @@ import { FakeR2Client } from "./support/fake-r2-client.ts";
 const config = {
   accessKeyId: "access-key",
   endpoint: "https://account.r2.cloudflarestorage.com",
+  environment: "test" as const,
   privateBucket: "private-assets",
   publicBucket: "public-assets",
   region: "auto",
@@ -100,6 +101,33 @@ describe("R2 object-storage adapter", () => {
       }),
     ).rejects.toThrow();
     expect(client.calls).toEqual([]);
+  });
+
+  it("accepts a plain-http signed URL only from the configured loopback endpoint", async () => {
+    const local = { ...config, endpoint: "http://127.0.0.1:9000" };
+    const storage = createR2ObjectStorage(local, client);
+    const request = {
+      contentLength: 5,
+      contentType: "image/png",
+      expiresInSeconds: 60,
+      key,
+    };
+    client.signedUrl = "http://127.0.0.1:9000/private-assets/a.png?sig=1";
+    expect((await storage.presignPrivateUpload(request)).url.origin).toBe(
+      "http://127.0.0.1:9000",
+    );
+    for (const url of [
+      "http://127.0.0.1:9001/private-assets/a.png",
+      "http://localhost:9000/private-assets/a.png",
+      "http://insecure.example.invalid/upload",
+    ]) {
+      client.signedUrl = url;
+      await expect(storage.presignPrivateUpload(request)).rejects.toMatchObject(
+        {
+          code: "invalid-provider-response",
+        },
+      );
+    }
   });
 
   it("rejects an invalid provider URL and runtime attempts to replace public content", async () => {

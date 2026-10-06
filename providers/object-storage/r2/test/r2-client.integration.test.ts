@@ -9,6 +9,7 @@ import { createR2Client } from "../src/r2-client.ts";
 const config = {
   accessKeyId: "access-key",
   endpoint: "https://storage.example.invalid",
+  environment: "test" as const,
   privateBucket: "private-assets",
   publicBucket: "public-assets",
   region: "auto",

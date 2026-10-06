@@ -87,7 +87,8 @@ export const uploadIntentResponseSchema = z
         expiresAt: z.iso.datetime({ offset: true }),
         headers: z.record(z.string(), z.string()),
         method: z.literal("PUT"),
-        url: z.url({ protocol: /^https$/ }),
+        // The server only issues https URLs, or plain http to a loopback storage stand-in (local development).
+        url: z.url({ protocol: /^https?$/ }),
       })
       .strict(),
   })

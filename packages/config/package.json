@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./env": "./src/env/runtime.ts",
-    "./authorization": "./src/policy/authorization.ts"
+    "./authorization": "./src/policy/authorization.ts",
+    "./transport": "./src/transport/loopback-transport.ts"
   },
   "scripts": {
     "env:check": "node --experimental-strip-types src/env/check-files.ts",
