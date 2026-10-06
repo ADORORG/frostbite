@@ -32,6 +32,10 @@ adapters as domain tables are accepted; it never exports database rows as HTTP c
   tokens and separately models idle expiry, absolute expiry, and revocation.
 - One upload intent can create at most one asset. Provider identity, private key, measured metadata,
   and pending-validation state are persisted without storing temporary upload URLs.
+- An asset's byte-validation outcome (W3-04) is a terminal `validated` or `rejected` state. The
+  `assets_validation_coherent` CHECK ties each state to exactly its required fields (hash, detected
+  type, dimensions, validator version, and entity tag for `validated`; a reason code only for
+  `rejected`). Every required field is tested `IS NOT NULL` because a CHECK accepts UNKNOWN.
 - The W3-03 expand migration backfills pre-existing intents to `r2-object-storage`, the only adapter
   that could issue them, then removes that temporary default so all new writes remain explicit.
 

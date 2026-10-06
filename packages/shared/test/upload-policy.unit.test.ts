@@ -12,6 +12,8 @@ describe("upload policy", () => {
       activeIntentLimitPerUser: 2,
       cleanupDelayMs: 86_400_000,
       intentRetentionMs: 2_592_000_000,
+      maxImageDimension: 8_192,
+      maxImagePixels: 40_000_000,
       maxBytesByPurpose: {
         "collection-artwork": 25_000_000,
         "collection-banner": 15_000_000,
@@ -40,5 +42,15 @@ describe("upload policy", () => {
         cleanupDelayMs: defaultUploadPolicy.presignedUrlLifetimeMs,
       }),
     ).toThrow("Cleanup delay");
+  });
+
+  it("bounds image limits to what the database can persist", () => {
+    expect(
+      resolveUploadPolicy({ maxImageDimension: 2 ** 31 - 1 }).maxImageDimension,
+    ).toBe(2 ** 31 - 1);
+    for (const maxImageDimension of [0, -1, 1.5, 2 ** 31])
+      expect(() => resolveUploadPolicy({ maxImageDimension })).toThrow();
+    for (const maxImagePixels of [0, -1, 1.5])
+      expect(() => resolveUploadPolicy({ maxImagePixels })).toThrow();
   });
 });

@@ -23,8 +23,25 @@ export const completeUploadIntentInputSchema = z
   .object({ intentId: uuidV7TextSchema })
   .strict();
 
-export const assetProcessingStates = ["pending-validation"] as const;
+export const assetProcessingStates = [
+  "pending-validation",
+  "validated",
+  "rejected",
+] as const;
 export const assetProcessingStateSchema = z.enum(assetProcessingStates);
+// Stable, non-sensitive outcomes of byte validation; never raw decoder or parser messages.
+export const assetRejectionReasons = [
+  "unsupported-format",
+  "media-type-mismatch",
+  "size-exceeded",
+  "byte-length-mismatch",
+  "malformed",
+  "animation-unsupported",
+  "dimensions-exceeded",
+  "pixels-exceeded",
+] as const;
+export const assetRejectionReasonSchema = z.enum(assetRejectionReasons);
+export type AssetRejectionReason = z.infer<typeof assetRejectionReasonSchema>;
 export const assetProcessingRequestedEvent = {
   name: "uploads.assetprocessing.requested.v1",
   schemaVersion: 1,

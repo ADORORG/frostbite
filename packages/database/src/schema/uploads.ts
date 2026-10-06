@@ -2,6 +2,8 @@ import {
   uploadContentTypes,
   uploadPurposes,
   assetProcessingStates,
+  assetRejectionReasons,
+  type AssetRejectionReason,
   type UploadContentType,
 } from "@ador/shared/uploads";
 import { sql } from "drizzle-orm";
@@ -9,6 +11,7 @@ import {
   bigint,
   check,
   index,
+  integer,
   text,
   timestamp,
   uniqueIndex,
@@ -39,6 +42,11 @@ export const uploadContentType = platformSchema.enum(
 export const assetProcessingState = platformSchema.enum(
   "asset_processing_state",
   assetProcessingStates,
+);
+
+export const assetRejectionReason = platformSchema.enum(
+  "asset_rejection_reason",
+  assetRejectionReasons,
 );
 
 export const uploadIntents = platformSchema.table(
@@ -131,6 +139,21 @@ export const assets = platformSchema.table(
     processingState: assetProcessingState("processing_state")
       .notNull()
       .default("pending-validation"),
+    // Validation outcome (W3-04): all null while pending; see assets_validation_coherent.
+    validationCompletedAt: timestamp("validation_completed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    validatorVersion: text("validator_version"),
+    validatedEntityTag: text("validated_entity_tag"),
+    contentSha256: text("content_sha256"),
+    detectedContentType: uploadContentType(
+      "detected_content_type",
+    ).$type<UploadContentType>(),
+    widthPixels: integer("width_pixels"),
+    heightPixels: integer("height_pixels"),
+    rejectionReason:
+      assetRejectionReason("rejection_reason").$type<AssetRejectionReason>(),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -148,6 +171,49 @@ export const assets = platformSchema.table(
     check(
       "assets_storage_provider_nonempty",
       sql`length(btrim(${table.storageProviderId})) > 0`,
+    ),
+    check(
+      "assets_validation_coherent",
+      // Every required field is tested IS NOT NULL: a NULL comparison is UNKNOWN, which CHECK
+      // accepts. Compared as text so the migration never uses an enum value added in the same
+      // transaction.
+      sql`(
+        ${table.processingState}::text = 'pending-validation'
+        AND ${table.validationCompletedAt} IS NULL
+        AND ${table.validatorVersion} IS NULL
+        AND ${table.validatedEntityTag} IS NULL
+        AND ${table.contentSha256} IS NULL
+        AND ${table.detectedContentType} IS NULL
+        AND ${table.widthPixels} IS NULL
+        AND ${table.heightPixels} IS NULL
+        AND ${table.rejectionReason} IS NULL
+      ) OR (
+        ${table.processingState}::text = 'validated'
+        AND ${table.validationCompletedAt} IS NOT NULL
+        AND ${table.validatorVersion} IS NOT NULL
+        AND length(btrim(${table.validatorVersion})) > 0
+        AND ${table.validatedEntityTag} IS NOT NULL
+        AND length(btrim(${table.validatedEntityTag})) > 0
+        AND ${table.contentSha256} IS NOT NULL
+        AND ${table.contentSha256} ~ '^[0-9a-f]{64}$'
+        AND ${table.detectedContentType} IS NOT NULL
+        AND ${table.widthPixels} IS NOT NULL
+        AND ${table.widthPixels} > 0
+        AND ${table.heightPixels} IS NOT NULL
+        AND ${table.heightPixels} > 0
+        AND ${table.rejectionReason} IS NULL
+      ) OR (
+        ${table.processingState}::text = 'rejected'
+        AND ${table.validationCompletedAt} IS NOT NULL
+        AND ${table.validatorVersion} IS NOT NULL
+        AND length(btrim(${table.validatorVersion})) > 0
+        AND ${table.rejectionReason} IS NOT NULL
+        AND ${table.validatedEntityTag} IS NULL
+        AND ${table.contentSha256} IS NULL
+        AND ${table.detectedContentType} IS NULL
+        AND ${table.widthPixels} IS NULL
+        AND ${table.heightPixels} IS NULL
+      )`,
     ),
     check("assets_object_key_nonempty", sql`length(${table.objectKey}) > 0`),
     check(

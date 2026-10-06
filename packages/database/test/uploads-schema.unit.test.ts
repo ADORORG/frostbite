@@ -64,14 +64,15 @@ describe("asset schema", () => {
         "assets_object_key_nonempty",
         "assets_content_type_nonempty",
         "assets_entity_tag_nonempty",
+        "assets_validation_coherent",
       ]),
     );
   });
 
   it("infers asset state and measured bytes from Drizzle", () => {
-    expectTypeOf<
-      Asset["processingState"]
-    >().toEqualTypeOf<"pending-validation">();
+    expectTypeOf<Asset["processingState"]>().toEqualTypeOf<
+      "pending-validation" | "validated" | "rejected"
+    >();
     expectTypeOf<Asset["observedByteLength"]>().toEqualTypeOf<number>();
   });
 });

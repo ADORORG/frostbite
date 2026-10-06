@@ -8,6 +8,7 @@ import {
   createUploadIntentInputSchema,
   completeUploadIntentInputSchema,
   assetProcessingRequestedEvent,
+  type AssetProcessingState,
   type CompleteUploadIntentInput,
   resolveUploadPolicy,
   type CreateUploadIntentInput,
@@ -38,7 +39,7 @@ export type CompleteIntentResult =
   | {
       readonly asset: {
         readonly id: UuidV7;
-        readonly processingState: "pending-validation";
+        readonly processingState: AssetProcessingState;
       };
       readonly kind: "completed" | "replayed";
     }

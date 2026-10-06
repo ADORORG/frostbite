@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assetProcessingStates,
   assetProcessingRequestedEvent,
   assetProcessingRequestedPayloadSchema,
   completeUploadIntentInputSchema,
@@ -47,14 +48,18 @@ describe("upload completion contracts", () => {
     ).toThrow();
   });
 
-  it("exposes only the pending-validation asset state", () => {
-    expect(
-      completedUploadResponseSchema.parse({
-        asset: { id: intentId, processingState: "pending-validation" },
-      }),
-    ).toEqual({
-      asset: { id: intentId, processingState: "pending-validation" },
-    });
+  it("exposes only validation states, never publication states", () => {
+    expect(assetProcessingStates).toEqual([
+      "pending-validation",
+      "validated",
+      "rejected",
+    ]);
+    for (const processingState of assetProcessingStates)
+      expect(
+        completedUploadResponseSchema.parse({
+          asset: { id: intentId, processingState },
+        }),
+      ).toEqual({ asset: { id: intentId, processingState } });
     expect(() =>
       completedUploadResponseSchema.parse({
         asset: { id: intentId, processingState: "published" },
