@@ -53,6 +53,7 @@ export function fakeStorage(
     copyPrivateToPublicIfAbsent: unused,
     delete: unused,
     head: unused,
+    presignPrivateRead: unused,
     presignPrivateUpload: unused,
     providerId: id,
     read: async (): Promise<StoredObject> => {

@@ -28,6 +28,7 @@ export function memoryStorage() {
             lastModified: new Date(),
           };
     },
+    presignPrivateRead: unused,
     presignPrivateUpload: unused,
     providerId: storageProviderId,
     read: async ({ key }) => {

@@ -10,6 +10,8 @@ export const objectTransferSchema = z.object({
   contentType,
 });
 
-export const presignSchema = objectTransferSchema.extend({
-  expiresInSeconds: z.number().int().min(1).max(604_800),
-});
+// Seven days is the longest lifetime SigV4 presigned URLs allow.
+const expiresInSeconds = z.number().int().min(1).max(604_800);
+
+export const presignSchema = objectTransferSchema.extend({ expiresInSeconds });
+export const readPresignSchema = z.object({ expiresInSeconds });

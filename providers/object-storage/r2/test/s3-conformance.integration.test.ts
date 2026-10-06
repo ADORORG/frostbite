@@ -1,4 +1,5 @@
 import { Readable } from "node:stream";
+import { setTimeout as delay } from "node:timers/promises";
 
 import { CreateBucketCommand, S3Client } from "@aws-sdk/client-s3";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -91,5 +92,42 @@ describe("local S3-compatible service conformance", () => {
     );
     expect(signed.pathname).toBe(`/${bucket}/${key}`);
     expect(signed.searchParams.get("X-Amz-Expires")).toBe("60");
+  });
+
+  it("uploads through a presigned PUT and reads through a presigned GET, and refuses misuse", async () => {
+    const objectKey = "presigned/round-trip.txt";
+    const put = await client.presignPut({
+      bucket,
+      contentLength: 5,
+      contentType: "text/plain",
+      expiresInSeconds: 60,
+      key: objectKey,
+    });
+    const upload = await fetch(put, {
+      body: "asset",
+      headers: { "content-type": "text/plain" },
+      method: "PUT",
+    });
+    expect(upload.status).toBe(200);
+    const get = (key: string, expiresInSeconds = 60) =>
+      client.presignGet({ bucket, expiresInSeconds, key });
+
+    const read = await fetch(await get(objectKey));
+    expect([read.status, await read.text()]).toEqual([200, "asset"]);
+
+    const other = new URL(await get(objectKey));
+    other.pathname = `/${bucket}/presigned/other.txt`;
+    expect((await fetch(other)).status).toBe(403);
+
+    const upload2 = await fetch(put, {
+      body: "tampered-length",
+      headers: { "content-type": "text/plain" },
+      method: "PUT",
+    });
+    expect(upload2.status).not.toBe(200);
+
+    const shortLived = await get(objectKey, 1);
+    await delay(2_100);
+    expect((await fetch(shortLived)).status).toBe(403);
   });
 });

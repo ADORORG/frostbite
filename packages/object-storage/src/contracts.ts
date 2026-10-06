@@ -49,6 +49,11 @@ export interface PresignedUpload {
   readonly url: URL;
 }
 
+export interface PresignedRead {
+  readonly expiresAt: Date;
+  readonly url: URL;
+}
+
 export interface ObjectStoragePort {
   readonly providerId: ProviderId;
   copyPrivateToPublicIfAbsent(input: {
@@ -69,6 +74,12 @@ export interface ObjectStoragePort {
     readonly expiresInSeconds: number;
     readonly key: ObjectKey;
   }): Promise<PresignedUpload>;
+  // A short-lived bearer URL for one private object; whoever holds it can read the object until it
+  // expires. Callers authorize the reader before asking (ADR-016).
+  presignPrivateRead(input: {
+    readonly expiresInSeconds: number;
+    readonly key: ObjectKey;
+  }): Promise<PresignedRead>;
   read(input: {
     readonly key: ObjectKey;
     readonly scope: StorageScope;

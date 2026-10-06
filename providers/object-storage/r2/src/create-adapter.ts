@@ -9,7 +9,11 @@ import { r2ConfigSchema, type R2Config } from "./config.ts";
 import { toStoredMetadata, toStoredObject } from "./metadata.ts";
 import { createR2Client, type R2ClientPort } from "./r2-client.ts";
 import { translateProviderError } from "./provider-errors.ts";
-import { objectTransferSchema, presignSchema } from "./validation.ts";
+import {
+  objectTransferSchema,
+  presignSchema,
+  readPresignSchema,
+} from "./validation.ts";
 import { r2ObjectStorageProviderId } from "./identity.ts";
 
 function bucketFor(config: R2Config, scope: StorageScope): string {
@@ -117,6 +121,21 @@ export function createR2ObjectStorage(
           return null;
         throw error;
       }
+    },
+    presignPrivateRead: async (input) => {
+      const { expiresInSeconds } = readPresignSchema.parse(input);
+      const issuedAt = Date.now();
+      const url = await providerRequest(() =>
+        client.presignGet({
+          bucket: config.privateBucket,
+          expiresInSeconds,
+          key: input.key,
+        }),
+      );
+      return {
+        expiresAt: new Date(issuedAt + expiresInSeconds * 1_000),
+        url: parsePresignedUrl(url, config.endpoint),
+      };
     },
     presignPrivateUpload: async (input) => {
       const values = presignSchema.parse(input);

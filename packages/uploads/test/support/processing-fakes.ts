@@ -70,6 +70,7 @@ export function processingStorage(script: StorageScript) {
     copyPrivateToPublicIfAbsent: unused,
     delete: unused,
     head: async () => script.head ?? null,
+    presignPrivateRead: unused,
     presignPrivateUpload: unused,
     providerId,
     read: async ({ key }) => {

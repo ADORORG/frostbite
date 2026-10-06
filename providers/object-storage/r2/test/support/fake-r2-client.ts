@@ -90,6 +90,18 @@ export class FakeR2Client implements R2ClientPort {
     };
   }
 
+  async presignGet(input: {
+    readonly bucket: string;
+    readonly expiresInSeconds: number;
+    readonly key: string;
+  }): Promise<string> {
+    this.consumeFailure();
+    this.calls.push(
+      `presign-get:${input.bucket}:${input.key}:${input.expiresInSeconds}`,
+    );
+    return this.signedUrl;
+  }
+
   async presignPut(input: {
     readonly bucket: string;
     readonly contentLength: number;

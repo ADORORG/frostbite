@@ -40,6 +40,11 @@ export interface R2ClientPort {
     readonly expiresInSeconds: number;
     readonly key: string;
   }): Promise<string>;
+  presignGet(input: {
+    readonly bucket: string;
+    readonly expiresInSeconds: number;
+    readonly key: string;
+  }): Promise<string>;
   put(input: {
     readonly body: Readable;
     readonly bucket: string;
@@ -106,6 +111,10 @@ export function createR2Client(
       client.send(new GetObjectCommand({ Bucket: bucket, Key: key })),
     head: async ({ bucket, key }) =>
       client.send(new HeadObjectCommand({ Bucket: bucket, Key: key })),
+    presignGet: async ({ bucket, expiresInSeconds, key }) =>
+      getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), {
+        expiresIn: expiresInSeconds,
+      }),
     presignPut: async ({
       bucket,
       contentLength,

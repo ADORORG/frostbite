@@ -1,0 +1,37 @@
+import type { ObjectKey } from "@ador/object-storage/contracts";
+import type { UuidV7 } from "@ador/shared/identifiers";
+import type {
+  AssetProcessingState,
+  AssetRejectionReason,
+  DerivativeKind,
+  UploadContentType,
+  UploadPurpose,
+} from "@ador/shared/uploads";
+
+export interface LibraryDerivativeRecord {
+  readonly contentType: UploadContentType;
+  readonly heightPixels: number;
+  readonly kind: DerivativeKind;
+  readonly objectKey: ObjectKey;
+  readonly widthPixels: number;
+}
+
+export interface LibraryAssetRecord {
+  readonly createdAt: Date;
+  // At most one per kind: the newest rendition.
+  readonly derivatives: readonly LibraryDerivativeRecord[];
+  readonly heightPixels: number | null;
+  readonly id: UuidV7;
+  readonly processingState: AssetProcessingState;
+  readonly purpose: UploadPurpose;
+  readonly rejectionReason: AssetRejectionReason | null;
+  readonly widthPixels: number | null;
+}
+
+export interface AssetLibraryRepository {
+  // The caller's own assets, newest first. Never returns another user's asset.
+  listNewestForUser(input: {
+    readonly limit: number;
+    readonly userId: UuidV7;
+  }): Promise<readonly LibraryAssetRecord[]>;
+}

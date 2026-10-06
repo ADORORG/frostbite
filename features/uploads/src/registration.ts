@@ -1,6 +1,6 @@
 import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import { uploadIntentRoutes } from "@ador/shared/uploads";
+import { libraryRoute, uploadIntentRoutes } from "@ador/shared/uploads";
 
 export function createUploadsFeature(providers: ProviderRegistry) {
   return defineFeature({
@@ -12,7 +12,11 @@ export function createUploadsFeature(providers: ProviderRegistry) {
       pages: [],
       requiredDecisionGates: [],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
-      routes: [uploadIntentRoutes.complete, uploadIntentRoutes.create],
+      routes: [
+        libraryRoute,
+        uploadIntentRoutes.complete,
+        uploadIntentRoutes.create,
+      ],
       version: "1.0.0",
     },
     load: async () =>

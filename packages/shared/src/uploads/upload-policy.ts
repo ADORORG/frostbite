@@ -42,12 +42,21 @@ const policySchema = z
       z.number().int().positive(),
     ),
     presignedUrlLifetimeMs: z.number().int().min(minuteMs).max(hourMs),
+    // How long a signed derivative URL stays valid (ADR-016). A bearer URL, so kept short.
+    derivativeReadLifetimeMs: z.number().int().min(minuteMs).max(hourMs),
+    // Newest assets returned by the library; there is no pagination yet.
+    libraryPageSize: z.number().int().min(1).max(100),
   })
   .strict()
   .refine(
     ({ cleanupDelayMs, presignedUrlLifetimeMs }) =>
       cleanupDelayMs > presignedUrlLifetimeMs,
     "Cleanup delay must exceed the presigned URL lifetime.",
+  )
+  .refine(
+    ({ derivativeReadLifetimeMs, presignedUrlLifetimeMs }) =>
+      derivativeReadLifetimeMs <= presignedUrlLifetimeMs,
+    "Derivative read lifetime cannot exceed the presigned URL lifetime.",
   );
 
 export type UploadPolicy = z.infer<typeof policySchema>;
@@ -72,6 +81,8 @@ export const defaultUploadPolicy: UploadPolicy = Object.freeze({
     "creator-avatar": 5 * megabyte,
   }),
   presignedUrlLifetimeMs: 15 * minuteMs,
+  derivativeReadLifetimeMs: 5 * minuteMs,
+  libraryPageSize: 48,
 });
 
 export function resolveUploadPolicy(

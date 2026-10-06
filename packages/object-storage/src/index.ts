@@ -1,6 +1,7 @@
 export type {
   ObjectKey,
   ObjectStoragePort,
+  PresignedRead,
   PresignedUpload,
   StorageScope,
   StoredObject,

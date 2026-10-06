@@ -1,15 +1,9 @@
 import type { DatabaseClient } from "@ador/database/connection";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import {
-  createProviderRegistry,
-  defineProvider,
-} from "@ador/plugin-kit/providers";
 import type {
   ReserveUploadIntentResult,
   UploadIntentRepository,
   createUploadIntentService as CreateUploadIntentService,
 } from "@ador/uploads";
-import { providerIdSchema } from "@ador/shared/providers";
 import { describe, expect, it, vi } from "vitest";
 
 type ServiceDependencies = Parameters<typeof CreateUploadIntentService>[0];
@@ -43,46 +37,9 @@ vi.mock("@ador/uploads", () => ({
   createUploadIntentService: runtimeMocks.createService,
 }));
 
+import { createUploadsContextResolver } from "../src/context.ts";
+import { storageRegistry, unusedStorage } from "./support/storage-registry.ts";
 import { createUploadServiceResolver } from "../src/runtime.ts";
-
-const unusedStorage: ObjectStoragePort = {
-  copyPrivateToPublicIfAbsent: vi.fn(async () => {
-    throw new Error("unused");
-  }),
-  delete: vi.fn(async () => undefined),
-  head: vi.fn(async () => null),
-  presignPrivateUpload: vi.fn(async () => {
-    throw new Error("unused");
-  }),
-  providerId: providerIdSchema.parse("test-object-storage"),
-  read: vi.fn(async () => {
-    throw new Error("unused");
-  }),
-  write: vi.fn(async () => {
-    throw new Error("unused");
-  }),
-};
-
-function providers() {
-  return createProviderRegistry([
-    defineProvider({
-      load: async () => ({
-        capabilities: ["object-storage:s3-compatible"],
-        createServices: () => ({
-          "object-storage:s3-compatible": unusedStorage,
-        }),
-        id: "test-object-storage",
-        version: "1.0.0",
-      }),
-      manifest: {
-        capabilities: ["object-storage:s3-compatible"],
-        id: "test-object-storage",
-        requiredDecisionGates: [],
-        version: "1.0.0",
-      },
-    }),
-  ]);
-}
 
 describe("upload runtime", () => {
   it("constructs and caches one provider-neutral service", async () => {
@@ -92,7 +49,9 @@ describe("upload runtime", () => {
     process.env.DATABASE_ACQUIRE_TIMEOUT_MS = "1000";
     process.env.DATABASE_IDLE_TIMEOUT_MS = "1000";
     process.env.DATABASE_STATEMENT_TIMEOUT_MS = "1000";
-    const resolve = createUploadServiceResolver(providers());
+    const resolve = createUploadServiceResolver(
+      createUploadsContextResolver(storageRegistry()),
+    );
     const first = resolve();
     expect(resolve()).toBe(first);
     await expect(first).resolves.toBeDefined();
@@ -100,5 +59,15 @@ describe("upload runtime", () => {
     expect(runtimeMocks.createService).toHaveBeenCalledWith(
       expect.objectContaining({ storage: unusedStorage }),
     );
+  });
+
+  it("does not cache a failed context resolution", async () => {
+    const resolveContext = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("storage configuration is missing"))
+      .mockResolvedValue({ database: {}, storage: unusedStorage });
+    const resolve = createUploadServiceResolver(resolveContext);
+    await expect(resolve()).rejects.toThrow("storage configuration");
+    await expect(resolve()).resolves.toBeDefined();
   });
 });

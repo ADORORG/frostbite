@@ -21,6 +21,8 @@ describe("upload policy", () => {
         "creator-avatar": 5_000_000,
       },
       presignedUrlLifetimeMs: 900_000,
+      derivativeReadLifetimeMs: 300_000,
+      libraryPageSize: 48,
     });
     expect(resolveUploadPolicy({ activeIntentLimitPerUser: 1 })).toMatchObject({
       activeIntentLimitPerUser: 1,
@@ -42,6 +44,22 @@ describe("upload policy", () => {
         cleanupDelayMs: defaultUploadPolicy.presignedUrlLifetimeMs,
       }),
     ).toThrow("Cleanup delay");
+  });
+
+  it("keeps signed derivative reads short-lived and the library page bounded", () => {
+    expect(
+      resolveUploadPolicy({
+        derivativeReadLifetimeMs: defaultUploadPolicy.presignedUrlLifetimeMs,
+      }).derivativeReadLifetimeMs,
+    ).toBe(900_000);
+    for (const derivativeReadLifetimeMs of [59_999, 900_001, 3_600_001, 1.5, 0])
+      expect(() => resolveUploadPolicy({ derivativeReadLifetimeMs })).toThrow();
+    expect(resolveUploadPolicy({ libraryPageSize: 1 }).libraryPageSize).toBe(1);
+    expect(resolveUploadPolicy({ libraryPageSize: 100 }).libraryPageSize).toBe(
+      100,
+    );
+    for (const libraryPageSize of [0, 101, 1.5, -1])
+      expect(() => resolveUploadPolicy({ libraryPageSize })).toThrow();
   });
 
   it("bounds image limits to what the database can persist", () => {

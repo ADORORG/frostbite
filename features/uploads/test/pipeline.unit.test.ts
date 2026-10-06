@@ -16,6 +16,7 @@ const storage: ObjectStoragePort = {
   copyPrivateToPublicIfAbsent: unused,
   delete: unused,
   head: unused,
+  presignPrivateRead: unused,
   presignPrivateUpload: unused,
   providerId: providerIdSchema.parse("test-object-storage"),
   read: unused,

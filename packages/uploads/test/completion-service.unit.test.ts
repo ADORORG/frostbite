@@ -43,6 +43,7 @@ function setup() {
   const storage: ObjectStoragePort = {
     copyPrivateToPublicIfAbsent: vi.fn(),
     delete: vi.fn(),
+    presignPrivateRead: vi.fn(),
     head: vi.fn(async () => ({
       contentLength: 100,
       contentType: "image/png",

@@ -81,7 +81,7 @@ stored in `references/task-list.md`.
 | W3-04  | Validate file signatures, MIME, size, decoded dimensions, and checksums           | completed   | `references/media-validation-task-record.md`; structural validation; triggered by W3-05A                         |
 | W3-05  | Generate thumbnails and previews for PNG, JPEG, and WebP                          | completed   | `references/thumbnail-derivatives-task-record.md`; provider-standard decoder; triggered by W3-05A                |
 | W3-05A | Implement the signed Inngest adapter and trigger upload validation and processing | completed   | `references/workflow-adapter-task-record.md`; completed; all root gates green; review Converged (3 clean passes) |
-| W3-06  | Build upload progress, retry, validation-error, and asset-library UI              | in_progress | Local S3 stand-in and loopback transport policy done; read API, UI, e2e pending                                  |
+| W3-06  | Build upload progress, retry, validation-error, and asset-library UI              | in_progress | Local S3 stand-in, loopback transport policy, signed reads (ADR-016), and library API done; UI and e2e pending   |
 | W3-07  | Enforce private draft access and abandoned-upload cleanup                         | pending     | Depends on W3-03 and authorization                                                                               |
 | W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests   | pending     | Depends on W3-01 through W3-07                                                                                   |
 

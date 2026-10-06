@@ -37,6 +37,7 @@ function dependencies() {
   const storage: ObjectStoragePort = {
     copyPrivateToPublicIfAbsent: vi.fn(),
     delete: vi.fn(),
+    presignPrivateRead: vi.fn(),
     head: vi.fn(),
     providerId: providerIdSchema.parse("test-object-storage"),
     presignPrivateUpload: vi.fn(async (): Promise<PresignedUpload> => {

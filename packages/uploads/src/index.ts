@@ -8,3 +8,6 @@ export * from "./adapters/drizzle-processing-repository.ts";
 export * from "./application/processing-repository.ts";
 export * from "./application/processing-service.ts";
 export * from "./application/pipeline-activities.ts";
+export * from "./adapters/drizzle-library-repository.ts";
+export * from "./application/library-repository.ts";
+export * from "./application/library-service.ts";
