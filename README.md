@@ -19,10 +19,12 @@ gated until their product decisions and end-to-end verification are complete.
 - `tests/e2e` — Playwright browser coverage.
 - `tooling/repository-policy` — executable workspace, boundary, file-size, and coverage gates.
 - `packages/jobs` — provider-neutral outbox relay policy and workflow publication port.
+- `apps/worker` — standalone service: signed workflow endpoint and outbox relay.
 
-The signed Inngest adapter is intentionally gated by
-[`references/workflow-adapter-gate.md`](references/workflow-adapter-gate.md); no workflow provider
-is registered or represented as available until that gate is satisfied.
+The signed Inngest adapter is registered under the exception in ADR-014 (see
+[`references/workflow-adapter-gate.md`](references/workflow-adapter-gate.md) and
+[`references/workflow-adapter-task-record.md`](references/workflow-adapter-task-record.md)). It runs in
+`apps/worker`, which hosts the signed workflow endpoint and the outbox relay; nothing is deployed.
 
 ## Requirements
 
