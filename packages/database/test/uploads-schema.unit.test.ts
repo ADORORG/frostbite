@@ -3,6 +3,7 @@ import { getTableConfig } from "drizzle-orm/pg-core";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
+  assetDerivatives,
   assets,
   authUsers,
   type Asset,
@@ -71,8 +72,33 @@ describe("asset schema", () => {
 
   it("infers asset state and measured bytes from Drizzle", () => {
     expectTypeOf<Asset["processingState"]>().toEqualTypeOf<
-      "pending-validation" | "validated" | "rejected"
+      | "pending-validation"
+      | "validated"
+      | "rejected"
+      | "processed"
+      | "unprocessable"
     >();
     expectTypeOf<Asset["observedByteLength"]>().toEqualTypeOf<number>();
+  });
+
+  it("keeps derivatives private, write-once per spec version, and owned by one asset", () => {
+    const config = getTableConfig(assetDerivatives);
+    expect(
+      config.foreignKeys.map((key) =>
+        getTableName(key.reference().foreignTable),
+      ),
+    ).toEqual([getTableName(assets)]);
+    expect(config.indexes.map(({ config: index }) => index.name)).toContain(
+      "asset_derivatives_asset_kind_spec_unique",
+    );
+    expect(config.checks.map(({ name }) => name)).toEqual(
+      expect.arrayContaining([
+        "asset_derivatives_bytes_positive",
+        "asset_derivatives_dimensions_positive",
+        "asset_derivatives_hash_sha256",
+        "asset_derivatives_spec_nonempty",
+        "asset_derivatives_provider_nonempty",
+      ]),
+    );
   });
 });

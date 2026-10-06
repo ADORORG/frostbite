@@ -31,6 +31,12 @@ framework code and performs no I/O.
   declared size, itself capped by upload policy (at most 25 MB today). That bound is per run;
   nothing here limits concurrent runs, so the trigger that invokes the activity must.
 
+## Processing port
+
+`@ador/media/processing` defines `ImageProcessor` and its typed `media-processing:image-derivatives`
+capability. It is the boundary between platform code and a decoder; the `sharp` implementation is the
+provider adapter `@ador/provider-media-processing-sharp` (ADR-013). This package stays decoder-free.
+
 ## Invariants
 
 Parsers are written to return a rejection rather than throw: every length is checked against the

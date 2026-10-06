@@ -1,11 +1,9 @@
-import type { Readable } from "node:stream";
-
 import { mediaValidatorVersion, validateImage } from "@ador/media";
 import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 import type { UploadPolicy } from "@ador/shared/uploads";
 
+import { readUpTo } from "./bounded-read.ts";
 import type {
   AssetValidationOutcome,
   AssetValidationRepository,
@@ -27,32 +25,6 @@ const rejected = (
   state: "rejected",
   validatorVersion: mediaValidatorVersion,
 });
-
-// Buffers at most `limit` bytes, so memory is bounded by the declared size. Returns null as soon
-// as the object proves larger; the stream is always destroyed.
-async function readUpTo(
-  body: Readable,
-  limit: number,
-): Promise<Uint8Array | null> {
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  try {
-    for await (const chunk of body) {
-      if (!(chunk instanceof Uint8Array)) {
-        throw new ObjectStorageError(
-          "invalid-provider-response",
-          "Object body produced a non-binary chunk.",
-        );
-      }
-      total += chunk.length;
-      if (total > limit) return null;
-      chunks.push(chunk);
-    }
-  } finally {
-    body.destroy();
-  }
-  return Buffer.concat(chunks);
-}
 
 export function createAssetValidationService(dependencies: {
   readonly clock: () => Date;

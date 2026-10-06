@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None — `W3-04` converged; `W3-05` is next and needs a decoder ADR   |
-| Next ordered task       | `W3-05` Thumbnails and previews for PNG, JPEG, and WebP             |
+| Active task             | None — `W3-05` converged; `W3-06` is next                           |
+| Next ordered task       | `W3-06` Upload progress, retry, validation-error, and asset library |
 | Current milestone phase | Week 3 — Upload pipeline                                            |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -79,7 +79,7 @@ stored in `references/task-list.md`.
 | W3-02  | Persist and authorize short-lived direct-upload intents before signing          | completed | `references/upload-intents-task-record.md`                                                                          |
 | W3-03  | Add asset persistence and idempotent processing jobs for completed uploads      | completed | `references/asset-processing-task-record.md`                                                                        |
 | W3-04  | Validate file signatures, MIME, size, decoded dimensions, and checksums         | completed | `references/media-validation-task-record.md`; structural validation only, not yet triggered (workflow adapter gate) |
-| W3-05  | Generate thumbnails and previews for PNG, JPEG, and WebP                        | pending   | Depends on W3-04                                                                                                    |
+| W3-05  | Generate thumbnails and previews for PNG, JPEG, and WebP                        | completed | `references/thumbnail-derivatives-task-record.md`; provider-standard decoder, not yet triggered                     |
 | W3-06  | Build upload progress, retry, validation-error, and asset-library UI            | pending   | Depends on W3-02 through W3-05                                                                                      |
 | W3-07  | Enforce private draft access and abandoned-upload cleanup                       | pending   | Depends on W3-03 and authorization                                                                                  |
 | W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests | pending   | Depends on W3-01 through W3-07                                                                                      |

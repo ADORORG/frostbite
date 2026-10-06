@@ -1,4 +1,7 @@
+import { createHash } from "node:crypto";
+
 import {
+  assetDerivatives,
   assets,
   authUsers,
   createDatabaseClient,
@@ -25,12 +28,18 @@ export const sha = "a".repeat(64);
 // Registers the suite lifecycle: real migrations, then an empty slate for every test.
 export function useValidationDatabase(): void {
   beforeAll(async () => runMigrations(environment));
-  beforeEach(async () => {
+  const clear = async () => {
+    await database.delete(assetDerivatives);
     await database.delete(assets);
     await database.delete(uploadIntents);
     await database.delete(authUsers);
+  };
+  beforeEach(clear);
+  // Leaves no child rows behind for suites that clear only `assets` and below.
+  afterAll(async () => {
+    await clear();
+    await pool.end();
   });
-  afterAll(async () => pool.end());
 }
 
 export async function seed(options: { readonly byteLength?: number } = {}) {
@@ -90,3 +99,24 @@ export const rejected: AssetValidationOutcome = {
 export function unknownAssetId() {
   return uuidV7Schema.parse(createUuidV7());
 }
+
+// A `validated` asset whose recorded hash and size match `png`, as the processing activity requires.
+export async function seedValidated() {
+  const seeded = await seed();
+  await repository.record({
+    assetId: seeded.assetId,
+    completedAt: now,
+    outcome: {
+      contentSha256: pngSha256,
+      contentType: "image/png",
+      entityTag: "etag-1",
+      height: 5,
+      state: "validated",
+      validatorVersion: "structural-v1",
+      width: 7,
+    },
+  });
+  return seeded;
+}
+
+export const pngSha256 = createHash("sha256").update(png).digest("hex");

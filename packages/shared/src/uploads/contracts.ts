@@ -27,6 +27,8 @@ export const assetProcessingStates = [
   "pending-validation",
   "validated",
   "rejected",
+  "processed",
+  "unprocessable",
 ] as const;
 export const assetProcessingStateSchema = z.enum(assetProcessingStates);
 // Stable, non-sensitive outcomes of byte validation; never raw decoder or parser messages.
@@ -39,7 +41,15 @@ export const assetRejectionReasons = [
   "animation-unsupported",
   "dimensions-exceeded",
   "pixels-exceeded",
+  // Decoding stage (W3-05): a structurally valid container that cannot be safely processed.
+  "decode-failed",
+  "decoded-size-mismatch",
+  "content-changed",
+  "processing-limit-exceeded",
 ] as const;
+export const derivativeKinds = ["thumbnail", "preview"] as const;
+export const derivativeKindSchema = z.enum(derivativeKinds);
+export type DerivativeKind = z.infer<typeof derivativeKindSchema>;
 export const assetRejectionReasonSchema = z.enum(assetRejectionReasons);
 export type AssetRejectionReason = z.infer<typeof assetRejectionReasonSchema>;
 export const assetProcessingRequestedEvent = {

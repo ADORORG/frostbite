@@ -45,5 +45,19 @@ an explicitly approved trigger exists. Each run buffers up to the declared size 
 the future trigger must also bound concurrent runs (W8-06). A missing object is a retryable error
 here; abandoned-upload cleanup belongs to W3-07.
 
+## Asset processing (W3-05)
+
+`createAssetProcessingService.process({ assetId })` takes a `validated` asset, reads its private
+object (bounded by the recorded size), requires the bytes to hash to the recorded SHA-256 (otherwise
+`unprocessable: content-changed`), and passes them to an injected `ImageProcessor`. The processor is a
+port; this package never imports a decoder. Derivatives are written as private, write-once,
+content-addressed objects (`derivatives/<asset>/<spec-version>/<kind>-<sha256>.webp`); a retry that
+finds an identical object continues. One transaction then moves the asset to `processed` and inserts
+its `asset_derivatives` rows, or to `unprocessable` with a stable reason. Replays return the persisted
+winner. Storage, launch, and worker-protocol failures throw before any state change, so the asset
+stays `validated` and retryable. Derivatives are not published and have no public URL.
+
+Like validation, processing has **no trigger yet** and its concurrency is the caller's to bound.
+
 Configuration comes from the validated shared upload policy. Run `env:check`, `typecheck`,
 `test:unit`, `test:integration`, or `test:coverage`. Platform engineering owns this package.

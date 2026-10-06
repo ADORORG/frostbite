@@ -53,6 +53,8 @@ describe("upload completion contracts", () => {
       "pending-validation",
       "validated",
       "rejected",
+      "processed",
+      "unprocessable",
     ]);
     for (const processingState of assetProcessingStates)
       expect(

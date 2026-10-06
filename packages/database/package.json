@@ -9,10 +9,11 @@
     "./outbox": "./src/outbox/repository.ts",
     "./schema/accounts": "./src/schema/accounts.ts",
     "./schema/auth": "./src/schema/auth.ts",
-    "./schema/wallet-qualification": "./src/schema/wallet-qualification.ts",
     "./schema/creator-admission": "./src/schema/creator-admission.ts",
+    "./schema/derivatives": "./src/schema/derivatives.ts",
     "./schema/platform": "./src/schema/platform.ts",
-    "./schema/uploads": "./src/schema/uploads.ts"
+    "./schema/uploads": "./src/schema/uploads.ts",
+    "./schema/wallet-qualification": "./src/schema/wallet-qualification.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

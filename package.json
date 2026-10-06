@@ -7,10 +7,11 @@
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
-    "@ador/feature-wallet-connection": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
+    "@ador/feature-wallet-connection": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
+    "@ador/provider-media-processing-sharp": "workspace:*",
     "@ador/provider-object-storage-r2": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/wallet": "workspace:*",
@@ -63,7 +64,8 @@
       "vite-plugin-ssr>esbuild": "0.28.2",
       "flatted": "3.4.2",
       "nanoid@3": "3.3.18",
-      "picomatch@2": "2.3.2"
+      "picomatch@2": "2.3.2",
+      "sharp": "0.35.5"
     }
   }
 }

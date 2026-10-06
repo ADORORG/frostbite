@@ -66,6 +66,11 @@ export {
   type OutboxEvent,
 } from "./schema/outbox.ts";
 export {
+  assetDerivatives,
+  derivativeKind,
+  type AssetDerivative,
+} from "./schema/derivatives.ts";
+export {
   assets,
   assetProcessingState,
   uploadIntents,
