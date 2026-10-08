@@ -1,0 +1,127 @@
+import { describe, expect, it, vi } from "vitest";
+
+import { UploadApiError } from "../../src/client/api-error.ts";
+import { TransferError } from "../../src/client/transfer.ts";
+import { attempt, setup } from "../support/runner-harness.ts";
+
+describe("upload runner failures", () => {
+  it.each([
+    [
+      "a network failure",
+      new UploadApiError("network", null, "x"),
+      { code: "network", kind: "api" },
+      true,
+    ],
+    [
+      "a server fault",
+      new UploadApiError("internal_error", 500, "x"),
+      { code: "internal_error", kind: "api" },
+      true,
+    ],
+    [
+      "a conflict",
+      new UploadApiError("conflict", 409, "x"),
+      { code: "conflict", kind: "api" },
+      false,
+    ],
+    [
+      "no session",
+      new UploadApiError("unauthorized", 401, "x"),
+      { code: "unauthorized", kind: "api" },
+      false,
+    ],
+  ] as const)(
+    "reports %s from intent creation with the right retryability",
+    async (_name, error, cause, retryable) => {
+      const { events, go } = setup({
+        api: { createIntent: vi.fn().mockRejectedValue(error) },
+      });
+      await go();
+      expect(events).toEqual([
+        { stage: "requesting", type: "stage-entered" },
+        { cause, retryable, type: "failed" },
+      ]);
+    },
+  );
+
+  it.each(["network", "rejected"] as const)(
+    "reports a %s transfer failure as retryable",
+    async (failure) => {
+      const { events, go } = setup({
+        transfer: {
+          upload: vi
+            .fn()
+            .mockRejectedValue(
+              new TransferError(failure, failure === "rejected" ? 403 : null),
+            ),
+        },
+      });
+      await go();
+      expect(events.at(-1)).toEqual({
+        cause: { failure, kind: "transfer" },
+        retryable: true,
+        type: "failed",
+      });
+    },
+  );
+
+  it("reports failures from completion and from polling", async () => {
+    const completion = setup({
+      api: {
+        completeIntent: vi
+          .fn()
+          .mockRejectedValue(new UploadApiError("conflict", 409, "x")),
+      },
+    });
+    await completion.go();
+    expect(completion.events.at(-1)).toMatchObject({
+      cause: { code: "conflict" },
+      retryable: false,
+      type: "failed",
+    });
+    const polling = setup({
+      api: {
+        listAssets: vi
+          .fn()
+          .mockRejectedValue(new UploadApiError("network", null, "x")),
+      },
+    });
+    await polling.go();
+    expect(polling.events.at(-1)).toMatchObject({
+      cause: { code: "network" },
+      retryable: true,
+      type: "failed",
+    });
+  });
+
+  it("reports a cancel, whatever the aborted call threw", async () => {
+    const harness = setup({
+      transfer: {
+        upload: vi.fn(async ({ signal }) => {
+          harness.controller.abort();
+          signal.throwIfAborted();
+        }),
+      },
+    });
+    await harness.go();
+    expect(harness.events.at(-1)).toEqual({ type: "cancelled" });
+    expect(harness.events.some(({ type }) => type === "failed")).toBe(false);
+  });
+
+  it("does not swallow a defect that is not an expected failure", async () => {
+    const { go } = setup({
+      api: { createIntent: vi.fn().mockRejectedValue(new TypeError("bug")) },
+    });
+    await expect(go()).rejects.toThrow("bug");
+  });
+
+  it("creates a fresh attempt with nothing done", () => {
+    expect(attempt).toEqual({
+      assetId: null,
+      file: { name: "a.png", size: 3 },
+      idempotencyKey: "upload-attempt-0001",
+      purpose: "collection-artwork",
+      transferred: false,
+    });
+  });
+});

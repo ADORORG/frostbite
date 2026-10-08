@@ -1,0 +1,165 @@
+.arcade-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--arcade-space-medium);
+}
+.arcade-progress progress {
+  flex: 1;
+  height: 0.875rem;
+  appearance: none;
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+  accent-color: var(--arcade-cyan);
+}
+.arcade-progress progress::-webkit-progress-bar {
+  background: var(--arcade-surface-recessed);
+}
+.arcade-progress progress::-webkit-progress-value {
+  background: var(--arcade-cyan);
+}
+.arcade-progress progress::-moz-progress-bar {
+  background: var(--arcade-cyan);
+}
+.arcade-progress__value {
+  min-width: 3rem;
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-align: right;
+}
+.arcade-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 0.125rem solid currentcolor;
+  border-radius: var(--arcade-radius-small);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.5625rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.arcade-badge--cyan {
+  color: var(--arcade-cyan);
+}
+.arcade-badge--mint {
+  color: var(--arcade-mint);
+}
+.arcade-badge--pink {
+  color: var(--arcade-pink);
+}
+.arcade-badge--red {
+  color: var(--arcade-red);
+}
+.arcade-badge--yellow {
+  color: var(--arcade-yellow);
+}
+.arcade-field {
+  display: grid;
+  gap: var(--arcade-space-small);
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.arcade-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 0.125rem solid var(--arcade-text-muted);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+  color: var(--arcade-text);
+  font: inherit;
+  text-transform: none;
+}
+.arcade-field select:focus-visible {
+  border-color: var(--arcade-cyan);
+  outline: 0.1875rem solid var(--arcade-cyan);
+  outline-offset: 0.1875rem;
+}
+.arcade-file-drop {
+  position: relative;
+  display: grid;
+  gap: var(--arcade-space-small);
+  padding: 1.5rem;
+  border: 0.1875rem dashed var(--arcade-cyan);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+  cursor: pointer;
+  text-align: center;
+}
+.arcade-file-drop:focus-within,
+.arcade-file-drop--active {
+  border-style: solid;
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.1875rem;
+}
+.arcade-file-drop--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.arcade-file-drop__label {
+  color: var(--arcade-cyan);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.arcade-file-drop__hint {
+  color: var(--arcade-text-muted);
+}
+.arcade-file-drop input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: inherit;
+  opacity: 0;
+}
+.arcade-media-tile {
+  display: grid;
+  gap: var(--arcade-space-small);
+  margin: 0;
+  padding: var(--arcade-space-small);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.arcade-media-tile__frame {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+}
+.arcade-media-tile__frame img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  max-height: 14rem;
+  object-fit: contain;
+}
+.arcade-media-tile__placeholder {
+  margin: 0;
+  padding: var(--arcade-space-medium);
+  color: var(--arcade-text-subtle);
+  text-align: center;
+}
+.arcade-media-tile__caption {
+  display: grid;
+  gap: var(--arcade-space-small);
+  color: var(--arcade-text-muted);
+  font-size: 0.875rem;
+}
+.arcade-grid {
+  display: grid;
+  gap: var(--arcade-space-medium);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  margin: var(--arcade-space-medium) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.arcade-stack {
+  display: grid;
+  gap: calc(var(--arcade-space-medium) * 2);
+}

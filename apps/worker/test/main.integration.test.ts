@@ -1,7 +1,5 @@
-import { spawn } from "node:child_process";
-import { setTimeout as delay } from "node:timers/promises";
-
 import { freePort, waitFor } from "@ador/test-kit/inngest-runtime";
+import { startServiceProcess } from "@ador/test-kit/service-process";
 import { describe, expect, it } from "vitest";
 
 // Starts the real entry point as a process. No Inngest settings are provided on purpose, so every
@@ -19,54 +17,24 @@ describe("the worker process", () => {
       "INNGEST_SIGNING_KEY",
     ])
       delete env[key];
-    const child = spawn(
-      process.execPath,
-      [
-        "--disable-warning=ExperimentalWarning",
-        "--experimental-strip-types",
-        "src/main.ts",
-      ],
-      {
-        cwd: new URL("..", import.meta.url),
-        env,
-        stdio: ["ignore", "ignore", "pipe"],
-      },
-    );
-    const lines: string[] = [];
-    child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (chunk: string) =>
-      lines.push(...chunk.split("\n").filter(Boolean)),
-    );
-    const exited = new Promise<number | null>((resolve) =>
-      child.on("close", resolve),
-    );
+    const worker = await startServiceProcess({
+      cwd: new URL("..", import.meta.url),
+      entry: "src/main.ts",
+      env,
+      readyLine: "worker listening",
+    });
     try {
       await waitFor(
         () =>
-          lines.some((line) => line.includes("worker listening"))
-            ? true
-            : undefined,
-        30_000,
-        "the worker to listen",
-      );
-      const health = await fetch(`http://127.0.0.1:${port}/health`);
-      expect([health.status, await health.json()]).toEqual([
-        200,
-        { status: "ok" },
-      ]);
-      await waitFor(
-        () =>
-          lines.some((line) => line.includes("relay pass failed"))
+          worker.lines().some((line) => line.includes("relay pass failed"))
             ? true
             : undefined,
         30_000,
         "a failed relay pass",
       );
       expect((await fetch(`http://127.0.0.1:${port}/health`)).status).toBe(200);
-      child.kill("SIGTERM");
-      expect(
-        await Promise.race([exited, delay(30_000).then(() => "timeout")]),
-      ).toBe(0);
+      expect(await worker.stop()).toBe(0);
+      const lines = worker.lines();
       expect(lines.some((line) => line.includes("worker stopped"))).toBe(true);
       for (const line of lines) {
         const entry: unknown = JSON.parse(line);
@@ -78,7 +46,7 @@ describe("the worker process", () => {
         expect(line).not.toMatch(/password|secret|signkey/iu);
       }
     } finally {
-      child.kill("SIGKILL");
+      await worker.stop();
     }
   }, 120_000);
 });

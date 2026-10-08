@@ -1,0 +1,19 @@
+import type { LibraryAsset } from "@ador/shared/uploads";
+
+import { AssetCard } from "./asset-card.tsx";
+
+export function AssetGrid({
+  assets,
+}: {
+  readonly assets: readonly LibraryAsset[];
+}) {
+  return (
+    <ul aria-label="Your uploaded images" className="arcade-grid">
+      {assets.map((asset) => (
+        <li key={asset.id}>
+          <AssetCard asset={asset} />
+        </li>
+      ))}
+    </ul>
+  );
+}

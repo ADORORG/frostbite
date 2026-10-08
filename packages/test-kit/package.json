@@ -7,8 +7,10 @@
     "./docker": "./src/docker.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
+    "./png": "./src/png.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
-    "./serve-fetch-handler": "./src/serve-fetch-handler.ts"
+    "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
+    "./service-process": "./src/service-process.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

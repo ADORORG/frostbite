@@ -5,7 +5,9 @@ arcade components, and platform patterns derived from the immutable standalone a
 
 ## Public API
 
-- `@repo/ui/arcade` exports `AppShell`, `ArcadeButton`, `ArcadePanel`, and `StatusLamp`.
+- `@repo/ui/arcade` exports `AppShell`, `ArcadePanel`, `StatusLamp`, `AccessState`, and the controls
+  `ArcadeButton` (a link), `ArcadeActionButton` (a `<button>`), `ArcadeSelect`, `ArcadeFileDrop`
+  (a real file input that also accepts drops), `ArcadeProgress`, `ArcadeBadge`, and `ArcadeMediaTile`.
 - `@repo/ui/styles.css` installs tokens and shared component styles.
 - `ArcadeModal` lives in `src/components/arcade-modal.tsx` and accepts a title, trigger label,
   and arbitrary children. It owns hydration-safe opening, native focus behavior, dismissal,

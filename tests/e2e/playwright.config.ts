@@ -6,6 +6,8 @@ import { resolveE2EServerConfig } from "./src/server-config.ts";
 const { baseURL, port: serverPort } = resolveE2EServerConfig(
   process.env.E2E_BASE_URL,
 );
+// Real-service flows are slow, so only the desktop project runs them; every project runs the rest.
+const desktopOnlySpecs = /uploads\.spec\.ts$/u;
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 export default defineConfig({
@@ -22,10 +24,12 @@ export default defineConfig({
   projects: [
     {
       name: "mobile",
+      testIgnore: desktopOnlySpecs,
       use: { ...devices["Pixel 7"] },
     },
     {
       name: "tablet",
+      testIgnore: desktopOnlySpecs,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 768, height: 1024 },
@@ -40,6 +44,7 @@ export default defineConfig({
     },
     {
       name: "wide",
+      testIgnore: desktopOnlySpecs,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1600, height: 1000 },

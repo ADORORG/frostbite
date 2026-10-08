@@ -47,6 +47,10 @@ export type CompleteIntentResult =
   | { readonly kind: "missing-object" }
   | { readonly kind: "unavailable" };
 
+// Seconds shaved off a signed credential's lifetime so provider-side clock reads never push its expiry
+// past the persisted authorization expiry.
+const credentialExpiryMarginSeconds = 1;
+
 export function createUploadIntentService(dependencies: {
   readonly clock: () => Date;
   readonly createDraftKey: () => string;
@@ -157,9 +161,15 @@ export function createUploadIntentService(dependencies: {
       }
       if (reserved.intent.storageProviderId !== dependencies.storage.providerId)
         return { kind: "conflict" };
-      const remainingLifetimeSeconds = Math.floor(
-        (reserved.intent.expiresAt.getTime() - createdAt.getTime()) / 1_000,
-      );
+      // The provider stamps its own, slightly later, issue time, so signing for the whole remaining
+      // lifetime would outlive the persisted authorization by the time it took to get here. Measure
+      // from now and keep a margin that covers that delay.
+      const remainingLifetimeSeconds =
+        Math.floor(
+          (reserved.intent.expiresAt.getTime() -
+            dependencies.clock().getTime()) /
+            1_000,
+        ) - credentialExpiryMarginSeconds;
       if (remainingLifetimeSeconds < 1) return { kind: "conflict" };
       try {
         const upload = await dependencies.storage.presignPrivateUpload({

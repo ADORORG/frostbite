@@ -1,15 +1,31 @@
 import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import { libraryRoute, uploadIntentRoutes } from "@ador/shared/uploads";
+import {
+  libraryRoute,
+  uploadIntentRoutes,
+  uploadsNavigationLabel,
+  uploadsStudioPath,
+} from "@ador/shared/uploads";
 
 export function createUploadsFeature(providers: ProviderRegistry) {
   return defineFeature({
     manifest: {
-      capabilities: ["api-routes"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "studio-page",
+      ],
       dependencies: ["accounts"],
-      navigation: [],
+      navigation: [
+        {
+          access: { kind: "authenticated" },
+          href: uploadsStudioPath,
+          label: uploadsNavigationLabel,
+        },
+      ],
       id: "uploads",
-      pages: [],
+      pages: [{ access: { kind: "authenticated" }, path: uploadsStudioPath }],
       requiredDecisionGates: [],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
       routes: [

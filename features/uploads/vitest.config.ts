@@ -1,15 +1,33 @@
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
+// Pure logic (src/client) runs in node; React components (src/ui) run in jsdom. Test files pick
+// their environment by suffix: `.unit.test.ts` is node, `.dom.test.ts(x)` is jsdom.
 export default defineConfig({
+  plugins: [react()],
   test: {
     coverage: {
-      include: ["src/**/*.ts"],
+      exclude: ["test/**", "vitest.config.ts"],
+      include: ["src/**/*.{ts,tsx}"],
       provider: "v8",
       reporter: ["text", "json-summary", "lcov"],
-      thresholds: { branches: 90, functions: 90, lines: 90, statements: 90 },
+      thresholds: {
+        branches: 90.01,
+        functions: 90.01,
+        lines: 90.01,
+        statements: 90.01,
+      },
     },
     projects: [
       { test: { include: ["test/**/*.unit.test.ts"], name: "unit" } },
+      {
+        test: {
+          environment: "jsdom",
+          include: ["test/**/*.dom.test.{ts,tsx}"],
+          name: "unit-dom",
+          setupFiles: ["test/ui-setup.ts"],
+        },
+      },
       {
         test: {
           include: ["test/**/*.integration.test.ts"],

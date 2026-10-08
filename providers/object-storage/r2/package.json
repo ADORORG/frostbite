@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "node --experimental-strip-types test/support/run-s3.ts integration",
-    "test:coverage": "node --experimental-strip-types test/support/run-s3.ts coverage"
+    "test:coverage": "node --experimental-strip-types test/support/run-s3.ts coverage",
+    "smoke": "node --env-file-if-exists=../../../.env.local --experimental-strip-types scripts/smoke.ts"
   },
   "dependencies": {
     "@ador/object-storage": "workspace:*",

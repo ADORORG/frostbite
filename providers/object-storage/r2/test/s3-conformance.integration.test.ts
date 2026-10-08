@@ -5,19 +5,9 @@ import { CreateBucketCommand, S3Client } from "@aws-sdk/client-s3";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { createR2Client } from "../src/r2-client.ts";
+import { s3Environment } from "./support/s3-environment.ts";
 
-function requiredEnvironment(name: string): string {
-  const value = process.env[name];
-  if (!value)
-    throw new Error(`${name} is required by the S3 conformance harness.`);
-  return value;
-}
-
-const endpoint = requiredEnvironment("S3_TEST_ENDPOINT");
-const credentials = {
-  accessKeyId: requiredEnvironment("S3_TEST_ACCESS_KEY_ID"),
-  secretAccessKey: requiredEnvironment("S3_TEST_SECRET_ACCESS_KEY"),
-};
+const { endpoint, ...credentials } = s3Environment;
 const bucket = "ador-conformance";
 const key = "nested/asset.txt";
 const sdk = new S3Client({

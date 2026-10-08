@@ -40,7 +40,10 @@ import {
 } from "./fakes.ts";
 import { tinyPng } from "./png.ts";
 
-const now = new Date("2026-10-06T12:00:00.000Z");
+// One reading of the real clock for every timestamp of the scenario. The database enforces ordering
+// between them (cleanup after expiry), and the pipeline compares them with the real time, so a fixed
+// calendar date would eventually fall out of order.
+const now = new Date();
 
 export const database = createDatabaseClient(
   createDatabasePool(parseDatabaseEnvironment(process.env)),
@@ -177,7 +180,7 @@ export async function seedCompletedUpload(options: { bytes: Buffer }) {
     cleanupEligibleAt: new Date(now.getTime() + 86_400_000),
     contentType: "image/png",
     createdAt: now,
-    expiresAt: new Date(Date.now() + 900_000),
+    expiresAt: new Date(now.getTime() + 900_000),
     id: intentId,
     idempotencyKey: idempotencyKeySchema.parse("upload-request-0001"),
     objectKey,
