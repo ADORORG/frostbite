@@ -1,7 +1,7 @@
 # W3-06 — Upload progress, retry, validation-error, and asset-library UI
 
 Status: completed 2026-10-08; formal deep review Converged (see "Review")
-Baselines: `1feeee8` (part 1), `53ddd0d` (part 2: signed reads and library API)
+Baselines: `1feeee8` (part 1), `53ddd0d` (part 2: signed reads and library API), `d367740` (part 3: UI and review)
 Depends on: W3-02 through W3-05A (completed). Unblocks W3-07 and W3-08.
 
 ## Objective and done criteria
