@@ -18,6 +18,16 @@ Shared, test-only helpers. Production code never imports this package.
   (structurally valid, undecodable pixel data) for upload tests.
 - `@ador/test-kit/images` — `createJpeg` and `createWebp`, tiny real 24x16 images (fixture data from the pinned
   `sharp`) for the other two committed upload formats.
+- `@ador/test-kit/chain-conformance` — `defineChainAdapterConformance`, the suite every chain adapter must
+  pass (ADR-017): canonical addresses and refusal of invalid, cross-chain, and unserved input; summary
+  fidelity; verification of what was signed; idempotent broadcast; repeatable observation; chain-bound
+  reads. Each group runs only for a port the adapter declares. The checks are plain functions, and tests
+  prove each one fails for a deliberately broken adapter.
+- `@ador/test-kit/simulated-chain` — `createSimulatedChain`, a deterministic second chain family with a
+  different address format, finality model, and transaction shape, plus controls to advance blocks,
+  fund an address, and force a rejected, unavailable, or ambiguous broadcast. Test-only: the registry
+  refuses it for any chain whose role is not `test`. `@ador/test-kit/simulated-chain-config` gives
+  `simulatedChainConfig`, a ready `ChainConfig` for it, so a feature test boots the registry in one call.
 - `@ador/test-kit/serve-fetch-handler` — serves a fetch-style handler over HTTP and records each exchange.
 
 Docker is required for the integration tests. Run `typecheck`, `test:unit`, `test:integration`, or

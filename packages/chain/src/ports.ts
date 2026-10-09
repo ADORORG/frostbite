@@ -1,0 +1,83 @@
+import type {
+  Address,
+  Amount,
+  AssetRef,
+  BlockRef,
+  BroadcastOutcome,
+  ChainRef,
+  ChainTransaction,
+  ContractInspection,
+  ContractRef,
+  FundingPolicy,
+  Observation,
+  SignedTransaction,
+  SimulationResult,
+  TransactionIntent,
+  TransactionRef,
+  UnsignedTransaction,
+  VerificationResult,
+} from "@ador/shared/chain";
+
+// The neutral chain ports (ADR-017 section 3). Each exists because the platform performs the
+// operation; there is no generic "call any method" escape hatch. Family concepts (Alkane ids,
+// PSBTs, protostones, view-function names) never appear in a signature here.
+
+export class InvalidAddressError extends Error {
+  readonly code = "invalid-address";
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidAddressError";
+  }
+}
+
+export interface AddressCodec {
+  // Returns the canonical address, or throws InvalidAddressError for non-canonical, malformed, or
+  // cross-chain input. It never "fixes up" what it was given.
+  parse(chain: ChainRef, text: string): Address;
+}
+
+export interface ChainReader {
+  balances(
+    owner: Address,
+    assets?: readonly AssetRef[],
+  ): Promise<readonly Amount[]>;
+  head(chain: ChainRef): Promise<BlockRef>;
+  transaction(ref: TransactionRef): Promise<ChainTransaction>;
+}
+
+export interface ContractGateway {
+  inspect(ref: ContractRef): Promise<ContractInspection>;
+  simulate(intent: TransactionIntent): Promise<SimulationResult>;
+}
+
+export interface TransactionBuilder {
+  build(
+    intent: TransactionIntent,
+    funding: FundingPolicy,
+  ): Promise<UnsignedTransaction>;
+  // Checks that what the wallet signed is what was built and shown: same chain, family, format,
+  // and a payload that still matches the summary the person approved.
+  verifySigned(
+    unsigned: UnsignedTransaction,
+    signed: SignedTransaction,
+  ): VerificationResult;
+}
+
+export interface Broadcaster {
+  // Broadcasting the same signed transaction twice never yields two different transaction ids.
+  broadcast(transaction: SignedTransaction): Promise<BroadcastOutcome>;
+}
+
+export interface ChainObserver {
+  // Read-only and repeatable: asking again for the same state returns equivalent evidence.
+  observe(ref: TransactionRef): Promise<Observation>;
+}
+
+export interface ChainPorts {
+  readonly addressCodec: AddressCodec;
+  readonly broadcaster: Broadcaster;
+  readonly contracts: ContractGateway;
+  readonly observer: ChainObserver;
+  readonly reader: ChainReader;
+  readonly builder: TransactionBuilder;
+}

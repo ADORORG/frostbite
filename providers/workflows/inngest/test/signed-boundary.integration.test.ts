@@ -11,10 +11,14 @@ import { happy, useRealRuntime } from "./support/runtime-harness.ts";
 const harness = useRealRuntime();
 
 describe("the signed boundary against the real Inngest runtime", () => {
-  it("synced the signed endpoint at startup", () => {
-    expect(
-      harness.served().requests.find(({ method }) => method === "PUT"),
-    ).toMatchObject({ path: "/api/inngest", status: 200 });
+  it("synced the signed endpoint at startup", async () => {
+    // The server reports healthy before its one startup sync reaches the endpoint, so wait for it.
+    const sync = await waitFor(
+      () => harness.served().requests.find(({ method }) => method === "PUT"),
+      15_000,
+      "the startup sync",
+    );
+    expect(sync).toMatchObject({ path: "/api/inngest", status: 200 });
   });
 
   it("rejects a publish with the wrong event key as a retryable failure", async () => {

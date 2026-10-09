@@ -6,6 +6,10 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
 
 - `@ador/shared/allowlists` — strict Leaf V1 bytes, decoder, and SHA-256 Merkle primitives used by
   browser, server, and contract fixture tooling.
+- `@ador/shared/chain` — the chain-neutral model of ADR-017: CAIP-2 `ChainRef` and `ChainFamilyId`,
+  `ChainConfig` (role, per-operation finality, release gate), addresses, assets, amounts, contract
+  references, transaction intents and summaries, opaque unsigned and signed payloads, broadcast
+  outcomes, observations, and the neutral transaction state machine. No family concept appears here.
 - `@ador/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
   manifest schema.
 - `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.

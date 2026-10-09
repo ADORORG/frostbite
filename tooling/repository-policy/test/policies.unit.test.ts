@@ -114,4 +114,45 @@ describe("source policies", () => {
     );
     await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
   });
+
+  it("keeps chain-family code and vendor SDKs behind the adapter", async () => {
+    const imports = [
+      'import { validateBitcoinAddress } from "@ador/chain/bitcoin";',
+      'import { createBitcoinAlkanesAdapter } from "@ador/chain/bitcoin-alkanes";',
+      'import { address } from "bitcoinjs-lib";',
+      'import { Provider } from "@alkanes/ts-sdk";',
+      'import { useLaserEyes } from "@omnisat/lasereyes-react";',
+    ];
+    const [root, file] = await temporaryFile(
+      "features/uploads/src/chain.ts",
+      `${imports.join("\n")}\n`,
+    );
+    const violations = await findBoundaryViolations(root, [file]);
+    expect(violations).toHaveLength(imports.length);
+    expect(violations[0]).toBe(
+      "features/uploads/src/chain.ts imports chain-family code @ador/chain/bitcoin; use the neutral chain ports.",
+    );
+  });
+
+  it.each([
+    "packages/chain/src/bitcoin-alkanes/adapter.ts",
+    "packages/wallet/src/client/provider.tsx",
+    "packages/auth/src/domain/contracts.ts",
+    "packages/test-kit/test/chain-conformance.unit.test.ts",
+    "providers/chain/bitcoin-alkanes/src/index.ts",
+  ])("allows chain-family imports in %s", async (path) => {
+    const [root, file] = await temporaryFile(
+      path,
+      'import { address } from "bitcoinjs-lib";\nvoid address;\n',
+    );
+    await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
+  });
+
+  it("allows the neutral chain ports everywhere", async () => {
+    const [root, file] = await temporaryFile(
+      "features/collections/src/chain.ts",
+      'import { createChainRegistry } from "@ador/chain/registry";\nimport type { AddressCodec } from "@ador/chain/ports";\nimport { chainRefSchema } from "@ador/shared/chain";\nvoid createChainRegistry;\nvoid chainRefSchema;\n',
+    );
+    await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
+  });
 });

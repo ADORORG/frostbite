@@ -1,24 +1,59 @@
 # `@ador/chain`
 
-Provider-neutral Bitcoin and Alkanes boundaries.
+The chain boundary: neutral ports, the adapter registry, and the chain-family adapters behind them
+([ADR-017](../../../docs/decisions/ADR-017-multichain-chain-family-adapters.md)). Nothing above this
+package knows which chain family it is talking to.
 
 ## Public API
 
-- `validateBitcoinAddress` decodes and canonically round-trips P2WPKH and P2TR addresses for
-  mainnet or signet with `bitcoinjs-lib` 7.0.2.
-- `loadAlkanesSdk` is the isolated server-side entrypoint for the immutable
+Neutral surface, safe for features, workers, and apps:
+
+- `@ador/chain/ports` — the small ports (`AddressCodec`, `ChainReader`, `ContractGateway`,
+  `TransactionBuilder`, `Broadcaster`, `ChainObserver`) and `InvalidAddressError`. Data types and
+  schemas live in `@ador/shared/chain`.
+- `@ador/chain/adapter` — `ChainAdapter`, `portCapabilities`, and `portNames`.
+- `@ador/chain/registry` — `createChainRegistry`, which checks the configured chains against the
+  registered adapters once at boot and then resolves a chain's config, adapter, ports, and
+  capabilities.
+
+Family-specific, allowed only where the repository boundary policy permits (this package, the wallet
+bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/` exception):
+
+- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter.
+  Today it provides the address codec only and declares only `address:codec`; reads, construction,
+  broadcast, and observation arrive with the contract and mint tasks (W6, W7).
+- `@ador/chain/bitcoin` — `validateBitcoinAddress` (P2WPKH and P2TR, mainnet or signet, `bitcoinjs-lib`
+  7.0.2).
+- `@ador/chain/alkanes` — `loadAlkanesSdk`, the isolated entrypoint for the immutable
   `@alkanes/ts-sdk@0.1.6-669e7c0` artifact.
 
 ## Invariants
 
-Address validation rejects whitespace, non-canonical case, checksum failures, cross-network input,
-and script types outside P2WPKH/P2TR. Signet shares Bitcoin's test-network address encoding, so an
-address alone cannot distinguish signet from testnet; provider/network agreement remains a separate
-authorization check. SDK values do not cross this boundary without application-owned validation.
+- A chain is a CAIP-2 `ChainRef` from validated configuration. No chain identifier is hard-coded.
+- Boot fails when an enabled chain has no adapter for its family, when two adapters claim a family,
+  when an adapter does not support a chain it is configured for, when a feature needs a capability the
+  adapter lacks, when an adapter provides a port it did not declare (or declares one it does not
+  provide), and when a test-only adapter would serve a chain whose role is not `test`.
+- Capability names declared by adapters or required by features must be well formed
+  (`chainCapabilitySchema`); a malformed name fails boot.
+- Disabled chains are configuration only: not resolvable, not checked.
+- Broadcast is allowed on a `test` chain, and elsewhere only when the chain's release gate is open.
+- The address codec returns the canonical form or throws `InvalidAddressError`; it never repairs input
+  and never accepts another chain's address. Bitcoin address validation rejects whitespace,
+  non-canonical case, checksum failures, cross-network input, and script types outside P2WPKH/P2TR.
+  Signet shares the testnet address encoding, so an address alone cannot distinguish signet from
+  testnet; provider and network agreement stays a separate authorization check.
+- Family concepts (Alkane ids, PSBTs, protostones, view-function names) never appear in a port
+  signature. SDK values do not cross this boundary without application-owned validation.
 
 ## Configuration and ownership
 
-Network selection is supplied by validated application configuration. Provider URLs, credentials,
-contract IDs, and network values are not owned here. Platform engineering owns this package.
+Which CAIP-2 chain is which Bitcoin network is passed to `createBitcoinAlkanesAdapter` from validated
+configuration. Provider URLs, credentials, contract ids, and the chain list are not owned here. The
+application's chain list is loaded into `createChainRegistry` by the first feature that needs it
+(`W4-01`). Platform engineering owns this package.
 
-Run the package `typecheck`, `test:unit`, `test:integration`, or `test:coverage` scripts.
+## Tests
+
+Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. The conformance suite and the
+simulated second family live in `@ador/test-kit` (`chain-conformance`, `simulated-chain`).

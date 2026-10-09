@@ -658,6 +658,9 @@ importers:
 
   packages/chain:
     dependencies:
+      '@ador/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@alkanes/ts-sdk':
         specifier: https://pkg.alkanes.build/dist/@alkanes/ts-sdk?v=0.1.6-669e7c0
         version: https://pkg.alkanes.build/dist/@alkanes/ts-sdk?v=0.1.6-669e7c0(@oyl/sdk@1.17.0(@types/node@26.4.0)(typescript@5.9.3))(@types/node@26.4.0)
@@ -1059,15 +1062,24 @@ importers:
 
   packages/test-kit:
     dependencies:
+      '@ador/chain':
+        specifier: workspace:*
+        version: link:../chain
       '@ador/http':
         specifier: workspace:*
         version: link:../http
       '@ador/jobs':
         specifier: workspace:*
         version: link:../jobs
+      '@ador/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@aws-sdk/client-s3':
         specifier: 3.1131.0
         version: 3.1131.0
+      zod:
+        specifier: ^4.5.4
+        version: 4.5.4
     devDependencies:
       '@aws-sdk/s3-request-presigner':
         specifier: 3.1131.0

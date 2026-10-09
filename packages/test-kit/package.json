@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./chain-conformance": "./src/chain-conformance.ts",
     "./docker": "./src/docker.ts",
     "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
@@ -11,7 +12,9 @@
     "./png": "./src/png.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
-    "./service-process": "./src/service-process.ts"
+    "./service-process": "./src/service-process.ts",
+    "./simulated-chain": "./src/simulated-chain/adapter.ts",
+    "./simulated-chain-config": "./src/simulated-chain/config.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -21,9 +24,12 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/chain": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
-    "@aws-sdk/client-s3": "3.1131.0"
+    "@ador/shared": "workspace:*",
+    "@aws-sdk/client-s3": "3.1131.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@aws-sdk/s3-request-presigner": "3.1131.0",
