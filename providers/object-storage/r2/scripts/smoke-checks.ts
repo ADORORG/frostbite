@@ -136,6 +136,12 @@ export async function runStorageSmoke(
       });
       return "copied; repeat is idempotent";
     });
+    // Abandoned-upload cleanup deletes keys that may never have been written, so a repeat must succeed.
+    await run("delete, twice (cleanup relies on it)", async () => {
+      await storage.delete({ key, scope: "private" });
+      await storage.delete({ key, scope: "private" });
+      return "second delete of a missing key succeeded";
+    });
   } finally {
     for (const scope of ["private", "public"] as const)
       await storage.delete({ key, scope }).catch(() => undefined);

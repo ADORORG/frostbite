@@ -36,6 +36,10 @@ adapters as domain tables are accepted; it never exports database rows as HTTP c
   `assets_validation_coherent` CHECK ties each state to exactly its required fields (hash, detected
   type, dimensions, validator version, and entity tag for `validated`; a reason code only for
   `rejected`). Every required field is tested `IS NOT NULL` because a CHECK accepts UNKNOWN.
+- An upload intent ends `completed` (it has an asset) or, if never completed and past its cleanup
+  time, `abandoned` (W3-07). `object_removed_at` records that its private object was removed and may be
+  set only on an abandoned intent (`upload_intents_removal_requires_abandoned`). The partial index
+  `upload_intents_cleanup_idx` serves the cleanup sweep.
 - The W3-03 expand migration backfills pre-existing intents to `r2-object-storage`, the only adapter
   that could issue them, then removes that temporary default so all new writes remain explicit.
 

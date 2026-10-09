@@ -10,13 +10,20 @@ export const storageProviderId = providerIdSchema.parse("test-object-storage");
 export function memoryStorage() {
   const objects = new Map<string, Buffer>();
   const writes: string[] = [];
+  const deletions: string[] = [];
+  let failDeletes = false;
   let failReads = false;
   const unused = async (): Promise<never> => {
     throw new Error("Not used by the pipeline.");
   };
   const storage: ObjectStoragePort = {
     copyPrivateToPublicIfAbsent: unused,
-    delete: unused,
+    delete: async ({ key, scope }) => {
+      if (failDeletes)
+        throw new ObjectStorageError("provider-failure", "storage unavailable");
+      if (scope === "private") objects.delete(key);
+      deletions.push(key);
+    },
     head: async ({ key }) => {
       const object = objects.get(key);
       return object === undefined
@@ -60,6 +67,8 @@ export function memoryStorage() {
     },
   };
   return {
+    deletions,
+    failDeletes: (value: boolean) => void (failDeletes = value),
     failReads: (value: boolean) => void (failReads = value),
     objects,
     storage,

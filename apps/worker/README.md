@@ -1,6 +1,7 @@
 # `worker`
 
-The standalone background service: it runs the outbox relay and hosts the signed workflow endpoint.
+The standalone background service: it runs the outbox relay and the abandoned-upload cleanup, and
+hosts the signed workflow endpoint.
 It is a second deployable beside the web app and shares the platform's typed environment inventory
 (ADR-012, ADR-015 proposed).
 
@@ -10,6 +11,10 @@ It is a second deployable beside the web app and shares the platform's typed env
   provider with their stable event ids, and records delivery, retry, or terminal failure. It does not
   depend on any workflow function, so work recorded during a provider outage is delivered when the
   provider returns (ADR-003). Delivery never implies business completion.
+- **Abandoned-upload cleanup.** A slow loop (five-minute idle delay, one-minute backoff after a
+  failure; `defaultMaintenanceLoopPolicy`) removes the private objects of uploads that were never
+  completed once their cleanup time has passed, and records it. Each pass logs what it found; failed
+  removals are logged and retried on later passes. See `@ador/uploads` for the rules.
 - **Signed workflow endpoint.** `GET|POST|PUT /api/inngest` is served by the workflow provider, which
   verifies the request signature before any activity runs. The activities (asset validation, then
   derivative generation) come from the uploads feature and see only provider-neutral inputs.
@@ -22,9 +27,11 @@ It is a second deployable beside the web app and shares the platform's typed env
 
 - `src/main.ts` — the process shell: signals, an HTTP listener, the runtime. Excluded from in-process
   coverage; a smoke test starts it as a real process.
-- `src/runtime.ts` — composes the worker from the provider registry and environment.
-- `src/routes.ts`, `src/endpoint.ts`, `src/relay.ts`, `src/config.ts` — routing, the memoized endpoint
-  resolver (a failed build is not cached), one relay pass with injectable dependencies, and the port.
+- `src/runtime.ts` — composes the worker from the provider registry and environment: the endpoint, the
+  relay loop, and the cleanup loop.
+- `src/routes.ts`, `src/endpoint.ts`, `src/relay.ts`, `src/cleanup.ts`, `src/config.ts` — routing, the
+  memoized endpoint resolver (a failed build is not cached), one relay pass and one cleanup pass with
+  injectable dependencies, and the port. A cleanup pass reports what it removed as its progress.
 
 ## Configuration
 
@@ -45,6 +52,6 @@ the container.
 
 `test:unit` covers configuration, routing, the endpoint resolver, relay wiring, and the runtime.
 `test:integration` runs against real PostgreSQL and the real Inngest server: an upload completion to a
-processed asset, recovery after a provider outage, a lost delivery acknowledgement, a rejected upload,
+processed asset, abandoned-upload cleanup (including a storage outage and a later run), recovery after a provider outage, a lost delivery acknowledgement, a rejected upload,
 persistent storage failure, the HTTP surface, and the real process. Platform engineering owns this
 service.

@@ -63,6 +63,6 @@ Before pointing an environment at real R2, in the Cloudflare dashboard:
    ```
 
    It uploads and reads back one throwaway object through every supported path, verifies the CORS
-   preflight for the application origin, exercises the R2-only conditional copy, and deletes the
-   object. It prints PASS or FAIL per check and exits non-zero on any failure. The conditional-copy
+   preflight for the application origin, exercises the R2-only conditional copy, checks that deleting a missing key succeeds (abandoned-upload
+   cleanup relies on it), and deletes the object. It prints PASS or FAIL per check and exits non-zero on any failure. The conditional-copy
    header is a beta Cloudflare extension; treat a failure there as a release blocker.

@@ -70,6 +70,25 @@ describe("local S3-compatible service conformance", () => {
     });
   });
 
+  it("deletes a key that was never written, or already deleted, without error", async () => {
+    // Abandoned-upload cleanup relies on this: a browser that never started the upload left no object.
+    await expect(
+      client.delete({ bucket, key: "never/written.txt" }),
+    ).resolves.toBeUndefined();
+    await client.put({
+      body: Readable.from(["asset"]),
+      bucket,
+      contentLength: 5,
+      contentType: "text/plain",
+      ifAbsent: false,
+      key: "delete/twice.txt",
+    });
+    await client.delete({ bucket, key: "delete/twice.txt" });
+    await expect(
+      client.delete({ bucket, key: "delete/twice.txt" }),
+    ).resolves.toBeUndefined();
+  });
+
   it("presigns the exact key without contacting the service", async () => {
     const signed = new URL(
       await client.presignPut({

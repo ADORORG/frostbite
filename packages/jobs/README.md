@@ -22,5 +22,6 @@ real-PostgreSQL adapter tests.
 `@ador/jobs/asset-pipeline` is the workflow itself, `runAssetPipeline`, parameterized over a durable
 `step` so any provider can run it: permanent file outcomes end the run, and only faults throw and are
 retried. `@ador/jobs/provider-service` defines the typed workflow capabilities a provider supplies, and
-`@ador/jobs/relay-loop` runs the relay until stopped. `@ador/jobs/policy` holds the typed, overridable
-defaults for retries, media concurrency, relay batching, and polling.
+`@ador/jobs/drain-loop` runs any bounded pass until stopped (immediately again after work, an idle delay
+after none, a backoff after a failure) and `@ador/jobs/relay-loop` applies it to the relay. `@ador/jobs/policy` holds the typed, overridable
+defaults for retries, media concurrency, relay batching, polling, and the slow maintenance loop.

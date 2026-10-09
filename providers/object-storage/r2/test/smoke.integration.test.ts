@@ -53,6 +53,7 @@ describe("storage smoke checks", () => {
       ["read through a signed URL", true],
       ["streamed server read", true],
       ["conditional private-to-public copy (R2 extension)", true],
+      ["delete, twice (cleanup relies on it)", true],
     ]);
     expect([
       await leftovers(config.privateBucket),
@@ -81,6 +82,28 @@ describe("storage smoke checks", () => {
       results.every(({ detail }) => !detail.includes(secretAccessKey)),
     ).toBe(true);
     expect(await leftovers(config.publicBucket)).toBe(0);
+  });
+
+  it("fails the delete check when deleting a key twice is refused", async () => {
+    const storage = createR2ObjectStorage(config);
+    let deletes = 0;
+    const results = await runStorageSmoke(
+      {
+        ...storage,
+        delete: (input) =>
+          (deletes += 1) === 2
+            ? Promise.reject(new Error("second delete refused"))
+            : storage.delete(input),
+      },
+      testWebOrigin,
+    );
+    expect(
+      results.find(({ name }) => name.startsWith("delete, twice")),
+    ).toEqual({
+      detail: "second delete refused",
+      name: "delete, twice (cleanup relies on it)",
+      ok: false,
+    });
   });
 
   it("stops after a failed presign instead of reporting misleading follow-on failures", async () => {

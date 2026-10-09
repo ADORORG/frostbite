@@ -28,14 +28,16 @@ export function resolveWorkflowPolicy(
   );
 }
 
-export const relayLoopPolicySchema = z
+export const drainLoopPolicySchema = z
   .object({
     errorDelayMs: z.number().int().positive(),
     idleDelayMs: z.number().int().positive(),
   })
   .strict();
 
-export type RelayLoopPolicy = z.infer<typeof relayLoopPolicySchema>;
+export type DrainLoopPolicy = z.infer<typeof drainLoopPolicySchema>;
+export const relayLoopPolicySchema = drainLoopPolicySchema;
+export type RelayLoopPolicy = DrainLoopPolicy;
 
 // Operational defaults for the standalone relay worker; typed and overridable, not env-bound.
 export const defaultOutboxRelayPolicy: OutboxRelayPolicy = Object.freeze(
@@ -50,4 +52,10 @@ export const defaultOutboxRelayPolicy: OutboxRelayPolicy = Object.freeze(
 
 export const defaultRelayLoopPolicy: RelayLoopPolicy = Object.freeze(
   relayLoopPolicySchema.parse({ errorDelayMs: 5_000, idleDelayMs: 2_000 }),
+);
+
+// Housekeeping sweeps (abandoned uploads) have no latency target: eligibility is measured in hours, so
+// they poll slowly and back off for a minute after a failure.
+export const defaultMaintenanceLoopPolicy: DrainLoopPolicy = Object.freeze(
+  drainLoopPolicySchema.parse({ errorDelayMs: 60_000, idleDelayMs: 300_000 }),
 );

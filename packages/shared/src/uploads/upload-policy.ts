@@ -46,6 +46,8 @@ const policySchema = z
     derivativeReadLifetimeMs: z.number().int().min(minuteMs).max(hourMs),
     // Newest assets returned by the library; there is no pagination yet.
     libraryPageSize: z.number().int().min(1).max(100),
+    // Abandoned uploads claimed per cleanup pass; each one costs a storage delete.
+    cleanupBatchSize: z.number().int().min(1).max(500),
   })
   .strict()
   .refine(
@@ -83,6 +85,7 @@ export const defaultUploadPolicy: UploadPolicy = Object.freeze({
   presignedUrlLifetimeMs: 15 * minuteMs,
   derivativeReadLifetimeMs: 5 * minuteMs,
   libraryPageSize: 48,
+  cleanupBatchSize: 50,
 });
 
 export function resolveUploadPolicy(

@@ -13,13 +13,9 @@ import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createRelayPass } from "../src/relay.ts";
-import {
-  clearDatabase,
-  createScenario,
-  database,
-  seedCompletedUpload,
-  validPng,
-} from "./support/scenario.ts";
+import { clearDatabase, database } from "./support/database.ts";
+import { createScenario } from "./support/scenario.ts";
+import { seedCompletedUpload, validPng } from "./support/seeds.ts";
 
 beforeAll(async () => runMigrations(parseDatabaseEnvironment(process.env)));
 beforeEach(clearDatabase);

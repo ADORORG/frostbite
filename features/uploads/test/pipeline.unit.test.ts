@@ -7,7 +7,8 @@ import {
 import { providerIdSchema } from "@ador/shared/providers";
 import { describe, expect, it } from "vitest";
 
-import { createAssetPipelineResolver, systemClock } from "../src/pipeline.ts";
+import { systemClock } from "../src/clock.ts";
+import { createAssetPipelineResolver } from "../src/pipeline.ts";
 
 const unused = async (): Promise<never> => {
   throw new Error("unused");

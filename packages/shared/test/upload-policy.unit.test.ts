@@ -23,6 +23,7 @@ describe("upload policy", () => {
       presignedUrlLifetimeMs: 900_000,
       derivativeReadLifetimeMs: 300_000,
       libraryPageSize: 48,
+      cleanupBatchSize: 50,
     });
     expect(resolveUploadPolicy({ activeIntentLimitPerUser: 1 })).toMatchObject({
       activeIntentLimitPerUser: 1,
@@ -60,6 +61,17 @@ describe("upload policy", () => {
     );
     for (const libraryPageSize of [0, 101, 1.5, -1])
       expect(() => resolveUploadPolicy({ libraryPageSize })).toThrow();
+  });
+
+  it("bounds the cleanup batch", () => {
+    expect(resolveUploadPolicy({ cleanupBatchSize: 1 }).cleanupBatchSize).toBe(
+      1,
+    );
+    expect(
+      resolveUploadPolicy({ cleanupBatchSize: 500 }).cleanupBatchSize,
+    ).toBe(500);
+    for (const cleanupBatchSize of [0, 501, 1.5, -1])
+      expect(() => resolveUploadPolicy({ cleanupBatchSize })).toThrow();
   });
 
   it("bounds image limits to what the database can persist", () => {

@@ -18,6 +18,16 @@ processing activities from the typed `object-storage:s3-compatible` and
 `media-processing:image-derivatives` capabilities and returns provider-neutral activities for a workflow
 host. A failed composition is not cached; the host may pass its own database client and clock.
 
+## Abandoned-upload cleanup
+
+`@ador/feature-uploads/cleanup` exports `createUploadCleanupResolver`, which composes
+`@ador/uploads`'s cleanup service from the typed `object-storage:s3-compatible` capability and
+returns it lazily (a failed composition is not cached). The worker runs it periodically; see the
+package README for the rules and the access policy for private drafts.
+
+Resolvers share one helper, `memoizeUntilFailure` (`src/lazy.ts`): build on first use, share the
+result, forget a failure.
+
 ## Library API
 
 `GET /api/v1/uploads/assets` returns the caller's newest assets (policy `libraryPageSize`, default 48;

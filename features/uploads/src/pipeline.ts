@@ -21,7 +21,8 @@ import {
   createDrizzleAssetValidationRepository,
 } from "@ador/uploads";
 
-export const systemClock = (): Date => new Date();
+import { systemClock } from "./clock.ts";
+import { memoizeUntilFailure } from "./lazy.ts";
 
 export interface AssetPipelineOptions {
   readonly clock?: () => Date;
@@ -73,12 +74,5 @@ export function createAssetPipelineResolver(
   providers: ProviderRegistry,
   options: AssetPipelineOptions = {},
 ): () => Promise<AssetPipelineActivities> {
-  let activities: Promise<AssetPipelineActivities> | undefined;
-  return () => {
-    activities ??= build(providers, options).catch((error: Error) => {
-      activities = undefined;
-      throw error;
-    });
-    return activities;
-  };
+  return memoizeUntilFailure(() => build(providers, options));
 }

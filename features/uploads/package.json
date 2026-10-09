@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./cleanup": "./src/cleanup.ts",
     "./entrypoint": "./src/entrypoint.tsx",
     "./pipeline": "./src/pipeline.ts"
   },

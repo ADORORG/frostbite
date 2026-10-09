@@ -3,12 +3,21 @@ import { startServiceProcess } from "@ador/test-kit/service-process";
 import { describe, expect, it } from "vitest";
 
 // Starts the real entry point as a process. No Inngest settings are provided on purpose, so every
-// relay pass fails; the worker must stay up, keep answering liveness, log without secrets, and stop
-// cleanly on SIGTERM.
+// relay pass fails, and the storage settings are invalid, so every cleanup pass fails too; the worker
+// must stay up, keep answering liveness, log without secrets, and stop cleanly on SIGTERM. Secret
+// values are planted in the environment and must never appear in a log line (a message may name a
+// missing setting, which is not a secret).
+const sentinels = ["sentinel-r2-secret-value", "sentinel-r2-key-id-value"];
 describe("the worker process", () => {
   it("starts, stays live while its relay fails, logs safely, and stops on SIGTERM", async () => {
     const port = await freePort();
-    const env: NodeJS.ProcessEnv = { ...process.env, PORT: String(port) };
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      PORT: String(port),
+      R2_ACCESS_KEY_ID: sentinels[1],
+      R2_ENDPOINT: "http://storage.invalid.example.test",
+      R2_SECRET_ACCESS_KEY: sentinels[0],
+    };
     for (const key of [
       "INNGEST_APP_ID",
       "INNGEST_BASE_URL",
@@ -24,14 +33,15 @@ describe("the worker process", () => {
       readyLine: "worker listening",
     });
     try {
-      await waitFor(
-        () =>
-          worker.lines().some((line) => line.includes("relay pass failed"))
-            ? true
-            : undefined,
-        30_000,
-        "a failed relay pass",
-      );
+      for (const failure of ["relay pass failed", "cleanup pass failed"])
+        await waitFor(
+          () =>
+            worker.lines().some((line) => line.includes(failure))
+              ? true
+              : undefined,
+          30_000,
+          `a "${failure}" line`,
+        );
       expect((await fetch(`http://127.0.0.1:${port}/health`)).status).toBe(200);
       expect(await worker.stop()).toBe(0);
       const lines = worker.lines();
@@ -43,7 +53,8 @@ describe("the worker process", () => {
           message: expect.any(String),
         });
         expect(line).not.toContain(process.env.DATABASE_URL ?? "never-set");
-        expect(line).not.toMatch(/password|secret|signkey/iu);
+        expect(line).not.toMatch(/password|signkey/iu);
+        for (const sentinel of sentinels) expect(line).not.toContain(sentinel);
       }
     } finally {
       await worker.stop();

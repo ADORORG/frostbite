@@ -17,6 +17,8 @@ const coverage = {
 export default defineConfig({
   test: {
     coverage,
+    // The integration files share one database and each applies migrations, so they run one by one.
+    fileParallelism: false,
     projects: [
       { test: { name: "unit", include: ["test/**/*.unit.test.ts"] } },
       {

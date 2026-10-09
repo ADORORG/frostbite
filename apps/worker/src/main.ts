@@ -36,9 +36,21 @@ const server = createServer(
 await new Promise<void>((resolve) => server.listen(port, resolve));
 log("info", "worker listening", { port });
 
-await runtime.runRelay(shutdown.signal, (error) =>
-  log("error", "relay pass failed", { error: error.message }),
-);
+await Promise.all([
+  runtime.runRelay(shutdown.signal, (error) =>
+    log("error", "relay pass failed", { error: error.message }),
+  ),
+  runtime.runCleanup(shutdown.signal, {
+    onError: (error) =>
+      log("error", "cleanup pass failed", { error: error.message }),
+    onResult: ({ claimed, failures, removed }) =>
+      log(failures.length > 0 ? "error" : "info", "abandoned uploads", {
+        claimed,
+        failures,
+        removed,
+      }),
+  }),
+]);
 // Stop accepting connections and drop idle keep-alive ones so shutdown cannot wait on them; a request
 // still in flight (a media step) is allowed to finish.
 const closed = new Promise<void>((resolve) => server.close(() => resolve()));

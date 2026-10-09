@@ -81,6 +81,47 @@ describe("worker runtime", () => {
     }
   });
 
+  it("returns from the cleanup loop without running a pass when it is already stopped", async () => {
+    const runtime = createWorkerRuntime({
+      environment,
+      providers: createProviderRegistry([]),
+    });
+    try {
+      const stopped = new AbortController();
+      stopped.abort();
+      const seen: string[] = [];
+      await runtime.runCleanup(stopped.signal, {
+        onError: (error) => seen.push(error.message),
+        onResult: () => seen.push("result"),
+      });
+      expect(seen).toEqual([]);
+    } finally {
+      await runtime.close();
+    }
+  });
+
+  it("reports a cleanup failure and keeps running until stopped", async () => {
+    const runtime = createWorkerRuntime({
+      environment,
+      providers: createProviderRegistry([]),
+    });
+    try {
+      const controller = new AbortController();
+      const errors: Error[] = [];
+      await runtime.runCleanup(controller.signal, {
+        onError: (error) => {
+          errors.push(error);
+          controller.abort();
+        },
+        onResult: () => undefined,
+      });
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.message).toBeTruthy();
+    } finally {
+      await runtime.close();
+    }
+  });
+
   it("refuses to start with an invalid database configuration", () => {
     expect(() =>
       createWorkerRuntime({

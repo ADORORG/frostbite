@@ -38,12 +38,11 @@ tag, because a presigned upload credential can outlive completion and overwrite 
 The recorded width and height are the dimensions the container declares; the pixel stream is not
 decoded until W3-05, which must confirm them.
 
-**Not yet connected:** nothing invokes this activity. The signed workflow adapter is gated
-(`references/workflow-adapter-gate.md`), so `uploads.assetprocessing.requested.v1` events are
-written to the outbox but not delivered. Assets remain `pending-validation` until that adapter or
-an explicitly approved trigger exists. Each run buffers up to the declared size (policy-capped), so
-the future trigger must also bound concurrent runs (W8-06). A missing object is a retryable error
-here; abandoned-upload cleanup belongs to W3-07.
+**Triggered by the worker.** The signed workflow adapter (W3-05A) delivers
+`uploads.assetprocessing.requested.v1` from the outbox and runs this activity, then processing. Each
+run buffers up to the declared size (policy-capped), so the worker bounds concurrent media runs
+(`maxConcurrentMediaRuns`). A missing object is a retryable error here; objects that were never
+completed are removed by abandoned-upload cleanup (below).
 
 ## Asset processing (W3-05)
 
@@ -57,7 +56,49 @@ its `asset_derivatives` rows, or to `unprocessable` with a stable reason. Replay
 winner. Storage, launch, and worker-protocol failures throw before any state change, so the asset
 stays `validated` and retryable. Derivatives are not published and have no public URL.
 
-Like validation, processing has **no trigger yet** and its concurrency is the caller's to bound.
+Like validation, processing is run by the worker, which bounds its concurrency.
+
+## Abandoned-upload cleanup (W3-07)
+
+An intent that is never completed leaves, at most, a private object nobody refers to. Accepted
+W3-02 policy: the upload window is 15 minutes, unclaimed objects become eligible for removal 24 hours
+after it ends (`cleanupDelayMs`), and the intent record is kept 30 days (`intentRetentionMs`).
+
+`createUploadCleanupService({...}).sweep()` removes those objects in one bounded pass
+(`cleanupBatchSize`, default 50):
+
+1. `UploadCleanupRepository.claim` atomically moves intents that are `reserved` or `failed`, past their
+   cleanup time, without an asset, and written through the configured storage provider, to
+   `abandoned`, oldest first, with `FOR UPDATE SKIP LOCKED`. It also returns `abandoned` intents whose
+   object removal was never recorded. An abandoned intent can no longer be completed, re-reserved, or
+   released, so deleting its object cannot race a user.
+2. The service deletes each object from the private scope. Deleting a key that was never written is a
+   no-op, so an upload the browser never started needs no special case.
+3. `markObjectRemoved` records `object_removed_at`. A failed delete is reported and left unrecorded,
+   so the next pass retries it; one failure never stops the batch.
+
+Intents of another storage provider are never claimed (their objects cannot be removed from here), so
+they cannot crowd out work that can be done. Passes running at the same time never lose an intent; one
+that sees another's removal still pending may return it too, which is harmless because deleting and
+recording are idempotent. The worker runs the sweep on a slow loop (`defaultMaintenanceLoopPolicy`).
+
+## Access rules for private drafts
+
+A draft (an upload intent, its object, its asset, and its renditions) is accessible to its **owner
+only**. Staff and reviewer access to a frozen submission is a separate, later rule (W4-03); until then
+no role widens it.
+
+| Path                            | Rule                                                                                   |
+| ------------------------------- | -------------------------------------------------------------------------------------- |
+| Create an intent                | Authenticated; quota and idempotency keys are per user                                 |
+| Complete an intent              | Owner only; another user's intent is indistinguishable from a missing one              |
+| Release a failed reservation    | Owner only                                                                             |
+| List assets and read renditions | Owner's assets only; renditions are signed per request for the owner (ADR-016)         |
+| Object bytes                    | Private bucket; opaque random keys; a presigned URL reaches one key, for one operation |
+| Validation, processing, cleanup | Worker-internal; not reachable from a user request                                     |
+
+Every repository query that serves a user filters by the authenticated user's id. The integration
+tests cover another user's completion, release, library, and identical idempotency key.
 
 Configuration comes from the validated shared upload policy. Run `env:check`, `typecheck`,
 `test:unit`, `test:integration`, or `test:coverage`. Platform engineering owns this package.

@@ -1,0 +1,75 @@
+import type { DatabaseClient } from "@ador/database/connection";
+import { assets, uploadIntents } from "@ador/database/schema/uploads";
+import { parseObjectKey } from "@ador/object-storage/contracts";
+import { uuidV7Schema } from "@ador/shared/identifiers";
+import { and, asc, eq, inArray, isNull, lte, notExists, or } from "drizzle-orm";
+
+import type { UploadCleanupRepository } from "../application/cleanup-repository.ts";
+
+export function createDrizzleUploadCleanupRepository(
+  database: DatabaseClient,
+): UploadCleanupRepository {
+  return {
+    async claim({ limit, now, storageProviderId }) {
+      return database.transaction(async (transaction) => {
+        // SKIP LOCKED leaves rows another pass (or a completion in flight) holds to that owner.
+        const rows = await transaction
+          .select({
+            id: uploadIntents.id,
+            objectKey: uploadIntents.objectKey,
+            state: uploadIntents.state,
+          })
+          .from(uploadIntents)
+          .where(
+            and(
+              eq(uploadIntents.storageProviderId, storageProviderId),
+              // Whatever its state says, an object an asset refers to is never claimed.
+              notExists(
+                transaction
+                  .select({ id: assets.id })
+                  .from(assets)
+                  .where(eq(assets.uploadIntentId, uploadIntents.id)),
+              ),
+              or(
+                and(
+                  inArray(uploadIntents.state, ["reserved", "failed"]),
+                  lte(uploadIntents.cleanupEligibleAt, now),
+                ),
+                and(
+                  eq(uploadIntents.state, "abandoned"),
+                  isNull(uploadIntents.objectRemovedAt),
+                ),
+              ),
+            ),
+          )
+          .orderBy(asc(uploadIntents.cleanupEligibleAt), asc(uploadIntents.id))
+          .limit(limit)
+          .for("update", { skipLocked: true });
+        const fresh = rows
+          .filter(({ state }) => state !== "abandoned")
+          .map(({ id }) => id);
+        if (fresh.length > 0)
+          await transaction
+            .update(uploadIntents)
+            .set({ state: "abandoned", updatedAt: now })
+            .where(inArray(uploadIntents.id, fresh));
+        return rows.map((row) => ({
+          intentId: uuidV7Schema.parse(row.id),
+          objectKey: parseObjectKey(row.objectKey),
+        }));
+      });
+    },
+    async markObjectRemoved({ intentId, removedAt }) {
+      await database
+        .update(uploadIntents)
+        .set({ objectRemovedAt: removedAt, updatedAt: removedAt })
+        .where(
+          and(
+            eq(uploadIntents.id, intentId),
+            eq(uploadIntents.state, "abandoned"),
+            isNull(uploadIntents.objectRemovedAt),
+          ),
+        );
+    },
+  };
+}

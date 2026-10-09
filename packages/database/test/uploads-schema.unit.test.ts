@@ -23,6 +23,7 @@ describe("upload-intent schema", () => {
       expect.arrayContaining([
         "upload_intents_user_idempotency_unique",
         "upload_intents_active_user_idx",
+        "upload_intents_cleanup_idx",
       ]),
     );
     expect(config.checks.map(({ name }) => name)).toEqual(
@@ -32,6 +33,7 @@ describe("upload-intent schema", () => {
         "upload_intents_fingerprint_sha256",
         "upload_intents_cleanup_after_expiry",
         "upload_intents_retention_after_cleanup",
+        "upload_intents_removal_requires_abandoned",
       ]),
     );
   });
@@ -39,8 +41,11 @@ describe("upload-intent schema", () => {
   it("infers persistence fields from the Drizzle table", () => {
     expectTypeOf<UploadIntent["byteLength"]>().toEqualTypeOf<number>();
     expectTypeOf<UploadIntent["state"]>().toEqualTypeOf<
-      "reserved" | "completed" | "cancelled" | "failed"
+      "reserved" | "completed" | "cancelled" | "failed" | "abandoned"
     >();
+    expectTypeOf<
+      UploadIntent["objectRemovedAt"]
+    >().toEqualTypeOf<Date | null>();
   });
 });
 

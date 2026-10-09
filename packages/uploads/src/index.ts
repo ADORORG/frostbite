@@ -11,3 +11,6 @@ export * from "./application/pipeline-activities.ts";
 export * from "./adapters/drizzle-library-repository.ts";
 export * from "./application/library-repository.ts";
 export * from "./application/library-service.ts";
+export * from "./adapters/drizzle-cleanup-repository.ts";
+export * from "./application/cleanup-repository.ts";
+export * from "./application/cleanup-service.ts";

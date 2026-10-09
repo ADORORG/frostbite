@@ -7,6 +7,8 @@ import {
 import type { ObjectStorageProviderServices } from "@ador/object-storage";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 
+import { memoizeUntilFailure } from "./lazy.ts";
+
 type Storage = ObjectStorageProviderServices["object-storage:s3-compatible"];
 
 export interface UploadsContext {
@@ -20,20 +22,15 @@ export function createUploadsContextResolver(
   providers: ProviderRegistry,
   environment: NodeJS.ProcessEnv = process.env,
 ): () => Promise<UploadsContext> {
-  let context: Promise<UploadsContext> | undefined;
-  return () => {
-    context ??= providers
-      .resolve("object-storage:s3-compatible")
-      .then((storage: Storage) => ({
-        database: createDatabaseClient(
-          createDatabasePool(parseDatabaseEnvironment(environment)),
-        ),
-        storage,
-      }))
-      .catch((error: Error) => {
-        context = undefined;
-        throw error;
-      });
-    return context;
-  };
+  return memoizeUntilFailure(async () => {
+    const storage: Storage = await providers.resolve(
+      "object-storage:s3-compatible",
+    );
+    return {
+      database: createDatabaseClient(
+        createDatabasePool(parseDatabaseEnvironment(environment)),
+      ),
+      storage,
+    };
+  });
 }

@@ -22,11 +22,14 @@ import { assetValidationCoherence } from "./asset-validation-check.ts";
 import { authUsers } from "./auth.ts";
 import { platformSchema } from "./platform.ts";
 
+// `abandoned` is set by cleanup once an intent was never completed and its cleanup time has passed;
+// the private object is then removed, and `object_removed_at` records that it was.
 export const uploadIntentStates = [
   "reserved",
   "completed",
   "cancelled",
   "failed",
+  "abandoned",
 ] as const;
 export const uploadIntentState = platformSchema.enum(
   "upload_intent_state",
@@ -79,6 +82,10 @@ export const uploadIntents = platformSchema.table(
       mode: "date",
       withTimezone: true,
     }).notNull(),
+    objectRemovedAt: timestamp("object_removed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -95,6 +102,17 @@ export const uploadIntents = platformSchema.table(
       table.userId,
       table.state,
       table.expiresAt,
+    ),
+    // The cleanup sweep: intents not yet completed whose cleanup time has come, and abandoned ones
+    // whose object removal has not been recorded.
+    index("upload_intents_cleanup_idx")
+      .on(table.cleanupEligibleAt)
+      .where(
+        sql`${table.state} in ('reserved', 'failed') or (${table.state} = 'abandoned' and ${table.objectRemovedAt} is null)`,
+      ),
+    check(
+      "upload_intents_removal_requires_abandoned",
+      sql`${table.objectRemovedAt} is null or ${table.state} = 'abandoned'`,
     ),
     check("upload_intents_byte_length_positive", sql`${table.byteLength} > 0`),
     check(

@@ -85,6 +85,24 @@ describe("upload intent persistence", () => {
     ).resolves.toEqual({ kind: "conflict" });
   });
 
+  it("keeps two users' identical idempotency keys apart, so neither is handed the other's intent", async () => {
+    const [first, second] = [await user(), await user()];
+    const mine = reservation(first, "upload-request-0001", intent("mine"));
+    const theirs = reservation(second, "upload-request-0001", intent("theirs"));
+    await expect(repository.reserve(mine)).resolves.toMatchObject({
+      intent: { id: mine.id },
+      kind: "reserved",
+    });
+    await expect(repository.reserve(theirs)).resolves.toMatchObject({
+      intent: { id: theirs.id },
+      kind: "reserved",
+    });
+    await expect(repository.reserve(theirs)).resolves.toMatchObject({
+      intent: { id: theirs.id, objectKey: theirs.objectKey },
+      kind: "replayed",
+    });
+  });
+
   it("serializes concurrent reservations at the configured quota", async () => {
     const userId = await user();
     const attempts = ["one", "two", "three"].map((suffix, index) =>
