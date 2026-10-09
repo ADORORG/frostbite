@@ -175,6 +175,24 @@ describe("upload completion persistence", () => {
     await expect(database.select().from(assets)).resolves.toHaveLength(0);
   });
 
+  it("refuses another user completing a live intent, creating no asset and leaving it completable by its owner", async () => {
+    const live = await reserve();
+    const otherUserId = createUuidV7();
+    await database.insert(authUsers).values({
+      email: `${otherUserId}@example.test`,
+      id: otherUserId,
+      name: "Other",
+    });
+    await expect(
+      repository.complete(completion(live.intent.id, otherUserId)),
+    ).resolves.toEqual({ kind: "unavailable" });
+    await expect(database.select().from(assets)).resolves.toHaveLength(0);
+    await expect(database.select().from(outboxEvents)).resolves.toHaveLength(0);
+    await expect(
+      repository.complete(completion(live.intent.id, live.userId)),
+    ).resolves.toMatchObject({ kind: "completed" });
+  });
+
   it("refuses completion evidence from a different storage provider", async () => {
     const { intent, userId } = await reserve();
     const input = completion(intent.id, userId);

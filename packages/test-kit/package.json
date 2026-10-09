@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./docker": "./src/docker.ts",
+    "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
     "./png": "./src/png.ts",

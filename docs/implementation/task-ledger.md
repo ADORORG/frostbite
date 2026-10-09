@@ -26,9 +26,9 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W3-07` completed; `W3-08` not started)                       |
-| Next ordered task       | `W3-08` Upload acceptance tests                                     |
-| Current milestone phase | Week 3 — Upload pipeline                                            |
+| Active task             | None (`W3-08` completed; Week 3 closed)                             |
+| Next ordered task       | `W4-00` Chain-neutral contracts (blocked on ADR-017)                |
+| Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
 
@@ -83,7 +83,7 @@ stored in `references/task-list.md`.
 | W3-05A | Implement the signed Inngest adapter and trigger upload validation and processing | completed | `references/workflow-adapter-task-record.md`; completed; all root gates green; review Converged (3 clean passes) |
 | W3-06  | Build upload progress, retry, validation-error, and asset-library UI              | completed | `references/upload-ui-task-record.md`; all root gates and e2e green; review Converged (3 clean passes)           |
 | W3-07  | Enforce private draft access and abandoned-upload cleanup                         | completed | `references/upload-cleanup-task-record.md`; all root gates and e2e green; review Converged (3 clean passes)      |
-| W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests   | pending   | Depends on W3-01 through W3-07                                                                                   |
+| W3-08  | Close positive, negative, unauthorized, retry, and idempotency acceptance tests   | completed | `references/upload-acceptance-task-record.md`; all root gates and e2e green; review Converged (3 clean passes)   |
 
 ## Week 4 — Collection and creator workflow
 

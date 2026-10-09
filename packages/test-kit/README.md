@@ -16,6 +16,8 @@ Shared, test-only helpers. Production code never imports this package.
   child process and waits for a readiness log line.
 - `@ador/test-kit/png` — `createDecodablePng` (a real gradient image) and `createUndecodablePng`
   (structurally valid, undecodable pixel data) for upload tests.
+- `@ador/test-kit/images` — `createJpeg` and `createWebp`, tiny real 24x16 images (fixture data from the pinned
+  `sharp`) for the other two committed upload formats.
 - `@ador/test-kit/serve-fetch-handler` — serves a fetch-style handler over HTTP and records each exchange.
 
 Docker is required for the integration tests. Run `typecheck`, `test:unit`, `test:integration`, or

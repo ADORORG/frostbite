@@ -53,6 +53,27 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-retry-uploader-session-token",
     userId: "01994b10-0000-7000-8000-000000000018",
   },
+  // Acceptance flows (W3-08), each with its own session so parallel specs never share one.
+  acceptanceApiUploader: {
+    sessionId: "01994b10-0000-7000-8000-00000000001b",
+    sessionToken: "e2e-acceptance-api-uploader-session-token",
+    userId: "01994b10-0000-7000-8000-00000000001a",
+  },
+  acceptanceApiOther: {
+    sessionId: "01994b10-0000-7000-8000-00000000001d",
+    sessionToken: "e2e-acceptance-api-other-session-token",
+    userId: "01994b10-0000-7000-8000-00000000001c",
+  },
+  acceptanceFormatUploader: {
+    sessionId: "01994b10-0000-7000-8000-00000000001f",
+    sessionToken: "e2e-acceptance-format-uploader-session-token",
+    userId: "01994b10-0000-7000-8000-00000000001e",
+  },
+  acceptanceHostileUploader: {
+    sessionId: "01994b10-0000-7000-8000-000000000021",
+    sessionToken: "e2e-acceptance-hostile-uploader-session-token",
+    userId: "01994b10-0000-7000-8000-000000000020",
+  },
   visualUser: {
     sessionId: "01994b10-0000-7000-8000-00000000000a",
     sessionToken: "e2e-visual-session-token",

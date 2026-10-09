@@ -32,6 +32,8 @@ describe("Playwright production-server integration", () => {
       throw new Error("expected a RegExp ignore pattern");
     expect(String(pattern)).toContain("uploads");
     expect(pattern.test("tests/uploads.spec.ts")).toBe(true);
+    expect(pattern.test("tests/uploads-acceptance.spec.ts")).toBe(true);
+    expect(pattern.test("tests/uploads-acceptance-api.spec.ts")).toBe(true);
     expect(pattern.test("tests/uploads-quality.spec.ts")).toBe(false);
   });
 });

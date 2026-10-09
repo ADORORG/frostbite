@@ -1,36 +1,18 @@
 import { createDecodablePng, createUndecodablePng } from "@ador/test-kit/png";
 import { uploadsStudioPath } from "@ador/shared/uploads";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
-import { useE2ESession } from "../src/session.ts";
+import {
+  chooseImage,
+  processingTimeout,
+  signIn,
+} from "../src/upload-helpers.ts";
 
 // The flows run real services (Postgres, S3-compatible storage, the worker, a signed Inngest runtime)
 // and take seconds each, so playwright.config runs this spec on the desktop project only; the quality
 // spec covers every viewport.
 test.describe.configure({ mode: "serial", timeout: 150_000 });
-
-const processingTimeout = 90_000;
-
-async function signIn(
-  page: Page,
-  baseURL: string | undefined,
-  actor: { readonly sessionToken: string },
-) {
-  if (baseURL === undefined) throw new Error("Expected configured base URL");
-  await useE2ESession(page.context(), baseURL, actor.sessionToken);
-}
-
-function chooseImage(
-  page: Page,
-  name: string,
-  mimeType: string,
-  buffer: Buffer,
-) {
-  return page
-    .locator('input[type="file"]')
-    .setInputFiles({ buffer, mimeType, name });
-}
 
 test("a signed-in user uploads an image and sees its processed thumbnail, which survives a reload", async ({
   baseURL,
