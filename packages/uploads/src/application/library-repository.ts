@@ -34,4 +34,10 @@ export interface AssetLibraryRepository {
     readonly limit: number;
     readonly userId: UuidV7;
   }): Promise<readonly LibraryAssetRecord[]>;
+  // The caller's own assets among `assetIds`, in no particular order. An id that is unknown or
+  // belongs to someone else is simply absent: ownership is part of the query.
+  listByIdsForUser(input: {
+    readonly assetIds: readonly UuidV7[];
+    readonly userId: UuidV7;
+  }): Promise<readonly LibraryAssetRecord[]>;
 }

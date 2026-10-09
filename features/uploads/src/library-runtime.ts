@@ -4,7 +4,7 @@ import {
 } from "@ador/uploads";
 
 import type { UploadsContext } from "./context.ts";
-import { memoizeUntilFailure } from "./lazy.ts";
+import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
 
 export function createLibraryServiceResolver(
   resolveContext: () => Promise<UploadsContext>,

@@ -6,6 +6,8 @@ Explicit feature/provider registration, boot validation, dependency checking, an
 
 - `defineFeature(registration)` validates one manifest at its declaration boundary.
 - `createFeatureRegistry(registrations)` creates an immutable public registry interface.
+- `@ador/plugin-kit/lazy` exports `memoizeUntilFailure`: build a feature's shared dependency on first use,
+  share it, and forget a failed build so a later call can retry.
 - `FeatureRegistration` and `FeatureEntrypoint` define the plugin boundary.
 - Feature entrypoints own pages and framework-neutral HTTP operations; apps use generic dispatchers.
 - `@ador/plugin-kit/providers` defines and creates explicit provider registries.

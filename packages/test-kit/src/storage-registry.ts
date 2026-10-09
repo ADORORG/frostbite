@@ -1,3 +1,5 @@
+// Loads the `object-storage:s3-compatible` service typing into the provider registry.
+import type {} from "@ador/object-storage";
 import type { ObjectStoragePort } from "@ador/object-storage/contracts";
 import {
   createProviderRegistry,

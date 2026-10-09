@@ -7,6 +7,8 @@ import {
   chainFamilyIdSchema,
   chainCapabilitySchema,
   chainNamespace,
+  chainOptionSchema,
+  chainRefTextSchema,
   chainReference,
   chainRefSchema,
   finalitySchema,
@@ -49,6 +51,30 @@ describe("chainRefSchema", () => {
     const parsed = chainRefSchema.parse(bitcoin);
     expect(chainNamespace(parsed)).toBe("bip122");
     expect(chainReference(parsed)).toBe("000000000019d6689c085ae165831e93");
+  });
+});
+
+describe("chain option and text schemas", () => {
+  it("projects a chain config to what a feature needs, without confirmation policy", () => {
+    const option = {
+      chainId: bitcoin,
+      displayName: "Bitcoin signet",
+      enabled: true,
+      family: "bitcoin-alkanes",
+      role: "public-beta",
+    };
+    expect(chainOptionSchema.safeParse(option).success).toBe(true);
+    expect(
+      chainOptionSchema.safeParse({ ...option, confirmations: {} }).success,
+    ).toBe(false);
+    expect(
+      chainOptionSchema.safeParse({ ...option, enabled: "yes" }).success,
+    ).toBe(false);
+  });
+
+  it("validates a chain reference as plain text, without a brand, for HTTP contracts", () => {
+    expect(chainRefTextSchema.parse(bitcoin)).toBe(bitcoin);
+    expect(chainRefTextSchema.safeParse("nope").success).toBe(false);
   });
 });
 

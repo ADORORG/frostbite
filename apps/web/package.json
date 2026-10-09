@@ -21,6 +21,7 @@
     "@ador/authorization": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
+    "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
@@ -28,8 +29,8 @@
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
-    "@repo/ui": "workspace:*",
     "@repo/config": "workspace:*",
+    "@repo/ui": "workspace:*",
     "next": "16.3.3",
     "react": "19.2.8",
     "react-dom": "19.2.8"

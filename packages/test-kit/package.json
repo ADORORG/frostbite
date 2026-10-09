@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./chain-conformance": "./src/chain-conformance.ts",
+    "./creator-database": "./src/creator-database.ts",
     "./docker": "./src/docker.ts",
     "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
@@ -14,21 +15,26 @@
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
     "./service-process": "./src/service-process.ts",
     "./simulated-chain": "./src/simulated-chain/adapter.ts",
-    "./simulated-chain-config": "./src/simulated-chain/config.ts"
+    "./simulated-chain-config": "./src/simulated-chain/config.ts",
+    "./storage-registry": "./src/storage-registry.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
-    "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:integration": "node --experimental-strip-types ../database/test/support/run-postgres.ts integration",
+    "test:coverage": "node --experimental-strip-types ../database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
     "@ador/chain": "workspace:*",
+    "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
+    "@ador/object-storage": "workspace:*",
+    "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
     "@aws-sdk/client-s3": "3.1131.0",
+    "drizzle-orm": "1.0.0-rc.4",
     "zod": "^4.5.4"
   },
   "devDependencies": {

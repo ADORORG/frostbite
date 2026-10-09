@@ -4,6 +4,7 @@ import {
 } from "@ador/object-storage/contracts";
 import { ObjectStorageError } from "@ador/object-storage/errors";
 import { createUuidV7 } from "@ador/shared/identifiers";
+import { unusedStorage } from "@ador/test-kit/storage-registry";
 import { describe, expect, it, vi } from "vitest";
 
 import type {
@@ -53,7 +54,11 @@ function setup(
   } = {},
 ) {
   const listNewestForUser = vi.fn(async () => records);
-  const repository: AssetLibraryRepository = { listNewestForUser };
+  const listByIdsForUser = vi.fn(async () => records);
+  const repository: AssetLibraryRepository = {
+    listByIdsForUser,
+    listNewestForUser,
+  };
   const defaultPresign: ObjectStoragePort["presignPrivateRead"] = async ({
     key,
   }) => ({
@@ -61,9 +66,10 @@ function setup(
     url: new URL(`https://storage.example.test/${key}?sig=1`),
   });
   const presignPrivateRead = vi.fn(options.presign ?? defaultPresign);
-  // Only the one method under test exists on this fake; every other call would throw.
-  const storage = { presignPrivateRead } as unknown as ObjectStoragePort;
+  // Only the one method under test works; every other call on `unusedStorage` would throw.
+  const storage: ObjectStoragePort = { ...unusedStorage, presignPrivateRead };
   return {
+    listByIdsForUser,
     listNewestForUser,
     presignPrivateRead,
     service: createAssetLibraryService({
@@ -75,6 +81,37 @@ function setup(
 }
 
 describe("asset library service", () => {
+  it("presents requested assets like the library, scoped to the caller", async () => {
+    const asset = record();
+    const { listByIdsForUser, presignPrivateRead, service } = setup([asset]);
+    const result = await service.getMany(userId, [asset.id]);
+    expect(listByIdsForUser).toHaveBeenCalledWith({
+      assetIds: [asset.id],
+      userId,
+    });
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      derivativeAccess: "available",
+      id: asset.id,
+      processingState: "processed",
+    });
+    expect(presignPrivateRead).toHaveBeenCalledTimes(2);
+  });
+
+  it("signs nothing for an asset that is not processed", async () => {
+    const pending = record({
+      derivatives: [],
+      processingState: "pending-validation",
+    });
+    const { presignPrivateRead, service } = setup([pending]);
+    const [result] = await service.getMany(userId, [pending.id]);
+    expect(result).toMatchObject({
+      derivativeAccess: "none",
+      derivatives: [],
+    });
+    expect(presignPrivateRead).not.toHaveBeenCalled();
+  });
+
   it("signs each rendition of a processed asset for the policy lifetime", async () => {
     const asset = record();
     const { presignPrivateRead, service } = setup([asset]);

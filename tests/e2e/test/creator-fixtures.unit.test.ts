@@ -1,7 +1,10 @@
 import { uuidV7TextSchema } from "@ador/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
-import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
+import {
+  approvedCreators,
+  creatorE2EFixtures,
+} from "../src/creator-fixtures.ts";
 
 describe("creator E2E fixtures", () => {
   const actors = Object.values(creatorE2EFixtures);
@@ -32,6 +35,20 @@ describe("creator E2E fixtures", () => {
     expect(creatorE2EFixtures.uploader.sessionToken).toContain("uploader");
     expect(creatorE2EFixtures.otherUploader.sessionToken).toContain(
       "other-uploader",
+    );
+  });
+
+  it("seeds approved creators only from named fixtures, never the unapproved one", () => {
+    const named = new Set(
+      Object.values(creatorE2EFixtures).map(({ userId }) => userId),
+    );
+    for (const creator of approvedCreators)
+      expect(named.has(creator.userId)).toBe(true);
+    expect(approvedCreators.map(({ userId }) => userId)).not.toContain(
+      creatorE2EFixtures.collectionUnapproved.userId,
+    );
+    expect(new Set(approvedCreators.map(({ userId }) => userId)).size).toBe(
+      approvedCreators.length,
     );
   });
 });

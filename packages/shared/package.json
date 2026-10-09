@@ -16,7 +16,8 @@
     "./identifiers": "./src/identifiers/uuid-v7.ts",
     "./platform": "./src/platform/status.ts",
     "./uploads": "./src/uploads/index.ts",
-    "./providers": "./src/features/manifest.ts"
+    "./providers": "./src/features/manifest.ts",
+    "./collections": "./src/collections/index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

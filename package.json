@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "@ador/feature-accounts": "workspace:*",
+    "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-products": "workspace:*",

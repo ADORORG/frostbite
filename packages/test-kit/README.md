@@ -28,6 +28,9 @@ Shared, test-only helpers. Production code never imports this package.
   fund an address, and force a rejected, unavailable, or ambiguous broadcast. Test-only: the registry
   refuses it for any chain whose role is not `test`. `@ador/test-kit/simulated-chain-config` gives
   `simulatedChainConfig`, a ready `ChainConfig` for it, so a feature test boots the registry in one call.
+- `@ador/test-kit/storage-registry` — `storageRegistry` (a provider registry whose only provider supplies
+  `object-storage:s3-compatible`) and `unusedStorage` (a storage port that fails on any call it was not
+  given), for feature composition tests.
 - `@ador/test-kit/serve-fetch-handler` — serves a fetch-style handler over HTTP and records each exchange.
 
 Docker is required for the integration tests. Run `typecheck`, `test:unit`, `test:integration`, or

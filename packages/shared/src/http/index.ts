@@ -51,3 +51,4 @@ export type HttpErrorEnvelope = z.infer<typeof httpErrorEnvelopeSchema>;
 export type HttpMethod = z.infer<typeof httpMethodSchema>;
 export type IdempotencyKey = z.infer<typeof idempotencyKeySchema>;
 export type IdempotencyPolicy = z.infer<typeof idempotencyPolicySchema>;
+export * from "./fingerprint.ts";

@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W4-00` completed)                                            |
-| Next ordered task       | `W4-01` Collection and project records                              |
+| Active task             | None (`W4-01` completed)                                            |
+| Next ordered task       | `W4-02` Resumable creator collection wizard                         |
 | Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -90,7 +90,7 @@ stored in `references/task-list.md`.
 | ID    | Task                                                                                      | Status    | Evidence or blocker                                 |
 | ----- | ----------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
 | W4-00 | Define chain-neutral contracts, adapter registry, conformance suite, and simulated family | completed | `references/chain-neutral-contracts-task-record.md` |
-| W4-01 | Implement collection/project records, versioned drafts, metadata, supply, and items       | pending   | Depends on Week 3, creator admission, and W4-00     |
+| W4-01 | Implement collection/project records, versioned drafts, metadata, supply, and items       | completed | `references/collection-records-task-record.md`      |
 | W4-02 | Build the resumable creator collection wizard                                             | pending   | Depends on W4-01                                    |
 | W4-03 | Implement immutable submission snapshots and review state transitions                     | pending   | Depends on W4-01 and staff authorization            |
 | W4-04 | Enforce no self-approval and approval/revocation concurrency invariants                   | pending   | Depends on W4-03                                    |

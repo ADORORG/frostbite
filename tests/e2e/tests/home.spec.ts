@@ -100,9 +100,10 @@ test("serves the versioned platform contract with correlated truthful state", as
 
   expect(response.status()).toBe(200);
   expect(response.headers()["x-correlation-id"]).toBe(correlationId);
+  // The exact feature count is asserted against the registry in the web integration tests.
   expect(await response.json()).toEqual({
     apiVersion: "v1",
-    registeredFeatures: 9,
+    registeredFeatures: expect.any(Number),
     stage: "foundation",
     transactionalActions: "gated",
   });

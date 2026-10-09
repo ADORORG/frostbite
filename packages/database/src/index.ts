@@ -78,3 +78,9 @@ export {
   type UploadIntent,
   type Asset,
 } from "./schema/uploads.ts";
+export {
+  collectionItems,
+  collections,
+  type Collection,
+  type CollectionItemRow,
+} from "./schema/collections.ts";

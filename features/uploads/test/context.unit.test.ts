@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createUploadsContextResolver } from "../src/context.ts";
-import { storageRegistry, unusedStorage } from "./support/storage-registry.ts";
+import {
+  storageRegistry,
+  unusedStorage,
+} from "@ador/test-kit/storage-registry";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",

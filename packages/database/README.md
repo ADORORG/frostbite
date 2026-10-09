@@ -12,6 +12,10 @@ Server-only, provider-neutral PostgreSQL infrastructure for the platform.
 - `@ador/database/schema/wallet-qualification` — separate diagnostic challenges, with message
   hashes, attempt bounds, expiry, and single-use settlement owned by the auth qualification adapter.
 - Durable upload-intent and private asset-observation tables with explicit processing state.
+- Collection drafts (`collections`) and their ordered items (`collection_items`): a revision counter bumped
+  by every change, a CAIP-2 target chain id, per-creator and per-collection idempotency keys, and CHECK
+  constraints for the stored limits. `createDatabaseFromEnvironment` builds a client from validated
+  configuration for composition roots.
 - Transactional outbox insertion, lease-based claiming, acknowledgement, retry, and exhausted
   failure transitions.
 

@@ -12,17 +12,25 @@ export type ChainFamilyId = string & { readonly [chainFamilyIdBrand]: true };
 const chainRefPattern = /^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}$/u;
 const chainFamilyIdPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u;
 
-// The brand is introduced only after the pattern check, the same way `uuidV7Schema` does it.
-export const chainRefSchema = z
+// The text schemas validate and add no brand, so they can describe an HTTP contract (a transform has
+// no JSON Schema form and would break the OpenAPI document). The branded schemas below add the brand
+// only after the same pattern check, the way `uuidV7Schema` does for `uuidV7TextSchema`.
+export const chainRefTextSchema = z
   .string()
-  .regex(chainRefPattern, "Expected a CAIP-2 chain reference")
-  .transform((value) => value as ChainRef);
+  .regex(chainRefPattern, "Expected a CAIP-2 chain reference");
 
-export const chainFamilyIdSchema = z
+export const chainRefSchema = chainRefTextSchema.transform(
+  (value) => value as ChainRef,
+);
+
+export const chainFamilyIdTextSchema = z
   .string()
   .max(48)
-  .regex(chainFamilyIdPattern, "Expected a lowercase chain family id")
-  .transform((value) => value as ChainFamilyId);
+  .regex(chainFamilyIdPattern, "Expected a lowercase chain family id");
+
+export const chainFamilyIdSchema = chainFamilyIdTextSchema.transform(
+  (value) => value as ChainFamilyId,
+);
 
 export function chainNamespace(chain: ChainRef): string {
   return chain.slice(0, chain.indexOf(":"));

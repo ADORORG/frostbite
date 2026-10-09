@@ -10,10 +10,15 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
   `ChainConfig` (role, per-operation finality, release gate), addresses, assets, amounts, contract
   references, transaction intents and summaries, opaque unsigned and signed payloads, broadcast
   outcomes, observations, and the neutral transaction state machine. No family concept appears here.
+- `@ador/shared/collections` — collection draft and item schemas, the engineering limits, the asset
+  purposes a draft may reference, and the HTTP contract (inputs, responses, routes) of the collection
+  studio API.
 - `@ador/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
   manifest schema.
 - `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.
-- `@ador/shared/http` — HTTP headers, methods, idempotency policy, and the versioned error envelope.
+- `@ador/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
+  `requestFingerprint`, a key-order-independent digest used to detect an idempotency key reused with
+  different content.
 - `@ador/shared/wallet-qualification` — bounded diagnostic schemas, routes, and configurable
   defaults. The strict result contract cannot carry a session or represent successful sign-in.
 - `@ador/shared/platform` — public platform-status input and output contracts.

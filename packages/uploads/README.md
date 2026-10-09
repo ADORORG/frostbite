@@ -94,6 +94,7 @@ no role widens it.
 | Complete an intent              | Owner only; another user's intent is indistinguishable from a missing one              |
 | Release a failed reservation    | Owner only                                                                             |
 | List assets and read renditions | Owner's assets only; renditions are signed per request for the owner (ADR-016)         |
+| Read assets by id (previews)    | `getMany`: the owner's assets among the ids asked; others are absent, like unknown ids |
 | Object bytes                    | Private bucket; opaque random keys; a presigned URL reaches one key, for one operation |
 | Validation, processing, cleanup | Worker-internal; not reachable from a user request                                     |
 

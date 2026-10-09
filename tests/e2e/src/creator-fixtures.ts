@@ -79,4 +79,33 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-visual-session-token",
     userId: "01994b10-0000-7000-8000-000000000009",
   },
+  // Collection drafts (W4-01): two approved creators, so a spec can prove one never reaches the other's
+  // drafts or images, and a user who never applied, who must be refused.
+  collectionCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000023",
+    sessionToken: "e2e-collection-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000022",
+  },
+  collectionOtherCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000025",
+    sessionToken: "e2e-collection-other-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000024",
+  },
+  collectionAccessOwner: {
+    sessionId: "01994b10-0000-7000-8000-000000000029",
+    sessionToken: "e2e-collection-access-owner-session-token",
+    userId: "01994b10-0000-7000-8000-000000000028",
+  },
+  collectionUnapproved: {
+    sessionId: "01994b10-0000-7000-8000-000000000027",
+    sessionToken: "e2e-collection-unapproved-session-token",
+    userId: "01994b10-0000-7000-8000-000000000026",
+  },
 } as const;
+
+// Actors the seed gives an approved creator application, so they may change collection drafts.
+export const approvedCreators = [
+  creatorE2EFixtures.collectionCreator,
+  creatorE2EFixtures.collectionOtherCreator,
+  creatorE2EFixtures.collectionAccessOwner,
+] as const;

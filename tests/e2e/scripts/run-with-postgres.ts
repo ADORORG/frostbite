@@ -6,13 +6,18 @@ import {
   authSessions,
   authUsers,
   createDatabaseClient,
+  creatorApplications,
   createDatabasePool,
   platformRoleAssignments,
   walletIdentities,
 } from "@ador/database";
+import { creatorApplicationFixture } from "@ador/test-kit/creator-database";
 import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
 
-import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
+import {
+  approvedCreators,
+  creatorE2EFixtures,
+} from "../src/creator-fixtures.ts";
 import { normalizePlaywrightArguments } from "../src/playwright-arguments.ts";
 import { resolveE2EServerConfig } from "../src/server-config.ts";
 import { withUploadServices } from "../src/services.ts";
@@ -61,6 +66,14 @@ async function seed(databaseUrl: string): Promise<void> {
         idleExpiresAt: expiry,
         tokenHash: hash(fixture.sessionToken),
         userId: fixture.userId,
+      })),
+    );
+    await database.insert(creatorApplications).values(
+      approvedCreators.map(({ userId }, index) => ({
+        applicantUserId: userId,
+        draft: creatorApplicationFixture,
+        id: `01994b10-0000-7000-8000-0000000000${(0x30 + index).toString(16)}`,
+        state: "approved" as const,
       })),
     );
     await database.insert(platformRoleAssignments).values([

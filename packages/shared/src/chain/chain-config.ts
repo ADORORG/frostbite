@@ -16,7 +16,7 @@ export const chainOperationSchema = z.enum(chainOperations);
 // (ADR-008's mainnet rule, applied per chain). A `test` chain does not need the gate.
 export const releaseGateSchema = z.enum(["closed", "open"]);
 
-export const chainConfigSchema = z
+const chainConfigObject = z
   .object({
     chainId: chainRefSchema,
     confirmations: z.record(chainOperationSchema, finalitySchema),
@@ -26,7 +26,21 @@ export const chainConfigSchema = z
     releaseGate: releaseGateSchema,
     role: chainRoleSchema,
   })
-  .strict()
+  .strict();
+
+export const chainConfigSchema = chainConfigObject.readonly();
+
+// What a feature that only needs to offer or validate a chain (for example a collection draft's
+// target chain) reads. It is a projection of `ChainConfig`, so there is one definition, and it does
+// not need a confirmation policy that nobody has decided yet (D22).
+export const chainOptionSchema = chainConfigObject
+  .pick({
+    chainId: true,
+    displayName: true,
+    enabled: true,
+    family: true,
+    role: true,
+  })
   .readonly();
 
 export const chainConfigListSchema = z
@@ -41,3 +55,4 @@ export const chainConfigListSchema = z
 export type ChainRole = z.infer<typeof chainRoleSchema>;
 export type ChainOperation = z.infer<typeof chainOperationSchema>;
 export type ChainConfig = z.infer<typeof chainConfigSchema>;
+export type ChainOption = z.infer<typeof chainOptionSchema>;
