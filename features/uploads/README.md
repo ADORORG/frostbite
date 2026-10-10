@@ -1,7 +1,8 @@
 # Uploads feature
 
 Contributes the authenticated direct-upload API (intent creation, completion, and the asset library
-listing) and the `/studio/uploads` page. Registration receives the platform provider registry
+listing) and two studio pages: `/studio/uploads` (the library, filtered by purpose, each ready image with a
+"Use in a collection" link) and `/studio/uploads/new` (adding an image). Registration receives the platform provider registry
 explicitly, so removing its one line detaches the routes, the page, and storage use.
 
 The feature validates HTTP input through `@ador/shared/uploads`, delegates persistence and signing to
@@ -60,8 +61,9 @@ The page is organized so each layer can be replaced or tested alone:
 - `src/ui/hooks/` connects that logic to React (`use-upload-session`, `use-asset-library`).
 - `src/ui/components/` holds small presentational components (`upload-form`, `upload-feedback`,
   `upload-panel`, `asset-card`, `asset-grid`, `asset-library-panel`) built from `@repo/ui` primitives.
-- `src/ui/uploads-workspace.tsx` is the only client boundary and composition root;
-  `uploads-surface.tsx` is the server-rendered page shell.
+- `src/ui/library-workspace.tsx` and `new-upload-workspace.tsx` are the client boundaries and composition
+  roots of the two pages; `uploads-surface.tsx`, `new-upload-surface.tsx` and `uploads-frame.tsx` are the
+  server-rendered page shells.
 
 Retrying an upload reuses its idempotency key, so intent creation and completion are safe to repeat and a
 finished transfer is never repeated. The server remains authoritative for type, size, and content.

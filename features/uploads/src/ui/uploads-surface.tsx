@@ -1,37 +1,22 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { AppShell } from "@repo/ui/arcade";
 
-import { UploadsWorkspace } from "./uploads-workspace.tsx";
+import { LibraryWorkspace } from "./library-workspace.tsx";
+import { UploadsFrame } from "./uploads-frame.tsx";
 
-// The studio page for uploads: the shared shell around the client workspace. It is a server
-// component; everything interactive lives behind the workspace's client boundary.
+// The library page: the images already added. Everything interactive lives behind the workspace's
+// client boundary.
 export function UploadsSurface({
   navigation,
 }: {
   readonly navigation: readonly NavigationItem[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Uploads beta"
-      homeHref="/"
+    <UploadsFrame
+      heading="Uploads"
+      intro="Images you upload stay private to you. They are checked and resized on the server before they appear below, and nothing is published from here."
       navigation={navigation}
-      notices={[
-        "◆ PRIVATE DRAFTS",
-        "▲ CHECKED ON THE SERVER",
-        "★ NOTHING PUBLISHED",
-      ]}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Studio</p>
-        <h1>Uploads</h1>
-        <p>
-          Images you upload stay private to you. They are checked and resized on
-          the server before they appear below, and nothing is published from
-          here.
-        </p>
-        <UploadsWorkspace />
-      </section>
-    </AppShell>
+      <LibraryWorkspace />
+    </UploadsFrame>
   );
 }

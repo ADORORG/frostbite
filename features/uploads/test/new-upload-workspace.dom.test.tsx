@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "@ador/client-http";
 import { TransferError, type ObjectTransfer } from "../src/client/transfer.ts";
-import { UploadsWorkspace } from "../src/ui/uploads-workspace.tsx";
+import { NewUploadWorkspace } from "../src/ui/new-upload-workspace.tsx";
 import {
   assetId,
   button,
@@ -16,47 +16,30 @@ import {
 } from "./support/dom.tsx";
 import { libraryAsset, processedAsset } from "./support/library-fixtures.ts";
 
-describe("uploads workspace", () => {
-  it("shows the upload form and the loaded library together", async () => {
+describe("new upload workspace", () => {
+  it("shows the upload form and leaves the library to its own page", async () => {
+    const services = fakeServices();
+    const container = await mount(<NewUploadWorkspace services={services} />);
+    expect(textOf(container)).toContain("Choose a file");
+    expect(textOf(container)).not.toContain("Your library");
+    expect(services.api.listAssets).not.toHaveBeenCalled();
+  });
+
+  it("uploads, waits for processing, and says where to go next", async () => {
     const services = fakeServices({
       api: {
+        completeIntent: async () => ({
+          asset: { id: assetId, processingState: "pending-validation" },
+        }),
         listAssets: async () => ({
           assets: [processedAsset()],
           truncated: false,
         }),
       },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
-    await settle(() =>
-      expect(container.querySelectorAll("li")).toHaveLength(1),
-    );
-    expect(textOf(container)).toContain("Upload an image");
-    expect(textOf(container)).toContain("Your library");
-  });
-
-  it("uploads, waits for processing, and refreshes the library with the result", async () => {
-    let processed = false;
-    const services = fakeServices({
-      api: {
-        completeIntent: async () => {
-          processed = true;
-          return {
-            asset: { id: assetId, processingState: "pending-validation" },
-          };
-        },
-        listAssets: async () => ({
-          assets: processed ? [processedAsset()] : [],
-          truncated: false,
-        }),
-      },
-    });
-    const container = await mount(<UploadsWorkspace services={services} />);
-    await settle(() =>
-      expect(textOf(container)).toContain("Nothing uploaded yet"),
-    );
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() => expect(textOf(container)).toContain("Upload processed"));
-    await settle(() => expect(container.querySelector("img")).not.toBeNull());
     expect(services.api.createIntent).toHaveBeenCalledWith(
       {
         byteLength: 3,
@@ -66,16 +49,18 @@ describe("uploads workspace", () => {
       expect.objectContaining({ idempotencyKey: "upload-attempt-0001" }),
     );
     expect(button(container, "Upload another")).not.toBeNull();
-    // An uploaded image has somewhere to go: the collections it is used in.
-    const next = [...container.querySelectorAll("a")].find(
-      (link) => link.textContent === "Use it in a collection",
-    );
-    expect(next?.getAttribute("href")).toBe("/studio/collections");
+    // An uploaded image has somewhere to go: the collections it is used in, or the library it joined.
+    const hrefOf = (text: string) =>
+      [...container.querySelectorAll("a")]
+        .find((link) => link.textContent === text)
+        ?.getAttribute("href");
+    expect(hrefOf("Use it in a collection")).toBe("/studio/collections");
+    expect(hrefOf("See your library")).toBe("/studio/uploads");
   });
 
   it("refuses an unsupported file locally without contacting the server", async () => {
     const services = fakeServices();
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile(3, "image/gif"));
     expect(textOf(container)).toContain("Only PNG, JPEG, and WebP");
     expect(services.api.createIntent).not.toHaveBeenCalled();
@@ -95,7 +80,7 @@ describe("uploads workspace", () => {
         }),
       },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() =>
       expect(textOf(container)).toContain("Could not reach the server"),
@@ -129,7 +114,7 @@ describe("uploads workspace", () => {
       },
       transfer: { upload },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() =>
       expect(textOf(container)).toContain("The server had a problem"),
@@ -145,7 +130,7 @@ describe("uploads workspace", () => {
         upload: async () => Promise.reject(new TransferError("rejected", 403)),
       },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() =>
       expect(textOf(container)).toContain("upload link may have expired"),
@@ -163,7 +148,7 @@ describe("uploads workspace", () => {
         listAssets: async () => ({ assets: [rejected], truncated: false }),
       },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() =>
       expect(textOf(container)).toContain("Animated images are not supported"),
@@ -171,7 +156,7 @@ describe("uploads workspace", () => {
     expect(button(container, "Retry")).toBeNull();
   });
 
-  it("cancels an in-flight transfer and leaves the library untouched", async () => {
+  it("cancels an in-flight transfer without completing it", async () => {
     const services = fakeServices({
       transfer: {
         upload: ({ signal }) =>
@@ -182,7 +167,7 @@ describe("uploads workspace", () => {
           }),
       },
     });
-    const container = await mount(<UploadsWorkspace services={services} />);
+    const container = await mount(<NewUploadWorkspace services={services} />);
     await chooseFile(container, imageFile());
     await settle(() =>
       expect(button(container, "Cancel upload")).not.toBeNull(),

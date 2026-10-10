@@ -1,5 +1,6 @@
 import type { LibraryAsset } from "@ador/shared/uploads";
-import { ArcadeBadge, ArcadeMediaTile } from "@repo/ui/arcade";
+import { collectionStudioPath } from "@ador/shared/collections";
+import { ArcadeBadge, ArcadeButton, ArcadeMediaTile } from "@repo/ui/arcade";
 
 import {
   assetBadge,
@@ -7,6 +8,7 @@ import {
   describeDimensions,
   pickRendition,
 } from "../../client/asset-presentation.ts";
+import { canUseInCollection } from "../../client/library-view.ts";
 import { purposeLabels } from "../../client/purpose-labels.ts";
 
 // One asset in the library: its image when there is one, its state, and a plain explanation of
@@ -25,6 +27,14 @@ export function AssetCard({ asset }: { readonly asset: LibraryAsset }) {
           <ArcadeBadge tone={badge.tone}>{badge.label}</ArcadeBadge>
           {dimensions === null ? null : <span>{dimensions}</span>}
           {note === null ? null : <span>{note}</span>}
+          {canUseInCollection(asset) ? (
+            <ArcadeButton
+              ariaLabel={`Use in a collection: ${label} uploaded ${asset.createdAt.slice(0, 10)}`}
+              href={collectionStudioPath}
+            >
+              Use in a collection
+            </ArcadeButton>
+          ) : null}
         </>
       }
       image={
