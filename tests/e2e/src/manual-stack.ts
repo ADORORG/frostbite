@@ -1,6 +1,5 @@
-import { platformSessionCookieName } from "@ador/shared/auth";
-
 import { creatorE2EFixtures, publicCollection } from "./creator-fixtures.ts";
+import { signInPath } from "./sign-in-picker.ts";
 import {
   resolveE2EServerConfig,
   type E2EServerConfig,
@@ -23,6 +22,9 @@ export function resolveStackServer(
 
 export interface StackActor {
   readonly goal: string;
+  readonly id: string;
+  // Where the person lands after signing in: the page their goal starts on.
+  readonly landing: string;
   readonly label: string;
   readonly token: string;
 }
@@ -31,37 +33,41 @@ export interface StackActor {
 // throwaway database on this machine only; the server is bound to the loopback address.
 export const stackActors: readonly StackActor[] = [
   {
+    id: "creator",
+    landing: "/studio/collections",
     goal: "Upload images, build and submit a collection, read the feedback.",
     label: "Creator (approved)",
     token: creatorE2EFixtures.collectionWizardCreator.sessionToken,
   },
   {
+    id: "second-creator",
+    landing: "/studio/collections",
     goal: "A second approved creator, to see that one creator never reaches another's drafts.",
     label: "Second creator (approved)",
     token: creatorE2EFixtures.collectionOtherCreator.sessionToken,
   },
   {
+    id: "applicant",
+    landing: "/studio",
     goal: "Apply to become a creator; not approved yet, so collection changes are refused.",
     label: "Applicant (not approved)",
     token: creatorE2EFixtures.applicant.sessionToken,
   },
   {
+    id: "reviewer",
+    landing: "/admin/collection-reviews",
     goal: "Work the review queue, decide on submissions, read the activity log.",
     label: "Reviewer",
     token: creatorE2EFixtures.reviewer.sessionToken,
   },
   {
+    id: "staff",
+    landing: "/admin",
     goal: "Staff without the reviewer role: the admin console, but not collection decisions.",
     label: "Staff (no reviewer role)",
     token: creatorE2EFixtures.staff.sessionToken,
   },
 ] as const;
-
-// A line to paste into the browser console on the stack's page: the session cookie is a host-only,
-// secure cookie, which a page on localhost may set. Reload afterwards.
-export function cookieSnippet(token: string): string {
-  return `document.cookie = "${platformSessionCookieName}=${token}; path=/; Secure"`;
-}
 
 export const stackPages = [
   ["/", "The arcade shell and navigation"],
@@ -85,17 +91,12 @@ export function formatStackGuide(input: {
     "",
     `The Well is running at ${input.baseURL}`,
     "",
-    "To be someone: open the site, paste that person's line into the browser console, and reload.",
-    "To be nobody: clear the site's cookies.",
+    `To sign in, open ${input.baseURL}${signInPath} and pick a person. Real sign-in is by wallet and is not`,
+    "enabled yet, so this local page stands in for it. Sign out from the same page.",
     "",
   ];
-  for (const actor of actors)
-    lines.push(
-      `${actor.label}: ${actor.goal}`,
-      `  ${cookieSnippet(actor.token)}`,
-      "",
-    );
-  lines.push("Pages worth visiting:");
+  for (const actor of actors) lines.push(`  ${actor.label}: ${actor.goal}`);
+  lines.push("", "Pages worth visiting:");
   for (const [path, note] of stackPages)
     lines.push(`  ${input.baseURL}${path}  ${note}`);
   lines.push(

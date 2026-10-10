@@ -1,10 +1,16 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { access } from "node:fs/promises";
+import { createServer, type Server } from "node:http";
 import { resolve } from "node:path";
 
 import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
 
-import { formatStackGuide, resolveStackServer } from "../src/manual-stack.ts";
+import {
+  formatStackGuide,
+  resolveStackServer,
+  stackActors,
+} from "../src/manual-stack.ts";
+import { createStackProxy } from "../src/stack-proxy.ts";
 import { withUploadServices } from "../src/services.ts";
 import { applicationEnvironment, seed } from "./stack-setup.ts";
 
@@ -72,6 +78,29 @@ async function waitUntilServing(
   throw new Error(`The web server did not answer at ${url} in time.`);
 }
 
+// A port nobody is using, for the web server behind the sign-in front door.
+function freePort(): Promise<number> {
+  return new Promise((resolvePort, reject) => {
+    const probe = createServer();
+    probe.on("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      probe.close(() =>
+        typeof address === "object" && address !== null
+          ? resolvePort(address.port)
+          : reject(new Error("No free port")),
+      );
+    });
+  });
+}
+
+function listen(server: Server, port: number): Promise<void> {
+  return new Promise((resolveListen, reject) => {
+    server.on("error", reject);
+    server.listen(port, "127.0.0.1", resolveListen);
+  });
+}
+
 function untilInterrupted(): Promise<void> {
   return new Promise((resolveStop) => {
     for (const signal of ["SIGINT", "SIGTERM"] as const)
@@ -92,6 +121,7 @@ await withDisposablePostgres(async (databaseUrl) => {
     async (serviceEnvironment) => {
       // The server is started directly (not through pnpm) so the process stopped below is the server
       // itself: a wrapper that is stopped would leave the real server running and the port taken.
+      const upstreamPort = await freePort();
       const server = run(
         ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
         {
@@ -99,14 +129,26 @@ await withDisposablePostgres(async (databaseUrl) => {
           ...baseEnvironment,
           ...serviceEnvironment,
           HOSTNAME: "127.0.0.1",
-          PORT: port,
+          PORT: String(upstreamPort),
         },
         resolve(repositoryRoot, "apps/web"),
       );
       try {
-        await waitUntilServing(baseURL, server);
+        await waitUntilServing(`http://127.0.0.1:${upstreamPort}`, server);
+        // The people use the stack's address; the front door serves the test sign-in and passes the rest on.
+        const frontDoor = createStackProxy({
+          actors: stackActors,
+          origin: baseURL,
+          upstreamPort,
+        });
+        await listen(frontDoor, Number(port));
         console.log(formatStackGuide({ baseURL }));
-        await untilInterrupted();
+        try {
+          await untilInterrupted();
+        } finally {
+          frontDoor.closeAllConnections();
+          frontDoor.close();
+        }
       } finally {
         server.kill("SIGTERM");
         await finished(server).catch(() => null);

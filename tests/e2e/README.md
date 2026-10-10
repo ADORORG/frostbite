@@ -23,9 +23,15 @@ after reading the diff: `pnpm test:e2e -- --update-snapshots changed <spec>`.
 
 `pnpm stack` runs the whole product locally for a person to drive by hand: the same disposable
 PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the same users, kept running
-until Ctrl+C. It builds the web app first if there is no build, then prints, for each seeded person, one
-line to paste into the browser console (it sets the session cookie), and the pages worth visiting.
+until Ctrl+C. It builds the web app first if there is no build, then prints the address and the pages
+worth visiting.
 
+- **Signing in:** open `http://localhost:4174/dev/sign-in` and click a person (creator, second creator,
+  applicant, reviewer, staff). It sets the session and lands on that person's page. Real sign-in is by
+  wallet and is not enabled yet; this page stands in for it. Sign out from the same page.
+- The sign-in page is served by the stack's own front door (`src/stack-proxy.ts`), which passes every
+  other request to the web server. It is not part of the web app, so it cannot ship with a build. Its
+  session cookie is secure, so use Chrome or Firefox on `localhost`.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
 - Everything is disposable and local: the server binds the loopback address, the session tokens are fixed

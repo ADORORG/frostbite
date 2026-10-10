@@ -1,9 +1,7 @@
-import { platformSessionCookieName } from "@ador/shared/auth";
 import { describe, expect, it } from "vitest";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import {
-  cookieSnippet,
   formatStackGuide,
   resolveStackServer,
   stackActors,
@@ -36,6 +34,13 @@ describe("manual stack actors", () => {
     for (const actor of stackActors) expect(seeded.has(actor.token)).toBe(true);
   });
 
+  it("have unique ids and a landing page on this site, so a sign-in lands somewhere real", () => {
+    expect(new Set(stackActors.map(({ id }) => id)).size).toBe(
+      stackActors.length,
+    );
+    for (const actor of stackActors) expect(actor.landing).toMatch(/^\/[a-z]/u);
+  });
+
   it("include a reviewer and someone who is not approved, each with a goal in words", () => {
     const labels = stackActors.map(({ label }) => label);
     expect(labels).toContain("Reviewer");
@@ -49,19 +54,12 @@ describe("manual stack actors", () => {
 });
 
 describe("the guide", () => {
-  it("makes the session cookie by the platform's own cookie name", () => {
-    expect(cookieSnippet("abc")).toBe(
-      `document.cookie = "${platformSessionCookieName}=abc; path=/; Secure"`,
-    );
-  });
-
   it("says where it runs, how to become each person, and which pages to visit", () => {
     const guide = formatStackGuide({ baseURL: "http://localhost:4174" });
     expect(guide).toContain("running at http://localhost:4174");
-    for (const actor of stackActors) {
-      expect(guide).toContain(actor.label);
-      expect(guide).toContain(cookieSnippet(actor.token));
-    }
+    expect(guide).toContain("http://localhost:4174/dev/sign-in");
+    for (const actor of stackActors) expect(guide).toContain(actor.label);
+    expect(guide).not.toContain("document.cookie");
     for (const [path] of stackPages)
       expect(guide).toContain(`http://localhost:4174${path}`);
     expect(guide).toContain("Ctrl+C");
@@ -71,7 +69,13 @@ describe("the guide", () => {
   it("uses the actors it is given", () => {
     const guide = formatStackGuide({
       actors: [
-        { goal: "Do the only thing here.", label: "Only me", token: "t" },
+        {
+          goal: "Do the only thing here.",
+          id: "only",
+          label: "Only me",
+          landing: "/",
+          token: "t",
+        },
       ],
       baseURL: "http://localhost:1",
     });
