@@ -1,10 +1,12 @@
+import { InlineUpload } from "@ador/feature-uploads/inline";
 import { pickRendition } from "@ador/feature-uploads/presentation";
 import type { LibraryAsset, UploadPurpose } from "@ador/shared/uploads";
-import { ArcadeButton, ArcadeMediaTile } from "@repo/ui/arcade";
+import { ArcadeMediaTile } from "@repo/ui/arcade";
 import { useId } from "react";
 
 // The creator's own processed images made for one purpose, offered as a radio group. Only a processed
-// image can be chosen (the server refuses anything else), and an empty library says how to fill it.
+// image can be chosen (the server refuses anything else). A new image is uploaded right here, so the
+// creator never leaves the page; once it is processed the library is refreshed and the image is chosen.
 export function ImageChoice({
   allowNone,
   assets,
@@ -12,8 +14,8 @@ export function ImageChoice({
   legend,
   onChange,
   purpose,
+  onUploaded,
   selectedId,
-  uploadHref,
 }: {
   readonly allowNone: boolean;
   readonly assets: readonly LibraryAsset[];
@@ -21,10 +23,19 @@ export function ImageChoice({
   readonly legend: string;
   readonly onChange: (assetId: string | null) => void;
   readonly purpose: UploadPurpose;
+  // Resolves once the library holds the image that was just uploaded.
+  readonly onUploaded: () => Promise<void>;
   readonly selectedId: string | null;
-  readonly uploadHref: string;
 }) {
   const group = useId();
+  const uploader = (
+    <InlineUpload
+      onUploaded={(assetId) => {
+        void onUploaded().then(() => onChange(assetId));
+      }}
+      purpose={purpose}
+    />
+  );
   const choices = assets.filter(
     (asset) =>
       asset.purpose === purpose && asset.processingState === "processed",
@@ -36,12 +47,7 @@ export function ImageChoice({
     <fieldset className="arcade-choice">
       <legend>{legend}</legend>
       {choices.length === 0 ? (
-        <p>
-          You have no ready images for this yet.{" "}
-          <ArcadeButton href={uploadHref} tone="yellow">
-            Upload images
-          </ArcadeButton>
-        </p>
+        <p>You have no ready images for this yet. Upload one below.</p>
       ) : null}
       {allowNone ? (
         <label>
@@ -92,6 +98,14 @@ export function ImageChoice({
           );
         })}
       </ul>
+      {choices.length === 0 ? (
+        uploader
+      ) : (
+        <details className="arcade-disclosure">
+          <summary>Upload a new image</summary>
+          {uploader}
+        </details>
+      )}
     </fieldset>
   );
 }

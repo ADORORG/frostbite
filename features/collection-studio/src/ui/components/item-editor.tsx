@@ -24,8 +24,8 @@ export function ItemEditor({
   initial = emptyItemForm,
   onCancel,
   onSubmit,
+  onUploaded,
   submitLabel,
-  uploadHref,
 }: {
   readonly assets: readonly LibraryAsset[];
   readonly busy: boolean;
@@ -36,8 +36,9 @@ export function ItemEditor({
     item: CollectionItem,
     key: IdempotencyKey,
   ) => Promise<boolean>;
+  // Resolves once the library holds an image that was just uploaded here.
+  readonly onUploaded: () => Promise<void>;
   readonly submitLabel: string;
-  readonly uploadHref: string;
 }) {
   const [values, setValues] = useState<ItemFormValues>(initial);
   const [errors, setErrors] = useState<ItemFormErrors>({});
@@ -94,9 +95,9 @@ export function ItemEditor({
         disabled={busy}
         legend="Item image"
         onChange={(imageAssetId) => change({ imageAssetId })}
+        onUploaded={onUploaded}
         purpose="collection-item-artwork"
         selectedId={values.imageAssetId}
-        uploadHref={uploadHref}
       />
       {errors.imageAssetId === undefined ? null : (
         <p role="alert">{errors.imageAssetId}</p>

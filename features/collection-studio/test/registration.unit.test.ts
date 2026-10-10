@@ -56,6 +56,7 @@ describe("collection studio registration", () => {
     );
     expect(manifest.pages).toEqual([
       { access: { kind: "authenticated" }, path: "/studio/collections" },
+      { access: { kind: "authenticated" }, path: "/studio/collections/new" },
       {
         access: { kind: "authenticated" },
         path: "/studio/collections/[collectionId]",

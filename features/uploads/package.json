@@ -8,6 +8,7 @@
     "./cleanup": "./src/cleanup.ts",
     "./context": "./src/context.ts",
     "./entrypoint": "./src/entrypoint.tsx",
+    "./inline": "./src/ui/inline-upload.tsx",
     "./pipeline": "./src/pipeline.ts",
     "./presentation": "./src/client/asset-presentation.ts"
   },

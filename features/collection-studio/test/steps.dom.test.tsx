@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { describeFailure } from "../src/client/error-copy.ts";
 import { newDraftForm } from "../src/client/draft-form.ts";
-import { DraftList } from "../src/ui/components/draft-list.tsx";
+import { CollectionList } from "../src/ui/components/collection-list.tsx";
 import { ImagesStep } from "../src/ui/components/images-step.tsx";
 import { imageAsset } from "./support/detail.ts";
 import { signet } from "./support/stubs.ts";
@@ -25,7 +25,7 @@ describe("images step", () => {
         library={{ status: "loading" }}
         onChange={noop}
         onRefresh={noop}
-        uploadHref="/up"
+        onUploaded={async () => undefined}
       />,
     );
     expect(textOf(loading)).toContain("Loading your images…");
@@ -41,7 +41,7 @@ describe("images step", () => {
         }}
         onChange={noop}
         onRefresh={onRefresh}
-        uploadHref="/up"
+        onUploaded={async () => undefined}
       />,
     );
     expect(textOf(failed)).toContain("Your images could not be loaded.");
@@ -57,7 +57,7 @@ describe("images step", () => {
         library={{ data: { ...library, truncated: true }, status: "ready" }}
         onChange={noop}
         onRefresh={noop}
-        uploadHref="/up"
+        onUploaded={async () => undefined}
       />,
     );
     expect(textOf(container)).toContain("Cover image");
@@ -78,7 +78,7 @@ describe("images step", () => {
         }}
         onChange={noop}
         onRefresh={noop}
-        uploadHref="/up"
+        onUploaded={async () => undefined}
       />,
     );
     expect(textOf(container)).toContain(
@@ -88,7 +88,7 @@ describe("images step", () => {
   });
 });
 
-describe("draft list", () => {
+describe("collection list", () => {
   const summary = {
     createdAt: "2026-10-09T12:00:00.000Z",
     id: "018f22f2-9c1a-7b21-8c45-000000000001",
@@ -96,6 +96,7 @@ describe("draft list", () => {
     name: "First light",
     plannedSupply: 5,
     revision: 2,
+    submissionState: null,
     targetChain: signet,
     updatedAt: "2026-10-09T13:00:00.000Z",
   };
@@ -103,7 +104,7 @@ describe("draft list", () => {
   it("keeps showing what was loaded when a refresh fails, and offers a retry", async () => {
     const reload = vi.fn();
     const container = await mount(
-      <DraftList
+      <CollectionList
         chains={[]}
         list={{
           reload,

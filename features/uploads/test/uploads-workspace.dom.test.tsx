@@ -66,6 +66,11 @@ describe("uploads workspace", () => {
       expect.objectContaining({ idempotencyKey: "upload-attempt-0001" }),
     );
     expect(button(container, "Upload another")).not.toBeNull();
+    // An uploaded image has somewhere to go: the collections it is used in.
+    const next = [...container.querySelectorAll("a")].find(
+      (link) => link.textContent === "Use it in a collection",
+    );
+    expect(next?.getAttribute("href")).toBe("/studio/collections");
   });
 
   it("refuses an unsupported file locally without contacting the server", async () => {

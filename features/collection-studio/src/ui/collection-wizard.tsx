@@ -29,7 +29,6 @@ import { useDraftForm } from "./hooks/use-draft-form.ts";
 import { useSubmissions } from "./hooks/use-submissions.ts";
 import { useResource, type LoadedResource } from "./hooks/use-resource.ts";
 
-export const uploadsHref = "/studio/uploads";
 export const applyHref = "/studio/creator-application";
 
 // The wizard for one draft. It loads the draft, lands the creator on the first step that still asks
@@ -99,6 +98,17 @@ function WizardBody({
 }) {
   const draft = useDraftForm(editor, detail);
   const submissions = useSubmissions(services, detail.collection.id);
+  // After an image is uploaded here: fetch the library again and put it in place, so the new image is
+  // in the list before it is chosen. If that fails, the usual reload (with its retry) takes over.
+  async function refreshLibrary(): Promise<void> {
+    try {
+      library.replace(
+        await services.api.listImages({ signal: new AbortController().signal }),
+      );
+    } catch {
+      library.reload();
+    }
+  }
   const [chosen, setChosen] = useState<WizardStep | null>(null);
   const [saved, setSaved] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -176,7 +186,7 @@ function WizardBody({
           library={library.state}
           onChange={draft.change}
           onRefresh={library.reload}
-          uploadHref={uploadsHref}
+          onUploaded={refreshLibrary}
         />
       ) : null}
       {step === "items" ? (
@@ -185,7 +195,7 @@ function WizardBody({
           createKey={services.createIdempotencyKey}
           detail={detail}
           editor={editor}
-          uploadHref={uploadsHref}
+          onUploaded={refreshLibrary}
         />
       ) : null}
       {step === "review" ? (

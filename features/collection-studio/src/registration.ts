@@ -2,6 +2,7 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { ChainOption } from "@ador/shared/chain";
 import {
+  collectionNewPath,
   collectionRoutes,
   collectionStudioNavigationLabel,
   collectionStudioPath,
@@ -51,6 +52,7 @@ export function createCollectionStudioFeature(
       ],
       pages: [
         { access: { kind: "authenticated" }, path: collectionStudioPath },
+        { access: { kind: "authenticated" }, path: collectionNewPath },
         { access: { kind: "authenticated" }, path: collectionWizardPath },
       ],
       requiredDecisionGates: [],

@@ -13,14 +13,14 @@ export function ImagesStep({
   library,
   onChange,
   onRefresh,
-  uploadHref,
+  onUploaded,
 }: {
   readonly disabled: boolean;
   readonly form: DraftFormValues;
   readonly library: Resource<LibraryResponse>;
   readonly onChange: (changes: Partial<DraftFormValues>) => void;
   readonly onRefresh: () => void;
-  readonly uploadHref: string;
+  readonly onUploaded: () => Promise<void>;
 }) {
   const loaded = library.status === "loading" ? null : library.data;
   return (
@@ -55,7 +55,7 @@ export function ImagesStep({
             onChange={(coverAssetId) => onChange({ coverAssetId })}
             purpose="collection-artwork"
             selectedId={form.coverAssetId}
-            uploadHref={uploadHref}
+            onUploaded={onUploaded}
           />
           <ImageChoice
             allowNone
@@ -65,7 +65,7 @@ export function ImagesStep({
             onChange={(bannerAssetId) => onChange({ bannerAssetId })}
             purpose="collection-banner"
             selectedId={form.bannerAssetId}
-            uploadHref={uploadHref}
+            onUploaded={onUploaded}
           />
           {loaded.truncated ? (
             <StatusLamp

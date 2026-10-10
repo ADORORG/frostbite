@@ -3,8 +3,10 @@ import {
   collectionItems,
   collections,
 } from "@ador/database/schema/collections";
-import { and, asc, count, desc, eq } from "drizzle-orm";
+import { collectionSubmissions } from "@ador/database/schema/collection-submissions";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 
+import type { SubmissionState } from "@ador/shared/collections";
 import type {
   CollectionAggregate,
   CollectionRepository,
@@ -41,6 +43,24 @@ async function loadAggregate(
     .where(eq(collectionItems.collectionId, collectionId))
     .orderBy(asc(collectionItems.position));
   return { collection: collectionRecord(row), items: items.map(itemRecord) };
+}
+
+// The state of each collection's latest submission (the highest sequence), for the collections that have
+// one. A collection a creator revises after "changes-requested" has several; only the newest counts.
+async function latestSubmissionStates(
+  database: Pick<DatabaseClient, "select">,
+  collectionIds: readonly string[],
+): Promise<ReadonlyMap<string, SubmissionState>> {
+  const rows = await database
+    .select({
+      collectionId: collectionSubmissions.collectionId,
+      state: collectionSubmissions.state,
+    })
+    .from(collectionSubmissions)
+    .where(inArray(collectionSubmissions.collectionId, [...collectionIds]))
+    .orderBy(asc(collectionSubmissions.sequence));
+  // Ascending by sequence, so a later row for the same collection replaces an earlier one.
+  return new Map(rows.map(({ collectionId, state }) => [collectionId, state]));
 }
 
 export function createDrizzleCollectionRepository(
@@ -130,6 +150,10 @@ export function createDrizzleCollectionRepository(
         .groupBy(collections.id)
         .orderBy(desc(collections.updatedAt), desc(collections.id))
         .limit(limit);
+      const states = await latestSubmissionStates(
+        database,
+        rows.map(({ collection }) => collection.id),
+      );
       return rows.map(({ collection, itemCount }) => {
         const record = collectionRecord(collection);
         return {
@@ -139,6 +163,7 @@ export function createDrizzleCollectionRepository(
           name: record.name,
           plannedSupply: record.plannedSupply,
           revision: record.revision,
+          submissionState: states.get(collection.id) ?? null,
           targetChain: record.targetChain,
           updatedAt: record.updatedAt,
         };

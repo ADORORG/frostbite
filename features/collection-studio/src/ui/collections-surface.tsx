@@ -1,6 +1,9 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import type { ChainOption } from "@ador/shared/chain";
 
+import { collectionNewPath } from "@ador/shared/collections";
+import { ArcadeButton } from "@repo/ui/arcade";
+
 import { CollectionsWorkspace } from "./collections-workspace.tsx";
 import { StudioFrame } from "./studio-frame.tsx";
 
@@ -15,8 +18,13 @@ export function CollectionsSurface({
 }) {
   return (
     <StudioFrame
+      actions={
+        <ArcadeButton href={collectionNewPath} tone="mint">
+          New collection
+        </ArcadeButton>
+      }
       heading="Collections"
-      intro="Build a collection privately: its details, images, and items. Nothing is published, and nothing is sent to a chain, from here."
+      intro="Everything you are building, and where each collection stands. Nothing is published, and nothing is sent to a chain, from here."
       navigation={navigation}
     >
       <CollectionsWorkspace targetChains={targetChains} />

@@ -132,6 +132,12 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-public-collection-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000044",
   },
+  // Images uploaded inside the wizard (UX-2): one creator who uploads a cover and a banner in the browser.
+  collectionInlineCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000061",
+    sessionToken: "e2e-collection-inline-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000060",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
@@ -145,6 +151,7 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionOtherCreator,
   creatorE2EFixtures.collectionAccessOwner,
   creatorE2EFixtures.collectionWizardCreator,
+  creatorE2EFixtures.collectionInlineCreator,
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,
   creatorE2EFixtures.reviewQualityCreator,

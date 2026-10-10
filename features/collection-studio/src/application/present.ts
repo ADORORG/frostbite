@@ -31,6 +31,7 @@ export function presentSummary(
     name: record.name,
     plannedSupply: record.plannedSupply,
     revision: record.revision,
+    submissionState: record.submissionState,
     targetChain: record.targetChain,
     updatedAt: record.updatedAt.toISOString(),
   };

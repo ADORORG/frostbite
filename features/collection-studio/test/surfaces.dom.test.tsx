@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { createCollectionStudioEntrypoint } from "../src/entrypoint.tsx";
 import { CollectionsSurface } from "../src/ui/collections-surface.tsx";
+import { NewCollectionSurface } from "../src/ui/new-collection-surface.tsx";
 import { WizardSurface } from "../src/ui/wizard-surface.tsx";
 import { id, signet } from "./support/stubs.ts";
 
@@ -42,7 +43,21 @@ describe("collection pages", () => {
     expect(markup).toContain("NO CHAIN ACTION");
     expect(markup).toContain('href="/studio/collections"');
     expect(markup).toContain("Loading your collections…");
-    expect(markup).toContain("Start a collection");
+    // Starting a collection is a page of its own, reached by a button here, never a form on this page.
+    expect(markup).toContain('href="/studio/collections/new"');
+    expect(markup).toContain("New collection");
+    expect(markup).not.toContain("Collection name");
+  });
+
+  it("frame the page that starts a collection, with the form and a way back", () => {
+    const markup = renderToStaticMarkup(
+      <NewCollectionSurface navigation={navigation} targetChains={[enabled]} />,
+    );
+    expect(markup).toContain("<h1>New collection</h1>");
+    expect(markup).toContain("Collection name");
+    expect(markup).toContain("Bitcoin signet");
+    expect(markup).toContain('href="/studio/collections"');
+    expect(markup).toContain("Cancel");
   });
 
   it("frame one draft's wizard, which loads in the browser", () => {
@@ -63,11 +78,14 @@ describe("collection pages", () => {
       createProviderRegistry([]),
       [enabled, disabled],
     );
-    const [list, wizard] = entrypoint.pages ?? [];
+    const [list, creating, wizard] = entrypoint.pages ?? [];
     const context = { actorUserId: id(), navigation, params: {} };
     const listMarkup = renderToStaticMarkup(<>{list?.render(context)}</>);
-    expect(listMarkup).toContain("Bitcoin signet");
-    expect(listMarkup).not.toContain("Disabled chain");
+    // The list loads in the browser; the chains an entry may use are offered where a collection starts.
+    expect(listMarkup).toContain("Loading your collections…");
+    const createMarkup = renderToStaticMarkup(<>{creating?.render(context)}</>);
+    expect(createMarkup).toContain("Bitcoin signet");
+    expect(createMarkup).not.toContain("Disabled chain");
     const wizardMarkup = renderToStaticMarkup(
       <>{wizard?.render({ ...context, params: { collectionId: id() } })}</>,
     );

@@ -32,7 +32,7 @@ function view(overrides: Partial<Props> = {}) {
     createKey,
     onSubmit,
     submitLabel: "Add item",
-    uploadHref: "/studio/uploads",
+    onUploaded: async () => undefined,
     ...overrides,
   };
   return { onSubmit, props };

@@ -6,4 +6,5 @@ export * from "./review-activity.ts";
 export * from "./review-http.ts";
 export * from "./review-state.ts";
 export * from "./snapshot.ts";
+export * from "./standing.ts";
 export * from "./submission-http.ts";

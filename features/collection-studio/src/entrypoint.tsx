@@ -4,6 +4,7 @@ import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { ChainOption } from "@ador/shared/chain";
 import {
+  collectionNewPath,
   collectionStudioPath,
   collectionWizardPath,
 } from "@ador/shared/collections";
@@ -30,6 +31,7 @@ import {
   createSubmissionServiceResolver,
 } from "./runtime.ts";
 import { CollectionsSurface } from "./ui/collections-surface.tsx";
+import { NewCollectionSurface } from "./ui/new-collection-surface.tsx";
 import { WizardSurface } from "./ui/wizard-surface.tsx";
 
 export function createCollectionStudioEntrypoint(
@@ -69,6 +71,16 @@ export function createCollectionStudioEntrypoint(
         path: collectionStudioPath,
         render: ({ navigation }) => (
           <CollectionsSurface
+            navigation={navigation}
+            targetChains={enabledChains}
+          />
+        ),
+      },
+      {
+        access: { kind: "authenticated" },
+        path: collectionNewPath,
+        render: ({ navigation }) => (
+          <NewCollectionSurface
             navigation={navigation}
             targetChains={enabledChains}
           />

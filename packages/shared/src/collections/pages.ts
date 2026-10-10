@@ -2,6 +2,8 @@
 // browser tests, so the routes cannot drift between them.
 export const collectionStudioPath = "/studio/collections";
 export const collectionWizardPath = "/studio/collections/[collectionId]";
+// Starting a collection has a page of its own, apart from the list of collections.
+export const collectionNewPath = "/studio/collections/new";
 export const collectionStudioNavigationLabel = "Collections";
 
 export function collectionWizardHref(collectionId: string): string {

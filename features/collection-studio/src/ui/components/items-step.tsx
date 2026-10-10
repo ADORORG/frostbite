@@ -17,13 +17,13 @@ export function ItemsStep({
   createKey,
   detail,
   editor,
-  uploadHref,
+  onUploaded,
 }: {
   readonly assets: readonly LibraryAsset[];
   readonly createKey: () => IdempotencyKey;
   readonly detail: CollectionDetail;
   readonly editor: DraftEditor;
-  readonly uploadHref: string;
+  readonly onUploaded: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState<Item | null>(null);
   const { collection, items } = detail;
@@ -55,7 +55,7 @@ export function ItemsStep({
             createKey={createKey}
             onSubmit={editor.addItem}
             submitLabel="Add item"
-            uploadHref={uploadHref}
+            onUploaded={onUploaded}
           />
         )
       ) : (
@@ -72,7 +72,7 @@ export function ItemsStep({
             return done;
           }}
           submitLabel="Save item"
-          uploadHref={uploadHref}
+          onUploaded={onUploaded}
         />
       )}
     </div>

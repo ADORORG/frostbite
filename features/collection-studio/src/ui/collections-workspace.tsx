@@ -7,13 +7,11 @@ import {
   createBrowserServices,
   type CollectionsClientServices,
 } from "../client/services.ts";
-import { DraftList } from "./components/draft-list.tsx";
-import { NewCollection } from "./components/new-collection.tsx";
+import { CollectionList } from "./components/collection-list.tsx";
 import { useResource } from "./hooks/use-resource.ts";
-import { applyHref } from "./collection-wizard.tsx";
 
-// The client composition root of the collections page: the creator's drafts, and the form that starts
-// a new one. Both are plain components that take what they render.
+// The client composition root of the collections overview: the creator's collections, loaded in the
+// browser. Starting one is a page of its own.
 export function CollectionsWorkspace({
   services: provided,
   targetChains,
@@ -23,14 +21,5 @@ export function CollectionsWorkspace({
 }) {
   const [services] = useState(() => provided ?? createBrowserServices());
   const list = useResource((signal) => services.api.list({ signal }), "list");
-  return (
-    <div className="arcade-stack">
-      <DraftList chains={targetChains} list={list} />
-      <NewCollection
-        applyHref={applyHref}
-        chains={targetChains}
-        services={services}
-      />
-    </div>
-  );
+  return <CollectionList chains={targetChains} list={list} />;
 }

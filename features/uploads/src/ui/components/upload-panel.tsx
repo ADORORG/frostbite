@@ -1,4 +1,5 @@
-import { ArcadePanel } from "@repo/ui/arcade";
+import { collectionStudioPath } from "@ador/shared/collections";
+import { ArcadeButton, ArcadePanel } from "@repo/ui/arcade";
 
 import type { UploadSession } from "../hooks/use-upload-session.ts";
 import { UploadFeedback } from "./upload-feedback.tsx";
@@ -9,6 +10,11 @@ export function UploadPanel({ session }: { readonly session: UploadSession }) {
     <ArcadePanel eyebrow="Private drafts" title="Upload an image">
       <UploadForm disabled={session.busy} onFile={session.select} />
       <UploadFeedback
+        next={
+          <ArcadeButton href={collectionStudioPath} tone="mint">
+            Use it in a collection
+          </ArcadeButton>
+        }
         onCancel={session.cancel}
         onReset={session.reset}
         onRetry={session.retry}

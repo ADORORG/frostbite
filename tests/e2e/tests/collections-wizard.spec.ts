@@ -35,9 +35,10 @@ test("a creator builds a draft in the browser, leaves, and resumes where it stan
   );
 
   await page.goto("/studio/collections");
-  await expect(
-    page.getByText("No collections yet. Start one below."),
-  ).toBeVisible();
+  await expect(page.getByText("No collections yet")).toBeVisible();
+  // The list and the form are separate pages, joined by a button.
+  await page.getByRole("link", { name: "Start your first collection" }).click();
+  await expect(page).toHaveURL(/\/studio\/collections\/new$/u);
   await page.getByLabel("Collection name").fill("Browser built");
   await page.getByLabel("Planned supply").fill("2");
   await page.getByRole("button", { name: "Create collection" }).click();
@@ -79,7 +80,9 @@ test("a creator builds a draft in the browser, leaves, and resumes where it stan
   // something (here nothing is missing, so review), with the same content from the server.
   await page.goto("/studio/collections");
   await expect(page.getByText("1 of 2 items")).toBeVisible();
-  await page.getByRole("link", { name: "Continue Browser built" }).click();
+  await page
+    .getByRole("link", { name: "Continue editing: Browser built" })
+    .click();
   await expect(step(page, "Review")).toBeVisible();
   await expect(
     page.getByText("Not ready to submit yet. It needs every planned item."),
@@ -100,7 +103,9 @@ test("a stale page is told its draft changed elsewhere and can reload it", async
 }) => {
   await signIn(page, baseURL, creatorE2EFixtures.collectionWizardCreator);
   await page.goto("/studio/collections");
-  await page.getByRole("link", { name: "Continue Browser built" }).click();
+  await page
+    .getByRole("link", { name: "Continue editing: Browser built" })
+    .click();
   await expect(step(page, "Review")).toBeVisible();
   await page.getByRole("button", { name: "1. Details" }).click();
 

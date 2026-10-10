@@ -124,6 +124,7 @@ describe("list drafts", () => {
       name: "First light",
       plannedSupply: 5,
       revision: 3,
+      submissionState: "changes-requested",
       targetChain: signet,
       updatedAt: new Date("2026-10-09T13:00:00.000Z"),
     };
@@ -144,6 +145,7 @@ describe("list drafts", () => {
         name: "First light",
         plannedSupply: 5,
         revision: 3,
+        submissionState: "changes-requested",
         targetChain: signet,
         updatedAt: "2026-10-09T13:00:00.000Z",
       },

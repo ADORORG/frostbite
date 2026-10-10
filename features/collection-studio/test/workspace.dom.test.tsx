@@ -1,18 +1,10 @@
 import { ApiError } from "@ador/client-http";
 import { chainOptionSchema } from "@ador/shared/chain";
-import {
-  button,
-  click,
-  fieldByLabel,
-  mount,
-  settle,
-  textOf,
-  typeInto,
-} from "@ador/test-kit/dom";
+import type { SubmissionState } from "@ador/shared/collections";
+import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { CollectionsWorkspace } from "../src/ui/collections-workspace.tsx";
-import { detail } from "./support/detail.ts";
 import { fakeCollections } from "./support/fake-api.ts";
 import { id, signet } from "./support/stubs.ts";
 
@@ -24,13 +16,18 @@ const chain = chainOptionSchema.parse({
   role: "public-beta",
 });
 
-const summary = (name: string, itemCount: number) => ({
+const summary = (
+  name: string,
+  itemCount: number,
+  submissionState: SubmissionState | null = null,
+) => ({
   createdAt: "2026-10-09T12:00:00.000Z",
   id: id(),
   itemCount,
   name,
   plannedSupply: 5,
   revision: 2,
+  submissionState,
   targetChain: signet,
   updatedAt: "2026-10-09T13:00:00.000Z",
 });
@@ -41,28 +38,67 @@ function view(fake: ReturnType<typeof fakeCollections>) {
   );
 }
 
-describe("collections page: the list", () => {
-  it("shows loading, then an empty state that points to the form", async () => {
+describe("collections overview", () => {
+  it("shows loading, then an empty state that points to the page that starts a collection", async () => {
     const fake = fakeCollections();
     fake.api.list.mockReturnValueOnce(new Promise(() => undefined));
     const loading = await mount(view(fake));
     expect(textOf(loading)).toContain("Loading your collections…");
     const empty = await mount(view(fakeCollections()));
-    await settle(() =>
-      expect(textOf(empty)).toContain("No collections yet. Start one below."),
+    await settle(() => expect(textOf(empty)).toContain("No collections yet"));
+    const start = [...empty.querySelectorAll("a")].find(
+      (link) => link.textContent === "Start your first collection",
     );
+    expect(start?.getAttribute("href")).toBe("/studio/collections/new");
+    expect(empty.querySelector("input")).toBeNull();
   });
 
-  it("lists each draft with its chain, progress, update date, and a link to resume it", async () => {
+  it("shows each collection as a card with its chain, state, progress, date, and next step", async () => {
     const fake = fakeCollections();
-    fake.state.summaries = [summary("First light", 2), summary("Second", 0)];
+    fake.state.summaries = [
+      summary("First light", 2),
+      summary("Second", 5, "changes-requested"),
+    ];
     const container = await mount(view(fake));
     await settle(() => expect(textOf(container)).toContain("First light"));
     expect(textOf(container)).toContain("Bitcoin signet");
     expect(textOf(container)).toContain("2 of 5 items");
     expect(textOf(container)).toContain("Updated 2026-10-09");
-    const link = container.querySelector(`a[href^="/studio/collections/"]`);
-    expect(link?.textContent).toBe("Continue First light");
+    expect(textOf(container)).toContain("Draft");
+    expect(textOf(container)).toContain("Changes requested");
+    const links = [
+      ...container.querySelectorAll('a[href^="/studio/collections/"]'),
+    ];
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Continue editing",
+      "Make changes",
+    ]);
+    expect(links.map((link) => link.getAttribute("aria-label"))).toEqual([
+      "Continue editing: First light",
+      "Make changes: Second",
+    ]);
+  });
+
+  it("filters by where each collection stands, and only offers filters that lead somewhere", async () => {
+    const fake = fakeCollections();
+    fake.state.summaries = [
+      summary("Alpha", 1),
+      summary("Beta", 5, "under-review"),
+      summary("Gamma", 5, "submitted"),
+    ];
+    const container = await mount(view(fake));
+    await settle(() => expect(textOf(container)).toContain("Alpha"));
+    const filters = [...container.querySelectorAll("[aria-pressed]")].map(
+      (option) => option.textContent,
+    );
+    expect(filters).toEqual(["All3", "Drafts1", "In review2"]);
+    await click(button(container, "In review2"));
+    expect(textOf(container)).not.toContain("Alpha");
+    expect(textOf(container)).toContain("Beta");
+    expect(textOf(container)).toContain("Gamma");
+    await click(button(container, "Drafts1"));
+    expect(textOf(container)).toContain("Alpha");
+    expect(textOf(container)).not.toContain("Beta");
   });
 
   it("says when the list could not load, and retries", async () => {
@@ -77,84 +113,5 @@ describe("collections page: the list", () => {
     fake.state.summaries = [summary("First light", 1)];
     await click(button(container, "Retry"));
     await settle(() => expect(textOf(container)).toContain("First light"));
-  });
-});
-
-describe("collections page: starting a collection", () => {
-  async function start(fake: ReturnType<typeof fakeCollections>) {
-    const container = await mount(view(fake));
-    await settle(() =>
-      expect(textOf(container)).toContain("No collections yet"),
-    );
-    return container;
-  }
-
-  it("refuses an incomplete form in words, without calling the server", async () => {
-    const fake = fakeCollections();
-    const container = await start(fake);
-    await click(button(container, "Create collection"));
-    expect(fake.api.create).not.toHaveBeenCalled();
-    expect(textOf(container)).toContain(
-      "Problem: Enter a name of up to 120 characters.",
-    );
-    expect(textOf(container)).toContain(
-      "Problem: Enter a whole number from 1 to 1,000,000.",
-    );
-  });
-
-  it("creates the draft with the three required fields and opens its wizard", async () => {
-    const created = detail({ name: "Brand new" });
-    const fake = fakeCollections(created);
-    const container = await start(fake);
-    await typeInto(fieldByLabel(container, "Collection name"), "Brand new");
-    await typeInto(fieldByLabel(container, "Planned supply"), "12");
-    await click(button(container, "Create collection"));
-    await settle(() => expect(fake.services.navigate).toHaveBeenCalled());
-    expect(fake.api.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Brand new",
-        plannedSupply: 12,
-        targetChain: signet,
-      }),
-      { idempotencyKey: "request-key-00000001" },
-    );
-    expect(fake.services.navigate).toHaveBeenCalledWith(
-      `/studio/collections/${created.collection.id}`,
-    );
-  });
-
-  it("keeps the same idempotency key when creating fails, so a retry cannot make a second draft", async () => {
-    const fake = fakeCollections();
-    fake.api.create.mockRejectedValueOnce(new ApiError("network", null, "x"));
-    const container = await start(fake);
-    await typeInto(fieldByLabel(container, "Collection name"), "Brand new");
-    await typeInto(fieldByLabel(container, "Planned supply"), "3");
-    await click(button(container, "Create collection"));
-    await settle(() =>
-      expect(textOf(container)).toContain("could not reach the server"),
-    );
-    await click(button(container, "Dismiss and try again"));
-    await click(button(container, "Create collection"));
-    await settle(() => expect(fake.api.create).toHaveBeenCalledTimes(2));
-    const keys = fake.api.create.mock.calls.map(
-      ([, options]) => options.idempotencyKey,
-    );
-    expect(keys[0]).toBe(keys[1]);
-  });
-
-  it("tells a creator who is not approved how to apply", async () => {
-    const fake = fakeCollections();
-    fake.api.create.mockRejectedValue(new ApiError("forbidden", 403, "x"));
-    const container = await start(fake);
-    await typeInto(fieldByLabel(container, "Collection name"), "Brand new");
-    await typeInto(fieldByLabel(container, "Planned supply"), "3");
-    await click(button(container, "Create collection"));
-    await settle(() =>
-      expect(textOf(container)).toContain("Only approved creators"),
-    );
-    expect(
-      container.querySelector('a[href="/studio/creator-application"]'),
-    ).not.toBeNull();
-    expect(fake.services.navigate).not.toHaveBeenCalled();
   });
 });

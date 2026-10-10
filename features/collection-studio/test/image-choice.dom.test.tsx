@@ -1,6 +1,26 @@
-import { mount, textOf } from "@ador/test-kit/dom";
+import { click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
+
+// The real uploader is covered in the uploads feature. Here it is a button that "finishes an upload", so
+// what this component does with the result is tested on its own.
+vi.mock("@ador/feature-uploads/inline", () => ({
+  InlineUpload: ({
+    onUploaded,
+    purpose,
+  }: {
+    onUploaded: (assetId: string) => void;
+    purpose: string;
+  }) => (
+    <button
+      data-purpose={purpose}
+      onClick={() => onUploaded("new-asset-id")}
+      type="button"
+    >
+      Finish upload
+    </button>
+  ),
+}));
 
 import { ImageChoice } from "../src/ui/components/image-choice.tsx";
 import { imageAsset } from "./support/detail.ts";
@@ -23,8 +43,8 @@ function view(overrides: Partial<Parameters<typeof ImageChoice>[0]> = {}) {
     legend: "Cover image",
     onChange,
     purpose: "collection-artwork",
+    onUploaded: vi.fn(async () => undefined),
     selectedId: null,
-    uploadHref: "/studio/uploads",
     ...overrides,
   } as const;
   return { onChange, props };
@@ -66,15 +86,47 @@ describe("image choice", () => {
     expect(onChange).toHaveBeenLastCalledWith(null);
   });
 
-  it("says how to get images when there are none ready, with a link to upload them", async () => {
+  it("when there are none ready, says so and offers the uploader for this purpose right there", async () => {
     const { props } = view({ assets: [banner, pending] });
     const container = await mount(<ImageChoice {...props} />);
     expect(textOf(container)).toContain(
       "You have no ready images for this yet.",
     );
-    expect(container.querySelector("a")?.getAttribute("href")).toBe(
-      "/studio/uploads",
+    expect(container.querySelector("a")).toBeNull();
+    expect(container.querySelector("details")).toBeNull();
+    expect(
+      container
+        .querySelector("button[data-purpose]")
+        ?.getAttribute("data-purpose"),
+    ).toBe("collection-artwork");
+  });
+
+  it("keeps the uploader a click away, not in the way, when images already exist", async () => {
+    const { props } = view();
+    const container = await mount(<ImageChoice {...props} />);
+    const disclosure = container.querySelector("details");
+    expect(disclosure?.open).toBe(false);
+    expect(disclosure?.querySelector("summary")?.textContent).toBe(
+      "Upload a new image",
     );
+    expect(disclosure?.querySelector("button[data-purpose]")).not.toBeNull();
+  });
+
+  it("chooses the uploaded image only after the library holds it", async () => {
+    let finishRefresh: () => void = () => undefined;
+    const onUploaded = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishRefresh = resolve;
+        }),
+    );
+    const { onChange, props } = view({ onUploaded });
+    const container = await mount(<ImageChoice {...props} />);
+    await click(container.querySelector("button[data-purpose]"));
+    expect(onUploaded).toHaveBeenCalledOnce();
+    expect(onChange).not.toHaveBeenCalled();
+    await act(async () => finishRefresh());
+    await settle(() => expect(onChange).toHaveBeenCalledWith("new-asset-id"));
   });
 
   it("keeps showing a chosen image that is not in the list, and says so", async () => {

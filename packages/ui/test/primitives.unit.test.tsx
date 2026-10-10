@@ -4,8 +4,24 @@ import { describe, expect, it } from "vitest";
 import {
   ArcadeActionButton,
   ArcadeBadge,
+  ArcadeButton,
   ArcadeProgress,
 } from "../src/arcade.js";
+
+describe("arcade link button", () => {
+  it("names a link on its own when the visible words repeat, and adds no label otherwise", () => {
+    const named = renderToStaticMarkup(
+      <ArcadeButton ariaLabel="Continue: First light" href="/a">
+        Continue
+      </ArcadeButton>,
+    );
+    expect(named).toContain('aria-label="Continue: First light"');
+    expect(named).toContain(">Continue</a>");
+    expect(
+      renderToStaticMarkup(<ArcadeButton href="/a">Continue</ArcadeButton>),
+    ).not.toContain("aria-label");
+  });
+});
 
 describe("arcade action button", () => {
   it("renders a real button with the arcade look, defaulting to a non-submitting cyan button", () => {

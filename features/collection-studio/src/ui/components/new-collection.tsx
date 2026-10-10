@@ -1,6 +1,9 @@
 import type { ChainOption } from "@ador/shared/chain";
-import { collectionWizardHref } from "@ador/shared/collections";
-import { ArcadeActionButton, ArcadePanel } from "@repo/ui/arcade";
+import {
+  collectionStudioPath,
+  collectionWizardHref,
+} from "@ador/shared/collections";
+import { ArcadeActionButton, ArcadeButton, ArcadePanel } from "@repo/ui/arcade";
 import { useRef, useState } from "react";
 
 import { describeFailure, type Failure } from "../../client/error-copy.ts";
@@ -57,7 +60,7 @@ export function NewCollection({
   const change = (changes: Partial<DraftFormValues>) =>
     setForm((current) => ({ ...current, ...changes }));
   return (
-    <ArcadePanel eyebrow="New" title="Start a collection">
+    <ArcadePanel eyebrow="Step 1" title="The basics">
       <DetailsFields
         disabled={busy}
         errors={{ name: errors.name }}
@@ -88,6 +91,9 @@ export function NewCollection({
         >
           Create collection
         </ArcadeActionButton>
+        <ArcadeButton href={collectionStudioPath} tone="pink">
+          Cancel
+        </ArcadeButton>
       </div>
     </ArcadePanel>
   );

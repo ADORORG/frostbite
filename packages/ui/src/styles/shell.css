@@ -1,7 +1,9 @@
 .app-shell {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  /* Clip sideways overflow without making the shell a scroll container, which would stop the header
+     and the area sidebar from staying in view (position: sticky). */
+  overflow-x: clip;
   background:
     radial-gradient(
       circle at 85% 0%,

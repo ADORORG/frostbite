@@ -1,4 +1,7 @@
-import { collectionStudioPath } from "@ador/shared/collections";
+import {
+  collectionNewPath,
+  collectionStudioPath,
+} from "@ador/shared/collections";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
@@ -27,11 +30,39 @@ test("the collections list closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Collections" }),
   ).toBeVisible();
+  await expect(page.getByText("No collections yet")).toBeVisible();
+
+  // Keyboard, with real key presses: past the skip link and the breadcrumb, Tab reaches the page's
+  // main action, then the empty state's own, in reading order. Both lead to the page that starts one.
+  await skipToMain(page);
+  await passBreadcrumb(page);
+  await page.keyboard.press("Tab");
   await expect(
-    page.getByText("No collections yet. Start one below."),
+    page.getByRole("link", { name: "New collection", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("link", { name: "Start your first collection" }),
+  ).toBeFocused();
+  await page.getByRole("link", { name: "Start your first collection" }).blur();
+  await closeMatrix(page, "collections-empty.png");
+});
+
+test("the new collection page closes the experience-quality matrix", async ({
+  baseURL,
+  page,
+}) => {
+  await prepare(
+    page,
+    baseURL,
+    creatorE2EFixtures.collectionQualityList.sessionToken,
+  );
+  await page.goto(collectionNewPath);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "New collection" }),
   ).toBeVisible();
 
-  // Keyboard, with real key presses: past the skip link, Tab reaches the form in reading order.
+  // Keyboard: past the skip link and the breadcrumb, Tab reaches the form in reading order, then the way back.
   await skipToMain(page);
   await passBreadcrumb(page);
   await page.keyboard.press("Tab");
@@ -44,8 +75,10 @@ test("the collections list closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("button", { name: "Create collection" }),
   ).toBeFocused();
-  await page.getByLabel("Collection name").blur();
-  await closeMatrix(page, "collections-empty.png");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Cancel" })).toBeFocused();
+  await page.getByRole("link", { name: "Cancel" }).blur();
+  await closeMatrix(page, "collection-new.png");
 });
 
 test("the collection wizard closes the experience-quality matrix on its first step", async ({

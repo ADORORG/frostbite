@@ -1,6 +1,10 @@
 import type { IdempotencyKey } from "@ador/shared/http";
 import type { UuidV7 } from "@ador/shared/identifiers";
-import type { CollectionDraft, CollectionItem } from "@ador/shared/collections";
+import type {
+  CollectionDraft,
+  CollectionItem,
+  SubmissionState,
+} from "@ador/shared/collections";
 
 export interface CollectionRecord extends CollectionDraft {
   readonly createdAt: Date;
@@ -26,6 +30,8 @@ export interface CollectionSummaryRecord {
   readonly name: string;
   readonly plannedSupply: number;
   readonly revision: number;
+  // The latest submission's state, or null if the collection was never submitted.
+  readonly submissionState: SubmissionState | null;
   readonly targetChain: CollectionDraft["targetChain"];
   readonly updatedAt: Date;
 }

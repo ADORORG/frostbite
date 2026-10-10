@@ -3,6 +3,7 @@ import { z } from "zod";
 import { libraryAssetSchema } from "../uploads/library-contracts.ts";
 import { uuidV7TextSchema } from "../identifiers/uuid-v7.ts";
 import { collectionDraftSchema, collectionItemSchema } from "./draft.ts";
+import { submissionStateSchema } from "./review-state.ts";
 
 const timestamp = z.iso.datetime({ offset: true });
 const collectionId = uuidV7TextSchema;
@@ -15,6 +16,8 @@ export const collectionSummarySchema = z
     name: collectionDraftSchema.shape.name,
     plannedSupply: collectionDraftSchema.shape.plannedSupply,
     revision: z.number().int().positive(),
+    // The state of the latest submission, or null while the collection has never been submitted.
+    submissionState: submissionStateSchema.nullable(),
     targetChain: collectionDraftSchema.shape.targetChain,
     updatedAt: timestamp,
   })

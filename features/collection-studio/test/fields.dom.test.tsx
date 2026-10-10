@@ -104,7 +104,7 @@ describe("images step choices", () => {
         }}
         onChange={onChange}
         onRefresh={() => undefined}
-        uploadHref="/up"
+        onUploaded={async () => undefined}
       />,
     );
     const radios = [
