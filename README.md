@@ -49,12 +49,16 @@ pnpm test:coverage
 pnpm migration:check
 pnpm build
 pnpm test:e2e
+pnpm stack
 pnpm format:check
 pnpm repository:check
 ```
 
 Database migrations are never applied during application startup. Deployment automation must run
 `pnpm --filter @ador/database migration:apply` as an explicit pre-deploy step.
+
+`pnpm stack` starts the whole product locally (database, storage, worker, web) with seeded users, for
+manual testing in a browser; see [`tests/e2e/README.md`](tests/e2e/README.md).
 
 ## Architecture rules
 

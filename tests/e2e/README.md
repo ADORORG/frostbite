@@ -1,0 +1,39 @@
+# `@repo/e2e`
+
+Playwright browser coverage on the real stack, plus the local manual-test stack that uses the same
+services and seeded users.
+
+## Browser tests
+
+`pnpm test:e2e` (from the repository root) builds the app, starts a disposable PostgreSQL, local S3
+(MinIO), the worker, and a self-hosted Inngest, seeds the fixture users, and runs Playwright on four
+viewport projects (mobile, tablet, desktop, wide). Real-service flows (uploads, collections, review)
+run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experience-quality matrices
+(axe, keyboard, reduced motion, visual baselines) run on every viewport. Update a visual baseline only
+after reading the diff: `pnpm test:e2e -- --update-snapshots changed <spec>`.
+
+- `src/creator-fixtures.ts` is the one list of seeded users and their session tokens. A new fixture is
+  seeded automatically (`scripts/stack-setup.ts`).
+- `scripts/public-collection-seed.ts` seeds an approved collection with fixed content for the public
+  page checks.
+- Quality specs that need fixed data answer the API call that carries it (`tests/support/review-mocks.ts`),
+  parsed through the shared contract, so a mock that drifts from it fails loudly.
+
+## Manual test stack
+
+`pnpm stack` runs the whole product locally for a person to drive by hand: the same disposable
+PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the same users, kept running
+until Ctrl+C. It builds the web app first if there is no build, then prints, for each seeded person, one
+line to paste into the browser console (it sets the session cookie), and the pages worth visiting.
+
+- Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
+  does not clash with the test run's port.
+- Everything is disposable and local: the server binds the loopback address, the session tokens are fixed
+  fixtures of a throwaway database, storage is MinIO (never real R2), and nothing touches a chain. Never
+  run it on a shared host.
+- Docker is required (as for the integration tests).
+
+## Verification
+
+`typecheck`, `test:unit`, `test:integration`, `test:coverage` cover `src/`; the scripts are exercised by
+running them. Platform engineering owns this workspace.
