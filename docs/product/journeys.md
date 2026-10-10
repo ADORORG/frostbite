@@ -10,6 +10,20 @@ them. Defaults are chosen and logged in `docs/session-findings.md` (section Q); 
 4. A person is never shown an action they cannot do; if they must wait, the page says why.
 5. Content is at most one readable column (about 72rem), two columns on desktop where it helps.
 
+## One page, one job (applies to every feature)
+Each feature separates three kinds of page and links them with clear buttons:
+- **Overview** (what exists): a list with status filters and a primary "New …" button.
+- **Create** (make one): its own page, one focused form, "Cancel" back to the overview.
+- **Detail / editor** (work on one): breadcrumb back to the overview, next-step button.
+Never a list and a create form stacked on one page.
+
+| Feature | Overview | Create | Detail |
+|---|---|---|---|
+| Collections | `/studio/collections`: tabs Drafts, In review, Needs changes, Live; cards with cover, name, supply, status, next action | `/studio/collections/new` | `/studio/collections/:id` wizard |
+| Uploads | `/studio/uploads`: library grid, filter by purpose, "Use in a collection" | `/studio/uploads/new` | image detail (purpose, where used) |
+| Creator application | `/studio` dashboard card | `/studio/creator-application` | same page, read-only after submit |
+| Reviews | `/admin/collection-reviews`: queue with filters | none | `/admin/collection-reviews/:id` |
+
 ## Top bar by role
 - Visitor: Collections, Games, Sign in.
 - Signed in: Collections, Games, Studio (if creator or applicant), Admin (if staff), account menu
