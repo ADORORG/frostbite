@@ -1,10 +1,10 @@
 import { accountsFeature } from "@ador/feature-accounts";
+import { createPublicCollectionsFeature } from "@ador/feature-public-collections";
 import { createCollectionReviewFeature } from "@ador/feature-collection-review";
 import { createCollectionStudioFeature } from "@ador/feature-collection-studio";
 import { creatorAdmissionFeature } from "@ador/feature-creator-admission";
 import { platformShellFeature } from "@ador/feature-platform-shell";
 import {
-  collectionsFeature,
   creatorsFeature,
   gamesFeature,
   launchesFeature,
@@ -22,7 +22,7 @@ export const featureRegistry = createFeatureRegistry([
   accountsFeature,
   creatorAdmissionFeature,
   launchesFeature,
-  collectionsFeature,
+  createPublicCollectionsFeature(providerRegistry, targetChains),
   creatorsFeature,
   gamesFeature,
   createWalletConnectionFeature(walletConnectionConfig),

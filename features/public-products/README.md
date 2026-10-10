@@ -1,10 +1,11 @@
 # `@ador/feature-public-products`
 
-Detachable public discovery surfaces for launches, collections, creators, and games.
+Detachable public discovery surfaces for launches, creators, and games. The collections catalog is
+`@ador/feature-public-collections`.
 
 ## Public API
 
-`launchesFeature`, `collectionsFeature`, `creatorsFeature`, and `gamesFeature` are independent
+`launchesFeature`, `creatorsFeature`, and `gamesFeature` are independent
 registration exports. One explicit registry line installs or removes each domain route family; the
 application contains no product-specific routing branches. Shared factories keep their contracts
 and honest pre-data states aligned without coupling their registration lifecycle.

@@ -76,7 +76,8 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
 - An **approved version** is a submission in the `approved` state **and** whose creator is still an
   approved creator. Either half failing means there is none, whatever the submission row says.
 - `ApprovedVersionReader.findApprovedVersion` reads it without a lock, for display (public pages): the
-  answer can be stale by the time it is used.
+  answer can be stale by the time it is used. `listApprovedCollections(limit)` lists the collections that
+  have one, newest approval first, reading each from its snapshot in SQL (so a list never loads every item).
 - `lockApprovedVersion(transaction, collectionId)` is for anything that **acts** on approval
   (publication, deployment). Call it inside the transaction that records the action. It takes shared
   locks on the approved submission and then on the creator's application, the order a decision uses, so

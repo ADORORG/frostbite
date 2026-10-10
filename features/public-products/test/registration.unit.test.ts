@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  collectionsFeature,
   creatorsFeature,
   gamesFeature,
   launchesFeature,
@@ -9,15 +8,9 @@ import {
 
 describe("publicProductsFeature", () => {
   it("declares independently detachable domain route families", () => {
-    const features = [
-      launchesFeature,
-      collectionsFeature,
-      creatorsFeature,
-      gamesFeature,
-    ];
+    const features = [launchesFeature, creatorsFeature, gamesFeature];
     expect(features.map(({ manifest }) => manifest.id)).toEqual([
       "launches",
-      "collections",
       "creators",
       "games",
     ]);

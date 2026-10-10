@@ -69,6 +69,9 @@ test("a creator submits a ready collection and sees it waiting for a reviewer", 
   await page.getByRole("button", { name: "Submit for review" }).click();
   await expect(page.getByText("Submission 1: Submitted")).toBeVisible();
   await expect(page.getByRole("button", { name: /submit/iu })).toHaveCount(0);
+  // Submitted is not approved: nothing is public yet.
+  await page.goto(`/collections/${collectionId}`);
+  await expect(page.getByText("Record not published")).toBeVisible();
 });
 
 test("a reviewer reads the frozen version with its art and asks for changes", async ({
@@ -132,6 +135,37 @@ test("the reviewer approves the new version and the creator sees it approved, wi
   await expect(page.getByText("Submission 2: Approved")).toBeVisible();
   await expect(page.getByText("does not publish or launch it")).toBeVisible();
   await expect(page.getByRole("button", { name: /submit/iu })).toHaveCount(0);
+});
+
+test("once approved the collection is public, as the version that was approved, to anyone", async ({
+  baseURL,
+  browser,
+}) => {
+  const visitor = await browser.newContext({ baseURL });
+  const page = await visitor.newPage();
+  await page.goto("/collections");
+  await expect(page.getByText("Approved by review")).toBeVisible();
+  await page.getByRole("link", { name: `View ${name}` }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/collections/${collectionId}$`, "u"),
+  );
+  await expect(
+    page.getByText("Approved by review. Not yet minted."),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+  await expect(
+    page.getByText("A small ready collection, drawn by hand", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: `Cover image for ${name}` }).first(),
+  ).toBeVisible();
+  await expect(page.getByRole("img", { name: "1. Dawn" })).toBeVisible();
+  await expect(page.getByText("Items (1)")).toBeVisible();
+  // Nothing of the creator or the review reaches the visitor.
+  const text = await page.locator("body").innerText();
+  for (const private_ of [creator.userId, "reviewer-", feedback])
+    expect(text).not.toContain(private_);
+  await visitor.close();
 });
 
 test("people without the reviewer role cannot read or decide on submissions", async ({

@@ -9,15 +9,6 @@ export const productCatalogs = [
     path: "/launches",
   },
   {
-    detailNoun: "collection",
-    emptyBody:
-      "No collection is published. Draft uploads and creator submissions are never shown here.",
-    emptyTitle: "No collections online",
-    label: "Collections",
-    featureId: "collections",
-    path: "/collections",
-  },
-  {
     detailNoun: "creator",
     emptyBody:
       "No creator profile is published. Applications remain private until staff approval and publication.",
@@ -40,9 +31,8 @@ export const productCatalogs = [
 export type ProductCatalog = (typeof productCatalogs)[number];
 
 export const launchesCatalog = productCatalogs[0];
-export const collectionsCatalog = productCatalogs[1];
-export const creatorsCatalog = productCatalogs[2];
-export const gamesCatalog = productCatalogs[3];
+export const creatorsCatalog = productCatalogs[1];
+export const gamesCatalog = productCatalogs[2];
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

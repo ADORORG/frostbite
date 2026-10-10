@@ -13,6 +13,7 @@ import {
 } from "./support/database.ts";
 import { newId } from "./support/fixtures.ts";
 import {
+  approvedSubmission,
   decide,
   readyCollection,
   reviewerDecides,
@@ -23,16 +24,6 @@ import {
 
 useCollectionDatabase();
 
-// A submission taken through review to approval, with the time the approval was recorded.
-async function approved() {
-  const seeded = await submitted();
-  const reviewer = await seedReviewer();
-  await decide(seeded.submission.id, reviewer, "start-review");
-  const result = await decide(seeded.submission.id, reviewer, "approve");
-  if (result.kind !== "decided") throw new Error(`got ${result.kind}`);
-  return { ...seeded, reviewer };
-}
-
 const held = (collectionId: string) =>
   database.transaction((transaction) =>
     lockApprovedVersion(transaction, collectionId),
@@ -40,7 +31,7 @@ const held = (collectionId: string) =>
 
 describe("the approved version", () => {
   it("is the approved submission, with its snapshot, hash, sequence, and the time it was approved", async () => {
-    const seeded = await approved();
+    const seeded = await approvedSubmission();
     const row = await rowOf(seeded.submission.id);
     const version = await approvedVersions.findApprovedVersion(
       seeded.collectionId,
@@ -88,7 +79,7 @@ describe("the approved version", () => {
   it.each(["suspend", "revoke"] as const)(
     "is nothing once an approved submission is %sed",
     async (action) => {
-      const seeded = await approved();
+      const seeded = await approvedSubmission();
       await decide(seeded.submission.id, seeded.reviewer, action, {
         creatorFeedback: "Words.",
       });
@@ -100,7 +91,7 @@ describe("the approved version", () => {
   );
 
   it("comes back when a suspended approval is reinstated", async () => {
-    const seeded = await approved();
+    const seeded = await approvedSubmission();
     await decide(seeded.submission.id, seeded.reviewer, "suspend", {
       creatorFeedback: "Looking into it.",
     });
@@ -114,7 +105,7 @@ describe("the approved version", () => {
   it.each(["suspended", "revoked", "rejected", "draft"] as const)(
     "is nothing when the creator is %s, whatever the submission row says",
     async (creatorState) => {
-      const seeded = await approved();
+      const seeded = await approvedSubmission();
       await setApplicationState(seeded.ownerUserId, creatorState);
       expect((await rowOf(seeded.submission.id)).state).toBe("approved");
       expect(
@@ -167,7 +158,7 @@ describe("the approved version", () => {
 
 describe("acting on the approved version", () => {
   it("makes a revocation in flight wait until the caller has finished, then lands after it", async () => {
-    const seeded = await approved();
+    const seeded = await approvedSubmission();
     const holder = await holdTransaction(database, async (transaction) => {
       expect(
         await lockApprovedVersion(transaction, seeded.collectionId),
@@ -185,7 +176,7 @@ describe("acting on the approved version", () => {
   });
 
   it("makes a suspension of the creator in flight wait until the caller has finished", async () => {
-    const seeded = await approved();
+    const seeded = await approvedSubmission();
     const holder = await holdTransaction(database, async (transaction) => {
       expect(
         await lockApprovedVersion(transaction, seeded.collectionId),
@@ -200,7 +191,7 @@ describe("acting on the approved version", () => {
   });
 
   it("sees a revocation that committed first, and does not act", async () => {
-    const seeded = await approved();
+    const seeded = await approvedSubmission();
     const revocation = await holdTransaction(database, (transaction) =>
       transaction
         .update(collectionSubmissions)

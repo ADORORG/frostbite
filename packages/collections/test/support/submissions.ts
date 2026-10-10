@@ -116,3 +116,13 @@ export async function rowOf(submissionId: UuidV7) {
   if (row === undefined) throw new Error("no such submission");
   return row;
 }
+
+// A submission taken through review to approval, with the time the approval was recorded.
+export async function approvedSubmission() {
+  const seeded = await submitted();
+  const reviewer = await seedReviewer();
+  await decide(seeded.submission.id, reviewer, "start-review");
+  const result = await decide(seeded.submission.id, reviewer, "approve");
+  if (result.kind !== "decided") throw new Error(`got ${result.kind}`);
+  return { ...seeded, reviewer };
+}

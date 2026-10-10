@@ -7,9 +7,11 @@ import {
   collectionSubmissions,
 } from "@ador/database/schema/collection-submissions";
 import { uuidV7Schema } from "@ador/shared/identifiers";
-import { and, desc, eq } from "drizzle-orm";
+import { creatorApplications } from "@ador/database/schema/creator-admission";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import type {
+  ApprovedCollectionSummary,
   ApprovedVersion,
   ApprovedVersionReader,
 } from "../application/approved-version.ts";
@@ -89,6 +91,49 @@ export function createDrizzleApprovedVersionReader(
   database: DatabaseClient,
 ): ApprovedVersionReader {
   return {
+    async listApprovedCollections(limit) {
+      // Read from the snapshot's own fields in SQL, so a list never loads every item of every collection.
+      const snapshot = collectionSubmissions.snapshot;
+      const rows = await database
+        .select({
+          approvedAt: collectionSubmissions.updatedAt,
+          collectionId: collectionSubmissions.collectionId,
+          coverAssetId: sql<
+            string | null
+          >`${snapshot}->'collection'->>'coverAssetId'`,
+          description: sql<string>`${snapshot}->'collection'->>'description'`,
+          itemCount: sql<number>`jsonb_array_length(${snapshot}->'items')`,
+          name: sql<string>`${snapshot}->'collection'->>'name'`,
+          ownerUserId: collectionSubmissions.ownerUserId,
+          plannedSupply: sql<number>`(${snapshot}->'collection'->>'plannedSupply')::int`,
+          targetChain: sql<string>`${snapshot}->'collection'->>'targetChain'`,
+        })
+        .from(collectionSubmissions)
+        .innerJoin(
+          creatorApplications,
+          eq(
+            creatorApplications.applicantUserId,
+            collectionSubmissions.ownerUserId,
+          ),
+        )
+        .where(
+          and(
+            eq(collectionSubmissions.state, "approved"),
+            eq(creatorApplications.state, "approved"),
+          ),
+        )
+        .orderBy(
+          desc(collectionSubmissions.updatedAt),
+          desc(collectionSubmissions.id),
+        )
+        .limit(limit);
+      return rows.map((row): ApprovedCollectionSummary => ({
+        ...row,
+        collectionId: uuidV7Schema.parse(row.collectionId),
+        ownerUserId: uuidV7Schema.parse(row.ownerUserId),
+      }));
+    },
+
     async findApprovedVersion(collectionId) {
       const row = await latestApproved(database, collectionId, false);
       if (row === undefined) return null;

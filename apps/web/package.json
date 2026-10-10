@@ -25,6 +25,7 @@
     "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
+    "@ador/feature-public-collections": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-wallet-connection": "workspace:*",
     "@ador/http": "workspace:*",

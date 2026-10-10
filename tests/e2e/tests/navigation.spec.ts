@@ -17,7 +17,14 @@ test("reaches every public surface from visible navigation", async ({
     await page.goto("/");
     await page.getByRole("link", { name: label, exact: true }).click();
     await expect(page).toHaveURL(destination);
-    await expect(page.getByText("Catalog empty")).toBeVisible();
+    // Collections shows whatever has been approved; the other catalogs have nothing published yet.
+    await expect(
+      page.getByText(
+        label === "Collections"
+          ? /Catalog empty|Approved by review/u
+          : "Catalog empty",
+      ),
+    ).toBeVisible();
   }
 
   await page.goto("/");

@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W4-03` completed)                                            |
-| Next ordered task       | `W4-03b` Creator submit/status UI and staff review page             |
+| Active task             | None (`W4-05` completed)                                            |
+| Next ordered task       | `W4-06` Add creator/staff audit visibility                          |
 | Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -94,8 +94,8 @@ stored in `references/task-list.md`.
 | W4-02  | Build the resumable creator collection wizard                                             | completed | `references/collection-wizard-task-record.md`       |
 | W4-03  | Implement immutable submission snapshots and review state transitions                     | completed | `references/submission-snapshots-task-record.md`    |
 | W4-03b | Add creator submit and status controls to the wizard and the staff review page            | completed | `references/submission-ui-task-record.md`           |
-| W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | pending   | Depends on W4-03                                    |
-| W4-05  | Build approved public collection list and detail pages                                    | pending   | Depends on W4-03                                    |
+| W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | completed | `references/review-invariants-task-record.md`       |
+| W4-05  | Build approved public collection list and detail pages                                    | completed | `references/public-collections-task-record.md`      |
 | W4-06  | Add creator/staff audit visibility                                                        | pending   | Depends on W4-03                                    |
 | W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending   | Depends on W4-01 through W4-06                      |
 

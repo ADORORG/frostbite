@@ -18,6 +18,7 @@ import {
   approvedCreators,
   creatorE2EFixtures,
 } from "../src/creator-fixtures.ts";
+import { seedPublicCollection } from "./public-collection-seed.ts";
 import { normalizePlaywrightArguments } from "../src/playwright-arguments.ts";
 import { resolveE2EServerConfig } from "../src/server-config.ts";
 import { withUploadServices } from "../src/services.ts";
@@ -90,6 +91,7 @@ async function seed(databaseUrl: string): Promise<void> {
         userId: creatorE2EFixtures.staff.userId,
       },
     ]);
+    await seedPublicCollection(database);
     await database.insert(walletIdentities).values({
       address: "tb1qe2eapplicant",
       id: "01994b10-0000-7000-8000-000000000006",

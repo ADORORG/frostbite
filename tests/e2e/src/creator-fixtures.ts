@@ -125,6 +125,13 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-review-quality-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000042",
   },
+  // The public catalog (W4-05): a creator whose approved collection is seeded with fixed content, so the
+  // public pages can be checked visually in a known state.
+  publicCollectionCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000045",
+    sessionToken: "e2e-public-collection-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000044",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
@@ -141,4 +148,11 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,
   creatorE2EFixtures.reviewQualityCreator,
+  creatorE2EFixtures.publicCollectionCreator,
 ] as const;
+
+// The seeded approved collection the public pages are checked against.
+export const publicCollection = {
+  id: "01994b10-0000-7000-8000-000000000050",
+  name: "Public light",
+} as const;

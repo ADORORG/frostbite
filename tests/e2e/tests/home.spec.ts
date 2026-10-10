@@ -112,10 +112,15 @@ test("serves the versioned platform contract with correlated truthful state", as
 test("serves every public catalog and validates detail identifiers", async ({
   page,
 }) => {
-  for (const path of ["launches", "collections", "creators", "games"]) {
+  for (const path of ["launches", "creators", "games"]) {
     await page.goto(`/${path}`);
     await expect(page.getByText("Catalog empty")).toBeVisible();
   }
+  // Collections lists whatever has been approved (the seeded public collection at least).
+  await page.goto("/collections");
+  await expect(page.getByText("Approved by review")).toBeVisible();
+  await page.goto("/collections/Not-A-Collection");
+  await expect(page.getByText("Invalid identifier")).toBeVisible();
   await page.goto("/games/frostbite");
   await expect(page.getByText("Record not published")).toBeVisible();
   await page.goto("/games/Frostbite");

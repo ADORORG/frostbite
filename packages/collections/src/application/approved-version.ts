@@ -14,7 +14,26 @@ export interface ApprovedVersion {
   readonly submissionId: UuidV7;
 }
 
+// One approved collection as a list shows it, taken from its frozen snapshot (never from the draft).
+export interface ApprovedCollectionSummary {
+  // When the submission last entered the approved state (an approval or a reinstatement).
+  readonly approvedAt: Date;
+  readonly collectionId: UuidV7;
+  readonly coverAssetId: string | null;
+  readonly description: string;
+  readonly itemCount: number;
+  readonly name: string;
+  // The creator, for signing the cover's preview. Server code only: it is never shown to the public.
+  readonly ownerUserId: UuidV7;
+  readonly plannedSupply: number;
+  readonly targetChain: string;
+}
+
 export interface ApprovedVersionReader {
+  // The collections that currently have an approved version, newest approval first, at most `limit`.
+  listApprovedCollections(
+    limit: number,
+  ): Promise<readonly ApprovedCollectionSummary[]>;
   // The approved version as of now, or null. A read that takes no lock: it can be stale by the time it
   // is used, so it is for display. Anything that acts on approval must hold `lockApprovedVersion`.
   findApprovedVersion(collectionId: UuidV7): Promise<ApprovedVersion | null>;
