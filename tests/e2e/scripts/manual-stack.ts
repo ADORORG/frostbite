@@ -101,10 +101,16 @@ function listen(server: Server, port: number): Promise<void> {
   });
 }
 
+// Waits for the first interrupt. Later interrupts are ignored on purpose: a terminal sends Ctrl+C to the
+// whole process group and pnpm forwards it again, so a second one arrives while the containers are being
+// removed, and letting it kill this process would leave them running.
 function untilInterrupted(): Promise<void> {
   return new Promise((resolveStop) => {
+    let stopping = false;
     for (const signal of ["SIGINT", "SIGTERM"] as const)
-      process.once(signal, () => {
+      process.on(signal, () => {
+        if (stopping) return;
+        stopping = true;
         console.log(`\nStopping (${signal})...`);
         resolveStop();
       });
