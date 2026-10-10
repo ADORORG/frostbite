@@ -69,18 +69,20 @@ export function effectiveFilter(
 
 export const nextActionLabels: Readonly<Record<CollectionStanding, string>> = {
   approved: "View",
-  closed: "See details",
   draft: "Continue editing",
+  ended: "See details",
   "in-review": "See status",
   "needs-changes": "Make changes",
+  paused: "See details",
 };
 
 export const standingTones: Readonly<Record<CollectionStanding, ArcadeTone>> = {
   approved: "mint",
-  closed: "red",
   draft: "yellow",
+  ended: "red",
   "in-review": "cyan",
   "needs-changes": "pink",
+  paused: "yellow",
 };
 
 // A draft has no submission to name, so it is simply a draft.

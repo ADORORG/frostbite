@@ -17,9 +17,9 @@ describe("collection standing", () => {
     ["under-review", "in-review"],
     ["changes-requested", "needs-changes"],
     ["approved", "approved"],
-    ["rejected", "closed"],
-    ["suspended", "closed"],
-    ["revoked", "closed"],
+    ["suspended", "paused"],
+    ["rejected", "ended"],
+    ["revoked", "ended"],
   ] as const)("puts a %s submission in %s", (state, standing) => {
     expect(standingOf(state)).toBe(standing);
   });

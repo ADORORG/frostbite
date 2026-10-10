@@ -49,7 +49,8 @@ describe("overview filters", () => {
       ["in-review", 2],
       ["needs-changes", 1],
       ["approved", 1],
-      ["closed", 3],
+      ["paused", 1],
+      ["ended", 2],
     ]);
   });
 
@@ -69,7 +70,8 @@ describe("overview filters", () => {
       "In review",
       "Needs changes",
       "Approved",
-      "Closed",
+      "Paused",
+      "Ended",
     ]);
   });
 
@@ -79,8 +81,11 @@ describe("overview filters", () => {
       visibleCollections(collections, "in-review").map(({ name }) => name),
     ).toEqual(["b", "c"]);
     expect(
-      visibleCollections(collections, "closed").map(({ name }) => name),
-    ).toEqual(["f", "g", "h"]);
+      visibleCollections(collections, "paused").map(({ name }) => name),
+    ).toEqual(["g"]);
+    expect(
+      visibleCollections(collections, "ended").map(({ name }) => name),
+    ).toEqual(["f", "h"]);
     expect(visibleCollections([], "draft")).toEqual([]);
   });
 
@@ -104,10 +109,11 @@ describe("overview wording", () => {
   it("gives each standing its own next step", () => {
     expect(nextActionLabels).toEqual({
       approved: "View",
-      closed: "See details",
       draft: "Continue editing",
+      ended: "See details",
       "in-review": "See status",
       "needs-changes": "Make changes",
+      paused: "See details",
     });
   });
 });
