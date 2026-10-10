@@ -13,6 +13,8 @@ import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
 
 import { mutationContext, type RequestContext } from "./submission-context.ts";
 import type {
+  ActivityCursor,
+  ActivityPage,
   DecideResult,
   ReviewQueueRecord,
   ReviewRepository,
@@ -23,6 +25,8 @@ export interface ReviewServiceDependencies {
   readonly authorizationPolicy: AuthorizationPolicy;
   readonly clock: () => Date;
   readonly createId: () => UuidV7;
+  // Events per page of the activity log; an engineering bound, not a product quota.
+  readonly activityLimit: number;
   readonly queueLimit: number;
   readonly repository: ReviewRepository;
 }
@@ -49,6 +53,13 @@ export function createReviewService(dependencies: ReviewServiceDependencies) {
         ...decision,
         allowedReviewerRoles,
         submissionId: uuidV7Schema.parse(decision.submissionId),
+      });
+    },
+
+    activity(cursor: ActivityCursor | null): Promise<ActivityPage> {
+      return dependencies.repository.activity({
+        cursor,
+        limit: dependencies.activityLimit,
       });
     },
 

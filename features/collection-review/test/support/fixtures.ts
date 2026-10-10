@@ -1,5 +1,7 @@
-import type {
-  ReviewDetailResponse,
+import {
+  encodeActivityCursor,
+  type ReviewActivityItem,
+  type ReviewDetailResponse,
   ReviewEvent,
   ReviewQueueItem,
   ReviewSubmission,
@@ -27,6 +29,7 @@ export const event = (
   overrides: Partial<ReviewEvent> = {},
 ): ReviewEvent => ({
   action,
+  actorName: action === "submit" ? "Creator Crea" : "Rita Reviewer",
   actorUserId: action === "submit" ? owner : reviewer,
   createdAt: stamp,
   creatorFeedback: "",
@@ -48,6 +51,7 @@ export function reviewSubmission(
     createdAt: stamp,
     events: [event("submit")],
     id: id(),
+    ownerState: "approved",
     ownerUserId: owner,
     payloadHash: "a".repeat(64),
     sequence: 1,
@@ -108,3 +112,25 @@ export const queueItem = (
   updatedAt: stamp,
   ...overrides,
 });
+
+export const activityItem = (
+  overrides: Partial<ReviewActivityItem> = {},
+): ReviewActivityItem => ({
+  action: "start-review",
+  actorName: "Rita Reviewer",
+  actorUserId: reviewer,
+  collectionId: id(),
+  collectionName: "First light",
+  createdAt: stamp,
+  eventId: id(),
+  nextState: "under-review",
+  previousState: "submitted",
+  reasonCode: "reviewer-started-review",
+  sequence: 1,
+  submissionId: id(),
+  ...overrides,
+});
+
+// The cursor the real log would hand out after `item`.
+export const cursorAfter = (item: ReviewActivityItem) =>
+  encodeActivityCursor({ createdAt: item.createdAt, id: item.eventId });

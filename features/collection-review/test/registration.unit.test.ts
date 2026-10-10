@@ -1,5 +1,6 @@
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
 import {
+  collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
   collectionReviewNavigationLabel,
@@ -38,6 +39,7 @@ describe("collection review registration", () => {
       ],
       pages: [
         { access, path: collectionReviewQueuePath },
+        { access, path: collectionReviewActivityPath },
         { access, path: collectionReviewDetailPath },
       ],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
@@ -47,6 +49,7 @@ describe("collection review registration", () => {
         ({ method, operationId }) => `${method} ${operationId}`,
       ),
     ).toEqual([
+      "POST listCollectionReviewActivity",
       "POST decideCollectionReview",
       "POST listCollectionReviewQueue",
       "POST readCollectionReviewSubmission",
@@ -87,7 +90,7 @@ describe("collection review registration", () => {
       registeredFeatureCount: 1,
       registeredFeatureIds: ["collection-review"],
     });
-    const [queue, detail] = entrypoint.pages ?? [];
+    const [queue, activity, detail] = entrypoint.pages ?? [];
     const navigation = [] as const;
     const submissionId = "018f22f2-9c1a-7b21-8c45-0000000000aa";
     const queuePage = queue?.render({
@@ -100,8 +103,13 @@ describe("collection review registration", () => {
       navigation,
       params: { submissionId },
     });
+    const activityPage = activity?.render({
+      actorUserId: null,
+      navigation,
+      params: {},
+    });
     const empty = detail?.render({ actorUserId: null, navigation, params: {} });
-    for (const page of [queuePage, detailPage, empty])
+    for (const page of [queuePage, activityPage, detailPage, empty])
       expect(isValidElement(page)).toBe(true);
     expect(isValidElement(detailPage) && detailPage.props).toMatchObject({
       submissionId,

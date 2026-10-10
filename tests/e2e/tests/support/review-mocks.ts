@@ -1,4 +1,8 @@
-import { reviewDetailResponseSchema } from "@ador/shared/collections";
+import {
+  encodeActivityCursor,
+  reviewActivityResponseSchema,
+  reviewDetailResponseSchema,
+} from "@ador/shared/collections";
 import type { Page } from "@playwright/test";
 
 // Fixed review data for the visual and accessibility checks: the pages are real and their data is
@@ -89,6 +93,7 @@ const submission = (state: string, events: object[]) => ({
   events: [
     {
       action: "submit",
+      actorName: "E2E creator",
       actorUserId: ids.owner,
       createdAt: stamp,
       creatorFeedback: "",
@@ -100,6 +105,7 @@ const submission = (state: string, events: object[]) => ({
     ...events,
   ],
   id: ids.submission,
+  ownerState: "approved",
   ownerUserId: ids.owner,
   payloadHash: "a".repeat(64),
   sequence: 1,
@@ -131,3 +137,55 @@ export async function answer(page: Page, route: string, body: object) {
     }),
   );
 }
+
+// A page of the activity log with fixed events, parsed through the shared contract.
+export const activityBody = (more: boolean) =>
+  reviewActivityResponseSchema.parse({
+    items: [
+      {
+        action: "approve",
+        actorName: "E2E reviewer",
+        actorUserId: ids.reviewer,
+        collectionId: ids.collection,
+        collectionName: "First light",
+        createdAt: later,
+        eventId: "018f22f2-9c1a-7b21-8c45-0000000000a3",
+        nextState: "approved",
+        previousState: "under-review",
+        reasonCode: "reviewer-approved",
+        sequence: 1,
+        submissionId: ids.submission,
+      },
+      {
+        action: "start-review",
+        actorName: "E2E reviewer",
+        actorUserId: ids.reviewer,
+        collectionId: ids.collection,
+        collectionName: "First light",
+        createdAt: stamp,
+        eventId: "018f22f2-9c1a-7b21-8c45-0000000000a2",
+        nextState: "under-review",
+        previousState: "submitted",
+        reasonCode: "reviewer-started-review",
+        sequence: 1,
+        submissionId: ids.submission,
+      },
+      {
+        action: "submit",
+        actorName: "E2E creator",
+        actorUserId: ids.owner,
+        collectionId: ids.collection,
+        collectionName: "First light",
+        createdAt: stamp,
+        eventId: "018f22f2-9c1a-7b21-8c45-0000000000a1",
+        nextState: "submitted",
+        previousState: null,
+        reasonCode: "creator-submitted",
+        sequence: 1,
+        submissionId: ids.submission,
+      },
+    ],
+    nextCursor: more
+      ? encodeActivityCursor({ createdAt: stamp, id: ids.waiting })
+      : null,
+  });

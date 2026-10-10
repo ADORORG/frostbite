@@ -1,6 +1,7 @@
 "use client";
 
-import { ArcadePanel, ArcadeSelect } from "@repo/ui/arcade";
+import { collectionReviewActivityPath } from "@ador/shared/collections";
+import { ArcadeButton, ArcadePanel, ArcadeSelect } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import {
@@ -41,6 +42,9 @@ export function ReviewQueue({
         value={group.id}
       />
       <QueueList list={list} />
+      <ArcadeButton href={collectionReviewActivityPath} tone="yellow">
+        Activity log
+      </ArcadeButton>
     </ArcadePanel>
   );
 }

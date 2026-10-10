@@ -3,6 +3,11 @@ import type { HttpOperation } from "@ador/http";
 import { failure, unauthenticated } from "@ador/http/outcome";
 import {
   collectionReviewCapability,
+  decodeActivityCursor,
+  reviewActivityInputSchema,
+  reviewActivityResponseSchema,
+  type ReviewActivityInput,
+  type ReviewActivityResponse,
   decideReviewInputSchema,
   readReviewSubmissionInputSchema,
   reviewQueueInputSchema,
@@ -18,7 +23,11 @@ import {
 } from "@ador/shared/collections";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
-import { presentQueueItem, presentReviewSubmission } from "./present.ts";
+import {
+  presentActivity,
+  presentQueueItem,
+  presentReviewSubmission,
+} from "./present.ts";
 import type { createAssetLibraryService } from "@ador/uploads";
 
 export type ReviewService = ReturnType<typeof createReviewService>;
@@ -148,4 +157,35 @@ export function createReadOperation(
     { readonly submissionId: string },
     ReviewDetailResponse
   >;
+}
+
+export function createActivityOperation(getService: Resolve) {
+  return {
+    access,
+    applicationErrors: ["forbidden", "invalid_request", "unauthorized"],
+    execute: async (input, context) => {
+      if (context.actorUserId === null) return unauthenticated;
+      const position =
+        input.cursor === null ? null : decodeActivityCursor(input.cursor);
+      // A cursor the log did not produce is refused, not treated as the start of the log.
+      if (input.cursor !== null && position === null)
+        return failure("invalid_request", "The page cursor is not valid.");
+      const page = await (
+        await getService()
+      ).activity(
+        position === null
+          ? null
+          : {
+              createdAt: new Date(position.createdAt),
+              id: uuidV7Schema.parse(position.id),
+            },
+      );
+      return { ok: true, value: presentActivity(page) } as const;
+    },
+    idempotency: "none",
+    input: "json",
+    inputSchema: reviewActivityInputSchema,
+    outputSchema: reviewActivityResponseSchema,
+    ...reviewRoutes.activity,
+  } satisfies HttpOperation<ReviewActivityInput, ReviewActivityResponse>;
 }

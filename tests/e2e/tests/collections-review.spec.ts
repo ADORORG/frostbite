@@ -101,7 +101,10 @@ test("the creator reads the feedback, changes the collection, and submits again"
   await page.goto(wizardUrl());
   await page.getByRole("button", { name: "5. Review" }).click();
   await expect(page.getByText("Submission 1: Changes requested")).toBeVisible();
-  await expect(page.getByText(`Changes requested: ${feedback}`)).toBeVisible();
+  await expect(page.getByText(feedback, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("list", { name: "History of this submission" }),
+  ).toContainText("Changes requested");
   await page.getByRole("button", { name: "1. Details" }).click();
   await page
     .getByLabel("Description")
@@ -135,6 +138,43 @@ test("the reviewer approves the new version and the creator sees it approved, wi
   await expect(page.getByText("Submission 2: Approved")).toBeVisible();
   await expect(page.getByText("does not publish or launch it")).toBeVisible();
   await expect(page.getByRole("button", { name: /submit/iu })).toHaveCount(0);
+});
+
+test("the activity log shows who did what, newest first, and the creator's history shows what happened", async ({
+  baseURL,
+  browser,
+  page,
+}) => {
+  const staff = await asReviewer(baseURL, browser);
+  await staff.goto("/admin/collection-activity");
+  const log = staff.getByRole("list", { name: "Review activity" });
+  await expect(log).toContainText(`approved ${name}, submission 2`);
+  await expect(log).toContainText(`requested changes on ${name}, submission 1`);
+  await expect(log).toContainText(`submitted ${name}, submission 1`);
+  // Newest first: the approval comes before the first submission.
+  const text = await log.innerText();
+  expect(text.indexOf(`approved ${name}`)).toBeLessThan(
+    text.indexOf(`submitted ${name}, submission 1`),
+  );
+  await staff
+    .getByRole("link", { name: `Open ${name}, submission 2` })
+    .first()
+    .click();
+  await expect(staff.getByText("Creator standing: approved")).toBeVisible();
+  await expect(staff.getByText(/started review of it/u).first()).toBeVisible();
+  await staff.context().close();
+
+  await signIn(page, baseURL, creator);
+  await page.goto(wizardUrl());
+  await page.getByRole("button", { name: "5. Review" }).click();
+  const history = page.getByRole("list", {
+    name: "History of this submission",
+  });
+  await expect(history).toContainText("Submitted");
+  await expect(history).toContainText("Approved");
+  // The creator never sees who decided.
+  await expect(page.getByText("E2E reviewer")).toHaveCount(0);
+  await expect(history).not.toContainText(creatorE2EFixtures.reviewer.userId);
 });
 
 test("once approved the collection is public, as the version that was approved, to anyone", async ({

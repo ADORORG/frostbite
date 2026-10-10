@@ -4,12 +4,14 @@ import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
 import {
+  collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
   collectionReviewQueuePath,
 } from "@ador/shared/collections";
 
 import {
+  createActivityOperation,
   createDecideOperation,
   createQueueOperation,
   createReadOperation,
@@ -18,6 +20,7 @@ import {
   createPreviewResolver,
   createReviewServiceResolver,
 } from "./runtime.ts";
+import { ActivitySurface } from "./ui/activity-surface.tsx";
 import { DetailSurface } from "./ui/detail-surface.tsx";
 import { QueueSurface } from "./ui/queue-surface.tsx";
 
@@ -42,6 +45,7 @@ export function createCollectionReviewEntrypoint(
     ],
     id: "collection-review",
     operations: [
+      registerHttpOperation(createActivityOperation(getService)),
       registerHttpOperation(createDecideOperation(getService)),
       registerHttpOperation(createQueueOperation(getService)),
       registerHttpOperation(createReadOperation(getService, getPreviews)),
@@ -51,6 +55,11 @@ export function createCollectionReviewEntrypoint(
         access,
         path: collectionReviewQueuePath,
         render: ({ navigation }) => <QueueSurface navigation={navigation} />,
+      },
+      {
+        access,
+        path: collectionReviewActivityPath,
+        render: ({ navigation }) => <ActivitySurface navigation={navigation} />,
       },
       {
         access,

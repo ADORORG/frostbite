@@ -12,6 +12,9 @@ export function collectionWizardHref(collectionId: string): string {
 export const collectionReviewQueuePath = "/admin/collection-reviews";
 export const collectionReviewDetailPath =
   "/admin/collection-reviews/[submissionId]";
+// Every review event across every submission, for staff. A separate path from the queue's `[submissionId]`
+// pages, so a static page never competes with a dynamic one.
+export const collectionReviewActivityPath = "/admin/collection-activity";
 export const collectionReviewNavigationLabel = "Collection reviews";
 
 export const collectionReviewHref = (submissionId: string) =>

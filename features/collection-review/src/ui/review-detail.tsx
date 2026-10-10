@@ -19,6 +19,7 @@ import {
   createBrowserServices,
   type ReviewClientServices,
 } from "../client/services.ts";
+import { CreatorStanding } from "./components/creator-standing.tsx";
 import { DecisionForm } from "./components/decision-form.tsx";
 import { EventTimeline } from "./components/event-timeline.tsx";
 import { FailureNotice } from "./components/notice.tsx";
@@ -109,6 +110,7 @@ export function ReviewDetail({
             label={`State: ${loaded.submission.state}`}
             tone="attention"
           />
+          <CreatorStanding state={loaded.submission.ownerState} />
           <SnapshotView
             previews={loaded.previews}
             submission={loaded.submission}

@@ -162,11 +162,19 @@ describe("review step after submitting", () => {
     });
     const { element, onSubmit } = view({ submissions: loaded(asked) });
     const container = await mount(element);
-    expect(textOf(container)).toContain(
-      "Changes requested: Please add a banner.",
-    );
+    // Every step is in the history with its date; only a step with words has feedback under it.
+    const steps = [
+      ...container.querySelectorAll(
+        'ol[aria-label="History of this submission"] > li',
+      ),
+    ].map((item) => item.textContent ?? "");
+    expect(steps).toEqual([
+      "Submitted 2026-10-10",
+      "In review 2026-10-10",
+      "Changes requested 2026-10-10Please add a banner.",
+    ]);
     expect(
-      container.querySelectorAll('ul[aria-label="Feedback from reviewers"] li'),
+      container.querySelectorAll('p[aria-label="Feedback from a reviewer"]'),
     ).toHaveLength(1);
     await click(button(container, "Submit again"));
     expect(onSubmit).toHaveBeenCalledOnce();
@@ -216,6 +224,41 @@ describe("review step after submitting", () => {
     expect(textOf(moved)).toContain(
       "You have changed this collection since it was submitted",
     );
+  });
+});
+
+describe("review step history", () => {
+  it("shows when the collection was submitted even before any reviewer has acted", async () => {
+    const container = await mount(
+      view({ submissions: loaded(submission("submitted")) }).element,
+    );
+    expect(
+      container.querySelector('ol[aria-label="History of this submission"]')
+        ?.textContent,
+    ).toBe("Submitted 2026-10-10");
+  });
+
+  it("never shows who decided, or anything but the date and the words written for the creator", async () => {
+    const container = await mount(
+      view({
+        submissions: loaded(
+          submission("approved", {
+            decisions: [
+              {
+                action: "approve",
+                createdAt: "2026-10-11T09:30:00.000Z",
+                creatorFeedback: "",
+                nextState: "approved",
+              },
+            ],
+          }),
+        ),
+      }).element,
+    );
+    const history = container.querySelector(
+      'ol[aria-label="History of this submission"]',
+    )?.textContent;
+    expect(history).toBe("Submitted 2026-10-10Approved 2026-10-11");
   });
 });
 

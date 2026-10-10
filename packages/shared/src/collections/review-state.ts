@@ -81,6 +81,20 @@ export const reviewActionsNeedingFeedback: readonly ReviewAction[] = [
   "suspend",
 ];
 
+// What was done, in the past tense, for logs and histories ("Rita approved ...").
+export const submissionActionPastLabels: Readonly<
+  Record<SubmissionAction, string>
+> = {
+  approve: "approved",
+  reinstate: "reinstated",
+  reject: "rejected",
+  "request-changes": "requested changes on",
+  revoke: "revoked",
+  "start-review": "started review of",
+  submit: "submitted",
+  suspend: "suspended",
+};
+
 const transitions: Readonly<
   Record<
     SubmissionState,

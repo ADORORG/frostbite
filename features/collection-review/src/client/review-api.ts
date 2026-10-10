@@ -1,9 +1,11 @@
 import { createRequester, type FetchLike } from "@ador/client-http";
 import {
+  reviewActivityResponseSchema,
   reviewDetailResponseSchema,
   reviewQueueResponseSchema,
   reviewRoutes,
   reviewSubmissionResponseSchema,
+  type ReviewActivityResponse,
   type ReviewDecision,
   type ReviewDetailResponse,
   type ReviewQueueResponse,
@@ -17,6 +19,11 @@ export interface CallOptions {
 }
 
 export interface ReviewApi {
+  // One page of the activity log, newest first; a null cursor is the first page.
+  activity(
+    cursor: string | null,
+    options?: CallOptions,
+  ): Promise<ReviewActivityResponse>;
   decide(
     input: ReviewDecision,
     options: CallOptions & { readonly idempotencyKey: IdempotencyKey },
@@ -36,6 +43,11 @@ export interface ReviewApi {
 export function createReviewApi(fetchImpl: FetchLike): ReviewApi {
   const request = createRequester(fetchImpl);
   return {
+    activity: (cursor, options = {}) =>
+      request(reviewRoutes.activity, reviewActivityResponseSchema, {
+        body: { cursor },
+        ...options,
+      }),
     decide: (input, options) =>
       request(reviewRoutes.decide, reviewSubmissionResponseSchema, {
         body: input,

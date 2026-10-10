@@ -20,10 +20,10 @@ describe("event timeline", () => {
     );
     expect(items).toHaveLength(2);
     expect(items[0]).toContain("Submitted by the creator");
-    expect(items[1]).toContain("Start review");
+    expect(items[1]).toContain("Rita Reviewer started review of it");
     expect(items[1]).toContain("now In review");
     expect(items[1]).toContain(
-      `By ${events[1]?.actorUserId} · reviewer-started-review`,
+      `Rita Reviewer (${events[1]?.actorUserId}) · reviewer-started-review`,
     );
   });
 

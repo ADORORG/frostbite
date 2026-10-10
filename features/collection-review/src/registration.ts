@@ -2,6 +2,7 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
 import {
+  collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
   collectionReviewNavigationLabel,
@@ -41,11 +42,17 @@ export function createCollectionReviewFeature(
       ],
       pages: [
         { access, path: collectionReviewQueuePath },
+        { access, path: collectionReviewActivityPath },
         { access, path: collectionReviewDetailPath },
       ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
-      routes: [reviewRoutes.decide, reviewRoutes.queue, reviewRoutes.read],
+      routes: [
+        reviewRoutes.activity,
+        reviewRoutes.decide,
+        reviewRoutes.queue,
+        reviewRoutes.read,
+      ],
       version: "1.0.0",
     },
     load: async () =>

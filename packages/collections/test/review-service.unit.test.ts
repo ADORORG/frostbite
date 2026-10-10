@@ -28,6 +28,7 @@ function setup(authorizationPolicy: AuthorizationPolicy = policy) {
     authorizationPolicy,
     clock: () => new Date("2026-10-10T12:00:00.000Z"),
     createId: recording.createId,
+    activityLimit: 40,
     queueLimit: 50,
     repository: recording.repository,
   });
@@ -71,6 +72,22 @@ describe("deciding", () => {
       return JSON.stringify(calls[0]?.input);
     };
     expect(await sent("approve")).not.toBe(await sent("start-review"));
+  });
+});
+
+describe("activity", () => {
+  it("passes the cursor and the page size straight through", async () => {
+    const { calls, service } = setup();
+    const cursor = {
+      createdAt: new Date("2026-10-10T12:00:00.000Z"),
+      id: newId(),
+    };
+    await service.activity(cursor);
+    await service.activity(null);
+    expect(calls.map(({ input, method }) => [method, input])).toEqual([
+      ["activity", { cursor, limit: 40 }],
+      ["activity", { cursor: null, limit: 40 }],
+    ]);
   });
 });
 

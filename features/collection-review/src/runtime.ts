@@ -11,6 +11,9 @@ import {
   createDrizzleAssetLibraryRepository,
 } from "@ador/uploads";
 
+// Events on one page of the activity log; an engineering bound, not a product quota.
+const activityLimit = 50;
+
 // Submissions waiting at once on the queue page; an engineering bound, not a product quota.
 const queueLimit = 100;
 
@@ -24,6 +27,7 @@ export function createReviewServiceResolver(
   return memoizeUntilFailure(async () => {
     const { database } = await resolveContext();
     return createReviewService({
+      activityLimit,
       authorizationPolicy,
       clock: () => new Date(),
       createId: createUuidV7,

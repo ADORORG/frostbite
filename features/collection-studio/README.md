@@ -33,7 +33,8 @@ Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, err
 | `submitCollection` | `POST /api/v1/collection-submissions` | Idempotency key required; names `expectedRevision` |
 | `listCollectionSubmissions` | `POST /api/v1/collection-submissions/list` | The creator's own submissions with decisions |
 
-Submitting freezes the collection (see `@ador/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with the reviewers' feedback. Refusals:
+Submitting freezes the collection (see `@ador/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with its history: when it was submitted and what each decision was, with the
+reviewers' feedback (never who decided or the private notes). Refusals:
 not ready (400, naming what is missing), a stale revision, a submission already in review, or one closed
 for good (409), another creator's collection (404), a creator no longer approved (403).
 

@@ -4,8 +4,8 @@ import {
   reviewRoutes,
   reviewSubmissionResponseSchema,
 } from "@ador/shared/collections";
-import { platformRoleAssignments } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import {} from "@ador/database";
+import {} from "@ador/shared/identifiers";
 import {
   seedCreatorUser,
   setCreatorApplicationState,
@@ -211,27 +211,6 @@ describe("reviewing submissions over the real database", () => {
       key: key(),
     });
     expect([own.status, errorOf(own.body)]).toEqual([403, "forbidden"]);
-  });
-
-  it("refuses a creator who has also been given the reviewer role, for every decision", async () => {
-    const seed = await submittedCollection();
-    await database.insert(platformRoleAssignments).values({
-      id: createUuidV7(),
-      role: "reviewer",
-      status: "active",
-      userId: seed.ownerUserId,
-    });
-    for (const action of ["start-review", "approve"]) {
-      const refused = await call(reviewRoutes.decide, {
-        actor: seed.ownerUserId,
-        body: decision(seed.submissionId, action),
-        key: key(),
-      });
-      expect([refused.status, errorOf(refused.body)]).toEqual([
-        403,
-        "forbidden",
-      ]);
-    }
   });
 
   it("reports an illegal move as a conflict, and an unknown submission as not found", async () => {

@@ -15,6 +15,10 @@ export function recordingSubmissions() {
     return Promise.resolve({ kind: "not-found" } as const);
   };
   const repository: SubmissionRepository = {
+    activity: (input) => {
+      calls.push({ input, method: "activity" });
+      return Promise.resolve({ items: [], next: null });
+    },
     decide: record("decide"),
     listForOwner: (input) => {
       calls.push({ input, method: "listForOwner" });

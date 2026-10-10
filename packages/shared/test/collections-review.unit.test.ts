@@ -13,6 +13,8 @@ import {
   reviewSubmissionSchema,
   submissionRoutes,
   submissionSnapshotSchema,
+  submissionActionPastLabels,
+  submissionActions,
   submissionStateLabels,
   submissionStates,
   type ReviewAction,
@@ -173,6 +175,7 @@ describe("submission snapshot", () => {
       createdAt: "2026-10-10T10:00:00.000Z",
       events: [],
       id: submission,
+      ownerState: "approved",
       ownerUserId: asset,
       payloadHash: hash,
       sequence: 1,
@@ -261,5 +264,16 @@ describe("the words for states and actions", () => {
           submissionId: submission,
         }).success,
       ).toBe(!reviewActionsNeedingFeedback.includes(action));
+  });
+});
+
+describe("the past tense of each action", () => {
+  it("has a distinct phrase for every action that reads after a name", () => {
+    const phrases = submissionActions.map(
+      (action) => submissionActionPastLabels[action],
+    );
+    expect(new Set(phrases).size).toBe(submissionActions.length);
+    expect(submissionActionPastLabels.approve).toBe("approved");
+    expect(submissionActionPastLabels.submit).toBe("submitted");
   });
 });

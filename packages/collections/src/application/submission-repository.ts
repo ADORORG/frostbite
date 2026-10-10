@@ -6,6 +6,7 @@ import type {
   SubmissionState,
 } from "@ador/shared/collections";
 import type { PlatformRole } from "@ador/shared/accounts";
+import type { CreatorApplicationState } from "@ador/shared/creator-admission";
 import type { CorrelationId, IdempotencyKey } from "@ador/shared/http";
 import type { UuidV7 } from "@ador/shared/identifiers";
 
@@ -31,6 +32,8 @@ export interface SubmissionRecord {
 }
 
 export interface ReviewEventRecord extends SubmissionDecisionRecord {
+  // The actor's display name now, so staff can tell who acted without looking an id up.
+  readonly actorName: string;
   readonly actorUserId: UuidV7;
   readonly previousState: SubmissionState | null;
   readonly privateNotes: string;
@@ -39,6 +42,8 @@ export interface ReviewEventRecord extends SubmissionDecisionRecord {
 
 export interface ReviewSubmissionRecord extends SubmissionRecord {
   readonly events: readonly ReviewEventRecord[];
+  // The creator's standing now (null if they never applied): why an approval would be refused.
+  readonly ownerState: CreatorApplicationState | null;
   readonly snapshot: SubmissionSnapshot;
 }
 
@@ -50,6 +55,34 @@ export interface ReviewQueueRecord {
   readonly sequence: number;
   readonly state: SubmissionState;
   readonly updatedAt: Date;
+}
+
+// One event of the activity log across every submission, newest first.
+export interface ReviewActivityRecord {
+  readonly action: SubmissionAction;
+  readonly actorName: string;
+  readonly actorUserId: UuidV7;
+  readonly collectionId: UuidV7;
+  readonly collectionName: string;
+  readonly createdAt: Date;
+  readonly eventId: UuidV7;
+  readonly nextState: SubmissionState;
+  readonly previousState: SubmissionState | null;
+  readonly reasonCode: string;
+  readonly sequence: number;
+  readonly submissionId: UuidV7;
+}
+
+// The position of an event in the log (its time, then its id), which pages are cut at.
+export interface ActivityCursor {
+  readonly createdAt: Date;
+  readonly id: UuidV7;
+}
+
+export interface ActivityPage {
+  readonly items: readonly ReviewActivityRecord[];
+  // Where the next, older page starts, or null at the end of the log.
+  readonly next: ActivityCursor | null;
 }
 
 // Retryable operations carry an idempotency key and a fingerprint of their meaningful content (which
@@ -113,6 +146,11 @@ export interface SubmissionAuthoring {
 
 // What staff do with submissions: find them, read them in full, and decide.
 export interface ReviewRepository {
+  // Every event of every submission, newest first, a page at a time. No private notes or feedback.
+  activity(input: {
+    readonly cursor: ActivityCursor | null;
+    readonly limit: number;
+  }): Promise<ActivityPage>;
   decide(
     input: SubmissionMutation & {
       readonly action: ReviewAction;

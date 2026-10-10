@@ -118,7 +118,7 @@ describe("review detail: deciding", () => {
       }),
       expect.objectContaining({ idempotencyKey: expect.any(String) }),
     );
-    expect(textOf(container)).toContain("Start review on");
+    expect(textOf(container)).toContain("Rita Reviewer started review of it");
     expect(textOf(container)).toContain("Approve");
     expect(textOf(container)).toContain("Reject");
   });

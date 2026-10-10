@@ -1,5 +1,5 @@
 import {
-  reviewActionLabels,
+  submissionActionPastLabels,
   submissionStateLabels,
   type ReviewEvent,
 } from "@ador/shared/collections";
@@ -20,11 +20,11 @@ export function EventTimeline({
             <strong>
               {event.action === "submit"
                 ? "Submitted by the creator"
-                : reviewActionLabels[event.action]}
+                : `${event.actorName} ${submissionActionPastLabels[event.action]} it`}
             </strong>{" "}
             {`on ${event.createdAt.slice(0, 10)}, now ${submissionStateLabels[event.nextState]}`}
             <br />
-            <small>{`By ${event.actorUserId} · ${event.reasonCode}`}</small>
+            <small>{`${event.actorName} (${event.actorUserId}) · ${event.reasonCode}`}</small>
             {event.creatorFeedback === "" ? null : (
               <p>{`Told the creator: ${event.creatorFeedback}`}</p>
             )}

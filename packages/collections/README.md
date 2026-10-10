@@ -68,6 +68,9 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
   revocation never need the creator to be approved.
 - Retries are idempotent through the event's unique key (serialised with an advisory lock), and a key
   replayed with different content or by another actor is a `conflict`.
+- Staff can read the **activity log** (`ReviewRepository.activity`): every event of every submission,
+  newest first, with the actor's name, in pages cut at the last event seen. It carries no private notes or
+  feedback.
 - The creator sees decisions and the feedback written for them; private notes, reviewer identity and
   reason codes stay with staff.
 

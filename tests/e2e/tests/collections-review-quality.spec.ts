@@ -190,6 +190,7 @@ test("a finished submission closes the experience-quality matrix", async ({
     detailBody("changes-requested", [
       {
         action: "start-review",
+        actorName: "E2E reviewer",
         actorUserId: ids.reviewer,
         createdAt: stamp,
         creatorFeedback: "",
@@ -200,6 +201,7 @@ test("a finished submission closes the experience-quality matrix", async ({
       },
       {
         action: "request-changes",
+        actorName: "E2E reviewer",
         actorUserId: ids.reviewer,
         createdAt: later,
         creatorFeedback: "Please add a banner.",

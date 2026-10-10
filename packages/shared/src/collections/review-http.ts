@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { creatorApplicationStateSchema } from "../creator-admission/contracts.ts";
 import { uuidV7TextSchema } from "../identifiers/uuid-v7.ts";
 import { libraryAssetSchema } from "../uploads/library-contracts.ts";
 import { collectionSubmissionSchema } from "./submission-http.ts";
@@ -30,6 +31,7 @@ export const reviewQueueItemSchema = z
 export const reviewEventSchema = z
   .object({
     action: submissionActionSchema,
+    actorName: z.string(),
     actorUserId: uuidV7TextSchema,
     createdAt: timestamp,
     creatorFeedback: z.string(),
@@ -44,6 +46,8 @@ export const reviewSubmissionSchema = collectionSubmissionSchema
   .omit({ decisions: true })
   .extend({
     events: z.array(reviewEventSchema),
+    // The creator's standing now, so a reviewer sees why an approval would be refused.
+    ownerState: creatorApplicationStateSchema.nullable(),
     ownerUserId: uuidV7TextSchema,
     snapshot: submissionSnapshotSchema,
   })
@@ -76,6 +80,11 @@ export const reviewDetailResponseSchema = z
   .strict();
 
 export const reviewRoutes = {
+  activity: {
+    method: "POST",
+    operationId: "listCollectionReviewActivity",
+    path: "/api/v1/collection-reviews/activity",
+  },
   decide: {
     method: "POST",
     operationId: "decideCollectionReview",

@@ -10,13 +10,20 @@ import { uuidV7Schema } from "@ador/shared/identifiers";
 import { asc, eq, inArray } from "drizzle-orm";
 
 import type { ReviewRepository } from "../application/submission-repository.ts";
+import { createDrizzleActivity } from "./drizzle-activity.ts";
 import { isApprovedCreator, lockIdempotencyKey } from "./guards.ts";
-import { loadEvents, reviewSubmissionRecord } from "./submission-views.ts";
+import {
+  loadEvents,
+  loadOwnerState,
+  reviewSubmissionRecord,
+} from "./submission-views.ts";
 
 export function createDrizzleReview(
   database: DatabaseClient,
 ): ReviewRepository {
   return {
+    ...createDrizzleActivity(database),
+
     decide(input) {
       return database.transaction(async (transaction) => {
         await lockIdempotencyKey(transaction, input.idempotencyKey);
@@ -42,6 +49,7 @@ export function createDrizzleReview(
                 submission: reviewSubmissionRecord(
                   row,
                   await loadEvents(transaction, [row.id]),
+                  await loadOwnerState(transaction, row.ownerUserId),
                 ),
               }
             : { kind: "conflict" };
@@ -92,6 +100,7 @@ export function createDrizzleReview(
           submission: reviewSubmissionRecord(
             updated,
             await loadEvents(transaction, [row.id]),
+            await loadOwnerState(transaction, row.ownerUserId),
           ),
         };
       });
@@ -136,7 +145,11 @@ export function createDrizzleReview(
         .limit(1);
       return row === undefined
         ? null
-        : reviewSubmissionRecord(row, await loadEvents(database, [row.id]));
+        : reviewSubmissionRecord(
+            row,
+            await loadEvents(database, [row.id]),
+            await loadOwnerState(database, row.ownerUserId),
+          );
     },
   };
 }
