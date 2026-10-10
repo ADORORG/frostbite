@@ -24,8 +24,12 @@ client bundle.
 - [ ] Set `DATABASE_POOL_MAX`, `DATABASE_ACQUIRE_TIMEOUT_MS`, `DATABASE_IDLE_TIMEOUT_MS`,
       `DATABASE_STATEMENT_TIMEOUT_MS`. Keep pool size × service count below the database connection limit.
 - [ ] Enable automated backups and confirm a restore works before real users arrive.
-- [ ] Apply migrations as an explicit pre-deploy step. They never run on startup:
-      `pnpm --filter @ador/database migration:apply`
+- [ ] Do not rely on someone remembering to run migrations. Configure the platform's **pre-deploy
+      (release) command** on the web service to run
+      `pnpm --filter @ador/database migration:apply`. A failed migration then blocks the deploy and the
+      old version keeps serving. Migrations never run on application startup (ADR-009), so only one
+      step applies them. Configure it on one service only (web), not the worker.
+- [ ] Until the readiness check (task W8-06) exists, after each deploy confirm no migration is pending.
 - [ ] Confirm `pnpm db:check` passes against the schema.
 
 ## 2. Cloudflare R2 (object storage)
