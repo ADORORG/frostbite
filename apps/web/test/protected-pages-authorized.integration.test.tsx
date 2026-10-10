@@ -33,9 +33,56 @@ describe("authorized protected page delivery", () => {
     const markup = renderToStaticMarkup(page);
     expect(markup).toContain(heading);
     expect(markup).toContain("01992bd8-a740-7000-8000-000000000002");
+    // The work areas are bar entries; a staff member sees both.
     expect(markup).toContain('href="/studio"');
-    expect(markup).toContain('href="/studio/creator-application"');
     expect(markup).toContain('href="/admin"');
-    expect(markup).toContain('href="/admin/creator-applications"');
+    // The account links share one menu.
+    expect(markup).toContain('<details class="account-menu">');
+    expect(markup).toContain('href="/account"');
+  });
+
+  it("shows the admin links in the admin sidebar and not on other pages", async () => {
+    const admin = renderToStaticMarkup(
+      await FeaturePage({
+        params: Promise.resolve({ path: ["admin"] }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(admin).toContain('aria-label="Admin sections"');
+    expect(admin).toContain('href="/admin/creator-applications"');
+    expect(admin).toContain('href="/admin/collection-reviews"');
+    expect(admin).not.toContain('href="/studio/collections"');
+    const account = renderToStaticMarkup(
+      await FeaturePage({
+        params: Promise.resolve({ path: ["account"] }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(account).not.toContain("area-sidebar");
+    expect(account).not.toContain('href="/admin/creator-applications"');
+  });
+
+  it("shows the studio links in the studio sidebar", async () => {
+    const studio = renderToStaticMarkup(
+      await FeaturePage({
+        params: Promise.resolve({ path: ["studio"] }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(studio).toContain('aria-label="Studio sections"');
+    expect(studio).toContain('href="/studio/collections"');
+    expect(studio).toContain('href="/studio/uploads"');
+    expect(studio).toContain('href="/studio/creator-application"');
+  });
+
+  it("keeps a signed-in person's links on a public page", async () => {
+    const collections = renderToStaticMarkup(
+      await FeaturePage({
+        params: Promise.resolve({ path: ["collections"] }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(collections).toContain('href="/studio"');
+    expect(collections).toContain('href="/account"');
   });
 });

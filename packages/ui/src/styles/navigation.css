@@ -1,0 +1,183 @@
+/* The bar: a few quiet links, the work areas, and one account menu. */
+.app-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem 0.5rem;
+}
+.app-nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  border-bottom: var(--arcade-border-width) solid transparent;
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--arcade-transition-fast);
+}
+.app-nav-link:hover,
+.app-nav-link[data-current="true"] {
+  color: var(--arcade-text);
+}
+.app-nav-link[data-current="true"] {
+  border-bottom-color: var(--arcade-yellow);
+}
+.app-nav-link--account {
+  margin-left: 0.5rem;
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  color: var(--arcade-cyan);
+}
+.account-menu {
+  position: relative;
+}
+.account-menu > summary {
+  list-style: none;
+}
+.account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.account-menu > summary::after {
+  content: "▾";
+  margin-left: 0.5rem;
+}
+.account-menu__list {
+  position: absolute;
+  right: 0;
+  z-index: 30;
+  min-width: 13rem;
+  margin: 0.5rem 0 0;
+  padding: 0.375rem;
+  border: var(--arcade-border-width) solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 50%);
+  list-style: none;
+}
+.account-menu__list a {
+  display: block;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--arcade-radius-small);
+  text-decoration: none;
+}
+.account-menu__list a:hover,
+.account-menu__list a[aria-current="page"] {
+  background: var(--arcade-surface-raised);
+}
+
+/* The body: an area's sidebar beside the page, or the page alone. */
+.app-body {
+  display: block;
+}
+.app-body[data-sidebar="true"] {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 2rem;
+  width: min(100%, var(--arcade-content-width));
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.app-body[data-sidebar="true"] .arcade-section {
+  padding: 2rem;
+  border: var(--arcade-border-width) solid var(--arcade-border);
+  border-radius: var(--arcade-radius-medium);
+}
+.area-sidebar {
+  align-self: start;
+  position: sticky;
+  top: 6rem;
+}
+.area-sidebar__title {
+  margin: 0 0 0.75rem;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+}
+.area-sidebar ul {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.area-sidebar__link {
+  display: block;
+  padding: 0.75rem 0.875rem;
+  border-left: var(--arcade-border-width) solid transparent;
+  border-radius: var(--arcade-radius-small);
+  color: var(--arcade-text-muted);
+  text-decoration: none;
+}
+.area-sidebar__link:hover {
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text);
+}
+.area-sidebar__link[data-current="true"] {
+  border-left-color: var(--arcade-yellow);
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text);
+}
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  color: var(--arcade-text-subtle);
+  font-size: 0.875rem;
+  list-style: none;
+}
+.breadcrumbs li + li::before {
+  content: "›";
+  margin-right: 0.5rem;
+}
+.app-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+@media (max-width: 52rem) {
+  .app-body[data-sidebar="true"] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem 1rem 3rem;
+  }
+  .area-sidebar {
+    position: static;
+  }
+  .area-sidebar__title {
+    display: none;
+  }
+  .area-sidebar ul {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+  .area-sidebar__link {
+    border-bottom: var(--arcade-border-width) solid transparent;
+    border-left: 0;
+    white-space: nowrap;
+  }
+  .area-sidebar__link[data-current="true"] {
+    border-bottom-color: var(--arcade-yellow);
+  }
+  .app-body[data-sidebar="true"] .arcade-section {
+    padding: 1.25rem;
+  }
+  .account-menu__list {
+    right: auto;
+    left: 0;
+  }
+}
+@media (max-width: 40rem) {
+  .app-navigation {
+    justify-content: flex-start;
+  }
+}

@@ -9,7 +9,7 @@ describe("wallet connection registration", () => {
       network: "signet",
     });
     expect(feature.manifest).toMatchObject({
-      navigation: [{ href: "/connect", label: "Connect" }],
+      navigation: [{ area: "account", href: "/connect", label: "Connect" }],
       pages: [{ path: "/connect" }],
       requiredProviderCapabilities: ["wallet:connect", "wallet:message-sign"],
     });

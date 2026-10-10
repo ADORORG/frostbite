@@ -33,7 +33,12 @@ describe("featureManifestSchema", () => {
 
   it("accepts validated navigation and rejects undeclared or duplicate links", () => {
     const navigation = [
-      { access: { kind: "public" }, href: "/games", label: "Games" },
+      {
+        access: { kind: "public" },
+        area: "main",
+        href: "/games",
+        label: "Games",
+      },
     ] as const;
     expect(
       featureManifestSchema.parse({
@@ -54,6 +59,45 @@ describe("featureManifestSchema", () => {
         pages: [{ access: { kind: "public" }, path: "/games" }],
       }),
     ).toThrow("unique");
+  });
+
+  it.each([-1, 100, 1.5])("rejects the navigation order %s", (order) => {
+    expect(() =>
+      featureManifestSchema.parse({
+        ...validManifest,
+        capabilities: ["public-page", "navigation"],
+        navigation: [
+          {
+            access: { kind: "public" },
+            area: "main",
+            href: "/games",
+            label: "Games",
+            order,
+          },
+        ],
+        pages: [{ access: { kind: "public" }, path: "/games" }],
+      }),
+    ).toThrow();
+  });
+
+  it("accepts a navigation order within bounds", () => {
+    const navigation = [
+      {
+        access: { kind: "public" },
+        area: "main",
+        href: "/games",
+        label: "Games",
+        order: 99,
+      },
+    ] as const;
+    expect(
+      featureManifestSchema.parse({
+        ...validManifest,
+        capabilities: ["public-page", "navigation"],
+        navigation,
+        pages: [{ access: { kind: "public" }, path: "/games" }],
+      }).navigation,
+    ).toEqual(navigation);
   });
 
   it.each([
@@ -95,20 +139,58 @@ describe("featureManifestSchema", () => {
       ...validManifest,
       capabilities: ["public-page", "navigation"],
       navigation: [
-        { access: { kind: "public" }, href: "/games/[slug]", label: "Games" },
+        {
+          access: { kind: "public" },
+          area: "main",
+          href: "/games/[slug]",
+          label: "Games",
+        },
       ],
-    },
-    {
-      ...validManifest,
-      capabilities: ["public-page", "navigation"],
-      navigation: [{ access: { kind: "public" }, href: "/games", label: " " }],
     },
     {
       ...validManifest,
       capabilities: ["public-page", "navigation"],
       navigation: [
-        { access: { kind: "public" }, href: "/missing", label: "Missing" },
+        {
+          access: { kind: "public" },
+          area: "main",
+          href: "/games",
+          label: " ",
+        },
       ],
+    },
+    {
+      ...validManifest,
+      capabilities: ["public-page", "navigation"],
+      navigation: [
+        {
+          access: { kind: "public" },
+          area: "main",
+          href: "/missing",
+          label: "Missing",
+        },
+      ],
+    },
+    {
+      ...validManifest,
+      capabilities: ["public-page", "navigation"],
+      navigation: [
+        { access: { kind: "public" }, href: "/games", label: "No area" },
+      ],
+      pages: [{ access: { kind: "public" }, path: "/games" }],
+    },
+    {
+      ...validManifest,
+      capabilities: ["public-page", "navigation"],
+      navigation: [
+        {
+          access: { kind: "public" },
+          area: "sidebar",
+          href: "/games",
+          label: "Unknown area",
+        },
+      ],
+      pages: [{ access: { kind: "public" }, path: "/games" }],
     },
     {
       ...validManifest,

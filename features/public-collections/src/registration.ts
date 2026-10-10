@@ -19,7 +19,15 @@ export function createPublicCollectionsFeature(
       capabilities: ["navigation", "public-page"],
       dependencies: ["collection-review"],
       id: "collections",
-      navigation: [{ access, href: collectionsPath, label: "Collections" }],
+      navigation: [
+        {
+          access,
+          area: "main",
+          href: collectionsPath,
+          label: "Collections",
+          order: 10,
+        },
+      ],
       pages: [
         { access, path: collectionsPath },
         { access, path: collectionPagePath },

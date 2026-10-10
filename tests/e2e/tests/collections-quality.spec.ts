@@ -3,7 +3,12 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { create, detailOf, draftBody } from "./support/collection-helpers.ts";
-import { closeMatrix, prepare, skipToMain } from "./support/quality.ts";
+import {
+  closeMatrix,
+  passBreadcrumb,
+  prepare,
+  skipToMain,
+} from "./support/quality.ts";
 
 // Layout, keyboard, reduced-motion, accessibility, and visual coverage of the collection pages in
 // deterministic states, on every viewport project. The list is checked empty (a creator with no
@@ -28,6 +33,7 @@ test("the collections list closes the experience-quality matrix", async ({
 
   // Keyboard, with real key presses: past the skip link, Tab reaches the form in reading order.
   await skipToMain(page);
+  await passBreadcrumb(page);
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Collection name")).toBeFocused();
   await page.keyboard.press("Tab");
@@ -69,6 +75,7 @@ test("the collection wizard closes the experience-quality matrix on its first st
 
   // Keyboard: past the skip link, the steps come first, in order, and a step can be chosen with Enter.
   await skipToMain(page);
+  await passBreadcrumb(page);
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "1. Details" })).toBeFocused();
   await page.keyboard.press("Tab");

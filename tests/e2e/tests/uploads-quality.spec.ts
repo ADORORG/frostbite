@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
+import { passBreadcrumb } from "./support/quality.ts";
 
 // Layout, keyboard, reduced-motion, accessibility, and visual coverage of the uploads page in its
 // empty state, on every viewport project. A user with no uploads keeps the state deterministic.
@@ -39,6 +40,7 @@ test("the uploads page closes the experience-quality matrix", async ({
   await expect(skipLink).toBeFocused();
   await skipLink.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
+  await passBreadcrumb(page);
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("What is this image for?")).toBeFocused();
   await page.keyboard.press("Tab");

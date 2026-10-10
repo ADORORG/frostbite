@@ -22,7 +22,14 @@ const disabled = chainOptionSchema.parse({
   family: "evm",
   role: "production",
 });
-const navigation = [{ href: "/studio/collections", label: "Collections" }];
+const navigation = [
+  {
+    area: "studio",
+    current: "page",
+    href: "/studio/collections",
+    label: "Collections",
+  },
+] as const;
 
 describe("collection pages", () => {
   it("frame the list in the platform shell, with a heading and the studio notices", () => {

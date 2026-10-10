@@ -44,7 +44,8 @@ sorted-pair convention are protocol behavior and are locked by Rust/TypeScript f
 - Manifests reject undeclared fields.
 - Feature routes and provider requirements are runtime-validated boot contracts.
 - Navigation destinations and labels are strict, unique per feature, and require the declared
-  navigation capability.
+  navigation capability. Each link names its `area` (`main`, `studio`, `admin`, `account`, `footer`)
+  and may give an `order` (0-99, default 50) within the shown list.
 - Accepted decisions require an owner, date, selected outcome, ADR, and evidence records.
 - Correlation IDs are UUIDs and idempotency keys are bounded opaque values.
 - HTTP errors use one strict, versioned public envelope.

@@ -6,7 +6,8 @@ import { QueueSurface } from "../src/ui/queue-surface.tsx";
 
 const navigation = [
   {
-    access: { capability: "collection:review", kind: "platform" },
+    area: "admin",
+    current: "page",
     href: "/admin/collection-reviews",
     label: "Collection reviews",
   },

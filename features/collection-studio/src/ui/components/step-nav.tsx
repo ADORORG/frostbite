@@ -21,22 +21,26 @@ export function StepNav({
 }) {
   return (
     <nav aria-label="Collection steps">
-      <ol className="arcade-actions arcade-steps">
-        {wizardSteps.map((step, index) => (
-          <li key={step}>
-            <button
-              aria-current={step === current ? "step" : undefined}
-              className={`arcade-button arcade-button--${step === current ? "cyan" : "pink"}`}
-              onClick={() => onSelect(step)}
-              type="button"
-            >
-              {`${index + 1}. ${stepLabels[step]}`}
-            </button>
-            {isStepFilled(detail, step) && step !== "supply" ? (
-              <ArcadeBadge tone="mint">Done</ArcadeBadge>
-            ) : null}
-          </li>
-        ))}
+      <ol className="wizard-steps">
+        {wizardSteps.map((step, index) => {
+          const done = isStepFilled(detail, step) && step !== "supply";
+          return (
+            <li key={step}>
+              <button
+                aria-current={step === current ? "step" : undefined}
+                className="wizard-step"
+                data-state={
+                  step === current ? "current" : done ? "done" : "todo"
+                }
+                onClick={() => onSelect(step)}
+                type="button"
+              >
+                {`${index + 1}. ${stepLabels[step]}`}
+              </button>
+              {done ? <ArcadeBadge tone="mint">Done</ArcadeBadge> : null}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

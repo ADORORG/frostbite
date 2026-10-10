@@ -115,6 +115,12 @@ describe("step navigation", () => {
     );
     expect(container.querySelectorAll("li")).toHaveLength(5);
     expect(textOf(container).match(/Done/gu)).toHaveLength(2);
+    // The state drives the stepper's look: done steps, the current one, and what is still to do.
+    expect(
+      [...container.querySelectorAll("button")].map(
+        (step) => step.dataset.state,
+      ),
+    ).toEqual(["done", "todo", "current", "done", "todo"]);
     await click(buttonMatching(container, /4\. Items/u));
     expect(onSelect).toHaveBeenCalledWith("items");
   });

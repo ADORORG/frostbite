@@ -2,14 +2,15 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { AccessState } from "@repo/ui/arcade";
-import {
-  navigationForAudience,
-  navigationForUser,
-} from "@ador/plugin-kit/navigation";
 
 import { platformComposition } from "../../../../../configs/platform";
 import { resolvePageAccess } from "../../server/auth/page-access";
 import { getPageAccessDependencies } from "../../server/auth/runtime";
+import {
+  actorNavigation,
+  navigationForSession,
+  visitorNavigation,
+} from "../../server/navigation";
 
 export default async function FeaturePage({
   params,
@@ -20,18 +21,19 @@ export default async function FeaturePage({
   if (!match) notFound();
   const { page: contribution, params: routeParams } = match;
   const navigationContributions = platformComposition.features.listNavigation();
-  const publicNavigation = navigationForAudience(
-    navigationContributions,
-    "public",
-  );
+  const token = (await cookies()).get(platformSessionCookieName)?.value;
   if (contribution.access.kind === "public") {
     return contribution.render({
       actorUserId: null,
-      navigation: publicNavigation,
+      navigation: await navigationForSession(
+        navigationContributions,
+        routePath,
+        token,
+        getPageAccessDependencies,
+      ),
       params: routeParams,
     });
   }
-  const token = (await cookies()).get(platformSessionCookieName)?.value;
   const access = await resolvePageAccess(
     contribution.access,
     token,
@@ -40,25 +42,20 @@ export default async function FeaturePage({
   if (access.kind !== "allowed") {
     return (
       <AccessState
-        navigation={publicNavigation}
+        navigation={visitorNavigation(navigationContributions, routePath)}
         retryHref={routePath}
         state={access.kind}
       />
     );
   }
-  const navigation = await navigationForUser(
-    navigationContributions,
-    async (capability) => {
-      const decision = await getPageAccessDependencies().forPlatform({
-        capability,
-        userId: access.actorUserId,
-      });
-      return decision.allowed;
-    },
-  );
   return contribution.render({
     actorUserId: access.actorUserId,
-    navigation,
+    navigation: await actorNavigation(
+      navigationContributions,
+      routePath,
+      access.actorUserId,
+      getPageAccessDependencies,
+    ),
     params: routeParams,
   });
 }

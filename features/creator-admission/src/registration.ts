@@ -13,13 +13,17 @@ export const creatorAdmissionFeature = defineFeature({
     navigation: [
       {
         access: { kind: "authenticated" },
+        area: "studio",
         href: "/studio/creator-application",
-        label: "Apply to create",
+        label: "Creator application",
+        order: 30,
       },
       {
         access: { capability: "creator:review", kind: "platform" },
+        area: "admin",
         href: "/admin/creator-applications",
         label: "Creator reviews",
+        order: 20,
       },
     ],
     id: "creator-admission",

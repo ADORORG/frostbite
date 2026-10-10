@@ -1,5 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// A visitor: no session cookie.
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => undefined }),
+}));
 
 import FeaturePage from "../src/app/[[...path]]/page";
 
@@ -18,8 +23,8 @@ describe("home navigation", () => {
     expect(markup).toContain("Frostbite");
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/creators"');
-    expect(markup).toContain('href="/account"');
     expect(markup).toContain('href="/connect"');
+    expect(markup).not.toContain('href="/account"');
     expect(markup).not.toContain('href="/studio"');
     expect(markup).not.toContain('href="/admin"');
   });

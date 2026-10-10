@@ -45,7 +45,6 @@
   backdrop-filter: blur(0.75rem);
 }
 .app-brand,
-.app-navigation,
 .app-footer {
   display: flex;
   align-items: center;
@@ -69,11 +68,6 @@
     var(--arcade-text) 54%
   );
   box-shadow: 0 0 1rem color-mix(in srgb, var(--arcade-red) 60%, transparent);
-}
-.app-navigation {
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: flex-end;
 }
 .app-footer {
   justify-content: space-between;
@@ -104,10 +98,6 @@
   .app-header {
     align-items: stretch;
     flex-direction: column;
-  }
-  .app-navigation {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
   .app-footer {
     align-items: flex-start;

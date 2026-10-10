@@ -14,6 +14,14 @@ arcade components, and platform patterns derived from the immutable standalone a
   and arbitrary children. It owns hydration-safe opening, native focus behavior, dismissal,
   unique accessible labels, and shared compact modal styling. It has no wallet dependencies.
 
+`AppShell` takes the flat list of links, each with an `area`, and lays it out: `main` links and one
+entry per work area (`studio`, `admin`) in the bar, `account` links in one menu (a lone link is shown
+as itself), `footer` links in the footer, and, inside a work area with more than one link, that area's
+sidebar (tabs on a narrow screen) and a breadcrumb. A work area's bar entry opens the first link the
+person may see. The grouping is `buildNavigationModel` in `src/patterns/navigation-model.ts`; its areas
+must match the manifest's (`@ador/shared/features`), which a type error at each page enforces. Guided
+forms use the `wizard-steps` styles (a connected row that scrolls sideways on narrow screens).
+
 The shared form styles also give `.arcade-facts` (a label and value list that stacks on narrow screens)
 and lay out radio and checkbox labels beside their control.
 

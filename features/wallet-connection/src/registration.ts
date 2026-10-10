@@ -13,7 +13,13 @@ export function createWalletConnectionFeature(input: WalletConnectionConfig) {
       dependencies: [],
       id: "wallet-connection",
       navigation: [
-        { access: { kind: "public" }, href: "/connect", label: "Connect" },
+        {
+          access: { kind: "public" },
+          area: "account",
+          href: "/connect",
+          label: "Connect",
+          order: 10,
+        },
       ],
       pages: [{ access: { kind: "public" }, path: "/connect" }],
       requiredDecisionGates: [],

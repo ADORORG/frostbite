@@ -33,7 +33,7 @@ describe("uploads entrypoint", () => {
     const markup = renderToStaticMarkup(
       await page.render({
         actorUserId: null,
-        navigation: [{ href: "/studio", label: "Studio" }],
+        navigation: [{ area: "studio", href: "/studio", label: "Overview" }],
         params: {},
       }),
     );

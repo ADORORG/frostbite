@@ -105,11 +105,6 @@
   outline: 0.1875rem solid var(--arcade-cyan);
   outline-offset: 0.1875rem;
 }
-.arcade-steps {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 .arcade-choice {
   display: grid;
   gap: var(--arcade-space-small);

@@ -14,7 +14,9 @@ Explicit feature/provider registration, boot validation, dependency checking, an
 - `@ador/plugin-kit/boot` validates decision gates, provider requirements, pages, routes, and
   operation IDs before serving.
 - `@ador/plugin-kit/navigation` filters validated manifest navigation for public, authenticated, or
-  capability-authorized users. Visibility never replaces destination authorization.
+  capability-authorized users, returns each link with its `area` in display `order`, and
+  `markCurrent` marks the link for the page being shown (longest matching parent). Visibility never
+  replaces destination authorization.
 
 Applications register a feature by importing its registration and adding it to
 `configs/features.ts`. The registry never scans the filesystem or activates modules through import

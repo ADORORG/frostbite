@@ -99,6 +99,16 @@ stored in `references/task-list.md`.
 | W4-06  | Add creator/staff audit visibility                                                        | completed | `references/audit-visibility-task-record.md`        |
 | W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending   | Depends on W4-01 through W4-06                      |
 
+## UX — Journey rework (before preview)
+
+| ID   | Task                                                                                  | Status      | Evidence or blocker                                                                         |
+| ---- | ------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| UX-1 | Walk every role, record the problems, and write the intended journeys                 | completed   | `docs/product/journeys.md`; findings Q1-Q13                                                 |
+| UX-2 | Fix flow and data bugs; split overview, create, and detail pages for each feature     | pending     | Depends on UX-1; rule in `docs/product/journeys.md`                                         |
+| UX-3 | Area-aware navigation, sidebars, breadcrumbs, account menu, responsive wizard stepper | in progress | `references/studio-navigation-task-record.md`; gates and mutation proofs, review open       |
+| UX-4 | Layout and density: content widths, desktop columns, design tokens                    | pending     | Depends on UX-3                                                                             |
+| UX-5 | Click-only journey tests for every role plus desktop and mobile baselines             | pending     | Depends on UX-2 through UX-4; preview waits for this and a manual walk by the product owner |
+
 ## Week 5 — Launch phases and allowlists
 
 | ID    | Task                                                                        | Status  | Evidence or blocker                                    |

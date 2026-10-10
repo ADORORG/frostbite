@@ -15,7 +15,7 @@ import {
 import { chains, previewsFor, summary, version } from "./support/fixtures.ts";
 
 const navigation = [
-  { access: { kind: "public" }, href: "/collections", label: "Collections" },
+  { area: "main", href: "/collections", label: "Collections" },
 ] as const;
 
 describe("collection index", () => {

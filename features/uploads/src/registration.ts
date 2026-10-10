@@ -20,8 +20,10 @@ export function createUploadsFeature(providers: ProviderRegistry) {
       navigation: [
         {
           access: { kind: "authenticated" },
+          area: "studio",
           href: uploadsStudioPath,
           label: uploadsNavigationLabel,
+          order: 20,
         },
       ],
       id: "uploads",

@@ -64,8 +64,10 @@ describe("collection studio registration", () => {
     expect(manifest.navigation).toEqual([
       {
         access: { kind: "authenticated" },
+        area: "studio",
         href: "/studio/collections",
-        label: "My collections",
+        label: "Collections",
+        order: 10,
       },
     ]);
   });

@@ -50,3 +50,17 @@ export async function skipToMain(page: Page) {
   await skipLink.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
 }
+
+// Inside a work area the breadcrumb is the first thing in the main content, ahead of the page's own controls:
+// one stop for each link in it.
+export async function passBreadcrumb(page: Page) {
+  const links = page
+    .getByRole("navigation", { name: "Breadcrumb" })
+    .getByRole("link");
+  const count = await links.count();
+  expect(count).toBeGreaterThan(0);
+  for (let index = 0; index < count; index += 1) {
+    await page.keyboard.press("Tab");
+    await expect(links.nth(index)).toBeFocused();
+  }
+}

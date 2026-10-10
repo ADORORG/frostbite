@@ -1,5 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// The page reads the session cookie to decide which links to show; there is no request here, so the
+// visitor has none.
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => undefined }),
+}));
 
 import { featureRegistry } from "../../../configs/features";
 import FeaturePage from "../src/app/[[...path]]/page";

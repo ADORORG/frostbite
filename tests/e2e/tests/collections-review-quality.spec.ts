@@ -6,7 +6,12 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { create, detailOf, draftBody } from "./support/collection-helpers.ts";
-import { closeMatrix, prepare, skipToMain } from "./support/quality.ts";
+import {
+  closeMatrix,
+  passBreadcrumb,
+  prepare,
+  skipToMain,
+} from "./support/quality.ts";
 import {
   answer,
   answerImages,
@@ -82,6 +87,7 @@ test("the creator's review step closes the experience-quality matrix", async ({
 
   // Keyboard: past the skip link, the steps come first and the review step offers its way back.
   await skipToMain(page);
+  await passBreadcrumb(page);
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "1. Details" })).toBeFocused();
   await page.getByRole("button", { name: "1. Details" }).blur();

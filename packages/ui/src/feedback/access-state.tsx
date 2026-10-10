@@ -29,7 +29,7 @@ const states = {
 } as const;
 
 export function AccessState({
-  navigation = [{ href: "/", label: "Home" }],
+  navigation = [{ area: "main", href: "/", label: "Home" }],
   retryHref = "/",
   state,
 }: {

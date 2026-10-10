@@ -43,8 +43,10 @@ export function createCollectionStudioFeature(
       navigation: [
         {
           access: { kind: "authenticated" },
+          area: "studio",
           href: collectionStudioPath,
           label: collectionStudioNavigationLabel,
+          order: 10,
         },
       ],
       pages: [

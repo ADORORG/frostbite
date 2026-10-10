@@ -1,0 +1,52 @@
+/* The steps of a guided form: one connected row. Each step shows its state with a bar under it, and on a
+   narrow screen the row scrolls sideways instead of wrapping into a pile of buttons. */
+.wizard-steps {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 0 1.5rem;
+  padding: 0 0 0.25rem;
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+}
+.wizard-steps li {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: 0.375rem;
+  align-items: flex-start;
+  scroll-snap-align: start;
+}
+.wizard-step {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.625rem 1rem;
+  border: 0;
+  border-bottom: 0.25rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small) var(--arcade-radius-small) 0 0;
+  background: var(--arcade-surface-recessed);
+  color: var(--arcade-text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.wizard-step:hover {
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text);
+}
+.wizard-step[data-state="done"] {
+  border-bottom-color: var(--arcade-mint);
+}
+.wizard-step[data-state="current"] {
+  border-bottom-color: var(--arcade-yellow);
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text);
+  font-weight: 700;
+}
+@media (max-width: 40rem) {
+  .wizard-steps li {
+    flex-basis: 8.5rem;
+  }
+}

@@ -9,8 +9,8 @@ describe("PlatformHome", () => {
     const markup = renderToStaticMarkup(
       <PlatformHome
         navigation={[
-          { href: "/launches", label: "Launches" },
-          { href: "/games", label: "Games" },
+          { area: "footer", href: "/launches", label: "Launches" },
+          { area: "main", href: "/games", label: "Games" },
         ]}
         registeredFeatureIds={["platform-shell", "launches", "games"]}
         registeredFeatures={3}
@@ -52,7 +52,11 @@ describe("PlatformHome", () => {
       const markup = renderToStaticMarkup(
         <PlatformHome
           navigation={[
-            { href: `/${testCase.present}`, label: testCase.present },
+            {
+              area: "main",
+              href: `/${testCase.present}`,
+              label: testCase.present,
+            },
           ]}
           registeredFeatureIds={["platform-shell", testCase.present]}
           registeredFeatures={2}

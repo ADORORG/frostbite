@@ -36,8 +36,10 @@ export function createCollectionReviewFeature(
       navigation: [
         {
           access,
+          area: "admin",
           href: collectionReviewQueuePath,
           label: collectionReviewNavigationLabel,
+          order: 10,
         },
       ],
       pages: [

@@ -15,8 +15,10 @@ function productFeature(catalog: ProductCatalog) {
       navigation: [
         {
           access: { kind: "public" },
+          area: catalog.navigationArea,
           href: catalog.path,
           label: catalog.label,
+          order: catalog.navigationOrder,
         },
       ],
       id: catalog.featureId,
