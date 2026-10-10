@@ -24,6 +24,7 @@ export interface CollectionAggregate {
 }
 
 export interface CollectionSummaryRecord {
+  readonly coverAssetId: CollectionRecord["coverAssetId"];
   readonly createdAt: Date;
   readonly id: UuidV7;
   readonly itemCount: number;

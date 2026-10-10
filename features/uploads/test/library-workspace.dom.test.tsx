@@ -161,4 +161,14 @@ describe("library workspace: filters and use", () => {
       "Use in a collection: Collection banner uploaded 2026-10-06",
     );
   });
+
+  it("links every image, ready or not, to its own page", async () => {
+    const container = await mount(<LibraryWorkspace services={withAssets()} />);
+    await settle(() =>
+      expect(container.querySelectorAll("li")).toHaveLength(3),
+    );
+    expect(
+      links(container, "Details").map((link) => link.getAttribute("href")),
+    ).toEqual(purposes.map(({ id }) => `/studio/uploads/${id}`));
+  });
 });

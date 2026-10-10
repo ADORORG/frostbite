@@ -2,6 +2,7 @@ import { collectionWizardHref, standingOf } from "@ador/shared/collections";
 import type { CollectionSummary } from "@ador/shared/collections";
 import { ArcadeBadge, ArcadeButton, ArcadeProgress } from "@repo/ui/arcade";
 
+import type { CoverPicture } from "../../client/covers.ts";
 import {
   nextActionLabels,
   stateLabel,
@@ -13,9 +14,12 @@ import {
 export function CollectionCard({
   chainName,
   collection,
+  cover,
 }: {
   readonly chainName: string;
   readonly collection: CollectionSummary;
+  // The cover's picture when there is one that can be shown; otherwise the monogram stands in.
+  readonly cover?: CoverPicture;
 }) {
   const standing = standingOf(collection.submissionState);
   const tone = standingTones[standing];
@@ -23,12 +27,22 @@ export function CollectionCard({
   return (
     <article className="arcade-card">
       <div className="arcade-card__head">
-        <span
-          aria-hidden="true"
-          className={`arcade-card__avatar arcade-card__avatar--${tone}`}
-        >
-          {collection.name.slice(0, 1).toUpperCase()}
-        </span>
+        {cover === undefined ? (
+          <span
+            aria-hidden="true"
+            className={`arcade-card__avatar arcade-card__avatar--${tone}`}
+          >
+            {collection.name.slice(0, 1).toUpperCase()}
+          </span>
+        ) : (
+          <img
+            alt={`${collection.name} cover`}
+            className="arcade-card__cover"
+            height={cover.height}
+            src={cover.src}
+            width={cover.width}
+          />
+        )}
         <div>
           <h3 className="arcade-card__title">{collection.name}</h3>
           <p className="arcade-card__meta">{chainName}</p>

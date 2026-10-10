@@ -39,7 +39,7 @@ describe("review detail: loading", () => {
   it("shows the submission with its frozen version, decision form, and history", async () => {
     const { container } = await open();
     expect(container.querySelector("h2")?.textContent).toBe("First light");
-    expect(textOf(container)).toContain("State: submitted");
+    expect(textOf(container)).toContain("Status: Submitted");
     expect(
       container.querySelector('section[aria-label="Submitted version"]'),
     ).not.toBeNull();
@@ -109,7 +109,7 @@ describe("review detail: deciding", () => {
     await choose(container, "Start review");
     await click(button(container, "Record decision"));
     await settle(() =>
-      expect(textOf(container)).toContain("State: under-review"),
+      expect(textOf(container)).toContain("Status: In review"),
     );
     expect(fake.api.decide).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -128,7 +128,7 @@ describe("review detail: deciding", () => {
     await choose(container, "Start review");
     await click(button(container, "Record decision"));
     await settle(() =>
-      expect(textOf(container)).toContain("State: under-review"),
+      expect(textOf(container)).toContain("Status: In review"),
     );
     expect(
       container.querySelector('img[alt="Cover image for First light"]'),
@@ -147,7 +147,7 @@ describe("review detail: deciding", () => {
     );
     await click(button(container, "Record decision"));
     await settle(() =>
-      expect(textOf(container)).toContain("State: changes-requested"),
+      expect(textOf(container)).toContain("Status: Changes requested"),
     );
     expect(textOf(container)).not.toContain(
       "Write what the creator should know",
@@ -166,7 +166,7 @@ describe("review detail: deciding", () => {
     );
     await click(button(container, "Dismiss and try again"));
     await click(button(container, "Record decision"));
-    await settle(() => expect(textOf(container)).toContain("State: approved"));
+    await settle(() => expect(textOf(container)).toContain("Status: Approved"));
     const keys = fake.api.decide.mock.calls.map(
       ([, options]) => options.idempotencyKey,
     );
@@ -188,7 +188,7 @@ describe("review detail: deciding", () => {
       "A different decision now.",
     );
     await click(button(container, "Record decision"));
-    await settle(() => expect(textOf(container)).toContain("State: approved"));
+    await settle(() => expect(textOf(container)).toContain("Status: Approved"));
     const keys = fake.api.decide.mock.calls.map(
       ([, options]) => options.idempotencyKey,
     );
@@ -209,7 +209,7 @@ describe("review detail: deciding", () => {
       ),
     );
     await click(button(container, "Reload the submission"));
-    await settle(() => expect(textOf(container)).toContain("State: approved"));
+    await settle(() => expect(textOf(container)).toContain("Status: Approved"));
     expect(textOf(container)).not.toContain("cannot take that action");
   });
 
@@ -249,7 +249,9 @@ describe("review detail: deciding", () => {
       await click(button(container, "Record decision"));
       await settle(() => expect(fake.api.decide).toHaveBeenCalled());
     }
-    await settle(() => expect(textOf(container)).toContain("State: suspended"));
+    await settle(() =>
+      expect(textOf(container)).toContain("Status: Suspended"),
+    );
     const keys = fake.api.decide.mock.calls.map(
       ([, options]) => options.idempotencyKey,
     );
@@ -268,7 +270,7 @@ describe("review detail: deciding", () => {
       expect(textOf(container)).toContain("cannot take that action"),
     );
     await click(button(container, "Reload the submission"));
-    await settle(() => expect(textOf(container)).toContain("State: approved"));
+    await settle(() => expect(textOf(container)).toContain("Status: Approved"));
     // The old choice (approve) is no longer a legal move, so nothing is chosen any more.
     await click(button(container, "Record decision"));
     expect(textOf(container)).toContain("Choose what to do.");

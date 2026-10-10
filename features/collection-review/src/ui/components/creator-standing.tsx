@@ -1,4 +1,5 @@
 import type { ReviewSubmission } from "@ador/shared/collections";
+import { creatorStandingCopy } from "@ador/shared/creator-admission";
 import { StatusLamp } from "@repo/ui/arcade";
 
 // The creator's standing now. An approval is refused for anyone who is not an approved creator, so a
@@ -9,13 +10,18 @@ export function CreatorStanding({
   readonly state: ReviewSubmission["ownerState"];
 }) {
   if (state === "approved")
-    return <StatusLamp label="Creator standing: approved" tone="ready" />;
+    return (
+      <StatusLamp
+        label={`Creator standing: ${creatorStandingCopy.approved.headline}`}
+        tone="ready"
+      />
+    );
   return (
     <StatusLamp
       label={
         state === null
           ? "Creator standing: never applied. An approval will be refused."
-          : `Creator standing: ${state}. An approval will be refused.`
+          : `Creator standing: ${creatorStandingCopy[state].headline}. An approval will be refused.`
       }
       tone="unavailable"
     />

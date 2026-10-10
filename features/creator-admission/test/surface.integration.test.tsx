@@ -1,3 +1,7 @@
+import {
+  creatorStandingCopy,
+  type CreatorApplicationState,
+} from "@ador/shared/creator-admission";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -73,5 +77,84 @@ describe("creator admission surfaces", () => {
     );
     expect(degraded).toContain("No state is being inferred");
     expect(degraded).not.toContain("Save private draft");
+  });
+});
+
+describe("creator application status", () => {
+  const sent = (state: CreatorApplicationState) => ({
+    applicantUserId: createUuidV7(),
+    draft: {
+      contentDeclarationAccepted: true,
+      displayName: "Sent Creator",
+      expectedLaunchSize: "Small",
+      expectedLaunchTiming: "Soon",
+      jurisdictionAcknowledged: false,
+      portfolioLinks: ["https://example.test/work"],
+      projectSummary: "Sent summary",
+      provenanceDeclarationAccepted: true,
+      rightsDeclarationAccepted: true,
+    },
+    id: createUuidV7(),
+    revision: 2,
+    state,
+  });
+  const studio = (application: ReturnType<typeof sent> | null) =>
+    renderToStaticMarkup(
+      <CreatorApplicationSurface
+        application={application}
+        mode="studio"
+        unavailable={false}
+      />,
+    );
+
+  it("tells a person who never applied so, and offers the form", () => {
+    const markup = studio(null);
+    expect(markup).toContain("Not a creator yet");
+    expect(markup).toContain("Save private draft");
+  });
+
+  it.each(["draft", "changes-requested"] as const)(
+    "keeps the form while the application is %s",
+    (state) => {
+      const markup = studio(sent(state));
+      expect(markup).toContain(creatorStandingCopy[state].headline);
+      expect(markup).toContain("Save private draft");
+      expect(markup).not.toContain("What you sent");
+    },
+  );
+
+  it.each([
+    "submitted",
+    "under-review",
+    "approved",
+    "rejected",
+    "suspended",
+    "revoked",
+  ] as const)(
+    "shows what was sent, read-only, once the application is %s",
+    (state) => {
+      const markup = studio(sent(state));
+      expect(markup).toContain(creatorStandingCopy[state].headline);
+      expect(markup).toContain("What you sent");
+      expect(markup).toContain("Sent Creator");
+      expect(markup).toContain("https://example.test/work");
+      expect(markup).not.toContain("Save private draft");
+      expect(markup).not.toContain("Submit snapshot");
+      expect(markup).not.toContain("<form");
+    },
+  );
+
+  it("shows declarations as they were answered, and leads an approved creator to collections", () => {
+    const approved = studio(sent("approved"));
+    expect(approved).toMatch(
+      /Acknowledges jurisdiction requirements<\/dt><dd>No</,
+    );
+    expect(approved).toMatch(
+      /Holds the required rights and licences<\/dt><dd>Yes</,
+    );
+    expect(approved).toContain('href="/studio/collections"');
+    expect(studio(sent("submitted"))).not.toContain(
+      'href="/studio/collections"',
+    );
   });
 });

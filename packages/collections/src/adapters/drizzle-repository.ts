@@ -157,6 +157,7 @@ export function createDrizzleCollectionRepository(
       return rows.map(({ collection, itemCount }) => {
         const record = collectionRecord(collection);
         return {
+          coverAssetId: record.coverAssetId,
           createdAt: record.createdAt,
           id: record.id,
           itemCount,

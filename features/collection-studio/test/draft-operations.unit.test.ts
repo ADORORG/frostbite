@@ -118,6 +118,7 @@ describe("create draft", () => {
 describe("list drafts", () => {
   it("requires a session and presents summaries", async () => {
     const record: CollectionSummaryRecord = {
+      coverAssetId: null,
       createdAt: new Date("2026-10-09T12:00:00.000Z"),
       id: id(),
       itemCount: 2,
@@ -139,6 +140,7 @@ describe("list drafts", () => {
     expect(list).toHaveBeenCalledWith(context.actorUserId);
     expect(result.value.collections).toEqual([
       {
+        coverAssetId: null,
         createdAt: "2026-10-09T12:00:00.000Z",
         id: record.id,
         itemCount: 2,

@@ -1,5 +1,6 @@
 import type { LibraryAsset } from "@ador/shared/uploads";
 import { collectionStudioPath } from "@ador/shared/collections";
+import { uploadDetailHref } from "@ador/shared/uploads";
 import { ArcadeBadge, ArcadeButton, ArcadeMediaTile } from "@repo/ui/arcade";
 
 import {
@@ -27,6 +28,13 @@ export function AssetCard({ asset }: { readonly asset: LibraryAsset }) {
           <ArcadeBadge tone={badge.tone}>{badge.label}</ArcadeBadge>
           {dimensions === null ? null : <span>{dimensions}</span>}
           {note === null ? null : <span>{note}</span>}
+          <ArcadeButton
+            ariaLabel={`Details: ${label} uploaded ${asset.createdAt.slice(0, 10)}`}
+            href={uploadDetailHref(asset.id)}
+            tone="yellow"
+          >
+            Details
+          </ArcadeButton>
           {canUseInCollection(asset) ? (
             <ArcadeButton
               ariaLabel={`Use in a collection: ${label} uploaded ${asset.createdAt.slice(0, 10)}`}

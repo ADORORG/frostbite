@@ -4,7 +4,11 @@ import {
   standingOf,
   type CollectionSummary,
 } from "@ador/shared/collections";
-import type { CreatorApplicationState } from "@ador/shared/creator-admission";
+import {
+  creatorStandingCopy,
+  neverAppliedCopy,
+  type CreatorApplicationState,
+} from "@ador/shared/creator-admission";
 import type { ArcadeTone } from "@repo/ui/arcade";
 
 // What a person is told about their standing as a creator, and what they can do about it. The state
@@ -30,77 +34,32 @@ const viewApplication = {
   label: "View your application",
 } as const;
 
-const states: Readonly<Record<CreatorApplicationState, StandingCopy>> = {
-  approved: {
-    action: null,
-    body: "You can upload images and build collections.",
-    canCreate: true,
-    headline: "Approved creator",
-    tone: "mint",
-  },
+// How each state is shown and where it leads; the words are shared with the application page.
+const presentation: Readonly<
+  Record<CreatorApplicationState, Pick<StandingCopy, "action" | "tone">>
+> = {
+  approved: { action: null, tone: "mint" },
   "changes-requested": {
     action: { href: applicationHref, label: "Update your application" },
-    body: "A reviewer asked for changes. Update your application and send it again.",
-    canCreate: false,
-    headline: "Changes requested",
     tone: "pink",
   },
   draft: {
     action: { href: applicationHref, label: "Finish your application" },
-    body: "Your application is saved but not sent. Finish it and submit it to be reviewed.",
-    canCreate: false,
-    headline: "Application started",
     tone: "yellow",
   },
-  rejected: {
-    action: viewApplication,
-    body: "Your application was not approved, so collections cannot be built from this account.",
-    canCreate: false,
-    headline: "Application not approved",
-    tone: "red",
-  },
-  revoked: {
-    action: viewApplication,
-    body: "Creator access for this account has ended. Collections cannot be changed.",
-    canCreate: false,
-    headline: "Creator access ended",
-    tone: "red",
-  },
-  submitted: {
-    action: viewApplication,
-    body: "Your application is waiting for a reviewer. You will see the result here.",
-    canCreate: false,
-    headline: "Application submitted",
-    tone: "cyan",
-  },
-  suspended: {
-    action: viewApplication,
-    body: "Creator access is paused. Collections cannot be changed until it is reinstated.",
-    canCreate: false,
-    headline: "Creator access paused",
-    tone: "red",
-  },
-  "under-review": {
-    action: viewApplication,
-    body: "A reviewer is looking at your application. You will see the result here.",
-    canCreate: false,
-    headline: "Application in review",
-    tone: "cyan",
-  },
-};
-
-const neverApplied: StandingCopy = {
-  action: apply,
-  body: "Apply to become a creator to upload images and build collections. You can save as you go.",
-  canCreate: false,
-  headline: "Not a creator yet",
-  tone: "yellow",
+  rejected: { action: viewApplication, tone: "red" },
+  revoked: { action: viewApplication, tone: "red" },
+  submitted: { action: viewApplication, tone: "cyan" },
+  suspended: { action: viewApplication, tone: "red" },
+  "under-review": { action: viewApplication, tone: "cyan" },
 };
 
 export function describeCreatorStanding(
   state: CreatorApplicationState | null,
 ): StandingCopy {
-  return state === null ? neverApplied : states[state];
+  return state === null
+    ? { ...neverAppliedCopy, action: apply, tone: "yellow" }
+    : { ...creatorStandingCopy[state], ...presentation[state] };
 }
 
 export interface NextStep {

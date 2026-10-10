@@ -60,6 +60,20 @@ test("a signed-in user uploads an image and sees its processed thumbnail, which 
   await expect(
     page.getByRole("img", { name: "Collection artwork thumbnail" }),
   ).toBeVisible();
+
+  // The image has a page of its own, reached from the library and back again.
+  await page.getByRole("link", { name: /^Details:/u }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Image" }),
+  ).toBeVisible();
+  const details = page.getByRole("article", { name: "Image details" });
+  await expect(details.getByText("Ready")).toBeVisible();
+  await expect(details.getByText("64 × 48 px")).toBeVisible();
+  await expect(details.getByRole("img")).toBeVisible();
+  await details.getByRole("link", { name: "Back to your library" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Uploads" }),
+  ).toBeVisible();
 });
 
 test("another user never sees that image, and anonymous callers cannot list assets", async ({

@@ -1,6 +1,9 @@
 "use client";
 
-import { collectionReviewQueuePath } from "@ador/shared/collections";
+import {
+  collectionReviewQueuePath,
+  submissionStateLabels,
+} from "@ador/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeButton,
@@ -106,11 +109,13 @@ export function ReviewDetail({
       )}
       {loaded === null ? null : (
         <>
-          <StatusLamp
-            label={`State: ${loaded.submission.state}`}
-            tone="attention"
-          />
-          <CreatorStanding state={loaded.submission.ownerState} />
+          <div className="arcade-actions">
+            <StatusLamp
+              label={`Status: ${submissionStateLabels[loaded.submission.state]}`}
+              tone="attention"
+            />
+            <CreatorStanding state={loaded.submission.ownerState} />
+          </div>
           <SnapshotView
             previews={loaded.previews}
             submission={loaded.submission}

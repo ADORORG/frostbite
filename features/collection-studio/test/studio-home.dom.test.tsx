@@ -11,6 +11,7 @@ const summary = (
   name: string,
   state: "approved" | "changes-requested" | null,
 ) => ({
+  coverAssetId: null,
   createdAt: "2026-10-09T12:00:00.000Z",
   id: id(),
   itemCount: 1,

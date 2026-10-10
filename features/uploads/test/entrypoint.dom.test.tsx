@@ -1,5 +1,9 @@
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { uploadsNewPath, uploadsStudioPath } from "@ador/shared/uploads";
+import {
+  uploadDetailPath,
+  uploadsNewPath,
+  uploadsStudioPath,
+} from "@ador/shared/uploads";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -8,7 +12,7 @@ import { createUploadsEntrypoint } from "../src/entrypoint.tsx";
 describe("uploads entrypoint", () => {
   const entrypoint = createUploadsEntrypoint(createProviderRegistry([]));
 
-  it("contributes the library, intent, and completion operations and a library page and an upload page", () => {
+  it("contributes the library, intent, and completion operations and a library page, an upload page and an image page", () => {
     expect(
       entrypoint.operations?.map(({ route }) => route.operationId).sort(),
     ).toEqual([
@@ -21,6 +25,7 @@ describe("uploads entrypoint", () => {
     ).toEqual([
       [uploadsStudioPath, "authenticated"],
       [uploadsNewPath, "authenticated"],
+      [uploadDetailPath, "authenticated"],
     ]);
     expect(entrypoint.capabilities).toEqual([
       "api-routes",
@@ -54,5 +59,19 @@ describe("uploads entrypoint", () => {
     );
     expect(markup).toContain("<h1>Upload an image</h1>");
     expect(markup).not.toContain("Your library");
+  });
+
+  it("renders the image page for the image in the address", async () => {
+    const page = entrypoint.pages?.[2];
+    if (page === undefined) throw new Error("page missing");
+    const markup = renderToStaticMarkup(
+      await page.render({
+        actorUserId: null,
+        navigation: [],
+        params: { assetId: "abc" },
+      }),
+    );
+    expect(markup).toContain("<h1>Image</h1>");
+    expect(markup).toContain("Loading the image");
   });
 });

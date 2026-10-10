@@ -43,9 +43,17 @@ test("persists, submits, and reviews a creator application", async ({
   await page.getByRole("button", { name: "Submit snapshot" }).click();
   const submitResponse = await submitResponsePromise;
   expect(submitResponse.status(), await submitResponse.text()).toBe(200);
+  // Sent: the card says so and the form gives way to what was sent, so it cannot be sent twice.
   await expect(
-    page.getByText("Immutable review snapshot submitted. State: submitted."),
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Application submitted");
+  await expect(
+    page.getByRole("heading", { name: "What you sent" }),
   ).toBeVisible();
+  await expect(page.getByText("E2E Creator")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Submit snapshot" }),
+  ).toHaveCount(0);
 
   const mine = creatorApplicationResponseSchema.parse(
     await submitResponse.json(),

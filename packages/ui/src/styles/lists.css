@@ -174,3 +174,29 @@
   margin: 0;
   font-size: 1.125rem;
 }
+
+/* A read-only list of labelled values (what an applicant sent): the label above, the value below. */
+.arcade-details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.arcade-details dt {
+  color: var(--arcade-text-muted);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.arcade-details dd {
+  margin: 0.125rem 0 0;
+  overflow-wrap: anywhere;
+}
+.arcade-card__cover {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  object-fit: cover;
+}

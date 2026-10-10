@@ -20,12 +20,12 @@ Each feature separates three kinds of page and links them with clear buttons:
 - **Detail / editor** (work on one): breadcrumb back to the overview, next-step button.
   Never a list and a create form stacked on one page.
 
-| Feature             | Overview                                                                                                                | Create                        | Detail                             |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------------------------------- |
-| Collections         | `/studio/collections`: tabs Drafts, In review, Needs changes, Live; cards with cover, name, supply, status, next action | `/studio/collections/new`     | `/studio/collections/:id` wizard   |
-| Uploads             | `/studio/uploads`: library grid, filter by purpose, "Use in a collection"                                               | `/studio/uploads/new`         | image detail (purpose, where used) |
-| Creator application | `/studio` dashboard card                                                                                                | `/studio/creator-application` | same page, read-only after submit  |
-| Reviews             | `/admin/collection-reviews`: queue with filters                                                                         | none                          | `/admin/collection-reviews/:id`    |
+| Feature             | Overview                                                                                                                | Create                        | Detail                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Collections         | `/studio/collections`: tabs Drafts, In review, Needs changes, Live; cards with cover, name, supply, status, next action | `/studio/collections/new`     | `/studio/collections/:id` wizard                               |
+| Uploads             | `/studio/uploads`: library grid, filter by purpose, "Use in a collection"                                               | `/studio/uploads/new`         | image detail (purpose, size, state; "where used" needs an API) |
+| Creator application | `/studio` dashboard card                                                                                                | `/studio/creator-application` | same page, status card, read-only after submit                 |
+| Reviews             | `/admin/collection-reviews`: queue with filters                                                                         | none                          | `/admin/collection-reviews/:id`                                |
 
 ## Top bar by role
 

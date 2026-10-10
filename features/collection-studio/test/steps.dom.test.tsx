@@ -90,6 +90,7 @@ describe("images step", () => {
 
 describe("collection list", () => {
   const summary = {
+    coverAssetId: null,
     createdAt: "2026-10-09T12:00:00.000Z",
     id: "018f22f2-9c1a-7b21-8c45-000000000001",
     itemCount: 1,
@@ -106,6 +107,7 @@ describe("collection list", () => {
     const container = await mount(
       <CollectionList
         chains={[]}
+        covers={new Map()}
         list={{
           reload,
           replace: () => undefined,

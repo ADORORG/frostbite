@@ -83,9 +83,9 @@ test("a reviewer reads the frozen version with its art and asks for changes", as
   await expect(page.getByText("A small ready collection")).toBeVisible();
   await expect(page.getByRole("img", { name: "1. Dawn" })).toBeVisible();
   await decide(page, "Start review");
-  await expect(page.getByText("State: under-review")).toBeVisible();
+  await expect(page.getByText("Status: In review")).toBeVisible();
   await decide(page, "Request changes", feedback);
-  await expect(page.getByText("State: changes-requested")).toBeVisible();
+  await expect(page.getByText("Status: Changes requested")).toBeVisible();
   await expect(page.getByText(`Told the creator: ${feedback}`)).toBeVisible();
   await expect(
     page.getByText("No further decisions are possible"),
@@ -127,9 +127,9 @@ test("the reviewer approves the new version and the creator sees it approved, wi
     staff.getByText("A small ready collection, drawn by hand", { exact: true }),
   ).toBeVisible();
   await decide(staff, "Start review");
-  await expect(staff.getByText("State: under-review")).toBeVisible();
+  await expect(staff.getByText("Status: In review")).toBeVisible();
   await decide(staff, "Approve");
-  await expect(staff.getByText("State: approved")).toBeVisible();
+  await expect(staff.getByText("Status: Approved")).toBeVisible();
   await staff.context().close();
 
   await signIn(page, baseURL, creator);

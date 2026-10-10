@@ -67,4 +67,14 @@ test("a creator uploads a cover and a banner inside the wizard and never leaves 
   expect(saved.collection.coverAssetId).not.toBe(
     saved.collection.bannerAssetId,
   );
+
+  // The collections list shows the cover that was chosen, picture and all, instead of a monogram.
+  await page.goto("/studio/collections");
+  const picture = page.getByRole("img", { name: "Uploaded in place cover" });
+  await expect(picture).toBeVisible();
+  await expect
+    .poll(() =>
+      picture.evaluate((image: HTMLImageElement) => image.naturalWidth),
+    )
+    .toBeGreaterThan(0);
 });

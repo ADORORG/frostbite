@@ -119,9 +119,10 @@ describe("creator admission forms", () => {
     );
     expect(submit.disabled).toBe(false);
     await act(() => submit.click());
-    expect(container.textContent).toContain("State: submitted");
-    expect(submit.disabled).toBe(true);
-    await act(() => submit.click());
+    // Sent: the card says so, and the form gives way to what was sent, so it cannot be sent twice.
+    expect(container.textContent).toContain("Application submitted");
+    expect(container.textContent).toContain("What you sent");
+    expect(container.querySelector("form")).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     await act(() => root.unmount());
   });

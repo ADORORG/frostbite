@@ -5,7 +5,7 @@ import {
   seedUser,
   useCollectionDatabase,
 } from "./support/database.ts";
-import { draft, type mutation } from "./support/fixtures.ts";
+import { draft, mutation, newId } from "./support/fixtures.ts";
 import {
   readyCollection,
   reviewerDecides,
@@ -29,6 +29,30 @@ describe("a creator's list shows where each collection stands", () => {
     expect(
       await repository.listForOwner({ limit: 10, ownerUserId: owner }),
     ).toEqual([]);
+  });
+
+  it("carries the cover image of each collection, or none while none is chosen", async () => {
+    const ready = await readyCollection();
+    const [summary] = await repository.listForOwner({
+      limit: 10,
+      ownerUserId: ready.ownerUserId,
+    });
+    expect(summary?.coverAssetId).toBe(ready.cover);
+    const created = await repository.create({
+      ...mutation(ready.ownerUserId),
+      collectionId: newId(),
+      draft: draft({ coverAssetId: null }),
+    });
+    expect(created.kind).toBe("created");
+    const covers = (
+      await repository.listForOwner({
+        limit: 10,
+        ownerUserId: ready.ownerUserId,
+      })
+    ).map(({ coverAssetId }) => coverAssetId);
+    expect(covers).toHaveLength(2);
+    expect(covers).toContain(null);
+    expect(covers).toContain(ready.cover);
   });
 
   it("has no state for a draft that was never submitted", async () => {

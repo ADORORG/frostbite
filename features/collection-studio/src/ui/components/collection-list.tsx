@@ -10,6 +10,7 @@ import {
 } from "@repo/ui/arcade";
 import { useState } from "react";
 
+import type { CoverPicture } from "../../client/covers.ts";
 import {
   effectiveFilter,
   filterOptions,
@@ -23,9 +24,11 @@ import { CollectionCard } from "./collection-card.tsx";
 // refresh does not hide what was already loaded. A filter narrows them by where each one stands.
 export function CollectionList({
   chains,
+  covers,
   list,
 }: {
   readonly chains: readonly ChainOption[];
+  readonly covers: ReadonlyMap<string, CoverPicture>;
   readonly list: LoadedResource<CollectionListResponse>;
 }) {
   const { state } = list;
@@ -89,6 +92,11 @@ export function CollectionList({
                     )?.displayName ?? collection.targetChain
                   }
                   collection={collection}
+                  cover={
+                    collection.coverAssetId === null
+                      ? undefined
+                      : covers.get(collection.coverAssetId)
+                  }
                 />
               </li>
             ))}

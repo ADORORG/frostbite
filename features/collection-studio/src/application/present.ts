@@ -25,6 +25,7 @@ export function presentSummary(
   record: CollectionSummaryRecord,
 ): CollectionSummary {
   return {
+    coverAssetId: record.coverAssetId,
     createdAt: record.createdAt.toISOString(),
     id: record.id,
     itemCount: record.itemCount,

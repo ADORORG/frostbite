@@ -1,11 +1,15 @@
 import { ApiError } from "@ador/client-http";
 import { chainOptionSchema } from "@ador/shared/chain";
-import type { SubmissionState } from "@ador/shared/collections";
+import type {
+  CollectionSummary,
+  SubmissionState,
+} from "@ador/shared/collections";
 import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { CollectionsWorkspace } from "../src/ui/collections-workspace.tsx";
 import { fakeCollections } from "./support/fake-api.ts";
+import { imageAsset } from "./support/detail.ts";
 import { id, signet } from "./support/stubs.ts";
 
 const chain = chainOptionSchema.parse({
@@ -21,6 +25,7 @@ const summary = (
   itemCount: number,
   submissionState: SubmissionState | null = null,
 ) => ({
+  coverAssetId: null,
   createdAt: "2026-10-09T12:00:00.000Z",
   id: id(),
   itemCount,
@@ -159,5 +164,52 @@ describe("collections overview: who may start a collection", () => {
     await settle(() => expect(fake.api.creatorStanding).toHaveBeenCalled());
     await settle(() => expect(link(container, "New collection")).toBeDefined());
     expect(textOf(container)).not.toContain("Collections open once");
+  });
+});
+
+describe("collections overview: covers", () => {
+  const withCover = (
+    name: string,
+    coverAssetId: string | null,
+  ): CollectionSummary => ({ ...summary(name, 1), coverAssetId });
+
+  it("shows the cover picture on a card whose cover is ready, and the monogram on the rest", async () => {
+    const fake = fakeCollections();
+    const ready = id();
+    const pending = id();
+    fake.state.summaries = [
+      withCover("With cover", ready),
+      withCover("Cover still processing", pending),
+      withCover("No cover", null),
+    ];
+    fake.state.library = [
+      imageAsset("collection-artwork", ready),
+      imageAsset("collection-artwork", pending, {
+        derivatives: [],
+        processingState: "validated",
+      }),
+    ];
+    const container = await mount(view(fake));
+    await settle(() => expect(textOf(container)).toContain("With cover"));
+    await settle(() =>
+      expect(container.querySelectorAll("img")).toHaveLength(1),
+    );
+    const image = container.querySelector("img");
+    expect(image?.getAttribute("alt")).toBe("With cover cover");
+    expect(image?.getAttribute("src")).toBe(
+      `https://storage.example.test/${ready}.webp`,
+    );
+    expect(container.querySelectorAll(".arcade-card__avatar")).toHaveLength(2);
+  });
+
+  it("keeps the monogram when the images cannot be loaded", async () => {
+    const fake = fakeCollections();
+    fake.state.summaries = [withCover("Only name", id())];
+    fake.api.listImages.mockRejectedValue(new ApiError("network", null, "x"));
+    const container = await mount(view(fake));
+    await settle(() => expect(textOf(container)).toContain("Only name"));
+    await settle(() => expect(fake.api.listImages).toHaveBeenCalled());
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelectorAll(".arcade-card__avatar")).toHaveLength(1);
   });
 });

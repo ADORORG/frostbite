@@ -10,6 +10,8 @@ const collectionId = uuidV7TextSchema;
 
 export const collectionSummarySchema = z
   .object({
+    // The image chosen as the cover, so a list can show it; null until one is chosen.
+    coverAssetId: uuidV7TextSchema.nullable(),
     createdAt: timestamp,
     id: collectionId,
     itemCount: z.number().int().nonnegative(),

@@ -1,3 +1,4 @@
+import { creatorStandingCopy } from "@ador/shared/creator-admission";
 import { ApiError } from "@ador/client-http";
 import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
@@ -63,11 +64,11 @@ describe("activity list", () => {
 describe("creator standing", () => {
   it("is calm for an approved creator, and warns before an approval for anyone else", async () => {
     expect(textOf(await mount(<CreatorStanding state="approved" />))).toBe(
-      "Creator standing: approved",
+      "Creator standing: Approved creator",
     );
     for (const state of ["suspended", "revoked", "draft"] as const)
       expect(textOf(await mount(<CreatorStanding state={state} />))).toContain(
-        `Creator standing: ${state}. An approval will be refused.`,
+        `Creator standing: ${creatorStandingCopy[state].headline}. An approval will be refused.`,
       );
     expect(textOf(await mount(<CreatorStanding state={null} />))).toContain(
       "never applied",

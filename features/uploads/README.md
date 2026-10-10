@@ -2,7 +2,7 @@
 
 Contributes the authenticated direct-upload API (intent creation, completion, and the asset library
 listing) and two studio pages: `/studio/uploads` (the library, filtered by purpose, each ready image with a
-"Use in a collection" link) and `/studio/uploads/new` (adding an image). Registration receives the platform provider registry
+"Use in a collection" link) `/studio/uploads/new` (adding an image) and `/studio/uploads/[assetId]` (one image in full). Registration receives the platform provider registry
 explicitly, so removing its one line detaches the routes, the page, and storage use.
 
 The feature validates HTTP input through `@ador/shared/uploads`, delegates persistence and signing to
