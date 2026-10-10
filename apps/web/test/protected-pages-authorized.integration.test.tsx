@@ -22,9 +22,9 @@ import FeaturePage from "../src/app/[[...path]]/page";
 
 describe("authorized protected page delivery", () => {
   it.each([
-    ["account", "Account console"],
-    ["admin", "Admin console"],
-  ])("renders the authorized /%s contribution", async (path, heading) => {
+    ["account", "Account console", "Session active"],
+    ["admin", "Admin console", 'aria-label="Staff areas"'],
+  ])("renders the authorized /%s contribution", async (path, heading, own) => {
     const page = await FeaturePage({
       params: Promise.resolve({ path: [path] }),
       searchParams: Promise.resolve({}),
@@ -32,7 +32,7 @@ describe("authorized protected page delivery", () => {
 
     const markup = renderToStaticMarkup(page);
     expect(markup).toContain(heading);
-    expect(markup).toContain("01992bd8-a740-7000-8000-000000000002");
+    expect(markup).toContain(own);
     // The work areas are bar entries; a staff member sees both.
     expect(markup).toContain('href="/studio"');
     expect(markup).toContain('href="/admin"');

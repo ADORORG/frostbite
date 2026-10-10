@@ -143,6 +143,8 @@ test("staff without the reviewer role reach the admin console and see no review 
   await expect(page.getByRole("link", { name: "Creator reviews" })).toHaveCount(
     0,
   );
+  // With nothing else open to them the overview says so, instead of offering a link that would refuse.
+  await expect(page.getByText("No staff areas yet")).toBeVisible();
 });
 
 test("a reviewer's Admin entry opens a page they may use, and the sidebar lists their review work", async ({
