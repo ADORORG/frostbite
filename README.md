@@ -60,6 +60,9 @@ Database migrations are never applied during application startup. Deployment aut
 `pnpm stack` starts the whole product locally (database, storage, worker, web) with seeded users, for
 manual testing in a browser; see [`tests/e2e/README.md`](tests/e2e/README.md).
 
+Setting up preview or production (Postgres, R2, Inngest, worker, web): see
+[`docs/operations/preview-environment-checklist.md`](docs/operations/preview-environment-checklist.md).
+
 ## Architecture rules
 
 Features and providers are registered explicitly in `configs/features.ts` and
