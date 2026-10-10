@@ -9,6 +9,7 @@
     "./outbox": "./src/outbox/repository.ts",
     "./schema/accounts": "./src/schema/accounts.ts",
     "./schema/auth": "./src/schema/auth.ts",
+    "./schema/collection-submissions": "./src/schema/collection-submissions.ts",
     "./schema/collections": "./src/schema/collections.ts",
     "./schema/creator-admission": "./src/schema/creator-admission.ts",
     "./schema/derivatives": "./src/schema/derivatives.ts",

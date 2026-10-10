@@ -16,6 +16,11 @@ Server-only, provider-neutral PostgreSQL infrastructure for the platform.
   by every change, a CAIP-2 target chain id, per-creator and per-collection idempotency keys, and CHECK
   constraints for the stored limits. `createDatabaseFromEnvironment` builds a client from validated
   configuration for composition roots.
+- Collection submissions (`collection_submissions`) and their review events
+  (`collection_review_events`): a frozen snapshot with its hash, one review state, at most one live
+  submission per collection, and an append-only event record. Hand-written triggers in the migration
+  make a submission immutable (only its state and update time may change, nothing is deleted) and
+  events append-only; drizzle-kit does not model triggers, so they live in the SQL migration.
 - Transactional outbox insertion, lease-based claiming, acknowledgement, retry, and exhausted
   failure transitions.
 

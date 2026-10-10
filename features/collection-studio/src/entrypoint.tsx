@@ -18,10 +18,15 @@ import {
   createRemoveItemOperation,
   createUpdateItemOperation,
 } from "./application/item-operations.ts";
+import {
+  createListSubmissionsOperation,
+  createSubmitCollectionOperation,
+} from "./application/submission-operations.ts";
 import { createCollectionStudioContextResolver } from "./context.ts";
 import {
   createAssetPreviewResolver,
   createCollectionServiceResolver,
+  createSubmissionServiceResolver,
 } from "./runtime.ts";
 import { CollectionsSurface } from "./ui/collections-surface.tsx";
 import { WizardSurface } from "./ui/wizard-surface.tsx";
@@ -33,6 +38,7 @@ export function createCollectionStudioEntrypoint(
   const enabledChains = targetChains.filter(({ enabled }) => enabled);
   const context = createCollectionStudioContextResolver(providers);
   const getService = createCollectionServiceResolver(context, targetChains);
+  const getSubmissions = createSubmissionServiceResolver(context, targetChains);
   const dependencies = {
     getPreviews: createAssetPreviewResolver(context),
     getService,
@@ -49,9 +55,11 @@ export function createCollectionStudioEntrypoint(
       registerHttpOperation(createAddItemOperation(getService)),
       registerHttpOperation(createCreateDraftOperation(dependencies)),
       registerHttpOperation(createListDraftsOperation(dependencies)),
+      registerHttpOperation(createListSubmissionsOperation(getSubmissions)),
       registerHttpOperation(createReadDraftOperation(dependencies)),
       registerHttpOperation(createRemoveItemOperation(getService)),
       registerHttpOperation(createSaveDraftOperation(dependencies)),
+      registerHttpOperation(createSubmitCollectionOperation(getSubmissions)),
       registerHttpOperation(createUpdateItemOperation(getService)),
     ],
     pages: [

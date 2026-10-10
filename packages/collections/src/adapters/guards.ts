@@ -35,7 +35,9 @@ export async function isApprovedCreator(
   return application?.state === "approved";
 }
 
-export function draftAssetReferences(draft: CollectionDraft): AssetReference[] {
+export function draftAssetReferences(
+  draft: Pick<CollectionDraft, "bannerAssetId" | "coverAssetId">,
+): AssetReference[] {
   return [
     ...(draft.coverAssetId === null
       ? []
@@ -46,16 +48,28 @@ export function draftAssetReferences(draft: CollectionDraft): AssetReference[] {
   ];
 }
 
-// The first reference that is not a processed asset of the owner uploaded for the purpose it is
-// used for, or null. A reference to someone else's asset is reported exactly like a missing one.
-export async function firstInvalidAsset(
+const assetPurposes: readonly string[] = Object.values(collectionAssetPurposes);
+const isAssetPurpose = (purpose: string): purpose is AssetPurpose =>
+  assetPurposes.includes(purpose);
+
+export interface ValidAsset {
+  readonly contentSha256: string;
+  readonly id: string;
+  readonly purpose: AssetPurpose;
+}
+
+// The references that are processed assets of the owner uploaded for the purpose they are used for,
+// with the content hash the processing recorded. A reference to someone else's asset is absent, exactly
+// like a missing one, so existence is never disclosed.
+export async function findValidAssets(
   transaction: DatabaseTransaction,
   ownerUserId: string,
   references: readonly AssetReference[],
-): Promise<string | null> {
-  if (references.length === 0) return null;
+): Promise<readonly ValidAsset[]> {
+  if (references.length === 0) return [];
   const rows = await transaction
     .select({
+      contentSha256: assets.contentSha256,
       id: assets.id,
       purpose: uploadIntents.purpose,
       state: assets.processingState,
@@ -69,12 +83,30 @@ export async function firstInvalidAsset(
         references.map(({ id }) => id),
       ),
     );
+  const wanted = new Set(
+    references.map(({ id, purpose }) => `${id}:${purpose}`),
+  );
+  return rows.flatMap(({ contentSha256, id, purpose, state, userId }) =>
+    state === "processed" &&
+    userId === ownerUserId &&
+    contentSha256 !== null &&
+    isAssetPurpose(purpose) &&
+    wanted.has(`${id}:${purpose}`)
+      ? [{ contentSha256, id, purpose }]
+      : [],
+  );
+}
+
+// The first reference that is not a valid asset of the owner for its purpose, or null.
+export async function firstInvalidAsset(
+  transaction: DatabaseTransaction,
+  ownerUserId: string,
+  references: readonly AssetReference[],
+): Promise<string | null> {
   const valid = new Set(
-    rows
-      .filter(
-        ({ state, userId }) => state === "processed" && userId === ownerUserId,
-      )
-      .map(({ id, purpose }) => `${id}:${purpose}`),
+    (await findValidAssets(transaction, ownerUserId, references)).map(
+      ({ id, purpose }) => `${id}:${purpose}`,
+    ),
   );
   const invalid = references.find(
     ({ id, purpose }) => !valid.has(`${id}:${purpose}`),
@@ -109,6 +141,17 @@ export async function lockCreation(
 ): Promise<void> {
   await transaction.execute(
     sql`select pg_advisory_xact_lock(hashtextextended(${`${ownerUserId}|${idempotencyKey}`}, 0))`,
+  );
+}
+
+// Serialises every request that carries one idempotency key, so two concurrent requests with the same
+// key cannot both pass the replay check and then race to record the same key.
+export async function lockIdempotencyKey(
+  transaction: DatabaseTransaction,
+  idempotencyKey: string,
+): Promise<void> {
+  await transaction.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended(${`review|${idempotencyKey}`}, 0))`,
   );
 }
 

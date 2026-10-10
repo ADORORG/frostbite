@@ -10,6 +10,10 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
   (`@ador/shared/collections`), checks the target chain against the enabled chains it was given, builds
   a fingerprint of each retryable request, and delegates to the repository port.
 - `createDrizzleCollectionRepository` is the PostgreSQL adapter for `CollectionRepository`.
+- `createSubmissionService` (creator: submit a collection for review, list its submissions) and
+  `createReviewService` (staff: queue, read in full, decide) validate requests, derive the idempotency
+  fingerprint (which includes the actor), and delegate to `SubmissionAuthoring` and `ReviewRepository`.
+  `createDrizzleSubmissionRepository` implements both ports on PostgreSQL.
 - Result types (`CreateResult`, `SaveResult`, `AddItemResult`, ...) are discriminated unions: every
   expected failure is a value, not an exception.
 
@@ -23,9 +27,11 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
 - Every mutation locks the collection row, so item changes and draft saves of one collection are
   serialised. `revision` rises by one on every change to the draft **or** its items; a save must name
   the revision it was based on, and a stale one is `revision-conflict` and changes nothing.
-- Lock order, to be kept by anything that joins these transactions (such as submission in W4-03): the
-  collection row first (`FOR UPDATE`), then the creator's application row (`FOR SHARE`). The creator
-  admission review locks only the application row, so the two cannot deadlock while this order holds.
+- Lock order, to be kept by anything that joins these transactions: the collection row first
+  (`FOR UPDATE`), then the creator's application row (`FOR SHARE`). A decision locks the submission row
+  first, then the reviewer's role assignment and the creator's application row (both `FOR SHARE`). The
+  creator admission review locks only the application row, so none of these can deadlock while the
+  order holds.
 - A referenced image (cover, banner, item image) must be a **processed** asset of the same creator,
   uploaded for the matching purpose. Someone else's asset, an unprocessed one, one made for another
   purpose, and a missing one are all reported as the same `invalid-asset`.
@@ -40,11 +46,36 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
 - The stored limits (name length, supply range, CAIP-2 chain id, positive revision and position) are
   also database CHECK constraints.
 
+## Submissions and review
+
+- **Submitting** freezes the collection as a new `collection_submissions` row in one transaction that
+  holds the collection row: a snapshot of the draft, its items in order, and the SHA-256 content hash
+  of every image, plus a hash of the whole snapshot. It must name the revision the creator last saw
+  (`revision-conflict` otherwise), the creator must still be approved, the chain must still be offered,
+  every image must still be the creator's processed upload for its purpose, and the collection must
+  satisfy `missingSubmissionRequirements` (description, cover image, every planned item present).
+- **Immutability is enforced by the database.** A trigger refuses any update to a submission except its
+  review `state` and `updated_at`, and every delete; review events are append-only. Editing the draft
+  afterwards never changes what was reviewed.
+- **One live submission per collection** (a partial unique index). A new submission is possible only
+  when the previous one ended in `changes-requested`; `rejected` and `revoked` close the collection for
+  good (an approved version's later revision is a later task).
+- **Review states** are in `@ador/shared/collections` (`resolveSubmissionTransition`): submitted,
+  under-review, approved, changes-requested, rejected, suspended, revoked.
+- **Deciding** checks, inside the decision's transaction: the reviewer holds an active reviewer role
+  (shared lock, so a withdrawal waits), the reviewer is **not the creator**, the transition is legal, and
+  for `approve` and `reinstate` the creator is still an approved creator. Rejection, suspension and
+  revocation never need the creator to be approved.
+- Retries are idempotent through the event's unique key (serialised with an advisory lock), and a key
+  replayed with different content or by another actor is a `conflict`.
+- The creator sees decisions and the feedback written for them; private notes, reviewer identity and
+  reason codes stay with staff.
+
 ## What this is not
 
 A draft records the chain it **targets** (a CAIP-2 id, ADR-017). The adapter family and version are
-recorded when a deployment binds a collection to a chain, which this package does not do. Frozen,
-reviewable copies and review states arrive with W4-03.
+recorded when a deployment binds a collection to a chain, which this package does not do. Approval
+does not publish or deploy anything: publication and deployment are separate, later authorizations.
 
 ## Configuration
 

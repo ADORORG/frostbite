@@ -69,6 +69,39 @@ function moduleSpecifiers(
   return specifiers;
 }
 
+// The database package root also exports the migration runner, which reads files relative to its own
+// location and breaks inside a bundled server. Library and feature code imports the narrow subpaths;
+// a type-only import is erased and harmless. Test support and apps are not bundled that way.
+const databaseRoot = "@ador/database";
+const databaseRootExempt = ["packages/test-kit/", "packages/database/"];
+
+function mustAvoidDatabaseRoot(relativePath: string): boolean {
+  const path = relativePath.replaceAll(sep, "/");
+  return (
+    /^(?:packages|features)\/[^/]+\/src\//u.test(path) &&
+    !databaseRootExempt.some((prefix) => path.startsWith(prefix))
+  );
+}
+
+function importsDatabaseRootAtRuntime(
+  contents: string,
+  filename: string,
+): boolean {
+  const source = ts.createSourceFile(
+    filename,
+    contents,
+    ts.ScriptTarget.Latest,
+    true,
+  );
+  return source.statements.some(
+    (statement) =>
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      statement.moduleSpecifier.text === databaseRoot &&
+      statement.importClause?.isTypeOnly !== true,
+  );
+}
+
 function isSharedSource(relativePath: string): boolean {
   return relativePath.startsWith(["packages", "shared", "src", ""].join(sep));
 }
@@ -80,7 +113,15 @@ export async function findBoundaryViolations(
   const violations: string[] = [];
   for (const file of files.filter((path) => /\.[cm]?[jt]sx?$/.test(path))) {
     const path = relative(root, file);
-    const imports = moduleSpecifiers(await readFile(file, "utf8"), file);
+    const contents = await readFile(file, "utf8");
+    if (
+      mustAvoidDatabaseRoot(path) &&
+      importsDatabaseRootAtRuntime(contents, file)
+    )
+      violations.push(
+        `${path} imports the database package root; import a subpath such as @ador/database/connection.`,
+      );
+    const imports = moduleSpecifiers(contents, file);
     for (const imported of imports) {
       if (
         !imported.startsWith(".") &&

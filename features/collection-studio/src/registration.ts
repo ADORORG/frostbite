@@ -6,9 +6,10 @@ import {
   collectionStudioNavigationLabel,
   collectionStudioPath,
   collectionWizardPath,
+  submissionRoutes,
 } from "@ador/shared/collections";
 
-// The routes in registration order of their method and path, so the manifest is stable.
+// The routes, listed in a fixed order so the manifest is stable.
 const routes = [
   collectionRoutes.addItem,
   collectionRoutes.create,
@@ -17,6 +18,8 @@ const routes = [
   collectionRoutes.removeItem,
   collectionRoutes.save,
   collectionRoutes.updateItem,
+  submissionRoutes.list,
+  submissionRoutes.submit,
 ];
 
 // Creator-owned collection drafts: the API, and the studio pages that list them and walk a creator

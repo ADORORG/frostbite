@@ -84,3 +84,11 @@ export {
   type Collection,
   type CollectionItemRow,
 } from "./schema/collections.ts";
+export {
+  collectionReviewEvents,
+  collectionSubmissions,
+  submissionAction,
+  submissionState,
+  type CollectionReviewEventRow,
+  type CollectionSubmissionRow,
+} from "./schema/collection-submissions.ts";

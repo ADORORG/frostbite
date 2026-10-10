@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W4-02` completed)                                            |
-| Next ordered task       | `W4-03` Immutable submission snapshots and review state transitions |
+| Active task             | None (`W4-03` completed)                                            |
+| Next ordered task       | `W4-03b` Creator submit/status UI and staff review page             |
 | Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -87,16 +87,17 @@ stored in `references/task-list.md`.
 
 ## Week 4 — Collection and creator workflow
 
-| ID    | Task                                                                                      | Status    | Evidence or blocker                                 |
-| ----- | ----------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
-| W4-00 | Define chain-neutral contracts, adapter registry, conformance suite, and simulated family | completed | `references/chain-neutral-contracts-task-record.md` |
-| W4-01 | Implement collection/project records, versioned drafts, metadata, supply, and items       | completed | `references/collection-records-task-record.md`      |
-| W4-02 | Build the resumable creator collection wizard                                             | completed | `references/collection-wizard-task-record.md`       |
-| W4-03 | Implement immutable submission snapshots and review state transitions                     | pending   | Depends on W4-01 and staff authorization            |
-| W4-04 | Enforce no self-approval and approval/revocation concurrency invariants                   | pending   | Depends on W4-03                                    |
-| W4-05 | Build approved public collection list and detail pages                                    | pending   | Depends on W4-03                                    |
-| W4-06 | Add creator/staff audit visibility                                                        | pending   | Depends on W4-03                                    |
-| W4-07 | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending   | Depends on W4-01 through W4-06                      |
+| ID     | Task                                                                                      | Status    | Evidence or blocker                                 |
+| ------ | ----------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
+| W4-00  | Define chain-neutral contracts, adapter registry, conformance suite, and simulated family | completed | `references/chain-neutral-contracts-task-record.md` |
+| W4-01  | Implement collection/project records, versioned drafts, metadata, supply, and items       | completed | `references/collection-records-task-record.md`      |
+| W4-02  | Build the resumable creator collection wizard                                             | completed | `references/collection-wizard-task-record.md`       |
+| W4-03  | Implement immutable submission snapshots and review state transitions                     | completed | `references/submission-snapshots-task-record.md`    |
+| W4-03b | Add creator submit and status controls to the wizard and the staff review page            | pending   | Depends on W4-03; split from it                     |
+| W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | pending   | Depends on W4-03                                    |
+| W4-05  | Build approved public collection list and detail pages                                    | pending   | Depends on W4-03                                    |
+| W4-06  | Add creator/staff audit visibility                                                        | pending   | Depends on W4-03                                    |
+| W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending   | Depends on W4-01 through W4-06                      |
 
 ## Week 5 — Launch phases and allowlists
 

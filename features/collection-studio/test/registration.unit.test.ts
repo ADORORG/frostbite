@@ -44,6 +44,8 @@ describe("collection studio registration", () => {
       "DELETE removeCollectionItem",
       "PUT saveCollectionDraft",
       "PUT updateCollectionItem",
+      "POST listCollectionSubmissions",
+      "POST submitCollection",
     ]);
   });
 

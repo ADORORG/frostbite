@@ -17,7 +17,12 @@ import {
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
 import { detailOf, type OperationDependencies } from "./dependencies.ts";
-import { commonFailures, failure, unauthenticated } from "./outcome.ts";
+import {
+  commonFailures,
+  failure,
+  revisionConflict,
+  unauthenticated,
+} from "./outcome.ts";
 import { presentSummary } from "./present.ts";
 
 export function createCreateDraftOperation(
@@ -143,11 +148,7 @@ export function createSaveDraftOperation(dependencies: OperationDependencies) {
             result.aggregate,
           ),
         } as const;
-      if (result.kind === "revision-conflict")
-        return failure(
-          "conflict",
-          "The draft changed since it was loaded. Reload it and try again.",
-        );
+      if (result.kind === "revision-conflict") return revisionConflict;
       if (result.kind === "supply-below-items")
         return failure(
           "invalid_request",

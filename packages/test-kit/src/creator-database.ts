@@ -3,6 +3,7 @@ import {
   assets,
   authUsers,
   creatorApplications,
+  platformRoleAssignments,
   uploadIntents,
   type DatabaseClient,
 } from "@ador/database";
@@ -46,6 +47,22 @@ export async function seedCreatorUser(
       id: createUuidV7(),
       state,
     });
+  return userId;
+}
+
+// A user holding a platform role, who can decide on submissions when the role is `reviewer`.
+export async function seedPlatformUser(
+  database: DatabaseClient,
+  role: "reviewer" | "staff" = "reviewer",
+  status: "active" | "suspended" = "active",
+) {
+  const userId = uuidV7Schema.parse(createUuidV7());
+  await database
+    .insert(authUsers)
+    .values({ email: `${userId}@example.test`, id: userId, name: role });
+  await database
+    .insert(platformRoleAssignments)
+    .values({ id: createUuidV7(), role, status, userId });
   return userId;
 }
 

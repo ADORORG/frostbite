@@ -31,6 +31,9 @@ Shared, test-only helpers. Production code never imports this package.
 - `@ador/test-kit/storage-registry` — `storageRegistry` (a provider registry whose only provider supplies
   `object-storage:s3-compatible`) and `unusedStorage` (a storage port that fails on any call it was not
   given), for feature composition tests.
+- `@ador/test-kit/collection-database` — `seedReadyCollection`, an approved creator's collection that is
+  ready to submit (written directly, so a suite needs no collections package), and `seededChain`.
+  `@ador/test-kit/creator-database` also has `seedPlatformUser` for a reviewer or staff member.
 - `@ador/test-kit/dom` — React Testing Library helpers for jsdom suites (render with cleanup, typed
   fetch stubs, storage reset) shared by every feature's `unit-dom` project.
 - `@ador/test-kit/serve-fetch-handler` — serves a fetch-style handler over HTTP and records each exchange.

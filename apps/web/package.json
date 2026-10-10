@@ -21,6 +21,7 @@
     "@ador/authorization": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
+    "@ador/feature-collection-review": "workspace:*",
     "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",

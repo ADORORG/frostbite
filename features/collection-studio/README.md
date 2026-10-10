@@ -30,6 +30,13 @@ Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, err
 | `updateCollectionItem`  | `PUT /api/v1/collection-drafts/items`    |                                                                                          |
 | `removeCollectionItem`  | `DELETE /api/v1/collection-drafts/items` | Removing what is gone succeeds                                                           |
 
+| `submitCollection` | `POST /api/v1/collection-submissions` | Idempotency key required; names `expectedRevision` |
+| `listCollectionSubmissions` | `POST /api/v1/collection-submissions/list` | The creator's own submissions with decisions |
+
+Submitting freezes the collection (see `@ador/collections`); the wizard does not offer it yet. Refusals:
+not ready (400, naming what is missing), a stale revision, a submission already in review, or one closed
+for good (409), another creator's collection (404), a creator no longer approved (403).
+
 Item operations return the collection's new `revision`, which the next draft save must name.
 
 Persistence and rules are in `@ador/collections`; this feature validates input through

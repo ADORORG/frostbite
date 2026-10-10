@@ -11,6 +11,7 @@ import { createCollectionStudioContextResolver } from "../src/context.ts";
 import {
   createAssetPreviewResolver,
   createCollectionServiceResolver,
+  createSubmissionServiceResolver,
 } from "../src/runtime.ts";
 import { signet } from "./support/stubs.ts";
 
@@ -83,10 +84,15 @@ describe("collection studio runtime", () => {
     const resolveContext = vi.fn(async () => context);
     const getService = createCollectionServiceResolver(resolveContext, chains);
     const getPreviews = createAssetPreviewResolver(resolveContext);
+    const getSubmissions = createSubmissionServiceResolver(
+      resolveContext,
+      chains,
+    );
     expect(resolveContext).not.toHaveBeenCalled();
     expect(await getService()).toBe(await getService());
     expect(await getPreviews()).toBe(await getPreviews());
-    expect(resolveContext).toHaveBeenCalledTimes(2);
+    expect(await getSubmissions()).toBe(await getSubmissions());
+    expect(resolveContext).toHaveBeenCalledTimes(3);
   });
 
   it("does not cache a failed context resolution", async () => {

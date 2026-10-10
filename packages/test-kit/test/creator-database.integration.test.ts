@@ -6,6 +6,7 @@ import {
   createDatabasePool,
   creatorApplications,
   parseDatabaseEnvironment,
+  platformRoleAssignments,
   runMigrations,
   uploadIntents,
 } from "@ador/database";
@@ -15,6 +16,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   seedCreatorUser,
   seedDerivative,
+  seedPlatformUser,
   seedUploadedAsset,
   setCreatorApplicationState,
 } from "../src/creator-database.ts";
@@ -30,6 +32,7 @@ afterAll(async () => {
   await database.delete(assets);
   await database.delete(uploadIntents);
   await database.delete(creatorApplications);
+  await database.delete(platformRoleAssignments);
   await database.delete(authUsers);
   await pool.end();
 });
@@ -48,6 +51,25 @@ describe("creator database fixtures", () => {
     expect(await stateOf(userId)).toEqual(["approved"]);
     await setCreatorApplicationState(database, userId, "suspended");
     expect(await stateOf(userId)).toEqual(["suspended"]);
+  });
+
+  it("seeds a user with an active platform role, or a suspended or different one", async () => {
+    const rolesOf = async (userId: string) =>
+      (
+        await database
+          .select({
+            role: platformRoleAssignments.role,
+            status: platformRoleAssignments.status,
+          })
+          .from(platformRoleAssignments)
+          .where(eq(platformRoleAssignments.userId, userId))
+      ).map(({ role, status }) => `${role}:${status}`);
+    expect(await rolesOf(await seedPlatformUser(database))).toEqual([
+      "reviewer:active",
+    ]);
+    expect(
+      await rolesOf(await seedPlatformUser(database, "staff", "suspended")),
+    ).toEqual(["staff:suspended"]);
   });
 
   it("seeds a user who never applied, or one in any other state", async () => {

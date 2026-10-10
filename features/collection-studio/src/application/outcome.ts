@@ -1,21 +1,12 @@
-import type { ApplicationHttpErrorCode } from "@ador/shared/http";
+import { failure } from "@ador/http/outcome";
 
-export interface Failure {
-  readonly error: ApplicationHttpErrorCode;
-  readonly message: string;
-  readonly ok: false;
-}
+// Re-exported so the operations in this feature import their outcomes from one place.
+export { failure, unauthenticated } from "@ador/http/outcome";
 
-export function failure(
-  error: ApplicationHttpErrorCode,
-  message: string,
-): Failure {
-  return { error, message, ok: false };
-}
-
-export const unauthenticated = failure(
-  "unauthorized",
-  "Authentication is required.",
+// A save or submission based on an older view of the draft than the one stored.
+export const revisionConflict = failure(
+  "conflict",
+  "The draft changed since it was loaded. Reload it and try again.",
 );
 
 // The outcomes every mutation can report; each maps to one stable HTTP error.

@@ -30,7 +30,7 @@ async function errorCode(response: Response) {
 
 const noSegments: readonly string[] = [];
 
-describe("collection draft API", () => {
+describe("collection draft, submission, and review API", () => {
   it.each([
     ["GET", noSegments, "collection-drafts"],
     ["POST", ["read"], "collection-drafts"],
@@ -39,6 +39,11 @@ describe("collection draft API", () => {
     ["POST", ["items"], "collection-drafts"],
     ["PUT", ["items"], "collection-drafts"],
     ["DELETE", ["items"], "collection-drafts"],
+    ["POST", [], "collection-submissions"],
+    ["POST", ["list"], "collection-submissions"],
+    ["POST", ["decide"], "collection-reviews"],
+    ["POST", ["queue"], "collection-reviews"],
+    ["POST", ["read"], "collection-reviews"],
   ] as const)("requires a session for %s %j", async (method, rest, base) => {
     const segments = [base, ...rest];
     const response = await handlers[method](
@@ -82,10 +87,15 @@ describe("collection draft API", () => {
       expect.arrayContaining([
         "addCollectionItem",
         "createCollectionDraft",
+        "decideCollectionReview",
         "listCollectionDrafts",
+        "listCollectionReviewQueue",
+        "listCollectionSubmissions",
         "readCollectionDraft",
+        "readCollectionReviewSubmission",
         "removeCollectionItem",
         "saveCollectionDraft",
+        "submitCollection",
         "updateCollectionItem",
       ]),
     );

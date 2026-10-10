@@ -1,6 +1,8 @@
 import {
   createCollectionService,
   createDrizzleCollectionRepository,
+  createDrizzleSubmissionRepository,
+  createSubmissionService,
 } from "@ador/collections";
 import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
 import type { ChainOption } from "@ador/shared/chain";
@@ -26,6 +28,21 @@ export function createCollectionServiceResolver(
       createId: createUuidV7,
       listLimit: draftListLimit,
       repository: createDrizzleCollectionRepository(database),
+      targetChains,
+    });
+  });
+}
+
+export function createSubmissionServiceResolver(
+  resolveContext: () => Promise<CollectionStudioContext>,
+  targetChains: readonly ChainOption[],
+) {
+  return memoizeUntilFailure(async () => {
+    const { database } = await resolveContext();
+    return createSubmissionService({
+      clock: () => new Date(),
+      createId: createUuidV7,
+      repository: createDrizzleSubmissionRepository(database),
       targetChains,
     });
   });

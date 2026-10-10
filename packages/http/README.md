@@ -7,6 +7,9 @@ application handler. Delivery adapters supply untrusted input, selected normaliz
 correlation-ID generator. The executor validates every boundary and emits the shared safe error
 envelope without importing Next.js or Fastify.
 
+`@ador/http/outcome` exports `failure` and `unauthenticated`, the one way an operation reports a
+refusal, so features do not restate the result shape.
+
 The `@ador/http/openapi` export derives an OpenAPI 3.1 document from those same operation schemas
 and declarations. This keeps request, response, header, and application-error documentation tied to
 the executable contract. The generated document contains no deployment domain or server URL.

@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./chain-conformance": "./src/chain-conformance.ts",
+    "./collection-database": "./src/collection-database.ts",
     "./creator-database": "./src/creator-database.ts",
     "./docker": "./src/docker.ts",
     "./dom": "./src/dom.tsx",

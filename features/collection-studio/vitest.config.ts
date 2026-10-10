@@ -7,6 +7,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Integration files share one database and each applies the migrations first.
+    fileParallelism: false,
     coverage: {
       exclude: ["test/**", "vitest.config.ts"],
       include: ["src/**/*.{ts,tsx}"],
