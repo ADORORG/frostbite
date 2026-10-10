@@ -813,6 +813,9 @@ importers:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.0)(valibot@1.4.2(typescript@5.9.3))(zod@4.5.4)
     devDependencies:
+      '@ador/test-kit':
+        specifier: workspace:*
+        version: link:../test-kit
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config

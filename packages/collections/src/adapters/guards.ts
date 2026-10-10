@@ -35,6 +35,19 @@ export async function isApprovedCreator(
   return application?.state === "approved";
 }
 
+// The same question without a lock, for display: the answer can be stale by the time it is used.
+export async function isApprovedCreatorNow(
+  reader: Pick<DatabaseClient, "select">,
+  userId: string,
+): Promise<boolean> {
+  const [application] = await reader
+    .select({ state: creatorApplications.state })
+    .from(creatorApplications)
+    .where(eq(creatorApplications.applicantUserId, userId))
+    .limit(1);
+  return application?.state === "approved";
+}
+
 export function draftAssetReferences(
   draft: Pick<CollectionDraft, "bannerAssetId" | "coverAssetId">,
 ): AssetReference[] {

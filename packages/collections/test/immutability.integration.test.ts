@@ -2,7 +2,11 @@ import { collectionReviewEvents, collectionSubmissions } from "@ador/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import { database, useCollectionDatabase } from "./support/database.ts";
+import {
+  database,
+  seedReviewer,
+  useCollectionDatabase,
+} from "./support/database.ts";
 import { newId } from "./support/fixtures.ts";
 import { reviewerDecides, rowOf, submitted } from "./support/submissions.ts";
 
@@ -137,6 +141,7 @@ describe("the database also holds the structural rules", () => {
       database.insert(collectionReviewEvents).values({
         ...event,
         action: "approve",
+        actorUserId: await seedReviewer(),
         id: newId(),
         idempotencyKey: "another-request-key-001",
         previousState: null,
@@ -149,10 +154,12 @@ describe("the database also holds the structural rules", () => {
     const { submission } = await submitted();
     const [event] = await database.select().from(collectionReviewEvents);
     if (event === undefined) throw new Error("no event");
+    const reviewer = await seedReviewer();
     const next = (policyVersion: string) =>
       database.insert(collectionReviewEvents).values({
         ...event,
         action: "start-review",
+        actorUserId: reviewer,
         id: newId(),
         idempotencyKey: `another-request-key-${policyVersion.length}`,
         policyVersion,

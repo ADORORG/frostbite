@@ -1,4 +1,5 @@
 import { collectionSubmissions } from "@ador/database";
+import { expectToWait, holdTransaction } from "@ador/test-kit/race";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
@@ -21,57 +22,14 @@ import {
 
 useCollectionDatabase();
 
-const pause = (milliseconds: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
-
-// Holds a transaction open until `release` is called, and resolves once `acquire` has taken its lock.
-async function holding<Acquired>(
-  acquire: (
-    transaction: Parameters<Parameters<typeof database.transaction>[0]>[0],
-  ) => Promise<Acquired>,
-) {
-  let release: () => void = () => undefined;
-  const held = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  let taken: () => void = () => undefined;
-  const lockTaken = new Promise<void>((resolve) => {
-    taken = resolve;
-  });
-  const finished = database.transaction(async (transaction) => {
-    await acquire(transaction);
-    taken();
-    await held;
-  });
-  await lockTaken;
-  return { finished, release };
-}
-
-// An operation must wait for the lock holder rather than run past it.
-async function waitsFor<Result>(
-  holder: { finished: Promise<void>; release: () => void },
-  attempt: () => Promise<Result>,
-): Promise<Result> {
-  let settled = false;
-  const outcome = attempt().then((result) => {
-    settled = true;
-    return result;
-  });
-  await pause(300);
-  expect(settled).toBe(false);
-  holder.release();
-  await holder.finished;
-  return outcome;
-}
-
 describe("requests that share an idempotency key", () => {
   it("make a submission wait while another request holds the key, then replay or refuse it", async () => {
     const ready = await readyCollection();
     const context = submitContext(ready.ownerUserId);
-    const holder = await holding((transaction) =>
+    const holder = await holdTransaction(database, (transaction) =>
       lockIdempotencyKey(transaction, context.idempotencyKey),
     );
-    const result = await waitsFor(holder, () => submit(ready, context));
+    const result = await expectToWait(holder, () => submit(ready, context));
     expect(result.kind).toBe("submitted");
   });
 
@@ -79,10 +37,10 @@ describe("requests that share an idempotency key", () => {
     const seeded = await submitted();
     const reviewer = await seedReviewer();
     const context = submitContext(reviewer);
-    const holder = await holding((transaction) =>
+    const holder = await holdTransaction(database, (transaction) =>
       lockIdempotencyKey(transaction, context.idempotencyKey),
     );
-    const result = await waitsFor(holder, () =>
+    const result = await expectToWait(holder, () =>
       decide(seeded.submission.id, reviewer, "start-review", context),
     );
     expect(result.kind).toBe("decided");
@@ -106,14 +64,14 @@ describe("requests that share an idempotency key", () => {
 describe("a decision on one submission", () => {
   it("waits while the submission is locked by another change", async () => {
     const seeded = await submitted();
-    const holder = await holding((transaction) =>
+    const holder = await holdTransaction(database, (transaction) =>
       transaction
         .select()
         .from(collectionSubmissions)
         .where(eq(collectionSubmissions.id, seeded.submission.id))
         .for("update"),
     );
-    const result = await waitsFor(holder, () =>
+    const result = await expectToWait(holder, () =>
       reviewerDecides(seeded.submission.id, "start-review"),
     );
     expect(result.kind).toBe("decided");
@@ -123,13 +81,13 @@ describe("a decision on one submission", () => {
     const seeded = await submitted();
     await reviewerDecides(seeded.submission.id, "start-review");
     // Another decision approves the submission and has not committed yet.
-    const holder = await holding((transaction) =>
+    const holder = await holdTransaction(database, (transaction) =>
       transaction
         .update(collectionSubmissions)
         .set({ state: "approved" })
         .where(eq(collectionSubmissions.id, seeded.submission.id)),
     );
-    const result = await waitsFor(holder, () =>
+    const result = await expectToWait(holder, () =>
       reviewerDecides(seeded.submission.id, "reject", {
         creatorFeedback: "Not suitable.",
       }),

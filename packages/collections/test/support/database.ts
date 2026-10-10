@@ -27,6 +27,7 @@ import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { now } from "./fixtures.ts";
 import { createDrizzleCollectionRepository } from "../../src/adapters/drizzle-repository.ts";
+import { createDrizzleApprovedVersionReader } from "../../src/adapters/approved-version.ts";
 import { createDrizzleSubmissionRepository } from "../../src/adapters/drizzle-submissions.ts";
 
 const environment = parseDatabaseEnvironment(process.env);
@@ -77,3 +78,5 @@ export const seedAsset = (
   purpose: UploadPurpose,
   state?: SeededAssetState,
 ) => seedUploadedAsset(database, { now, purpose, state, userId });
+
+export const approvedVersions = createDrizzleApprovedVersionReader(database);

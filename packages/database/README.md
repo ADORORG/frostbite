@@ -20,7 +20,8 @@ Server-only, provider-neutral PostgreSQL infrastructure for the platform.
   (`collection_review_events`): a frozen snapshot with its hash, one review state, at most one live
   submission per collection, and an append-only event record. Hand-written triggers in the migration
   make a submission immutable (only its state and update time may change, nothing is deleted) and
-  events append-only; drizzle-kit does not model triggers, so they live in the SQL migration.
+  events append-only, and a second trigger refuses a decision event by the creator or a submit event by anyone
+  else; drizzle-kit does not model triggers, so they live in the SQL migrations.
 - Transactional outbox insertion, lease-based claiming, acknowledgement, retry, and exhausted
   failure transitions.
 

@@ -6,3 +6,5 @@ export * from "./application/review-service.ts";
 export * from "./application/submission-context.ts";
 export * from "./application/submission-service.ts";
 export * from "./adapters/drizzle-submissions.ts";
+export * from "./adapters/approved-version.ts";
+export * from "./application/approved-version.ts";

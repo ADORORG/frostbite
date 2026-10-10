@@ -1,4 +1,5 @@
 import { creatorApplications } from "@ador/database";
+import { expectToWait, holdTransaction } from "@ador/test-kit/race";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
@@ -15,31 +16,14 @@ import { seeded } from "./support/items.ts";
 
 useCollectionDatabase();
 
-const pause = (milliseconds: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
-
-// Suspends the creator in a transaction that stays open until `commit` is called, and resolves once
-// the suspension (and its row lock) is in place.
-async function holdSuspension(userId: string) {
-  let commit: () => void = () => undefined;
-  const held = new Promise<void>((resolve) => {
-    commit = resolve;
-  });
-  let locked: () => void = () => undefined;
-  const lockTaken = new Promise<void>((resolve) => {
-    locked = resolve;
-  });
-  const finished = database.transaction(async (transaction) => {
-    await transaction
+// Suspends the creator in a transaction that stays open until released.
+const holdSuspension = (userId: string) =>
+  holdTransaction(database, (transaction) =>
+    transaction
       .update(creatorApplications)
       .set({ state: "suspended" })
-      .where(eq(creatorApplications.applicantUserId, userId));
-    locked();
-    await held;
-  });
-  await lockTaken;
-  return { commit, finished };
-}
+      .where(eq(creatorApplications.applicantUserId, userId)),
+  );
 
 type Seed = Awaited<ReturnType<typeof seeded>>;
 
@@ -50,16 +34,7 @@ describe("a suspension racing a change", () => {
     attempt: () => Promise<{ readonly kind: string }>,
   ) {
     const suspension = await holdSuspension(seed.ownerUserId);
-    let settled = false;
-    const outcome = attempt().then((result) => {
-      settled = true;
-      return result;
-    });
-    await pause(300);
-    expect(settled).toBe(false);
-    suspension.commit();
-    await suspension.finished;
-    return outcome;
+    return expectToWait(suspension, attempt);
   }
 
   it("makes a draft save wait, then refuses it", async () => {
@@ -111,31 +86,12 @@ describe("creation by idempotency key", () => {
   it("waits while another request holds the creator's key, then replays", async () => {
     const owner = await seedUser();
     const context = mutation(owner);
-    let release: () => void = () => undefined;
-    const held = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    let taken: () => void = () => undefined;
-    const lockTaken = new Promise<void>((resolve) => {
-      taken = resolve;
-    });
-    const holder = database.transaction(async (transaction) => {
-      await lockCreation(transaction, owner, context.idempotencyKey);
-      taken();
-      await held;
-    });
-    await lockTaken;
-    let settled = false;
-    const attempt = repository
-      .create({ ...context, collectionId: newId(), draft: draft() })
-      .then((result) => {
-        settled = true;
-        return result;
-      });
-    await pause(300);
-    expect(settled).toBe(false);
-    release();
-    await holder;
-    expect((await attempt).kind).toBe("created");
+    const holder = await holdTransaction(database, (transaction) =>
+      lockCreation(transaction, owner, context.idempotencyKey),
+    );
+    const result = await expectToWait(holder, () =>
+      repository.create({ ...context, collectionId: newId(), draft: draft() }),
+    );
+    expect(result.kind).toBe("created");
   });
 });

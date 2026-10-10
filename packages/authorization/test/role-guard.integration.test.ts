@@ -7,6 +7,7 @@ import {
   runMigrations,
 } from "@ador/database";
 import { createUuidV7 } from "@ador/shared/identifiers";
+import { expectToWait, holdTransaction } from "@ador/test-kit/race";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -60,35 +61,17 @@ describe("platform role guard", () => {
 
   it("makes a role withdrawal wait for the decision it authorizes", async () => {
     const reviewer = await userWith("reviewer");
-    let release: () => void = () => undefined;
-    const held = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    let granted: () => void = () => undefined;
-    const checked = new Promise<void>((resolve) => {
-      granted = resolve;
-    });
-    const decision = database.transaction(async (transaction) => {
+    const holder = await holdTransaction(database, async (transaction) => {
       expect(
         await holdsActivePlatformRole(transaction, reviewer, ["reviewer"]),
       ).toBe(true);
-      granted();
-      await held;
     });
-    await checked;
-    let withdrawn = false;
-    const withdrawal = database
-      .update(platformRoleAssignments)
-      .set({ status: "suspended" })
-      .where(eq(platformRoleAssignments.userId, reviewer))
-      .then(() => {
-        withdrawn = true;
-      });
-    await new Promise<void>((resolve) => setTimeout(resolve, 300));
-    expect(withdrawn).toBe(false);
-    release();
-    await decision;
-    await withdrawal;
+    await expectToWait(holder, () =>
+      database
+        .update(platformRoleAssignments)
+        .set({ status: "suspended" })
+        .where(eq(platformRoleAssignments.userId, reviewer)),
+    );
     expect(await check(reviewer, ["reviewer"])).toBe(false);
   });
 });

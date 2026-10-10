@@ -71,6 +71,28 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
 - The creator sees decisions and the feedback written for them; private notes, reviewer identity and
   reason codes stay with staff.
 
+## The approved version, and what must hold when acting on it
+
+- An **approved version** is a submission in the `approved` state **and** whose creator is still an
+  approved creator. Either half failing means there is none, whatever the submission row says.
+- `ApprovedVersionReader.findApprovedVersion` reads it without a lock, for display (public pages): the
+  answer can be stale by the time it is used.
+- `lockApprovedVersion(transaction, collectionId)` is for anything that **acts** on approval
+  (publication, deployment). Call it inside the transaction that records the action. It takes shared
+  locks on the approved submission and then on the creator's application, the order a decision uses, so
+  a revocation, a suspension, or a withdrawal in flight waits until the caller commits, and one that
+  already committed is seen (it returns null and the caller must not act).
+- A decision (`approve`, `reinstate`) takes the same locks from the other side, so approval versus
+  revocation is ordered by the database, never by luck. Lock order for the review path: the idempotency
+  key, the submission row (`FOR UPDATE`), the reviewer's role assignment (`FOR SHARE`), the creator's
+  application (`FOR SHARE`). A concurrency test runs mixed approvals, rejections, suspensions and
+  revocations and requires no deadlock and a record consistent with the state.
+- **Nobody reviews their own collection**: the repository refuses it, and a trigger on the review record
+  independently refuses a decision event by the creator and a submit event by anyone else, so no path
+  (a later role grant, a bug, a stray query) can record it.
+- A rejection, suspension or revocation does not need the creator to be approved, so a suspended creator
+  cannot hold a pending submission hostage.
+
 ## What this is not
 
 A draft records the chain it **targets** (a CAIP-2 id, ADR-017). The adapter family and version are
