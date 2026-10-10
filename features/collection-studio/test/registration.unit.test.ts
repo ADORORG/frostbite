@@ -22,7 +22,12 @@ describe("collection studio registration", () => {
       targetChains,
     );
     expect(feature.manifest).toMatchObject({
-      capabilities: ["api-routes"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "studio-page",
+      ],
       dependencies: ["accounts", "creator-admission", "uploads"],
       id: "collection-studio",
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
@@ -39,6 +44,27 @@ describe("collection studio registration", () => {
       "DELETE removeCollectionItem",
       "PUT saveCollectionDraft",
       "PUT updateCollectionItem",
+    ]);
+  });
+
+  it("declares the list and wizard pages for signed-in users, and one navigation entry", () => {
+    const { manifest } = createCollectionStudioFeature(
+      createProviderRegistry([]),
+      targetChains,
+    );
+    expect(manifest.pages).toEqual([
+      { access: { kind: "authenticated" }, path: "/studio/collections" },
+      {
+        access: { kind: "authenticated" },
+        path: "/studio/collections/[collectionId]",
+      },
+    ]);
+    expect(manifest.navigation).toEqual([
+      {
+        access: { kind: "authenticated" },
+        href: "/studio/collections",
+        label: "My collections",
+      },
     ]);
   });
 
@@ -59,5 +85,8 @@ describe("collection studio registration", () => {
     );
     expect(loaded.sort()).toEqual([...declared].sort());
     expect(entrypoint).toMatchObject({ id: "collection-studio" });
+    expect((entrypoint.pages ?? []).map(({ path }) => path)).toEqual(
+      feature.manifest.pages.map(({ path }) => path),
+    );
   });
 });

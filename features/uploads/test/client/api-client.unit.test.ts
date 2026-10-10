@@ -5,10 +5,10 @@ import {
   type FetchLike,
 } from "../../src/client/api-client.ts";
 import {
-  UploadApiError,
+  ApiError,
   isRetryableApiError,
-  type UploadApiErrorCode,
-} from "../../src/client/api-error.ts";
+  type ApiErrorCode,
+} from "@ador/client-http";
 import { assetId, intentId } from "../support/library-fixtures.ts";
 
 const json = (body: object, status = 200) =>
@@ -98,7 +98,7 @@ describe("uploads API client", () => {
     const { api } = apiWith(async () => envelope(code, status));
     await expect(api.listAssets()).rejects.toMatchObject({
       code,
-      name: "UploadApiError",
+      name: "ApiError",
       status,
     });
   });
@@ -152,14 +152,14 @@ describe("uploads API client", () => {
   });
 
   it("flags only transport and server faults as retryable", () => {
-    const retryable = (code: UploadApiErrorCode) =>
-      isRetryableApiError(new UploadApiError(code, null, "x"));
-    const transient: UploadApiErrorCode[] = [
+    const retryable = (code: ApiErrorCode) =>
+      isRetryableApiError(new ApiError(code, null, "x"));
+    const transient: ApiErrorCode[] = [
       "network",
       "internal_error",
       "invalid-response",
     ];
-    const permanent: UploadApiErrorCode[] = [
+    const permanent: ApiErrorCode[] = [
       "conflict",
       "unauthorized",
       "invalid_request",

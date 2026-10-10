@@ -7,7 +7,8 @@
     ".": "./src/registration.ts",
     "./cleanup": "./src/cleanup.ts",
     "./entrypoint": "./src/entrypoint.tsx",
-    "./pipeline": "./src/pipeline.ts"
+    "./pipeline": "./src/pipeline.ts",
+    "./presentation": "./src/client/asset-presentation.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -19,6 +20,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",

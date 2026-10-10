@@ -1,9 +1,24 @@
 # Collection studio feature
 
-Contributes the authenticated API for a creator's collection drafts: create, list, read, save, and
-add, update, or remove items. It adds no page yet (the creator wizard is W4-02). Registration receives
+Contributes the authenticated API for a creator's collection drafts (create, list, read, save, and
+add, update, or remove items) and the resumable creator wizard that uses it. Registration receives
 the platform provider registry and the enabled chains explicitly, so removing its one line detaches the
-routes and their storage use.
+routes, pages, navigation entry, and their storage use.
+
+## Pages (W4-02)
+
+| Page                      | Path                      | Notes                                                                        |
+| ------------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| Collections list (studio) | `/studio/collections`     | Drafts, newest first, plus a start form. Navigation label "My collections"   |
+| Collection wizard         | `/studio/collections/:id` | Details, supply and chain, images, items, review; step lives in the URL hash |
+
+All wizard state is server-side, so a creator resumes on the first unfinished step from any device.
+Unsaved edits overlay the saved draft; a stale revision shows a conflict notice with a reload. Images
+are chosen from the creator's processed library (upload on the uploads page). Review states plainly
+that submission is not available yet (W4-03); nothing is published or sent to a chain.
+
+Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, error copy, progress),
+`src/ui/hooks`, `src/ui/components`, and the surface files that compose them.
 
 | Operation               | Route                                    | Notes                                                                                    |
 | ----------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------- |

@@ -104,6 +104,26 @@
   outline: 0.1875rem solid var(--arcade-cyan);
   outline-offset: 0.1875rem;
 }
+.arcade-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.arcade-choice {
+  display: grid;
+  gap: var(--arcade-space-small);
+  margin: 0;
+  padding: var(--arcade-space-medium);
+  border: 0.125rem solid var(--arcade-text-muted);
+  border-radius: var(--arcade-radius-small);
+}
+.arcade-choice legend {
+  padding: 0 var(--arcade-space-small);
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+}
 .arcade-form button:disabled {
   cursor: wait;
   opacity: 0.6;

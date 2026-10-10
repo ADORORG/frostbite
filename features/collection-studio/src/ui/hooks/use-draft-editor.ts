@@ -1,0 +1,102 @@
+import { useCallback, useState } from "react";
+import type {
+  CollectionDetail,
+  CollectionDraft,
+  CollectionItem,
+} from "@ador/shared/collections";
+import type { IdempotencyKey } from "@ador/shared/http";
+
+import type { CollectionsClientServices } from "../../client/services.ts";
+import { describeFailure, type Failure } from "../../client/error-copy.ts";
+import { useResource, type Resource } from "./use-resource.ts";
+
+export interface DraftEditor {
+  readonly addItem: (
+    item: CollectionItem,
+    key: IdempotencyKey,
+  ) => Promise<boolean>;
+  readonly busy: boolean;
+  readonly dismissNotice: () => void;
+  // The last failed action, until it is dismissed or the next action starts.
+  readonly notice: Failure | null;
+  readonly reload: () => void;
+  readonly removeItem: (itemId: string) => Promise<boolean>;
+  readonly save: (
+    draft: CollectionDraft,
+    expectedRevision: number,
+  ) => Promise<boolean>;
+  readonly state: Resource<CollectionDetail>;
+  readonly updateItem: (
+    itemId: string,
+    item: CollectionItem,
+  ) => Promise<boolean>;
+}
+
+// The draft being edited and every change the wizard can make to it. A save names the revision the
+// page last saw; an item change returns the new revision, and the draft is read again so the page
+// always shows what the server holds (items, order, and signed previews).
+export function useDraftEditor(
+  services: CollectionsClientServices,
+  collectionId: string,
+): DraftEditor {
+  const { reload, replace, state } = useResource(
+    (signal) => services.api.read(collectionId, { signal }),
+    collectionId,
+  );
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<Failure | null>(null);
+
+  const act = useCallback(
+    async (work: () => Promise<void>): Promise<boolean> => {
+      setBusy(true);
+      setNotice(null);
+      try {
+        await work();
+        return true;
+      } catch (error) {
+        setNotice(describeFailure(error));
+        return false;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [],
+  );
+
+  const refresh = useCallback(
+    async () => replace(await services.api.read(collectionId)),
+    [collectionId, replace, services],
+  );
+
+  return {
+    addItem: (item, key) =>
+      act(async () => {
+        await services.api.addItem(
+          { collectionId, item },
+          { idempotencyKey: key },
+        );
+        await refresh();
+      }),
+    busy,
+    dismissNotice: () => setNotice(null),
+    notice,
+    reload,
+    removeItem: (itemId) =>
+      act(async () => {
+        await services.api.removeItem({ collectionId, itemId });
+        await refresh();
+      }),
+    save: (draft, expectedRevision) =>
+      act(async () => {
+        replace(
+          await services.api.save({ collectionId, draft, expectedRevision }),
+        );
+      }),
+    state,
+    updateItem: (itemId, item) =>
+      act(async () => {
+        await services.api.updateItem({ collectionId, item, itemId });
+        await refresh();
+      }),
+  };
+}

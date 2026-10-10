@@ -1,10 +1,8 @@
 import { idempotencyKeySchema, type IdempotencyKey } from "@ador/shared/http";
 
-import {
-  createUploadsApi,
-  type FetchLike,
-  type UploadsApi,
-} from "./api-client.ts";
+import { sameOriginFetch } from "@ador/client-http";
+
+import { createUploadsApi, type UploadsApi } from "./api-client.ts";
 import {
   resolveUploadClientPolicy,
   type UploadClientPolicy,
@@ -41,9 +39,6 @@ export function abortableSleep(
     signal.addEventListener("abort", onAbort, { once: true });
   });
 }
-
-const sameOriginFetch: FetchLike = (input, init) =>
-  fetch(input, { ...init, credentials: "same-origin" });
 
 export function createBrowserServices(
   overrides: Partial<UploadsClientServices> = {},

@@ -13,3 +13,4 @@ export { ArcadeProgress } from "./primitives/arcade-progress.tsx";
 export { ArcadeFileDrop } from "./components/arcade-file-drop.tsx";
 export { ArcadeMediaTile } from "./primitives/arcade-media-tile.tsx";
 export { ArcadeSelect } from "./primitives/arcade-select.tsx";
+export { ArcadeTextField } from "./primitives/arcade-text-field.tsx";

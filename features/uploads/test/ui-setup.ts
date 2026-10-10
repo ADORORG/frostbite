@@ -1,7 +1,5 @@
-import { afterEach } from "vitest";
+import { installReactTestEnvironment } from "@ador/test-kit/dom";
 
-import { unmountAll } from "./support/dom.tsx";
-
-// React needs to know it runs under a test harness so `act` batches updates.
-Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
-afterEach(unmountAll);
+// React needs to know it runs under a test harness so `act` batches updates; trees are unmounted
+// after each test.
+installReactTestEnvironment();

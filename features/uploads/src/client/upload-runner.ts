@@ -2,7 +2,7 @@ import type { IdempotencyKey } from "@ador/shared/http";
 import type { LibraryAsset } from "@ador/shared/uploads";
 
 import { waitForAsset } from "./asset-poller.ts";
-import { isRetryableApiError, UploadApiError } from "./api-error.ts";
+import { isRetryableApiError, ApiError } from "@ador/client-http";
 import type { UploadsApi } from "./api-client.ts";
 import type { UploadClientPolicy } from "./client-policy.ts";
 import type { CheckedFile } from "./file-checks.ts";
@@ -112,7 +112,7 @@ export function createUploadRunner(dependencies: UploadRunnerDependencies) {
           retryable: true,
           type: "failed",
         });
-      if (error instanceof UploadApiError)
+      if (error instanceof ApiError)
         return emit({
           cause: { code: error.code, kind: "api" },
           retryable: isRetryableApiError(error),

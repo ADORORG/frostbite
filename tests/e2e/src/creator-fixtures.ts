@@ -96,6 +96,23 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-access-owner-session-token",
     userId: "01994b10-0000-7000-8000-000000000028",
   },
+  // The collection wizard (W4-02): one creator who builds a draft in the browser, one who only reads
+  // an empty list, and one whose draft is the subject of the visual and accessibility checks.
+  collectionWizardCreator: {
+    sessionId: "01994b10-0000-7000-8000-00000000002b",
+    sessionToken: "e2e-collection-wizard-creator-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002a",
+  },
+  collectionQualityList: {
+    sessionId: "01994b10-0000-7000-8000-00000000002d",
+    sessionToken: "e2e-collection-quality-list-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002c",
+  },
+  collectionQualityWizard: {
+    sessionId: "01994b10-0000-7000-8000-00000000002f",
+    sessionToken: "e2e-collection-quality-wizard-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002e",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
@@ -108,4 +125,6 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionCreator,
   creatorE2EFixtures.collectionOtherCreator,
   creatorE2EFixtures.collectionAccessOwner,
+  creatorE2EFixtures.collectionWizardCreator,
+  creatorE2EFixtures.collectionQualityWizard,
 ] as const;

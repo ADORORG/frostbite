@@ -16,7 +16,7 @@ export default defineConfig({
   test: {
     coverage,
     projects: [
-      { test: { name: "unit", include: ["test/**/*.unit.test.ts"] } },
+      { test: { name: "unit", include: ["test/**/*.unit.test.{ts,tsx}"] } },
       {
         test: {
           name: "integration",

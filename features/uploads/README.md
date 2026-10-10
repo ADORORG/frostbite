@@ -11,6 +11,12 @@ state; it does not claim validation or publication.
 Configuration uses the shared typed upload policy. Run `env:check`, `typecheck`, `test:unit`,
 `test:integration`, or `test:coverage`. Platform engineering owns this feature.
 
+## Presentation helpers
+
+`@ador/feature-uploads/presentation` exports the pure helpers that explain a `LibraryAsset` to a person
+(`assetBadge`, `assetNote`, `pickRendition`, `describeDimensions`), so other studio pages that show the
+creator's images describe them in the same words.
+
 ## Asset pipeline composition
 
 `@ador/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and
@@ -40,7 +46,7 @@ bearer-URL trade-offs and the plan to migrate to a streaming route.
 
 The page is organized so each layer can be replaced or tested alone:
 
-- `src/client/` is framework-free: `api-client` (validated HTTP), `file-checks`, `transfer` (an
+- `src/client/` is framework-free: `api-client` (typed routes on the shared `@ador/client-http` requester), `file-checks`, `transfer` (an
   `ObjectTransfer` port with an XHR implementation for progress), `upload-state` (a pure reducer),
   `upload-runner` (resumable orchestration), `asset-poller`, `library-refresh`, copy modules
   (`rejection-copy`, `upload-messages`, `asset-presentation`, `purpose-labels`), `client-policy`, and

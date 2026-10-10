@@ -12,7 +12,7 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
   outcomes, observations, and the neutral transaction state machine. No family concept appears here.
 - `@ador/shared/collections` — collection draft and item schemas, the engineering limits, the asset
   purposes a draft may reference, and the HTTP contract (inputs, responses, routes) of the collection
-  studio API.
+  studio API, plus the studio page paths and the wizard link helper.
 - `@ador/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
   manifest schema.
 - `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.

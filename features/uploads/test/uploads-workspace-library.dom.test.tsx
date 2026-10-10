@@ -1,7 +1,7 @@
 import { act } from "react";
 import { describe, expect, it } from "vitest";
 
-import { UploadApiError } from "../src/client/api-error.ts";
+import { ApiError } from "@ador/client-http";
 import { resolveUploadClientPolicy } from "../src/client/client-policy.ts";
 import { UploadsWorkspace } from "../src/ui/uploads-workspace.tsx";
 import {
@@ -80,7 +80,7 @@ describe("uploads workspace library", () => {
     const services = fakeServices({
       api: {
         listAssets: async () => {
-          if (failing) throw new UploadApiError("network", null, "offline");
+          if (failing) throw new ApiError("network", null, "offline");
           return { assets: [processedAsset()], truncated: false };
         },
       },
@@ -102,7 +102,7 @@ describe("uploads workspace library", () => {
     const services = fakeServices({
       api: {
         listAssets: async () => {
-          if (failing) throw new UploadApiError("network", null, "offline");
+          if (failing) throw new ApiError("network", null, "offline");
           return { assets: [], truncated: false };
         },
       },

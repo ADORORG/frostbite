@@ -19,7 +19,7 @@ import {
   unusedStorage,
 } from "@ador/test-kit/storage-registry";
 
-import { createCollectionStudioEntrypoint } from "../../src/entrypoint.ts";
+import { createCollectionStudioEntrypoint } from "../../src/entrypoint.tsx";
 import { signet } from "./stubs.ts";
 
 // The registered operations over the real database and the real uploads library, with only object

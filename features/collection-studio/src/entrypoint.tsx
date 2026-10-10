@@ -2,6 +2,10 @@ import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { ChainOption } from "@ador/shared/chain";
+import {
+  collectionStudioPath,
+  collectionWizardPath,
+} from "@ador/shared/collections";
 
 import {
   createCreateDraftOperation,
@@ -19,11 +23,14 @@ import {
   createAssetPreviewResolver,
   createCollectionServiceResolver,
 } from "./runtime.ts";
+import { CollectionsSurface } from "./ui/collections-surface.tsx";
+import { WizardSurface } from "./ui/wizard-surface.tsx";
 
 export function createCollectionStudioEntrypoint(
   providers: ProviderRegistry,
   targetChains: readonly ChainOption[],
 ): FeatureEntrypoint {
+  const enabledChains = targetChains.filter(({ enabled }) => enabled);
   const context = createCollectionStudioContextResolver(providers);
   const getService = createCollectionServiceResolver(context, targetChains);
   const dependencies = {
@@ -31,7 +38,12 @@ export function createCollectionStudioEntrypoint(
     getService,
   };
   return {
-    capabilities: ["api-routes"],
+    capabilities: [
+      "api-routes",
+      "authenticated-page",
+      "navigation",
+      "studio-page",
+    ],
     id: "collection-studio",
     operations: [
       registerHttpOperation(createAddItemOperation(getService)),
@@ -41,6 +53,29 @@ export function createCollectionStudioEntrypoint(
       registerHttpOperation(createRemoveItemOperation(getService)),
       registerHttpOperation(createSaveDraftOperation(dependencies)),
       registerHttpOperation(createUpdateItemOperation(getService)),
+    ],
+    pages: [
+      {
+        access: { kind: "authenticated" },
+        path: collectionStudioPath,
+        render: ({ navigation }) => (
+          <CollectionsSurface
+            navigation={navigation}
+            targetChains={enabledChains}
+          />
+        ),
+      },
+      {
+        access: { kind: "authenticated" },
+        path: collectionWizardPath,
+        render: ({ navigation, params }) => (
+          <WizardSurface
+            collectionId={params.collectionId ?? ""}
+            navigation={navigation}
+            targetChains={enabledChains}
+          />
+        ),
+      },
     ],
     version: "1.0.0",
   };

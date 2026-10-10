@@ -8,10 +8,16 @@ import {
   collectionItemSchema,
   collectionLimits,
   collectionRoutes,
+  collectionStudioPath,
+  collectionWizardHref,
+  collectionWizardPath,
   removeCollectionItemInputSchema,
   saveCollectionDraftInputSchema,
 } from "../src/collections/index.ts";
-import { routeContributionSchema } from "../src/features/manifest.ts";
+import {
+  pageContributionSchema,
+  routeContributionSchema,
+} from "../src/features/manifest.ts";
 import { uploadPurposes } from "../src/uploads/index.ts";
 
 const chain = "bip122:00000008819873e925422c1ff0f99f7c";
@@ -204,6 +210,22 @@ describe("collection HTTP contract", () => {
     expect(
       new Set(routes.map(({ method, path }) => `${method} ${path}`)).size,
     ).toBe(routes.length);
+  });
+
+  it("builds the wizard link from the page route, and the page routes are accepted by the manifest", () => {
+    expect(collectionWizardHref(asset)).toBe(
+      `${collectionStudioPath}/${asset}`,
+    );
+    expect(collectionWizardPath.replace("[collectionId]", asset)).toBe(
+      collectionWizardHref(asset),
+    );
+    for (const path of [collectionStudioPath, collectionWizardPath])
+      expect(
+        pageContributionSchema.safeParse({
+          access: { kind: "authenticated" },
+          path,
+        }).success,
+      ).toBe(true);
   });
 
   it("names only upload purposes that exist", () => {

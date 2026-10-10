@@ -297,12 +297,18 @@ importers:
 
   features/collection-studio:
     dependencies:
+      '@ador/client-http':
+        specifier: workspace:*
+        version: link:../../packages/client-http
       '@ador/collections':
         specifier: workspace:*
         version: link:../../packages/collections
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/feature-uploads':
+        specifier: workspace:*
+        version: link:../uploads
       '@ador/http':
         specifier: workspace:*
         version: link:../../packages/http
@@ -318,6 +324,15 @@ importers:
       '@ador/uploads':
         specifier: workspace:*
         version: link:../../packages/uploads
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: 19.2.8
+        version: 19.2.8(react@19.2.8)
     devDependencies:
       '@ador/test-kit':
         specifier: workspace:*
@@ -331,12 +346,24 @@ importers:
       '@types/node':
         specifier: 26.4.0
         version: 26.4.0
+      '@types/react':
+        specifier: ^19
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.5(@types/react@19.2.18)
+      '@vitejs/plugin-react':
+        specifier: ^6.1.1
+        version: 6.1.1(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.11)
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
+      jsdom:
+        specifier: 30.0.1
+        version: 30.0.1(@noble/hashes@2.4.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -502,6 +529,9 @@ importers:
 
   features/uploads:
     dependencies:
+      '@ador/client-http':
+        specifier: workspace:*
+        version: link:../../packages/client-http
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -747,6 +777,37 @@ importers:
       vitest:
         specifier: ^4.1.11
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+
+  packages/client-http:
+    dependencies:
+      '@ador/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 26.4.0
+        version: 26.4.0
+      '@vitest/coverage-v8':
+        specifier: 4.1.11
+        version: 4.1.11(vitest@4.1.11)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.11
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      zod:
+        specifier: ^4.5.4
+        version: 4.5.4
 
   packages/collections:
     dependencies:
@@ -1184,6 +1245,12 @@ importers:
       drizzle-orm:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.0)(valibot@1.4.2(typescript@5.9.3))(zod@4.5.4)
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: 19.2.8
+        version: 19.2.8(react@19.2.8)
       zod:
         specifier: ^4.5.4
         version: 4.5.4
@@ -1200,12 +1267,21 @@ importers:
       '@types/node':
         specifier: 26.4.0
         version: 26.4.0
+      '@types/react':
+        specifier: ^19
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.5(@types/react@19.2.18)
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.11)
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
+      jsdom:
+        specifier: 30.0.1
+        version: 30.0.1(@noble/hashes@2.4.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3

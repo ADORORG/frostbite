@@ -62,7 +62,9 @@
   line-height: 1.5;
   text-transform: uppercase;
 }
-.arcade-field select {
+.arcade-field select,
+.arcade-field input,
+.arcade-field textarea {
   width: 100%;
   padding: 0.75rem;
   border: 0.125rem solid var(--arcade-text-muted);
@@ -72,10 +74,30 @@
   font: inherit;
   text-transform: none;
 }
-.arcade-field select:focus-visible {
+.arcade-field textarea {
+  min-height: 7rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+.arcade-field select:focus-visible,
+.arcade-field input:focus-visible,
+.arcade-field textarea:focus-visible {
   border-color: var(--arcade-cyan);
   outline: 0.1875rem solid var(--arcade-cyan);
   outline-offset: 0.1875rem;
+}
+.arcade-field input[aria-invalid="true"],
+.arcade-field textarea[aria-invalid="true"] {
+  border-color: var(--arcade-red);
+}
+.arcade-field__note {
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-body, inherit);
+  font-size: 0.8125rem;
+  text-transform: none;
+}
+.arcade-field__note--error {
+  color: var(--arcade-red);
 }
 .arcade-file-drop {
   position: relative;

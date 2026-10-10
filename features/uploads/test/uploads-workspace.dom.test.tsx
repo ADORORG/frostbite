@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { UploadApiError } from "../src/client/api-error.ts";
+import { ApiError } from "@ador/client-http";
 import { TransferError, type ObjectTransfer } from "../src/client/transfer.ts";
 import { UploadsWorkspace } from "../src/ui/uploads-workspace.tsx";
 import {
@@ -81,8 +81,7 @@ describe("uploads workspace", () => {
     const services = fakeServices({
       api: {
         createIntent: async (...args) => {
-          if (failures-- > 0)
-            throw new UploadApiError("network", null, "offline");
+          if (failures-- > 0) throw new ApiError("network", null, "offline");
           return fakeServices().api.createIntent(...args);
         },
         listAssets: async () => ({
@@ -112,7 +111,7 @@ describe("uploads workspace", () => {
         completeIntent: async () => {
           if (failCompletion) {
             failCompletion = false;
-            throw new UploadApiError("internal_error", 500, "boom");
+            throw new ApiError("internal_error", 500, "boom");
           }
           return {
             asset: { id: assetId, processingState: "pending-validation" },
