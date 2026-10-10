@@ -57,18 +57,6 @@ export function createAccountsEntrypoint(
           account(actorUserId, getService, navigation),
       },
       {
-        access: { kind: "authenticated" },
-        path: "/studio",
-        render: ({ actorUserId, navigation }) =>
-          actorUserId === null ? null : (
-            <AccountSurface
-              actorUserId={actorUserId}
-              navigation={navigation}
-              surface="studio"
-            />
-          ),
-      },
-      {
         access: { capability: "platform:operate", kind: "platform" },
         path: "/admin",
         render: ({ actorUserId, navigation }) =>

@@ -19,6 +19,10 @@ uploads-backed feature needs (collection studio and collection review use it ins
 (`assetBadge`, `assetNote`, `pickRendition`, `describeDimensions`), so other studio pages that show the
 creator's images describe them in the same words.
 
+`@ador/feature-uploads/inline` exports `InlineUpload`, a client component that uploads one image for a
+fixed purpose inside another page (the collection wizard's image slots). It reports the asset only once it
+is processed; refused or still-processing images are not offered for use.
+
 ## Asset pipeline composition
 
 `@ador/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and

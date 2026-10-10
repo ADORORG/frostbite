@@ -7,7 +7,6 @@ import { createAccountsEntrypoint } from "../src/entrypoint.tsx";
 describe("accounts entrypoint", () => {
   it.each([
     ["/account", "Account console", "Authenticated session"],
-    ["/studio", "Creator studio", "Authenticated access"],
     ["/admin", "Admin console", "Staff capability verified"],
   ])("renders the authorized %s surface", async (path, title, status) => {
     const entrypoint = createAccountsEntrypoint(() => ({

@@ -5,17 +5,29 @@ add, update, or remove items) and the resumable creator wizard that uses it. Reg
 the platform provider registry and the enabled chains explicitly, so removing its one line detaches the
 routes, pages, navigation entry, and their storage use.
 
-## Pages (W4-02)
+## Pages
 
-| Page                      | Path                      | Notes                                                                        |
-| ------------------------- | ------------------------- | ---------------------------------------------------------------------------- |
-| Collections list (studio) | `/studio/collections`     | Drafts, newest first, plus a start form. Navigation label "My collections"   |
-| Collection wizard         | `/studio/collections/:id` | Details, supply and chain, images, items, review; step lives in the URL hash |
+One page, one job (see `docs/product/journeys.md`): an overview, a create page, and a detail page.
+
+| Page              | Path                      | Notes                                                                                                    |
+| ----------------- | ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Studio home       | `/studio`                 | Where the person stands as a creator, their collections by standing, their images, and the one next step |
+| Collections       | `/studio/collections`     | Cards with standing, progress, and next action; filters by standing; "New collection"                    |
+| New collection    | `/studio/collections/new` | One short form (name, supply, chain), with a way back                                                    |
+| Collection wizard | `/studio/collections/:id` | Details, supply and chain, images, items, review; step lives in the URL hash                             |
+
+The studio home and the collections pages read the caller's creator standing (the creator-admission
+contract) and say why instead of offering a form that would be refused; if the standing cannot be read,
+the server decides. Standing words and next steps are pure and tested (`src/client/creator-standing.ts`);
+a collection's standing (draft, in review, needs changes, approved, closed) comes from the state of its
+latest submission and is defined once in `@ador/shared/collections`.
 
 All wizard state is server-side, so a creator resumes on the first unfinished step from any device.
 Unsaved edits overlay the saved draft; a stale revision shows a conflict notice with a reload. Images
-are chosen from the creator's processed library (upload on the uploads page). Nothing is
-published or sent to a chain, and the page says so.
+are chosen from the creator's processed library and uploaded in place: each image slot has an uploader
+for its purpose (`@ador/feature-uploads/inline`), and a processed upload refreshes the library and is
+chosen, so the creator never leaves the step. Nothing is published or sent to a chain, and the page says
+so.
 
 Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, error copy, progress),
 `src/ui/hooks`, `src/ui/components`, and the surface files that compose them.

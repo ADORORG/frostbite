@@ -1,10 +1,12 @@
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { chainOptionSchema } from "@ador/shared/chain";
+import { chainOptionSchema, type ChainOption } from "@ador/shared/chain";
+import { isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { createCollectionStudioEntrypoint } from "../src/entrypoint.tsx";
 import { CollectionsSurface } from "../src/ui/collections-surface.tsx";
+import { StudioHomeSurface } from "../src/ui/studio-home-surface.tsx";
 import { NewCollectionSurface } from "../src/ui/new-collection-surface.tsx";
 import { WizardSurface } from "../src/ui/wizard-surface.tsx";
 import { id, signet } from "./support/stubs.ts";
@@ -54,10 +56,19 @@ describe("collection pages", () => {
       <NewCollectionSurface navigation={navigation} targetChains={[enabled]} />,
     );
     expect(markup).toContain("<h1>New collection</h1>");
-    expect(markup).toContain("Collection name");
-    expect(markup).toContain("Bitcoin signet");
+    // Whether to show the form depends on who is asking, which is learned in the browser.
+    expect(markup).toContain("Checking your creator status…");
     expect(markup).toContain('href="/studio/collections"');
-    expect(markup).toContain("Cancel");
+  });
+
+  it("frame the studio home, whose parts load in the browser", () => {
+    const markup = renderToStaticMarkup(
+      <StudioHomeSurface navigation={navigation} />,
+    );
+    expect(markup).toContain("<h1>Creator studio</h1>");
+    expect(markup).toContain("Loading your standing…");
+    expect(markup).toContain("Loading your collections…");
+    expect(markup).toContain("Loading your images…");
   });
 
   it("frame one draft's wizard, which loads in the browser", () => {
@@ -78,14 +89,26 @@ describe("collection pages", () => {
       createProviderRegistry([]),
       [enabled, disabled],
     );
-    const [list, creating, wizard] = entrypoint.pages ?? [];
+    const [home, list, creating, wizard] = entrypoint.pages ?? [];
+    expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
+      "/studio",
+      "/studio/collections",
+      "/studio/collections/new",
+      "/studio/collections/[collectionId]",
+    ]);
     const context = { actorUserId: id(), navigation, params: {} };
+    expect(renderToStaticMarkup(<>{home?.render(context)}</>)).toContain(
+      "Creator studio",
+    );
     const listMarkup = renderToStaticMarkup(<>{list?.render(context)}</>);
-    // The list loads in the browser; the chains an entry may use are offered where a collection starts.
     expect(listMarkup).toContain("Loading your collections…");
-    const createMarkup = renderToStaticMarkup(<>{creating?.render(context)}</>);
-    expect(createMarkup).toContain("Bitcoin signet");
-    expect(createMarkup).not.toContain("Disabled chain");
+    // The chains a collection may target are offered where one starts; only the enabled ones are passed.
+    const element = creating?.render(context);
+    if (!isValidElement<{ targetChains: readonly ChainOption[] }>(element))
+      throw new Error("the create page did not render an element");
+    expect(element.props.targetChains.map(({ chainId }) => chainId)).toEqual([
+      enabled.chainId,
+    ]);
     const wizardMarkup = renderToStaticMarkup(
       <>{wizard?.render({ ...context, params: { collectionId: id() } })}</>,
     );

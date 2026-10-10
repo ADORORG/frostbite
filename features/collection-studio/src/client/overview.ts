@@ -14,15 +14,22 @@ import type { ArcadeTone } from "@repo/ui/arcade";
 
 export type StandingFilter = "all" | CollectionStanding;
 
-// "All" always; each standing only while some collection has it, so there are no tabs that lead nowhere.
-export function filterOptions(
+export function countByStanding(
   collections: readonly CollectionSummary[],
-): readonly FilterOption<StandingFilter>[] {
+): ReadonlyMap<CollectionStanding, number> {
   const counts = new Map<CollectionStanding, number>();
   for (const { submissionState } of collections) {
     const standing = standingOf(submissionState);
     counts.set(standing, (counts.get(standing) ?? 0) + 1);
   }
+  return counts;
+}
+
+// "All" always; each standing only while some collection has it, so there are no tabs that lead nowhere.
+export function filterOptions(
+  collections: readonly CollectionSummary[],
+): readonly FilterOption<StandingFilter>[] {
+  const counts = countByStanding(collections);
   return [
     { count: collections.length, label: "All", value: "all" },
     ...collectionStandings.flatMap((standing) => {

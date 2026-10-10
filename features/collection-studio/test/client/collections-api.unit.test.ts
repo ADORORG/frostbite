@@ -155,4 +155,68 @@ describe("collections API client", () => {
       status: 409,
     });
   });
+
+  describe("creator standing", () => {
+    const correlationId = "018f22f2-9c1a-7b21-8c45-0000000000aa";
+    const application = (state: string) => ({
+      application: {
+        applicantUserId: id(),
+        draft: {
+          contentDeclarationAccepted: true,
+          displayName: "A",
+          expectedLaunchSize: "10",
+          expectedLaunchTiming: "soon",
+          jurisdictionAcknowledged: true,
+          portfolioLinks: [],
+          projectSummary: "x",
+          provenanceDeclarationAccepted: true,
+          rightsDeclarationAccepted: true,
+        },
+        id: id(),
+        revision: 1,
+        state,
+      },
+    });
+
+    it("reads the state of the caller's own application", async () => {
+      const { api, fetchImpl } = apiWith(async () =>
+        json(application("approved")),
+      );
+      await expect(api.creatorStanding()).resolves.toEqual({
+        state: "approved",
+      });
+      expect(fetchImpl).toHaveBeenCalledWith(
+        "/api/v1/creator-application",
+        expect.objectContaining({ method: "GET" }),
+      );
+    });
+
+    it("answers that a person who never applied has no state, rather than failing", async () => {
+      const { api } = apiWith(async () =>
+        json(
+          { error: { code: "not_found", correlationId, message: "None." } },
+          404,
+        ),
+      );
+      await expect(api.creatorStanding()).resolves.toEqual({ state: null });
+    });
+
+    it("still fails for anything else, so an outage is not read as never having applied", async () => {
+      const { api } = apiWith(async () =>
+        json(
+          { error: { code: "internal_error", correlationId, message: "x" } },
+          500,
+        ),
+      );
+      await expect(api.creatorStanding()).rejects.toMatchObject({
+        code: "internal_error",
+      });
+      const network = apiWith(async () => {
+        throw new TypeError("offline");
+      });
+      await expect(network.api.creatorStanding()).rejects.toMatchObject({
+        code: "network",
+      });
+    });
+  });
 });

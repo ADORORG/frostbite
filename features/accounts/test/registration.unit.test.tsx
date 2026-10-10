@@ -10,7 +10,6 @@ describe("accounts feature registration", () => {
       id: "accounts",
       pages: [
         { access: { kind: "authenticated" }, path: "/account" },
-        { access: { kind: "authenticated" }, path: "/studio" },
         {
           access: { capability: "platform:operate", kind: "platform" },
           path: "/admin",
@@ -33,7 +32,6 @@ describe("accounts feature registration", () => {
     });
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
       "/account",
-      "/studio",
       "/admin",
     ]);
     expect(entrypoint.operations?.map(({ route }) => route)).toEqual(

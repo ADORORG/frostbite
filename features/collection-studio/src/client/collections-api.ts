@@ -1,4 +1,4 @@
-import { createRequester, type FetchLike } from "@ador/client-http";
+import { ApiError, createRequester, type FetchLike } from "@ador/client-http";
 import {
   collectionDetailSchema,
   collectionItemChangeSchema,
@@ -21,12 +21,23 @@ import {
   type SubmitCollectionInput,
   type UpdateCollectionItemInput,
 } from "@ador/shared/collections";
+import {
+  creatorApplicationResponseSchema,
+  creatorApplicationRoutes,
+  type CreatorApplicationState,
+} from "@ador/shared/creator-admission";
 import type { IdempotencyKey } from "@ador/shared/http";
 import {
   libraryResponseSchema,
   libraryRoute,
   type LibraryResponse,
 } from "@ador/shared/uploads";
+
+// The state of the caller's creator application; `state` is null if they never applied. An object, so a
+// person who never applied is an answer that has arrived, not an absence of one.
+export interface CreatorStanding {
+  readonly state: CreatorApplicationState | null;
+}
 
 export interface CallOptions {
   readonly signal?: AbortSignal;
@@ -41,6 +52,7 @@ export interface CollectionsApi {
     input: CreateCollectionDraftInput,
     options: CallOptions & { readonly idempotencyKey: IdempotencyKey },
   ): Promise<CollectionDetail>;
+  creatorStanding(options?: CallOptions): Promise<CreatorStanding>;
   list(options?: CallOptions): Promise<CollectionListResponse>;
   // The creator's own uploads, for choosing images. This is the uploads feature's public contract.
   listImages(options?: CallOptions): Promise<LibraryResponse>;
@@ -82,6 +94,21 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
         body: input,
         ...options,
       }),
+    creatorStanding: async (options = {}) => {
+      try {
+        const { application } = await request(
+          creatorApplicationRoutes.mine,
+          creatorApplicationResponseSchema,
+          options,
+        );
+        return { state: application.state };
+      } catch (error) {
+        // Never having applied is an answer, not a failure.
+        if (error instanceof ApiError && error.code === "not_found")
+          return { state: null };
+        throw error;
+      }
+    },
     list: (options = {}) =>
       request(collectionRoutes.list, collectionListResponseSchema, options),
     listImages: (options = {}) =>

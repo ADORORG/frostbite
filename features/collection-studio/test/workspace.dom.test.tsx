@@ -63,12 +63,16 @@ describe("collections overview", () => {
     await settle(() => expect(textOf(container)).toContain("First light"));
     expect(textOf(container)).toContain("Bitcoin signet");
     expect(textOf(container)).toContain("2 of 5 items");
+    // The bar says the same thing in words and in its value: 2 of 5 is 40%, 5 of 5 is 100%.
+    expect(
+      [...container.querySelectorAll("progress")].map((bar) => bar.value),
+    ).toEqual([40, 100]);
     expect(textOf(container)).toContain("Updated 2026-10-09");
     expect(textOf(container)).toContain("Draft");
     expect(textOf(container)).toContain("Changes requested");
     const links = [
       ...container.querySelectorAll('a[href^="/studio/collections/"]'),
-    ];
+    ].filter((link) => !link.getAttribute("href")?.endsWith("/new"));
     expect(links.map((link) => link.textContent)).toEqual([
       "Continue editing",
       "Make changes",
@@ -113,5 +117,47 @@ describe("collections overview", () => {
     fake.state.summaries = [summary("First light", 1)];
     await click(button(container, "Retry"));
     await settle(() => expect(textOf(container)).toContain("First light"));
+  });
+});
+
+describe("collections overview: who may start a collection", () => {
+  const link = (container: HTMLElement, text: string) =>
+    [...container.querySelectorAll("a")].find((a) => a.textContent === text);
+
+  it("offers the button to an approved creator", async () => {
+    const fake = fakeCollections();
+    const container = await mount(view(fake));
+    await settle(() => expect(link(container, "New collection")).toBeDefined());
+    expect(textOf(container)).not.toContain("approved creator");
+  });
+
+  it.each([
+    [null, "Not a creator yet", "Apply to create"],
+    ["draft", "Application started", "Finish your application"],
+    ["under-review", "Application in review", "View your application"],
+    ["suspended", "Creator access paused", "View your application"],
+  ] as const)(
+    "tells a person whose standing is %s why, and where to go, instead of offering the button",
+    async (standing, headline, label) => {
+      const fake = fakeCollections();
+      fake.state.standing = standing;
+      const container = await mount(view(fake));
+      await settle(() => expect(textOf(container)).toContain(headline));
+      expect(link(container, label)?.getAttribute("href")).toBe(
+        "/studio/creator-application",
+      );
+      expect(link(container, "New collection")).toBeUndefined();
+    },
+  );
+
+  it("keeps the button when the standing cannot be read, and leaves the decision to the server", async () => {
+    const fake = fakeCollections();
+    fake.api.creatorStanding.mockRejectedValue(
+      new ApiError("network", null, "x"),
+    );
+    const container = await mount(view(fake));
+    await settle(() => expect(fake.api.creatorStanding).toHaveBeenCalled());
+    await settle(() => expect(link(container, "New collection")).toBeDefined());
+    expect(textOf(container)).not.toContain("Collections open once");
   });
 });

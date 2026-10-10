@@ -18,6 +18,10 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [["html", { open: "never" }]],
+  expect: {
+    // Applied only while a screenshot is taken (see the file for why).
+    toHaveScreenshot: { stylePath: "./screenshot.css" },
+  },
   use: {
     baseURL,
     trace: "on-first-retry",

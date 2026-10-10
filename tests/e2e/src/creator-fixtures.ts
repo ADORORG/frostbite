@@ -151,6 +151,7 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionOtherCreator,
   creatorE2EFixtures.collectionAccessOwner,
   creatorE2EFixtures.collectionWizardCreator,
+  creatorE2EFixtures.collectionQualityList,
   creatorE2EFixtures.collectionInlineCreator,
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,

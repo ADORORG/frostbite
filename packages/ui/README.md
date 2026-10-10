@@ -22,6 +22,10 @@ person may see. The grouping is `buildNavigationModel` in `src/patterns/navigati
 must match the manifest's (`@ador/shared/features`), which a type error at each page enforces. Guided
 forms use the `wizard-steps` styles (a connected row that scrolls sideways on narrow screens).
 
+Lists use `ArcadeFilterTabs` (buttons with counts and `aria-pressed`), `ArcadeEmptyState` (title, one
+sentence, one action), and the `arcade-card`, `arcade-cards`, `arcade-callout`, and `arcade-disclosure`
+styles. `ArcadeButton` takes an optional `ariaLabel` for links whose words repeat on a page.
+
 The shared form styles also give `.arcade-facts` (a label and value list that stacks on narrow screens)
 and lay out radio and checkbox labels beside their control.
 

@@ -7,6 +7,7 @@ import {
   collectionStudioNavigationLabel,
   collectionStudioPath,
   collectionWizardPath,
+  studioHomePath,
   submissionRoutes,
 } from "@ador/shared/collections";
 
@@ -45,12 +46,20 @@ export function createCollectionStudioFeature(
         {
           access: { kind: "authenticated" },
           area: "studio",
+          href: studioHomePath,
+          label: "Overview",
+          order: 0,
+        },
+        {
+          access: { kind: "authenticated" },
+          area: "studio",
           href: collectionStudioPath,
           label: collectionStudioNavigationLabel,
           order: 10,
         },
       ],
       pages: [
+        { access: { kind: "authenticated" }, path: studioHomePath },
         { access: { kind: "authenticated" }, path: collectionStudioPath },
         { access: { kind: "authenticated" }, path: collectionNewPath },
         { access: { kind: "authenticated" }, path: collectionWizardPath },

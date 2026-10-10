@@ -4,6 +4,7 @@ import type {
   CollectionSubmission,
   CollectionSummary,
 } from "@ador/shared/collections";
+import type { CreatorApplicationState } from "@ador/shared/creator-admission";
 import { idempotencyKeySchema } from "@ador/shared/http";
 import type { LibraryAsset } from "@ador/shared/uploads";
 import { vi } from "vitest";
@@ -20,6 +21,14 @@ const revisionConflict = () =>
     "The draft changed since it was loaded. Reload it and try again.",
   );
 
+interface FakeState {
+  detail: CollectionDetail;
+  library: LibraryAsset[];
+  standing: CreatorApplicationState | null;
+  submissions: CollectionSubmission[];
+  summaries: CollectionSummary[];
+}
+
 // An in-memory collections API with the server's rules that matter to the UI: every change bumps the
 // revision, a save must name the current one, and each call is a spy. Tests change `state` to stage a
 // situation, and replace any method to stage a failure.
@@ -33,9 +42,11 @@ export function fakeCollections(
 ) {
   const summaries: CollectionSummary[] = [];
   const submissions: CollectionSubmission[] = [];
-  const state = {
+  const state: FakeState = {
     detail: initial,
     library: [...library],
+    // The caller's creator application state; approved unless a test stages another standing.
+    standing: "approved",
     submissions,
     summaries,
   };
@@ -64,6 +75,9 @@ export function fakeCollections(
       return { item: record, revision: bump() };
     }),
     create: vi.fn<CollectionsApi["create"]>(async () => state.detail),
+    creatorStanding: vi.fn<CollectionsApi["creatorStanding"]>(async () => ({
+      state: state.standing,
+    })),
     list: vi.fn<CollectionsApi["list"]>(async () => ({
       collections: state.summaries,
     })),

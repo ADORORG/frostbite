@@ -49,12 +49,13 @@ describe("collection studio registration", () => {
     ]);
   });
 
-  it("declares the list and wizard pages for signed-in users, and one navigation entry", () => {
+  it("declares the home, list, create, and wizard pages for signed-in users, and the studio links", () => {
     const { manifest } = createCollectionStudioFeature(
       createProviderRegistry([]),
       targetChains,
     );
     expect(manifest.pages).toEqual([
+      { access: { kind: "authenticated" }, path: "/studio" },
       { access: { kind: "authenticated" }, path: "/studio/collections" },
       { access: { kind: "authenticated" }, path: "/studio/collections/new" },
       {
@@ -63,6 +64,13 @@ describe("collection studio registration", () => {
       },
     ]);
     expect(manifest.navigation).toEqual([
+      {
+        access: { kind: "authenticated" },
+        area: "studio",
+        href: "/studio",
+        label: "Overview",
+        order: 0,
+      },
       {
         access: { kind: "authenticated" },
         area: "studio",

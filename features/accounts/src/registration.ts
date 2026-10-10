@@ -14,13 +14,6 @@ export const accountsFeature = defineFeature({
         order: 0,
       },
       {
-        access: { kind: "authenticated" },
-        area: "studio",
-        href: "/studio",
-        label: "Overview",
-        order: 0,
-      },
-      {
         access: { capability: "platform:operate", kind: "platform" },
         area: "admin",
         href: "/admin",
@@ -31,7 +24,6 @@ export const accountsFeature = defineFeature({
     id: "accounts",
     pages: [
       { access: { kind: "authenticated" }, path: "/account" },
-      { access: { kind: "authenticated" }, path: "/studio" },
       {
         access: { capability: "platform:operate", kind: "platform" },
         path: "/admin",

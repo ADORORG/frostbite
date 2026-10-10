@@ -7,6 +7,7 @@ import {
   collectionNewPath,
   collectionStudioPath,
   collectionWizardPath,
+  studioHomePath,
 } from "@ador/shared/collections";
 
 import {
@@ -32,6 +33,7 @@ import {
 } from "./runtime.ts";
 import { CollectionsSurface } from "./ui/collections-surface.tsx";
 import { NewCollectionSurface } from "./ui/new-collection-surface.tsx";
+import { StudioHomeSurface } from "./ui/studio-home-surface.tsx";
 import { WizardSurface } from "./ui/wizard-surface.tsx";
 
 export function createCollectionStudioEntrypoint(
@@ -66,6 +68,13 @@ export function createCollectionStudioEntrypoint(
       registerHttpOperation(createUpdateItemOperation(getService)),
     ],
     pages: [
+      {
+        access: { kind: "authenticated" },
+        path: studioHomePath,
+        render: ({ navigation }) => (
+          <StudioHomeSurface navigation={navigation} />
+        ),
+      },
       {
         access: { kind: "authenticated" },
         path: collectionStudioPath,

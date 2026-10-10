@@ -51,6 +51,8 @@ for (const surface of authenticatedSurfaces) {
     await expect(
       page.getByRole("heading", { level: 1, name: surface.heading }),
     ).toBeVisible();
+    // Pages that load their content in the browser are checked once it has loaded, not while it loads.
+    await expect(page.getByText(/^Loading /u)).toHaveCount(0);
     await expect(page.locator(".scanlines")).toHaveCSS("display", "none");
     await expect(page.locator(".app-shell")).toHaveJSProperty(
       "scrollWidth",

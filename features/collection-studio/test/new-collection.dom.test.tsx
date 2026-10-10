@@ -113,3 +113,38 @@ describe("new collection page", () => {
     expect(fake.api.create).not.toHaveBeenCalled();
   });
 });
+
+describe("new collection page: who sees the form", () => {
+  it("says it is checking, not showing a form that may vanish", async () => {
+    const fake = fakeCollections();
+    fake.api.creatorStanding.mockReturnValueOnce(new Promise(() => undefined));
+    const container = await mount(view(fake));
+    expect(textOf(container)).toContain("Checking your creator status…");
+    expect(container.querySelector("input")).toBeNull();
+  });
+
+  it("shows why instead of the form to someone who cannot build collections yet", async () => {
+    const fake = fakeCollections();
+    fake.state.standing = "changes-requested";
+    const container = await mount(view(fake));
+    await settle(() =>
+      expect(textOf(container)).toContain("Collections open once"),
+    );
+    expect(textOf(container)).toContain("Changes requested");
+    expect(container.querySelector("input")).toBeNull();
+    const update = [...container.querySelectorAll("a")].find(
+      (a) => a.textContent === "Update your application",
+    );
+    expect(update?.getAttribute("href")).toBe("/studio/creator-application");
+    expect(fake.api.create).not.toHaveBeenCalled();
+  });
+
+  it("shows the form when the standing cannot be read, and the server decides", async () => {
+    const fake = fakeCollections();
+    fake.api.creatorStanding.mockRejectedValue(
+      new ApiError("network", null, "x"),
+    );
+    const container = await mount(view(fake));
+    await settle(() => expect(container.querySelector("input")).not.toBeNull());
+  });
+});

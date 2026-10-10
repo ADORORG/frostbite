@@ -19,6 +19,11 @@ after reading the diff: `pnpm test:e2e -- --update-snapshots changed <spec>`.
 - Quality specs that need fixed data answer the API call that carries it (`tests/support/review-mocks.ts`),
   parsed through the shared contract, so a mock that drifts from it fails loudly.
 
+- `screenshot.css` is applied only while a screenshot is taken: it fixes the sticky header and area
+  sidebar in place, since a full-page capture would otherwise draw them away from their place in the page.
+- Journey specs (`navigation.spec.ts`, `studio-home.spec.ts`) reach pages by clicking only, as a person
+  would; a spec that jumps to a URL is testing a page, not a journey.
+
 ## Manual test stack
 
 `pnpm stack` runs the whole product locally for a person to drive by hand: the same disposable

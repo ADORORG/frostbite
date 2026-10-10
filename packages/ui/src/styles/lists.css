@@ -146,3 +146,31 @@
 .arcade-disclosure[open] > summary {
   margin-bottom: 0.75rem;
 }
+.arcade-card__list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  color: var(--arcade-text-muted);
+  font-size: 0.875rem;
+  list-style: none;
+}
+.arcade-callout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border: 0.125rem solid var(--arcade-mint);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+}
+.arcade-callout .arcade-eyebrow {
+  flex-basis: 100%;
+  margin: 0;
+}
+.arcade-callout__text {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 1.125rem;
+}

@@ -31,6 +31,10 @@ test("the collections list closes the experience-quality matrix", async ({
     page.getByRole("heading", { level: 1, name: "Collections" }),
   ).toBeVisible();
   await expect(page.getByText("No collections yet")).toBeVisible();
+  // The button appears once the creator's standing is known.
+  await expect(
+    page.getByRole("link", { name: "New collection", exact: true }),
+  ).toBeVisible();
 
   // Keyboard, with real key presses: past the skip link and the breadcrumb, Tab reaches the page's
   // main action, then the empty state's own, in reading order. Both lead to the page that starts one.
@@ -61,6 +65,8 @@ test("the new collection page closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "New collection" }),
   ).toBeVisible();
+  // The form appears once the creator's standing is known.
+  await expect(page.getByLabel("Collection name")).toBeVisible();
 
   // Keyboard: past the skip link and the breadcrumb, Tab reaches the form in reading order, then the way back.
   await skipToMain(page);

@@ -16,12 +16,6 @@ const surfaces = {
     title: "Admin console",
     body: "Platform operations are available to an active staff assignment. Creator admission reviews are separated from broader platform authority.",
   },
-  studio: {
-    eyebrow: "Private workspace",
-    status: "Authenticated access",
-    title: "Creator studio",
-    body: "Private creator-application drafts are available here. This session does not imply creator approval or publication authority.",
-  },
 } as const;
 
 export function AccountSurface({
