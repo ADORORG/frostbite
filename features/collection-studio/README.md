@@ -14,8 +14,8 @@ routes, pages, navigation entry, and their storage use.
 
 All wizard state is server-side, so a creator resumes on the first unfinished step from any device.
 Unsaved edits overlay the saved draft; a stale revision shows a conflict notice with a reload. Images
-are chosen from the creator's processed library (upload on the uploads page). Review states plainly
-that submission is not available yet (W4-03); nothing is published or sent to a chain.
+are chosen from the creator's processed library (upload on the uploads page). Nothing is
+published or sent to a chain, and the page says so.
 
 Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, error copy, progress),
 `src/ui/hooks`, `src/ui/components`, and the surface files that compose them.
@@ -33,7 +33,7 @@ Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, err
 | `submitCollection` | `POST /api/v1/collection-submissions` | Idempotency key required; names `expectedRevision` |
 | `listCollectionSubmissions` | `POST /api/v1/collection-submissions/list` | The creator's own submissions with decisions |
 
-Submitting freezes the collection (see `@ador/collections`); the wizard does not offer it yet. Refusals:
+Submitting freezes the collection (see `@ador/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with the reviewers' feedback. Refusals:
 not ready (400, naming what is missing), a stale revision, a submission already in review, or one closed
 for good (409), another creator's collection (404), a creator no longer approved (403).
 

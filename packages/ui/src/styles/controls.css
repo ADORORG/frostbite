@@ -76,11 +76,12 @@
   line-height: 1.5;
   text-transform: uppercase;
 }
-.arcade-form label:has(input[type="checkbox"]) {
+.arcade-form label:has(input[type="checkbox"]),
+.arcade-form label:has(input[type="radio"]) {
   grid-template-columns: auto 1fr;
   align-items: start;
 }
-.arcade-form input:not([type="checkbox"]),
+.arcade-form input:not([type="checkbox"]):not([type="radio"]),
 .arcade-form select,
 .arcade-form textarea {
   width: 100%;
@@ -123,6 +124,32 @@
   font-family: var(--arcade-font-pixel);
   font-size: 0.625rem;
   text-transform: uppercase;
+}
+.arcade-form h3,
+.arcade-form h4 {
+  margin: 0;
+}
+.arcade-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--arcade-space-small);
+  margin: 0;
+}
+@media (min-width: 48rem) {
+  .arcade-facts {
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--arcade-space-small) var(--arcade-space-medium);
+  }
+}
+.arcade-facts dt {
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+}
+.arcade-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 .arcade-form button:disabled {
   cursor: wait;

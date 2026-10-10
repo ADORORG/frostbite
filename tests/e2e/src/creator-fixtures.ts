@@ -113,6 +113,18 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-quality-wizard-session-token",
     userId: "01994b10-0000-7000-8000-00000000002e",
   },
+  // Submission and review (W4-03b): one creator who submits, is asked for changes, and is approved in
+  // a real browser, and one whose review step is the subject of the visual and accessibility checks.
+  reviewJourneyCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000041",
+    sessionToken: "e2e-review-journey-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000040",
+  },
+  reviewQualityCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000043",
+    sessionToken: "e2e-review-quality-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000042",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
@@ -127,4 +139,6 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionAccessOwner,
   creatorE2EFixtures.collectionWizardCreator,
   creatorE2EFixtures.collectionQualityWizard,
+  creatorE2EFixtures.reviewJourneyCreator,
+  creatorE2EFixtures.reviewQualityCreator,
 ] as const;

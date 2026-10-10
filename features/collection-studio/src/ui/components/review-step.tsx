@@ -1,31 +1,48 @@
 import { pickRendition } from "@ador/feature-uploads/presentation";
 import type { ChainOption } from "@ador/shared/chain";
-import type { CollectionDetail } from "@ador/shared/collections";
+import type {
+  CollectionDetail,
+  CollectionSubmission,
+} from "@ador/shared/collections";
 import {
-  ArcadeBadge,
+  ArcadeActionButton,
   ArcadeButton,
   ArcadeMediaTile,
   StatusLamp,
 } from "@repo/ui/arcade";
 
 import {
-  isStepFilled,
-  stepLabels,
-  type WizardStep,
-} from "../../client/progress.ts";
+  draftChangedSince,
+  latestSubmission,
+  submitAvailability,
+} from "../../client/submission-progress.ts";
+import type { Resource } from "../hooks/use-resource.ts";
+import { ReadinessList } from "./readiness-list.tsx";
+import { SubmissionStatus } from "./submission-status.tsx";
+import { SubmitPanel } from "./submit-panel.tsx";
 
-const checked: readonly WizardStep[] = ["details", "images", "items"];
-
-// What the draft holds, and what it still asks for. It does not offer submission: that does not exist
-// yet, and saying so plainly is better than a button that does nothing.
+// What the draft holds, whether it can be submitted, and where its submissions stand. The submission
+// list loads on its own, so a slow or failed load never hides the summary.
 export function ReviewStep({
+  busy,
   chains,
   detail,
   listHref,
+  onRefresh,
+  onSubmit,
+  submissions,
+  unsaved,
 }: {
+  readonly busy: boolean;
   readonly chains: readonly ChainOption[];
   readonly detail: CollectionDetail;
   readonly listHref: string;
+  readonly onRefresh: () => void;
+  readonly onSubmit: () => void;
+  readonly submissions: Resource<{
+    readonly submissions: readonly CollectionSubmission[];
+  }>;
+  readonly unsaved: boolean;
 }) {
   const { collection, items, previews } = detail;
   const chain = chains.find(
@@ -36,6 +53,9 @@ export function ReviewStep({
     cover === undefined
       ? undefined
       : pickRendition(cover.derivatives, "thumbnail");
+  const loaded = submissions.status === "loading" ? null : submissions.data;
+  const latest = loaded === null ? null : latestSubmission(loaded.submissions);
+  const availability = submitAvailability(detail, latest);
   return (
     <div className="arcade-form">
       <ArcadeMediaTile
@@ -58,22 +78,41 @@ export function ReviewStep({
         }
         placeholder="No cover image yet"
       />
-      <ul aria-label="What this draft still needs">
-        {checked.map((step) => (
-          <li key={step}>
-            {stepLabels[step]}{" "}
-            {isStepFilled(detail, step) ? (
-              <ArcadeBadge tone="mint">Ready</ArcadeBadge>
-            ) : (
-              <ArcadeBadge tone="yellow">Still needed</ArcadeBadge>
-            )}
-          </li>
-        ))}
-      </ul>
-      <StatusLamp
-        label="Submitting for review is not available yet. Your draft is saved privately, and only you can see it."
-        tone="attention"
-      />
+      {availability.kind === "missing" || availability.kind === "ready" ? (
+        <ReadinessList
+          missing={availability.kind === "missing" ? availability.missing : []}
+        />
+      ) : null}
+      {submissions.status === "loading" ? (
+        <StatusLamp label="Loading submissions…" tone="attention" />
+      ) : null}
+      {submissions.status === "error" ? (
+        <div className="arcade-form">
+          <StatusLamp
+            label="Your submissions could not be loaded."
+            tone="unavailable"
+          />
+          <div className="arcade-actions">
+            <ArcadeActionButton onClick={onRefresh} tone="yellow">
+              Retry
+            </ArcadeActionButton>
+          </div>
+        </div>
+      ) : null}
+      {latest === null ? null : (
+        <SubmissionStatus
+          changedSince={draftChangedSince(detail, latest)}
+          submission={latest}
+        />
+      )}
+      {loaded === null ? null : (
+        <SubmitPanel
+          availability={availability}
+          busy={busy}
+          onSubmit={onSubmit}
+          unsaved={unsaved}
+        />
+      )}
       <div className="arcade-actions">
         <ArcadeButton href={listHref} tone="yellow">
           Back to your collections

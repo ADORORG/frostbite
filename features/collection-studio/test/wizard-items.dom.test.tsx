@@ -119,24 +119,6 @@ describe("collection wizard: images and items", () => {
   });
 });
 
-describe("collection wizard: review", () => {
-  it("shows what the draft holds and what it still needs, and does not offer submission", async () => {
-    const fake = fakeCollections(detail({ description: "About" }));
-    const container = await mount(wizard(fake));
-    await settle(() => expect(heading(container)).toBe("Images"));
-    await click(buttonMatching(container, /5\. Review/u));
-    expect(heading(container)).toBe("Review");
-    expect(textOf(container)).toContain(
-      "Submitting for review is not available yet.",
-    );
-    expect(textOf(container)).toContain("Still needed");
-    expect(buttonMatching(container, /submit/iu)).toBeNull();
-    expect(
-      container.querySelector('a[href="/studio/collections"]'),
-    ).not.toBeNull();
-  });
-});
-
 function imageAssetId() {
   return id();
 }

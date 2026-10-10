@@ -8,7 +8,7 @@ const { baseURL, port: serverPort } = resolveE2EServerConfig(
 );
 // Real-service flows are slow, so only the desktop project runs them; every project runs the rest.
 const desktopOnlySpecs =
-  /(?:uploads(?:-acceptance(?:-api)?)?|collections(?:-access)?-api|collections-wizard)\.spec\.ts$/u;
+  /(?:uploads(?:-acceptance(?:-api)?)?|collections(?:-access)?-api|collections-wizard|collections-review)\.spec\.ts$/u;
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 export default defineConfig({

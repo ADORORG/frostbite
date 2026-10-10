@@ -26,6 +26,7 @@ import { StepNav } from "./components/step-nav.tsx";
 import { DetailsFields, SupplyFields } from "./components/step-fields.tsx";
 import { useDraftEditor } from "./hooks/use-draft-editor.ts";
 import { useDraftForm } from "./hooks/use-draft-form.ts";
+import { useSubmissions } from "./hooks/use-submissions.ts";
 import { useResource, type LoadedResource } from "./hooks/use-resource.ts";
 
 export const uploadsHref = "/studio/uploads";
@@ -97,6 +98,7 @@ function WizardBody({
   readonly services: CollectionsClientServices;
 }) {
   const draft = useDraftForm(editor, detail);
+  const submissions = useSubmissions(services, detail.collection.id);
   const [chosen, setChosen] = useState<WizardStep | null>(null);
   const [saved, setSaved] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -135,16 +137,20 @@ function WizardBody({
       <h3 ref={heading} tabIndex={-1}>
         {stepLabels[step]}
       </h3>
-      {editor.notice === null ? null : (
-        <FailureNotice
-          applyHref={applyHref}
-          failure={editor.notice}
-          onDismiss={editor.dismissNotice}
-          onReload={() => {
-            editor.dismissNotice();
-            editor.reload();
-          }}
-        />
+      {[editor, submissions].map((source, index) =>
+        source.notice === null ? null : (
+          <FailureNotice
+            applyHref={applyHref}
+            failure={source.notice}
+            key={index}
+            onDismiss={source.dismissNotice}
+            onReload={() => {
+              source.dismissNotice();
+              editor.reload();
+              submissions.list.reload();
+            }}
+          />
+        ),
       )}
       {step === "details" ? (
         <DetailsFields
@@ -184,9 +190,14 @@ function WizardBody({
       ) : null}
       {step === "review" ? (
         <ReviewStep
+          busy={submissions.busy}
           chains={chains}
           detail={detail}
           listHref={collectionStudioPath}
+          onRefresh={submissions.list.reload}
+          onSubmit={() => void submissions.submit(detail.collection.revision)}
+          submissions={submissions.list.state}
+          unsaved={draft.dirty}
         />
       ) : null}
       {draft.dirty && saving ? (

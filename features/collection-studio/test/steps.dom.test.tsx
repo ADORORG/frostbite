@@ -1,5 +1,4 @@
 import { ApiError } from "@ador/client-http";
-import { chainOptionSchema } from "@ador/shared/chain";
 import { button, click, mount, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
@@ -7,8 +6,7 @@ import { describeFailure } from "../src/client/error-copy.ts";
 import { newDraftForm } from "../src/client/draft-form.ts";
 import { DraftList } from "../src/ui/components/draft-list.tsx";
 import { ImagesStep } from "../src/ui/components/images-step.tsx";
-import { ReviewStep } from "../src/ui/components/review-step.tsx";
-import { detail, imageAsset, itemRecord } from "./support/detail.ts";
+import { imageAsset } from "./support/detail.ts";
 import { signet } from "./support/stubs.ts";
 
 describe("images step", () => {
@@ -125,43 +123,5 @@ describe("draft list", () => {
     expect(textOf(container)).toContain(signet);
     await click(button(container, "Retry"));
     expect(reload).toHaveBeenCalledOnce();
-  });
-});
-
-describe("review step", () => {
-  const chain = {
-    chainId: signet,
-    displayName: "Bitcoin signet",
-    enabled: true,
-    family: "bitcoin-alkanes",
-    role: "public-beta",
-  } as const;
-
-  it("names the chain and shows the cover when there is one, and the raw chain id and a placeholder when not", async () => {
-    const cover = imageAsset("collection-artwork");
-    const full = detail(
-      { coverAssetId: cover.id, description: "About" },
-      [itemRecord(1)],
-      [cover],
-    );
-    const withCover = await mount(
-      <ReviewStep
-        chains={[chainOptionSchema.parse(chain)]}
-        detail={full}
-        listHref="/studio/collections"
-      />,
-    );
-    expect(textOf(withCover)).toContain("Bitcoin signet");
-    expect(withCover.querySelectorAll("img")).toHaveLength(1);
-    expect(textOf(withCover)).toContain("Ready");
-    const bare = await mount(
-      <ReviewStep
-        chains={[]}
-        detail={detail()}
-        listHref="/studio/collections"
-      />,
-    );
-    expect(textOf(bare)).toContain(signet);
-    expect(textOf(bare)).toContain("No cover image yet");
   });
 });

@@ -1,5 +1,6 @@
 import type { CollectionDetail } from "@ador/shared/collections";
 import type { LibraryAsset } from "@ador/shared/uploads";
+import { libraryAssetFixture } from "@ador/test-kit/library-asset";
 
 import { id, signet } from "./stubs.ts";
 
@@ -51,25 +52,5 @@ export function imageAsset(
   assetId = id(),
   overrides: Partial<LibraryAsset> = {},
 ): LibraryAsset {
-  return {
-    createdAt: at,
-    derivativeAccess: "available",
-    derivatives: [
-      {
-        contentType: "image/webp",
-        expiresAt: "2099-01-01T00:00:00.000Z",
-        heightPixels: 8,
-        kind: "thumbnail",
-        url: `https://storage.example.test/${assetId}.webp`,
-        widthPixels: 12,
-      },
-    ],
-    heightPixels: 16,
-    id: assetId,
-    processingState: "processed",
-    purpose,
-    rejectionReason: null,
-    widthPixels: 24,
-    ...overrides,
-  };
+  return libraryAssetFixture(purpose, assetId, overrides);
 }

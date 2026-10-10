@@ -8,8 +8,10 @@ import {
   reviewQueueInputSchema,
   reviewQueueResponseSchema,
   reviewRoutes,
+  reviewDetailResponseSchema,
   reviewSubmissionResponseSchema,
   type ReviewDecision,
+  type ReviewDetailResponse,
   type ReviewQueueInput,
   type ReviewQueueResponse,
   type ReviewSubmissionResponse,
@@ -17,8 +19,13 @@ import {
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
 import { presentQueueItem, presentReviewSubmission } from "./present.ts";
+import type { createAssetLibraryService } from "@ador/uploads";
 
 export type ReviewService = ReturnType<typeof createReviewService>;
+export type AssetPreviews = Pick<
+  ReturnType<typeof createAssetLibraryService>,
+  "getMany"
+>;
 type Resolve = () => Promise<ReviewService>;
 
 const access = {
@@ -102,7 +109,10 @@ export function createQueueOperation(getService: Resolve) {
   } satisfies HttpOperation<ReviewQueueInput, ReviewQueueResponse>;
 }
 
-export function createReadOperation(getService: Resolve) {
+export function createReadOperation(
+  getService: Resolve,
+  getPreviews: () => Promise<AssetPreviews>,
+) {
   return {
     access,
     applicationErrors: ["forbidden", "not_found", "unauthorized"],
@@ -111,20 +121,31 @@ export function createReadOperation(getService: Resolve) {
       const record = await (
         await getService()
       ).readForReview(uuidV7Schema.parse(input.submissionId));
-      return record === null
-        ? failure("not_found", "The submission was not found.")
-        : ({
-            ok: true,
-            value: { submission: presentReviewSubmission(record) },
-          } as const);
+      if (record === null)
+        return failure("not_found", "The submission was not found.");
+      // Only the images frozen into this submission are signed, as its creator's own assets.
+      const ids = record.snapshot.assets.map(({ id }) =>
+        uuidV7Schema.parse(id),
+      );
+      const previews =
+        ids.length === 0
+          ? []
+          : await (await getPreviews()).getMany(record.ownerUserId, ids);
+      return {
+        ok: true,
+        value: {
+          previews: [...previews],
+          submission: presentReviewSubmission(record),
+        },
+      } as const;
     },
     idempotency: "none",
     input: "json",
     inputSchema: readReviewSubmissionInputSchema,
-    outputSchema: reviewSubmissionResponseSchema,
+    outputSchema: reviewDetailResponseSchema,
     ...reviewRoutes.read,
   } satisfies HttpOperation<
     { readonly submissionId: string },
-    ReviewSubmissionResponse
+    ReviewDetailResponse
   >;
 }

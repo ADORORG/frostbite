@@ -1,30 +1,57 @@
 import { defineFeature } from "@ador/plugin-kit";
+import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { reviewRoutes } from "@ador/shared/collections";
+import {
+  collectionReviewCapability,
+  collectionReviewDetailPath,
+  collectionReviewNavigationLabel,
+  collectionReviewQueuePath,
+  reviewRoutes,
+} from "@ador/shared/collections";
 
-// Staff review of submitted collections: the review queue, a submission in full, and decisions. It
-// contributes API routes only for now (the review page is a later task). Which platform roles may
-// decide comes from the authorization policy passed in, so removing this one registration detaches
-// every review route and nothing else changes.
+const access = {
+  capability: collectionReviewCapability,
+  kind: "platform",
+} as const;
+
+// Staff review of submitted collections: the review queue, one submission in full with its images, and
+// decisions, as API routes and two admin pages. Which platform roles may decide comes from the
+// authorization policy passed in, and the registry supplies storage for the image previews, so removing
+// this one registration detaches every review route and page.
 export function createCollectionReviewFeature(
   authorizationPolicy: AuthorizationPolicy,
+  providers: ProviderRegistry,
 ) {
   return defineFeature({
     manifest: {
-      capabilities: ["api-routes"],
-      dependencies: ["accounts", "collection-studio"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "studio-page",
+      ],
+      dependencies: ["accounts", "collection-studio", "uploads"],
       id: "collection-review",
-      navigation: [],
-      pages: [],
+      navigation: [
+        {
+          access,
+          href: collectionReviewQueuePath,
+          label: collectionReviewNavigationLabel,
+        },
+      ],
+      pages: [
+        { access, path: collectionReviewQueuePath },
+        { access, path: collectionReviewDetailPath },
+      ],
       requiredDecisionGates: [],
-      requiredProviderCapabilities: [],
+      requiredProviderCapabilities: ["object-storage:s3-compatible"],
       routes: [reviewRoutes.decide, reviewRoutes.queue, reviewRoutes.read],
       version: "1.0.0",
     },
     load: async () =>
       import("@ador/feature-collection-review/entrypoint").then(
         ({ createCollectionReviewEntrypoint }) =>
-          createCollectionReviewEntrypoint(authorizationPolicy),
+          createCollectionReviewEntrypoint(authorizationPolicy, providers),
       ),
   });
 }

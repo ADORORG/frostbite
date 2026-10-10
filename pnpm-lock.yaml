@@ -303,21 +303,45 @@ importers:
 
   features/collection-review:
     dependencies:
+      '@ador/client-http':
+        specifier: workspace:*
+        version: link:../../packages/client-http
+      '@ador/client-react':
+        specifier: workspace:*
+        version: link:../../packages/client-react
       '@ador/collections':
         specifier: workspace:*
         version: link:../../packages/collections
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/feature-uploads':
+        specifier: workspace:*
+        version: link:../uploads
       '@ador/http':
         specifier: workspace:*
         version: link:../../packages/http
+      '@ador/object-storage':
+        specifier: workspace:*
+        version: link:../../packages/object-storage
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
       '@ador/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@ador/uploads':
+        specifier: workspace:*
+        version: link:../../packages/uploads
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: 19.2.8
+        version: 19.2.8(react@19.2.8)
     devDependencies:
       '@ador/test-kit':
         specifier: workspace:*
@@ -334,12 +358,24 @@ importers:
       '@types/node':
         specifier: 26.4.0
         version: 26.4.0
+      '@types/react':
+        specifier: ^19
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.5(@types/react@19.2.18)
+      '@vitejs/plugin-react':
+        specifier: ^6.1.1
+        version: 6.1.1(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.11)
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
+      jsdom:
+        specifier: 30.0.1
+        version: 30.0.1(@noble/hashes@2.4.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -352,6 +388,9 @@ importers:
       '@ador/client-http':
         specifier: workspace:*
         version: link:../../packages/client-http
+      '@ador/client-react':
+        specifier: workspace:*
+        version: link:../../packages/client-react
       '@ador/collections':
         specifier: workspace:*
         version: link:../../packages/collections
@@ -851,6 +890,58 @@ importers:
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.11
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      zod:
+        specifier: ^4.5.4
+        version: 4.5.4
+
+  packages/client-react:
+    dependencies:
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+    devDependencies:
+      '@ador/client-http':
+        specifier: workspace:*
+        version: link:../client-http
+      '@ador/test-kit':
+        specifier: workspace:*
+        version: link:../test-kit
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 26.4.0
+        version: 26.4.0
+      '@types/react':
+        specifier: ^19
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.5(@types/react@19.2.18)
+      '@vitejs/plugin-react':
+        specifier: ^6.1.1
+        version: 6.1.1(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      '@vitest/coverage-v8':
+        specifier: 4.1.11
+        version: 4.1.11(vitest@4.1.11)
+      eslint:
+        specifier: 10.9.1
+        version: 10.9.1(jiti@2.7.0)
+      jsdom:
+        specifier: 30.0.1
+        version: 30.0.1(@noble/hashes@2.4.0)
+      react-dom:
+        specifier: 19.2.8
+        version: 19.2.8(react@19.2.8)
       typescript:
         specifier: 5.9.3
         version: 5.9.3

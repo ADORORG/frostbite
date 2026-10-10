@@ -1,20 +1,46 @@
-import { collectionReviewCapability } from "@ador/shared/collections";
+import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import {
+  collectionReviewCapability,
+  collectionReviewDetailPath,
+  collectionReviewNavigationLabel,
+  collectionReviewQueuePath,
+} from "@ador/shared/collections";
 import { authorizationPolicy } from "@repo/config/authorization";
+import { isValidElement } from "react";
 import { describe, expect, it } from "vitest";
 
-import { createCollectionReviewEntrypoint } from "../src/entrypoint.ts";
 import { createCollectionReviewFeature } from "../src/registration.ts";
 
+const providers = createProviderRegistry([]);
+
 describe("collection review registration", () => {
-  it("declares detachable API routes only, depending on the features whose data it reviews", () => {
-    const { manifest } = createCollectionReviewFeature(authorizationPolicy);
+  it("declares detachable routes and admin pages for reviewers, depending on the features whose data it reviews", () => {
+    const { manifest } = createCollectionReviewFeature(
+      authorizationPolicy,
+      providers,
+    );
+    const access = { capability: collectionReviewCapability, kind: "platform" };
     expect(manifest).toMatchObject({
-      capabilities: ["api-routes"],
-      dependencies: ["accounts", "collection-studio"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "studio-page",
+      ],
+      dependencies: ["accounts", "collection-studio", "uploads"],
       id: "collection-review",
-      navigation: [],
-      pages: [],
-      requiredProviderCapabilities: [],
+      navigation: [
+        {
+          access,
+          href: collectionReviewQueuePath,
+          label: collectionReviewNavigationLabel,
+        },
+      ],
+      pages: [
+        { access, path: collectionReviewQueuePath },
+        { access, path: collectionReviewDetailPath },
+      ],
+      requiredProviderCapabilities: ["object-storage:s3-compatible"],
     });
     expect(
       manifest.routes.map(
@@ -27,8 +53,11 @@ describe("collection review registration", () => {
     ]);
   });
 
-  it("loads an entrypoint whose operations match the manifest and all require the review capability", async () => {
-    const feature = createCollectionReviewFeature(authorizationPolicy);
+  it("loads an entrypoint whose operations and pages match the manifest, all requiring the review capability", async () => {
+    const feature = createCollectionReviewFeature(
+      authorizationPolicy,
+      providers,
+    );
     const entrypoint = await feature.load({
       registeredFeatureCount: 1,
       registeredFeatureIds: ["collection-review"],
@@ -36,21 +65,58 @@ describe("collection review registration", () => {
     expect(entrypoint.operations?.map(({ route }) => route)).toEqual(
       feature.manifest.routes,
     );
-    expect(entrypoint.pages ?? []).toEqual([]);
-    for (const operation of entrypoint.operations ?? [])
-      expect(operation.access).toEqual({
+    expect(entrypoint.pages?.map(({ path }) => path)).toEqual(
+      feature.manifest.pages.map(({ path }) => path),
+    );
+    for (const { access } of [
+      ...(entrypoint.operations ?? []),
+      ...(entrypoint.pages ?? []),
+    ])
+      expect(access).toEqual({
         capability: collectionReviewCapability,
         kind: "platform",
       });
     expect(entrypoint.id).toBe(feature.manifest.id);
   });
 
-  it("grants the capability to reviewers in the platform policy", () => {
+  it("renders the queue page, and the detail page for the submission named in the path", async () => {
+    const entrypoint = await createCollectionReviewFeature(
+      authorizationPolicy,
+      providers,
+    ).load({
+      registeredFeatureCount: 1,
+      registeredFeatureIds: ["collection-review"],
+    });
+    const [queue, detail] = entrypoint.pages ?? [];
+    const navigation = [] as const;
+    const submissionId = "018f22f2-9c1a-7b21-8c45-0000000000aa";
+    const queuePage = queue?.render({
+      actorUserId: null,
+      navigation,
+      params: {},
+    });
+    const detailPage = detail?.render({
+      actorUserId: null,
+      navigation,
+      params: { submissionId },
+    });
+    const empty = detail?.render({ actorUserId: null, navigation, params: {} });
+    for (const page of [queuePage, detailPage, empty])
+      expect(isValidElement(page)).toBe(true);
+    expect(isValidElement(detailPage) && detailPage.props).toMatchObject({
+      submissionId,
+    });
+    expect(isValidElement(empty) && empty.props).toMatchObject({
+      submissionId: "",
+    });
+  });
+
+  it("grants the capability to reviewers, and not to staff, in the platform policy", () => {
     expect(authorizationPolicy.platform.reviewer).toContain(
       collectionReviewCapability,
     );
-    expect(createCollectionReviewEntrypoint(authorizationPolicy).id).toBe(
-      "collection-review",
+    expect(authorizationPolicy.platform.staff).not.toContain(
+      collectionReviewCapability,
     );
   });
 });

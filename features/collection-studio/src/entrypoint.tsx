@@ -1,3 +1,4 @@
+import { createUploadsContextResolver } from "@ador/feature-uploads/context";
 import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
@@ -22,7 +23,7 @@ import {
   createListSubmissionsOperation,
   createSubmitCollectionOperation,
 } from "./application/submission-operations.ts";
-import { createCollectionStudioContextResolver } from "./context.ts";
+
 import {
   createAssetPreviewResolver,
   createCollectionServiceResolver,
@@ -36,7 +37,7 @@ export function createCollectionStudioEntrypoint(
   targetChains: readonly ChainOption[],
 ): FeatureEntrypoint {
   const enabledChains = targetChains.filter(({ enabled }) => enabled);
-  const context = createCollectionStudioContextResolver(providers);
+  const context = createUploadsContextResolver(providers);
   const getService = createCollectionServiceResolver(context, targetChains);
   const getSubmissions = createSubmissionServiceResolver(context, targetChains);
   const dependencies = {

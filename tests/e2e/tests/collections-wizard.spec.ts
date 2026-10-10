@@ -82,7 +82,7 @@ test("a creator builds a draft in the browser, leaves, and resumes where it stan
   await page.getByRole("link", { name: "Continue Browser built" }).click();
   await expect(step(page, "Review")).toBeVisible();
   await expect(
-    page.getByText("Submitting for review is not available yet."),
+    page.getByText("Not ready to submit yet. It needs every planned item."),
   ).toBeVisible();
 
   const list = collectionListResponseSchema.parse(

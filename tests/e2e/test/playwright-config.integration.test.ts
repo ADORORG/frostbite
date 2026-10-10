@@ -38,6 +38,10 @@ describe("Playwright production-server integration", () => {
     expect(pattern.test("tests/collections-api.spec.ts")).toBe(true);
     expect(pattern.test("tests/collections-access-api.spec.ts")).toBe(true);
     expect(pattern.test("tests/collections-wizard.spec.ts")).toBe(true);
+    expect(pattern.test("tests/collections-review.spec.ts")).toBe(true);
     expect(pattern.test("tests/collections-quality.spec.ts")).toBe(false);
+    expect(pattern.test("tests/collections-review-quality.spec.ts")).toBe(
+      false,
+    );
   });
 });

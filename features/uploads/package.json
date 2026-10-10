@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/registration.ts",
     "./cleanup": "./src/cleanup.ts",
+    "./context": "./src/context.ts",
     "./entrypoint": "./src/entrypoint.tsx",
     "./pipeline": "./src/pipeline.ts",
     "./presentation": "./src/client/asset-presentation.ts"

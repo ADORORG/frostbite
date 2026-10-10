@@ -5,14 +5,20 @@ import {
   collectionItemRemovedSchema,
   collectionListResponseSchema,
   collectionRoutes,
+  collectionSubmissionListSchema,
+  collectionSubmissionResponseSchema,
+  submissionRoutes,
   type AddCollectionItemInput,
   type CollectionDetail,
   type CollectionItemChange,
   type CollectionItemRemoved,
   type CollectionListResponse,
+  type CollectionSubmissionList,
+  type CollectionSubmissionResponse,
   type CreateCollectionDraftInput,
   type RemoveCollectionItemInput,
   type SaveCollectionDraftInput,
+  type SubmitCollectionInput,
   type UpdateCollectionItemInput,
 } from "@ador/shared/collections";
 import type { IdempotencyKey } from "@ador/shared/http";
@@ -39,6 +45,10 @@ export interface CollectionsApi {
   // The creator's own uploads, for choosing images. This is the uploads feature's public contract.
   listImages(options?: CallOptions): Promise<LibraryResponse>;
   read(collectionId: string, options?: CallOptions): Promise<CollectionDetail>;
+  listSubmissions(
+    collectionId: string,
+    options?: CallOptions,
+  ): Promise<CollectionSubmissionList>;
   removeItem(
     input: RemoveCollectionItemInput,
     options?: CallOptions,
@@ -47,6 +57,10 @@ export interface CollectionsApi {
     input: SaveCollectionDraftInput,
     options?: CallOptions,
   ): Promise<CollectionDetail>;
+  submit(
+    input: SubmitCollectionInput,
+    options: CallOptions & { readonly idempotencyKey: IdempotencyKey },
+  ): Promise<CollectionSubmissionResponse>;
   updateItem(
     input: UpdateCollectionItemInput,
     options?: CallOptions,
@@ -72,6 +86,11 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
       request(collectionRoutes.list, collectionListResponseSchema, options),
     listImages: (options = {}) =>
       request(libraryRoute, libraryResponseSchema, options),
+    listSubmissions: (collectionId, options = {}) =>
+      request(submissionRoutes.list, collectionSubmissionListSchema, {
+        body: { collectionId },
+        ...options,
+      }),
     read: (collectionId, options = {}) =>
       request(collectionRoutes.read, collectionDetailSchema, {
         body: { collectionId },
@@ -84,6 +103,11 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
       }),
     save: (input, options = {}) =>
       request(collectionRoutes.save, collectionDetailSchema, {
+        body: input,
+        ...options,
+      }),
+    submit: (input, options) =>
+      request(submissionRoutes.submit, collectionSubmissionResponseSchema, {
         body: input,
         ...options,
       }),

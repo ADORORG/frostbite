@@ -5,12 +5,15 @@ import {
   liveSubmissionStates,
   missingSubmissionRequirements,
   resolveSubmissionTransition,
+  reviewActionLabels,
   reviewActions,
+  reviewActionsNeedingFeedback,
   reviewDecisionSchema,
   reviewRoutes,
   reviewSubmissionSchema,
   submissionRoutes,
   submissionSnapshotSchema,
+  submissionStateLabels,
   submissionStates,
   type ReviewAction,
   type SubmissionState,
@@ -230,5 +233,33 @@ describe("review and submission routes", () => {
       expect(route.method).toBe("POST");
       expect(routeContributionSchema.safeParse(route).success).toBe(true);
     }
+  });
+});
+
+describe("the words for states and actions", () => {
+  it("has a distinct label for every state and every review action", () => {
+    expect(
+      new Set(submissionStates.map((state) => submissionStateLabels[state]))
+        .size,
+    ).toBe(submissionStates.length);
+    expect(
+      new Set(reviewActions.map((action) => reviewActionLabels[action])).size,
+    ).toBe(reviewActions.length);
+  });
+
+  it("asks for feedback exactly where a decision ends or withholds something from the creator", () => {
+    expect([...reviewActionsNeedingFeedback].sort()).toEqual(
+      ["request-changes", "reject", "revoke", "suspend"].sort(),
+    );
+    for (const action of reviewActions)
+      expect(
+        reviewDecisionSchema.safeParse({
+          action,
+          creatorFeedback: "",
+          privateNotes: "",
+          reasonCode: "meets-policy",
+          submissionId: submission,
+        }).success,
+      ).toBe(!reviewActionsNeedingFeedback.includes(action));
   });
 });

@@ -1,52 +1,13 @@
-import { AxeBuilder } from "@axe-core/playwright";
 import { collectionStudioPath } from "@ador/shared/collections";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
-import { useE2ESession } from "../src/session.ts";
 import { create, detailOf, draftBody } from "./support/collection-helpers.ts";
+import { closeMatrix, prepare, skipToMain } from "./support/quality.ts";
 
 // Layout, keyboard, reduced-motion, accessibility, and visual coverage of the collection pages in
 // deterministic states, on every viewport project. The list is checked empty (a creator with no
 // drafts); the wizard on its first step (a draft with no images, so no signed URLs or dates appear).
-
-async function prepare(page: Page, baseURL: string | undefined, token: string) {
-  if (baseURL === undefined) throw new Error("Expected configured base URL");
-  await useE2ESession(page.context(), baseURL, token);
-  await page.emulateMedia({ reducedMotion: "reduce" });
-}
-
-async function closeMatrix(page: Page, name: string) {
-  await expect(page.locator(".app-shell")).toHaveJSProperty(
-    "scrollWidth",
-    await page.locator(".app-shell").evaluate((shell) => shell.clientWidth),
-  );
-  await expect(page.locator(".scanlines")).toHaveCSS("display", "none");
-  await page.addStyleTag({
-    content: [
-      ".skip-link { visibility: hidden !important; }",
-      ".status-lamp__light { box-shadow: none !important; }",
-    ].join("\n"),
-  });
-  await page.evaluate(() => window.scrollTo(0, 0));
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
-  expect(results.violations).toEqual([]);
-  await expect(page).toHaveScreenshot(name, {
-    animations: "disabled",
-    fullPage: true,
-    mask: [page.locator(".status-lamp__light")],
-  });
-}
-
-async function skipToMain(page: Page) {
-  await page.keyboard.press("Tab");
-  const skipLink = page.getByRole("link", { name: "Skip to main content" });
-  await expect(skipLink).toBeFocused();
-  await skipLink.press("Enter");
-  await expect(page.locator("#main-content")).toBeFocused();
-}
 
 test("the collections list closes the experience-quality matrix", async ({
   baseURL,

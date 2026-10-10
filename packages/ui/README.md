@@ -14,6 +14,9 @@ arcade components, and platform patterns derived from the immutable standalone a
   and arbitrary children. It owns hydration-safe opening, native focus behavior, dismissal,
   unique accessible labels, and shared compact modal styling. It has no wallet dependencies.
 
+The shared form styles also give `.arcade-facts` (a label and value list that stacks on narrow screens)
+and lay out radio and checkbox labels beside their control.
+
 Consumers compose these exports and must not copy their CSS or use raw brand colors. Status tones
 describe view state only; the caller remains responsible for deriving truthful state from its
 authoritative domain model.

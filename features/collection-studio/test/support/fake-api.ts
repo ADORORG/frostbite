@@ -1,6 +1,7 @@
 import { ApiError } from "@ador/client-http";
 import type {
   CollectionDetail,
+  CollectionSubmission,
   CollectionSummary,
 } from "@ador/shared/collections";
 import { idempotencyKeySchema } from "@ador/shared/http";
@@ -31,7 +32,14 @@ export function fakeCollections(
   ],
 ) {
   const summaries: CollectionSummary[] = [];
-  const state = { detail: initial, library: [...library], summaries };
+  const submissions: CollectionSubmission[] = [];
+  const state = {
+    detail: initial,
+    library: [...library],
+    submissions,
+    summaries,
+  };
+  const submittedKeys = new Map<string, CollectionSubmission>();
   const bump = () => {
     state.detail = {
       ...state.detail,
@@ -84,6 +92,33 @@ export function fakeCollections(
       };
       return state.detail;
     }),
+    listSubmissions: vi.fn<CollectionsApi["listSubmissions"]>(async () => ({
+      submissions: state.submissions,
+    })),
+    // Freezes the revision named, newest first, and replays a key it has already answered.
+    submit: vi.fn<CollectionsApi["submit"]>(
+      async ({ collectionId, expectedRevision }, { idempotencyKey }) => {
+        const replay = submittedKeys.get(idempotencyKey);
+        if (replay !== undefined) return { submission: replay };
+        if (expectedRevision !== state.detail.collection.revision)
+          throw revisionConflict();
+        const stamp = new Date("2026-10-10T12:00:00.000Z").toISOString();
+        const submission: CollectionSubmission = {
+          collectionId,
+          collectionRevision: expectedRevision,
+          createdAt: stamp,
+          decisions: [],
+          id: id(),
+          payloadHash: "a".repeat(64),
+          sequence: state.submissions.length + 1,
+          state: "submitted",
+          updatedAt: stamp,
+        };
+        state.submissions = [submission, ...state.submissions];
+        submittedKeys.set(idempotencyKey, submission);
+        return { submission };
+      },
+    ),
     updateItem: vi.fn<CollectionsApi["updateItem"]>(
       async ({ item, itemId }) => {
         const current = state.detail.items.find(

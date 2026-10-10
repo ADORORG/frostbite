@@ -93,7 +93,7 @@ stored in `references/task-list.md`.
 | W4-01  | Implement collection/project records, versioned drafts, metadata, supply, and items       | completed | `references/collection-records-task-record.md`      |
 | W4-02  | Build the resumable creator collection wizard                                             | completed | `references/collection-wizard-task-record.md`       |
 | W4-03  | Implement immutable submission snapshots and review state transitions                     | completed | `references/submission-snapshots-task-record.md`    |
-| W4-03b | Add creator submit and status controls to the wizard and the staff review page            | pending   | Depends on W4-03; split from it                     |
+| W4-03b | Add creator submit and status controls to the wizard and the staff review page            | completed | `references/submission-ui-task-record.md`           |
 | W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | pending   | Depends on W4-03                                    |
 | W4-05  | Build approved public collection list and detail pages                                    | pending   | Depends on W4-03                                    |
 | W4-06  | Add creator/staff audit visibility                                                        | pending   | Depends on W4-03                                    |

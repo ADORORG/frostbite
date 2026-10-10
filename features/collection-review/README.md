@@ -1,25 +1,47 @@
 # Collection review feature
 
-Staff review of collections that creators have submitted: the review queue, one submission in full
-(its frozen snapshot and every event, including private notes), and decisions. It contributes API
-routes only for now; the review page is a later task. Register `createCollectionReviewFeature` once in
-the feature registry with the authorization policy; removing that line removes every review route.
+Staff review of collections that creators have submitted: the review queue, one submission in full (its
+frozen snapshot with the creator's images, and every event including private notes), and decisions. It
+contributes three API routes and two admin pages. Register `createCollectionReviewFeature` once in the
+feature registry with the authorization policy and the provider registry; removing that line removes
+every review route, page, and navigation entry.
 
-| Operation                        | Route                                    | Notes                              |
-| -------------------------------- | ---------------------------------------- | ---------------------------------- |
-| `listCollectionReviewQueue`      | `POST /api/v1/collection-reviews/queue`  | Chosen states, oldest update first |
-| `readCollectionReviewSubmission` | `POST /api/v1/collection-reviews/read`   | Snapshot and the full audit trail  |
-| `decideCollectionReview`         | `POST /api/v1/collection-reviews/decide` | Idempotency key required           |
+| Operation                        | Route                                    | Notes                                              |
+| -------------------------------- | ---------------------------------------- | -------------------------------------------------- |
+| `listCollectionReviewQueue`      | `POST /api/v1/collection-reviews/queue`  | Chosen states, oldest update first                 |
+| `readCollectionReviewSubmission` | `POST /api/v1/collection-reviews/read`   | Snapshot, audit trail, and signed image previews   |
+| `decideCollectionReview`         | `POST /api/v1/collection-reviews/decide` | Idempotency key required; answers without previews |
 
-Every operation requires the `collection:review` capability, which the authorization policy grants to
-the `reviewer` role (not to `staff`). The web route layer enforces it for the session; `decide` also
-checks, inside its own transaction, that the reviewer's role is still active, that the reviewer is not
-the creator, and that the transition is legal.
+| Page                | Path                                       | Notes                                                    |
+| ------------------- | ------------------------------------------ | -------------------------------------------------------- |
+| Review queue        | `/admin/collection-reviews`                | Three groups: needs review, approved or paused, finished |
+| Review a submission | `/admin/collection-reviews/[submissionId]` | The frozen version, the decision form, and the history   |
 
-Rules and persistence live in `@ador/collections`; contracts in `@ador/shared/collections`. A
-decision that needs the creator to know why (request changes, reject, suspend, revoke) must carry
-feedback. Error mapping: an unknown submission is 404, a reviewer without the role (or the creator
-themselves) is 403, an illegal move, a creator who is no longer approved, or an idempotency conflict is 409.
+Everything requires the `collection:review` capability, which the authorization policy grants to the
+`reviewer` role (not to `staff`). The web route layer enforces it for the session; `decide` also checks,
+inside its own transaction, that the reviewer's role is still active, that the reviewer is not the
+creator, and that the transition is legal.
 
-Run `env:check`, `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. Platform engineering
-owns this feature.
+## Behaviour worth knowing
+
+- The decision form offers only the moves the state machine allows from where the submission stands, and
+  asks for a second click before rejecting or revoking. Feedback is required wherever the creator must be
+  told why (request changes, reject, suspend, revoke).
+- A decision's idempotency key is held until the decision is recorded and replaced when the decision
+  changes, so a retry after a lost response cannot record it twice.
+- Images are signed for the review only: the read operation signs just the assets frozen into that
+  submission, as its creator's own, through the uploads library (ADR-016). Previews are never stored.
+- The audit reason code is derived from the action (`client/decisions.ts`), not typed by the reviewer.
+
+## Structure
+
+`src/application` (operations, presenters), `src/client` (typed API client on `@ador/client-http`, form
+parsing, failure copy, queue groups), `src/ui` (hooks bound to `@ador/client-react`, components, and the
+two page surfaces), `src/runtime.ts` (lazy service and preview resolvers over the uploads context).
+
+Rules and persistence live in `@ador/collections`; contracts in `@ador/shared/collections`. Error mapping:
+an unknown submission is 404, a reviewer without the role (or the creator themselves) is 403, an illegal
+move, a creator who is no longer approved, or an idempotency conflict is 409.
+
+Run `env:check`, `typecheck`, `test:unit`, `test:integration`, `test:coverage`, or the browser checks
+(`tests/e2e`, `collections-review*.spec.ts`). Platform engineering owns this feature.

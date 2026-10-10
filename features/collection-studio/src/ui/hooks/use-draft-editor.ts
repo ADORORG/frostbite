@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import type {
   CollectionDetail,
   CollectionDraft,
@@ -7,7 +7,8 @@ import type {
 import type { IdempotencyKey } from "@ador/shared/http";
 
 import type { CollectionsClientServices } from "../../client/services.ts";
-import { describeFailure, type Failure } from "../../client/error-copy.ts";
+import type { Failure } from "../../client/error-copy.ts";
+import { useAction } from "./use-action.ts";
 import { useResource, type Resource } from "./use-resource.ts";
 
 export interface DraftEditor {
@@ -43,25 +44,7 @@ export function useDraftEditor(
     (signal) => services.api.read(collectionId, { signal }),
     collectionId,
   );
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<Failure | null>(null);
-
-  const act = useCallback(
-    async (work: () => Promise<void>): Promise<boolean> => {
-      setBusy(true);
-      setNotice(null);
-      try {
-        await work();
-        return true;
-      } catch (error) {
-        setNotice(describeFailure(error));
-        return false;
-      } finally {
-        setBusy(false);
-      }
-    },
-    [],
-  );
+  const { act, busy, dismissNotice, notice } = useAction();
 
   const refresh = useCallback(
     async () => replace(await services.api.read(collectionId)),
@@ -78,7 +61,7 @@ export function useDraftEditor(
         await refresh();
       }),
     busy,
-    dismissNotice: () => setNotice(null),
+    dismissNotice,
     notice,
     reload,
     removeItem: (itemId) =>

@@ -1,7 +1,12 @@
+import { unusedStorage } from "@ador/test-kit/storage-registry";
+import { createDatabaseFromEnvironment } from "@ador/database/connection";
 import { authorizationPolicy } from "@repo/config/authorization";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { createReviewServiceResolver } from "../src/runtime.ts";
+import {
+  createPreviewResolver,
+  createReviewServiceResolver,
+} from "../src/runtime.ts";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",
@@ -12,21 +17,35 @@ const environment = {
   DATABASE_URL: "postgresql://app:secret@database.invalid/app",
 };
 
-describe("review service resolver", () => {
-  it("builds the service once, on first use", async () => {
+describe("review runtime", () => {
+  it("builds the service and the preview source lazily, each once, from one shared context", async () => {
     // The pool connects lazily, and nothing here runs a query.
-    const resolve = createReviewServiceResolver(
+    const context = {
+      database: createDatabaseFromEnvironment(environment),
+      storage: unusedStorage,
+    };
+    const resolveContext = vi.fn(async () => context);
+    const getService = createReviewServiceResolver(
       authorizationPolicy,
-      environment,
+      resolveContext,
     );
-    const service = await resolve();
-    expect(await resolve()).toBe(service);
-    expect(typeof service.decide).toBe("function");
+    const getPreviews = createPreviewResolver(resolveContext);
+    expect(resolveContext).not.toHaveBeenCalled();
+    expect(await getService()).toBe(await getService());
+    expect(await getPreviews()).toBe(await getPreviews());
+    expect(resolveContext).toHaveBeenCalledTimes(2);
   });
 
-  it("fails on a misconfigured database and does not cache the failure", async () => {
-    const resolve = createReviewServiceResolver(authorizationPolicy, {});
-    await expect(resolve()).rejects.toThrow();
-    await expect(resolve()).rejects.toThrow();
+  it("does not cache a failed context resolution", async () => {
+    const resolveContext = vi
+      .fn<() => Promise<never>>()
+      .mockRejectedValue(new Error("unavailable"));
+    const getService = createReviewServiceResolver(
+      authorizationPolicy,
+      resolveContext,
+    );
+    await expect(getService()).rejects.toThrow("unavailable");
+    await expect(getService()).rejects.toThrow("unavailable");
+    expect(resolveContext).toHaveBeenCalledTimes(2);
   });
 });

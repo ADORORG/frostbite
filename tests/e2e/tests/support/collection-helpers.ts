@@ -78,3 +78,47 @@ export const create = (
 // A response body is `unknown` (untrusted) until the shared contract accepts it, as in `upload-api.ts`.
 export const detailOf = async (response: { json(): Promise<unknown> }) =>
   collectionDetailSchema.parse(await response.json());
+
+// A creator's collection that satisfies every submission requirement, built through the API: a cover
+// image, a description, and one item with its own image. Returns what a spec needs to find it again.
+export async function createReadyCollection(
+  request: APIRequestContext,
+  baseURL: string | undefined,
+  name: string,
+  prefix: string,
+) {
+  const cover = await uploadProcessed(
+    request,
+    baseURL,
+    `${prefix}-cover-000001`,
+    "collection-artwork",
+  );
+  const image = await uploadProcessed(
+    request,
+    baseURL,
+    `${prefix}-image-000001`,
+    "collection-item-artwork",
+  );
+  const created = await detailOf(
+    await create(
+      request,
+      baseURL,
+      `${prefix}-create-0001`,
+      draftBody({
+        coverAssetId: cover,
+        description: "A small ready collection",
+        name,
+        plannedSupply: 1,
+      }),
+    ),
+  );
+  const added = await post(
+    request,
+    baseURL,
+    itemsPath,
+    { collectionId: created.collection.id, item: itemBody(image, "Dawn") },
+    { "idempotency-key": `${prefix}-item-000001` },
+  );
+  expect(added.ok()).toBe(true);
+  return { id: created.collection.id, name };
+}

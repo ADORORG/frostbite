@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@ador/client-http": "workspace:*",
+    "@ador/client-react": "workspace:*",
     "@ador/collections": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/feature-uploads": "workspace:*",

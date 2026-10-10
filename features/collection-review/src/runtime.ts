@@ -2,32 +2,45 @@ import {
   createDrizzleSubmissionRepository,
   createReviewService,
 } from "@ador/collections";
-import { createDatabaseFromEnvironment } from "@ador/database/connection";
+import type { UploadsContext } from "@ador/feature-uploads/context";
 import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
 import { createUuidV7 } from "@ador/shared/identifiers";
+import {
+  createAssetLibraryService,
+  createDrizzleAssetLibraryRepository,
+} from "@ador/uploads";
 
 // Submissions waiting at once on the queue page; an engineering bound, not a product quota.
 const queueLimit = 100;
 
-export type ReviewServiceResolver = ReturnType<
-  typeof createReviewServiceResolver
->;
+type ResolveContext = () => Promise<UploadsContext>;
 
-// The review service, built on first use over one database client. A failed build is not cached.
+// The review service, built on first use over the shared database client. A failed build is not cached.
 export function createReviewServiceResolver(
   authorizationPolicy: AuthorizationPolicy,
-  environment: NodeJS.ProcessEnv = process.env,
+  resolveContext: ResolveContext,
 ) {
-  return memoizeUntilFailure(async () =>
-    createReviewService({
+  return memoizeUntilFailure(async () => {
+    const { database } = await resolveContext();
+    return createReviewService({
       authorizationPolicy,
       clock: () => new Date(),
       createId: createUuidV7,
       queueLimit,
-      repository: createDrizzleSubmissionRepository(
-        createDatabaseFromEnvironment(environment),
-      ),
-    }),
-  );
+      repository: createDrizzleSubmissionRepository(database),
+    });
+  });
+}
+
+// Previews of a submission's images for the reviewer: the uploads library's own presentation (state and
+// short-lived signed renditions, ADR-016), so signing stays in one place.
+export function createPreviewResolver(resolveContext: ResolveContext) {
+  return memoizeUntilFailure(async () => {
+    const { database, storage } = await resolveContext();
+    return createAssetLibraryService({
+      repository: createDrizzleAssetLibraryRepository(database),
+      storage,
+    });
+  });
 }

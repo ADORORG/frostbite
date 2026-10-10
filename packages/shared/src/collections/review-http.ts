@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { uuidV7TextSchema } from "../identifiers/uuid-v7.ts";
+import { libraryAssetSchema } from "../uploads/library-contracts.ts";
 import { collectionSubmissionSchema } from "./submission-http.ts";
 import { submissionSnapshotSchema } from "./snapshot.ts";
 import {
@@ -65,6 +66,15 @@ export const reviewSubmissionResponseSchema = z
   .object({ submission: reviewSubmissionSchema })
   .strict();
 
+// The submission in full with short-lived signed previews of every image in its snapshot (ADR-016),
+// so a reviewer sees the art. Never store these URLs.
+export const reviewDetailResponseSchema = z
+  .object({
+    previews: z.array(libraryAssetSchema),
+    submission: reviewSubmissionSchema,
+  })
+  .strict();
+
 export const reviewRoutes = {
   decide: {
     method: "POST",
@@ -83,6 +93,7 @@ export const reviewRoutes = {
   },
 } as const;
 
+export type ReviewDetailResponse = z.infer<typeof reviewDetailResponseSchema>;
 export type ReviewEvent = z.infer<typeof reviewEventSchema>;
 export type ReviewQueueInput = z.infer<typeof reviewQueueInputSchema>;
 export type ReviewQueueItem = z.infer<typeof reviewQueueItemSchema>;

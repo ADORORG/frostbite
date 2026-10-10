@@ -12,6 +12,7 @@
     "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
+    "./library-asset": "./src/library-asset.ts",
     "./png": "./src/png.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",

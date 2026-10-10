@@ -28,5 +28,5 @@ export const featureRegistry = createFeatureRegistry([
   createWalletConnectionFeature(walletConnectionConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),
-  createCollectionReviewFeature(authorizationPolicy),
+  createCollectionReviewFeature(authorizationPolicy, providerRegistry),
 ]);

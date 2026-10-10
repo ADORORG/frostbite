@@ -1,4 +1,5 @@
 import {
+  reviewDetailResponseSchema,
   reviewQueueResponseSchema,
   reviewRoutes,
   reviewSubmissionResponseSchema,
@@ -16,6 +17,7 @@ import {
   key,
   migrate,
   reviewer,
+  signedUrl,
   submittedCollection,
 } from "./support/review-harness.ts";
 
@@ -52,13 +54,21 @@ describe("reviewing submissions over the real database", () => {
       actor,
       body: { submissionId: seed.submissionId },
     });
-    const { submission } = reviewSubmissionResponseSchema.parse(read.body);
+    const { previews, submission } = reviewDetailResponseSchema.parse(
+      read.body,
+    );
     expect(submission).toMatchObject({
       collectionId: seed.collectionId,
       ownerUserId: seed.ownerUserId,
       state: "submitted",
     });
     expect(submission.snapshot.items).toHaveLength(1);
+    // The reviewer sees the art: the cover's short-lived signed rendition, for this submission's own images.
+    const cover = previews.find(({ id }) => id === seed.cover);
+    expect(cover?.derivatives[0]?.url).toBe(signedUrl(seed.coverKey));
+    expect(previews.map(({ id }) => id).sort()).toEqual(
+      submission.snapshot.assets.map(({ id }) => id).sort(),
+    );
 
     for (const action of ["start-review", "approve"] as const) {
       const decided = await call(reviewRoutes.decide, {
@@ -69,12 +79,16 @@ describe("reviewing submissions over the real database", () => {
         key: key(),
       });
       expect(decided.status).toBe(200);
+      // A decision answers with the submission as it now stands (no previews: the page keeps its own).
+      expect(
+        reviewSubmissionResponseSchema.parse(decided.body).submission.id,
+      ).toBe(seed.submissionId);
     }
     const after = await call(reviewRoutes.read, {
       actor,
       body: { submissionId: seed.submissionId },
     });
-    const view = reviewSubmissionResponseSchema.parse(after.body).submission;
+    const view = reviewDetailResponseSchema.parse(after.body).submission;
     expect(view.state).toBe("approved");
     expect(view.events.map(({ action }) => action)).toEqual([
       "submit",

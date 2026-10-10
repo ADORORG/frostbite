@@ -12,13 +12,13 @@ import {
   createDrizzleAssetLibraryRepository,
 } from "@ador/uploads";
 
-import type { CollectionStudioContext } from "./context.ts";
+import type { UploadsContext } from "@ador/feature-uploads/context";
 
 // A creator's own drafts listed at once; engineering bound, not a product quota.
 const draftListLimit = 100;
 
 export function createCollectionServiceResolver(
-  resolveContext: () => Promise<CollectionStudioContext>,
+  resolveContext: () => Promise<UploadsContext>,
   targetChains: readonly ChainOption[],
 ) {
   return memoizeUntilFailure(async () => {
@@ -34,7 +34,7 @@ export function createCollectionServiceResolver(
 }
 
 export function createSubmissionServiceResolver(
-  resolveContext: () => Promise<CollectionStudioContext>,
+  resolveContext: () => Promise<UploadsContext>,
   targetChains: readonly ChainOption[],
 ) {
   return memoizeUntilFailure(async () => {
@@ -51,7 +51,7 @@ export function createSubmissionServiceResolver(
 // The previews are the uploads library's own presentation of the creator's assets (state and
 // short-lived signed renditions, ADR-016), so signing stays in one place.
 export function createAssetPreviewResolver(
-  resolveContext: () => Promise<CollectionStudioContext>,
+  resolveContext: () => Promise<UploadsContext>,
 ) {
   return memoizeUntilFailure(async () => {
     const { database, storage } = await resolveContext();

@@ -1,13 +1,8 @@
 import { createDatabaseFromEnvironment } from "@ador/database/connection";
 import { chainOptionSchema } from "@ador/shared/chain";
-import {
-  storageRegistry,
-  unusedStorage,
-} from "@ador/test-kit/storage-registry";
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { unusedStorage } from "@ador/test-kit/storage-registry";
 import { describe, expect, it, vi } from "vitest";
 
-import { createCollectionStudioContextResolver } from "../src/context.ts";
 import {
   createAssetPreviewResolver,
   createCollectionServiceResolver,
@@ -33,46 +28,6 @@ const chains = [
     role: "public-beta",
   }),
 ];
-
-describe("collection studio context", () => {
-  it("resolves storage and one database client once and shares them", async () => {
-    const createStorage = vi.fn(() => unusedStorage);
-    const resolve = createCollectionStudioContextResolver(
-      storageRegistry(createStorage),
-      environment,
-    );
-    const context = await resolve();
-    expect(context.storage).toBe(unusedStorage);
-    expect(await resolve()).toBe(context);
-    expect(createStorage).toHaveBeenCalledOnce();
-  });
-
-  it("does not cache a failed resolution", async () => {
-    const createStorage = vi
-      .fn(() => unusedStorage)
-      .mockImplementationOnce(() => {
-        throw new Error("storage configuration is missing");
-      });
-    const resolve = createCollectionStudioContextResolver(
-      storageRegistry(createStorage),
-      environment,
-    );
-    await expect(resolve()).rejects.toThrow("storage configuration");
-    await expect(resolve()).resolves.toBeDefined();
-  });
-
-  it("fails when storage is not registered or the database is misconfigured", async () => {
-    await expect(
-      createCollectionStudioContextResolver(
-        createProviderRegistry([]),
-        environment,
-      )(),
-    ).rejects.toThrow(/not registered/u);
-    await expect(
-      createCollectionStudioContextResolver(storageRegistry(), {})(),
-    ).rejects.toThrow();
-  });
-});
 
 describe("collection studio runtime", () => {
   it("builds the service and the preview source lazily from one shared context", async () => {

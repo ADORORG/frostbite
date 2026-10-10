@@ -13,6 +13,8 @@ Configuration uses the shared typed upload policy. Run `env:check`, `typecheck`,
 
 ## Presentation helpers
 
+`@ador/feature-uploads/context` exports `createUploadsContextResolver`, the database and storage an
+uploads-backed feature needs (collection studio and collection review use it instead of repeating it).
 `@ador/feature-uploads/presentation` exports the pure helpers that explain a `LibraryAsset` to a person
 (`assetBadge`, `assetNote`, `pickRendition`, `describeDimensions`), so other studio pages that show the
 creator's images describe them in the same words.

@@ -50,6 +50,37 @@ export type SubmissionState = z.infer<typeof submissionStateSchema>;
 export type SubmissionAction = z.infer<typeof submissionActionSchema>;
 export type ReviewAction = z.infer<typeof reviewActionSchema>;
 
+// The words for each state, shared so creators and staff call a submission the same thing.
+export const submissionStateLabels: Readonly<Record<SubmissionState, string>> =
+  {
+    approved: "Approved",
+    "changes-requested": "Changes requested",
+    rejected: "Not approved",
+    revoked: "Revoked",
+    submitted: "Submitted",
+    suspended: "Suspended",
+    "under-review": "In review",
+  };
+
+// The words for each action a reviewer can take.
+export const reviewActionLabels: Readonly<Record<ReviewAction, string>> = {
+  approve: "Approve",
+  reinstate: "Reinstate",
+  reject: "Reject",
+  "request-changes": "Request changes",
+  revoke: "Revoke",
+  "start-review": "Start review",
+  suspend: "Suspend",
+};
+
+// Actions that end or withhold something from the creator must say why, in words they will see.
+export const reviewActionsNeedingFeedback: readonly ReviewAction[] = [
+  "request-changes",
+  "reject",
+  "revoke",
+  "suspend",
+];
+
 const transitions: Readonly<
   Record<
     SubmissionState,
@@ -92,14 +123,6 @@ export const reviewFieldLimits = Object.freeze({
   privateNotes: 4_000,
 });
 
-// Actions that end or withhold something from the creator must say why, in words they will see.
-const actionsNeedingFeedback: readonly ReviewAction[] = [
-  "request-changes",
-  "reject",
-  "revoke",
-  "suspend",
-];
-
 export const reviewDecisionSchema = z
   .object({
     action: reviewActionSchema,
@@ -111,7 +134,7 @@ export const reviewDecisionSchema = z
   .strict()
   .refine(
     ({ action, creatorFeedback }) =>
-      creatorFeedback !== "" || !actionsNeedingFeedback.includes(action),
+      creatorFeedback !== "" || !reviewActionsNeedingFeedback.includes(action),
     {
       message: "This decision needs feedback for the creator.",
       path: ["creatorFeedback"],

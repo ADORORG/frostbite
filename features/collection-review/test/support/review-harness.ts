@@ -17,14 +17,35 @@ import {
   seedReadyCollection,
   seededChain,
 } from "@ador/test-kit/collection-database";
-import { seedPlatformUser } from "@ador/test-kit/creator-database";
+import {
+  seedDerivative,
+  seedPlatformUser,
+} from "@ador/test-kit/creator-database";
+import type { ObjectStoragePort } from "@ador/object-storage/contracts";
+import {
+  storageRegistry,
+  unusedStorage,
+} from "@ador/test-kit/storage-registry";
 import { authorizationPolicy } from "@repo/config/authorization";
 
-import { createCollectionReviewEntrypoint } from "../../src/entrypoint.ts";
+import { createCollectionReviewEntrypoint } from "../../src/entrypoint.tsx";
 
 // The registered review operations over the real database and the real authorization policy.
 export const database = createDatabaseFromEnvironment(process.env);
-const entrypoint = createCollectionReviewEntrypoint(authorizationPolicy);
+export const signedUrl = (key: string) =>
+  `https://storage.example.test/${key}?signature=1`;
+// Only signing is faked: it returns a URL and nothing else.
+const storage: ObjectStoragePort = {
+  ...unusedStorage,
+  presignPrivateRead: async ({ key }) => ({
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    url: new URL(signedUrl(key)),
+  }),
+};
+const entrypoint = createCollectionReviewEntrypoint(
+  authorizationPolicy,
+  storageRegistry(() => storage),
+);
 const submissions = createDrizzleSubmissionRepository(database);
 
 export const migrate = () =>
@@ -79,5 +100,6 @@ export async function submittedCollection() {
     submissionId: uuidV7Schema.parse(createUuidV7()),
   });
   if (result.kind !== "submitted") throw new Error(`got ${result.kind}`);
-  return { ...seed, submissionId: result.submission.id };
+  const coverKey = await seedDerivative(database, seed.cover, "thumbnail");
+  return { ...seed, coverKey, submissionId: result.submission.id };
 }
