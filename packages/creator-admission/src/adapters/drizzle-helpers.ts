@@ -1,13 +1,19 @@
 import { createHash } from "node:crypto";
 
-import type { DatabaseTransaction } from "@ador/database/connection";
+import type {
+  DatabaseClient,
+  DatabaseTransaction,
+} from "@ador/database/connection";
 import {
   creatorAdmissionEvents,
   creatorApplications,
 } from "@ador/database/schema/creator-admission";
-import type { CreatorAdmissionAction } from "@ador/shared/creator-admission";
+import {
+  creatorReviewActions,
+  type CreatorAdmissionAction,
+} from "@ador/shared/creator-admission";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 
 import type {
   CreatorApplicationView,
@@ -21,12 +27,44 @@ export function snapshotHash(
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
-export function applicationView(
+type Reader = Pick<DatabaseClient, "select">;
+
+// The newest message a reviewer wrote for the applicant: the newest non-empty `creatorFeedback` among the
+// reviewer's own decisions (never the applicant's events, whatever they hold). Ties on the time are broken by
+// the event id, which is time-ordered, so the answer is always the same. Private notes are never read here.
+async function latestFeedback(
+  database: Reader,
+  applicationId: string,
+): Promise<CreatorApplicationView["feedback"]> {
+  const [event] = await database
+    .select({
+      createdAt: creatorAdmissionEvents.createdAt,
+      text: creatorAdmissionEvents.creatorFeedback,
+    })
+    .from(creatorAdmissionEvents)
+    .where(
+      and(
+        eq(creatorAdmissionEvents.applicationId, applicationId),
+        inArray(creatorAdmissionEvents.action, [...creatorReviewActions]),
+        ne(creatorAdmissionEvents.creatorFeedback, ""),
+      ),
+    )
+    .orderBy(
+      desc(creatorAdmissionEvents.createdAt),
+      desc(creatorAdmissionEvents.id),
+    )
+    .limit(1);
+  return event ?? null;
+}
+
+export async function applicationView(
+  database: Reader,
   row: typeof creatorApplications.$inferSelect,
-): CreatorApplicationView {
+): Promise<CreatorApplicationView> {
   return {
     applicantUserId: uuidV7Schema.parse(row.applicantUserId),
     draft: row.draft,
+    feedback: await latestFeedback(database, row.id),
     id: uuidV7Schema.parse(row.id),
     revision: row.revision,
     state: row.state,
@@ -80,7 +118,10 @@ export async function replayMutation(
   const application = await lockedApplication(transaction, event.applicationId);
   return application === undefined
     ? { kind: "conflict" }
-    : { application: applicationView(application), kind: "replayed" };
+    : {
+        application: await applicationView(transaction, application),
+        kind: "replayed",
+      };
 }
 
 export async function insertAdmissionEvent(

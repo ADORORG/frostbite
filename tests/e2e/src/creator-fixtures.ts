@@ -138,6 +138,12 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-inline-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000060",
   },
+  // An applicant a reviewer has asked for changes (UX: the reviewer's message is shown to them).
+  applicantFeedback: {
+    sessionId: "01994b10-0000-7000-8000-000000000063",
+    sessionToken: "e2e-applicant-feedback-session-token",
+    userId: "01994b10-0000-7000-8000-000000000062",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
@@ -158,6 +164,15 @@ export const approvedCreators = [
   creatorE2EFixtures.reviewQualityCreator,
   creatorE2EFixtures.publicCollectionCreator,
 ] as const;
+
+// The application the seed gives `applicantFeedback`, and the reviewer's message on it.
+export const feedbackApplication = {
+  applicationId: "01994b10-0000-7000-8000-000000000064",
+  eventId: "01994b10-0000-7000-8000-000000000065",
+  feedback: "Please add a link to earlier work and say how the art was made.",
+  // A fixed moment, so the page it appears on is the same every day.
+  writtenAt: new Date("2026-10-10T12:30:00.000Z"),
+} as const;
 
 // The seeded approved collection the public pages are checked against.
 export const publicCollection = {

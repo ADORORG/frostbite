@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   creatorApplicationDraftSchema,
+  creatorApplicationViewSchema,
   creatorApplicationPath,
   creatorApplicationStates,
   creatorApplicationSubmissionSchema,
@@ -131,5 +132,53 @@ describe("standing badge", () => {
     expect(standingBadgeLabel(neverAppliedCopy)).toBe(
       "Cannot build collections yet",
     );
+  });
+});
+
+describe("the applicant's view of an application", () => {
+  const view = {
+    applicantUserId: "01994b10-0000-7000-8000-000000000001",
+    draft: completeDraft,
+    feedback: null,
+    id: "01994b10-0000-7000-8000-000000000002",
+    revision: 1,
+    state: "changes-requested",
+  };
+
+  it("carries the reviewer's latest message for the applicant, or null, and nothing else about the decision", () => {
+    expect(creatorApplicationViewSchema.parse(view).feedback).toBeNull();
+    const message = {
+      createdAt: "2026-10-10T12:30:00.000Z",
+      text: "Add a portfolio link.",
+    };
+    expect(
+      creatorApplicationViewSchema.parse({ ...view, feedback: message })
+        .feedback,
+    ).toEqual(message);
+    // The private notes are not a field of the view, so they cannot be carried by it.
+    expect(() =>
+      creatorApplicationViewSchema.parse({
+        ...view,
+        feedback: { ...message, privateNotes: "Looks copied." },
+      }),
+    ).toThrow();
+  });
+
+  it("refuses a view with no feedback field, an empty message, or a time that is not a time", () => {
+    expect(() =>
+      creatorApplicationViewSchema.parse({ ...view, feedback: undefined }),
+    ).toThrow();
+    expect(() =>
+      creatorApplicationViewSchema.parse({
+        ...view,
+        feedback: { createdAt: "2026-10-10T12:30:00.000Z", text: "" },
+      }),
+    ).toThrow();
+    expect(() =>
+      creatorApplicationViewSchema.parse({
+        ...view,
+        feedback: { createdAt: "yesterday", text: "Add a link." },
+      }),
+    ).toThrow();
   });
 });

@@ -69,25 +69,61 @@ test("persists, submits, and reviews a creator application", async ({
   await expect(
     page.getByRole("heading", { name: "Review creator admission" }),
   ).toBeVisible();
+  const decide = async (action: string, reasonCode: string, words = "") => {
+    await page.getByLabel("Decision").selectOption(action);
+    await page.getByLabel("Reason code").fill(reasonCode);
+    await page.getByLabel("Creator feedback").fill(words);
+    await page.getByRole("button", { name: "Record decision" }).click();
+  };
   await page.getByLabel("Application UUID").fill(mine.application.id);
-  await page.getByLabel("Reason code").fill("review-started");
-  await page.getByLabel("Creator feedback").fill("Review has started.");
-  await page
-    .getByLabel("Evidence URL (private)")
-    .fill("https://example.test/review-evidence");
-  const reviewResponsePromise = page.waitForResponse((response) =>
-    response.url().endsWith("/creator-application/review"),
-  );
-  await page.getByRole("button", { name: "Record decision" }).click();
-  const reviewResponse = await reviewResponsePromise;
-  expect(reviewResponse.status(), await reviewResponse.text()).toBe(200);
+  await decide("start-review", "review-started", "Review has started.");
   await expect(
     page.getByText("Decision recorded. State: under-review."),
   ).toBeVisible();
+  const asked = "Please add a link to your earlier work.";
+  await decide("request-changes", "needs-more-evidence", asked);
+  await expect(
+    page.getByText("Decision recorded. State: changes-requested."),
+  ).toBeVisible();
 
-  await page.getByLabel("Decision").selectOption("approve");
-  await page.getByLabel("Reason code").fill("creator-approved");
-  await page.getByRole("button", { name: "Record decision" }).click();
+  // The applicant reads what the reviewer wrote, still has the form, and sends it again.
+  await useE2ESession(
+    context,
+    baseURL,
+    creatorE2EFixtures.applicant.sessionToken,
+  );
+  await page.goto("/studio/creator-application");
+  const message = page.getByRole("article", {
+    name: "Message from a reviewer",
+  });
+  await expect(message).toContainText(asked);
+  await expect(
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Changes requested");
+  await page.getByLabel("Portfolio URL").fill("https://example.test/earlier");
+  await page.getByRole("button", { name: "Save private draft" }).click();
+  await expect(
+    page.getByText("Private draft saved. State: changes-requested."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Submit snapshot" }).click();
+  await expect(
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Application submitted");
+  // The old message is not shown against the new submission.
+  await expect(message).toHaveCount(0);
+
+  await useE2ESession(
+    context,
+    baseURL,
+    creatorE2EFixtures.reviewer.sessionToken,
+  );
+  await page.goto("/admin/creator-applications");
+  await page.getByLabel("Application UUID").fill(mine.application.id);
+  await decide("start-review", "review-restarted");
+  await expect(
+    page.getByText("Decision recorded. State: under-review."),
+  ).toBeVisible();
+  await decide("approve", "creator-approved");
   await expect(
     page.getByText("Decision recorded. State: approved."),
   ).toBeVisible();

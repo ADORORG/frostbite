@@ -56,4 +56,38 @@ describe("creator admission entrypoint", () => {
       ),
     ).toContain("Admission review");
   });
+
+  it("renders a saved application with the message a reviewer wrote, dates and all", async () => {
+    const actorUserId = createUuidV7();
+    findMine.mockResolvedValueOnce({
+      applicantUserId: actorUserId,
+      draft: {
+        contentDeclarationAccepted: true,
+        displayName: "Saved Creator",
+        expectedLaunchSize: "Small",
+        expectedLaunchTiming: "Soon",
+        jurisdictionAcknowledged: true,
+        portfolioLinks: [],
+        projectSummary: "Summary",
+        provenanceDeclarationAccepted: true,
+        rightsDeclarationAccepted: true,
+      },
+      feedback: {
+        createdAt: new Date("2026-10-10T12:30:00.000Z"),
+        text: "Add a portfolio link.",
+      },
+      id: createUuidV7(),
+      revision: 2,
+      state: "changes-requested",
+    });
+    const studio = createCreatorAdmissionEntrypoint().pages?.[0];
+    if (studio === undefined) throw new Error("Expected page");
+    const markup = renderToStaticMarkup(
+      await studio.render({ actorUserId, navigation: [], params: {} }),
+    );
+    expect(markup).toContain("Changes requested");
+    expect(markup).toContain("From a reviewer, 2026-10-10");
+    expect(markup).toContain("Add a portfolio link.");
+    expect(markup).toContain("Saved Creator");
+  });
 });

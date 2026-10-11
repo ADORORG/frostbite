@@ -16,6 +16,7 @@ import {
   approvedCreators,
   creatorE2EFixtures,
 } from "../src/creator-fixtures.ts";
+import { seedFeedbackApplication } from "./feedback-seed.ts";
 import { seedPublicCollection } from "./public-collection-seed.ts";
 
 // Seeding and application environment shared by every script that runs the real stack: the browser
@@ -89,6 +90,7 @@ export async function seed(databaseUrl: string): Promise<void> {
         userId: creatorE2EFixtures.staff.userId,
       },
     ]);
+    await seedFeedbackApplication(database);
     await seedPublicCollection(database);
     await database.insert(walletIdentities).values({
       address: "tb1qe2eapplicant",

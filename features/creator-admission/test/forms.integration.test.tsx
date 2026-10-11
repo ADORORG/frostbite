@@ -20,6 +20,7 @@ const application = {
     provenanceDeclarationAccepted: true,
     rightsDeclarationAccepted: true,
   },
+  feedback: null,
   id: createUuidV7(),
   revision: 1,
   state: "draft" as const,

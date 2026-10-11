@@ -32,6 +32,13 @@ const authenticatedSurfaces = [
     token: creatorE2EFixtures.collectionQualityList.sessionToken,
   },
   {
+    // A reviewer asked for changes: their message sits between the status and the form.
+    heading: "Apply to create",
+    path: "/studio/creator-application",
+    snapshot: "creator-application-feedback",
+    token: creatorE2EFixtures.applicantFeedback.sessionToken,
+  },
+  {
     heading: "Review creator admission",
     path: "/admin/creator-applications",
     snapshot: "creator-review",

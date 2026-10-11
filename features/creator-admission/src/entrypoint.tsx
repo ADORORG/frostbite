@@ -4,6 +4,7 @@ import type { UuidV7 } from "@ador/shared/identifiers";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
 import { createCreatorApplicationOperations } from "./application/operations.ts";
+import { presentApplication } from "./application/present.ts";
 import { getCreatorAdmissionService } from "./runtime.ts";
 import { CreatorApplicationSurface } from "./ui/creator-application-surface.tsx";
 
@@ -17,7 +18,9 @@ async function studio(
       await getCreatorAdmissionService().findMine(actorUserId);
     return (
       <CreatorApplicationSurface
-        application={application}
+        application={
+          application === null ? null : presentApplication(application)
+        }
         mode="studio"
         navigation={navigation}
         unavailable={false}

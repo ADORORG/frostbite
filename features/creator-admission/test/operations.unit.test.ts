@@ -1,3 +1,4 @@
+import { creatorApplicationResponseSchema } from "@ador/shared/creator-admission";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
@@ -17,6 +18,7 @@ const application = {
     provenanceDeclarationAccepted: true,
     rightsDeclarationAccepted: true,
   },
+  feedback: null,
   id: createUuidV7(),
   revision: 1,
   state: "draft" as const,
@@ -161,5 +163,84 @@ describe("creator application operations", () => {
         incomplete,
       ),
     ).rejects.toThrow("Idempotency boundary missing");
+  });
+
+  it("sends a reviewer's feedback with its time as text, on every response that carries the application", async () => {
+    const withFeedback = {
+      ...application,
+      feedback: {
+        createdAt: new Date("2026-10-10T12:30:00.000Z"),
+        text: "Add a portfolio link.",
+      },
+    };
+    const storage = service();
+    storage.findMine.mockResolvedValue(withFeedback);
+    storage.review.mockResolvedValue({
+      application: withFeedback,
+      kind: "changed",
+    });
+    const [mine, , , review] = createCreatorApplicationOperations(
+      () => storage,
+    );
+    const wire = {
+      ok: true,
+      value: {
+        application: {
+          ...application,
+          feedback: {
+            createdAt: "2026-10-10T12:30:00.000Z",
+            text: "Add a portfolio link.",
+          },
+        },
+      },
+    };
+    await expect(mine.execute({}, context)).resolves.toEqual(wire);
+    await expect(
+      review.execute(
+        {
+          action: "request-changes",
+          applicationId: application.id,
+          creatorFeedback: "Add a portfolio link.",
+          evidenceReferences: [],
+          privateNotes: "",
+          reasonCode: "needs-links",
+        },
+        context,
+      ),
+    ).resolves.toEqual(wire);
+    // What goes out is what the shared contract accepts.
+    expect(
+      creatorApplicationResponseSchema.parse(wire.value).application.feedback,
+    ).toEqual(wire.value.application.feedback);
+  });
+
+  it("refuses every operation without a signed-in actor, before touching the service", async () => {
+    const storage = service();
+    const operations = createCreatorApplicationOperations(() => storage);
+    const [, saveDraft, submit, review] = operations;
+    const anonymous = { ...context, actorUserId: null };
+    await expect(
+      saveDraft.execute({ draft: application.draft }, anonymous),
+    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    await expect(submit.execute({}, anonymous)).resolves.toMatchObject({
+      error: "unauthorized",
+      ok: false,
+    });
+    await expect(
+      review.execute(
+        {
+          action: "start-review",
+          applicationId: application.id,
+          creatorFeedback: "",
+          evidenceReferences: [],
+          privateNotes: "",
+          reasonCode: "review-started",
+        },
+        anonymous,
+      ),
+    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    expect(storage.saveDraft).not.toHaveBeenCalled();
+    expect(storage.submit).not.toHaveBeenCalled();
+    expect(storage.review).not.toHaveBeenCalled();
   });
 });

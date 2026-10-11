@@ -4,7 +4,9 @@ import type { CreatorApplicationResponse } from "@ador/shared/creator-admission"
 import { useState } from "react";
 
 import {
+  feedbackToShow,
   isEditable,
+  ReviewerFeedback,
   SentApplication,
   StatusCard,
 } from "./application-status.tsx";
@@ -19,11 +21,13 @@ export function StudioApplication({
   readonly initial: CreatorApplicationResponse["application"] | null;
 }) {
   const [application, setApplication] = useState(initial);
+  const feedback = feedbackToShow(application);
   return (
     <div className="arcade-stack">
       <div aria-live="polite">
         <StatusCard application={application} />
       </div>
+      {feedback === null ? null : <ReviewerFeedback feedback={feedback} />}
       {isEditable(application) ? (
         <CreatorDraftForm
           application={application}

@@ -200,3 +200,10 @@
   background: var(--arcade-ink);
   object-fit: cover;
 }
+
+/* Text a person wrote for someone else, kept as written: line breaks stay, long words wrap. */
+.arcade-quote {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

@@ -172,6 +172,7 @@ describe("collections API client", () => {
           provenanceDeclarationAccepted: true,
           rightsDeclarationAccepted: true,
         },
+        feedback: null,
         id: id(),
         revision: 1,
         state,

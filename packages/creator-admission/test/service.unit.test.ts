@@ -106,6 +106,7 @@ describe("creator admission service", () => {
     vi.mocked(incomplete.findForApplicant).mockResolvedValue({
       applicantUserId: actorUserId,
       draft: { ...draft, rightsDeclarationAccepted: false },
+      feedback: null,
       id: applicationId,
       revision: 1,
       state: "draft",

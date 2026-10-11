@@ -44,6 +44,38 @@ export function StatusCard({
   );
 }
 
+// The states in which a reviewer's message still tells the person where they stand: asked for changes, not
+// approved, paused, or ended. In the others (not yet sent, waiting, approved) it would be an old message.
+const feedbackStates: readonly Application["state"][] = [
+  "changes-requested",
+  "rejected",
+  "revoked",
+  "suspended",
+];
+
+// The reviewer's message to show with this application, or null when there is none or it no longer applies.
+export function feedbackToShow(
+  application: Application | null,
+): Application["feedback"] {
+  return application !== null && feedbackStates.includes(application.state)
+    ? application.feedback
+    : null;
+}
+
+// What a reviewer wrote for the applicant. Shown as plain text, so nothing a reviewer types can act as markup.
+export function ReviewerFeedback({
+  feedback,
+}: {
+  readonly feedback: NonNullable<Application["feedback"]>;
+}) {
+  return (
+    <article aria-label="Message from a reviewer" className="arcade-card">
+      <p className="arcade-eyebrow">{`From a reviewer, ${feedback.createdAt.slice(0, 10)}`}</p>
+      <p className="arcade-quote">{feedback.text}</p>
+    </article>
+  );
+}
+
 const declarations = [
   ["rightsDeclarationAccepted", "Holds the required rights and licences"],
   ["provenanceDeclarationAccepted", "Confirms the stated provenance"],

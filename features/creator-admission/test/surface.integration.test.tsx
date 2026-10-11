@@ -58,6 +58,7 @@ describe("creator admission surfaces", () => {
         provenanceDeclarationAccepted: true,
         rightsDeclarationAccepted: true,
       },
+      feedback: null,
       id: createUuidV7(),
       revision: 1,
       state: "draft" as const,
@@ -96,6 +97,7 @@ const sent = (state: CreatorApplicationState) => ({
     provenanceDeclarationAccepted: true,
     rightsDeclarationAccepted: true,
   },
+  feedback: null,
   id: createUuidV7(),
   revision: 2,
   state,
@@ -195,5 +197,65 @@ describe("creator admission page navigation", () => {
       />,
     );
     expect(markup).toContain(`arcade-badge arcade-badge--${tone}`);
+  });
+});
+
+describe("what a reviewer wrote for the applicant", () => {
+  const withFeedback = (state: CreatorApplicationState, text: string) => ({
+    ...sent(state),
+    feedback: { createdAt: "2026-10-10T12:30:00.000Z", text },
+  });
+  const show = (
+    application: Parameters<typeof CreatorApplicationSurface>[0]["application"],
+  ) =>
+    renderToStaticMarkup(
+      <CreatorApplicationSurface
+        application={application}
+        mode="studio"
+        unavailable={false}
+      />,
+    );
+
+  it.each(["changes-requested", "rejected", "suspended", "revoked"] as const)(
+    "is shown, with its date, while the application is %s",
+    (state) => {
+      const markup = show(withFeedback(state, "Add a portfolio link."));
+      expect(markup).toContain('aria-label="Message from a reviewer"');
+      expect(markup).toContain("From a reviewer, 2026-10-10");
+      expect(markup).toContain("Add a portfolio link.");
+    },
+  );
+
+  it.each(["draft", "submitted", "under-review", "approved"] as const)(
+    "is an old message, and not shown, while the application is %s",
+    (state) => {
+      expect(show(withFeedback(state, "Add a portfolio link."))).not.toContain(
+        "Message from a reviewer",
+      );
+    },
+  );
+
+  it("is not invented when a reviewer has written nothing", () => {
+    expect(show(sent("changes-requested"))).not.toContain(
+      "Message from a reviewer",
+    );
+  });
+
+  it("is shown as text, so nothing a reviewer types can act as markup", () => {
+    const markup = show(
+      withFeedback("changes-requested", "<img src=x onerror=alert(1)>"),
+    );
+    expect(markup).toContain("&lt;img src=x onerror=alert(1)&gt;");
+    expect(markup).not.toContain("<img");
+  });
+
+  it("sits between the status and the form the applicant can still use", () => {
+    const markup = show(withFeedback("changes-requested", "Add a link."));
+    expect(markup.indexOf("Application status")).toBeLessThan(
+      markup.indexOf("Message from a reviewer"),
+    );
+    expect(markup.indexOf("Message from a reviewer")).toBeLessThan(
+      markup.indexOf("Save private draft"),
+    );
   });
 });
