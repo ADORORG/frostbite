@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseGameLaunchEnvironment } from "../src/env/runtime.ts";
+import {
+  developmentGamesEnabled,
+  parseGameLaunchEnvironment,
+} from "../src/env/runtime.ts";
 
 const base = {
   APP_ENV: "local",
@@ -123,5 +126,19 @@ describe("GAME_LAUNCHES", () => {
     expect(
       parse(frostbite({ url: "https://platform.example.com:8443" })),
     ).toHaveProperty("frostbite");
+  });
+});
+
+describe("development games", () => {
+  it.each([
+    ["local", true],
+    ["test", true],
+    ["preview", false],
+    ["production", false],
+    [undefined, false],
+    ["Local", false],
+    ["", false],
+  ])("are listed in %j: %s", (APP_ENV, listed) => {
+    expect(developmentGamesEnabled({ APP_ENV })).toBe(listed);
   });
 });

@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { createGamesEntrypoint } from "../src/entrypoint.tsx";
 import { createGamesFeature } from "../src/registration.ts";
-import { bareGame, chains, templateGame } from "./support/template-game.ts";
+import {
+  bareGame,
+  chains,
+  embeddedGame,
+  templateGame,
+} from "./support/template-game.ts";
 
 async function render(
   games: Parameters<typeof createGamesEntrypoint>[0],
@@ -74,6 +79,21 @@ describe("a game's page", () => {
     expect(markup).toContain("does not ask the platform for anything");
     expect(markup).not.toContain("Milestones of this game");
     expect(markup).not.toContain("<p></p>");
+  });
+
+  it("shows a game the platform plays itself in a frame that is sandboxed to scripts only, and offers no link away", async () => {
+    const markup = await render(
+      [embeddedGame],
+      "/games/[slug]",
+      "embedded-game",
+    );
+    expect(markup).toContain("This game is played on this page.");
+    expect(markup).toContain('src="/play/embedded-game/"');
+    expect(markup).toContain('sandbox="allow-scripts"');
+    expect(markup).not.toContain("allow-same-origin");
+    expect(markup).toContain("Playable");
+    expect(markup).not.toContain("not on this site");
+    expect(markup).toContain("Your milestones");
   });
 
   it("separates an address that cannot be a game from one that is only unknown", async () => {

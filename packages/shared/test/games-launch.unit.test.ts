@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   applyGameLaunchSettings,
   defineGame,
+  embeddedGamePath,
+  embeddedGameRoot,
   gameBasePathSchema,
   gameLaunchSettingsMapSchema,
   gameLaunchSettingsSchema,
@@ -25,8 +27,12 @@ const game = (id = "sample-game"): GameManifest => ({
   title: "Sample game",
   version: "1.0.0",
 });
-const launch = (overrides: Partial<GameManifest["launch"]> = {}) => ({
-  ...game().launch,
+type ExternalLaunch = Extract<GameManifest["launch"], { mode: "external" }>;
+const launch = (overrides: Partial<ExternalLaunch> = {}): ExternalLaunch => ({
+  basePath: "",
+  mode: "external",
+  returnUrl: null,
+  url: null,
   ...overrides,
 });
 
@@ -193,6 +199,49 @@ describe("applying launch settings to games", () => {
   it("returns the games unchanged when there are no settings", () => {
     const list = [game()];
     expect(applyGameLaunchSettings(list, {})).toEqual(list);
-    expect(defineGame(game()).launch.url).toBeNull();
+    expect(defineGame(game()).launch).toMatchObject({ url: null });
+  });
+});
+
+describe("a game the platform plays itself", () => {
+  const embedded = (): GameManifest => ({
+    ...game("tap-tower"),
+    launch: { mode: "embedded" },
+  });
+
+  it("is accepted with no settings, and has no external address", () => {
+    expect(gameManifestSchema.safeParse(embedded()).success).toBe(true);
+    expect(gamePlayAddress(embedded().launch)).toBeNull();
+  });
+
+  it("cannot carry an address, a base path or any other setting", () => {
+    for (const extra of [
+      { url: "https://example.com" },
+      { basePath: "/x" },
+      { anything: 1 },
+    ])
+      expect(
+        gameManifestSchema.safeParse({
+          ...embedded(),
+          launch: { mode: "embedded", ...extra },
+        }).success,
+      ).toBe(false);
+  });
+
+  it("is served from a folder named for the game, under the platform's play root", () => {
+    expect(embeddedGameRoot).toBe("/play");
+    expect(embeddedGamePath("tap-tower")).toBe("/play/tap-tower/");
+  });
+
+  it("refuses a launch setting naming it, because it has no address to set", () => {
+    expect(() =>
+      applyGameLaunchSettings([embedded()], {
+        "tap-tower": {
+          basePath: "",
+          returnUrl: null,
+          url: "https://example.com",
+        },
+      }),
+    ).toThrow("plays itself");
   });
 });

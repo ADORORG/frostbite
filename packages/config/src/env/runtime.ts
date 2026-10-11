@@ -48,6 +48,12 @@ export function parseAuthSessionEnvironment(
 // host will send a player there and it must never be a place an attacker can name. A game is never played on
 // the platform's own origin, whatever its base path: a game is code the platform did not write, and on this
 // origin it could act with a signed-in player's session (D23: separate origin by default).
+// Whether this run is for development or tests, where games that exist to check the platform are listed. An
+// unset or unknown environment is not one, so a misconfigured deployment never lists them.
+export function developmentGamesEnabled(source: NodeJS.ProcessEnv): boolean {
+  return source.APP_ENV === "local" || source.APP_ENV === "test";
+}
+
 export function parseGameLaunchEnvironment(
   source: NodeJS.ProcessEnv,
 ): Record<string, GameLaunchSettings> {

@@ -1,5 +1,6 @@
 import type { ChainOption } from "@ador/shared/chain";
 import {
+  embeddedGamePath,
   gameIdSchema,
   gameManifestHash,
   gamePlayAddress,
@@ -28,6 +29,8 @@ export const gameMilestonePolicyLabels: Readonly<
 export interface PublicGame {
   readonly capabilities: readonly string[];
   readonly description: string;
+  // Where the platform serves the game's files when it plays the game itself, in an isolated frame, or null.
+  readonly embedSrc: string | null;
   // The exact declarations this page was made from, as a digest, so a change is visible.
   readonly hash: string;
   readonly id: string;
@@ -58,6 +61,8 @@ export function createGameCatalog(
       (capability) => gameCapabilityLabels[capability],
     ),
     description: game.description,
+    embedSrc:
+      game.launch.mode === "embedded" ? embeddedGamePath(game.id) : null,
     hash: gameManifestHash(game),
     id: game.id,
     milestones: game.milestones,

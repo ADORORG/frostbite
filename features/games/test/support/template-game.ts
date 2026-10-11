@@ -61,3 +61,17 @@ export const bareGame = defineGame({
   title: "Bare game",
   version: "0.0.1",
 });
+
+// A game the platform plays itself, in its isolated frame.
+export const embeddedGame = defineGame({
+  capabilities: [],
+  description: "",
+  id: "embedded-game",
+  launch: { mode: "embedded" },
+  milestones: templateGame.milestones,
+  network: signet,
+  schemaVersion: 1,
+  summary: "Played on this page.",
+  title: "Embedded game",
+  version: "1.0.0",
+});

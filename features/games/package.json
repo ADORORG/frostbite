@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/game-sdk": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
     "@repo/ui": "workspace:*",
@@ -25,11 +26,13 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/jsdom": "30.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
+    "jsdom": "30.0.1",
     "react-dom": "19.2.8",
     "typescript": "5.9.3",
     "vitest": "4.1.11"

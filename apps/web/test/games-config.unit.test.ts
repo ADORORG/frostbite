@@ -7,9 +7,9 @@ const signet = targetChains[0]?.chainId ?? "";
 
 // The game list reads the deployment's settings when it is first imported, so each case sets them and
 // imports it afresh.
-async function gamesWith(launches: string) {
+async function gamesWith(launches: string, appEnv = "local") {
   vi.resetModules();
-  vi.stubEnv("APP_ENV", "local");
+  vi.stubEnv("APP_ENV", appEnv);
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
   vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Adorbitals");
   vi.stubEnv("GAME_LAUNCHES", launches);
@@ -24,9 +24,9 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE, first, and every game passes the manifest schema", async () => {
+  it("lists FROST·BITE, first, then the sample game while the platform runs for development, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
-    expect(games.map(({ id }) => id)).toEqual(["frostbite"]);
+    expect(games.map(({ id }) => id)).toEqual(["frostbite", "sample-game"]);
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
   });
@@ -66,9 +66,37 @@ describe("the platform's game list", () => {
     expect(frostbite && gamePlayAddress(frostbite.launch)).toBe(
       "https://example.com/play/frostbite",
     );
-    expect(frostbite?.launch.returnUrl).toBe(
-      "https://platform.example.com/games/frostbite",
-    );
+    expect(
+      frostbite?.launch.mode === "external" && frostbite.launch.returnUrl,
+    ).toBe("https://platform.example.com/games/frostbite");
+  });
+
+  it.each([
+    ["test", true],
+    ["local", true],
+    ["preview", false],
+    ["production", false],
+  ])("lists the sample game in %s: %s", async (appEnv, listed) => {
+    const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
+    expect(ids.includes("sample-game")).toBe(listed);
+    expect(ids[0]).toBe("frostbite");
+  });
+
+  it("plays the sample game on the platform itself, in the frame, with the milestones its code awards", async () => {
+    const sample = (await gamesWith("")).find(({ id }) => id === "sample-game");
+    expect(sample?.launch).toEqual({ mode: "embedded" });
+    expect(sample?.milestones.map(({ id }) => id)).toEqual([
+      "first-five",
+      "ten-taps",
+    ]);
+  });
+
+  it("refuses a launch setting for a game the platform plays itself", async () => {
+    await expect(
+      gamesWith(
+        JSON.stringify({ "sample-game": { url: "https://a.example.com" } }),
+      ),
+    ).rejects.toThrow("Launch settings name");
   });
 
   it("refuses to start with a setting for a game that is not registered", async () => {

@@ -76,18 +76,26 @@ export const gameBasePathSchema = z
   .max(128)
   .regex(/^(?:\/[a-z0-9]+(?:[._~-][a-z0-9]+)*)*$/u);
 
+// Where the platform serves the files of the games it plays itself, one folder per game identifier.
+export const embeddedGameRoot = "/play";
+export const embeddedGamePath = (id: string) => `${embeddedGameRoot}/${id}/`;
+
 // How a player reaches the game. `external`: the game runs on its own address, which is the host (`url`) plus
 // its base path. A null host means the game is registered but has no play address configured, and is shown
 // as not playable. `returnUrl` is where the game sends the player back to; null means the platform's own page
-// for the game.
-export const gameLaunchSchema = z
-  .object({
-    basePath: gameBasePathSchema,
-    mode: z.literal("external"),
-    returnUrl: webUrlSchema.nullable(),
-    url: gameOriginSchema.nullable(),
-  })
-  .strict();
+// for the game. `embedded`: the game is a reviewed, client-only build the platform serves from its own
+// domain and shows in an isolated frame; it needs no settings, because its address is its identifier.
+export const gameLaunchSchema = z.discriminatedUnion("mode", [
+  z
+    .object({
+      basePath: gameBasePathSchema,
+      mode: z.literal("external"),
+      returnUrl: webUrlSchema.nullable(),
+      url: gameOriginSchema.nullable(),
+    })
+    .strict(),
+  z.object({ mode: z.literal("embedded") }).strict(),
+]);
 
 export const gameManifestSchemaVersion = 1;
 
@@ -150,7 +158,7 @@ export function gameManifestHash(manifest: GameManifest): string {
 
 // The address a player is sent to, or null when the game has no host configured.
 export function gamePlayAddress(launch: GameManifest["launch"]): string | null {
-  return launch.url === null
+  return launch.mode === "embedded" || launch.url === null
     ? null
     : new URL(launch.basePath === "" ? "/" : launch.basePath, launch.url).href;
 }
@@ -187,6 +195,10 @@ export function applyGameLaunchSettings(
       );
   return games.map((game) => {
     const setting = settings[game.id];
+    if (setting !== undefined && game.launch.mode === "embedded")
+      throw new Error(
+        `Launch settings name "${game.id}", which the platform plays itself and which has no address to set.`,
+      );
     return setting === undefined
       ? game
       : {

@@ -62,10 +62,10 @@ describe("the content security policy", () => {
     expect(directive(none, "connect-src")).toBe("connect-src 'self'");
   });
 
-  it("allows no frames in or out, no plugins, and no other base or form target", () => {
+  it("allows only its own frames in, no framing out, no plugins, and no other base or form target", () => {
     for (const expected of [
       "frame-ancestors 'none'",
-      "frame-src 'none'",
+      "frame-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

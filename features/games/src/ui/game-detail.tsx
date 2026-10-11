@@ -11,6 +11,7 @@ import {
   gameMilestonePolicyLabels,
   type PublicGame,
 } from "../domain/catalog.ts";
+import { GamePlayer } from "./game-player.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 
 // One game as its manifest declares it. Nothing here implies a milestone can be claimed, or that the
@@ -22,11 +23,12 @@ export function GameDetail({
   readonly game: PublicGame;
   readonly navigation: readonly NavigationItem[];
 }) {
+  const playable = game.playUrl !== null || game.embedSrc !== null;
   return (
     <GamesFrame navigation={navigation}>
       <StatusLamp
-        label={game.playUrl === null ? "Not playable yet" : "Playable"}
-        tone={game.playUrl === null ? "attention" : "ready"}
+        label={playable ? "Playable" : "Not playable yet"}
+        tone={playable ? "ready" : "attention"}
       />
       <ArcadePanel eyebrow={`Version ${game.version}`} title={game.title}>
         <p>{game.summary}</p>
@@ -34,7 +36,9 @@ export function GameDetail({
         <p>
           <ArcadeBadge tone="cyan">{game.networkLabel}</ArcadeBadge>
         </p>
-        {game.playUrl === null ? (
+        {game.embedSrc !== null ? (
+          <p>This game is played on this page.</p>
+        ) : game.playUrl === null ? (
           <p>
             This game is registered, but it has no play address yet, so it
             cannot be opened from here.
@@ -48,6 +52,13 @@ export function GameDetail({
           </>
         )}
       </ArcadePanel>
+      {game.embedSrc === null ? null : (
+        <GamePlayer
+          game={{ id: game.id, milestones: game.milestones }}
+          src={game.embedSrc}
+          title={game.title}
+        />
+      )}
       <ArcadePanel eyebrow="Declared by the game" title="What it asks for">
         {game.capabilities.length === 0 ? (
           <p>This game does not ask the platform for anything.</p>

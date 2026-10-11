@@ -5,7 +5,12 @@ import {
   createGameCatalog,
   gameCapabilityLabels,
 } from "../src/domain/catalog.ts";
-import { bareGame, chains, templateGame } from "./support/template-game.ts";
+import {
+  bareGame,
+  chains,
+  embeddedGame,
+  templateGame,
+} from "./support/template-game.ts";
 
 describe("the game catalog", () => {
   const catalog = createGameCatalog([templateGame, bareGame], chains);
@@ -25,6 +30,7 @@ describe("the game catalog", () => {
         gameCapabilityLabels["run:submit"],
       ],
       description: "A game written from the template.",
+      embedSrc: null,
       hash: gameManifestHash(templateGame),
       id: "template-game",
       milestones: templateGame.milestones,
@@ -34,6 +40,12 @@ describe("the game catalog", () => {
       title: "Template game",
       version: "0.3.0",
     });
+  });
+
+  it("serves a game the platform plays itself from its own folder, with no external address", () => {
+    expect(
+      createGameCatalog([embeddedGame], chains).find("embedded-game"),
+    ).toMatchObject({ embedSrc: "/play/embedded-game/", playUrl: null });
   });
 
   it("has no play address for a game that is not configured, and names an unconfigured chain by its identifier", () => {

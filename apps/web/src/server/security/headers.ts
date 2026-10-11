@@ -13,7 +13,7 @@ export interface SecurityContext {
 // The Content Security Policy for a page. Scripts run only with this response's nonce (and what those scripts load),
 // so an injected script cannot run. Styles allow inline text because the UI sets some style attributes; that is a
 // known, lower risk and is the one relaxation. Images and uploads may go to the storage origin the platform is
-// configured with, nowhere else. No frames are allowed in or out, and no plugins.
+// configured with, nowhere else. No page may be framed, and the only frames a page may hold are the platform's own game files (which carry a sandbox of their own); no plugins.
 export function contentSecurityPolicy(context: SecurityContext): string {
   const { development, nonce, platformIsHttps, security } = context;
   const storage =
@@ -25,7 +25,7 @@ export function contentSecurityPolicy(context: SecurityContext): string {
     "font-src": ["'self'"],
     "form-action": ["'self'"],
     "frame-ancestors": ["'none'"],
-    "frame-src": ["'none'"],
+    "frame-src": ["'self'"],
     "img-src": ["'self'", "data:", "blob:", ...storage],
     "object-src": ["'none'"],
     "report-uri": [cspReportPath],
