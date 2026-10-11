@@ -75,6 +75,10 @@ test("a creator builds a draft in the browser, leaves, and resumes where it stan
   await page.getByRole("button", { name: "Add item" }).click();
   await expect(page.getByText("1 of 2 items")).toBeVisible();
   await expect(page.getByText("1. Item one")).toBeVisible();
+  await expect(page.getByText("1 trait")).toBeVisible();
+  await page.getByRole("button", { name: "Edit Item one" }).click();
+  await expect(page.getByLabel("Trait 1 name")).toHaveValue("Colour");
+  await expect(page.getByLabel("Trait 1 value")).toHaveValue("Blue");
 
   // Leaving and coming back: the list shows the draft, and the wizard opens where it still asks for
   // something (here nothing is missing, so review), with the same content from the server.
