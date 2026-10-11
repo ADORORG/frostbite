@@ -114,3 +114,27 @@ Procedure and rationale: `providers/object-storage/r2/README.md`.
       (HTTPS in preview and production, no path), the base path (blank for a subdomain, `/play/<id>` for a path of
       a domain), the return address (on `PUBLIC_BASE_URL`'s origin) and the network. See
       `docs/product/game-onboarding.md`. A bad value stops the web service at start, so check the deploy logs.
+
+## Hardening: health checks, security headers, rate limits
+
+Written from the code; none of it has been exercised against a real platform yet.
+
+- [ ] **Health checks.** Point the platform's health check for the web service at `GET /api/ready` and for the
+      worker at `GET /ready`. Each answers 200 when the database and object storage answer and 503 when one does
+      not, and names each check (`database`, `object-storage`) with its outcome and nothing else. `GET /health`
+      on the worker is liveness only. Use readiness to take an instance out of rotation, liveness to restart it.
+- [ ] **`TRUSTED_PROXY_HOPS`** (blank = 1). Set it to how many reverse proxies stand in front of the app and
+      append to `X-Forwarded-For`. Verify on the platform: send a request with a forged
+      `X-Forwarded-For: 6.6.6.6` and check the platform's own address is the last entry the app sees. A wrong
+      value either lets a client choose its own address (too low) or counts everyone as one address (too high).
+      A direct run with no proxy sets `0`; then address limits are skipped.
+- [ ] **`SECURITY_CSP_MODE`** (blank = `report-only`). Start in preview with `report-only`, open the main pages,
+      and read the `csp-report` lines in the web service log: the only report expected is the wallet library's
+      probe of script evaluation on `/connect`. Then set `enforce`. In a browser run of the end-to-end suite
+      with `enforce`, the wallet, passkey, upload, collection, bulk upload, import and acceptance journeys all pass.
+- [ ] `R2_ENDPOINT` also sets the one external origin the page policy allows images and uploads to; a different
+      public asset domain for images needs adding to the policy.
+- [ ] HSTS (`Strict-Transport-Security`) is sent only when `PUBLIC_BASE_URL` is https. Do not set a long
+      `max-age` preload on a hostname that may change (ADR-009: hostnames are configuration).
+- [ ] Rate limits are counted in the database (`rate_limit_windows`, subjects hashed), so every web instance
+      shares one count. The policy is `configs/rate-limits.ts`; a change is a new version of that record.

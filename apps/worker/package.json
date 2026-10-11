@@ -17,14 +17,14 @@
     "@ador/feature-uploads": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
-    "@ador/plugin-kit": "workspace:*"
+    "@ador/object-storage": "workspace:*",
+    "@ador/plugin-kit": "workspace:*",
+    "@ador/shared": "workspace:*"
   },
   "devDependencies": {
     "@ador/events": "workspace:*",
     "@ador/media": "workspace:*",
-    "@ador/object-storage": "workspace:*",
     "@ador/provider-workflows-inngest": "workspace:*",
-    "@ador/shared": "workspace:*",
     "@ador/test-kit": "workspace:*",
     "@ador/uploads": "workspace:*",
     "@repo/eslint-config": "workspace:*",

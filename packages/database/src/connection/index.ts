@@ -11,3 +11,4 @@ export {
 } from "./client.ts";
 export { createDatabasePool, toPoolConfig, type DatabasePool } from "./pool.ts";
 export { createDatabaseFromEnvironment } from "./from-environment.ts";
+export { databaseReadinessProbe } from "./readiness.ts";

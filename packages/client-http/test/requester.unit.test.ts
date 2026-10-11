@@ -85,6 +85,15 @@ describe("JSON requester", () => {
     },
   );
 
+  it("reports too many requests as an error worth retrying later", async () => {
+    const { request } = requesterWith(async () =>
+      envelope("rate_limited", 429),
+    );
+    const error = await failureOf(request(route, schema));
+    expect([error.code, error.status]).toEqual(["rate_limited", 429]);
+    expect(isRetryableApiError(error)).toBe(true);
+  });
+
   it("reports an error body that is not the documented envelope as an invalid response", async () => {
     const { request } = requesterWith(
       async () => new Response("oops", { status: 502 }),

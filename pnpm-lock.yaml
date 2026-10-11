@@ -138,6 +138,9 @@ importers:
       '@ador/http':
         specifier: workspace:*
         version: link:../../packages/http
+      '@ador/object-storage':
+        specifier: workspace:*
+        version: link:../../packages/object-storage
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
@@ -202,9 +205,15 @@ importers:
       '@ador/jobs':
         specifier: workspace:*
         version: link:../../packages/jobs
+      '@ador/object-storage':
+        specifier: workspace:*
+        version: link:../../packages/object-storage
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
     devDependencies:
       '@ador/events':
         specifier: workspace:*
@@ -212,15 +221,9 @@ importers:
       '@ador/media':
         specifier: workspace:*
         version: link:../../packages/media
-      '@ador/object-storage':
-        specifier: workspace:*
-        version: link:../../packages/object-storage
       '@ador/provider-workflows-inngest':
         specifier: workspace:*
         version: link:../../providers/workflows/inngest
-      '@ador/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@ador/test-kit':
         specifier: workspace:*
         version: link:../../packages/test-kit

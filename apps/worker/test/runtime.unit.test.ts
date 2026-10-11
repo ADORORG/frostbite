@@ -1,5 +1,5 @@
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createWorkerRuntime } from "../src/runtime.ts";
 
@@ -27,6 +27,38 @@ describe("worker runtime", () => {
         { status: "ok" },
       ]);
     } finally {
+      await runtime.close();
+    }
+  });
+
+  it("answers readiness 503 and names both checks when the database and object storage do not answer", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const runtime = createWorkerRuntime({
+      environment: {
+        ...environment,
+        DATABASE_URL: "postgresql://test:test@127.0.0.1:1/test",
+      },
+      providers: createProviderRegistry([]),
+    });
+    try {
+      const response = await runtime.handle(new Request("http://worker/ready"));
+      const body = await response.json();
+      expect(response.status).toBe(503);
+      expect(body.status).toBe("not-ready");
+      expect(body.checks.map(({ name }: { name: string }) => name)).toEqual([
+        "database",
+        "object-storage",
+      ]);
+      expect(
+        body.checks.every(({ status }: { status: string }) => status !== "ok"),
+      ).toBe(true);
+      // What went wrong is logged, not returned.
+      expect(log).toHaveBeenCalledWith(
+        expect.stringContaining("readiness: object-storage is not ready"),
+      );
+      expect(JSON.stringify(body)).not.toContain("provider");
+    } finally {
+      log.mockRestore();
       await runtime.close();
     }
   });

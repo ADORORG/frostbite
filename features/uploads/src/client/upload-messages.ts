@@ -31,6 +31,7 @@ const apiFailureText: Readonly<Record<ApiErrorCode, string>> = {
     "The upload request was not allowed. Reload the page and try again.",
   network: "Could not reach the server. Check your connection and retry.",
   not_found: "The upload could not be found. Choose the file again.",
+  rate_limited: "Too many requests in a short time. Wait a moment, then retry.",
   unauthorized: "Your session has ended. Sign in again to upload.",
 };
 

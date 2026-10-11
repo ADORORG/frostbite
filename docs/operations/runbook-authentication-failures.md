@@ -30,7 +30,7 @@ response's correlation id, and the platform's logs.
 
 Every API error is `{ "error": { "code", "correlationId", "message" } }`. Codes: `unauthorized` (no or ended
 session), `forbidden` (signed in without permission, or recent sign-in required), `conflict`,
-`invalid_request`, `not_found`, `idempotency_key_required`, `method_not_allowed`, `internal_error`.
+`invalid_request`, `not_found`, `idempotency_key_required`, `method_not_allowed`, `rate_limited` (HTTP 429, with a `Retry-After` header), `internal_error`.
 Ask the reporter for the `correlationId` (visible in the response) or the time and account.
 
 ## Symptom: "I was signed out" / `unauthorized` on every request
@@ -107,6 +107,7 @@ confirm the session row shows a fresh `authenticated_at` and a future `idle_expi
 
 - A public wallet sign-in route and its failure copy (then rewrite the wallet section).
 - Structured logs with the correlation id, so a ticket can be traced without database access.
-- Rate limits on challenge issuance and verification (W8-06) and an alert on a spike of
-  `challenge-invalid` or `signature-invalid`.
+- An alert on a spike of `challenge-invalid` or `signature-invalid`. Rate limits now exist for the wallet
+  challenge and passkey operations (10 a minute per address or person to start one, 20 to verify; see
+  `configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.
 - An operator view of a user's sessions that does not need SQL.

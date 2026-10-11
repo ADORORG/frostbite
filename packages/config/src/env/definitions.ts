@@ -206,6 +206,22 @@ export const environmentDefinitions = [
     required: false,
     secret: false,
   },
+  {
+    key: "SECURITY_CSP_MODE",
+    description:
+      "Content Security Policy mode: report-only (violations are reported, nothing is blocked) or enforce; blank means report-only.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "TRUSTED_PROXY_HOPS",
+    description:
+      "How many reverse proxies in front of the app set X-Forwarded-For (0 to 5); blank means 1. The client address is read that many hops from the end.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
 ] as const satisfies readonly EnvironmentDefinition[];
 
 export const environmentKeys = environmentDefinitions.map(({ key }) => key);

@@ -83,3 +83,38 @@ export function parseGameLaunchEnvironment(
   }
   return settings;
 }
+
+const blankAsUnset = (value: string | undefined) =>
+  value === undefined || value.trim() === "" ? undefined : value.trim();
+
+export const securityEnvironmentSchema = z.object({
+  SECURITY_CSP_MODE: z.enum(["report-only", "enforce"]).default("report-only"),
+  TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
+});
+
+export interface SecurityEnvironment {
+  readonly cspMode: "enforce" | "report-only";
+  // The origin browsers talk to for stored images and direct uploads, or null when no storage is configured.
+  readonly storageOrigin: string | null;
+  readonly trustedProxyHops: number;
+}
+
+// The settings the security headers and the rate limiter share. Blank values mean the safe default: report
+// before blocking, and one trusted proxy.
+export function parseSecurityEnvironment(
+  source: NodeJS.ProcessEnv,
+): SecurityEnvironment {
+  const parsed = securityEnvironmentSchema.parse({
+    SECURITY_CSP_MODE: blankAsUnset(source.SECURITY_CSP_MODE),
+    TRUSTED_PROXY_HOPS: blankAsUnset(source.TRUSTED_PROXY_HOPS),
+  });
+  const endpoint = blankAsUnset(source.R2_ENDPOINT);
+  return {
+    cspMode: parsed.SECURITY_CSP_MODE,
+    storageOrigin:
+      endpoint !== undefined && URL.canParse(endpoint)
+        ? new URL(endpoint).origin
+        : null,
+    trustedProxyHops: parsed.TRUSTED_PROXY_HOPS,
+  };
+}

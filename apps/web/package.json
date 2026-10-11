@@ -12,8 +12,8 @@
     "lint": "eslint --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit --incremental false",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
-    "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "test:integration": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts integration",
+    "test:coverage": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts coverage",
     "test:e2e": "pnpm --filter @repo/e2e test:e2e"
   },
   "dependencies": {
@@ -30,6 +30,7 @@
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-wallet-connection": "workspace:*",
     "@ador/http": "workspace:*",
+    "@ador/object-storage": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
     "@repo/config": "workspace:*",

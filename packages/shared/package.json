@@ -18,7 +18,9 @@
     "./platform": "./src/platform/status.ts",
     "./uploads": "./src/uploads/index.ts",
     "./providers": "./src/features/manifest.ts",
-    "./collections": "./src/collections/index.ts"
+    "./collections": "./src/collections/index.ts",
+    "./readiness": "./src/platform/readiness.ts",
+    "./csp-report": "./src/platform/csp-report.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

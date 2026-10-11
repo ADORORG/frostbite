@@ -20,6 +20,8 @@ const retryableCodes: readonly ApiErrorCode[] = [
   "internal_error",
   "invalid-response",
   "network",
+  // The limit passes with time, so trying again later can work.
+  "rate_limited",
 ];
 
 // Failures worth offering a retry for: transient transport or server faults. Everything else (bad

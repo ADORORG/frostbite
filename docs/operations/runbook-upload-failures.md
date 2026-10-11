@@ -26,15 +26,16 @@ Asset states: `pending-validation`, `validated`, `rejected`, `processed`, `unpro
 
 ## What the person sees, and where to look
 
-| Message in the product                                                                    | Likely cause                                                                  | First check                                                                    |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| "You may have reached the limit of active uploads"                                        | 2 reserved intents not finished (a stuck tab, or a bulk batch in another tab) | Section A                                                                      |
-| "Only PNG, JPEG, and WebP" / too large                                                    | Client check; or server `invalid_request`                                     | The file; limits per purpose (25 MB item and cover, 15 MB banner, 5 MB avatar) |
-| "The file could not be sent. Check your connection" / "storage did not accept the upload" | Network, expired URL (15 min), CORS, R2 credentials                           | Section B                                                                      |
-| "Processing is taking longer than usual"                                                  | Worker, relay or Inngest not progressing                                      | Section C                                                                      |
-| "The file is not a valid image", "too large in width or height" and similar               | The file was refused; copy is in the product                                  | Section D                                                                      |
-| Image tile says "Preview unavailable"                                                     | Processed but renditions could not be signed                                  | Section E                                                                      |
-| Image missing from the library                                                            | Library shows the newest 48 only                                              | Section F                                                                      |
+| Message in the product                                                                    | Likely cause                                                                        | First check                                                                    |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| "You may have reached the limit of active uploads"                                        | 2 reserved intents not finished (a stuck tab, or a bulk batch in another tab)       | Section A                                                                      |
+| "Only PNG, JPEG, and WebP" / too large                                                    | Client check; or server `invalid_request`                                           | The file; limits per purpose (25 MB item and cover, 15 MB banner, 5 MB avatar) |
+| "The file could not be sent. Check your connection" / "storage did not accept the upload" | Network, expired URL (15 min), CORS, R2 credentials                                 | Section B                                                                      |
+| "Processing is taking longer than usual"                                                  | Worker, relay or Inngest not progressing                                            | Section C                                                                      |
+| "The file is not a valid image", "too large in width or height" and similar               | The file was refused; copy is in the product                                        | Section D                                                                      |
+| "Too many requests in a short time. Wait a moment, then retry."                           | The person or address went over a rate limit (HTTP 429, with `Retry-After` seconds) | Section H                                                                      |
+| Image tile says "Preview unavailable"                                                     | Processed but renditions could not be signed                                        | Section E                                                                      |
+| Image missing from the library                                                            | Library shows the newest 48 only                                                    | Section F                                                                      |
 
 Ask for the `correlationId` and the approximate time; for a specific upload, the asset or intent id (shown on
 the image page) or the file name (kept with the upload).
@@ -142,10 +143,28 @@ Rows that stay for more than a few cleanup passes (the loop runs about every fiv
 deletion is failing: check the worker's logs and R2 permissions (delete on the private bucket). A single
 poison key can currently slow a batch (backlog item). Never delete an object by hand that an asset points to.
 
+## H. Too many requests (HTTP 429)
+
+Rate limits exist (`configs/rate-limits.ts`): for uploads, 120 a minute per person to start one and 120 to
+complete one; 600 requests a minute per network address for the API overall. The browser shows "wait a moment,
+then retry", and the Retry button works once the window passes. A bulk upload of many files may hit it at the
+busiest moments; the files that were refused can be retried together. To see how busy a limit is (the subject is
+stored as a hash, so you can only check a known address or user id, not list people):
+
+```sql
+select bucket, hits, window_start from ador.rate_limit_windows
+where bucket = 'createUploadIntent' order by window_start desc, hits desc limit 10;
+```
+
+If real users are limited, the numbers in `configs/rate-limits.ts` are too low: raise them (a new version of that
+record). If everyone from one place is limited, check `TRUSTED_PROXY_HOPS`: a value that is too high counts
+everybody as one address (see the preview checklist). The limiter fails open: if the database counter is down,
+requests are let through and the web log says `rate limiter:`.
+
 ## Containment
 
-- A flood of uploads from one account: rate limits are not in place yet (W8-06). Suspend the creator through
-  the product, then investigate; do not delete rows.
+- A flood of uploads from one account: the per-person limits slow it. Suspend the creator through the product,
+  then investigate; do not delete rows.
 - Suspected malicious file: the asset is isolated (decoding runs in a child process of the worker with
   limits). Do not open the original on a workstation; keep the asset id and escalate to security.
 

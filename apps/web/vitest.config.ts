@@ -16,6 +16,13 @@ const coverage = {
     "src/server/http/next-operation.ts",
     "src/server/auth/page-access.ts",
     "src/server/auth/runtime.ts",
+    "src/app/api/csp-report/route.ts",
+    "src/app/api/ready/route.ts",
+    "src/proxy.ts",
+    "src/server/database.ts",
+    "src/server/rate-limit.ts",
+    "src/server/readiness.ts",
+    "src/server/security/*.ts",
   ],
 };
 

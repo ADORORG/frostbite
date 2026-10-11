@@ -124,5 +124,8 @@ export function applicationEnvironment(
     PASSKEY_CHALLENGE_TIMEOUT_MS: "300000",
     PASSKEY_RECENT_AUTH_WINDOW_MS: "600000",
     PUBLIC_BASE_URL: baseURL,
+    // No proxy stands in front of the app here, so the address the framework reports is the test's own, shared
+    // by every test; counting by it would make unrelated tests limit each other.
+    TRUSTED_PROXY_HOPS: "0",
   };
 }
