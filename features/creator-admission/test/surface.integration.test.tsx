@@ -39,6 +39,9 @@ describe("creator admission surfaces", () => {
     );
     expect(review).toContain("Private reviewer notes");
     expect(studio).not.toContain("Private reviewer notes");
+    // Each audience gets its own page title.
+    expect(review).toContain("<h1>Review creator admission</h1>");
+    expect(studio).toContain("<h1>Apply to create</h1>");
   });
 
   it("renders persisted values and an honest degraded state", () => {
@@ -80,24 +83,25 @@ describe("creator admission surfaces", () => {
   });
 });
 
+const sent = (state: CreatorApplicationState) => ({
+  applicantUserId: createUuidV7(),
+  draft: {
+    contentDeclarationAccepted: true,
+    displayName: "Sent Creator",
+    expectedLaunchSize: "Small",
+    expectedLaunchTiming: "Soon",
+    jurisdictionAcknowledged: false,
+    portfolioLinks: ["https://example.test/work"],
+    projectSummary: "Sent summary",
+    provenanceDeclarationAccepted: true,
+    rightsDeclarationAccepted: true,
+  },
+  id: createUuidV7(),
+  revision: 2,
+  state,
+});
+
 describe("creator application status", () => {
-  const sent = (state: CreatorApplicationState) => ({
-    applicantUserId: createUuidV7(),
-    draft: {
-      contentDeclarationAccepted: true,
-      displayName: "Sent Creator",
-      expectedLaunchSize: "Small",
-      expectedLaunchTiming: "Soon",
-      jurisdictionAcknowledged: false,
-      portfolioLinks: ["https://example.test/work"],
-      projectSummary: "Sent summary",
-      provenanceDeclarationAccepted: true,
-      rightsDeclarationAccepted: true,
-    },
-    id: createUuidV7(),
-    revision: 2,
-    state,
-  });
   const studio = (application: ReturnType<typeof sent> | null) =>
     renderToStaticMarkup(
       <CreatorApplicationSurface
@@ -152,9 +156,44 @@ describe("creator application status", () => {
     expect(approved).toMatch(
       /Holds the required rights and licences<\/dt><dd>Yes</,
     );
+    expect(approved).toContain("Can build collections");
     expect(approved).toContain('href="/studio/collections"');
     expect(studio(sent("submitted"))).not.toContain(
       'href="/studio/collections"',
     );
+    expect(studio(sent("submitted"))).toContain("Cannot build collections yet");
+  });
+});
+
+describe("creator admission page navigation", () => {
+  const surface = (mode: "review" | "studio") =>
+    renderToStaticMarkup(
+      <CreatorApplicationSurface
+        application={null}
+        mode={mode}
+        unavailable={false}
+      />,
+    );
+
+  it("leads an applicant back to the studio, and offers a reviewer no way into it", () => {
+    expect(surface("studio")).toMatch(/href="\/studio"[^>]*>Back to studio/);
+    expect(surface("review")).not.toContain("Back to studio");
+  });
+
+  it.each([
+    ["approved", "mint"],
+    ["changes-requested", "pink"],
+    ["draft", "yellow"],
+    ["rejected", "red"],
+    ["submitted", "cyan"],
+  ] as const)("shows an application that is %s in %s", (state, tone) => {
+    const markup = renderToStaticMarkup(
+      <CreatorApplicationSurface
+        application={sent(state)}
+        mode="studio"
+        unavailable={false}
+      />,
+    );
+    expect(markup).toContain(`arcade-badge arcade-badge--${tone}`);
   });
 });

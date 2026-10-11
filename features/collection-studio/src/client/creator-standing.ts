@@ -5,6 +5,7 @@ import {
   type CollectionSummary,
 } from "@ador/shared/collections";
 import {
+  creatorApplicationPath,
   creatorStandingCopy,
   neverAppliedCopy,
   type CreatorApplicationState,
@@ -14,8 +15,6 @@ import type { ArcadeTone } from "@repo/ui/arcade";
 // What a person is told about their standing as a creator, and what they can do about it. The state
 // comes from their creator application; null means they never applied. Pure, so every state's words,
 // action, and permission are tested without a screen.
-
-export const applicationHref = "/studio/creator-application";
 
 export interface StandingCopy {
   readonly action: { readonly href: string; readonly label: string } | null;
@@ -27,39 +26,39 @@ export interface StandingCopy {
   readonly tone: ArcadeTone;
 }
 
-const apply = { href: applicationHref, label: "Apply to create" } as const;
+const apply = {
+  href: creatorApplicationPath,
+  label: "Apply to create",
+} as const;
 
 const viewApplication = {
-  href: applicationHref,
+  href: creatorApplicationPath,
   label: "View your application",
 } as const;
 
-// How each state is shown and where it leads; the words are shared with the application page.
-const presentation: Readonly<
-  Record<CreatorApplicationState, Pick<StandingCopy, "action" | "tone">>
+// Where each state leads; the words and the colour are shared with the application page.
+const actions: Readonly<
+  Record<CreatorApplicationState, StandingCopy["action"]>
 > = {
-  approved: { action: null, tone: "mint" },
+  approved: null,
   "changes-requested": {
-    action: { href: applicationHref, label: "Update your application" },
-    tone: "pink",
+    href: creatorApplicationPath,
+    label: "Update your application",
   },
-  draft: {
-    action: { href: applicationHref, label: "Finish your application" },
-    tone: "yellow",
-  },
-  rejected: { action: viewApplication, tone: "red" },
-  revoked: { action: viewApplication, tone: "red" },
-  submitted: { action: viewApplication, tone: "cyan" },
-  suspended: { action: viewApplication, tone: "red" },
-  "under-review": { action: viewApplication, tone: "cyan" },
+  draft: { href: creatorApplicationPath, label: "Finish your application" },
+  rejected: viewApplication,
+  revoked: viewApplication,
+  submitted: viewApplication,
+  suspended: viewApplication,
+  "under-review": viewApplication,
 };
 
 export function describeCreatorStanding(
   state: CreatorApplicationState | null,
 ): StandingCopy {
   return state === null
-    ? { ...neverAppliedCopy, action: apply, tone: "yellow" }
-    : { ...creatorStandingCopy[state], ...presentation[state] };
+    ? { ...neverAppliedCopy, action: apply }
+    : { ...creatorStandingCopy[state], action: actions[state] };
 }
 
 export interface NextStep {

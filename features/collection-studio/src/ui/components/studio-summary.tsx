@@ -5,6 +5,7 @@ import {
   collectionStudioPath,
   type CollectionSummary,
 } from "@ador/shared/collections";
+import { standingBadgeLabel } from "@ador/shared/creator-admission";
 import type { LibraryAsset } from "@ador/shared/uploads";
 import { uploadsStudioPath } from "@ador/shared/uploads";
 import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
@@ -24,9 +25,7 @@ export function StandingCard({
       <p className="arcade-eyebrow">Your standing</p>
       <h3 className="arcade-card__title">{standing.headline}</h3>
       <ArcadeBadge tone={standing.tone}>
-        {standing.canCreate
-          ? "Can build collections"
-          : "Cannot build collections yet"}
+        {standingBadgeLabel(standing)}
       </ArcadeBadge>
       <p className="arcade-card__meta">{standing.body}</p>
       {standing.action === null ? null : (

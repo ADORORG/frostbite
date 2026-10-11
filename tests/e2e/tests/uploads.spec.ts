@@ -1,8 +1,10 @@
+import { AxeBuilder } from "@axe-core/playwright";
 import { createDecodablePng, createUndecodablePng } from "@ador/test-kit/png";
 import { uploadsNewPath, uploadsStudioPath } from "@ador/shared/uploads";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
+import { loadFonts } from "./support/quality.ts";
 import {
   chooseImage,
   processingTimeout,
@@ -52,6 +54,7 @@ test("a signed-in user uploads an image and sees its processed thumbnail, which 
     )
     .toEqual([64, 48]);
   await expect(page.getByText("Ready")).toBeVisible();
+  await loadFonts(page);
   await expect(
     page.getByRole("list", { name: "Your uploaded images" }),
   ).toHaveScreenshot("library-ready.png", { animations: "disabled" });
@@ -70,6 +73,17 @@ test("a signed-in user uploads an image and sees its processed thumbnail, which 
   await expect(details.getByText("Ready")).toBeVisible();
   await expect(details.getByText("64 × 48 px")).toBeVisible();
   await expect(details.getByRole("img")).toBeVisible();
+  // The image page meets the same accessibility bar as the rest, and its picture and layout are pinned
+  // (the upload date changes every day, so it is masked).
+  const accessibility = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
+  await loadFonts(page);
+  await expect(details).toHaveScreenshot("image-detail.png", {
+    animations: "disabled",
+    mask: [details.locator("dl")],
+  });
   await details.getByRole("link", { name: "Back to your library" }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: "Uploads" }),

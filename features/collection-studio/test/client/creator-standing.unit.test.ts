@@ -2,11 +2,15 @@ import type {
   CollectionSummary,
   SubmissionState,
 } from "@ador/shared/collections";
-import { creatorApplicationStates } from "@ador/shared/creator-admission";
+import {
+  creatorApplicationPath,
+  creatorApplicationStates,
+  creatorStandingCopy,
+  neverAppliedCopy,
+} from "@ador/shared/creator-admission";
 import { describe, expect, it } from "vitest";
 
 import {
-  applicationHref,
   describeCreatorStanding,
   nextStep,
 } from "../../src/client/creator-standing.ts";
@@ -43,7 +47,7 @@ describe("creator standing", () => {
       expect(copy.body.length).toBeGreaterThan(0);
       // Everyone but an approved creator is sent to their application, the one place it can move on.
       if (state === "approved") expect(copy.action).toBeNull();
-      else expect(copy.action?.href).toBe(applicationHref);
+      else expect(copy.action?.href).toBe(creatorApplicationPath);
     }
   });
 
@@ -55,6 +59,19 @@ describe("creator standing", () => {
     expect(describeCreatorStanding("changes-requested").action?.label).toBe(
       "Update your application",
     );
+  });
+
+  it("shows each state in the colour and words the application page uses", () => {
+    for (const state of creatorApplicationStates)
+      expect(describeCreatorStanding(state)).toMatchObject({
+        body: creatorStandingCopy[state].body,
+        headline: creatorStandingCopy[state].headline,
+        tone: creatorStandingCopy[state].tone,
+      });
+    expect(describeCreatorStanding(null)).toMatchObject({
+      headline: neverAppliedCopy.headline,
+      tone: neverAppliedCopy.tone,
+    });
   });
 
   it("does not promise anything to a creator whose access was paused, ended, or refused", () => {
@@ -69,12 +86,12 @@ describe("creator standing", () => {
 describe("what to do next", () => {
   it("before approval, is the application", () => {
     expect(nextStep(null, [])).toMatchObject({
-      href: applicationHref,
+      href: creatorApplicationPath,
       label: "Apply to create",
       text: describeCreatorStanding(null).body,
     });
     expect(nextStep("under-review", null)).toMatchObject({
-      href: applicationHref,
+      href: creatorApplicationPath,
     });
   });
 

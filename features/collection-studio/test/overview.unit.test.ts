@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
   effectiveFilter,
   filterOptions,
+  firstCharacter,
   nextActionLabels,
   stateLabel,
   visibleCollections,
@@ -116,5 +117,14 @@ describe("overview wording", () => {
       "needs-changes": "Make changes",
       paused: "See details",
     });
+  });
+});
+
+describe("monogram character", () => {
+  it("is a whole character: an emoji, an accented letter, a plain letter, or nothing for no text", () => {
+    expect(firstCharacter("🌌 Nebula")).toBe("🌌");
+    expect(firstCharacter("élan")).toBe("é");
+    expect(firstCharacter("plain")).toBe("p");
+    expect(firstCharacter("")).toBe("");
   });
 });

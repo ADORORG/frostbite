@@ -53,6 +53,7 @@ describe("studio home", () => {
     expect(
       link(container, "Start your first collection")?.getAttribute("href"),
     ).toBe("/studio/collections/new");
+    expect(textOf(container)).toContain("Can build collections");
     expect(textOf(container)).toContain("None yet");
     expect(textOf(container)).toContain("1 ready");
     expect(link(container, "Open uploads")?.getAttribute("href")).toBe(
@@ -93,6 +94,7 @@ describe("studio home", () => {
     );
     expect(first?.getAttribute("href")).toBe("/studio/creator-application");
     expect(link(container, "New collection")).toBeUndefined();
+    expect(textOf(container)).toContain("Cannot build collections yet");
     expect(container.querySelector('[aria-label="Next step"]')).not.toBeNull();
   });
 

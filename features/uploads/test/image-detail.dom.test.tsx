@@ -53,6 +53,25 @@ describe("image detail", () => {
     expect(hrefOf(container, "Back to your library")).toBe("/studio/uploads");
   });
 
+  it("says why there is no picture: ready but unavailable, or not ready yet", async () => {
+    const unavailable = await mount(
+      <ImageDetailWorkspace
+        assetId={assetId}
+        services={withLibrary([processedAsset({ derivatives: [] })])}
+      />,
+    );
+    await settle(() => expect(textOf(unavailable)).toContain("Ready"));
+    expect(textOf(unavailable)).toContain("Preview unavailable");
+    const pending = await mount(
+      <ImageDetailWorkspace
+        assetId={assetId}
+        services={withLibrary([libraryAsset({ processingState: "validated" })])}
+      />,
+    );
+    await settle(() => expect(textOf(pending)).toContain("Processing"));
+    expect(textOf(pending)).toContain("No preview yet");
+  });
+
   it("offers no way to use an image that is not ready, and says why", async () => {
     const container = await mount(
       <ImageDetailWorkspace

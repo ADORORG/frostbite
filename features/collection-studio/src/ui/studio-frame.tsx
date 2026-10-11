@@ -1,9 +1,9 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { AppShell } from "@repo/ui/arcade";
+import { PageFrame } from "@repo/ui/arcade";
 import type { ReactNode } from "react";
 
-// The shared frame of the collection pages: the platform shell, the studio's notices, and one section
-// with the page heading. Both pages use it, so they cannot drift apart.
+// The shared frame of the collection pages: the platform page frame with the studio's notices. Every page
+// uses it, so they cannot drift apart.
 export function StudioFrame({
   children,
   heading,
@@ -16,19 +16,15 @@ export function StudioFrame({
   readonly navigation: readonly NavigationItem[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
+    <PageFrame
+      eyebrow="Studio"
       footerLabel="Collections beta"
-      homeHref="/"
+      heading={heading}
+      intro={intro}
       navigation={navigation}
       notices={["◆ PRIVATE DRAFTS", "▲ NOTHING PUBLISHED", "★ NO CHAIN ACTION"]}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Studio</p>
-        <h1>{heading}</h1>
-        <p>{intro}</p>
-        {children}
-      </section>
-    </AppShell>
+      {children}
+    </PageFrame>
   );
 }

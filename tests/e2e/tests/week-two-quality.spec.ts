@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
+import { loadFonts } from "./support/quality.ts";
 
 const authenticatedSurfaces = [
   {
@@ -22,6 +23,13 @@ const authenticatedSurfaces = [
     path: "/studio/creator-application",
     snapshot: "creator-application",
     token: creatorE2EFixtures.visualUser.sessionToken,
+  },
+  {
+    // An approved creator's application is read-only: the status card and what was sent, no form.
+    heading: "Apply to create",
+    path: "/studio/creator-application",
+    snapshot: "creator-application-approved",
+    token: creatorE2EFixtures.collectionQualityList.sessionToken,
   },
   {
     heading: "Review creator admission",
@@ -65,6 +73,7 @@ for (const surface of authenticatedSurfaces) {
     await skipLink.press("Enter");
     await expect(page.locator("#main-content")).toBeFocused();
     await page.locator("#main-content").blur();
+    await loadFonts(page);
     await page.addStyleTag({
       content: [
         ".skip-link { visibility: hidden !important; }",

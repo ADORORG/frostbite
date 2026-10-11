@@ -15,11 +15,23 @@ export async function prepare(
   await page.emulateMedia({ reducedMotion: "reduce" });
 }
 
+// A screenshot must show the real fonts. The browser fetches a font only once text needs it, and "fonts
+// ready" can be reported before that fetch has begun, so every declared font is asked for and awaited.
+export async function loadFonts(page: Page) {
+  await page.evaluate(async () => {
+    await Promise.all(
+      [...document.fonts].map((font) => font.load().catch(() => undefined)),
+    );
+    await document.fonts.ready;
+  });
+}
+
 export async function closeMatrix(page: Page, name: string) {
   // A picture still loading would make the screenshot depend on timing.
   await page.waitForFunction(() =>
     [...document.images].every((image) => image.complete),
   );
+  await loadFonts(page);
   await expect(page.locator(".app-shell")).toHaveJSProperty(
     "scrollWidth",
     await page.locator(".app-shell").evaluate((shell) => shell.clientWidth),

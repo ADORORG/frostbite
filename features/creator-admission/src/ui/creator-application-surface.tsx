@@ -1,5 +1,6 @@
+import { studioHomePath } from "@ador/shared/collections";
 import type { CreatorApplicationResponse } from "@ador/shared/creator-admission";
-import { AppShell, ArcadeButton, StatusLamp } from "@repo/ui/arcade";
+import { ArcadeButton, PageFrame, StatusLamp } from "@repo/ui/arcade";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
 import { ReviewerForm } from "./reviewer-form.tsx";
@@ -17,10 +18,13 @@ export function CreatorApplicationSurface({
   readonly unavailable: boolean;
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
+    <PageFrame
+      eyebrow="Creator admission"
       footerLabel="Creator admission beta"
-      homeHref="/"
+      heading={
+        mode === "studio" ? "Apply to create" : "Review creator admission"
+      }
+      intro="Admission is separate from project publication, deployment, launch, mint, and game permissions."
       navigation={navigation}
       notices={[
         "◆ PRIVATE EVIDENCE",
@@ -28,31 +32,23 @@ export function CreatorApplicationSurface({
         "★ SERVER AUTHORITY",
       ]}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Creator admission</p>
-        <h1>
-          {mode === "studio" ? "Apply to create" : "Review creator admission"}
-        </h1>
-        <p>
-          Admission is separate from project publication, deployment, launch,
-          mint, and game permissions.
-        </p>
-        {unavailable ? (
-          <StatusLamp
-            label="Admission service unavailable. No state is being inferred."
-            tone="unavailable"
-          />
-        ) : mode === "studio" ? (
-          <StudioApplication initial={application} />
-        ) : (
-          <ReviewerForm />
-        )}
+      {unavailable ? (
+        <StatusLamp
+          label="Admission service unavailable. No state is being inferred."
+          tone="unavailable"
+        />
+      ) : mode === "studio" ? (
+        <StudioApplication initial={application} />
+      ) : (
+        <ReviewerForm />
+      )}
+      {mode === "studio" ? (
         <div className="arcade-actions">
-          <ArcadeButton href="/studio" tone="cyan">
+          <ArcadeButton href={studioHomePath} tone="cyan">
             Back to studio
           </ArcadeButton>
         </div>
-      </section>
-    </AppShell>
+      ) : null}
+    </PageFrame>
   );
 }

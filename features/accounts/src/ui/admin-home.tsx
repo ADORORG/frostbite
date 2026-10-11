@@ -1,5 +1,5 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { AppShell, ArcadeButton, ArcadeEmptyState } from "@repo/ui/arcade";
+import { ArcadeButton, ArcadeEmptyState, PageFrame } from "@repo/ui/arcade";
 
 // The staff overview: where each staff area the person may open begins. The areas come from the
 // navigation the platform already resolved for this person, so a link here never leads to a page that
@@ -14,44 +14,37 @@ export function AdminHome({
     (item) => item.area === "admin" && item.current !== "page",
   );
   return (
-    <AppShell
-      brand="Adorbitals"
+    <PageFrame
+      eyebrow="Platform operations"
       footerLabel="Authenticated beta workspace"
-      homeHref="/"
+      heading="Admin console"
+      intro="Choose a staff area. Reviews are separated from broader platform authority, and nothing here publishes or deploys anything."
       navigation={navigation}
       notices={["◆ STAFF ONLY", "▲ PRIVATE ROUTE", "★ SERVER AUTHORITY"]}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Platform operations</p>
-        <h1>Admin console</h1>
-        <p>
-          Choose a staff area. Reviews are separated from broader platform
-          authority, and nothing here publishes or deploys anything.
-        </p>
-        {areas.length === 0 ? (
-          <ArcadeEmptyState title="No staff areas yet">
-            Staff areas appear here as they are enabled for your assignment.
-          </ArcadeEmptyState>
-        ) : (
-          <ul aria-label="Staff areas" className="arcade-cards">
-            {areas.map((area) => (
-              <li key={area.href}>
-                <article className="arcade-card">
-                  <p className="arcade-eyebrow">Admin</p>
-                  <h3 className="arcade-card__title">{area.label}</h3>
-                  <ArcadeButton
-                    ariaLabel={`Open ${area.label}`}
-                    href={area.href}
-                    tone="cyan"
-                  >
-                    Open
-                  </ArcadeButton>
-                </article>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </AppShell>
+      {areas.length === 0 ? (
+        <ArcadeEmptyState title="No staff areas yet">
+          Staff areas appear here as they are enabled for your assignment.
+        </ArcadeEmptyState>
+      ) : (
+        <ul aria-label="Staff areas" className="arcade-cards">
+          {areas.map((area) => (
+            <li key={area.href}>
+              <article className="arcade-card">
+                <p className="arcade-eyebrow">Admin</p>
+                <h3 className="arcade-card__title">{area.label}</h3>
+                <ArcadeButton
+                  ariaLabel={`Open ${area.label}`}
+                  href={area.href}
+                  tone="cyan"
+                >
+                  Open
+                </ArcadeButton>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )}
+    </PageFrame>
   );
 }

@@ -1,24 +1,13 @@
 import {
   creatorStandingCopy,
   neverAppliedCopy,
+  standingBadgeLabel,
   type CreatorApplicationResponse,
-  type CreatorApplicationState,
 } from "@ador/shared/creator-admission";
 import { collectionStudioPath } from "@ador/shared/collections";
-import { ArcadeBadge, ArcadeButton, type ArcadeTone } from "@repo/ui/arcade";
+import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
 
 type Application = CreatorApplicationResponse["application"];
-
-const tones: Readonly<Record<CreatorApplicationState, ArcadeTone>> = {
-  approved: "mint",
-  "changes-requested": "pink",
-  draft: "yellow",
-  rejected: "red",
-  revoked: "red",
-  submitted: "cyan",
-  suspended: "red",
-  "under-review": "cyan",
-};
 
 // Whether the person can still change what they wrote: before they send it, and after a reviewer asks
 // for changes. Every other state is read-only, because what was sent is what a reviewer sees.
@@ -40,16 +29,11 @@ export function StatusCard({
     application === null
       ? neverAppliedCopy
       : creatorStandingCopy[application.state];
-  const tone = application === null ? "yellow" : tones[application.state];
   return (
     <article aria-label="Application status" className="arcade-card">
       <p className="arcade-eyebrow">Your application</p>
       <h3 className="arcade-card__title">{copy.headline}</h3>
-      <ArcadeBadge tone={tone}>
-        {copy.canCreate
-          ? "Can build collections"
-          : "Cannot build collections yet"}
-      </ArcadeBadge>
+      <ArcadeBadge tone={copy.tone}>{standingBadgeLabel(copy)}</ArcadeBadge>
       <p className="arcade-card__meta">{copy.body}</p>
       {copy.canCreate ? (
         <ArcadeButton href={collectionStudioPath} tone="mint">

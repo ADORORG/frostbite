@@ -8,6 +8,8 @@ import {
   assetNote,
   describeDimensions,
   pickRendition,
+  previewPlaceholder,
+  uploadedOn,
 } from "../../client/asset-presentation.ts";
 import { canUseInCollection } from "../../client/library-view.ts";
 import { purposeLabels } from "../../client/purpose-labels.ts";
@@ -29,7 +31,7 @@ export function AssetCard({ asset }: { readonly asset: LibraryAsset }) {
           {dimensions === null ? null : <span>{dimensions}</span>}
           {note === null ? null : <span>{note}</span>}
           <ArcadeButton
-            ariaLabel={`Details: ${label} uploaded ${asset.createdAt.slice(0, 10)}`}
+            ariaLabel={`Details: ${label} uploaded ${uploadedOn(asset)}`}
             href={uploadDetailHref(asset.id)}
             tone="yellow"
           >
@@ -37,7 +39,7 @@ export function AssetCard({ asset }: { readonly asset: LibraryAsset }) {
           </ArcadeButton>
           {canUseInCollection(asset) ? (
             <ArcadeButton
-              ariaLabel={`Use in a collection: ${label} uploaded ${asset.createdAt.slice(0, 10)}`}
+              ariaLabel={`Use in a collection: ${label} uploaded ${uploadedOn(asset)}`}
               href={collectionStudioPath}
             >
               Use in a collection
@@ -55,11 +57,7 @@ export function AssetCard({ asset }: { readonly asset: LibraryAsset }) {
               width: thumbnail.widthPixels,
             }
       }
-      placeholder={
-        asset.processingState === "processed"
-          ? "Preview unavailable"
-          : "No preview yet"
-      }
+      placeholder={previewPlaceholder(asset)}
     />
   );
 }

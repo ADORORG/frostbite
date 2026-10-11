@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  collectionReviewHref,
   collectionStandingLabels,
   collectionStandings,
+  collectionWizardHref,
   standingOf,
   submissionStates,
 } from "../src/collections/index.ts";
@@ -30,5 +32,12 @@ describe("collection standing", () => {
     expect(Object.keys(collectionStandingLabels).sort()).toEqual(
       [...collectionStandings].sort(),
     );
+  });
+});
+
+describe("collection page addresses", () => {
+  it("builds each page's address from its identifier", () => {
+    expect(collectionWizardHref("abc")).toBe("/studio/collections/abc");
+    expect(collectionReviewHref("def")).toBe("/admin/collection-reviews/def");
   });
 });

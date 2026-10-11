@@ -91,3 +91,9 @@ export function stateLabel(summary: CollectionSummary): string {
     ? "Draft"
     : submissionStateLabels[summary.submissionState];
 }
+
+// The first character as a person sees it. `slice(0, 1)` would cut an emoji (two UTF-16 units) in half and
+// show a broken glyph, and collection names are free text.
+export function firstCharacter(text: string): string {
+  return [...text][0] ?? "";
+}

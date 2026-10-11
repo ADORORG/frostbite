@@ -100,6 +100,7 @@ export function createCollectionStudioEntrypoint(
         path: collectionWizardPath,
         render: ({ navigation, params }) => (
           <WizardSurface
+            // The registry matches this page only with its segment, so the parameter is always present.
             collectionId={params.collectionId ?? ""}
             navigation={navigation}
             targetChains={enabledChains}

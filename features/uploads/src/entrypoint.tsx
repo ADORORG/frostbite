@@ -56,6 +56,7 @@ export function createUploadsEntrypoint(
         path: uploadDetailPath,
         render: ({ navigation, params }) => (
           <ImageDetailSurface
+            // The registry matches this page only with its segment, so the parameter is always present.
             assetId={params.assetId ?? ""}
             navigation={navigation}
           />

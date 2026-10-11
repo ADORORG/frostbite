@@ -40,6 +40,8 @@ describe("collection pages", () => {
       <CollectionsSurface navigation={navigation} targetChains={[enabled]} />,
     );
     expect(markup).toContain("<h1>Collections</h1>");
+    expect(markup).toContain('<p class="arcade-eyebrow">Studio</p>');
+    expect(markup).toContain("Collections beta");
     expect(markup).toContain("Skip to main content");
     expect(markup).toContain("PRIVATE DRAFTS");
     expect(markup).toContain("NO CHAIN ACTION");

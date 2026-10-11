@@ -3,19 +3,20 @@ import {
   type CreatorApplicationResponse,
 } from "@ador/shared/creator-admission";
 
+// Sends one of the creator admission routes (method and path come from the shared contract).
 export async function sendCreatorAdmissionRequest(
-  path: string,
-  method: string,
+  route: { readonly method: string; readonly path: string },
   body: object,
 ): Promise<CreatorApplicationResponse> {
-  const response = await fetch(path, {
+  const response = await fetch(route.path, {
     body: JSON.stringify(body),
     headers: {
       "content-type": "application/json",
       "idempotency-key": crypto.randomUUID(),
     },
-    method,
+    method: route.method,
   });
+  // `unknown` is the honest type of a response body: it is untrusted until the shared schema accepts it.
   const payload: unknown = await response.json();
   if (!response.ok) throw new Error("The request could not be completed.");
   return creatorApplicationResponseSchema.parse(payload);

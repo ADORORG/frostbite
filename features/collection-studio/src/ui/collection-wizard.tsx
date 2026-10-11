@@ -3,6 +3,7 @@
 import type { ChainOption } from "@ador/shared/chain";
 import type { CollectionDetail } from "@ador/shared/collections";
 import { collectionStudioPath } from "@ador/shared/collections";
+import { creatorApplicationPath } from "@ador/shared/creator-admission";
 import type { LibraryResponse } from "@ador/shared/uploads";
 import { ArcadeActionButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import { useEffect, useRef, useState } from "react";
@@ -28,8 +29,6 @@ import { useDraftEditor } from "./hooks/use-draft-editor.ts";
 import { useDraftForm } from "./hooks/use-draft-form.ts";
 import { useSubmissions } from "./hooks/use-submissions.ts";
 import { useResource, type LoadedResource } from "./hooks/use-resource.ts";
-
-export const applyHref = "/studio/creator-application";
 
 // The wizard for one draft. It loads the draft, lands the creator on the first step that still asks
 // for something, and saves as they go. Everything is read from the server, so leaving and coming back
@@ -150,7 +149,7 @@ function WizardBody({
       {[editor, submissions].map((source, index) =>
         source.notice === null ? null : (
           <FailureNotice
-            applyHref={applyHref}
+            applyHref={creatorApplicationPath}
             failure={source.notice}
             key={index}
             onDismiss={source.dismissNotice}

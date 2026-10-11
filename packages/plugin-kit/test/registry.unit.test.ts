@@ -271,6 +271,10 @@ describe("createFeatureRegistry", () => {
     await expect(
       registry.resolvePage("/catalog/a/extra"),
     ).resolves.toBeUndefined();
+    // A dynamic page is never matched without its segment, so a page can rely on its parameter being a
+    // non-empty string (the pages' empty-string fallbacks only satisfy the type).
+    await expect(registry.resolvePage("/catalog/")).resolves.toBeUndefined();
+    await expect(registry.resolvePage("/catalog")).resolves.toBeUndefined();
   });
 });
 

@@ -39,3 +39,10 @@ Branch `feat/studio-journey`. Baseline: the journey docs commits `608bd65`, `d63
 ## Left for other tasks
 
 UX-2 (page split, flow fixes), UX-4 (layout), UX-5 (journeys for all roles). See findings R1-R7.
+
+## Convergence
+
+Reviewed together with UX-2 over `392a216~1` to the working tree; verdict Converged (see the review table in
+`references/studio-flow-task-record.md`). Navigation-specific results: the shell, sidebar, account menu and
+breadcrumb branches are fully covered (`@repo/ui` 100% on all four measures), and every shell path has a
+mutation proof.

@@ -160,7 +160,9 @@ test("the activity log shows who did what, newest first, and the creator's histo
     .getByRole("link", { name: `Open ${name}, submission 2` })
     .first()
     .click();
-  await expect(staff.getByText("Creator standing: approved")).toBeVisible();
+  await expect(
+    staff.getByText("Creator standing: Approved creator"),
+  ).toBeVisible();
   await expect(staff.getByText(/started review of it/u).first()).toBeVisible();
   await staff.context().close();
 

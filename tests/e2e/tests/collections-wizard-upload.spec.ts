@@ -37,11 +37,14 @@ test("a creator uploads a cover and a banner inside the wizard and never leaves 
   await expect(banner.getByText("You have no ready images")).toBeVisible();
 
   await cover.locator('input[type="file"]').setInputFiles(png("cover.png"));
-  await expect(cover.getByRole("radio", { checked: true })).toHaveCount(1, {
+  // "None" is chosen from the start, so the image is awaited by what it brings: the library now holds it.
+  await expect(cover.getByText("You have no ready images")).toHaveCount(0, {
     timeout: 90_000,
   });
   // The cover is chosen without clicking it, and the banner is untouched.
-  await expect(cover.getByText("You have no ready images")).toHaveCount(0);
+  await expect(
+    cover.getByRole("radio", { name: "Choose this image", checked: true }),
+  ).toHaveCount(1);
   await expect(banner.getByText("You have no ready images")).toBeVisible();
 
   await banner
@@ -51,7 +54,9 @@ test("a creator uploads a cover and a banner inside the wizard and never leaves 
   await expect(banner.getByText("You have no ready images")).toHaveCount(0, {
     timeout: 90_000,
   });
-  await expect(banner.getByRole("radio", { checked: true })).toHaveCount(1);
+  await expect(
+    banner.getByRole("radio", { name: "Choose this image", checked: true }),
+  ).toHaveCount(1);
   // Still on the same page (only the step's fragment changed).
   expect(new URL(page.url()).pathname).toBe(wizardPath);
 

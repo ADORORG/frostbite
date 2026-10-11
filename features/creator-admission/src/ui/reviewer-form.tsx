@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
+import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
 import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 
 import {
@@ -23,8 +24,7 @@ export function ReviewerForm() {
     const data = new FormData(event.currentTarget);
     try {
       const result = await sendCreatorAdmissionRequest(
-        "/api/v1/creator-application/review",
-        "POST",
+        creatorApplicationRoutes.review,
         {
           action: data.get("action"),
           applicationId: data.get("applicationId"),

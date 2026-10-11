@@ -1,3 +1,4 @@
+import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
@@ -124,6 +125,13 @@ describe("creator admission forms", () => {
     expect(container.textContent).toContain("What you sent");
     expect(container.querySelector("form")).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    // Each request goes where the shared contract says, with the contract's method.
+    expect(
+      fetchMock.mock.calls.map(([path, init]) => [path, init?.method]),
+    ).toEqual([
+      [creatorApplicationRoutes.saveDraft.path, "PUT"],
+      [creatorApplicationRoutes.submit.path, "POST"],
+    ]);
     await act(() => root.unmount());
   });
 
@@ -131,6 +139,7 @@ describe("creator admission forms", () => {
     const fetchMock = vi.fn().mockResolvedValue(response({ application }));
     vi.stubGlobal("fetch", fetchMock);
     const { container, root } = await render("studio", null);
+    expect(container.textContent).toContain("Not a creator yet");
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected creator form");
     const submit = [...container.querySelectorAll("button")].find((button) =>
@@ -149,6 +158,9 @@ describe("creator admission forms", () => {
     );
     expect(fetchMock).toHaveBeenCalled();
     expect(submit.disabled).toBe(false);
+    // The status card follows the save: a person who had not started has now started.
+    expect(container.textContent).toContain("Application started");
+    expect(container.textContent).not.toContain("Not a creator yet");
     await act(() => root.unmount());
   });
 
@@ -183,6 +195,13 @@ describe("creator admission forms", () => {
       );
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    // The decision goes where the shared contract says, with the contract's method.
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      creatorApplicationRoutes.review.path,
+    );
+    expect(fetchMock.mock.calls[0]?.[1]?.method).toBe(
+      creatorApplicationRoutes.review.method,
+    );
     if (finishFirstRequest === undefined)
       throw new Error("Expected pending review request");
     const completeFirstRequest = finishFirstRequest;
@@ -208,7 +227,7 @@ describe("creator admission forms", () => {
       vi.fn().mockResolvedValue(response({ application: {} })),
     );
     await expect(
-      sendCreatorAdmissionRequest("/api/v1/test", "POST", {}),
+      sendCreatorAdmissionRequest({ method: "POST", path: "/api/v1/test" }, {}),
     ).rejects.toThrow();
   });
 
@@ -218,7 +237,7 @@ describe("creator admission forms", () => {
       vi.fn().mockResolvedValue(response({ application }, 403)),
     );
     await expect(
-      sendCreatorAdmissionRequest("/api/v1/test", "POST", {}),
+      sendCreatorAdmissionRequest({ method: "POST", path: "/api/v1/test" }, {}),
     ).rejects.toThrow("could not be completed");
   });
 });

@@ -8,6 +8,8 @@ import {
   assetNote,
   describeDimensions,
   pickRendition,
+  previewPlaceholder,
+  uploadedOn,
 } from "../../client/asset-presentation.ts";
 import { canUseInCollection } from "../../client/library-view.ts";
 import { purposeLabels } from "../../client/purpose-labels.ts";
@@ -22,7 +24,7 @@ export function ImageDetails({ asset }: { readonly asset: LibraryAsset }) {
   const note = assetNote(asset);
   const dimensions = describeDimensions(asset);
   const facts: readonly (readonly [string, string])[] = [
-    ["Uploaded", asset.createdAt.slice(0, 10)],
+    ["Uploaded", uploadedOn(asset)],
     ...(dimensions === null ? [] : [["Size", dimensions] as const]),
   ];
   return (
@@ -39,11 +41,7 @@ export function ImageDetails({ asset }: { readonly asset: LibraryAsset }) {
                 width: picture.widthPixels,
               }
         }
-        placeholder={
-          asset.processingState === "processed"
-            ? "Preview unavailable"
-            : "No preview yet"
-        }
+        placeholder={previewPlaceholder(asset)}
       />
       <ArcadeBadge tone={badge.tone}>{badge.label}</ArcadeBadge>
       {note === null ? null : <p>{note}</p>}

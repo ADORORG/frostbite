@@ -46,6 +46,18 @@ async function fill(container: HTMLElement, name: string) {
 }
 
 describe("item editor", () => {
+  it("sends the description that was typed with the item", async () => {
+    const { onSubmit, props } = view();
+    const container = await mount(<ItemEditor {...props} />);
+    await fill(container, "First item");
+    await typeInto(fieldByLabel(container, "Item description"), "About it");
+    await click(button(container, "Add item"));
+    expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({
+      description: "About it",
+      name: "First item",
+    });
+  });
+
   it("refuses an item with no name or no image, in words, without calling the server", async () => {
     const { onSubmit, props } = view();
     const container = await mount(<ItemEditor {...props} />);
@@ -95,7 +107,9 @@ describe("item editor", () => {
     await typeInto(fieldByLabel(container, "Trait 1 name"), "Colour");
     await typeInto(fieldByLabel(container, "Trait 1 value"), "Blue");
     await click(button(container, "Remove trait 2"));
-    expect(container.querySelectorAll("label")).toBeDefined();
+    // The row is gone from the form itself, not merely left out of what is sent.
+    expect(textOf(container)).toContain("Trait 1 name");
+    expect(textOf(container)).not.toContain("Trait 2 name");
     await click(button(container, "Add item"));
     expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({
       attributes: [{ trait: "Colour", value: "Blue" }],

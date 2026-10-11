@@ -1,4 +1,4 @@
-import { mount, settle, textOf } from "@ador/test-kit/dom";
+import { mount, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { DetailSurface } from "../src/ui/detail-surface.tsx";
@@ -20,13 +20,16 @@ describe("review page surfaces", () => {
       "Collection reviews",
     );
     expect(textOf(container)).toContain("STAFF ONLY");
+    expect(container.querySelector(".arcade-eyebrow")?.textContent).toBe(
+      "Admin",
+    );
+    expect(textOf(container)).toContain("Collection reviews");
     expect(textOf(container)).toContain(
       "Nothing here publishes or deploys anything.",
     );
     expect(
       container.querySelector('a[href="/admin/collection-reviews"]'),
     ).not.toBeNull();
-    await settle(() => expect(textOf(container)).not.toBeUndefined());
   });
 
   it("frames the detail page and says the frozen version does not change when the draft does", async () => {

@@ -4,6 +4,7 @@ import { ArcadeBadge, ArcadeButton, ArcadeProgress } from "@repo/ui/arcade";
 
 import type { CoverPicture } from "../../client/covers.ts";
 import {
+  firstCharacter,
   nextActionLabels,
   stateLabel,
   standingTones,
@@ -32,7 +33,7 @@ export function CollectionCard({
             aria-hidden="true"
             className={`arcade-card__avatar arcade-card__avatar--${tone}`}
           >
-            {collection.name.slice(0, 1).toUpperCase()}
+            {firstCharacter(collection.name).toUpperCase()}
           </span>
         ) : (
           <img

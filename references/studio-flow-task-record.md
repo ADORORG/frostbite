@@ -41,8 +41,39 @@ Branch `feat/studio-flow`, stacked on `feat/studio-journey`. Baseline: `392a216`
    showed it the approval notice.
 5. Full-page screenshots drew the now-sticky header and sidebar displaced; frozen for screenshots.
 
+## Later increments (UX-2 remainder)
+
+- Closed standing split into Paused and Ended; uploads split into a library, an add page and an image page;
+  `/admin` is an overview of the staff areas a person may open; the creator application has a status card
+  and is read-only once sent; the review detail reads in plain words; collection cards show the chosen cover.
+- One shared `PageFrame` replaced three near-identical page frames; one shared creator-standing copy (words,
+  colour, badge) replaced two.
+
+## Convergence review (UX-2 and UX-3, 2026-10-10 to 11)
+
+Scope: `392a216~1` to the working tree, about 175 files. Verdict: **Converged**.
+
+| Pass | Method                                               | Result                                                                                    |
+| ---- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1    | M1 whole-file read of every production file          | duplicated paths and wording, a dead branch, a wrong link: repaired                       |
+| 2    | M4 producer/consumer diff, with a read of every test | vacuous and flaky tests, a coverage gap, stale wording: repaired                          |
+| 3    | M11 house rules, rule by rule                        | generated lockfile reformatted by my formatter (restored), one undocumented `unknown`     |
+| -    | M5 mutation proofs throughout                        | every new or changed test proven; survivors fixed with tests, or recorded as copy wording |
+| -    | M6 coverage walk, M8 adversarial inputs              | eight untested branches covered; an emoji monogram bug fixed                              |
+| -    | M9 siblings                                          | a third copy of the page frame and a duplicated badge wording merged                      |
+| A    | M10 dead-code proof                                  | clean: no new symbol unreferenced                                                         |
+| B    | M6 coverage holes (dynamic, with the full e2e run)   | clean: two documented, proven-unreachable fallbacks                                       |
+| C    | M9 convention conformance                            | clean                                                                                     |
+
+Final gates on the committed tree: env:check, format:check, typecheck, lint, repository:check,
+test:unit, test:integration, test:coverage, db:check, test:e2e all pass (217 e2e passed, 6 skipped).
+Lowest workspace coverage 95.4% statements, 91.2% branches, 96.5% functions, 96.6% lines. Longest file 285
+lines. `pnpm-lock.yaml` identical to the baseline.
+
+Findings log: `docs/session-findings.md` S12. Not fixed, filed as tasks: applicant cannot see the reviewer's
+feedback; creator review needs a list of applications (filter and sort); a layout gap on narrow screens.
+
 ## Left open
 
-Cover previews on cards, "Use in a collection" on library cards and an image detail page, and the wording
-of "Closed" (findings S4 to S6); `/admin` is still a placeholder. UX-4 (layout) and UX-5 (click-only
-journeys for every role) follow.
+Layout and density (UX-4) and click-only journeys for every role (UX-5) follow; the preview waits for them and
+for a manual walk by the product owner.

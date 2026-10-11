@@ -2,14 +2,16 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
-import type { CreatorApplicationResponse } from "@ador/shared/creator-admission";
+import {
+  creatorApplicationRoutes,
+  type CreatorApplicationResponse,
+} from "@ador/shared/creator-admission";
 import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 
 import {
   AdmissionField,
   sendCreatorAdmissionRequest,
 } from "./form-helpers.tsx";
-import { isEditable } from "./application-status.tsx";
 
 type SurfaceStatus = "idle" | "working" | "success" | "error";
 
@@ -38,8 +40,7 @@ export function CreatorDraftForm({
       data.getAll(name).map(String).filter(Boolean);
     try {
       const result = await sendCreatorAdmissionRequest(
-        "/api/v1/creator-application/draft",
-        "PUT",
+        creatorApplicationRoutes.saveDraft,
         {
           draft: {
             contentDeclarationAccepted:
@@ -75,8 +76,7 @@ export function CreatorDraftForm({
     setStatus("working");
     try {
       const result = await sendCreatorAdmissionRequest(
-        "/api/v1/creator-application/submit",
-        "POST",
+        creatorApplicationRoutes.submit,
         {},
       );
       onApplication(result.application);
@@ -92,7 +92,6 @@ export function CreatorDraftForm({
     }
   }
   const draft = application?.draft;
-  const editable = isEditable(application);
   const submittable =
     application?.state === "draft" ||
     application?.state === "changes-requested";
@@ -179,7 +178,7 @@ export function CreatorDraftForm({
         <div className="arcade-actions">
           <button
             className="arcade-button arcade-button--cyan"
-            disabled={status === "working" || !editable}
+            disabled={status === "working"}
             type="submit"
           >
             Save private draft

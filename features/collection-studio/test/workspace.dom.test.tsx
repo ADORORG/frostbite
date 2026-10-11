@@ -213,3 +213,21 @@ describe("collections overview: covers", () => {
     expect(container.querySelectorAll(".arcade-card__avatar")).toHaveLength(1);
   });
 });
+
+describe("collections overview: the monogram", () => {
+  it("shows a whole character, even when the name starts with an emoji or an accent", async () => {
+    const fake = fakeCollections();
+    fake.state.summaries = [
+      summary("🌌 Nebula", 1),
+      summary("élan", 1),
+      summary("plain", 1),
+    ];
+    const container = await mount(view(fake));
+    await settle(() => expect(textOf(container)).toContain("Nebula"));
+    expect(
+      [...container.querySelectorAll(".arcade-card__avatar")].map(
+        (avatar) => avatar.textContent,
+      ),
+    ).toEqual(["🌌", "É", "P"]);
+  });
+});

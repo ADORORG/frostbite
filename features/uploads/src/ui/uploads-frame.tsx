@@ -1,9 +1,9 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { AppShell } from "@repo/ui/arcade";
+import { PageFrame } from "@repo/ui/arcade";
 import type { ReactNode } from "react";
 
-// The shared frame of the uploads pages: the platform shell, the uploads notices, and one section with
-// the page heading. Both pages use it, so they cannot drift apart. A server component.
+// The shared frame of the uploads pages: the platform page frame with the uploads notices. Every page uses
+// it, so they cannot drift apart. A server component.
 export function UploadsFrame({
   children,
   heading,
@@ -16,10 +16,11 @@ export function UploadsFrame({
   readonly navigation: readonly NavigationItem[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
+    <PageFrame
+      eyebrow="Studio"
       footerLabel="Uploads beta"
-      homeHref="/"
+      heading={heading}
+      intro={intro}
       navigation={navigation}
       notices={[
         "◆ PRIVATE DRAFTS",
@@ -27,12 +28,7 @@ export function UploadsFrame({
         "★ NOTHING PUBLISHED",
       ]}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Studio</p>
-        <h1>{heading}</h1>
-        <p>{intro}</p>
-        {children}
-      </section>
-    </AppShell>
+      {children}
+    </PageFrame>
   );
 }

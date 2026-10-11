@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChainOption } from "@ador/shared/chain";
+import { creatorApplicationPath } from "@ador/shared/creator-admission";
 import { StatusLamp } from "@repo/ui/arcade";
 import { useState } from "react";
 
@@ -8,7 +9,6 @@ import {
   createBrowserServices,
   type CollectionsClientServices,
 } from "../client/services.ts";
-import { applyHref } from "./collection-wizard.tsx";
 import { ApprovalNotice } from "./components/approval-notice.tsx";
 import { NewCollection } from "./components/new-collection.tsx";
 import { useCreatorStanding } from "./hooks/use-creator-standing.ts";
@@ -33,7 +33,7 @@ export function NewCollectionWorkspace({
     return <ApprovalNotice standing={standing} />;
   return (
     <NewCollection
-      applyHref={applyHref}
+      applyHref={creatorApplicationPath}
       chains={targetChains}
       services={services}
     />
