@@ -207,3 +207,28 @@
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
+
+/* A long plain list (a batch of files) that scrolls inside its own box instead of stretching the page. */
+.arcade-scroll-list {
+  max-height: 24rem;
+  margin: 0;
+  padding: var(--arcade-space-small, 0.5rem);
+  overflow-y: auto;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 0.5rem;
+  background: var(--arcade-surface-recessed);
+  list-style: none;
+}
+.arcade-scroll-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.375rem 0;
+  border-bottom: 0.0625rem solid var(--arcade-border-strong);
+  overflow-wrap: anywhere;
+}
+.arcade-scroll-list > li:last-child {
+  border-bottom: 0;
+}

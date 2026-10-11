@@ -8,6 +8,10 @@ import {
   type UploadClientPolicy,
 } from "./client-policy.ts";
 import { createXhrTransfer, type ObjectTransfer } from "./transfer.ts";
+import {
+  createUploadRunner,
+  type UploadRunnerDependencies,
+} from "./upload-runner.ts";
 
 // Everything the browser UI needs from its environment, in one injectable bundle. Components and
 // hooks receive this instead of reaching for `fetch`, `XMLHttpRequest`, `crypto`, or timers, so the
@@ -52,4 +56,19 @@ export function createBrowserServices(
     transfer: createXhrTransfer(),
     ...overrides,
   };
+}
+
+// The runner for one set of services; every uploader builds it the same way. A batch passes a shared
+// `watch` so its uploads ask the server about processing together.
+export function runnerFor(
+  services: UploadsClientServices,
+  watch?: UploadRunnerDependencies["watch"],
+) {
+  return createUploadRunner({
+    api: services.api,
+    policy: services.policy,
+    sleep: services.sleep,
+    transfer: services.transfer,
+    watch,
+  });
 }

@@ -20,6 +20,8 @@ export interface LibraryAssetRecord {
   readonly createdAt: Date;
   // At most one per kind: the newest rendition.
   readonly derivatives: readonly LibraryDerivativeRecord[];
+  // The name the file had when it was uploaded; null when none was given.
+  readonly fileName: string | null;
   readonly heightPixels: number | null;
   readonly id: UuidV7;
   readonly processingState: AssetProcessingState;

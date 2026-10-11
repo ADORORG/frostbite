@@ -37,6 +37,7 @@ const record = (
       widthPixels: 40,
     },
   ],
+  fileName: null,
   heightPixels: 30,
   id: createUuidV7(),
   processingState: "processed",
@@ -113,7 +114,7 @@ describe("asset library service", () => {
   });
 
   it("signs each rendition of a processed asset for the policy lifetime", async () => {
-    const asset = record();
+    const asset = record({ fileName: "piece-1.png" });
     const { presignPrivateRead, service } = setup([asset]);
     const result = await service.list(userId);
     expect(presignPrivateRead.mock.calls.map(([input]) => input)).toEqual([
@@ -143,6 +144,7 @@ describe("asset library service", () => {
               widthPixels: 40,
             },
           ],
+          fileName: "piece-1.png",
           heightPixels: 30,
           id: asset.id,
           processingState: "processed",

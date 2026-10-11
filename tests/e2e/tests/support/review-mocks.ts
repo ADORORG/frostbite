@@ -43,6 +43,7 @@ const preview = (id: string, purpose: string) => ({
       widthPixels: 40,
     },
   ],
+  fileName: null,
   heightPixels: 40,
   id,
   processingState: "processed",

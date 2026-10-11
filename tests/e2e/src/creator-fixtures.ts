@@ -138,6 +138,12 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-inline-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000060",
   },
+  // Many images at once (bulk upload): one creator who uploads a batch of named images in the browser.
+  collectionBulkCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000067",
+    sessionToken: "e2e-collection-bulk-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000066",
+  },
   // An applicant a reviewer has asked for changes (UX: the reviewer's message is shown to them).
   applicantFeedback: {
     sessionId: "01994b10-0000-7000-8000-000000000063",
@@ -159,6 +165,7 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionWizardCreator,
   creatorE2EFixtures.collectionQualityList,
   creatorE2EFixtures.collectionInlineCreator,
+  creatorE2EFixtures.collectionBulkCreator,
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,
   creatorE2EFixtures.reviewQualityCreator,

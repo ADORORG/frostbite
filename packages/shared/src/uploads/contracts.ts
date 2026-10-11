@@ -11,10 +11,22 @@ export const uploadContentTypes = [
 export const uploadContentTypeSchema = z.enum(uploadContentTypes);
 export type UploadContentType = z.infer<typeof uploadContentTypeSchema>;
 
+export const uploadFileNameMaxLength = 255;
+// The name the file had on the creator's device, kept so a list of items can name its images. A bare name:
+// no folder separators and no control characters, so it can never be read as a path.
+export const uploadFileNameSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(uploadFileNameMaxLength)
+  .regex(/^[^/\\\p{Cc}]+$/u);
+
 export const createUploadIntentInputSchema = z
   .object({
     byteLength: z.number().int().positive(),
     contentType: uploadContentTypeSchema,
+    // Optional: an upload without a name (older clients) is still valid, and cannot be matched by name.
+    fileName: uploadFileNameSchema.optional(),
     purpose: uploadPurposeSchema,
   })
   .strict();

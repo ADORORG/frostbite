@@ -1,7 +1,7 @@
 import type { IdempotencyKey } from "@ador/shared/http";
-import type { LibraryAsset } from "@ador/shared/uploads";
+import { uploadFileNameSchema, type LibraryAsset } from "@ador/shared/uploads";
 
-import { waitForAsset } from "./asset-poller.ts";
+import { waitForAsset, type PollResult } from "./asset-poller.ts";
 import { isRetryableApiError, ApiError } from "@ador/client-http";
 import type { UploadsApi } from "./api-client.ts";
 import type { UploadClientPolicy } from "./client-policy.ts";
@@ -18,6 +18,12 @@ export interface UploadRunnerDependencies {
   readonly policy: UploadClientPolicy;
   readonly sleep: (milliseconds: number, signal: AbortSignal) => Promise<void>;
   readonly transfer: ObjectTransfer;
+  // Waits for an asset to be checked and processed. Defaults to polling on its own; a batch passes a
+  // shared watcher so many uploads ask the server once between them.
+  readonly watch?: (
+    assetId: string,
+    signal: AbortSignal,
+  ) => Promise<PollResult>;
 }
 
 export interface UploadRun {
@@ -51,6 +57,10 @@ function outcomeOf(asset: LibraryAsset): FinishedOutcome {
 // returns the same intent with a fresh signed URL, and completion is itself idempotent.
 export function createUploadRunner(dependencies: UploadRunnerDependencies) {
   const { api, policy, sleep, transfer } = dependencies;
+  const watch =
+    dependencies.watch ??
+    ((assetId: string, signal: AbortSignal) =>
+      waitForAsset({ api, assetId, policy, signal, sleep }));
 
   async function secureAsset(run: UploadRun): Promise<string> {
     const { attempt, checked, emit, file, signal } = run;
@@ -60,6 +70,8 @@ export function createUploadRunner(dependencies: UploadRunnerDependencies) {
       {
         byteLength: checked.byteLength,
         contentType: checked.contentType,
+        // A name the server would refuse is left out rather than failing an upload that is otherwise fine.
+        fileName: uploadFileNameSchema.safeParse(attempt.file.name).data,
         purpose: attempt.purpose,
       },
       { idempotencyKey: attempt.idempotencyKey, signal },
@@ -89,13 +101,7 @@ export function createUploadRunner(dependencies: UploadRunnerDependencies) {
     try {
       const assetId = await secureAsset(input);
       emit({ stage: "processing", type: "stage-entered" });
-      const result = await waitForAsset({
-        api,
-        assetId,
-        policy,
-        signal,
-        sleep,
-      });
+      const result = await watch(assetId, signal);
       if (result.kind === "timed-out")
         return emit({ type: "still-processing" });
       emit({

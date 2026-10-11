@@ -22,6 +22,7 @@ export function libraryAssetFixture(
         widthPixels: 12,
       },
     ],
+    fileName: null,
     heightPixels: 16,
     id: assetId,
     processingState: "processed",

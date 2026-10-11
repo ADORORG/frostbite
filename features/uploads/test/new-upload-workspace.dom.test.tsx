@@ -44,6 +44,7 @@ describe("new upload workspace", () => {
       {
         byteLength: 3,
         contentType: "image/png",
+        fileName: "art.png",
         purpose: "collection-artwork",
       },
       expect.objectContaining({ idempotencyKey: "upload-attempt-0001" }),

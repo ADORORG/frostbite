@@ -13,6 +13,7 @@ import type {
 
 type AssetRow = {
   readonly asset: typeof assets.$inferSelect;
+  readonly fileName: typeof uploadIntents.$inferSelect.fileName;
   readonly purpose: typeof uploadIntents.$inferSelect.purpose;
 };
 
@@ -46,9 +47,10 @@ async function withDerivatives(
         widthPixels: row.widthPixels,
       });
   }
-  return rows.map(({ asset, purpose }) => ({
+  return rows.map(({ asset, fileName, purpose }) => ({
     createdAt: asset.createdAt,
     derivatives: [...(current.get(asset.id)?.values() ?? [])],
+    fileName,
     heightPixels: asset.heightPixels,
     id: uuidV7Schema.parse(asset.id),
     processingState: asset.processingState,
@@ -65,7 +67,11 @@ export function createDrizzleAssetLibraryRepository(
     async listByIdsForUser({ assetIds, userId }) {
       if (assetIds.length === 0) return [];
       const rows = await database
-        .select({ asset: assets, purpose: uploadIntents.purpose })
+        .select({
+          asset: assets,
+          fileName: uploadIntents.fileName,
+          purpose: uploadIntents.purpose,
+        })
         .from(assets)
         .innerJoin(uploadIntents, eq(uploadIntents.id, assets.uploadIntentId))
         .where(
@@ -76,7 +82,11 @@ export function createDrizzleAssetLibraryRepository(
 
     async listNewestForUser({ limit, userId }) {
       const rows = await database
-        .select({ asset: assets, purpose: uploadIntents.purpose })
+        .select({
+          asset: assets,
+          fileName: uploadIntents.fileName,
+          purpose: uploadIntents.purpose,
+        })
         .from(assets)
         .innerJoin(uploadIntents, eq(uploadIntents.id, assets.uploadIntentId))
         .where(eq(assets.userId, userId))

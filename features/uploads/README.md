@@ -24,6 +24,14 @@ creator's images describe them in the same words.
 fixed purpose inside another page (the collection wizard's image slots). It reports the asset only once it
 is processed; refused or still-processing images are not offered for use.
 
+`@ador/feature-uploads/bulk` exports `BulkUpload`, a client component that uploads many images of one purpose
+at once. Every file is sent under its own name (kept with the asset as `fileName`, so a list of items can name
+its images) and has its own idempotency key and state, so one failure never stops the others. The batch keeps
+at most as many unfinished uploads as the server allows per person (`activeIntentLimitPerUser`) and at most
+`bulkInFlightLimit` files under way at all, starting the next as room appears; one shared watcher checks all of
+them with a single library read per interval. A batch takes up to `bulkFileLimit` files. `onProcessed` reports
+each image once it is processed, and `onSettled` once when the batch comes to rest.
+
 ## Asset pipeline composition
 
 `@ador/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and

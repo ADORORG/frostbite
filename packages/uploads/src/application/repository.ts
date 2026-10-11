@@ -71,6 +71,7 @@ export interface UploadIntentRepository {
       readonly activeLimit: number;
       readonly cleanupEligibleAt: Date;
       readonly createdAt: Date;
+      readonly fileName?: string;
       readonly idempotencyKey: IdempotencyKey;
       readonly requestFingerprint: string;
       readonly retainUntil: Date;

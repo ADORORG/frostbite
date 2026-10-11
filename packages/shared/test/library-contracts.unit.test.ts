@@ -21,6 +21,7 @@ const asset = {
   createdAt: "2026-10-06T12:00:00.000Z",
   derivativeAccess: "available",
   derivatives: [derivative],
+  fileName: "piece-1.png",
   heightPixels: 30,
   id,
   processingState: "processed",
@@ -97,6 +98,18 @@ describe("asset library contracts", () => {
     });
     expect(
       libraryResponseSchema.safeParse({ assets: [], truncated: "yes" }).success,
+    ).toBe(false);
+  });
+
+  it("carries the file name an asset was uploaded with, or null, and refuses a path", () => {
+    expect(
+      libraryAssetSchema.parse({ ...asset, fileName: null }).fileName,
+    ).toBeNull();
+    expect(
+      libraryAssetSchema.safeParse({ ...asset, fileName: "a/b.png" }).success,
+    ).toBe(false);
+    expect(
+      libraryAssetSchema.safeParse({ ...asset, fileName: undefined }).success,
     ).toBe(false);
   });
 });

@@ -29,6 +29,7 @@ export function createAssetLibraryService(dependencies: {
   async function present(record: LibraryAssetRecord): Promise<LibraryAsset> {
     const base = {
       createdAt: record.createdAt.toISOString(),
+      fileName: record.fileName,
       heightPixels: record.heightPixels,
       id: record.id,
       processingState: record.processingState,

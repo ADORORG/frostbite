@@ -10,6 +10,7 @@ export function libraryAsset(
     createdAt: "2026-10-06T12:00:00.000Z",
     derivativeAccess: "none",
     derivatives: [],
+    fileName: null,
     heightPixels: null,
     id: assetId,
     processingState: "pending-validation",

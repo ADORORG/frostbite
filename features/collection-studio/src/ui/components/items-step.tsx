@@ -1,3 +1,4 @@
+import { BulkUpload } from "@ador/feature-uploads/bulk";
 import type { CollectionDetail } from "@ador/shared/collections";
 import type { IdempotencyKey } from "@ador/shared/http";
 import type { LibraryAsset } from "@ador/shared/uploads";
@@ -35,6 +36,13 @@ export function ItemsStep({
         value={items.length / collection.plannedSupply}
       />
       <p>{`${items.length} of ${collection.plannedSupply} items`}</p>
+      <details className="arcade-disclosure">
+        <summary>Upload many images at once</summary>
+        <BulkUpload
+          onSettled={() => void onUploaded()}
+          purpose="collection-item-artwork"
+        />
+      </details>
       <ItemList
         busy={editor.busy}
         items={items}

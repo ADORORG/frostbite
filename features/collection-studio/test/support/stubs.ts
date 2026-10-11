@@ -70,6 +70,7 @@ export const preview = (assetId: string): LibraryAsset => ({
   createdAt: at.toISOString(),
   derivativeAccess: "none",
   derivatives: [],
+  fileName: null,
   heightPixels: null,
   id: assetId,
   processingState: "pending-validation",

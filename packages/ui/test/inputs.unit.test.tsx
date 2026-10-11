@@ -133,6 +133,48 @@ describe("arcade file drop", () => {
     expect(input.value).toBe("");
   });
 
+  it("hands every chosen or dropped file over, in order, when it takes many", async () => {
+    const second = new File([new Uint8Array(2)], "b.png", {
+      type: "image/png",
+    });
+    const onFiles = vi.fn();
+    const container = await mount(
+      <ArcadeFileDrop
+        accept="image/png"
+        hint="h"
+        label="l"
+        onFiles={onFiles}
+      />,
+    );
+    const input = container.querySelector("input");
+    if (input === null) throw new Error("input missing");
+    expect(input.multiple).toBe(true);
+    Object.defineProperty(input, "files", {
+      configurable: true,
+      value: [png, second],
+    });
+    await act(() => {
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(onFiles).toHaveBeenLastCalledWith([png, second]);
+    await drop(container, [second, png]);
+    expect(onFiles).toHaveBeenLastCalledWith([second, png]);
+    expect(onFiles).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not call a many-files handler for an empty choice, and one file at a time stays single", async () => {
+    const onFiles = vi.fn();
+    const many = await mount(
+      <ArcadeFileDrop accept="a" hint="h" label="l" onFiles={onFiles} />,
+    );
+    await drop(many, []);
+    expect(onFiles).not.toHaveBeenCalled();
+    const single = await mount(
+      <ArcadeFileDrop accept="a" hint="h" label="l" onFile={() => undefined} />,
+    );
+    expect(single.querySelector("input")?.multiple).toBe(false);
+  });
+
   it("resets the input after every selection, even an empty one, so a file can be chosen twice", async () => {
     const container = await mount(
       <ArcadeFileDrop accept="a" hint="h" label="l" onFile={() => undefined} />,

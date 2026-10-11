@@ -17,18 +17,24 @@ export {
   unmountAll,
 } from "@ador/test-kit/dom";
 
-export async function chooseFile(container: HTMLElement, file: File) {
+export async function chooseFiles(
+  container: HTMLElement,
+  files: readonly File[],
+) {
   const input = container.querySelector('input[type="file"]');
   if (!(input instanceof HTMLInputElement))
     throw new Error("file input is missing");
-  Object.defineProperty(input, "files", { configurable: true, value: [file] });
+  Object.defineProperty(input, "files", { configurable: true, value: files });
   await act(() => {
     input.dispatchEvent(new Event("change", { bubbles: true }));
   });
 }
 
-export const imageFile = (size = 3, type = "image/png") =>
-  new File([new Uint8Array(size)], "art.png", { type });
+export const chooseFile = (container: HTMLElement, file: File) =>
+  chooseFiles(container, [file]);
+
+export const imageFile = (size = 3, type = "image/png", name = "art.png") =>
+  new File([new Uint8Array(size)], name, { type });
 
 const intentResponse = {
   intent: {

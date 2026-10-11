@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./bulk": "./src/ui/bulk-upload.tsx",
     "./cleanup": "./src/cleanup.ts",
     "./context": "./src/context.ts",
     "./entrypoint": "./src/entrypoint.tsx",

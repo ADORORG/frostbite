@@ -25,6 +25,7 @@ describe("upload runner", () => {
       {
         byteLength: 3,
         contentType: "image/png",
+        fileName: "a.png",
         purpose: "collection-artwork",
       },
       {
@@ -109,5 +110,14 @@ describe("upload runner", () => {
     expect(transfer.upload).not.toHaveBeenCalled();
     expect(api.completeIntent).not.toHaveBeenCalled();
     expect(events[0]).toEqual({ stage: "processing", type: "stage-entered" });
+  });
+
+  it("leaves out a file name the server would refuse instead of failing the upload", async () => {
+    const { api, go } = setup();
+    await go({ ...attempt, file: { name: "folder/a.png", size: 3 } });
+    expect(api.createIntent).toHaveBeenCalledWith(
+      expect.not.objectContaining({ fileName: expect.anything() }),
+      expect.anything(),
+    );
   });
 });

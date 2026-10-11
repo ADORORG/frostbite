@@ -42,7 +42,9 @@ export function useValidationDatabase(): void {
   });
 }
 
-export async function seed(options: { readonly byteLength?: number } = {}) {
+export async function seed(
+  options: { readonly byteLength?: number; readonly fileName?: string } = {},
+) {
   const userId = createUuidV7();
   const intentId = createUuidV7();
   const assetId = createUuidV7();
@@ -57,6 +59,7 @@ export async function seed(options: { readonly byteLength?: number } = {}) {
     cleanupEligibleAt: new Date(now.getTime() + 86_400_000),
     contentType: "image/png",
     expiresAt: new Date(now.getTime() + 60_000),
+    fileName: options.fileName,
     id: intentId,
     idempotencyKey: "upload-request-0001",
     objectKey,

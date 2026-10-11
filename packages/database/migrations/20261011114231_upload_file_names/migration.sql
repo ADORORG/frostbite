@@ -1,0 +1,2 @@
+ALTER TABLE "ador"."upload_intents" ADD COLUMN "file_name" text;--> statement-breakpoint
+ALTER TABLE "ador"."upload_intents" ADD CONSTRAINT "upload_intents_file_name_bare" CHECK ("file_name" is null or (length("file_name") between 1 and 255 and "file_name" !~ '[/\\[:cntrl:]]'));
