@@ -20,6 +20,8 @@ export interface LibraryAssetRecord {
   readonly createdAt: Date;
   // At most one per kind: the newest rendition.
   readonly derivatives: readonly LibraryDerivativeRecord[];
+  // The name the file had when it was uploaded; null when none was given.
+  readonly fileName: string | null;
   readonly heightPixels: number | null;
   readonly id: UuidV7;
   readonly processingState: AssetProcessingState;
@@ -32,6 +34,12 @@ export interface AssetLibraryRepository {
   // The caller's own assets, newest first. Never returns another user's asset.
   listNewestForUser(input: {
     readonly limit: number;
+    readonly userId: UuidV7;
+  }): Promise<readonly LibraryAssetRecord[]>;
+  // The caller's own assets among `assetIds`, in no particular order. An id that is unknown or
+  // belongs to someone else is simply absent: ownership is part of the query.
+  listByIdsForUser(input: {
+    readonly assetIds: readonly UuidV7[];
     readonly userId: UuidV7;
   }): Promise<readonly LibraryAssetRecord[]>;
 }

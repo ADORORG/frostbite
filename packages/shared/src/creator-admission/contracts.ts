@@ -88,17 +88,22 @@ export const creatorApplicationSubmissionSchema =
     }
   });
 
+// What a reviewer can do to an application (the applicant's own actions are not among them).
+export const creatorReviewActions = [
+  "start-review",
+  "approve",
+  "request-changes",
+  "reject",
+  "suspend",
+  "reinstate",
+  "revoke",
+] as const;
+
+export type CreatorReviewAction = (typeof creatorReviewActions)[number];
+
 export const creatorReviewDecisionSchema = z
   .object({
-    action: z.enum([
-      "start-review",
-      "approve",
-      "request-changes",
-      "reject",
-      "suspend",
-      "reinstate",
-      "revoke",
-    ]),
+    action: z.enum(creatorReviewActions),
     applicationId: uuidV7Schema,
     creatorFeedback: z
       .string()

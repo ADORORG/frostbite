@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DatabaseEnvironment } from "../src/connection/config.ts";
+import { createDatabaseFromEnvironment } from "../src/connection/from-environment.ts";
 import { toPoolConfig } from "../src/connection/pool.ts";
 
 const environment: DatabaseEnvironment = {
@@ -40,5 +41,26 @@ describe("PostgreSQL pool configuration", () => {
     expect(toPoolConfig(environment, migrationUrl).connectionString).toBe(
       migrationUrl,
     );
+  });
+});
+
+describe("database client from environment", () => {
+  it("builds a client from a valid environment without connecting", () => {
+    const client = createDatabaseFromEnvironment({
+      ...environment,
+      DATABASE_POOL_MAX: String(environment.DATABASE_POOL_MAX),
+      DATABASE_ACQUIRE_TIMEOUT_MS: String(
+        environment.DATABASE_ACQUIRE_TIMEOUT_MS,
+      ),
+      DATABASE_IDLE_TIMEOUT_MS: String(environment.DATABASE_IDLE_TIMEOUT_MS),
+      DATABASE_STATEMENT_TIMEOUT_MS: String(
+        environment.DATABASE_STATEMENT_TIMEOUT_MS,
+      ),
+    });
+    expect(typeof client.transaction).toBe("function");
+  });
+
+  it("fails fast when a required setting is missing", () => {
+    expect(() => createDatabaseFromEnvironment({})).toThrow();
   });
 });

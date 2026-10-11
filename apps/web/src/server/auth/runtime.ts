@@ -6,13 +6,9 @@ import {
   createAuthorizationService,
   createDrizzleAuthorizationRepository,
 } from "@ador/authorization";
-import {
-  createDatabaseClient,
-  createDatabasePool,
-  parseDatabaseEnvironment,
-} from "@ador/database/connection";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 
+import { getDatabase } from "../database";
 import { authorizationPolicy } from "../../../../../configs/authorization";
 import type { PageAccessDependencies } from "./page-access.ts";
 
@@ -20,11 +16,8 @@ let services: PageAccessDependencies | undefined;
 
 export function getPageAccessDependencies(): PageAccessDependencies {
   if (services) return services;
-  const databaseEnvironment = parseDatabaseEnvironment(process.env);
   const authEnvironment = parseAuthSessionEnvironment(process.env);
-  const database = createDatabaseClient(
-    createDatabasePool(databaseEnvironment),
-  );
+  const database = getDatabase();
   const sessions = createSessionService({
     clock: () => new Date(),
     idleLifetimeMs: authEnvironment.AUTH_SESSION_IDLE_TIMEOUT_MS,

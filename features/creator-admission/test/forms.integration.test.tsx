@@ -1,8 +1,10 @@
+import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ReviewerForm } from "../src/ui/reviewer-form.tsx";
 import { CreatorApplicationSurface } from "../src/ui/creator-application-surface.tsx";
 import { sendCreatorAdmissionRequest } from "../src/ui/form-helpers.tsx";
 
@@ -19,6 +21,7 @@ const application = {
     provenanceDeclarationAccepted: true,
     rightsDeclarationAccepted: true,
   },
+  feedback: null,
   id: createUuidV7(),
   revision: 1,
   state: "draft" as const,
@@ -31,20 +34,13 @@ function response(body: object, status = 200) {
   });
 }
 
-async function render(
-  mode: "studio" | "review",
-  initial: typeof application | null = application,
-) {
+async function render(initial: typeof application | null = application) {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
   await act(() => {
     root.render(
-      <CreatorApplicationSurface
-        application={mode === "studio" ? initial : null}
-        mode={mode}
-        unavailable={false}
-      />,
+      <CreatorApplicationSurface application={initial} unavailable={false} />,
     );
   });
   return { container, root };
@@ -63,7 +59,7 @@ describe("creator admission forms", () => {
   it("sends a private draft and reports the returned state", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({ application }));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio");
+    const { container, root } = await render();
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected creator form");
     await act(() =>
@@ -96,7 +92,7 @@ describe("creator admission forms", () => {
         response({ application: { ...application, state: "submitted" } }),
       );
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio");
+    const { container, root } = await render();
     const declaration = container.querySelector<HTMLInputElement>(
       'input[name="rightsDeclarationAccepted"]',
     );
@@ -119,17 +115,26 @@ describe("creator admission forms", () => {
     );
     expect(submit.disabled).toBe(false);
     await act(() => submit.click());
-    expect(container.textContent).toContain("State: submitted");
-    expect(submit.disabled).toBe(true);
-    await act(() => submit.click());
+    // Sent: the card says so, and the form gives way to what was sent, so it cannot be sent twice.
+    expect(container.textContent).toContain("Application submitted");
+    expect(container.textContent).toContain("What you sent");
+    expect(container.querySelector("form")).toBeNull();
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    // Each request goes where the shared contract says, with the contract's method.
+    expect(
+      fetchMock.mock.calls.map(([path, init]) => [path, init?.method]),
+    ).toEqual([
+      [creatorApplicationRoutes.saveDraft.path, "PUT"],
+      [creatorApplicationRoutes.submit.path, "POST"],
+    ]);
     await act(() => root.unmount());
   });
 
   it("serializes an initially empty draft without inventing field values", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({ application }));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio", null);
+    const { container, root } = await render(null);
+    expect(container.textContent).toContain("Not a creator yet");
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected creator form");
     const submit = [...container.querySelectorAll("button")].find((button) =>
@@ -148,6 +153,9 @@ describe("creator admission forms", () => {
     );
     expect(fetchMock).toHaveBeenCalled();
     expect(submit.disabled).toBe(false);
+    // The status card follows the save: a person who had not started has now started.
+    expect(container.textContent).toContain("Application started");
+    expect(container.textContent).not.toContain("Not a creator yet");
     await act(() => root.unmount());
   });
 
@@ -161,7 +169,19 @@ describe("creator admission forms", () => {
       .mockReturnValueOnce(firstRequest)
       .mockRejectedValueOnce(new Error("offline"));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("review");
+    const decided = vi.fn();
+    const container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(() => {
+      root.render(
+        <ReviewerForm
+          applicationId={application.id}
+          onDecided={decided}
+          state="submitted"
+        />,
+      );
+    });
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected review form");
     const evidence = form.elements.namedItem("evidenceReference");
@@ -182,6 +202,13 @@ describe("creator admission forms", () => {
       );
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    // The decision goes where the shared contract says, with the contract's method.
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      creatorApplicationRoutes.review.path,
+    );
+    expect(fetchMock.mock.calls[0]?.[1]?.method).toBe(
+      creatorApplicationRoutes.review.method,
+    );
     if (finishFirstRequest === undefined)
       throw new Error("Expected pending review request");
     const completeFirstRequest = finishFirstRequest;
@@ -191,6 +218,7 @@ describe("creator admission forms", () => {
       );
     });
     expect(container.textContent).toContain("State: under-review");
+    expect(decided).toHaveBeenCalledTimes(1);
     evidence.value = "";
     await act(() =>
       form.dispatchEvent(
@@ -198,6 +226,7 @@ describe("creator admission forms", () => {
       ),
     );
     expect(container.textContent).toContain("Decision was not recorded");
+    expect(decided).toHaveBeenCalledTimes(1);
     await act(() => root.unmount());
   });
 
@@ -207,7 +236,7 @@ describe("creator admission forms", () => {
       vi.fn().mockResolvedValue(response({ application: {} })),
     );
     await expect(
-      sendCreatorAdmissionRequest("/api/v1/test", "POST", {}),
+      sendCreatorAdmissionRequest({ method: "POST", path: "/api/v1/test" }, {}),
     ).rejects.toThrow();
   });
 
@@ -217,7 +246,7 @@ describe("creator admission forms", () => {
       vi.fn().mockResolvedValue(response({ application }, 403)),
     );
     await expect(
-      sendCreatorAdmissionRequest("/api/v1/test", "POST", {}),
+      sendCreatorAdmissionRequest({ method: "POST", path: "/api/v1/test" }, {}),
     ).rejects.toThrow("could not be completed");
   });
 });

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import "@repo/ui/styles.css";
 import "./globals.css";
@@ -24,12 +25,25 @@ export const metadata: Metadata = {
   description: "A self-custodial launchpad and arcade for Bitcoin Alkanes.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// Tells the validation library, before any of its code runs, not to compile schemas at run time. Compiling
+// needs script evaluation, which the content security policy does not allow; the library probes for it and the
+// browser reports the probe as a violation. Validation behaves the same either way.
+const validationSetup = "globalThis.__zod_globalConfig={jitless:true};";
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // The policy lets only scripts with this response's nonce run, and this one is ours.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html
       lang="en"
       className={`${bodyFont.variable} ${displayFont.variable} ${pixelFont.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: validationSetup }}
+          nonce={nonce}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

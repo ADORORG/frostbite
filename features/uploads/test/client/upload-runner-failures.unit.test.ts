@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { UploadApiError } from "../../src/client/api-error.ts";
+import { ApiError } from "@ador/client-http";
 import { TransferError } from "../../src/client/transfer.ts";
 import { attempt, setup } from "../support/runner-harness.ts";
 
@@ -8,25 +8,25 @@ describe("upload runner failures", () => {
   it.each([
     [
       "a network failure",
-      new UploadApiError("network", null, "x"),
+      new ApiError("network", null, "x"),
       { code: "network", kind: "api" },
       true,
     ],
     [
       "a server fault",
-      new UploadApiError("internal_error", 500, "x"),
+      new ApiError("internal_error", 500, "x"),
       { code: "internal_error", kind: "api" },
       true,
     ],
     [
       "a conflict",
-      new UploadApiError("conflict", 409, "x"),
+      new ApiError("conflict", 409, "x"),
       { code: "conflict", kind: "api" },
       false,
     ],
     [
       "no session",
-      new UploadApiError("unauthorized", 401, "x"),
+      new ApiError("unauthorized", 401, "x"),
       { code: "unauthorized", kind: "api" },
       false,
     ],
@@ -70,7 +70,7 @@ describe("upload runner failures", () => {
       api: {
         completeIntent: vi
           .fn()
-          .mockRejectedValue(new UploadApiError("conflict", 409, "x")),
+          .mockRejectedValue(new ApiError("conflict", 409, "x")),
       },
     });
     await completion.go();
@@ -83,7 +83,7 @@ describe("upload runner failures", () => {
       api: {
         listAssets: vi
           .fn()
-          .mockRejectedValue(new UploadApiError("network", null, "x")),
+          .mockRejectedValue(new ApiError("network", null, "x")),
       },
     });
     await polling.go();

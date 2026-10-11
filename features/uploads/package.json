@@ -5,9 +5,13 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./bulk": "./src/ui/bulk-upload.tsx",
     "./cleanup": "./src/cleanup.ts",
+    "./context": "./src/context.ts",
     "./entrypoint": "./src/entrypoint.tsx",
-    "./pipeline": "./src/pipeline.ts"
+    "./inline": "./src/ui/inline-upload.tsx",
+    "./pipeline": "./src/pipeline.ts",
+    "./presentation": "./src/client/asset-presentation.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -19,6 +23,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
@@ -32,6 +37,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@ador/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.0",

@@ -7,7 +7,7 @@ import {
 import type { ObjectStorageProviderServices } from "@ador/object-storage";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 
-import { memoizeUntilFailure } from "./lazy.ts";
+import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
 
 type Storage = ObjectStorageProviderServices["object-storage:s3-compatible"];
 

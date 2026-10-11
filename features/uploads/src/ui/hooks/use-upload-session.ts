@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { UploadPurpose } from "@ador/shared/uploads";
 
-import type { UploadsClientServices } from "../../client/browser-services.ts";
-import { checkFile, type CheckedFile } from "../../client/file-checks.ts";
 import {
-  createUploadAttempt,
-  createUploadRunner,
-} from "../../client/upload-runner.ts";
+  runnerFor,
+  type UploadsClientServices,
+} from "../../client/browser-services.ts";
+import { checkFile, type CheckedFile } from "../../client/file-checks.ts";
+import { createUploadAttempt } from "../../client/upload-runner.ts";
 import {
   initialUploadState,
   isUploadBusy,
@@ -40,16 +40,7 @@ export function useUploadSession(
   // True from the moment a run starts until it settles, so a double click cannot start two runs.
   const runningRef = useRef(false);
 
-  const runner = useMemo(
-    () =>
-      createUploadRunner({
-        api: services.api,
-        policy: services.policy,
-        sleep: services.sleep,
-        transfer: services.transfer,
-      }),
-    [services],
-  );
+  const runner = useMemo(() => runnerFor(services), [services]);
 
   const start = useCallback(
     (attempt: UploadAttempt) => {

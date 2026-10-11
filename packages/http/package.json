@@ -6,8 +6,11 @@
   "exports": {
     ".": "./src/operation.ts",
     "./openapi": "./src/openapi.ts",
+    "./outcome": "./src/outcome.ts",
     "./registered-operation": "./src/registered-operation.ts",
-    "./node-adapter": "./src/node-adapter.ts"
+    "./node-adapter": "./src/node-adapter.ts",
+    "./readiness": "./src/readiness.ts",
+    "./rate-limit": "./src/rate-limit.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

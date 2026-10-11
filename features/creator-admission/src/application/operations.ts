@@ -13,9 +13,10 @@ import {
   type CreatorApplicationReviewInput,
 } from "@ador/shared/creator-admission";
 
+import { presentApplication } from "./present.ts";
+
 type Service = ReturnType<typeof createCreatorAdmissionService>;
 type Result = HttpOperationResult<CreatorApplicationResponse>;
-
 function requireActor(actorUserId: Parameters<Service["findMine"]>[0] | null) {
   return actorUserId === null
     ? ({
@@ -30,7 +31,10 @@ function mutationResult(
   result: Awaited<ReturnType<Service["saveDraft"]>>,
 ): Result {
   if (result.kind === "changed" || result.kind === "replayed") {
-    return { ok: true, value: { application: result.application } };
+    return {
+      ok: true,
+      value: { application: presentApplication(result.application) },
+    };
   }
   const mapping = {
     conflict: ["conflict", "The application state conflicts with this action."],
@@ -61,7 +65,7 @@ export function createCreatorApplicationOperations(getService: () => Service) {
             message: "Creator application not found.",
             ok: false,
           }
-        : { ok: true, value: { application } };
+        : { ok: true, value: { application: presentApplication(application) } };
     },
     idempotency: "none",
     input: "none",

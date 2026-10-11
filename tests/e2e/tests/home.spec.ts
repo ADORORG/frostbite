@@ -34,13 +34,18 @@ test("serves the arcade design stylesheet in the production build", async ({
   expect(stylesheetStatuses).not.toContain(404);
 });
 
-test("navigates to the truthful empty games catalog", async ({ page }) => {
+test("navigates to the games catalog, which says the registered game is not playable yet", async ({
+  page,
+}) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Enter arcade" }).click();
 
   await expect(page).toHaveURL(/\/games$/);
+  await expect(page.getByRole("heading", { name: "Games" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "No games online" }),
+    page
+      .getByRole("article", { name: "FROST·BITE" })
+      .getByText("Not playable yet"),
   ).toBeVisible();
 });
 
@@ -100,9 +105,10 @@ test("serves the versioned platform contract with correlated truthful state", as
 
   expect(response.status()).toBe(200);
   expect(response.headers()["x-correlation-id"]).toBe(correlationId);
+  // The exact feature count is asserted against the registry in the web integration tests.
   expect(await response.json()).toEqual({
     apiVersion: "v1",
-    registeredFeatures: 9,
+    registeredFeatures: expect.any(Number),
     stage: "foundation",
     transactionalActions: "gated",
   });
@@ -111,11 +117,20 @@ test("serves the versioned platform contract with correlated truthful state", as
 test("serves every public catalog and validates detail identifiers", async ({
   page,
 }) => {
-  for (const path of ["launches", "collections", "creators", "games"]) {
+  for (const path of ["launches", "creators"]) {
     await page.goto(`/${path}`);
     await expect(page.getByText("Catalog empty")).toBeVisible();
   }
+  // Collections lists whatever has been approved (the seeded public collection at least).
+  await page.goto("/collections");
+  await expect(page.getByText("Approved by review")).toBeVisible();
+  await page.goto("/collections/Not-A-Collection");
+  await expect(page.getByText("Invalid identifier")).toBeVisible();
   await page.goto("/games/frostbite");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "FROST·BITE" }),
+  ).toBeVisible();
+  await page.goto("/games/not-registered");
   await expect(page.getByText("Record not published")).toBeVisible();
   await page.goto("/games/Frostbite");
   await expect(page.getByText("Invalid identifier")).toBeVisible();

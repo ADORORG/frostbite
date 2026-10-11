@@ -35,3 +35,14 @@ pnpm db:check
 
 Browser behavior is verified by the root `pnpm test:e2e` command against the standalone production
 build. Shared domain logic belongs in a domain-specific package rather than in this delivery app.
+
+## Hardening (W8-06)
+
+- `src/proxy.ts` gives every page and API response its security headers and a fresh nonce for the Content Security
+  Policy (`src/server/security/headers.ts`). The policy is sent report-only until `SECURITY_CSP_MODE=enforce`; violations are
+  posted to `/api/csp-report`, bounded and logged. The root layout sets the validation library not to compile
+  schemas at run time, which the policy does not allow.
+- `GET /api/ready` is readiness (database and object storage); the worker's is `GET /ready`.
+- `src/server/rate-limit.ts` is the rate limit gate used by the API route: by address first (needs
+  `TRUSTED_PROXY_HOPS` to match the proxies in front of the app), then by person; the policy is
+  `configs/rate-limits.ts`; counts are in the database.

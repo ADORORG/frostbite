@@ -7,8 +7,7 @@ import { createAccountsEntrypoint } from "../src/entrypoint.tsx";
 describe("accounts entrypoint", () => {
   it.each([
     ["/account", "Account console", "Authenticated session"],
-    ["/studio", "Creator studio", "Authenticated access"],
-    ["/admin", "Admin console", "Staff capability verified"],
+    ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
     const entrypoint = createAccountsEntrypoint(() => ({
       begin: vi.fn(),
@@ -21,7 +20,13 @@ describe("accounts entrypoint", () => {
     const markup = renderToStaticMarkup(
       await page?.render({
         actorUserId: createUuidV7(),
-        navigation: [],
+        navigation: [
+          {
+            area: "admin",
+            href: "/admin/collection-reviews",
+            label: "Collection reviews",
+          },
+        ],
         params: {},
       }),
     );

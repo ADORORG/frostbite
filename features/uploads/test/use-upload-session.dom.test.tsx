@@ -1,7 +1,7 @@
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { UploadApiError } from "../src/client/api-error.ts";
+import { ApiError } from "@ador/client-http";
 import { TransferError, type ObjectTransfer } from "../src/client/transfer.ts";
 import {
   useUploadSession,
@@ -109,7 +109,7 @@ describe("upload session hook", () => {
         createIntent: async (...args) => {
           if (failing) {
             failing = false;
-            throw new UploadApiError("network", null, "offline");
+            throw new ApiError("network", null, "offline");
           }
           await new Promise((resolve) => setTimeout(resolve, 30));
           return fakeServices().api.createIntent(...args);

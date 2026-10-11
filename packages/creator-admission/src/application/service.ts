@@ -9,8 +9,12 @@ import {
   creatorApplicationSchemaVersion,
   creatorApplicationSubmissionSchema,
   creatorReviewDecisionSchema,
+  statesInGroup,
   type CreatorApplicationDraft,
   type CreatorReviewDecision,
+  type CreatorReviewGroup,
+  type CreatorReviewPosition,
+  type CreatorReviewSort,
 } from "@ador/shared/creator-admission";
 import { createHash } from "node:crypto";
 
@@ -26,6 +30,8 @@ export interface CreatorAdmissionDependencies {
   readonly authorizationPolicy: AuthorizationPolicy;
   readonly clock: () => Date;
   readonly createId: () => UuidV7;
+  // How many applications one page of the review queue holds.
+  readonly queuePageSize: number;
   readonly repository: CreatorAdmissionRepository;
 }
 
@@ -89,6 +95,49 @@ export function createCreatorAdmissionService(
         ...context(request, dependencies, { operation: "submit" }),
         schemaVersion: creatorApplicationSchemaVersion,
       });
+    },
+
+    // One page of the review queue, with every group's size. `position` continues after the last row of the
+    // previous page; the answer's `nextPosition` is null on the last page.
+    async reviewQueue(input: {
+      readonly group: CreatorReviewGroup;
+      readonly position: CreatorReviewPosition | null;
+      readonly sort: CreatorReviewSort;
+    }) {
+      const limit = dependencies.queuePageSize;
+      const [rows, byState] = await Promise.all([
+        dependencies.repository.listForReview({
+          limit: limit + 1,
+          position: input.position,
+          sort: input.sort,
+          states: statesInGroup(input.group),
+        }),
+        dependencies.repository.countsForReview(),
+      ]);
+      const items = rows.slice(0, limit);
+      const last = items.at(-1);
+      const total = (group: CreatorReviewGroup) =>
+        statesInGroup(group).reduce(
+          (sum, state) => sum + (byState.get(state) ?? 0),
+          0,
+        );
+      return {
+        counts: {
+          active: total("active"),
+          all: total("all"),
+          finished: total("finished"),
+          "needs-review": total("needs-review"),
+        },
+        items,
+        nextPosition:
+          rows.length > limit && last !== undefined
+            ? { id: last.applicationId, key: last.sortKey }
+            : null,
+      };
+    },
+
+    readForReview(applicationId: UuidV7) {
+      return dependencies.repository.readForReview(applicationId);
     },
 
     review(

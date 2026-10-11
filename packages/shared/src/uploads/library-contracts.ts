@@ -6,6 +6,7 @@ import {
   assetRejectionReasonSchema,
   derivativeKindSchema,
   uploadContentTypeSchema,
+  uploadFileNameSchema,
 } from "./contracts.ts";
 import { uploadPurposeSchema } from "./upload-policy.ts";
 
@@ -36,6 +37,7 @@ export const libraryAssetSchema = z
     createdAt: z.iso.datetime({ offset: true }),
     derivativeAccess: derivativeAccessSchema,
     derivatives: z.array(libraryDerivativeSchema),
+    fileName: uploadFileNameSchema.nullable(),
     heightPixels: z.number().int().positive().nullable(),
     id: uuidV7TextSchema,
     processingState: assetProcessingStateSchema,

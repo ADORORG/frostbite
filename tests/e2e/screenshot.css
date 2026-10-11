@@ -1,0 +1,8 @@
+/* Applied only while a screenshot is taken. The header and the area sidebar stick to the window while a
+   page scrolls, but a full-page capture stitches the page together and would draw them away from their
+   place in the page. Fixing them in place for the picture keeps every baseline a picture of the page
+   itself. */
+.app-header,
+.area-sidebar {
+  position: static !important;
+}

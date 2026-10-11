@@ -38,7 +38,10 @@ vi.mock("@ador/uploads", () => ({
 }));
 
 import { createUploadsContextResolver } from "../src/context.ts";
-import { storageRegistry, unusedStorage } from "./support/storage-registry.ts";
+import {
+  storageRegistry,
+  unusedStorage,
+} from "@ador/test-kit/storage-registry";
 import { createUploadServiceResolver } from "../src/runtime.ts";
 
 describe("upload runtime", () => {

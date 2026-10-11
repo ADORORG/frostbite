@@ -1,7 +1,7 @@
 import { assetRejectionReasons } from "@ador/shared/uploads";
 import { describe, expect, it } from "vitest";
 
-import type { UploadApiErrorCode } from "../../src/client/api-error.ts";
+import type { ApiErrorCode } from "@ador/client-http";
 import {
   availableUploadActions,
   describeUploadState,
@@ -20,7 +20,7 @@ const attempt: UploadAttempt = {
   purpose: "collection-artwork",
   transferred: false,
 };
-const apiCodes: UploadApiErrorCode[] = [
+const apiCodes: ApiErrorCode[] = [
   "conflict",
   "forbidden",
   "idempotency_key_required",

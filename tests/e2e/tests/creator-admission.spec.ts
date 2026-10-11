@@ -43,9 +43,17 @@ test("persists, submits, and reviews a creator application", async ({
   await page.getByRole("button", { name: "Submit snapshot" }).click();
   const submitResponse = await submitResponsePromise;
   expect(submitResponse.status(), await submitResponse.text()).toBe(200);
+  // Sent: the card says so and the form gives way to what was sent, so it cannot be sent twice.
   await expect(
-    page.getByText("Immutable review snapshot submitted. State: submitted."),
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Application submitted");
+  await expect(
+    page.getByRole("heading", { name: "What you sent" }),
   ).toBeVisible();
+  await expect(page.getByText("E2E Creator")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Submit snapshot" }),
+  ).toHaveCount(0);
 
   const mine = creatorApplicationResponseSchema.parse(
     await submitResponse.json(),
@@ -59,28 +67,74 @@ test("persists, submits, and reviews a creator application", async ({
   );
   await page.goto("/admin/creator-applications");
   await expect(
-    page.getByRole("heading", { name: "Review creator admission" }),
+    page.getByRole("heading", { name: "Creator reviews" }),
   ).toBeVisible();
-  await page.getByLabel("Application UUID").fill(mine.application.id);
-  await page.getByLabel("Reason code").fill("review-started");
-  await page.getByLabel("Creator feedback").fill("Review has started.");
+  const decide = async (action: string, reasonCode: string, words = "") => {
+    await page.getByRole("combobox", { name: "Decision" }).selectOption(action);
+    await page.getByLabel("Reason code").fill(reasonCode);
+    await page.getByLabel("Creator feedback").fill(words);
+    await page.getByRole("button", { name: "Record decision" }).click();
+  };
+  // The reviewer finds the application in the list and opens it; nobody types an identifier.
   await page
-    .getByLabel("Evidence URL (private)")
-    .fill("https://example.test/review-evidence");
-  const reviewResponsePromise = page.waitForResponse((response) =>
-    response.url().endsWith("/creator-application/review"),
-  );
-  await page.getByRole("button", { name: "Record decision" }).click();
-  const reviewResponse = await reviewResponsePromise;
-  expect(reviewResponse.status(), await reviewResponse.text()).toBe(200);
+    .getByRole("link", { name: /^Open E2E Creator, submission 1$/ })
+    .click();
   await expect(
-    page.getByText("Decision recorded. State: under-review."),
+    page.getByRole("heading", { name: "Review an application" }),
   ).toBeVisible();
+  await decide("start-review", "review-started", "Review has started.");
+  await expect(page.getByText("Status: In review")).toBeVisible();
+  const asked = "Please add a link to your earlier work.";
+  await decide("request-changes", "needs-more-evidence", asked);
+  await expect(page.getByText("Status: Changes requested")).toBeVisible();
+  // The history shows both decisions, with the words the applicant was told.
+  await expect(
+    page.getByRole("list", { name: "History of this application" }),
+  ).toContainText(`Told the applicant: ${asked}`);
 
-  await page.getByLabel("Decision").selectOption("approve");
-  await page.getByLabel("Reason code").fill("creator-approved");
-  await page.getByRole("button", { name: "Record decision" }).click();
+  // The applicant reads what the reviewer wrote, still has the form, and sends it again.
+  await useE2ESession(
+    context,
+    baseURL,
+    creatorE2EFixtures.applicant.sessionToken,
+  );
+  await page.goto("/studio/creator-application");
+  const message = page.getByRole("article", {
+    name: "Message from a reviewer",
+  });
+  await expect(message).toContainText(asked);
   await expect(
-    page.getByText("Decision recorded. State: approved."),
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Changes requested");
+  await page.getByLabel("Portfolio URL").fill("https://example.test/earlier");
+  await page.getByRole("button", { name: "Save private draft" }).click();
+  await expect(
+    page.getByText("Private draft saved. State: changes-requested."),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Submit snapshot" }).click();
+  await expect(
+    page.getByRole("article", { name: "Application status" }),
+  ).toContainText("Application submitted");
+  // The old message is not shown against the new submission.
+  await expect(message).toHaveCount(0);
+
+  await useE2ESession(
+    context,
+    baseURL,
+    creatorE2EFixtures.reviewer.sessionToken,
+  );
+  await page.goto("/admin/creator-applications");
+  // The second submission is waiting again, and the list says it is the second.
+  await page
+    .getByRole("link", { name: /^Open E2E Creator, submission 2$/ })
+    .click();
+  await decide("start-review", "review-restarted");
+  await expect(page.getByText("Status: In review")).toBeVisible();
+  await decide("approve", "creator-approved");
+  await expect(page.getByText("Status: Approved")).toBeVisible();
+  // Approved applications leave the waiting list.
+  await page.getByRole("link", { name: "Back to the queue" }).click();
+  await expect(
+    page.getByRole("link", { name: /^Open E2E Creator/ }),
+  ).toHaveCount(0);
 });

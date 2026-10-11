@@ -117,4 +117,32 @@ describe("upload feedback", () => {
     expect(button(container, "Retry")).toBeNull();
     expect(button(container, "Choose a different file")).not.toBeNull();
   });
+
+  it("offers the next step only for an image that was processed", async () => {
+    const handlers = { onCancel: vi.fn(), onReset: vi.fn(), onRetry: vi.fn() };
+    const next = <a href="/next">Use it</a>;
+    const show = async (state: UploadState) =>
+      mount(<UploadFeedback {...handlers} next={next} state={state} />);
+    const processed = await show({
+      attempt,
+      outcome: "processed",
+      reason: null,
+      status: "finished",
+    });
+    expect(processed.querySelector('a[href="/next"]')).not.toBeNull();
+    const refused = await show({
+      attempt,
+      outcome: "rejected",
+      reason: "malformed",
+      status: "finished",
+    });
+    expect(refused.querySelector('a[href="/next"]')).toBeNull();
+    const running = await show({
+      attempt,
+      progress: 0.5,
+      stage: "transferring",
+      status: "running",
+    });
+    expect(running.querySelector('a[href="/next"]')).toBeNull();
+  });
 });

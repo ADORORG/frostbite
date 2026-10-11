@@ -4,34 +4,55 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./chain-conformance": "./src/chain-conformance.ts",
+    "./collection-database": "./src/collection-database.ts",
+    "./creator-database": "./src/creator-database.ts",
     "./docker": "./src/docker.ts",
+    "./dom": "./src/dom.tsx",
     "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
+    "./library-asset": "./src/library-asset.ts",
     "./png": "./src/png.ts",
+    "./race": "./src/race.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
-    "./service-process": "./src/service-process.ts"
+    "./service-process": "./src/service-process.ts",
+    "./simulated-chain": "./src/simulated-chain/adapter.ts",
+    "./simulated-chain-config": "./src/simulated-chain/config.ts",
+    "./storage-registry": "./src/storage-registry.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
-    "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:integration": "node --experimental-strip-types ../database/test/support/run-postgres.ts integration",
+    "test:coverage": "node --experimental-strip-types ../database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
+    "@ador/chain": "workspace:*",
+    "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
-    "@aws-sdk/client-s3": "3.1131.0"
+    "@ador/object-storage": "workspace:*",
+    "@ador/plugin-kit": "workspace:*",
+    "@ador/shared": "workspace:*",
+    "@aws-sdk/client-s3": "3.1131.0",
+    "drizzle-orm": "1.0.0-rc.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@aws-sdk/s3-request-presigner": "3.1131.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
+    "jsdom": "30.0.1",
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   }

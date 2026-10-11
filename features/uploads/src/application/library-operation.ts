@@ -8,7 +8,7 @@ import {
 } from "@ador/shared/uploads";
 import type { createAssetLibraryService } from "@ador/uploads";
 
-type Service = ReturnType<typeof createAssetLibraryService>;
+type Service = Pick<ReturnType<typeof createAssetLibraryService>, "list">;
 
 // The caller's own assets with their processing outcome and short-lived signed rendition URLs
 // (ADR-016). The actor comes from the session, never from the request.

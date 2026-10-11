@@ -1,7 +1,7 @@
 import type { AssetRejectionReason, UploadPurpose } from "@ador/shared/uploads";
 import type { IdempotencyKey } from "@ador/shared/http";
 
-import type { UploadApiErrorCode } from "./api-error.ts";
+import type { ApiErrorCode } from "@ador/client-http";
 import type { FileRejection } from "./file-checks.ts";
 import type { TransferFailure } from "./transfer.ts";
 
@@ -26,7 +26,7 @@ export interface UploadAttempt {
 export type FinishedOutcome = "processed" | "rejected" | "unprocessable";
 
 export type FailureCause =
-  | { readonly kind: "api"; readonly code: UploadApiErrorCode }
+  | { readonly kind: "api"; readonly code: ApiErrorCode }
   | { readonly kind: "transfer"; readonly failure: TransferFailure }
   // A defect in this page, not a failure of the network or the server.
   | { readonly kind: "unexpected" };

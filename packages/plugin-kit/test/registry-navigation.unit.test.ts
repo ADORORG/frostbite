@@ -4,7 +4,12 @@ import type { FeatureRegistration } from "../src/registry.js";
 import { createFeatureRegistry } from "../src/registry.js";
 
 const navigation = [
-  { access: { kind: "public" as const }, href: "/catalog", label: "Catalog" },
+  {
+    access: { kind: "public" as const },
+    area: "main" as const,
+    href: "/catalog",
+    label: "Catalog",
+  },
 ] as const;
 
 function registration(id: string): FeatureRegistration {

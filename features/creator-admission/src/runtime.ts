@@ -7,6 +7,7 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
 } from "@ador/database/connection";
+import { creatorReviewQueueLimits } from "@ador/shared/creator-admission";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { authorizationPolicy } from "@repo/config/authorization";
 
@@ -21,6 +22,7 @@ export function getCreatorAdmissionService() {
     authorizationPolicy,
     clock: () => new Date(),
     createId: createUuidV7,
+    queuePageSize: creatorReviewQueueLimits.pageSize,
     repository: createDrizzleCreatorAdmissionRepository(database),
   });
   return service;

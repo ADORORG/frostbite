@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
+import { loadFonts } from "./support/quality.ts";
 
 const authenticatedSurfaces = [
   {
@@ -24,10 +25,18 @@ const authenticatedSurfaces = [
     token: creatorE2EFixtures.visualUser.sessionToken,
   },
   {
-    heading: "Review creator admission",
-    path: "/admin/creator-applications",
-    snapshot: "creator-review",
-    token: creatorE2EFixtures.reviewer.sessionToken,
+    // An approved creator's application is read-only: the status card and what was sent, no form.
+    heading: "Apply to create",
+    path: "/studio/creator-application",
+    snapshot: "creator-application-approved",
+    token: creatorE2EFixtures.collectionQualityList.sessionToken,
+  },
+  {
+    // A reviewer asked for changes: their message sits between the status and the form.
+    heading: "Apply to create",
+    path: "/studio/creator-application",
+    snapshot: "creator-application-feedback",
+    token: creatorE2EFixtures.applicantFeedback.sessionToken,
   },
   {
     heading: "Admin console",
@@ -51,6 +60,8 @@ for (const surface of authenticatedSurfaces) {
     await expect(
       page.getByRole("heading", { level: 1, name: surface.heading }),
     ).toBeVisible();
+    // Pages that load their content in the browser are checked once it has loaded, not while it loads.
+    await expect(page.getByText(/^Loading /u)).toHaveCount(0);
     await expect(page.locator(".scanlines")).toHaveCSS("display", "none");
     await expect(page.locator(".app-shell")).toHaveJSProperty(
       "scrollWidth",
@@ -63,6 +74,7 @@ for (const surface of authenticatedSurfaces) {
     await skipLink.press("Enter");
     await expect(page.locator("#main-content")).toBeFocused();
     await page.locator("#main-content").blur();
+    await loadFonts(page);
     await page.addStyleTag({
       content: [
         ".skip-link { visibility: hidden !important; }",

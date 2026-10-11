@@ -4,13 +4,13 @@ import type {
   LibraryDerivative,
 } from "@ador/shared/uploads";
 
-import { assetRejectionCopy } from "./rejection-copy.ts";
+import type { ArcadeTone } from "@repo/ui/arcade";
 
-export type BadgeTone = "cyan" | "mint" | "pink" | "red" | "yellow";
+import { assetRejectionCopy } from "./rejection-copy.ts";
 
 export interface AssetBadge {
   readonly label: string;
-  readonly tone: BadgeTone;
+  readonly tone: ArcadeTone;
 }
 
 const badges: Readonly<Record<LibraryAsset["processingState"], AssetBadge>> = {
@@ -46,11 +46,25 @@ export function assetNote(
   return null;
 }
 
+// What a tile says in place of a picture it does not have.
+export function previewPlaceholder(
+  asset: Pick<LibraryAsset, "processingState">,
+): string {
+  return asset.processingState === "processed"
+    ? "Preview unavailable"
+    : "No preview yet";
+}
+
 export function pickRendition(
   derivatives: readonly LibraryDerivative[],
   kind: LibraryDerivative["kind"],
 ): LibraryDerivative | undefined {
   return derivatives.find((derivative) => derivative.kind === kind);
+}
+
+// The day an image was uploaded, as the calendar date (UTC) the library shows everywhere.
+export function uploadedOn(asset: Pick<LibraryAsset, "createdAt">): string {
+  return asset.createdAt.slice(0, 10);
 }
 
 export function describeDimensions(

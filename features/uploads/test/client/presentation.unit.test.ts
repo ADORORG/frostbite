@@ -5,6 +5,8 @@ import {
   assetNote,
   describeDimensions,
   pickRendition,
+  previewPlaceholder,
+  uploadedOn,
 } from "../../src/client/asset-presentation.ts";
 import {
   purposeLabels,
@@ -62,6 +64,27 @@ describe("asset presentation", () => {
         }),
       ),
     ).toBeNull();
+  });
+
+  it("says why a tile has no picture: ready but unavailable, or not ready yet", () => {
+    expect(previewPlaceholder(processedAsset({ derivatives: [] }))).toBe(
+      "Preview unavailable",
+    );
+    for (const processingState of [
+      "pending-validation",
+      "validated",
+      "rejected",
+      "unprocessable",
+    ] as const)
+      expect(previewPlaceholder(libraryAsset({ processingState }))).toBe(
+        "No preview yet",
+      );
+  });
+
+  it("shows the day an image was uploaded", () => {
+    expect(
+      uploadedOn(libraryAsset({ createdAt: "2026-10-06T23:59:59.000Z" })),
+    ).toBe("2026-10-06");
   });
 
   it("picks a rendition by kind", () => {

@@ -7,6 +7,9 @@ application handler. Delivery adapters supply untrusted input, selected normaliz
 correlation-ID generator. The executor validates every boundary and emits the shared safe error
 envelope without importing Next.js or Fastify.
 
+`@ador/http/outcome` exports `failure` and `unauthenticated`, the one way an operation reports a
+refusal, so features do not restate the result shape.
+
 The `@ador/http/openapi` export derives an OpenAPI 3.1 document from those same operation schemas
 and declarations. This keeps request, response, header, and application-error documentation tied to
 the executable contract. The generated document contains no deployment domain or server URL.
@@ -23,3 +26,15 @@ request, runs the handler, and writes the response; a throwing handler yields a 
 reported only through an optional hook, never to the client. A body over `defaultMaxBodyBytes` (1 MiB, overridable) is refused with 413 before it is buffered,
 first from the declared length and otherwise as it streams. It is delivery plumbing for standalone
 services such as the worker, with no framework dependency.
+
+## Readiness and rate limits
+
+`@ador/http/readiness` runs a service's probes (database, object storage) at once, each with its own time limit,
+and says whether it can take traffic (`runReadiness`). A probe's failure reason goes to the service's log through
+`onFailure` and never into the answer, which is public.
+
+`@ador/http/rate-limit` holds the in-process limiter, `clientAddress` (the address a trusted proxy recorded, read
+from the end of `X-Forwarded-For`), and `createRateLimitGate`: a check by network address before any other work,
+and one by person after sign-in, each against a policy resolved per operation (`@ador/shared/http`). A limiter that
+fails lets the request through and reports the error. The PostgreSQL limiter that production uses is
+`@ador/database/rate-limit`.

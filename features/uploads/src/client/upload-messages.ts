@@ -1,4 +1,4 @@
-import type { UploadApiErrorCode } from "./api-error.ts";
+import type { ApiErrorCode } from "@ador/client-http";
 import { assetRejectionCopy, describeFileRejection } from "./rejection-copy.ts";
 import type { FailureCause, UploadStage, UploadState } from "./upload-state.ts";
 
@@ -16,7 +16,7 @@ const stageText: Readonly<Record<UploadStage, string>> = {
   transferring: "Uploading your image…",
 };
 
-const apiFailureText: Readonly<Record<UploadApiErrorCode, string>> = {
+const apiFailureText: Readonly<Record<ApiErrorCode, string>> = {
   conflict:
     "The upload could not be started. You may have reached the limit of active uploads; wait for the current ones to finish, then try again.",
   forbidden: "You do not have permission to upload here.",
@@ -31,6 +31,7 @@ const apiFailureText: Readonly<Record<UploadApiErrorCode, string>> = {
     "The upload request was not allowed. Reload the page and try again.",
   network: "Could not reach the server. Check your connection and retry.",
   not_found: "The upload could not be found. Choose the file again.",
+  rate_limited: "Too many requests in a short time. Wait a moment, then retry.",
   unauthorized: "Your session has ended. Sign in again to upload.",
 };
 

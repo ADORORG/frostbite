@@ -15,6 +15,11 @@ export function isTerminalAsset(
   return terminalStates.includes(asset.processingState);
 }
 
+export type PollSettings = Pick<
+  UploadClientPolicy,
+  "pollIntervalMs" | "pollMaxAttempts"
+>;
+
 export type PollResult =
   | { readonly asset: LibraryAsset; readonly kind: "settled" }
   | { readonly kind: "timed-out" };
@@ -24,10 +29,7 @@ export type PollResult =
 export async function waitForAsset(input: {
   readonly api: Pick<UploadsApi, "listAssets">;
   readonly assetId: string;
-  readonly policy: Pick<
-    UploadClientPolicy,
-    "pollIntervalMs" | "pollMaxAttempts"
-  >;
+  readonly policy: PollSettings;
   readonly signal: AbortSignal;
   readonly sleep: (milliseconds: number, signal: AbortSignal) => Promise<void>;
 }): Promise<PollResult> {

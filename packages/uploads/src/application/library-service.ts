@@ -29,6 +29,7 @@ export function createAssetLibraryService(dependencies: {
   async function present(record: LibraryAssetRecord): Promise<LibraryAsset> {
     const base = {
       createdAt: record.createdAt.toISOString(),
+      fileName: record.fileName,
       heightPixels: record.heightPixels,
       id: record.id,
       processingState: record.processingState,
@@ -67,6 +68,19 @@ export function createAssetLibraryService(dependencies: {
   }
 
   return {
+    // The caller's own assets among `assetIds`, presented like the library (state and signed
+    // renditions). Unknown or foreign ids are absent from the result.
+    async getMany(
+      userId: UuidV7,
+      assetIds: readonly UuidV7[],
+    ): Promise<readonly LibraryAsset[]> {
+      const records = await dependencies.repository.listByIdsForUser({
+        assetIds,
+        userId,
+      });
+      return Promise.all(records.map(present));
+    },
+
     async list(userId: UuidV7): Promise<LibraryResponse> {
       const records = await dependencies.repository.listNewestForUser({
         limit: policy.libraryPageSize + 1,

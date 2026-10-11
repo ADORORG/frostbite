@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./role-guard": "./src/adapters/role-guard.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -21,6 +22,7 @@
     "drizzle-orm": "1.0.0-rc.4"
   },
   "devDependencies": {
+    "@ador/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.0",

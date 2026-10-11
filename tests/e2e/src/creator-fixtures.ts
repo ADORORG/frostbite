@@ -79,4 +79,124 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-visual-session-token",
     userId: "01994b10-0000-7000-8000-000000000009",
   },
+  // Collection drafts (W4-01): two approved creators, so a spec can prove one never reaches the other's
+  // drafts or images, and a user who never applied, who must be refused.
+  collectionCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000023",
+    sessionToken: "e2e-collection-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000022",
+  },
+  collectionOtherCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000025",
+    sessionToken: "e2e-collection-other-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000024",
+  },
+  collectionAccessOwner: {
+    sessionId: "01994b10-0000-7000-8000-000000000029",
+    sessionToken: "e2e-collection-access-owner-session-token",
+    userId: "01994b10-0000-7000-8000-000000000028",
+  },
+  // The collection wizard (W4-02): one creator who builds a draft in the browser, one who only reads
+  // an empty list, and one whose draft is the subject of the visual and accessibility checks.
+  collectionWizardCreator: {
+    sessionId: "01994b10-0000-7000-8000-00000000002b",
+    sessionToken: "e2e-collection-wizard-creator-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002a",
+  },
+  collectionQualityList: {
+    sessionId: "01994b10-0000-7000-8000-00000000002d",
+    sessionToken: "e2e-collection-quality-list-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002c",
+  },
+  collectionQualityWizard: {
+    sessionId: "01994b10-0000-7000-8000-00000000002f",
+    sessionToken: "e2e-collection-quality-wizard-session-token",
+    userId: "01994b10-0000-7000-8000-00000000002e",
+  },
+  // Submission and review (W4-03b): one creator who submits, is asked for changes, and is approved in
+  // a real browser, and one whose review step is the subject of the visual and accessibility checks.
+  reviewJourneyCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000041",
+    sessionToken: "e2e-review-journey-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000040",
+  },
+  reviewQualityCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000043",
+    sessionToken: "e2e-review-quality-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000042",
+  },
+  // The public catalog (W4-05): a creator whose approved collection is seeded with fixed content, so the
+  // public pages can be checked visually in a known state.
+  publicCollectionCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000045",
+    sessionToken: "e2e-public-collection-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000044",
+  },
+  // Images uploaded inside the wizard (UX-2): one creator who uploads a cover and a banner in the browser.
+  collectionInlineCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000061",
+    sessionToken: "e2e-collection-inline-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000060",
+  },
+  // Many images at once (bulk upload): one creator who uploads a batch of named images in the browser.
+  collectionBulkCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000067",
+    sessionToken: "e2e-collection-bulk-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000066",
+  },
+  // Items added from a file (import): one creator who uploads named images and imports a list of items.
+  collectionImportCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000069",
+    sessionToken: "e2e-collection-import-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000068",
+  },
+  // The Week 4 internal-alpha acceptance journey: one creator who does everything in the browser.
+  alphaCreator: {
+    sessionId: "01994b10-0000-7000-8000-00000000006b",
+    sessionToken: "e2e-alpha-creator-session-token",
+    userId: "01994b10-0000-7000-8000-00000000006a",
+  },
+  // An applicant a reviewer has asked for changes (UX: the reviewer's message is shown to them).
+  applicantFeedback: {
+    sessionId: "01994b10-0000-7000-8000-000000000063",
+    sessionToken: "e2e-applicant-feedback-session-token",
+    userId: "01994b10-0000-7000-8000-000000000062",
+  },
+  collectionUnapproved: {
+    sessionId: "01994b10-0000-7000-8000-000000000027",
+    sessionToken: "e2e-collection-unapproved-session-token",
+    userId: "01994b10-0000-7000-8000-000000000026",
+  },
+} as const;
+
+// Actors the seed gives an approved creator application, so they may change collection drafts.
+export const approvedCreators = [
+  creatorE2EFixtures.collectionCreator,
+  creatorE2EFixtures.collectionOtherCreator,
+  creatorE2EFixtures.collectionAccessOwner,
+  creatorE2EFixtures.collectionWizardCreator,
+  creatorE2EFixtures.collectionQualityList,
+  creatorE2EFixtures.collectionInlineCreator,
+  creatorE2EFixtures.collectionBulkCreator,
+  creatorE2EFixtures.collectionImportCreator,
+  creatorE2EFixtures.alphaCreator,
+  creatorE2EFixtures.collectionQualityWizard,
+  creatorE2EFixtures.reviewJourneyCreator,
+  creatorE2EFixtures.reviewQualityCreator,
+  creatorE2EFixtures.publicCollectionCreator,
+] as const;
+
+// The application the seed gives `applicantFeedback`, and the reviewer's message on it.
+export const feedbackApplication = {
+  applicationId: "01994b10-0000-7000-8000-000000000064",
+  eventId: "01994b10-0000-7000-8000-000000000065",
+  feedback: "Please add a link to earlier work and say how the art was made.",
+  // A fixed moment, so the page it appears on is the same every day.
+  writtenAt: new Date("2026-10-10T12:30:00.000Z"),
+} as const;
+
+// The seeded approved collection the public pages are checked against.
+export const publicCollection = {
+  id: "01994b10-0000-7000-8000-000000000050",
+  name: "Public light",
 } as const;

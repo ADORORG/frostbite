@@ -22,7 +22,7 @@ import {
 } from "@ador/uploads";
 
 import { systemClock } from "./clock.ts";
-import { memoizeUntilFailure } from "./lazy.ts";
+import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
 
 export interface AssetPipelineOptions {
   readonly clock?: () => Date;

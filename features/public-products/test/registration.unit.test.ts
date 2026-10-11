@@ -1,25 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  collectionsFeature,
-  creatorsFeature,
-  gamesFeature,
-  launchesFeature,
-} from "../src/registration.ts";
+import { creatorsFeature, launchesFeature } from "../src/registration.ts";
 
 describe("publicProductsFeature", () => {
   it("declares independently detachable domain route families", () => {
-    const features = [
-      launchesFeature,
-      collectionsFeature,
-      creatorsFeature,
-      gamesFeature,
-    ];
+    const features = [launchesFeature, creatorsFeature];
     expect(features.map(({ manifest }) => manifest.id)).toEqual([
       "launches",
-      "collections",
       "creators",
-      "games",
     ]);
     for (const { manifest } of features) {
       expect(manifest.pages).toHaveLength(2);

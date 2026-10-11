@@ -7,7 +7,9 @@ const findMine = vi.fn();
 vi.mock("../src/runtime.ts", () => ({
   getCreatorAdmissionService: () => ({
     findMine,
+    readForReview: vi.fn(),
     review: vi.fn(),
+    reviewQueue: vi.fn(),
     saveDraft: vi.fn(),
     submit: vi.fn(),
   }),
@@ -18,10 +20,11 @@ import { createCreatorAdmissionEntrypoint } from "../src/entrypoint.tsx";
 describe("creator admission entrypoint", () => {
   it("contributes matching operations and pages", () => {
     const entrypoint = createCreatorAdmissionEntrypoint();
-    expect(entrypoint.operations).toHaveLength(4);
+    expect(entrypoint.operations).toHaveLength(6);
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
       "/studio/creator-application",
       "/admin/creator-applications",
+      "/admin/creator-applications/[applicationId]",
     ]);
   });
 
@@ -54,6 +57,40 @@ describe("creator admission entrypoint", () => {
       renderToStaticMarkup(
         await review.render({ actorUserId, navigation: [], params: {} }),
       ),
-    ).toContain("Admission review");
+    ).toContain("Creator reviews");
+  });
+
+  it("renders a saved application with the message a reviewer wrote, dates and all", async () => {
+    const actorUserId = createUuidV7();
+    findMine.mockResolvedValueOnce({
+      applicantUserId: actorUserId,
+      draft: {
+        contentDeclarationAccepted: true,
+        displayName: "Saved Creator",
+        expectedLaunchSize: "Small",
+        expectedLaunchTiming: "Soon",
+        jurisdictionAcknowledged: true,
+        portfolioLinks: [],
+        projectSummary: "Summary",
+        provenanceDeclarationAccepted: true,
+        rightsDeclarationAccepted: true,
+      },
+      feedback: {
+        createdAt: new Date("2026-10-10T12:30:00.000Z"),
+        text: "Add a portfolio link.",
+      },
+      id: createUuidV7(),
+      revision: 2,
+      state: "changes-requested",
+    });
+    const studio = createCreatorAdmissionEntrypoint().pages?.[0];
+    if (studio === undefined) throw new Error("Expected page");
+    const markup = renderToStaticMarkup(
+      await studio.render({ actorUserId, navigation: [], params: {} }),
+    );
+    expect(markup).toContain("Changes requested");
+    expect(markup).toContain("From a reviewer, 2026-10-10");
+    expect(markup).toContain("Add a portfolio link.");
+    expect(markup).toContain("Saved Creator");
   });
 });

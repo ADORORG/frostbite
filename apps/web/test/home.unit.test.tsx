@@ -1,6 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+// The page reads the session cookie to decide which links to show; there is no request here, so the
+// visitor has none.
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => undefined }),
+}));
+
+import { featureRegistry } from "../../../configs/features";
 import FeaturePage from "../src/app/[[...path]]/page";
 
 describe("home release state", () => {
@@ -13,7 +20,8 @@ describe("home release state", () => {
 
     expect(markup).toContain("No live sale is configured");
     expect(markup).toContain("GATED");
-    expect(markup).toContain("9 REGISTERED");
+    // The count is the registry's own, so adding a feature does not break this test.
+    expect(markup).toContain(`${featureRegistry.list().length} REGISTERED`);
     expect(markup).not.toContain("Connect wallet");
     expect(markup).not.toContain("Buy now");
   });

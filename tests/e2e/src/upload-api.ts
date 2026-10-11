@@ -39,7 +39,12 @@ export const createIntent = <Response>(
   request: JsonPoster<Response>,
   baseURL: string | undefined,
   key: string,
-  body: { byteLength: number; contentType: string; purpose?: string },
+  body: {
+    byteLength: number;
+    contentType: string;
+    fileName?: string;
+    purpose?: string;
+  },
 ) =>
   post(
     request,

@@ -6,9 +6,7 @@ describe("public product catalog", () => {
   it("defines every public catalog once", () => {
     expect(productCatalogs.map(({ path }) => path)).toEqual([
       "/launches",
-      "/collections",
       "/creators",
-      "/games",
     ]);
   });
 

@@ -15,6 +15,10 @@ import {
 import { executeNextOperation } from "../../../../server/http/next-operation";
 import { resolvePageAccess } from "../../../../server/auth/page-access";
 import { getPageAccessDependencies } from "../../../../server/auth/runtime";
+import {
+  getRateLimitGate,
+  tooManyRequests,
+} from "../../../../server/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -42,6 +46,15 @@ async function handle(request: Request, context: RouteContext) {
       { headers: { [correlationHeaderName]: correlationId }, status: 404 },
     );
   }
+  // The first limit comes before any other work: a flood from one address is answered cheaply, and an operation
+  // open to anyone is limited here, by address, because there is no one signed in to count against.
+  const byAddress = await getRateLimitGate().byAddress({
+    headers: request.headers,
+    method: request.method,
+    operationId: operation.route.operationId,
+    publicOperation: operation.access.kind === "public",
+  });
+  if (byAddress !== null) return tooManyRequests(byAddress);
   let actorSession: ActiveSession | null = null;
   // Origin protection also covers public qualification mutations; authentication is separate.
   if (request.method !== "GET" && request.method === operation.route.method) {
@@ -102,6 +115,14 @@ async function handle(request: Request, context: RouteContext) {
       );
     }
     actorSession = access.session;
+    if (actorSession) {
+      const byPerson = await getRateLimitGate().byPerson({
+        method: request.method,
+        operationId: operation.route.operationId,
+        userId: actorSession.userId,
+      });
+      if (byPerson !== null) return tooManyRequests(byPerson);
+    }
   }
   const rawInput: unknown =
     request.method === "GET" ? {} : await request.json().catch(() => undefined);

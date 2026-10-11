@@ -1,9 +1,7 @@
 import { defineFeature } from "@ador/plugin-kit";
 
 import {
-  collectionsCatalog,
   creatorsCatalog,
-  gamesCatalog,
   launchesCatalog,
   type ProductCatalog,
 } from "./domain/catalog.ts";
@@ -16,8 +14,10 @@ function productFeature(catalog: ProductCatalog) {
       navigation: [
         {
           access: { kind: "public" },
+          area: catalog.navigationArea,
           href: catalog.path,
           label: catalog.label,
+          order: catalog.navigationOrder,
         },
       ],
       id: catalog.featureId,
@@ -39,6 +39,4 @@ function productFeature(catalog: ProductCatalog) {
 }
 
 export const launchesFeature = productFeature(launchesCatalog);
-export const collectionsFeature = productFeature(collectionsCatalog);
 export const creatorsFeature = productFeature(creatorsCatalog);
-export const gamesFeature = productFeature(gamesCatalog);

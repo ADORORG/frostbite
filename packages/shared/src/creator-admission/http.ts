@@ -7,10 +7,20 @@ import {
 } from "./contracts.ts";
 import { uuidV7TextSchema } from "../identifiers/uuid-v7.ts";
 
+// The latest message a reviewer wrote for the applicant (never the private notes). Null until a reviewer
+// has written one.
+export const creatorApplicationFeedbackSchema = z
+  .object({
+    createdAt: z.iso.datetime({ offset: true }),
+    text: z.string().min(1),
+  })
+  .strict();
+
 export const creatorApplicationViewSchema = z
   .object({
     applicantUserId: uuidV7TextSchema,
     draft: creatorApplicationDraftSchema,
+    feedback: creatorApplicationFeedbackSchema.nullable(),
     id: uuidV7TextSchema,
     revision: z.number().int().positive(),
     state: creatorApplicationStateSchema,
@@ -39,6 +49,16 @@ export const creatorApplicationRoutes = Object.freeze({
     method: "POST",
     operationId: "reviewCreatorApplication",
     path: "/api/v1/creator-application/review",
+  },
+  reviewQueue: {
+    method: "POST",
+    operationId: "listCreatorApplicationReviewQueue",
+    path: "/api/v1/creator-application/review-queue",
+  },
+  reviewRead: {
+    method: "POST",
+    operationId: "readCreatorApplicationForReview",
+    path: "/api/v1/creator-application/review-read",
   },
   saveDraft: {
     method: "PUT",

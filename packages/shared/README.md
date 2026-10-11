@@ -6,10 +6,21 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
 
 - `@ador/shared/allowlists` — strict Leaf V1 bytes, decoder, and SHA-256 Merkle primitives used by
   browser, server, and contract fixture tooling.
+- `@ador/shared/chain` — the chain-neutral model of ADR-017: CAIP-2 `ChainRef` and `ChainFamilyId`,
+  `ChainConfig` (role, per-operation finality, release gate), addresses, assets, amounts, contract
+  references, transaction intents and summaries, opaque unsigned and signed payloads, broadcast
+  outcomes, observations, and the neutral transaction state machine. No family concept appears here.
+- `@ador/shared/collections` — collection draft and item schemas, the engineering limits, the asset
+  purposes a draft may reference, and the HTTP contract (inputs, responses, routes) of the collection
+  studio API, the studio page paths and the wizard link helper, and the submission and review
+  contracts: the review state machine, the frozen snapshot schema, submission readiness rules, the
+  review capability name, and the HTTP contracts for creators and staff.
 - `@ador/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
   manifest schema.
 - `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.
-- `@ador/shared/http` — HTTP headers, methods, idempotency policy, and the versioned error envelope.
+- `@ador/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
+  `requestFingerprint`, a key-order-independent digest used to detect an idempotency key reused with
+  different content.
 - `@ador/shared/wallet-qualification` — bounded diagnostic schemas, routes, and configurable
   defaults. The strict result contract cannot carry a session or represent successful sign-in.
 - `@ador/shared/platform` — public platform-status input and output contracts.
@@ -33,7 +44,8 @@ sorted-pair convention are protocol behavior and are locked by Rust/TypeScript f
 - Manifests reject undeclared fields.
 - Feature routes and provider requirements are runtime-validated boot contracts.
 - Navigation destinations and labels are strict, unique per feature, and require the declared
-  navigation capability.
+  navigation capability. Each link names its `area` (`main`, `studio`, `admin`, `account`, `footer`)
+  and may give an `order` (0-99, default 50) within the shown list.
 - Accepted decisions require an owner, date, selected outcome, ADR, and evidence records.
 - Correlation IDs are UUIDs and idempotency keys are bounded opaque values.
 - HTTP errors use one strict, versioned public envelope.

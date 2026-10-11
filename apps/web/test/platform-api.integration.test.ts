@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { httpErrorEnvelopeSchema } from "@ador/shared/http";
 import { platformStatusSchema } from "@ador/shared/platform";
 
+import { featureRegistry } from "../../../configs/features";
 import { GET, POST } from "../src/app/api/v1/[...segments]/route.js";
 
 const routeContext = { params: Promise.resolve({ segments: ["platform"] }) };
@@ -32,7 +33,8 @@ describe("Next platform API adapter", () => {
     expect(response.headers.get("x-correlation-id")).toBe(correlationId);
     expect(platformStatusSchema.parse(await response.json())).toEqual({
       apiVersion: "v1",
-      registeredFeatures: 9,
+      // The registry's own count, so adding a feature does not break this test.
+      registeredFeatures: featureRegistry.list().length,
       stage: "foundation",
       transactionalActions: "gated",
     });

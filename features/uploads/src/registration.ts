@@ -2,7 +2,9 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import {
   libraryRoute,
+  uploadDetailPath,
   uploadIntentRoutes,
+  uploadsNewPath,
   uploadsNavigationLabel,
   uploadsStudioPath,
 } from "@ador/shared/uploads";
@@ -20,12 +22,18 @@ export function createUploadsFeature(providers: ProviderRegistry) {
       navigation: [
         {
           access: { kind: "authenticated" },
+          area: "studio",
           href: uploadsStudioPath,
           label: uploadsNavigationLabel,
+          order: 20,
         },
       ],
       id: "uploads",
-      pages: [{ access: { kind: "authenticated" }, path: uploadsStudioPath }],
+      pages: [
+        { access: { kind: "authenticated" }, path: uploadsStudioPath },
+        { access: { kind: "authenticated" }, path: uploadsNewPath },
+        { access: { kind: "authenticated" }, path: uploadDetailPath },
+      ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
       routes: [

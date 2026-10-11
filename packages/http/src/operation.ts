@@ -94,6 +94,7 @@ const errorStatuses: Readonly<Record<HttpErrorCode, number>> = {
   invalid_request: 400,
   method_not_allowed: 405,
   not_found: 404,
+  rate_limited: 429,
   unauthorized: 401,
 };
 

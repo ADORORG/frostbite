@@ -6,6 +6,7 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { getPasskeyLinkingService } from "./runtime.ts";
 import { AccountSurface } from "./ui/account-surface.tsx";
+import { AdminHome } from "./ui/admin-home.tsx";
 
 type PasskeyService = ReturnType<typeof getPasskeyLinkingService>;
 
@@ -21,7 +22,6 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeyCredentialIds={await getService().list(actorUserId)}
-        surface="account"
       />
     );
   } catch {
@@ -30,7 +30,6 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeysUnavailable
-        surface="account"
       />
     );
   }
@@ -57,28 +56,10 @@ export function createAccountsEntrypoint(
           account(actorUserId, getService, navigation),
       },
       {
-        access: { kind: "authenticated" },
-        path: "/studio",
-        render: ({ actorUserId, navigation }) =>
-          actorUserId === null ? null : (
-            <AccountSurface
-              actorUserId={actorUserId}
-              navigation={navigation}
-              surface="studio"
-            />
-          ),
-      },
-      {
         access: { capability: "platform:operate", kind: "platform" },
         path: "/admin",
         render: ({ actorUserId, navigation }) =>
-          actorUserId === null ? null : (
-            <AccountSurface
-              actorUserId={actorUserId}
-              navigation={navigation}
-              surface="admin"
-            />
-          ),
+          actorUserId === null ? null : <AdminHome navigation={navigation} />,
       },
     ],
     version: "1.0.0",

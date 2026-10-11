@@ -40,3 +40,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Built from /games by scripts/build-games.ts
+/apps/web/public/play/

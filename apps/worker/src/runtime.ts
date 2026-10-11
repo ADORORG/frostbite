@@ -5,6 +5,7 @@ import { createOutboxDeliveryStore } from "@ador/database";
 import {
   createDatabaseClient,
   createDatabasePool,
+  databaseReadinessProbe,
   parseDatabaseEnvironment,
 } from "@ador/database/connection";
 import {
@@ -12,6 +13,7 @@ import {
   type UploadCleanupResult,
 } from "@ador/feature-uploads/cleanup";
 import { createAssetPipelineResolver } from "@ador/feature-uploads/pipeline";
+import { runReadiness } from "@ador/http/readiness";
 import { runDrainLoop } from "@ador/jobs/drain-loop";
 import {
   defaultMaintenanceLoopPolicy,
@@ -20,6 +22,7 @@ import {
   resolveWorkflowPolicy,
 } from "@ador/jobs/policy";
 import { runOutboxRelayLoop } from "@ador/jobs/relay-loop";
+import { storageReadinessProbe } from "@ador/object-storage/readiness";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 
 import { createCleanupPass } from "./cleanup.ts";
@@ -73,7 +76,28 @@ export function createWorkerRuntime(dependencies: {
   const cleanup = createUploadCleanupResolver(providers, { database });
   return {
     close: () => pool.end(),
-    handle: createWorkerRoutes({ endpoint }),
+    handle: createWorkerRoutes({
+      endpoint,
+      readiness: () =>
+        runReadiness(
+          [
+            databaseReadinessProbe(database),
+            {
+              check: async (signal) =>
+                storageReadinessProbe(
+                  await providers.resolve("object-storage:s3-compatible"),
+                ).check(signal),
+              name: "object-storage",
+            },
+          ],
+          {
+            onFailure: (name, error) =>
+              console.error(
+                `readiness: ${name} is not ready: ${error.message}`,
+              ),
+          },
+        ),
+    }),
     runCleanup: (signal, handlers) =>
       runDrainLoop(
         {

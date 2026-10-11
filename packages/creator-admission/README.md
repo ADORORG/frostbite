@@ -14,6 +14,8 @@ Owns creator application drafts, immutable review snapshots, lifecycle transitio
 - Active configured reviewers may review, and cannot review themselves.
 - Lifecycle changes lock the application and persist an audit event atomically.
 - Approval grants creator admission only; it grants no project or deployment authority.
+- The applicant's view carries the latest message a reviewer wrote for them (`feedback`), read from the audit
+  events; private notes and evidence are never part of it.
 
 ## Commands
 

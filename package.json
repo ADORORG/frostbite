@@ -4,8 +4,12 @@
   "type": "module",
   "dependencies": {
     "@ador/feature-accounts": "workspace:*",
+    "@ador/feature-collection-review": "workspace:*",
+    "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
+    "@ador/feature-public-collections": "workspace:*",
+    "@ador/feature-games": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
     "@ador/feature-wallet-connection": "workspace:*",
@@ -38,6 +42,7 @@
     "test:unit": "turbo run test:unit",
     "test:integration": "turbo run test:integration --concurrency=2 && pnpm contracts:test",
     "test:coverage": "turbo run test:coverage --concurrency=2 && pnpm contracts:coverage && pnpm repository:coverage",
+    "stack": "pnpm --filter @repo/e2e stack",
     "test:e2e": "pnpm build && pnpm --filter @repo/e2e test:e2e",
     "repository:check": "pnpm --filter @repo/repository-policy check",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage"

@@ -1,12 +1,18 @@
 import type { ReactNode } from "react";
 
-import { ArcadeButton, type ArcadeTone } from "../primitives/arcade-button.tsx";
+import { AccountMenu } from "./account-menu.tsx";
+import { AreaSidebar } from "./area-sidebar.tsx";
+import { Breadcrumbs } from "./breadcrumbs.tsx";
+import {
+  buildNavigationModel,
+  type ShellNavigationItem,
+} from "./navigation-model.ts";
 
-export interface ShellNavigationItem {
-  readonly href: string;
-  readonly label: string;
-  readonly tone?: ArcadeTone;
-}
+export type {
+  ShellArea,
+  ShellCurrent,
+  ShellNavigationItem,
+} from "./navigation-model.ts";
 
 interface AppShellProps {
   readonly brand: string;
@@ -17,6 +23,19 @@ interface AppShellProps {
   readonly notices: readonly string[];
 }
 
+function NavLink({ item }: { readonly item: ShellNavigationItem }) {
+  return (
+    <a
+      aria-current={item.current === "page" ? "page" : undefined}
+      className="app-nav-link"
+      data-current={item.current === undefined ? undefined : "true"}
+      href={item.href}
+    >
+      {item.label}
+    </a>
+  );
+}
+
 export function AppShell({
   brand,
   children,
@@ -25,6 +44,12 @@ export function AppShell({
   navigation,
   notices,
 }: AppShellProps) {
+  const model = buildNavigationModel(navigation);
+  // A sidebar of one link says nothing the bar does not, so it appears only when there is somewhere to go.
+  const sidebarArea =
+    model.active !== null && model.active.items.length > 1
+      ? model.active
+      : null;
   return (
     <div className="app-shell" id="top">
       <a className="skip-link" href="#main-content">
@@ -47,19 +72,42 @@ export function AppShell({
           <span>{brand}</span>
         </a>
         <nav className="app-navigation" aria-label="Primary navigation">
-          {navigation.map((item) => (
-            <ArcadeButton href={item.href} key={item.href} tone={item.tone}>
-              {item.label}
-            </ArcadeButton>
+          {model.main.map((item) => (
+            <NavLink item={item} key={item.href} />
           ))}
+          {model.areas.map((area) => (
+            <a
+              className="app-nav-link"
+              data-current={model.active === area ? "true" : undefined}
+              href={area.href}
+              key={area.area}
+            >
+              {area.label}
+            </a>
+          ))}
+          <AccountMenu items={model.account} />
         </nav>
       </header>
-      <main id="main-content" tabIndex={-1}>
-        {children}
-      </main>
+      <div
+        className="app-body"
+        data-sidebar={sidebarArea === null ? undefined : "true"}
+      >
+        {sidebarArea === null ? null : <AreaSidebar area={sidebarArea} />}
+        <main id="main-content" tabIndex={-1}>
+          <Breadcrumbs crumbs={model.breadcrumb} />
+          {children}
+        </main>
+      </div>
       <footer className="app-footer">
         <span>{footerLabel}</span>
-        <a href="#top">Back to top</a>
+        <nav aria-label="More">
+          {model.footer.map((item) => (
+            <a href={item.href} key={item.href}>
+              {item.label}
+            </a>
+          ))}
+          <a href="#top">Back to top</a>
+        </nav>
       </footer>
       <div className="scanlines" aria-hidden="true" />
     </div>

@@ -22,9 +22,13 @@ describe("creator admission registration", () => {
           access: { capability: "creator:review", kind: "platform" },
           path: "/admin/creator-applications",
         },
+        {
+          access: { capability: "creator:review", kind: "platform" },
+          path: "/admin/creator-applications/[applicationId]",
+        },
       ],
     });
-    expect(creatorAdmissionFeature.manifest.routes).toHaveLength(4);
+    expect(creatorAdmissionFeature.manifest.routes).toHaveLength(6);
   });
 
   it("loads the matching runtime entrypoint", async () => {
@@ -39,6 +43,6 @@ describe("creator admission registration", () => {
       registeredFeatureIds: ["accounts", "creator-admission", "platform-shell"],
     });
     expect(entrypoint.id).toBe("creator-admission");
-    expect(entrypoint.operations).toHaveLength(4);
+    expect(entrypoint.operations).toHaveLength(6);
   });
 });

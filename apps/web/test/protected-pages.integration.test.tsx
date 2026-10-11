@@ -18,13 +18,18 @@ describe("protected page delivery", () => {
       const markup = renderToStaticMarkup(page);
       expect(markup).toContain("Authentication required");
       expect(markup).not.toContain("Session active");
-      expect(markup).not.toContain("Staff capability verified");
+      // Neither private page's own content is shown to someone without a session.
+      expect(markup).not.toContain("Admin console");
+      expect(markup).not.toContain('aria-label="Staff areas"');
       expect(markup).toContain('href="/launches"');
       expect(markup).toContain('href="/collections"');
       expect(markup).toContain('href="/creators"');
       expect(markup).toContain('href="/games"');
-      expect(markup).toContain('href="/account"');
+      expect(markup).toContain('href="/connect"');
+      // A visitor is not offered private areas or an account page they cannot open.
+      expect(markup).not.toContain('href="/account"');
       expect(markup).not.toContain('href="/studio"');
+      expect(markup).not.toContain('href="/admin"');
     },
   );
 });

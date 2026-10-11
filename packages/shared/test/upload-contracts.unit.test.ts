@@ -6,6 +6,9 @@ import {
   assetProcessingRequestedPayloadSchema,
   completeUploadIntentInputSchema,
   completedUploadResponseSchema,
+  createUploadIntentInputSchema,
+  uploadFileNameMaxLength,
+  uploadFileNameSchema,
   uploadIntentRoutes,
 } from "../src/uploads/index.ts";
 
@@ -67,5 +70,46 @@ describe("upload completion contracts", () => {
         asset: { id: intentId, processingState: "published" },
       }),
     ).toThrow();
+  });
+});
+
+describe("upload file names", () => {
+  it.each([
+    "art.png",
+    "  spaced name (1).webp  ",
+    "ünï-💎.jpeg",
+    "a".repeat(255),
+  ])("accepts the bare name %j", (name) => {
+    expect(uploadFileNameSchema.parse(name)).toBe(name.trim());
+  });
+
+  it.each([
+    ["empty", ""],
+    ["blank", "   "],
+    ["a forward slash", "folder/a.png"],
+    ["a backslash", "folder\\a.png"],
+    ["a newline", "a\n.png"],
+    ["a NUL", "a\u0000.png"],
+    ["a delete character", "a\u007f.png"],
+    ["too long", "a".repeat(uploadFileNameMaxLength + 1)],
+  ])("refuses a name that is %s", (_why, name) => {
+    expect(uploadFileNameSchema.safeParse(name).success).toBe(false);
+  });
+
+  it("is optional on a new upload, so an upload without a name is still valid", () => {
+    const base = {
+      byteLength: 3,
+      contentType: "image/png",
+      purpose: "collection-item-artwork",
+    };
+    expect(createUploadIntentInputSchema.safeParse(base).success).toBe(true);
+    expect(
+      createUploadIntentInputSchema.parse({ ...base, fileName: " a.png " })
+        .fileName,
+    ).toBe("a.png");
+    expect(
+      createUploadIntentInputSchema.safeParse({ ...base, fileName: "../a.png" })
+        .success,
+    ).toBe(false);
   });
 });

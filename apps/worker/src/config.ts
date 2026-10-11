@@ -1,6 +1,8 @@
 // Where the signed workflow endpoint and the liveness probe are served.
 export const workflowEndpointPath = "/api/inngest";
 export const livenessPath = "/health";
+// Readiness: whether the database and object storage answer. Liveness says only that the process does.
+export const readinessPath = "/ready";
 
 // Used only when the platform injects no PORT (local runs). PORT is a provider-injected system
 // variable classified outside the application's environment inventory (ADR-012).

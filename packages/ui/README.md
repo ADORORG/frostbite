@@ -6,16 +6,38 @@ arcade components, and platform patterns derived from the immutable standalone a
 ## Public API
 
 - `@repo/ui/arcade` exports `AppShell`, `ArcadePanel`, `StatusLamp`, `AccessState`, and the controls
-  `ArcadeButton` (a link), `ArcadeActionButton` (a `<button>`), `ArcadeSelect`, `ArcadeFileDrop`
+  `ArcadeButton` (a link), `ArcadeActionButton` (a `<button>`), `ArcadeSelect`, `ArcadeTextField` (a labelled single-line input or textarea with hint and error),
+  `ArcadeFileDrop`
   (a real file input that also accepts drops), `ArcadeProgress`, `ArcadeBadge`, and `ArcadeMediaTile`.
 - `@repo/ui/styles.css` installs tokens and shared component styles.
 - `ArcadeModal` lives in `src/components/arcade-modal.tsx` and accepts a title, trigger label,
   and arbitrary children. It owns hydration-safe opening, native focus behavior, dismissal,
   unique accessible labels, and shared compact modal styling. It has no wallet dependencies.
 
+`AppShell` takes the flat list of links, each with an `area`, and lays it out: `main` links and one
+entry per work area (`studio`, `admin`) in the bar, `account` links in one menu (a lone link is shown
+as itself), `footer` links in the footer, and, inside a work area with more than one link, that area's
+sidebar (tabs on a narrow screen) and a breadcrumb. A work area's bar entry opens the first link the
+person may see. The grouping is `buildNavigationModel` in `src/patterns/navigation-model.ts`; its areas
+must match the manifest's (`@ador/shared/features`), which a type error at each page enforces. Guided
+forms use the `wizard-steps` styles (a connected row that scrolls sideways on narrow screens).
+
+Lists use `ArcadeFilterTabs` (buttons with counts and `aria-pressed`), `ArcadeEmptyState` (title, one
+sentence, one action), and the `arcade-card`, `arcade-cards`, `arcade-callout`, and `arcade-disclosure`
+styles. `ArcadeButton` takes an optional `ariaLabel` for links whose words repeat on a page.
+
+The shared form styles also give `.arcade-facts` (a label and value list that stacks on narrow screens)
+and lay out radio and checkbox labels beside their control.
+
 Consumers compose these exports and must not copy their CSS or use raw brand colors. Status tones
 describe view state only; the caller remains responsible for deriving truthful state from its
 authoritative domain model.
+
+## Layout helpers
+
+`arcade-stack` spaces separate blocks; add `arcade-stack--tight` when a heading sits over the content it
+introduces (it also removes the heading's and list's own margins, which would otherwise add to the gap in a
+grid). `arcade-columns` puts a main block and a side block beside each other from 64rem and stacks them below it.
 
 ## Dependencies and configuration
 

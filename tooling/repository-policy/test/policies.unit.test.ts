@@ -114,4 +114,91 @@ describe("source policies", () => {
     );
     await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
   });
+
+  it("keeps library and feature code off the database package root at runtime", async () => {
+    const [root, source] = await temporaryFile(
+      "packages/example/src/adapter.ts",
+      'import { runMigrations } from "@ador/database";\nvoid runMigrations;\n',
+    );
+    await expect(findBoundaryViolations(root, [source])).resolves.toEqual([
+      "packages/example/src/adapter.ts imports the database package root; import a subpath such as @ador/database/connection.",
+    ]);
+    const [featureRoot, feature] = await temporaryFile(
+      "features/example/src/adapter.ts",
+      'export { runMigrations } from "./local.ts";\nimport { runMigrations as run } from "@ador/database";\nvoid run;\n',
+    );
+    await expect(
+      findBoundaryViolations(featureRoot, [feature]),
+    ).resolves.toHaveLength(1);
+  });
+
+  it("allows the database root for types, subpaths, tests, apps, and test support", async () => {
+    const allowed: readonly [string, string][] = [
+      [
+        "packages/example/src/types.ts",
+        'import type { DatabaseClient } from "@ador/database";\nexport type Client = DatabaseClient;\n',
+      ],
+      [
+        "packages/example/src/subpath.ts",
+        'import { collections } from "@ador/database/schema/collections";\nvoid collections;\n',
+      ],
+      [
+        "packages/example/test/support.ts",
+        'import { runMigrations } from "@ador/database";\nvoid runMigrations;\n',
+      ],
+      [
+        "apps/worker/src/runtime.ts",
+        'import { createOutboxDeliveryStore } from "@ador/database";\nvoid createOutboxDeliveryStore;\n',
+      ],
+      [
+        "packages/test-kit/src/seed.ts",
+        'import { authUsers } from "@ador/database";\nvoid authUsers;\n',
+      ],
+    ];
+    for (const [path, contents] of allowed) {
+      const [root, file] = await temporaryFile(path, contents);
+      await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
+    }
+  });
+
+  it("keeps chain-family code and vendor SDKs behind the adapter", async () => {
+    const imports = [
+      'import { validateBitcoinAddress } from "@ador/chain/bitcoin";',
+      'import { createBitcoinAlkanesAdapter } from "@ador/chain/bitcoin-alkanes";',
+      'import { address } from "bitcoinjs-lib";',
+      'import { Provider } from "@alkanes/ts-sdk";',
+      'import { useLaserEyes } from "@omnisat/lasereyes-react";',
+    ];
+    const [root, file] = await temporaryFile(
+      "features/uploads/src/chain.ts",
+      `${imports.join("\n")}\n`,
+    );
+    const violations = await findBoundaryViolations(root, [file]);
+    expect(violations).toHaveLength(imports.length);
+    expect(violations[0]).toBe(
+      "features/uploads/src/chain.ts imports chain-family code @ador/chain/bitcoin; use the neutral chain ports.",
+    );
+  });
+
+  it.each([
+    "packages/chain/src/bitcoin-alkanes/adapter.ts",
+    "packages/wallet/src/client/provider.tsx",
+    "packages/auth/src/domain/contracts.ts",
+    "packages/test-kit/test/chain-conformance.unit.test.ts",
+    "providers/chain/bitcoin-alkanes/src/index.ts",
+  ])("allows chain-family imports in %s", async (path) => {
+    const [root, file] = await temporaryFile(
+      path,
+      'import { address } from "bitcoinjs-lib";\nvoid address;\n',
+    );
+    await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
+  });
+
+  it("allows the neutral chain ports everywhere", async () => {
+    const [root, file] = await temporaryFile(
+      "features/collections/src/chain.ts",
+      'import { createChainRegistry } from "@ador/chain/registry";\nimport type { AddressCodec } from "@ador/chain/ports";\nimport { chainRefSchema } from "@ador/shared/chain";\nvoid createChainRegistry;\nvoid chainRefSchema;\n',
+    );
+    await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
+  });
 });

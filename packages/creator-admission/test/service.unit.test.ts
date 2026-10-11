@@ -35,10 +35,14 @@ function repository(): CreatorAdmissionRepository {
     findForApplicant: vi.fn().mockResolvedValue({
       applicantUserId: actorUserId,
       draft,
+      feedback: null,
       id: applicationId,
       revision: 1,
       state: "draft",
     }),
+    countsForReview: vi.fn().mockResolvedValue(new Map()),
+    listForReview: vi.fn().mockResolvedValue([]),
+    readForReview: vi.fn().mockResolvedValue(null),
     review: vi.fn().mockResolvedValue({ kind: "changed" }),
     saveDraft: vi.fn().mockResolvedValue({ kind: "changed" }),
     submit: vi.fn().mockResolvedValue({ kind: "changed" }),
@@ -50,6 +54,7 @@ function service(storage: CreatorAdmissionRepository) {
     authorizationPolicy: policy,
     clock: () => new Date("2026-09-09T08:00:00.000Z"),
     createId: () => applicationId,
+    queuePageSize: 2,
     repository: storage,
   });
 }
@@ -106,6 +111,7 @@ describe("creator admission service", () => {
     vi.mocked(incomplete.findForApplicant).mockResolvedValue({
       applicantUserId: actorUserId,
       draft: { ...draft, rightsDeclarationAccepted: false },
+      feedback: null,
       id: applicationId,
       revision: 1,
       state: "draft",
@@ -174,5 +180,100 @@ describe("creator admission service", () => {
     expect(
       new Set([draftFingerprint, submitFingerprint, reviewFingerprint]).size,
     ).toBe(3);
+  });
+
+  describe("the review queue", () => {
+    const row = (
+      name: string,
+      state: "submitted" | "approved" = "submitted",
+    ) => ({
+      applicationId: createUuidV7(),
+      displayName: name,
+      sortKey: name.toLowerCase(),
+      state,
+      submissionNumber: 1,
+      submittedAt: new Date("2026-09-09T08:00:00.000Z"),
+      updatedAt: new Date("2026-09-09T08:00:00.000Z"),
+    });
+
+    it("asks for one row more than a page, to know whether there is another page", async () => {
+      const storage = repository();
+      const [a, b, c] = [row("Ada"), row("Bea"), row("Cy")];
+      vi.mocked(storage.listForReview).mockResolvedValue([a, b, c]);
+      const page = await service(storage).reviewQueue({
+        group: "needs-review",
+        position: null,
+        sort: "oldest",
+      });
+      expect(storage.listForReview).toHaveBeenCalledWith({
+        limit: 3,
+        position: null,
+        sort: "oldest",
+        states: ["submitted", "under-review"],
+      });
+      expect(page.items).toEqual([a, b]);
+      expect(page.nextPosition).toEqual({ id: b.applicationId, key: "bea" });
+    });
+
+    it("has no next page when the rows fit, and no page at all when there are none", async () => {
+      const storage = repository();
+      const a = row("Ada");
+      vi.mocked(storage.listForReview).mockResolvedValue([a]);
+      expect(
+        (
+          await service(storage).reviewQueue({
+            group: "all",
+            position: null,
+            sort: "name",
+          })
+        ).nextPosition,
+      ).toBeNull();
+      vi.mocked(storage.listForReview).mockResolvedValue([]);
+      await expect(
+        service(storage).reviewQueue({
+          group: "all",
+          position: null,
+          sort: "name",
+        }),
+      ).resolves.toMatchObject({ items: [], nextPosition: null });
+    });
+
+    it("passes the position on, reads every state for 'all', and sizes every group whatever is shown", async () => {
+      const storage = repository();
+      vi.mocked(storage.countsForReview).mockResolvedValue(
+        new Map([
+          ["submitted", 2],
+          ["under-review", 1],
+          ["approved", 4],
+          ["suspended", 1],
+          ["rejected", 3],
+        ]),
+      );
+      const position = { id: createUuidV7(), key: "bea" };
+      const page = await service(storage).reviewQueue({
+        group: "all",
+        position,
+        sort: "name",
+      });
+      expect(storage.listForReview).toHaveBeenCalledWith(
+        expect.objectContaining({ position }),
+      );
+      // Every state but "draft": an application that was never sent is not for review.
+      const states = vi.mocked(storage.listForReview).mock.calls[0]?.[0].states;
+      expect(states).toHaveLength(7);
+      expect(states).not.toContain("draft");
+      expect(page.counts).toEqual({
+        active: 5,
+        all: 11,
+        finished: 3,
+        "needs-review": 3,
+      });
+    });
+
+    it("reads an application for review through the repository", async () => {
+      const storage = repository();
+      await service(storage).readForReview(applicationId);
+      expect(storage.readForReview).toHaveBeenCalledWith(applicationId);
+    });
   });
 });

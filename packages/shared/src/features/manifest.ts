@@ -64,15 +64,30 @@ export const pageContributionSchema = z
   }, "Page parameter names must be unique.")
   .readonly();
 
+// Where a link is shown. `main` is the public bar, `studio` and `admin` are work areas (each becomes one
+// entry in the bar and a sidebar inside), `account` is the account menu, `footer` is the quiet links.
+export const navigationAreaSchema = z.enum([
+  "main",
+  "studio",
+  "admin",
+  "account",
+  "footer",
+]);
+
+// Links in an area are shown in ascending order; a link that gives none sits at this position.
+export const defaultNavigationOrder = 50;
+
 export const navigationContributionSchema = z
   .object({
     access: pageAccessRequirementSchema,
+    area: navigationAreaSchema,
     href: z
       .string()
       .regex(
         /^\/$|^\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/,
       ),
     label: z.string().trim().min(1).max(32),
+    order: z.number().int().min(0).max(99).optional(),
   })
   .strict()
   .readonly();
@@ -147,6 +162,7 @@ export type ProviderId = z.infer<typeof providerIdSchema>;
 export type ProviderManifest = z.infer<typeof providerManifestSchema>;
 export type PageContribution = z.infer<typeof pageContributionSchema>;
 export type PageAccessRequirement = PageContribution["access"];
+export type NavigationArea = z.infer<typeof navigationAreaSchema>;
 export type NavigationContribution = z.infer<
   typeof navigationContributionSchema
 >;

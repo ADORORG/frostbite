@@ -7,15 +7,20 @@
     "./accounts": "./src/accounts/contracts.ts",
     "./allowlists": "./src/allowlists/index.ts",
     "./auth": "./src/auth/wallet-auth-action.ts",
+    "./chain": "./src/chain/index.ts",
     "./wallet-qualification": "./src/auth/qualification.ts",
     "./creator-admission": "./src/creator-admission/index.ts",
     "./decisions": "./src/decisions/gates.ts",
     "./features": "./src/features/manifest.ts",
+    "./games": "./src/games/index.ts",
     "./http": "./src/http/index.ts",
     "./identifiers": "./src/identifiers/uuid-v7.ts",
     "./platform": "./src/platform/status.ts",
     "./uploads": "./src/uploads/index.ts",
-    "./providers": "./src/features/manifest.ts"
+    "./providers": "./src/features/manifest.ts",
+    "./collections": "./src/collections/index.ts",
+    "./readiness": "./src/platform/readiness.ts",
+    "./csp-report": "./src/platform/csp-report.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

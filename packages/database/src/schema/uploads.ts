@@ -4,6 +4,7 @@ import {
   assetProcessingStates,
   assetRejectionReasons,
   type AssetRejectionReason,
+  uploadFileNameMaxLength,
   type UploadContentType,
 } from "@ador/shared/uploads";
 import { sql } from "drizzle-orm";
@@ -61,6 +62,8 @@ export const uploadIntents = platformSchema.table(
       .notNull()
       .references(() => authUsers.id, { onDelete: "restrict" }),
     purpose: uploadPurpose("purpose").notNull(),
+    // The name on the creator's device, when they gave one; see uploadFileNameSchema.
+    fileName: text("file_name"),
     contentType: uploadContentType("content_type")
       .$type<UploadContentType>()
       .notNull(),
@@ -113,6 +116,10 @@ export const uploadIntents = platformSchema.table(
     check(
       "upload_intents_removal_requires_abandoned",
       sql`${table.objectRemovedAt} is null or ${table.state} = 'abandoned'`,
+    ),
+    check(
+      "upload_intents_file_name_bare",
+      sql`${table.fileName} is null or (length(${table.fileName}) between 1 and ${sql.raw(String(uploadFileNameMaxLength))} and ${table.fileName} !~ '[/\\\\[:cntrl:]]')`,
     ),
     check("upload_intents_byte_length_positive", sql`${table.byteLength} > 0`),
     check(

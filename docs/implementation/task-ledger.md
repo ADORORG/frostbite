@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W3-08` completed; Week 3 closed)                             |
-| Next ordered task       | `W4-00` Chain-neutral contracts (blocked on ADR-017)                |
+| Active task             | None (`W4-07` completed)                                            |
+| Next ordered task       | Week 5 entry gate: D13, D14, D17, D18 decision records and ADRs     |
 | Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -87,16 +87,27 @@ stored in `references/task-list.md`.
 
 ## Week 4 — Collection and creator workflow
 
-| ID    | Task                                                                                      | Status  | Evidence or blocker                                |
-| ----- | ----------------------------------------------------------------------------------------- | ------- | -------------------------------------------------- |
-| W4-00 | Define chain-neutral contracts, adapter registry, conformance suite, and simulated family | blocked | ADR-017 (proposed) awaits approval; precedes W4-01 |
-| W4-01 | Implement collection/project records, versioned drafts, metadata, supply, and items       | pending | Depends on Week 3, creator admission, and W4-00    |
-| W4-02 | Build the resumable creator collection wizard                                             | pending | Depends on W4-01                                   |
-| W4-03 | Implement immutable submission snapshots and review state transitions                     | pending | Depends on W4-01 and staff authorization           |
-| W4-04 | Enforce no self-approval and approval/revocation concurrency invariants                   | pending | Depends on W4-03                                   |
-| W4-05 | Build approved public collection list and detail pages                                    | pending | Depends on W4-03                                   |
-| W4-06 | Add creator/staff audit visibility                                                        | pending | Depends on W4-03                                   |
-| W4-07 | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending | Depends on W4-01 through W4-06                     |
+| ID     | Task                                                                                      | Status    | Evidence or blocker                                 |
+| ------ | ----------------------------------------------------------------------------------------- | --------- | --------------------------------------------------- |
+| W4-00  | Define chain-neutral contracts, adapter registry, conformance suite, and simulated family | completed | `references/chain-neutral-contracts-task-record.md` |
+| W4-01  | Implement collection/project records, versioned drafts, metadata, supply, and items       | completed | `references/collection-records-task-record.md`      |
+| W4-02  | Build the resumable creator collection wizard                                             | completed | `references/collection-wizard-task-record.md`       |
+| W4-03  | Implement immutable submission snapshots and review state transitions                     | completed | `references/submission-snapshots-task-record.md`    |
+| W4-03b | Add creator submit and status controls to the wizard and the staff review page            | completed | `references/submission-ui-task-record.md`           |
+| W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | completed | `references/review-invariants-task-record.md`       |
+| W4-05  | Build approved public collection list and detail pages                                    | completed | `references/public-collections-task-record.md`      |
+| W4-06  | Add creator/staff audit visibility                                                        | completed | `references/audit-visibility-task-record.md`        |
+| W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | completed | `references/alpha-acceptance-task-record.md`        |
+
+## UX — Journey rework (before preview)
+
+| ID   | Task                                                                                  | Status    | Evidence or blocker                                                                           |
+| ---- | ------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------- |
+| UX-1 | Walk every role, record the problems, and write the intended journeys                 | completed | `docs/product/journeys.md`; findings Q1-Q13                                                   |
+| UX-2 | Fix flow and data bugs; split overview, create, and detail pages for each feature     | completed | `references/studio-flow-task-record.md`; converged, see its review table                      |
+| UX-3 | Area-aware navigation, sidebars, breadcrumbs, account menu, responsive wizard stepper | completed | `references/studio-navigation-task-record.md`; converged with UX-2 (same review)              |
+| UX-4 | Layout and density: content widths, desktop columns, design tokens                    | completed | `references/studio-layout-task-record.md` (with the narrow-screen gap fix)                    |
+| UX-5 | Click-only journey tests for every role plus desktop and mobile baselines             | completed | `references/journey-e2e-task-record.md`; preview waits for a manual walk by the product owner |
 
 ## Week 5 — Launch phases and allowlists
 
@@ -138,17 +149,17 @@ stored in `references/task-list.md`.
 
 ## Week 8 — Frostbite catalog, hardening, and beta release
 
-| ID    | Task                                                                                                                  | Status  | Evidence or blocker                                         |
-| ----- | --------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------------------------------------------- |
-| W8-01 | Implement the versioned game manifest, games catalog, and game detail feature                                         | pending | Depends on public product routes                            |
-| W8-02 | Register Frostbite with configurable play URL, base path, return URL, and network                                     | pending | Depends on W8-01                                            |
-| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | pending | Depends on W8-02                                            |
-| W8-04 | Complete critical collector, creator, staff, transaction, game, and degradation E2E coverage                          | blocked | Depends on Weeks 3 through 7                                |
-| W8-05 | Complete all-route visual, accessibility, responsive, keyboard, and state matrices                                    | blocked | Depends on all route families                               |
-| W8-06 | Add rate limits, security headers, health checks, dashboards, and alerts                                              | pending | Depends on deployment configuration                         |
-| W8-07 | Verify backup/restore and write authentication, upload, provider, indexer, transaction, launch, and rollback runbooks | pending | Depends on implemented operational flows                    |
-| W8-08 | Deploy the beta and seed an honestly represented demonstration launch                                                 | blocked | Depends on all milestone acceptance gates, including W2-10B |
-| W8-09 | Record the smoke test, rollback exercise, release notes, and remaining limitations                                    | blocked | Depends on W8-08                                            |
+| ID    | Task                                                                                                                  | Status    | Evidence or blocker                                                                                                                                                     |
+| ----- | --------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W8-01 | Implement the versioned game manifest, games catalog, and game detail feature                                         | completed | `references/games-catalog-task-record.md`                                                                                                                               |
+| W8-02 | Register Frostbite with configurable play URL, base path, return URL, and network                                     | completed | `references/frostbite-launch-task-record.md`                                                                                                                            |
+| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | completed | `references/game-hosting-task-record.md`                                                                                                                                |
+| W8-04 | Complete critical collector, creator, staff, transaction, game, and degradation E2E coverage                          | blocked   | Depends on Weeks 3 through 7                                                                                                                                            |
+| W8-05 | Complete all-route visual, accessibility, responsive, keyboard, and state matrices                                    | blocked   | Depends on all route families                                                                                                                                           |
+| W8-06 | Add rate limits, security headers, health checks, dashboards, and alerts                                              | pending   | Code part done (`references/hardening-task-record.md`): readiness, security headers, rate limits. Dashboards and alerts remain; they depend on deployment configuration |
+| W8-07 | Verify backup/restore and write authentication, upload, provider, indexer, transaction, launch, and rollback runbooks | pending   | Depends on implemented operational flows                                                                                                                                |
+| W8-08 | Deploy the beta and seed an honestly represented demonstration launch                                                 | blocked   | Depends on all milestone acceptance gates, including W2-10B                                                                                                             |
+| W8-09 | Record the smoke test, rollback exercise, release notes, and remaining limitations                                    | blocked   | Depends on W8-08                                                                                                                                                        |
 
 ## Parallel security and product-decision gates
 
@@ -187,3 +198,25 @@ For every implementation task:
 5. After all gates and the required deep review converge, change the status to `completed` in the
    same commit as the final task record.
 6. Set the next eligible task to `in_progress` only after the prior task is completed.
+
+## Games platform (proposed; outside Launchpad Beta until the milestone is amended)
+
+Tracks the game SDK and protocol, the onboarding template, and player-claimed milestone minting
+([ADR-018](../../../docs/decisions/ADR-018-game-protocol-and-milestone-minting.md), D35). The
+milestone document still lists the game host protocol and reward contract as deferred; moving any of
+these into the beta is a scope decision for the product owner, with its schedule cost recorded.
+
+| ID    | Task                                                                                                                   | Status  | Evidence or blocker                                                                                                               |
+| ----- | ---------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| GP-00 | Accept ADR-018 (D35), resolve its open questions, and complete the signature-verification spike                        | blocked | ADR-018 proposed; spike not started                                                                                               |
+| GP-01 | Extend the game manifest with contracts, capabilities, and versioned hashed milestones                                 | blocked | Depends on GP-00 and W8-01                                                                                                        |
+| GP-02 | Implement the game SDK and versioned host/game protocol (direct, URL, postMessage)                                     | partial | Branch `feat/game-host-sdk`: SDK, protocol v1, host, client, local backend, isolated frame (draft amendment, not an accepted ADR) |
+| GP-03 | Add the game conformance suite and a deterministic simulated game to test-kit                                          | partial | `@ador/game-sdk/conformance` (jsdom host simulation) and the sample game; not yet in test-kit                                     |
+| GP-04 | Build the runnable game template and one-line registration generator                                                   | partial | `games/sample-game` is the template; the registration generator is not built                                                      |
+| GP-05 | Implement the `game-rewards@1` contract template with on-chain attestation and claim limits                            | blocked | Depends on GP-00, W6-00, and W6-04                                                                                                |
+| GP-06 | Build the attestation service: keys, single-use nonces, expiry, rate limits, pause, audit                              | blocked | Depends on GP-00, GP-01, and W4-06                                                                                                |
+| GP-07 | Implement the `mint-milestone` intent through the quote, sign, broadcast, and observe pipeline                         | blocked | Depends on GP-05, GP-06, W7-03, and W7-04                                                                                         |
+| GP-08 | Build player milestone states (earned, pending, claimed, complete) in the host and game detail                         | blocked | Depends on GP-07 and W8-01                                                                                                        |
+| GP-09 | Migrate Frostbite onto the SDK, manifest, and rewards role; keep both hosting modes from one build                     | blocked | Depends on GP-02, GP-07, and W8-03                                                                                                |
+| GP-10 | Security review and abuse tests: forged or replayed attestations, hostile origins, cheating game                       | blocked | Depends on GP-05 through GP-07                                                                                                    |
+| GP-11 | Close the gate: a generated second game onboards with no platform-core edits and a milestone mints on the test network | blocked | Depends on GP-03, GP-04, GP-08, GP-09, and GP-10                                                                                  |

@@ -1,6 +1,4 @@
 import { act } from "react";
-import type { ReactElement } from "react";
-import { createRoot, type Root } from "react-dom/client";
 import { vi, type Mock } from "vitest";
 
 import type { UploadsApi } from "../../src/client/api-client.ts";
@@ -9,78 +7,34 @@ import { resolveUploadClientPolicy } from "../../src/client/client-policy.ts";
 import type { ObjectTransfer } from "../../src/client/transfer.ts";
 import { assetId, intentId } from "./library-fixtures.ts";
 
-const mounted: { container: HTMLElement; root: Root }[] = [];
+export {
+  button,
+  chooseOption,
+  click,
+  mount,
+  settle,
+  textOf,
+  unmountAll,
+} from "@ador/test-kit/dom";
 
-export async function mount(element: ReactElement) {
-  const container = document.createElement("div");
-  document.body.append(container);
-  const root = createRoot(container);
-  mounted.push({ container, root });
-  await act(() => root.render(element));
-  return container;
-}
-
-export async function unmountAll() {
-  for (const { container, root } of mounted.splice(0)) {
-    await act(() => root.unmount());
-    container.remove();
-  }
-}
-
-export const click = (element: Element | null) => {
-  if (element === null) throw new Error("element to click is missing");
-  return act(() => {
-    element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-  });
-};
-
-// Waits for an assertion to hold while the app updates on its own (timers, promises). `act` is
-// switched off for the wait, as React's own testing library does, because updates made outside an
-// `act` scope are applied immediately instead of being queued until the scope ends.
-export async function settle(assertion: () => void, timeout = 3_000) {
-  Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", false);
-  try {
-    await vi.waitFor(assertion, { interval: 10, timeout });
-  } finally {
-    Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
-  }
-  await act(async () => undefined);
-}
-
-export const textOf = (container: HTMLElement) => container.textContent ?? "";
-
-export function button(
+export async function chooseFiles(
   container: HTMLElement,
-  label: string,
-): HTMLButtonElement | null {
-  return (
-    [...container.querySelectorAll("button")].find(
-      (candidate) => candidate.textContent === label,
-    ) ?? null
-  );
-}
-
-export async function chooseFile(container: HTMLElement, file: File) {
+  files: readonly File[],
+) {
   const input = container.querySelector('input[type="file"]');
   if (!(input instanceof HTMLInputElement))
     throw new Error("file input is missing");
-  Object.defineProperty(input, "files", { configurable: true, value: [file] });
+  Object.defineProperty(input, "files", { configurable: true, value: files });
   await act(() => {
     input.dispatchEvent(new Event("change", { bubbles: true }));
   });
 }
 
-export async function chooseOption(container: HTMLElement, value: string) {
-  const select = container.querySelector("select");
-  if (select === null) throw new Error("select is missing");
-  await act(() => {
-    select.value = value;
-    select.dispatchEvent(new Event("change", { bubbles: true }));
-  });
-}
+export const chooseFile = (container: HTMLElement, file: File) =>
+  chooseFiles(container, [file]);
 
-export const imageFile = (size = 3, type = "image/png") =>
-  new File([new Uint8Array(size)], "art.png", { type });
+export const imageFile = (size = 3, type = "image/png", name = "art.png") =>
+  new File([new Uint8Array(size)], name, { type });
 
 const intentResponse = {
   intent: {

@@ -7,7 +7,8 @@ const { baseURL, port: serverPort } = resolveE2EServerConfig(
   process.env.E2E_BASE_URL,
 );
 // Real-service flows are slow, so only the desktop project runs them; every project runs the rest.
-const desktopOnlySpecs = /uploads(?:-acceptance(?:-api)?)?\.spec\.ts$/u;
+const desktopOnlySpecs =
+  /(?:uploads(?:-acceptance(?:-api)?)?|collections(?:-access)?-api|collections-(?:wizard(?:-upload)?|bulk-upload|import)|alpha-acceptance|game-hosting|platform-hardening|collections-review)\.spec\.ts$/u;
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 export default defineConfig({
@@ -17,6 +18,10 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [["html", { open: "never" }]],
+  expect: {
+    // Applied only while a screenshot is taken (see the file for why).
+    toHaveScreenshot: { stylePath: "./screenshot.css" },
+  },
   use: {
     baseURL,
     trace: "on-first-retry",

@@ -3,41 +3,17 @@ import { AppShell, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { PasskeyPanel } from "./passkey-panel.tsx";
 
-const surfaces = {
-  account: {
-    eyebrow: "Player identity",
-    status: "Authenticated session",
-    title: "Account console",
-    body: "Your platform session is active. Wallet connection alone never unlocks this surface.",
-  },
-  admin: {
-    eyebrow: "Platform operations",
-    status: "Staff capability verified",
-    title: "Admin console",
-    body: "Platform operations are available to an active staff assignment. Creator admission reviews are separated from broader platform authority.",
-  },
-  studio: {
-    eyebrow: "Private workspace",
-    status: "Authenticated access",
-    title: "Creator studio",
-    body: "Private creator-application drafts are available here. This session does not imply creator approval or publication authority.",
-  },
-} as const;
-
 export function AccountSurface({
   actorUserId,
   navigation = [],
   passkeyCredentialIds = [],
   passkeysUnavailable = false,
-  surface,
 }: {
   readonly actorUserId: UuidV7;
   readonly navigation?: readonly NavigationItem[];
   readonly passkeyCredentialIds?: readonly string[];
   readonly passkeysUnavailable?: boolean;
-  readonly surface: keyof typeof surfaces;
 }) {
-  const content = surfaces[surface];
   return (
     <AppShell
       brand="Adorbitals"
@@ -47,19 +23,20 @@ export function AccountSurface({
       notices={["◆ SESSION VERIFIED", "▲ PRIVATE ROUTE", "★ SERVER AUTHORITY"]}
     >
       <section className="arcade-section arcade-section--raised">
-        <StatusLamp label={content.status} tone="ready" />
-        <p className="arcade-eyebrow">{content.eyebrow}</p>
-        <h1>{content.title}</h1>
-        <p>{content.body}</p>
+        <StatusLamp label="Authenticated session" tone="ready" />
+        <p className="arcade-eyebrow">Player identity</p>
+        <h1>Account console</h1>
+        <p>
+          Your platform session is active. Wallet connection alone never unlocks
+          this surface.
+        </p>
         <ArcadePanel eyebrow="Current player" title="Session active">
           <p className="arcade-muted">User {actorUserId}</p>
         </ArcadePanel>
-        {surface === "account" ? (
-          <PasskeyPanel
-            initialCredentialIds={passkeyCredentialIds}
-            initialUnavailable={passkeysUnavailable}
-          />
-        ) : null}
+        <PasskeyPanel
+          initialCredentialIds={passkeyCredentialIds}
+          initialUnavailable={passkeysUnavailable}
+        />
       </section>
     </AppShell>
   );

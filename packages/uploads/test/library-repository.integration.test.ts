@@ -15,6 +15,7 @@ import {
   rejected,
   seed,
   seedValidated,
+  unknownAssetId,
   useValidationDatabase,
 } from "./support/validation-database.ts";
 
@@ -204,5 +205,32 @@ describe("asset library persistence", () => {
       }),
     ]);
     expect(record?.derivatives).toHaveLength(2);
+  });
+});
+
+describe("assets by id", () => {
+  it("returns only the caller's own assets among those asked for, with their renditions", async () => {
+    const mine = await seed();
+    const theirs = await seed();
+    const owner = await ownerOf(mine.assetId);
+    const found = await library.listByIdsForUser({
+      assetIds: [mine.assetId, theirs.assetId, unknownAssetId()],
+      userId: owner,
+    });
+    expect(found.map(({ id }) => id)).toEqual([mine.assetId]);
+    expect(found[0]).toMatchObject({
+      derivatives: [],
+      purpose: "collection-artwork",
+    });
+  });
+
+  it("returns nothing for no ids without querying", async () => {
+    const mine = await seed();
+    expect(
+      await library.listByIdsForUser({
+        assetIds: [],
+        userId: await ownerOf(mine.assetId),
+      }),
+    ).toEqual([]);
   });
 });

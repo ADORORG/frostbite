@@ -1,5 +1,10 @@
 import { defineFeature } from "@ador/plugin-kit";
-import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
+import {
+  creatorApplicationPath,
+  creatorApplicationRoutes,
+  creatorReviewDetailPath,
+  creatorReviewPath,
+} from "@ador/shared/creator-admission";
 
 export const creatorAdmissionFeature = defineFeature({
   manifest: {
@@ -13,24 +18,32 @@ export const creatorAdmissionFeature = defineFeature({
     navigation: [
       {
         access: { kind: "authenticated" },
-        href: "/studio/creator-application",
-        label: "Apply to create",
+        area: "studio",
+        href: creatorApplicationPath,
+        label: "Creator application",
+        order: 30,
       },
       {
         access: { capability: "creator:review", kind: "platform" },
-        href: "/admin/creator-applications",
+        area: "admin",
+        href: creatorReviewPath,
         label: "Creator reviews",
+        order: 20,
       },
     ],
     id: "creator-admission",
     pages: [
       {
         access: { kind: "authenticated" },
-        path: "/studio/creator-application",
+        path: creatorApplicationPath,
       },
       {
         access: { capability: "creator:review", kind: "platform" },
-        path: "/admin/creator-applications",
+        path: creatorReviewPath,
+      },
+      {
+        access: { capability: "creator:review", kind: "platform" },
+        path: creatorReviewDetailPath,
       },
     ],
     requiredDecisionGates: [],

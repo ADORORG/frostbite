@@ -8,6 +8,9 @@ Detachable server-side account mutation and authorization policy boundaries.
   versioned policy and repository port.
 - `createAccountService` validates organization creation and derives permitted membership actors
   from the same policy.
+- `@ador/authorization/role-guard` exports `holdsActivePlatformRole`, which a domain transaction uses to
+  check a platform role with a shared lock on the assignment row, so a role withdrawal waits for the
+  decision it would have authorized.
 - Drizzle adapters persist account records, recheck actor membership inside the mutation transaction,
   preserve the last-active-owner invariant, and append audit evidence.
 

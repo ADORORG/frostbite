@@ -1,0 +1,234 @@
+/* Lists of things a person owns: filters, cards, and the empty state. */
+.arcade-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+}
+.arcade-filter-tabs__option {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 999px;
+  background: var(--arcade-surface-recessed);
+  color: var(--arcade-text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.arcade-filter-tabs__option:hover {
+  color: var(--arcade-text);
+}
+.arcade-filter-tabs__option[aria-pressed="true"] {
+  border-color: var(--arcade-yellow);
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text);
+  font-weight: 700;
+}
+.arcade-filter-tabs__count {
+  min-width: 1.5rem;
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 999px;
+  background: var(--arcade-ink);
+  color: var(--arcade-cyan);
+  font-size: 0.75rem;
+  text-align: center;
+}
+.arcade-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.arcade-card {
+  display: grid;
+  gap: 0.875rem;
+  align-content: start;
+  height: 100%;
+  padding: 1.25rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.arcade-card:hover {
+  border-color: var(--arcade-cyan);
+}
+.arcade-card__head {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+}
+.arcade-card__avatar {
+  display: grid;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 0.125rem solid currentcolor;
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  font-family: var(--arcade-font-display);
+  font-size: 1.25rem;
+}
+.arcade-card__title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 1.125rem;
+  line-height: 1.25;
+}
+.arcade-card__meta {
+  margin: 0;
+  color: var(--arcade-text-subtle);
+  font-size: 0.8125rem;
+}
+.arcade-card .arcade-button {
+  justify-self: start;
+}
+.arcade-empty {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  padding: 2rem;
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+}
+.arcade-empty h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.arcade-empty p {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--arcade-text-muted);
+  line-height: 1.6;
+}
+.arcade-empty .arcade-actions {
+  margin-top: 0.75rem;
+}
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0 1.5rem;
+}
+.arcade-card__avatar--cyan {
+  color: var(--arcade-cyan);
+}
+.arcade-card__avatar--mint {
+  color: var(--arcade-mint);
+}
+.arcade-card__avatar--pink {
+  color: var(--arcade-pink);
+}
+.arcade-card__avatar--red {
+  color: var(--arcade-red);
+}
+.arcade-card__avatar--yellow {
+  color: var(--arcade-yellow);
+}
+.arcade-disclosure {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+}
+.arcade-disclosure > summary {
+  color: var(--arcade-cyan);
+  cursor: pointer;
+}
+.arcade-disclosure[open] > summary {
+  margin-bottom: 0.75rem;
+}
+.arcade-card__list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  color: var(--arcade-text-muted);
+  font-size: 0.875rem;
+  list-style: none;
+}
+.arcade-callout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border: 0.125rem solid var(--arcade-mint);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+}
+.arcade-callout .arcade-eyebrow {
+  flex-basis: 100%;
+  margin: 0;
+}
+.arcade-callout__text {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+/* A read-only list of labelled values (what an applicant sent): the label above, the value below. */
+.arcade-details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.arcade-details dt {
+  color: var(--arcade-text-muted);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.arcade-details dd {
+  margin: 0.125rem 0 0;
+  overflow-wrap: anywhere;
+}
+.arcade-card__cover {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  object-fit: cover;
+}
+
+/* Text a person wrote for someone else, kept as written: line breaks stay, long words wrap. */
+.arcade-quote {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* A long plain list (a batch of files) that scrolls inside its own box instead of stretching the page. */
+.arcade-scroll-list {
+  max-height: 24rem;
+  margin: 0;
+  padding: var(--arcade-space-small, 0.5rem);
+  overflow-y: auto;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 0.5rem;
+  background: var(--arcade-surface-recessed);
+  list-style: none;
+}
+.arcade-scroll-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.375rem 0;
+  border-bottom: 0.0625rem solid var(--arcade-border-strong);
+  overflow-wrap: anywhere;
+}
+.arcade-scroll-list > li:last-child {
+  border-bottom: 0;
+}

@@ -47,6 +47,7 @@ const service = createCreatorAdmissionService({
   authorizationPolicy: policy,
   clock: () => new Date(1_788_940_800_000 + tick++),
   createId: createUuidV7,
+  queuePageSize: 25,
   repository: createDrizzleCreatorAdmissionRepository(database),
 });
 

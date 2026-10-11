@@ -1,6 +1,6 @@
 import { createJpeg, createWebp } from "@ador/test-kit/images";
 import { createDecodablePng, createUndecodablePng } from "@ador/test-kit/png";
-import { uploadsStudioPath } from "@ador/shared/uploads";
+import { uploadsNewPath, uploadsStudioPath } from "@ador/shared/uploads";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
@@ -32,22 +32,26 @@ test("valid PNG, JPEG, and WebP uploads go straight to storage and are processed
       origin: new URL(request.url()).origin,
     }),
   );
-  await page.goto(uploadsStudioPath);
+  await page.goto(uploadsNewPath);
   const formats = [
     ["art.png", "image/png", createDecodablePng(64, 48)],
     ["photo.jpg", "image/jpeg", createJpeg()],
     ["sticker.webp", "image/webp", createWebp()],
   ] as const;
-  for (const [index, [name, mimeType, buffer]] of formats.entries()) {
+  for (const [name, mimeType, buffer] of formats) {
     await chooseImage(page, name, mimeType, buffer);
     await expect(page.getByText("Upload processed")).toBeVisible({
       timeout: processingTimeout,
     });
-    await expect(
-      page.getByRole("img", { name: "Collection artwork thumbnail" }),
-    ).toHaveCount(index + 1, { timeout: processingTimeout });
     await page.getByRole("button", { name: "Upload another" }).click();
   }
+  await page
+    .getByRole("link", { name: "Uploads", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("img", { name: "Collection artwork thumbnail" }),
+  ).toHaveCount(formats.length, { timeout: processingTimeout });
   // Each upload is one PUT to the storage origin carrying its own type; the application origin never
   // receives image bytes.
   const puts = requests.filter(({ method }) => method === "PUT");
@@ -69,11 +73,12 @@ test("bytes that do not match their declared type are rejected with a plain reas
   page,
 }) => {
   await signIn(page, baseURL, creatorE2EFixtures.acceptanceHostileUploader);
-  await page.goto(uploadsStudioPath);
+  await page.goto(uploadsNewPath);
   await chooseImage(page, "liar.jpg", "image/jpeg", createDecodablePng(16, 16));
   await expect(
     page.getByText("The file contents do not match its type").first(),
   ).toBeVisible({ timeout: processingTimeout });
+  await page.goto(uploadsStudioPath);
   await expect(page.getByText("Rejected")).toBeVisible();
 });
 
@@ -82,7 +87,7 @@ test("an image with oversized dimensions is rejected before it is decoded", asyn
   page,
 }) => {
   await signIn(page, baseURL, creatorE2EFixtures.acceptanceHostileUploader);
-  await page.goto(uploadsStudioPath);
+  await page.goto(uploadsNewPath);
   await chooseImage(
     page,
     "huge.png",

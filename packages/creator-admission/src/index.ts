@@ -4,6 +4,9 @@ export type {
   CreatorAdmissionRepository,
   CreatorApplicationView,
   CreatorMutationResult,
+  CreatorReviewDetailRecord,
+  CreatorReviewEventRecord,
+  CreatorReviewQueueRow,
   MutationContext,
 } from "./application/repository.ts";
 export type {
