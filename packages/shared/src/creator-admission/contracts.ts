@@ -99,6 +99,8 @@ export const creatorReviewActions = [
   "revoke",
 ] as const;
 
+export type CreatorReviewAction = (typeof creatorReviewActions)[number];
+
 export const creatorReviewDecisionSchema = z
   .object({
     action: z.enum(creatorReviewActions),

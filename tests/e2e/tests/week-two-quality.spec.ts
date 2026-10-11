@@ -39,12 +39,6 @@ const authenticatedSurfaces = [
     token: creatorE2EFixtures.applicantFeedback.sessionToken,
   },
   {
-    heading: "Review creator admission",
-    path: "/admin/creator-applications",
-    snapshot: "creator-review",
-    token: creatorE2EFixtures.reviewer.sessionToken,
-  },
-  {
     heading: "Admin console",
     path: "/admin",
     snapshot: "admin",

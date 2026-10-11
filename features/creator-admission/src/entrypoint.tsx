@@ -3,10 +3,24 @@ import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
+import {
+  creatorApplicationPath,
+  creatorReviewDetailPath,
+  creatorReviewPath,
+} from "@ador/shared/creator-admission";
+
 import { createCreatorApplicationOperations } from "./application/operations.ts";
+import { createCreatorReviewOperations } from "./application/review-operations.ts";
 import { presentApplication } from "./application/present.ts";
 import { getCreatorAdmissionService } from "./runtime.ts";
 import { CreatorApplicationSurface } from "./ui/creator-application-surface.tsx";
+import { ReviewDetailSurface } from "./ui/detail-surface.tsx";
+import { ReviewQueueSurface } from "./ui/queue-surface.tsx";
+
+const reviewAccess = {
+  capability: "creator:review",
+  kind: "platform",
+} as const;
 
 async function studio(
   actorUserId: UuidV7 | null,
@@ -21,7 +35,6 @@ async function studio(
         application={
           application === null ? null : presentApplication(application)
         }
-        mode="studio"
         navigation={navigation}
         unavailable={false}
       />
@@ -30,7 +43,6 @@ async function studio(
     return (
       <CreatorApplicationSurface
         application={null}
-        mode="studio"
         navigation={navigation}
         unavailable
       />
@@ -40,6 +52,9 @@ async function studio(
 
 export function createCreatorAdmissionEntrypoint(): FeatureEntrypoint {
   const [mine, saveDraft, submit, review] = createCreatorApplicationOperations(
+    getCreatorAdmissionService,
+  );
+  const [queue, read] = createCreatorReviewOperations(
     getCreatorAdmissionService,
   );
   return {
@@ -55,23 +70,31 @@ export function createCreatorAdmissionEntrypoint(): FeatureEntrypoint {
       registerHttpOperation(saveDraft),
       registerHttpOperation(submit),
       registerHttpOperation(review),
+      registerHttpOperation(queue),
+      registerHttpOperation(read),
     ],
     pages: [
       {
         access: { kind: "authenticated" },
-        path: "/studio/creator-application",
+        path: creatorApplicationPath,
         render: ({ actorUserId, navigation }) =>
           studio(actorUserId, navigation),
       },
       {
-        access: { capability: "creator:review", kind: "platform" },
-        path: "/admin/creator-applications",
+        access: reviewAccess,
+        path: creatorReviewPath,
         render: ({ navigation }) => (
-          <CreatorApplicationSurface
-            application={null}
-            mode="review"
+          <ReviewQueueSurface navigation={navigation} />
+        ),
+      },
+      {
+        access: reviewAccess,
+        path: creatorReviewDetailPath,
+        render: ({ navigation, params }) => (
+          // The registry matches this page only with its segment, so the parameter is always present.
+          <ReviewDetailSurface
+            applicationId={params.applicationId ?? ""}
             navigation={navigation}
-            unavailable={false}
           />
         ),
       },

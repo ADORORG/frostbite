@@ -40,10 +40,16 @@ export const draft: CreatorApplicationDraft = {
   provenanceDeclarationAccepted: true,
   rightsDeclarationAccepted: true,
 };
+// The moment the service believes it is, which a test can set to make times and their order exact.
+export const clock = { now: new Date() };
+export function at(iso: string) {
+  clock.now = new Date(iso);
+}
 export const service = createCreatorAdmissionService({
   authorizationPolicy: policy,
-  clock: () => new Date(),
+  clock: () => clock.now,
   createId: createUuidV7,
+  queuePageSize: 3,
   repository: createDrizzleCreatorAdmissionRepository(database),
 });
 
@@ -78,8 +84,27 @@ export async function user(role?: "reviewer") {
   return id;
 }
 
+// Idempotency keys are at least sixteen characters; a short label is padded so the same label is the same key.
 export function request(actorUserId: UuidV7, key: string) {
-  return { actorUserId, correlationId: createUuidV7(), idempotencyKey: key };
+  return {
+    actorUserId,
+    correlationId: createUuidV7(),
+    idempotencyKey: key.padEnd(16, "-"),
+  };
+}
+
+// An applicant who sent an application under `name` at `when`, ready for review.
+export async function sentApplication(name: string, when: string, key: string) {
+  const applicant = await user();
+  at(when);
+  await service.saveDraft(
+    { ...draft, displayName: name },
+    request(applicant, `draft-${key}`),
+  );
+  await service.submit(request(applicant, `submit-${key}`));
+  const mine = await service.findMine(applicant);
+  if (mine === null) throw new Error("Expected application");
+  return { applicant, id: mine.id };
 }
 
 export function decision(

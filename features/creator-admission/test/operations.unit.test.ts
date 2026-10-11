@@ -33,6 +33,12 @@ const context = {
 function service() {
   return {
     findMine: vi.fn().mockResolvedValue(application),
+    readForReview: vi.fn().mockResolvedValue(null),
+    reviewQueue: vi.fn().mockResolvedValue({
+      counts: { active: 0, all: 0, finished: 0, "needs-review": 0 },
+      items: [],
+      nextPosition: null,
+    }),
     review: vi.fn().mockResolvedValue({ application, kind: "changed" }),
     saveDraft: vi.fn().mockResolvedValue({ application, kind: "changed" }),
     submit: vi.fn().mockResolvedValue({ application, kind: "changed" }),

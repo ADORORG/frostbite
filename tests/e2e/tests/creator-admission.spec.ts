@@ -67,24 +67,30 @@ test("persists, submits, and reviews a creator application", async ({
   );
   await page.goto("/admin/creator-applications");
   await expect(
-    page.getByRole("heading", { name: "Review creator admission" }),
+    page.getByRole("heading", { name: "Creator reviews" }),
   ).toBeVisible();
   const decide = async (action: string, reasonCode: string, words = "") => {
-    await page.getByLabel("Decision").selectOption(action);
+    await page.getByRole("combobox", { name: "Decision" }).selectOption(action);
     await page.getByLabel("Reason code").fill(reasonCode);
     await page.getByLabel("Creator feedback").fill(words);
     await page.getByRole("button", { name: "Record decision" }).click();
   };
-  await page.getByLabel("Application UUID").fill(mine.application.id);
-  await decide("start-review", "review-started", "Review has started.");
+  // The reviewer finds the application in the list and opens it; nobody types an identifier.
+  await page
+    .getByRole("link", { name: /^Open E2E Creator, submission 1$/ })
+    .click();
   await expect(
-    page.getByText("Decision recorded. State: under-review."),
+    page.getByRole("heading", { name: "Review an application" }),
   ).toBeVisible();
+  await decide("start-review", "review-started", "Review has started.");
+  await expect(page.getByText("Status: In review")).toBeVisible();
   const asked = "Please add a link to your earlier work.";
   await decide("request-changes", "needs-more-evidence", asked);
+  await expect(page.getByText("Status: Changes requested")).toBeVisible();
+  // The history shows both decisions, with the words the applicant was told.
   await expect(
-    page.getByText("Decision recorded. State: changes-requested."),
-  ).toBeVisible();
+    page.getByRole("list", { name: "History of this application" }),
+  ).toContainText(`Told the applicant: ${asked}`);
 
   // The applicant reads what the reviewer wrote, still has the form, and sends it again.
   await useE2ESession(
@@ -118,13 +124,17 @@ test("persists, submits, and reviews a creator application", async ({
     creatorE2EFixtures.reviewer.sessionToken,
   );
   await page.goto("/admin/creator-applications");
-  await page.getByLabel("Application UUID").fill(mine.application.id);
+  // The second submission is waiting again, and the list says it is the second.
+  await page
+    .getByRole("link", { name: /^Open E2E Creator, submission 2$/ })
+    .click();
   await decide("start-review", "review-restarted");
-  await expect(
-    page.getByText("Decision recorded. State: under-review."),
-  ).toBeVisible();
+  await expect(page.getByText("Status: In review")).toBeVisible();
   await decide("approve", "creator-approved");
+  await expect(page.getByText("Status: Approved")).toBeVisible();
+  // Approved applications leave the waiting list.
+  await page.getByRole("link", { name: "Back to the queue" }).click();
   await expect(
-    page.getByText("Decision recorded. State: approved."),
-  ).toBeVisible();
+    page.getByRole("link", { name: /^Open E2E Creator/ }),
+  ).toHaveCount(0);
 });

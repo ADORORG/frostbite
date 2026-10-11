@@ -14,6 +14,11 @@ import { desc, eq } from "drizzle-orm";
 import type { CreatorAdmissionRepository } from "../application/repository.ts";
 import { review } from "./drizzle-review.ts";
 import {
+  countsForReview,
+  listForReview,
+  readForReview,
+} from "./drizzle-review-queue.ts";
+import {
   applicationView,
   insertAdmissionEvent,
   lockApplicant,
@@ -28,6 +33,9 @@ export function createDrizzleCreatorAdmissionRepository(
 ): CreatorAdmissionRepository {
   return {
     review: (input) => review(database, input),
+    countsForReview: () => countsForReview(database),
+    listForReview: (input) => listForReview(database, input),
+    readForReview: (applicationId) => readForReview(database, applicationId),
 
     async findForApplicant(applicantUserId) {
       const [application] = await database

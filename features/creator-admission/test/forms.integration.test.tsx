@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ReviewerForm } from "../src/ui/reviewer-form.tsx";
 import { CreatorApplicationSurface } from "../src/ui/creator-application-surface.tsx";
 import { sendCreatorAdmissionRequest } from "../src/ui/form-helpers.tsx";
 
@@ -33,20 +34,13 @@ function response(body: object, status = 200) {
   });
 }
 
-async function render(
-  mode: "studio" | "review",
-  initial: typeof application | null = application,
-) {
+async function render(initial: typeof application | null = application) {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
   await act(() => {
     root.render(
-      <CreatorApplicationSurface
-        application={mode === "studio" ? initial : null}
-        mode={mode}
-        unavailable={false}
-      />,
+      <CreatorApplicationSurface application={initial} unavailable={false} />,
     );
   });
   return { container, root };
@@ -65,7 +59,7 @@ describe("creator admission forms", () => {
   it("sends a private draft and reports the returned state", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({ application }));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio");
+    const { container, root } = await render();
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected creator form");
     await act(() =>
@@ -98,7 +92,7 @@ describe("creator admission forms", () => {
         response({ application: { ...application, state: "submitted" } }),
       );
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio");
+    const { container, root } = await render();
     const declaration = container.querySelector<HTMLInputElement>(
       'input[name="rightsDeclarationAccepted"]',
     );
@@ -139,7 +133,7 @@ describe("creator admission forms", () => {
   it("serializes an initially empty draft without inventing field values", async () => {
     const fetchMock = vi.fn().mockResolvedValue(response({ application }));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("studio", null);
+    const { container, root } = await render(null);
     expect(container.textContent).toContain("Not a creator yet");
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected creator form");
@@ -175,7 +169,19 @@ describe("creator admission forms", () => {
       .mockReturnValueOnce(firstRequest)
       .mockRejectedValueOnce(new Error("offline"));
     vi.stubGlobal("fetch", fetchMock);
-    const { container, root } = await render("review");
+    const decided = vi.fn();
+    const container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(() => {
+      root.render(
+        <ReviewerForm
+          applicationId={application.id}
+          onDecided={decided}
+          state="submitted"
+        />,
+      );
+    });
     const form = container.querySelector("form");
     if (form === null) throw new Error("Expected review form");
     const evidence = form.elements.namedItem("evidenceReference");
@@ -212,6 +218,7 @@ describe("creator admission forms", () => {
       );
     });
     expect(container.textContent).toContain("State: under-review");
+    expect(decided).toHaveBeenCalledTimes(1);
     evidence.value = "";
     await act(() =>
       form.dispatchEvent(
@@ -219,6 +226,7 @@ describe("creator admission forms", () => {
       ),
     );
     expect(container.textContent).toContain("Decision was not recorded");
+    expect(decided).toHaveBeenCalledTimes(1);
     await act(() => root.unmount());
   });
 

@@ -7,7 +7,9 @@ const findMine = vi.fn();
 vi.mock("../src/runtime.ts", () => ({
   getCreatorAdmissionService: () => ({
     findMine,
+    readForReview: vi.fn(),
     review: vi.fn(),
+    reviewQueue: vi.fn(),
     saveDraft: vi.fn(),
     submit: vi.fn(),
   }),
@@ -18,10 +20,11 @@ import { createCreatorAdmissionEntrypoint } from "../src/entrypoint.tsx";
 describe("creator admission entrypoint", () => {
   it("contributes matching operations and pages", () => {
     const entrypoint = createCreatorAdmissionEntrypoint();
-    expect(entrypoint.operations).toHaveLength(4);
+    expect(entrypoint.operations).toHaveLength(6);
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
       "/studio/creator-application",
       "/admin/creator-applications",
+      "/admin/creator-applications/[applicationId]",
     ]);
   });
 
@@ -54,7 +57,7 @@ describe("creator admission entrypoint", () => {
       renderToStaticMarkup(
         await review.render({ actorUserId, navigation: [], params: {} }),
       ),
-    ).toContain("Admission review");
+    ).toContain("Creator reviews");
   });
 
   it("renders a saved application with the message a reviewer wrote, dates and all", async () => {

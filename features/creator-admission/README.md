@@ -10,3 +10,11 @@ capability for review operations. It never grants project publication, deploymen
 game permissions.
 
 Run `pnpm env:check`, `pnpm typecheck`, `pnpm test:unit`, `pnpm test:integration`, and `pnpm test:coverage` from this package.
+
+## Pages and operations
+
+- `/studio/creator-application` — the applicant's page (draft form, or read-only status card once sent).
+- `/admin/creator-applications` — the review queue: groups (all, needs review, approved or paused, finished) with counts, and three sort orders, paged by an opaque keyset cursor.
+- `/admin/creator-applications/[applicationId]` — one application: the version sent, the decisions the state allows, and its history (private notes included; staff only).
+- Operations: `mine`, `saveDraft`, `submit`, `review`, `reviewQueue`, `reviewRead`. The queue and read are `creator:review` and also refuse a missing actor; a cursor the list did not produce is refused with `invalid_request`.
+- Browser code (`src/client`, `src/ui/hooks`) reaches the API only through `createCreatorReviewApi`, which validates every response against the shared schema; services are injectable for tests.

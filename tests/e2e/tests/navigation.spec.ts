@@ -169,6 +169,6 @@ test("a reviewer's Admin entry opens a page they may use, and the sidebar lists 
     .getByRole("link", { name: "Creator reviews", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Review creator admission" }),
+    page.getByRole("heading", { name: "Creator reviews", level: 1 }),
   ).toBeVisible();
 });

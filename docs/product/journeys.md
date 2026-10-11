@@ -53,6 +53,10 @@ Collections and uploads show "Available once approved", not forms that fail.
 Admin home lists Collection reviews, Creator applications, Activity log; queue → submission → decision →
 back to the queue. Everything stays under an Admin sidebar.
 
+Creator reviews is a list, not a form: choose a group (all, needs review, approved or paused, finished; each shows
+its size) and an order (oldest, newest, name), open an application from its card, read what was sent and the
+history, take one of the decisions its state allows, and return to the list. No identifier is ever typed.
+
 ## Staff without reviewer role
 
 Admin home shows what they can see; review actions are absent, not refused.

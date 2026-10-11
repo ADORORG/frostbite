@@ -470,6 +470,12 @@ importers:
 
   features/creator-admission:
     dependencies:
+      '@ador/client-http':
+        specifier: workspace:*
+        version: link:../../packages/client-http
+      '@ador/client-react':
+        specifier: workspace:*
+        version: link:../../packages/client-react
       '@ador/creator-admission':
         specifier: workspace:*
         version: link:../../packages/creator-admission

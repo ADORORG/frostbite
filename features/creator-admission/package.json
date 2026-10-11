@@ -17,6 +17,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/client-http": "workspace:*",
+    "@ador/client-react": "workspace:*",
     "@ador/creator-admission": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",

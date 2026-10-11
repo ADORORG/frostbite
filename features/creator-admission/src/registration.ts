@@ -2,6 +2,7 @@ import { defineFeature } from "@ador/plugin-kit";
 import {
   creatorApplicationPath,
   creatorApplicationRoutes,
+  creatorReviewDetailPath,
   creatorReviewPath,
 } from "@ador/shared/creator-admission";
 
@@ -39,6 +40,10 @@ export const creatorAdmissionFeature = defineFeature({
       {
         access: { capability: "creator:review", kind: "platform" },
         path: creatorReviewPath,
+      },
+      {
+        access: { capability: "creator:review", kind: "platform" },
+        path: creatorReviewDetailPath,
       },
     ],
     requiredDecisionGates: [],

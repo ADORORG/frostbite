@@ -34,7 +34,7 @@ export function StudioApplication({
           onApplication={setApplication}
         />
       ) : application === null ? null : (
-        <SentApplication draft={application.draft} />
+        <SentApplication draft={application.draft} heading="What you sent" />
       )}
     </div>
   );

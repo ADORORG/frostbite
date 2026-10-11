@@ -82,7 +82,10 @@ export const stackPages = [
   ["/admin", "Staff: the admin overview of the areas you may open"],
   ["/admin/collection-reviews", "Reviewer: the review queue"],
   ["/admin/collection-activity", "Reviewer: the activity log"],
-  ["/admin/creator-applications", "Reviewer: creator application review form"],
+  [
+    "/admin/creator-applications",
+    "Reviewer: the creator application queue, filter and sort, then open one to decide",
+  ],
 ] as const;
 
 export function formatStackGuide(input: {

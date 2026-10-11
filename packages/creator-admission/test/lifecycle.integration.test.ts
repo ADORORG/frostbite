@@ -39,12 +39,15 @@ const draft: CreatorApplicationDraft = {
   provenanceDeclarationAccepted: true,
   rightsDeclarationAccepted: true,
 };
-const repository = createDrizzleCreatorAdmissionRepository(database);
-const service = createCreatorAdmissionService({
-  authorizationPolicy: policy,
+const dependencies = {
   clock: () => new Date(),
   createId: createUuidV7,
-  repository,
+  queuePageSize: 25,
+  repository: createDrizzleCreatorAdmissionRepository(database),
+};
+const service = createCreatorAdmissionService({
+  ...dependencies,
+  authorizationPolicy: policy,
 });
 
 beforeAll(async () => runMigrations(environment));
@@ -221,10 +224,10 @@ describe("creator admission lifecycle", () => {
     const actor = await user("reviewer");
     const missingApplicant = createUuidV7();
     await expect(
-      repository.findForApplicant(missingApplicant),
+      dependencies.repository.findForApplicant(missingApplicant),
     ).resolves.toBeNull();
     await expect(
-      repository.submit({
+      dependencies.repository.submit({
         actorUserId: missingApplicant,
         changedAt: new Date(),
         correlationId: createUuidV7(),
@@ -241,10 +244,8 @@ describe("creator admission lifecycle", () => {
       ),
     ).resolves.toEqual({ kind: "not-found" });
     const noReviewerService = createCreatorAdmissionService({
+      ...dependencies,
       authorizationPolicy: { ...policy, platform: { reviewer: [], staff: [] } },
-      clock: () => new Date(),
-      createId: createUuidV7,
-      repository,
     });
     const applicant = await user();
     await service.saveDraft(draft, request(applicant, "draft-no-role-001"));

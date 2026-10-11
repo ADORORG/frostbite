@@ -50,6 +50,16 @@ export const creatorApplicationRoutes = Object.freeze({
     operationId: "reviewCreatorApplication",
     path: "/api/v1/creator-application/review",
   },
+  reviewQueue: {
+    method: "POST",
+    operationId: "listCreatorApplicationReviewQueue",
+    path: "/api/v1/creator-application/review-queue",
+  },
+  reviewRead: {
+    method: "POST",
+    operationId: "readCreatorApplicationForReview",
+    path: "/api/v1/creator-application/review-read",
+  },
   saveDraft: {
     method: "PUT",
     operationId: "saveCreatorApplicationDraft",

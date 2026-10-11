@@ -86,8 +86,11 @@ const declarations = [
 // What was sent, as plain text. Shown instead of the form once the application can no longer be edited.
 export function SentApplication({
   draft,
+  heading,
 }: {
   readonly draft: NonNullable<Application>["draft"];
+  // Whose words these are: "What you sent" to the applicant, "What the applicant sent" to a reviewer.
+  readonly heading: string;
 }) {
   const fields: readonly (readonly [string, string])[] = [
     ["Display name", draft.displayName],
@@ -97,8 +100,8 @@ export function SentApplication({
     ["Expected launch timing", draft.expectedLaunchTiming],
   ];
   return (
-    <section aria-label="What you sent" className="arcade-stack">
-      <h3>What you sent</h3>
+    <section aria-label={heading} className="arcade-stack">
+      <h3>{heading}</h3>
       <dl className="arcade-details">
         {fields.map(([term, value]) => (
           <div key={term}>

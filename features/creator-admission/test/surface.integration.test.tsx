@@ -11,36 +11,19 @@ import { CreatorApplicationSurface } from "../src/ui/creator-application-surface
 describe("creator admission surfaces", () => {
   it("renders a studio form without claiming project authority", () => {
     const markup = renderToStaticMarkup(
-      <CreatorApplicationSurface
-        application={null}
-        mode="studio"
-        unavailable={false}
-      />,
+      <CreatorApplicationSurface application={null} unavailable={false} />,
     );
     expect(markup).toContain("Apply to create");
     expect(markup).toContain("Save private draft");
     expect(markup).toContain("separate from project publication");
   });
 
-  it("keeps private review fields off the creator surface", () => {
-    const review = renderToStaticMarkup(
-      <CreatorApplicationSurface
-        application={null}
-        mode="review"
-        unavailable={false}
-      />,
-    );
+  it("keeps the reviewer's decision and private notes off the applicant's page", () => {
     const studio = renderToStaticMarkup(
-      <CreatorApplicationSurface
-        application={null}
-        mode="studio"
-        unavailable={false}
-      />,
+      <CreatorApplicationSurface application={null} unavailable={false} />,
     );
-    expect(review).toContain("Private reviewer notes");
     expect(studio).not.toContain("Private reviewer notes");
-    // Each audience gets its own page title.
-    expect(review).toContain("<h1>Review creator admission</h1>");
+    expect(studio).not.toContain("Record decision");
     expect(studio).toContain("<h1>Apply to create</h1>");
   });
 
@@ -67,17 +50,12 @@ describe("creator admission surfaces", () => {
       renderToStaticMarkup(
         <CreatorApplicationSurface
           application={application}
-          mode="studio"
           unavailable={false}
         />,
       ),
     ).toContain("Visible Creator");
     const degraded = renderToStaticMarkup(
-      <CreatorApplicationSurface
-        application={null}
-        mode="studio"
-        unavailable
-      />,
+      <CreatorApplicationSurface application={null} unavailable />,
     );
     expect(degraded).toContain("No state is being inferred");
     expect(degraded).not.toContain("Save private draft");
@@ -108,7 +86,6 @@ describe("creator application status", () => {
     renderToStaticMarkup(
       <CreatorApplicationSurface
         application={application}
-        mode="studio"
         unavailable={false}
       />,
     );
@@ -168,18 +145,11 @@ describe("creator application status", () => {
 });
 
 describe("creator admission page navigation", () => {
-  const surface = (mode: "review" | "studio") =>
-    renderToStaticMarkup(
-      <CreatorApplicationSurface
-        application={null}
-        mode={mode}
-        unavailable={false}
-      />,
+  it("leads an applicant back to the studio", () => {
+    const markup = renderToStaticMarkup(
+      <CreatorApplicationSurface application={null} unavailable={false} />,
     );
-
-  it("leads an applicant back to the studio, and offers a reviewer no way into it", () => {
-    expect(surface("studio")).toMatch(/href="\/studio"[^>]*>Back to studio/);
-    expect(surface("review")).not.toContain("Back to studio");
+    expect(markup).toMatch(/href="\/studio"[^>]*>Back to studio/);
   });
 
   it.each([
@@ -192,7 +162,6 @@ describe("creator admission page navigation", () => {
     const markup = renderToStaticMarkup(
       <CreatorApplicationSurface
         application={sent(state)}
-        mode="studio"
         unavailable={false}
       />,
     );
@@ -211,7 +180,6 @@ describe("what a reviewer wrote for the applicant", () => {
     renderToStaticMarkup(
       <CreatorApplicationSurface
         application={application}
-        mode="studio"
         unavailable={false}
       />,
     );
