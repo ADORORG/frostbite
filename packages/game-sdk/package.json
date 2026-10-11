@@ -1,0 +1,38 @@
+{
+  "name": "@ador/game-sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./build": "./src/build.ts",
+    "./client": "./src/client.ts",
+    "./conformance": "./src/conformance.ts",
+    "./host": "./src/host.ts",
+    "./local-backend": "./src/local-backend.ts",
+    "./policy": "./src/policy.ts",
+    "./protocol": "./src/protocol.ts"
+  },
+  "scripts": {
+    "env:check": "node --experimental-strip-types ../config/src/env/check-files.ts",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts --project unit",
+    "test:integration": "vitest run --config vitest.config.ts --project integration",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+  },
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/jsdom": "30.0.0",
+    "@types/node": "26.4.0",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "jsdom": "30.0.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}
