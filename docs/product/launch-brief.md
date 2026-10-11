@@ -1,6 +1,6 @@
 # Launch brief: pricing and phases live on the launch
 
-Status: draft for the product owner. Documents only; no code until D13, D14, D17 and D18 are accepted
+Status: draft; product owner answers recorded in section 7. Documents only; no code until D13, D14, D17 and D18 are accepted
 (Week 5 entry gate, `docs/milestones/launchpad-beta.md`). Nothing here fills in a gated decision; open
 choices are marked **Decide** with the options and a recommendation.
 
@@ -35,7 +35,7 @@ that a phase references.
 - `chain_id`, adapter family and version (copied from the collection; a launch cannot target another chain).
 - `supply_for_sale` (at most the collection's item count / planned supply), `reserve` (items kept back for
   the creator, counted against supply), per-wallet limit default.
-- `payment_asset` (**Decide D17**), `royalty_policy` (**Decide D18**), `proceeds_recipient` (a validated
+- `payment_asset` (D17: chosen per launch from an allowed list), `royalty_policy` (D18: fixed platform fee, creator royalty within a maximum), `proceeds_recipient` (a validated
   address on the launch chain, never free text, with step-up confirmation to change).
 - `contract_template` and version (reviewed template only; custom contracts need a separate review).
 - Locked: a hash over all of the above plus phases and the allowlist snapshot root, so the deployed contract
@@ -73,17 +73,24 @@ distinct states, as for minting (plan 8.6); a launch is never shown live from re
 - Public: launch detail (status, block height countdown, price, supply, progress, eligibility), reading the
   locked version, never the draft. Collection detail links to its launches.
 
-## 7. Decisions needed
+## 7. Product owner answers (2026-10-11)
 
-| #       | Decision                          | Options                                              | Recommendation                                                                                                   |
-| ------- | --------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| D17     | Payment asset                     | BTC only; frBTC; both per template                   | Per plan: BTC/frBTC first only after contract tests; one asset per launch, chosen from an allowed list in config |
-| D18     | Fees, proceeds, royalties         | Platform fee, creator proceeds split, royalty bounds | Versioned policy record with bounds; per-launch values within bounds; shown in the quote                         |
-| D16     | Phase timing                      | Block windows (accepted direction)                   | Block heights in the contract, estimated wall time in UI only                                                    |
-| D13/D14 | How art and content are published | Content-addressed flow per template                  | Not part of pricing; the launch only references the approved collection version                                  |
-| New     | Reserve and creator mint          | Reserve minted by creator wallet, or airdrop         | Count against supply; minted by the creator through the same contract path                                       |
-| New     | Price changes after lock          | Never; or new version before start                   | Never on a locked version; a new version supersedes before the first phase starts                                |
-| New     | Several launches per collection   | One at a time; or overlapping                        | One active launch per collection in beta, enforced in the database                                               |
+| #   | Question                  | Answer                                                                                                                                                                                                                                 |
+| --- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D17 | Payment asset             | The creator picks per launch, from a short allowed list kept in configuration. The list itself (which assets, and each one's contract tests) is still to be named.                                                                     |
+| D18 | Fees, proceeds, royalties | One fixed platform fee set by the platform; the creator sets their royalty up to a platform maximum. Both are a versioned policy record, shown to buyers in the quote, never hidden. The actual fee and maximum are still to be named. |
+| New | Creator's reserve         | The creator mints it like a buyer, through the same path; it counts against total supply.                                                                                                                                              |
+| New | Price after lock          | Never. A different price is a new version, reviewed again, made before the first phase starts.                                                                                                                                         |
+| New | Launches per collection   | One active launch at a time during beta, enforced in the database.                                                                                                                                                                     |
+| D16 | Phase timing              | Unchanged: contract block windows, estimated wall time in the UI only.                                                                                                                                                                 |
+
+Consequence of the D17 answer: the payment asset is a field of the launch version chosen from the allowed list,
+the allowed list is configuration validated at startup, and every asset on it needs its own contract tests
+before it can be listed (plan D17). Price is stored with the asset it is in.
+
+Still open before Week 5: the allowed payment assets, the platform fee value and the royalty maximum, and the
+formal records (D17 and D18 decision entries and linked ADRs) that the entry gate requires. These answers are
+inputs to those records, not a substitute for them.
 
 ## 8. Proposed task breakdown (after the gate)
 
