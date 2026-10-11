@@ -45,7 +45,9 @@ export function parseAuthSessionEnvironment(
 
 // The launch settings of the games, by game id. Blank means no game has a play address. In preview and
 // production a play host must be HTTPS, and a return address must be on the platform's own origin, because the
-// host will send a player there and it must never be a place an attacker can name.
+// host will send a player there and it must never be a place an attacker can name. A game is never played on
+// the platform's own origin, whatever its base path: a game is code the platform did not write, and on this
+// origin it could act with a signed-in player's session (D23: separate origin by default).
 export function parseGameLaunchEnvironment(
   source: NodeJS.ProcessEnv,
 ): Record<string, GameLaunchSettings> {
@@ -63,6 +65,10 @@ export function parseGameLaunchEnvironment(
   const strict = APP_ENV === "preview" || APP_ENV === "production";
   const platformOrigin = new URL(PUBLIC_BASE_URL).origin;
   for (const [id, setting] of Object.entries(settings)) {
+    if (setting.url === platformOrigin)
+      throw new Error(
+        `GAME_LAUNCHES: "${id}" cannot be played on the platform's own origin ${platformOrigin}; use another host.`,
+      );
     if (strict && !setting.url.startsWith("https://"))
       throw new Error(
         `GAME_LAUNCHES: the play host of "${id}" must use HTTPS.`,

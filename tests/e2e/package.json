@@ -10,7 +10,8 @@
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:e2e": "node --experimental-strip-types scripts/run-with-postgres.ts",
-    "stack": "node --experimental-strip-types scripts/manual-stack.ts"
+    "stack": "node --experimental-strip-types scripts/manual-stack.ts",
+    "audit:game": "node --experimental-strip-types scripts/audit-game.ts"
   },
   "devDependencies": {
     "@ador/database": "workspace:*",

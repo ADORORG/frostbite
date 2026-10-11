@@ -109,4 +109,19 @@ describe("GAME_LAUNCHES", () => {
       }),
     ).toThrow();
   });
+
+  it("never plays a game on the platform's own origin, with or without a base path", () => {
+    for (const setting of [
+      { url: "https://platform.example.com" },
+      { basePath: "/play/frostbite", url: "https://platform.example.com" },
+    ])
+      expect(() => parse(frostbite(setting))).toThrow("platform's own origin");
+    // A sibling host or another port is a different origin and is allowed.
+    expect(
+      parse(frostbite({ url: "https://games.platform.example.com" })),
+    ).toHaveProperty("frostbite");
+    expect(
+      parse(frostbite({ url: "https://platform.example.com:8443" })),
+    ).toHaveProperty("frostbite");
+  });
 });

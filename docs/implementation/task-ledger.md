@@ -153,7 +153,7 @@ stored in `references/task-list.md`.
 | ----- | --------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------- |
 | W8-01 | Implement the versioned game manifest, games catalog, and game detail feature                                         | completed | `references/games-catalog-task-record.md`                   |
 | W8-02 | Register Frostbite with configurable play URL, base path, return URL, and network                                     | completed | `references/frostbite-launch-task-record.md`                |
-| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | pending   | Depends on W8-02                                            |
+| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | completed | `references/game-hosting-task-record.md`                    |
 | W8-04 | Complete critical collector, creator, staff, transaction, game, and degradation E2E coverage                          | blocked   | Depends on Weeks 3 through 7                                |
 | W8-05 | Complete all-route visual, accessibility, responsive, keyboard, and state matrices                                    | blocked   | Depends on all route families                               |
 | W8-06 | Add rate limits, security headers, health checks, dashboards, and alerts                                              | pending   | Depends on deployment configuration                         |

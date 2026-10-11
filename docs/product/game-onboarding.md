@@ -53,9 +53,11 @@ game id) in the environment; the same build then serves any hosting style:
 }
 ```
 
-- `url`: the host only, no path or trailing slash. The play address is the host plus the base path.
-- `basePath`: blank when the game has the whole host (subdomain style); `/play/my-game` when it is served from a
-  path of a host (domain-path style). Safe segments only, no trailing slash.
+- `url`: the host only, no path or trailing slash. The play address is the host plus the base path. It must
+  not be the platform's own origin: a game is code the platform did not write and must not run beside a
+  signed-in player's session. Use a separate host (for example `games.example.com`).
+- `basePath`: blank when the game has the whole host (subdomain style, `frostbite.example.com`); `/frostbite`
+  when it is served from a path of a games host (domain-path style, `games.example.com/frostbite`). Safe segments only, no trailing slash.
 - `returnUrl`: where the game sends the player back to; must be on `PUBLIC_BASE_URL`'s origin. Blank means the
   platform's own page for the game.
 - `network`: optional chain reference; must be a chain the platform is configured for.
@@ -64,6 +66,26 @@ game id) in the environment; the same build then serves any hosting style:
 
 Adding a game never adds an environment key: it adds an entry to this value. A worked example with every field is the test fixture
 `features/games/test/support/template-game.ts`; the real first game is `configs/games/frostbite.ts`.
+
+## Hosting styles and how they are verified
+
+A game can be hosted two ways, from the same build:
+
+- **Subdomain style:** the game has a host to itself (`frostbite.example.com`), base path blank.
+- **Domain-path style:** several games share one games host, each under its own path
+  (`games.example.com/frostbite`), base path `/frostbite`. Never the platform's own origin.
+
+One build works in both only if the game names every file relative to its own page (`main.js`, `data/levels.json`)
+and never from the root of the host (`/main.js`, `fetch("/api/run")`). Verification, task W8-03:
+
+- `tests/e2e/tests/game-hosting.spec.ts` serves a fixture game both ways in a real browser: its script runs, its
+  data loads, its stylesheet and image apply, and no request fails. A second fixture that names files from the
+  root works with a host to itself and fails under a base path, so the passing runs prove something.
+- `pnpm --filter @repo/e2e audit:game -- <game folder>` screens a real game's files for root addresses and lists
+  the other hosts it loads from. Run it on every game before listing; a root address must be fixed or made
+  configurable. It is a screen, not a proof: an address built at run time is not seen.
+- Isolation: with path style every game on the host shares one origin (browser storage and cookies), so games
+  could read each other's data. Prefer one host per game (subdomain style) for games that keep anything private.
 
 ## What the platform guarantees about a listed game
 
