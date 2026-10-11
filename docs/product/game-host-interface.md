@@ -96,10 +96,15 @@ Answered:
 - **First verified level:** explore replaying a recorded run on the platform's server (the game must be
   deterministic). Self-reported stays until then.
 
+Answered in a second round:
+
+- **Milestones per game:** up to 64 (typed policy, configurable).
+- **"Differ a lot" for the merge:** the two saves disagree on any milestone, or the older save has more progress
+  by the game's own measure; otherwise the newer save wins quietly.
+- **Frame permissions:** full-screen, audio and keyboard or gamepad input, and nothing else (no camera,
+  microphone, location or file access).
+- **Build first:** the SDK, the isolated frame and a simulated test game, before touching FROST·BITE.
+
 Still open:
 
-- How many milestones a game may declare (typed policy; suggest 64, the current manifest limit).
-- What counts as "differ a lot" for the merge question (suggest: the two saves disagree on any milestone-bearing
-  field, or the older one has more progress by the game's own measure).
-- Whether the frame may go full-screen, and which permissions (audio, input) a game may request.
 - The shape of a deterministic run record for replay verification (a spike with the first game).
