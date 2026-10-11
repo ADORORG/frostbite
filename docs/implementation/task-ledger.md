@@ -101,13 +101,13 @@ stored in `references/task-list.md`.
 
 ## UX — Journey rework (before preview)
 
-| ID   | Task                                                                                  | Status    | Evidence or blocker                                                                         |
-| ---- | ------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| UX-1 | Walk every role, record the problems, and write the intended journeys                 | completed | `docs/product/journeys.md`; findings Q1-Q13                                                 |
-| UX-2 | Fix flow and data bugs; split overview, create, and detail pages for each feature     | completed | `references/studio-flow-task-record.md`; converged, see its review table                    |
-| UX-3 | Area-aware navigation, sidebars, breadcrumbs, account menu, responsive wizard stepper | completed | `references/studio-navigation-task-record.md`; converged with UX-2 (same review)            |
-| UX-4 | Layout and density: content widths, desktop columns, design tokens                    | pending   | Depends on UX-3                                                                             |
-| UX-5 | Click-only journey tests for every role plus desktop and mobile baselines             | pending   | Depends on UX-2 through UX-4; preview waits for this and a manual walk by the product owner |
+| ID   | Task                                                                                  | Status    | Evidence or blocker                                                                           |
+| ---- | ------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------- |
+| UX-1 | Walk every role, record the problems, and write the intended journeys                 | completed | `docs/product/journeys.md`; findings Q1-Q13                                                   |
+| UX-2 | Fix flow and data bugs; split overview, create, and detail pages for each feature     | completed | `references/studio-flow-task-record.md`; converged, see its review table                      |
+| UX-3 | Area-aware navigation, sidebars, breadcrumbs, account menu, responsive wizard stepper | completed | `references/studio-navigation-task-record.md`; converged with UX-2 (same review)              |
+| UX-4 | Layout and density: content widths, desktop columns, design tokens                    | completed | `references/studio-layout-task-record.md` (with the narrow-screen gap fix)                    |
+| UX-5 | Click-only journey tests for every role plus desktop and mobile baselines             | completed | `references/journey-e2e-task-record.md`; preview waits for a manual walk by the product owner |
 
 ## Week 5 — Launch phases and allowlists
 

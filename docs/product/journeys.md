@@ -64,3 +64,9 @@ Admin home shows what they can see; review actions are absent, not refused.
 ## Visitor
 
 Home → Collections → collection detail; Games; Sign in.
+
+## How the journeys are checked
+
+`tests/e2e/tests/journeys.spec.ts` follows one journey per kind of person (visitor, applicant, approved creator,
+reviewer, staff) from the home page by clicking only: after the first load, typing an address fails the test.
+Every viewport runs them; desktop and mobile keep a picture of the top bar with the account menu open.
