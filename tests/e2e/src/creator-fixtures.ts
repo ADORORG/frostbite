@@ -150,6 +150,12 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-import-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000068",
   },
+  // The Week 4 internal-alpha acceptance journey: one creator who does everything in the browser.
+  alphaCreator: {
+    sessionId: "01994b10-0000-7000-8000-00000000006b",
+    sessionToken: "e2e-alpha-creator-session-token",
+    userId: "01994b10-0000-7000-8000-00000000006a",
+  },
   // An applicant a reviewer has asked for changes (UX: the reviewer's message is shown to them).
   applicantFeedback: {
     sessionId: "01994b10-0000-7000-8000-000000000063",
@@ -173,6 +179,7 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionInlineCreator,
   creatorE2EFixtures.collectionBulkCreator,
   creatorE2EFixtures.collectionImportCreator,
+  creatorE2EFixtures.alphaCreator,
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,
   creatorE2EFixtures.reviewQualityCreator,

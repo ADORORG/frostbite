@@ -26,8 +26,8 @@ same change. Never infer completion from a commit, passing test, or partially de
 
 | Field                   | Value                                                               |
 | ----------------------- | ------------------------------------------------------------------- |
-| Active task             | None (`W4-06` completed)                                            |
-| Next ordered task       | `W4-07` Complete the internal-alpha workflow and acceptance gate    |
+| Active task             | None (`W4-07` completed)                                            |
+| Next ordered task       | Week 5 entry gate: D13, D14, D17, D18 decision records and ADRs     |
 | Current milestone phase | Week 3 closed; Week 4 — Collection and creator workflow             |
 | Parallel security gate  | `SEC-D15-04` remains blocked                                        |
 | Mainnet                 | Outside this milestone and blocked by a separate readiness decision |
@@ -97,7 +97,7 @@ stored in `references/task-list.md`.
 | W4-04  | Enforce no self-approval and approval/revocation concurrency invariants                   | completed | `references/review-invariants-task-record.md`       |
 | W4-05  | Build approved public collection list and detail pages                                    | completed | `references/public-collections-task-record.md`      |
 | W4-06  | Add creator/staff audit visibility                                                        | completed | `references/audit-visibility-task-record.md`        |
-| W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | pending   | Depends on W4-01 through W4-06                      |
+| W4-07  | Complete the internal-alpha end-to-end workflow and acceptance gate                       | completed | `references/alpha-acceptance-task-record.md`        |
 
 ## UX — Journey rework (before preview)
 
