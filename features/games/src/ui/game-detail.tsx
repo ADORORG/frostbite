@@ -44,7 +44,7 @@ export function GameDetail({
             <ArcadeButton href={game.playUrl} tone="mint">
               {`Play ${game.title}`}
             </ArcadeButton>
-            <p>It opens on the game's own address, not on this site.</p>
+            <p>{`It opens at ${new URL(game.playUrl).host}, not on this site.`}</p>
           </>
         )}
       </ArcadePanel>

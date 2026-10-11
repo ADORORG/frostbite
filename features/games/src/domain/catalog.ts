@@ -2,6 +2,7 @@ import type { ChainOption } from "@ador/shared/chain";
 import {
   gameIdSchema,
   gameManifestHash,
+  gamePlayAddress,
   type GameCapability,
   type GameManifest,
   type GameMilestone,
@@ -63,7 +64,7 @@ export function createGameCatalog(
     networkLabel:
       chains.find(({ chainId }) => chainId === game.network)?.displayName ??
       game.network,
-    playUrl: game.launch.url,
+    playUrl: gamePlayAddress(game.launch),
     summary: game.summary,
     title: game.title,
     version: game.version,

@@ -21,7 +21,7 @@ export const myGame = defineGame({
   description: "A longer text for the game's page.",
   version: "0.1.0", // the game's own release version
   network: "bip122:00000008819873e925422c1ff0f99f7c", // the chain its on-chain actions use (must be configured)
-  launch: { mode: "external", url: "https://play.example.com/my-game" }, // null = registered, not playable yet
+  launch: { mode: "external", url: null, basePath: "", returnUrl: null }, // no host = registered, not playable yet
   capabilities: ["wallet", "run:submit"], // what it will ask the host for; declarations only for now
   milestones: [
     {
@@ -35,7 +35,34 @@ export const myGame = defineGame({
 });
 ```
 
-Then add `myGame` to the list in `configs/games.ts`. A worked example with every field is the test fixture
+Then add `myGame` to the list in `configs/games.ts`.
+
+## Where a game is played (deployment configuration)
+
+A deployment, not the manifest, says where each game is played. Set `GAME_LAUNCHES` (one JSON value, keyed by
+game id) in the environment; the same build then serves any hosting style:
+
+```json
+{
+  "my-game": {
+    "url": "https://play.example.com",
+    "basePath": "",
+    "returnUrl": "https://example.com/games/my-game",
+    "network": "bip122:00000008819873e925422c1ff0f99f7c"
+  }
+}
+```
+
+- `url`: the host only, no path or trailing slash. The play address is the host plus the base path.
+- `basePath`: blank when the game has the whole host (subdomain style); `/play/my-game` when it is served from a
+  path of a host (domain-path style). Safe segments only, no trailing slash.
+- `returnUrl`: where the game sends the player back to; must be on `PUBLIC_BASE_URL`'s origin. Blank means the
+  platform's own page for the game.
+- `network`: optional chain reference; must be a chain the platform is configured for.
+- Preview and production require an HTTPS host. A setting that names a game that is not registered, a bad value,
+  or a chain that is not configured stops the platform from starting. Blank lists every game as not playable.
+
+Adding a game never adds an environment key: it adds an entry to this value. A worked example with every field is the test fixture
 `features/games/test/support/template-game.ts`; the real first game is `configs/games/frostbite.ts`.
 
 ## What the platform guarantees about a listed game
@@ -58,7 +85,7 @@ bounded (see `gameManifestLimits`); the network is a valid chain reference. Prod
 1. Write the manifest and add it to `configs/games.ts`; run `pnpm typecheck` and the games feature tests.
 2. Start the local stack (`pnpm stack`) and open `/games` and `/games/<id>`: the card, the state, the milestones
    as declared.
-3. Set the game's play address (null until W8-02 makes it configurable) to play it from the page.
+3. Set `GAME_LAUNCHES` for the game (for local use, `http://localhost:<port>` is allowed) to play it from the page.
 
 ## What "milestones minted to a player's account" still needs
 

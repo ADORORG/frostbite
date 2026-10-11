@@ -30,7 +30,8 @@ The platform core is not edited to add a game.
 ## Dependencies and configuration
 
 Depends on plugin contracts, `@ador/shared` (manifest schema, chain options), and shared UI. It reads no
-environment value; a game's play address is part of its manifest, supplied by the platform's configuration.
+environment value; where a game is played is supplied by the platform's configuration (`GAME_LAUNCHES`, applied
+in `configs/games.ts`) before the manifests reach the feature.
 
 ## Verification
 

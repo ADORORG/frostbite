@@ -41,6 +41,12 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
   await expect(
     page.getByText("does not ask the platform for anything"),
   ).toBeVisible();
+  // The digest changes whenever the manifest does, which is its job; the baseline is of the layout.
+  await page
+    .getByText(/^Declarations digest:/u)
+    .evaluate(
+      (node) => (node.textContent = "Declarations digest: 0000000000000000"),
+    );
   await skipToMain(page);
   await closeMatrix(page, "game-detail.png");
 });

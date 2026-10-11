@@ -52,7 +52,9 @@ describe("a game's page", () => {
     expect(markup).toContain("Version 0.3.0");
     expect(markup).toContain('href="https://play.example.test/template"');
     expect(markup).toContain("Play Template game");
-    expect(markup).toContain("opens on the game&#x27;s own address");
+    expect(markup).toContain(
+      "It opens at play.example.test, not on this site.",
+    );
     expect(markup).toContain("Connect the player&#x27;s wallet");
     expect(markup).toContain("These are requests only");
     expect(markup).toContain("First level");

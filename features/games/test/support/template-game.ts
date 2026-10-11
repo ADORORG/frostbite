@@ -19,7 +19,12 @@ export const templateGame = defineGame({
   capabilities: ["wallet", "run:submit"],
   description: "A game written from the template.",
   id: "template-game",
-  launch: { mode: "external", url: "https://play.example.test/template" },
+  launch: {
+    basePath: "/template",
+    mode: "external",
+    returnUrl: null,
+    url: "https://play.example.test",
+  },
   milestones: [
     {
       claimPolicy: "once",
@@ -48,7 +53,7 @@ export const bareGame = defineGame({
   capabilities: [],
   description: "",
   id: "bare-game",
-  launch: { mode: "external", url: null },
+  launch: { basePath: "", mode: "external", returnUrl: null, url: null },
   milestones: [],
   network: "eip155:1",
   schemaVersion: 1,

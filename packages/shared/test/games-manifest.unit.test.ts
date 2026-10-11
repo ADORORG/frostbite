@@ -19,11 +19,23 @@ const milestone = {
   id: "first-clear",
   title: "First clear",
 } as const;
+const launch = (overrides: object = {}) => ({
+  basePath: "",
+  mode: "external",
+  returnUrl: null,
+  url: "https://play.example.test",
+  ...overrides,
+});
 const manifest = (overrides: Partial<GameManifest> = {}): GameManifest => ({
   capabilities: ["wallet"],
   description: "A longer description.",
   id: "sample-game",
-  launch: { mode: "external", url: "https://play.example.test/sample" },
+  launch: {
+    basePath: "",
+    mode: "external",
+    returnUrl: null,
+    url: "https://play.example.test",
+  },
   milestones: [milestone],
   network: chain,
   schemaVersion: 1,
@@ -70,25 +82,24 @@ describe("a game manifest", () => {
       gameManifestSchema.safeParse(
         manifest({
           capabilities: [],
-          launch: { mode: "external", url: null },
+          launch: {
+            basePath: "",
+            mode: "external",
+            returnUrl: null,
+            url: null,
+          },
           milestones: [],
         }),
       ).success,
     ).toBe(true);
   });
 
-  it.each([
+  it.each<[string, object]>([
     ["an unknown field", { extra: 1 }],
     ["another schema version", { schemaVersion: 2 }],
-    [
-      "a script address",
-      { launch: { mode: "external", url: "javascript:alert(1)" } },
-    ],
-    [
-      "a file address",
-      { launch: { mode: "external", url: "file:///etc/passwd" } },
-    ],
-    ["another launch mode", { launch: { mode: "embedded", url: null } }],
+    ["a script address", { launch: launch({ url: "javascript:alert(1)" }) }],
+    ["a file address", { launch: launch({ url: "file:///etc/passwd" }) }],
+    ["another launch mode", { launch: launch({ mode: "embedded" }) }],
     ["a capability that does not exist", { capabilities: ["root"] }],
     ["a capability twice", { capabilities: ["wallet", "wallet"] }],
     ["two milestones with one id", { milestones: [milestone, milestone] }],
@@ -166,7 +177,14 @@ describe("the declarations digest", () => {
     ["a milestone", { milestones: [{ ...milestone, criteria: "Different." }] }],
     [
       "the play address",
-      { launch: { mode: "external", url: "https://other.example.test/" } },
+      {
+        launch: {
+          basePath: "",
+          mode: "external",
+          returnUrl: null,
+          url: "https://other.example.test",
+        },
+      },
     ],
     ["a capability", { capabilities: [] }],
     ["the version", { version: "1.2.4" }],

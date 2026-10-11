@@ -107,3 +107,10 @@ Procedure and rationale: `providers/object-storage/r2/README.md`.
 - No deployment configuration or pipeline exists (W8).
 - SUBFROST chain access is not wired.
 - Runbooks for auth and upload failures are still to be written (W8-07); they will live in this folder.
+
+## Games
+
+- [ ] Set `GAME_LAUNCHES` per environment (it is optional; blank lists every game as not playable): the play host
+      (HTTPS in preview and production, no path), the base path (blank for a subdomain, `/play/<id>` for a path of
+      a domain), the return address (on `PUBLIC_BASE_URL`'s origin) and the network. See
+      `docs/product/game-onboarding.md`. A bad value stops the web service at start, so check the deploy logs.

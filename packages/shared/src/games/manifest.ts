@@ -55,12 +55,37 @@ export const gameMilestoneSchema = z
   })
   .strict();
 
-// How a player reaches the game. `external`: the game runs on its own address. A null address means the
-// game is registered but has no play address configured, and is shown as not playable.
+const webUrlSchema = z.url({ protocol: /^https?$/u });
+
+// A host with no path, query or fragment: `https://play.example.com` or `https://example.com:8443`. Where a
+// game lives under that host is its base path, so the two cannot be confused or smuggle a query.
+export const gameOriginSchema = webUrlSchema.refine(
+  // A value that is not a URL at all has already failed the check above, and must not throw here.
+  (value) => URL.canParse(value) && new URL(value).origin === value,
+  {
+    message:
+      "Give the address of the host only, with no path or trailing slash.",
+  },
+);
+
+// Where a game lives under its host: nothing (the game has the whole host, the default way), or one or more
+// safe path segments (`/play/frostbite`) for a game served from a path of the platform's own domain. No
+// trailing slash, no empty, `.` or `..` segment.
+export const gameBasePathSchema = z
+  .string()
+  .max(128)
+  .regex(/^(?:\/[a-z0-9]+(?:[._~-][a-z0-9]+)*)*$/u);
+
+// How a player reaches the game. `external`: the game runs on its own address, which is the host (`url`) plus
+// its base path. A null host means the game is registered but has no play address configured, and is shown
+// as not playable. `returnUrl` is where the game sends the player back to; null means the platform's own page
+// for the game.
 export const gameLaunchSchema = z
   .object({
+    basePath: gameBasePathSchema,
     mode: z.literal("external"),
-    url: z.url({ protocol: /^https?$/u }).nullable(),
+    returnUrl: webUrlSchema.nullable(),
+    url: gameOriginSchema.nullable(),
   })
   .strict();
 
@@ -121,4 +146,58 @@ export function defineGames(
 // version of a game's declarations, so a milestone or a launch address cannot change under the same hash.
 export function gameManifestHash(manifest: GameManifest): string {
   return requestFingerprint(gameManifestSchema.parse(manifest));
+}
+
+// The address a player is sent to, or null when the game has no host configured.
+export function gamePlayAddress(launch: GameManifest["launch"]): string | null {
+  return launch.url === null
+    ? null
+    : new URL(launch.basePath === "" ? "/" : launch.basePath, launch.url).href;
+}
+
+// What a deployment may set about a game, without editing its manifest: where it is served, where it sends
+// the player back to, and which chain it uses there. Keyed by game identifier in the platform's configuration.
+export const gameLaunchSettingsSchema = z
+  .object({
+    basePath: gameBasePathSchema.default(""),
+    network: chainRefTextSchema.optional(),
+    returnUrl: webUrlSchema.nullable().default(null),
+    url: gameOriginSchema,
+  })
+  .strict();
+
+export const gameLaunchSettingsMapSchema = z.record(
+  gameIdSchema,
+  gameLaunchSettingsSchema,
+);
+
+export type GameLaunchSettings = z.infer<typeof gameLaunchSettingsSchema>;
+
+// The games with a deployment's launch settings applied. A setting for a game that is not registered is an
+// error, so a misspelt identifier fails when the platform starts instead of leaving a game quietly unplayable.
+export function applyGameLaunchSettings(
+  games: readonly GameManifest[],
+  settings: Readonly<Record<string, GameLaunchSettings>>,
+): GameManifest[] {
+  const known = new Set(games.map(({ id }) => id));
+  for (const id of Object.keys(settings))
+    if (!known.has(id))
+      throw new Error(
+        `Launch settings name a game that is not registered: "${id}".`,
+      );
+  return games.map((game) => {
+    const setting = settings[game.id];
+    return setting === undefined
+      ? game
+      : {
+          ...game,
+          launch: {
+            basePath: setting.basePath,
+            mode: "external",
+            returnUrl: setting.returnUrl,
+            url: setting.url,
+          },
+          network: setting.network ?? game.network,
+        };
+  });
 }

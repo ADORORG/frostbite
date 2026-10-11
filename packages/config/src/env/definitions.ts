@@ -198,6 +198,14 @@ export const environmentDefinitions = [
     required: true,
     secret: false,
   },
+  {
+    key: "GAME_LAUNCHES",
+    description:
+      "JSON object keyed by game id with each game's play host, base path, return address and network; blank lists every game as not playable.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
 ] as const satisfies readonly EnvironmentDefinition[];
 
 export const environmentKeys = environmentDefinitions.map(({ key }) => key);
