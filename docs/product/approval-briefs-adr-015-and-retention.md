@@ -151,3 +151,18 @@ follow_up:
   - "add values to the typed upload policy"
   - "sweep for refused originals; creator delete with reference check; asset hold"
 ```
+
+---
+
+## Owner answers (2026-10-11 survey)
+
+Inputs, not acceptance: the records still need the owner's name and date.
+
+- **ADR-015:** approve as proposed.
+- **R1 refused originals:** 30 days, then deleted and recorded.
+- **R2 unused processed originals:** kept; the creator can delete by hand, refused while anything uses the image.
+- **R3:** kept while a submission exists (as recommended, not asked).
+- **R4 upload-attempt rows:** kept during beta; revisit before public launch. The unused `retain_until` still
+  needs a job or removal so it stops implying a purge.
+- **R6 legal hold:** only platform admins, with a recorded reason.
+- **R5 account closure:** still to be defined with the privacy owner.

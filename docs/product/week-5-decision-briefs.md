@@ -10,6 +10,36 @@ How to read the tags: **Built** is what the code already does. **Input** is some
 said. **Open** needs an owner decision. **Evidence** is what must exist before the record can be accepted.
 Where a chain mechanism is not yet proven, this document says so rather than assuming it.
 
+## Owner answers (2026-10-11 survey)
+
+These are inputs to the records below, not acceptance: each decision still needs the owner's name, a date, an
+ADR and its evidence.
+
+| Decision                     | Answer                                                                                                                                                                                                                                              |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D14 content                  | **Generated art is in the beta**, alongside uploaded images ("both"). It must be built as a clean, maintainable adapter pattern: see `docs/product/generated-art-brief.md`. This replaces the recommendation of fixed items only.                   |
+| D14 reveal                   | Hidden until a reveal date (delayed reveal). Needs a commit-and-reveal design (below).                                                                                                                                                              |
+| D14 maximum beta supply      | 1,000 items per collection, configurable (the engineering limit stays 10,000).                                                                                                                                                                      |
+| D13 publication              | Depends on the chain family. Alkanes: the art goes on the chain itself, very small, including art composed from a light HTML/script. EVM chains: files in our storage, Arweave or IPFS. One strategy per chain family behind `PublicationStrategy`. |
+| D13 authorizer and fee payer | The creator, from their own wallet.                                                                                                                                                                                                                 |
+| D13 failure                  | Stop, show exactly what was and was not published, retry safely and idempotently.                                                                                                                                                                   |
+| D17 payment                  | Each chain's native coin **and** a selected token on each chain. The allowed list is configuration, one entry per asset, each needing its own tests.                                                                                                |
+| D17 overpayment              | Refused; exact price only.                                                                                                                                                                                                                          |
+| D18 platform fee             | 2.5% (250 basis points) of the primary sale; a starting value, changeable by versioned policy.                                                                                                                                                      |
+| D18 royalties                | Recorded, not enforced, shown as such; maximum 10% (1,000 basis points).                                                                                                                                                                            |
+
+Still open: the platform recipient address, the minimum price per asset, the selected token for each chain, the
+reveal date mechanism details, and the owner name and date on each record.
+
+Consequences worth seeing now:
+
+- **Reveal plus on-chain art.** Delayed reveal means the art must not be public before the reveal. For art
+  written on chain that is a contradiction unless the written content is committed (hash) first and revealed
+  later, or the reveal happens by publishing at reveal time. The reveal design must pick one before D13 can be
+  accepted for Alkanes.
+- **Generated art is untrusted code.** It is reviewed as code, rendered in a sandbox, and size-limited. That is
+  the largest addition to the beta; see the generated-art brief for the pattern and the scope risk.
+
 ## Order and dependencies
 
 D14 (what a collection's content is) constrains D13 (how that content is published), which constrains D17
