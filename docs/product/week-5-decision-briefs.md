@@ -28,8 +28,24 @@ ADR and its evidence.
 | D18 platform fee             | 2.5% (250 basis points) of the primary sale; a starting value, changeable by versioned policy.                                                                                                                                                      |
 | D18 royalties                | Recorded, not enforced, shown as such; maximum 10% (1,000 basis points).                                                                                                                                                                            |
 
-Still open: the platform recipient address, the minimum price per asset, the selected token for each chain, the
-reveal date mechanism details, and the owner name and date on each record.
+Values still to be supplied are **configuration, not code** (owner direction, 2026-10-11). Each is a typed,
+versioned or environment-validated setting that the application reads at startup and refuses to start without;
+none is a constant in source, and changing one never needs a release of product code:
+
+| Value                                                                     | Where it lives                                                                              | Notes                                                  |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Platform fee (250 bps), royalty maximum (1,000 bps)                       | Versioned fee policy record; a launch version stores the policy version it was made under   | Changing policy never changes a locked launch          |
+| Platform recipient address                                                | Per-environment validated configuration, one validated address per chain                    | Never free text; change needs step-up confirmation     |
+| Allowed payment assets, selected token per chain, minimum price per asset | Payment-asset configuration, one entry per asset (chain, asset id, decimals, minimum price) | An entry is only enabled after its contract tests pass |
+| Byte limits for on-chain and stored art, per chain family                 | Publication configuration, set from the D13 spike's measurements                            | Refused over the limit, with a clear message           |
+| Maximum items per collection (1,000)                                      | Collection policy, below the engineering limit of 10,000                                    | Product quota, not a schema limit                      |
+| Refused-original retention (30 days) and legal-hold rule                  | Typed upload retention policy                                                               | See the approval briefs                                |
+| Reveal timing                                                             | Per-launch setting within the allowed reveal modes                                          | Mechanism still to be designed                         |
+
+So these are no longer blockers for building: engineering builds the configuration shape and its validation now,
+and the owner fills values per environment. A decision still needs its record accepted (name, date, ADR,
+evidence) before the gated behaviour ships. The reveal design, the token for each chain and the owner names
+remain to be decided.
 
 Consequences worth seeing now:
 
