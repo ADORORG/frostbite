@@ -66,6 +66,26 @@ describe("creator review detail", () => {
     ).toBe("Back to the queue");
   });
 
+  it("lays what was sent and its history beside the decision, with each heading close to its content", async () => {
+    const application = detail({ state: "submitted" });
+    const read = vi
+      .fn<CreatorReviewApi["read"]>()
+      .mockResolvedValue({ application });
+    const container = await show(read, application.applicationId);
+    const columns = container.querySelector(".arcade-columns");
+    if (columns === null) throw new Error("Expected the two-column layout");
+    const [main, side] = [...columns.children];
+    expect(main?.textContent).toContain("What the applicant sent");
+    expect(main?.textContent).toContain("History");
+    expect(side?.querySelector("form")).not.toBeNull();
+    // A heading and its content share one tight stack, so no gap opens between them on a narrow screen.
+    for (const name of ["What the applicant sent", "History"]) {
+      expect(
+        container.querySelector(`section[aria-label="${name}"]`)?.className,
+      ).toContain("arcade-stack--tight");
+    }
+  });
+
   it("offers only the decisions the application's state allows", async () => {
     const application = detail({ state: "submitted" });
     const read = vi

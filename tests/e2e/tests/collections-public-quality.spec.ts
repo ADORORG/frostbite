@@ -2,7 +2,7 @@ import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 import { publicCollection } from "../src/creator-fixtures.ts";
-import { closeMatrix, skipToMain } from "./support/quality.ts";
+import { closeMatrix, loadFonts, skipToMain } from "./support/quality.ts";
 
 // Layout, keyboard, reduced-motion, accessibility, and visual coverage of the public collection pages
 // on every viewport project. The detail page is checked in full for the seeded approved collection
@@ -49,6 +49,15 @@ test("the public collection list closes the experience-quality matrix", async ({
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(results.violations).toEqual([]);
+  // The baseline is of this card alone. Other specs publish collections too, and a card beside others sits at
+  // a fractional offset, which moves its border by a pixel; so the other cards are taken out of the layout.
+  await card.evaluate((own) => {
+    const item = own.closest("li");
+    for (const other of item?.parentElement?.children ?? []) {
+      if (other !== item) other.setAttribute("hidden", "");
+    }
+  });
+  await loadFonts(page);
   await expect(card).toHaveScreenshot("public-collection-card.png", {
     animations: "disabled",
   });

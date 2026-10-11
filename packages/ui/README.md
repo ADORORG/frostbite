@@ -33,6 +33,12 @@ Consumers compose these exports and must not copy their CSS or use raw brand col
 describe view state only; the caller remains responsible for deriving truthful state from its
 authoritative domain model.
 
+## Layout helpers
+
+`arcade-stack` spaces separate blocks; add `arcade-stack--tight` when a heading sits over the content it
+introduces (it also removes the heading's and list's own margins, which would otherwise add to the gap in a
+grid). `arcade-columns` puts a main block and a side block beside each other from 64rem and stacks them below it.
+
 ## Dependencies and configuration
 
 The package depends only on React and React DOM. Font variables are supplied by the delivery

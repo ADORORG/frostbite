@@ -4,12 +4,7 @@ import {
   creatorApplicationStateLabels,
   creatorReviewPath,
 } from "@ador/shared/creator-admission";
-import {
-  ArcadeActionButton,
-  ArcadeButton,
-  ArcadePanel,
-  StatusLamp,
-} from "@repo/ui/arcade";
+import { ArcadeActionButton, ArcadeButton, StatusLamp } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import {
@@ -40,10 +35,7 @@ export function ReviewDetail({
   const loaded =
     state.status === "loading" ? null : (state.data?.application ?? null);
   return (
-    <ArcadePanel
-      eyebrow="Application"
-      title={loaded?.snapshot.displayName ?? "Application"}
-    >
+    <div className="arcade-stack">
       {state.status === "loading" ? (
         <StatusLamp label="Loading the application…" tone="attention" />
       ) : null}
@@ -61,24 +53,34 @@ export function ReviewDetail({
       ) : null}
       {loaded === null ? null : (
         <>
-          <StatusLamp
-            label={`Status: ${creatorApplicationStateLabels[loaded.state]}, submission ${loaded.submissionNumber}`}
-            tone="attention"
-          />
-          <SentApplication
-            draft={loaded.snapshot}
-            heading="What the applicant sent"
-          />
-          <ReviewerForm
-            applicationId={loaded.applicationId}
-            key={loaded.state}
-            onDecided={detail.reload}
-            state={loaded.state}
-          />
-          <section aria-label="History" className="arcade-stack">
-            <h3>History</h3>
-            <History events={loaded.events} />
-          </section>
+          <header className="arcade-stack arcade-stack--tight">
+            <h2>{loaded.snapshot.displayName}</h2>
+            <StatusLamp
+              label={`Status: ${creatorApplicationStateLabels[loaded.state]}, submission ${loaded.submissionNumber}`}
+              tone="attention"
+            />
+          </header>
+          <div className="arcade-columns">
+            <div className="arcade-stack">
+              <SentApplication
+                draft={loaded.snapshot}
+                heading="What the applicant sent"
+              />
+              <section
+                aria-label="History"
+                className="arcade-stack arcade-stack--tight"
+              >
+                <h3>History</h3>
+                <History events={loaded.events} />
+              </section>
+            </div>
+            <ReviewerForm
+              applicationId={loaded.applicationId}
+              key={loaded.state}
+              onDecided={detail.reload}
+              state={loaded.state}
+            />
+          </div>
         </>
       )}
       <div className="arcade-actions">
@@ -86,6 +88,6 @@ export function ReviewDetail({
           Back to the queue
         </ArcadeButton>
       </div>
-    </ArcadePanel>
+    </div>
   );
 }

@@ -185,3 +185,24 @@
   display: grid;
   gap: calc(var(--arcade-space-medium) * 2);
 }
+/* A heading and the content it introduces: close together, unlike separate blocks. The gap is the only
+   space between them; the margins of a heading or list would add to it in a grid. */
+.arcade-stack--tight {
+  gap: var(--arcade-space-medium);
+}
+.arcade-stack--tight > :is(h2, h3, ol, ul) {
+  margin: 0;
+}
+
+/* A main block and a block beside it (what was sent, and the decision about it). One column until there is
+   room for two; the side block never gets less than it needs. */
+.arcade-columns {
+  display: grid;
+  gap: calc(var(--arcade-space-medium) * 2);
+}
+@media (min-width: 64rem) {
+  .arcade-columns {
+    grid-template-columns: minmax(0, 3fr) minmax(24rem, 2fr);
+    align-items: start;
+  }
+}

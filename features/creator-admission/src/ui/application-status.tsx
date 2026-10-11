@@ -100,7 +100,7 @@ export function SentApplication({
     ["Expected launch timing", draft.expectedLaunchTiming],
   ];
   return (
-    <section aria-label={heading} className="arcade-stack">
+    <section aria-label={heading} className="arcade-stack arcade-stack--tight">
       <h3>{heading}</h3>
       <dl className="arcade-details">
         {fields.map(([term, value]) => (
