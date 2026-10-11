@@ -77,6 +77,7 @@ export const seedAsset = (
   userId: string,
   purpose: UploadPurpose,
   state?: SeededAssetState,
-) => seedUploadedAsset(database, { now, purpose, state, userId });
+  fileName?: string,
+) => seedUploadedAsset(database, { fileName, now, purpose, state, userId });
 
 export const approvedVersions = createDrizzleApprovedVersionReader(database);

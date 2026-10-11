@@ -6,7 +6,10 @@ import { ArcadeProgress } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import { formFromItem } from "../../client/item-form.ts";
+import type { CollectionsClientServices } from "../../client/services.ts";
 import type { DraftEditor } from "../hooks/use-draft-editor.ts";
+import { useItemImport } from "../hooks/use-item-import.ts";
+import { ImportItems } from "./import-items.tsx";
 import { ItemEditor } from "./item-editor.tsx";
 import { ItemList } from "./item-list.tsx";
 
@@ -19,13 +22,20 @@ export function ItemsStep({
   detail,
   editor,
   onUploaded,
+  services,
 }: {
   readonly assets: readonly LibraryAsset[];
   readonly createKey: () => IdempotencyKey;
   readonly detail: CollectionDetail;
   readonly editor: DraftEditor;
   readonly onUploaded: () => Promise<void>;
+  readonly services: CollectionsClientServices;
 }) {
+  const importer = useItemImport(
+    services,
+    detail.collection.id,
+    editor.refresh,
+  );
   const [editing, setEditing] = useState<Item | null>(null);
   const { collection, items } = detail;
   const full = items.length >= collection.plannedSupply;
@@ -41,6 +51,13 @@ export function ItemsStep({
         <BulkUpload
           onSettled={() => void onUploaded()}
           purpose="collection-item-artwork"
+        />
+      </details>
+      <details className="arcade-disclosure">
+        <summary>Add many items from a file</summary>
+        <ImportItems
+          importer={importer}
+          plannedSupply={detail.collection.plannedSupply}
         />
       </details>
       <ItemList

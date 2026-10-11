@@ -63,3 +63,21 @@ and a stale revision, an idempotency conflict, or a full collection is 409.
 
 Run `env:check`, `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. Platform engineering
 owns this feature.
+
+## Adding items from a file
+
+The Items step can add a whole list of items from a CSV or JSON file (`import-parse.ts`, `csv.ts`), with a
+downloadable template of each (`import-template.ts`). The file is read in the browser: every row is checked
+for what the file says, and when all rows read cleanly the server checks the images and the supply without
+writing (`dryRun`). Adding is a separate step, one request, all rows or none.
+
+- CSV columns: `name`, `image` (required), `description`, and one `trait:<Name>` column per trait; an empty
+  trait cell is no trait; unknown columns are refused so a mistyped trait column is never dropped silently.
+  Comma, semicolon or tab separated, quoted cells, and a leading byte-order mark are read.
+- JSON: a list of objects with `name`, `image`, optional `description`, and `attributes` as `{ trait_type, value }`
+  (or `{ trait, value }`) or `traits` as an object; other fields are ignored.
+- Images are matched by the file name they were uploaded with (`upload_intents.file_name`), ignoring case and
+  any folder in front of the name. When a name was uploaded more than once, the newest upload is used.
+- A file holds up to `collectionLimits.importRows` items. Each item gets the import's idempotency key plus its
+  place in the file, so the same import sent twice adds nothing twice (`POST
+/api/v1/collection-drafts/items/import`).

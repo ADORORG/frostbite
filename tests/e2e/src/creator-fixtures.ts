@@ -144,6 +144,12 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-collection-bulk-creator-session-token",
     userId: "01994b10-0000-7000-8000-000000000066",
   },
+  // Items added from a file (import): one creator who uploads named images and imports a list of items.
+  collectionImportCreator: {
+    sessionId: "01994b10-0000-7000-8000-000000000069",
+    sessionToken: "e2e-collection-import-creator-session-token",
+    userId: "01994b10-0000-7000-8000-000000000068",
+  },
   // An applicant a reviewer has asked for changes (UX: the reviewer's message is shown to them).
   applicantFeedback: {
     sessionId: "01994b10-0000-7000-8000-000000000063",
@@ -166,6 +172,7 @@ export const approvedCreators = [
   creatorE2EFixtures.collectionQualityList,
   creatorE2EFixtures.collectionInlineCreator,
   creatorE2EFixtures.collectionBulkCreator,
+  creatorE2EFixtures.collectionImportCreator,
   creatorE2EFixtures.collectionQualityWizard,
   creatorE2EFixtures.reviewJourneyCreator,
   creatorE2EFixtures.reviewQualityCreator,

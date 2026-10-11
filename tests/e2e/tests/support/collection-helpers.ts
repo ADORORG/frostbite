@@ -40,12 +40,14 @@ export async function uploadProcessed(
   baseURL: string | undefined,
   key: string,
   purpose: string,
+  fileName?: string,
 ): Promise<string> {
   const bytes = createDecodablePng(16, 16);
   const { intent, upload } = await intentOf(
     await createIntent(request, baseURL, key, {
       byteLength: bytes.length,
       contentType: "image/png",
+      fileName,
       purpose,
     }),
   );

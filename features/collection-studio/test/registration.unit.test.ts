@@ -39,6 +39,7 @@ describe("collection studio registration", () => {
     ).toEqual([
       "POST addCollectionItem",
       "POST createCollectionDraft",
+      "POST importCollectionItems",
       "GET listCollectionDrafts",
       "POST readCollectionDraft",
       "DELETE removeCollectionItem",

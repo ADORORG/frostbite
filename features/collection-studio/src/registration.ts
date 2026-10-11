@@ -2,6 +2,7 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { ChainOption } from "@ador/shared/chain";
 import {
+  collectionImportRoute,
   collectionNewPath,
   collectionRoutes,
   collectionStudioNavigationLabel,
@@ -15,6 +16,7 @@ import {
 const routes = [
   collectionRoutes.addItem,
   collectionRoutes.create,
+  collectionImportRoute,
   collectionRoutes.list,
   collectionRoutes.read,
   collectionRoutes.removeItem,

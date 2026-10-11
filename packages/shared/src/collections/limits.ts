@@ -7,6 +7,9 @@ export const collectionLimits = Object.freeze({
   description: 4_000,
   itemDescription: 1_000,
   itemName: 120,
+  // Rows one import accepts. A longer list is imported in several files: a request is also bounded in
+  // bytes, and one import is all-or-nothing, so it should stay small enough to review.
+  importRows: 500,
   itemsPerCollection: 10_000,
   name: 120,
   plannedSupply: 1_000_000,

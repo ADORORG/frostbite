@@ -1,6 +1,8 @@
 import { ApiError, createRequester, type FetchLike } from "@ador/client-http";
 import {
   collectionDetailSchema,
+  collectionImportResponseSchema,
+  collectionImportRoute,
   collectionItemChangeSchema,
   collectionItemRemovedSchema,
   collectionListResponseSchema,
@@ -10,12 +12,14 @@ import {
   submissionRoutes,
   type AddCollectionItemInput,
   type CollectionDetail,
+  type CollectionImportResponse,
   type CollectionItemChange,
   type CollectionItemRemoved,
   type CollectionListResponse,
   type CollectionSubmissionList,
   type CollectionSubmissionResponse,
   type CreateCollectionDraftInput,
+  type ImportCollectionItemsInput,
   type RemoveCollectionItemInput,
   type SaveCollectionDraftInput,
   type SubmitCollectionInput,
@@ -53,6 +57,11 @@ export interface CollectionsApi {
     options: CallOptions & { readonly idempotencyKey: IdempotencyKey },
   ): Promise<CollectionDetail>;
   creatorStanding(options?: CallOptions): Promise<CreatorStanding>;
+  // Adds a list of items in one step, or reports row by row why it cannot; `dryRun` only reports.
+  importItems(
+    input: ImportCollectionItemsInput,
+    options: CallOptions & { readonly idempotencyKey: IdempotencyKey },
+  ): Promise<CollectionImportResponse>;
   list(options?: CallOptions): Promise<CollectionListResponse>;
   // The creator's own uploads, for choosing images. This is the uploads feature's public contract.
   listImages(options?: CallOptions): Promise<LibraryResponse>;
@@ -109,6 +118,11 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
         throw error;
       }
     },
+    importItems: (input, options) =>
+      request(collectionImportRoute, collectionImportResponseSchema, {
+        body: input,
+        ...options,
+      }),
     list: (options = {}) =>
       request(collectionRoutes.list, collectionListResponseSchema, options),
     listImages: (options = {}) =>

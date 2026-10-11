@@ -83,13 +83,15 @@ export async function setCreatorApplicationState(
 export async function seedUploadedAsset(
   database: DatabaseClient,
   input: {
+    // The name the file had when it was uploaded; none by default.
+    readonly fileName?: string;
     readonly now: Date;
     readonly purpose: UploadPurpose;
     readonly state?: SeededAssetState;
     readonly userId: string;
   },
 ) {
-  const { now, purpose, state = "processed", userId } = input;
+  const { fileName, now, purpose, state = "processed", userId } = input;
   const intentId = createUuidV7();
   const assetId = uuidV7Schema.parse(createUuidV7());
   await database.insert(uploadIntents).values({
@@ -97,6 +99,7 @@ export async function seedUploadedAsset(
     cleanupEligibleAt: new Date(now.getTime() + dayMilliseconds),
     contentType: "image/png",
     expiresAt: new Date(now.getTime() + 60_000),
+    fileName,
     id: intentId,
     idempotencyKey: `upload-${intentId}`,
     objectKey: `drafts/${intentId}`,

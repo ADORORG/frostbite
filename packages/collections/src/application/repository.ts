@@ -2,6 +2,8 @@ import type { IdempotencyKey } from "@ador/shared/http";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type {
   CollectionDraft,
+  CollectionImportProblem as ImportProblem,
+  CollectionImportRow,
   CollectionItem,
   SubmissionState,
 } from "@ador/shared/collections";
@@ -84,6 +86,25 @@ export type AddItemResult =
   | ItemChange<"added">
   | ItemChange<"replayed">;
 
+export interface ImportRowReport {
+  readonly imageAssetId: UuidV7 | null;
+  readonly problems: readonly ImportProblem[];
+  // 1-based, in the order sent.
+  readonly row: number;
+}
+
+export type ImportItemsResult =
+  | CommonFailure
+  | { readonly kind: "conflict" }
+  | { readonly kind: "item-limit" }
+  // Nothing was written: a dry run, or rows that cannot be imported yet. Each row says why.
+  | { readonly kind: "report"; readonly rows: readonly ImportRowReport[] }
+  | {
+      readonly kind: "imported" | "replayed";
+      readonly revision: number;
+      readonly rows: readonly ImportRowReport[];
+    };
+
 export type UpdateItemResult = CommonFailure | ItemChange<"updated">;
 
 export type RemoveItemResult =
@@ -109,6 +130,20 @@ export interface CollectionRepository {
     readonly collectionId: UuidV7;
     readonly ownerUserId: UuidV7;
   }): Promise<CollectionAggregate | null>;
+  // Adds every row, in order, or none: rows whose image cannot be found, or that do not fit the planned
+  // supply, stop the whole import. With `dryRun` it only reports.
+  importItems(
+    input: RetryableMutation & {
+      readonly collectionId: UuidV7;
+      readonly dryRun: boolean;
+      readonly itemLimit: number;
+      // The rows in the order they will be added, each with the identifier its item will have.
+      readonly rows: readonly {
+        readonly itemId: UuidV7;
+        readonly row: CollectionImportRow;
+      }[];
+    },
+  ): Promise<ImportItemsResult>;
   listForOwner(input: {
     readonly limit: number;
     readonly ownerUserId: UuidV7;

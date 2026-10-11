@@ -45,7 +45,8 @@ export function formFromItem(item: CollectionItem): ItemFormValues {
   };
 }
 
-const messages = {
+// What the creator is told when a field of an item is not acceptable.
+export const itemFieldMessages = {
   attributes: `Each trait needs a name and a value, a trait can appear only once, and an item can have up to ${collectionLimits.attributesPerItem}.`,
   description: `Keep the description to ${collectionLimits.itemDescription.toLocaleString("en-US")} characters.`,
   imageAssetId: "Choose an image for this item.",
@@ -69,6 +70,6 @@ export function parseItemForm(values: ItemFormValues): ItemFormResult {
   const errors: { -readonly [Field in keyof ItemFormErrors]: string } = {};
   for (const field of itemFormFields)
     if (parsed.error.issues.some(({ path }) => path[0] === field))
-      errors[field] = messages[field];
+      errors[field] = itemFieldMessages[field];
   return { errors, ok: false };
 }

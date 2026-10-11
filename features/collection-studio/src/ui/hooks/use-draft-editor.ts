@@ -20,6 +20,8 @@ export interface DraftEditor {
   readonly dismissNotice: () => void;
   // The last failed action, until it is dismissed or the next action starts.
   readonly notice: Failure | null;
+  // Reads the draft again without clearing the page, for a change made outside the editor's own actions.
+  readonly refresh: () => Promise<void>;
   readonly reload: () => void;
   readonly removeItem: (itemId: string) => Promise<boolean>;
   readonly save: (
@@ -63,6 +65,7 @@ export function useDraftEditor(
     busy,
     dismissNotice,
     notice,
+    refresh,
     reload,
     removeItem: (itemId) =>
       act(async () => {

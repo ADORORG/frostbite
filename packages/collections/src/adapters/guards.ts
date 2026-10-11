@@ -192,3 +192,17 @@ export function editCollection<Result>(
     return work(transaction, locked);
   });
 }
+
+// Records a change to a locked collection: its revision goes up by one, and the new revision is returned.
+export async function bump(
+  transaction: DatabaseTransaction,
+  locked: LockedCollection,
+  changedAt: Date,
+): Promise<number> {
+  const revision = locked.revision + 1;
+  await transaction
+    .update(collections)
+    .set({ revision, updatedAt: changedAt })
+    .where(eq(collections.id, locked.id));
+  return revision;
+}

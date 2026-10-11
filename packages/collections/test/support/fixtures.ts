@@ -1,4 +1,8 @@
-import type { CollectionDraft, CollectionItem } from "@ador/shared/collections";
+import type {
+  CollectionDraft,
+  CollectionImportRow,
+  CollectionItem,
+} from "@ador/shared/collections";
 import { chainRefSchema } from "@ador/shared/chain";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
 
@@ -48,3 +52,15 @@ export function mutation(ownerUserId: ReturnType<typeof newId>) {
     requestFingerprint: "a".repeat(64),
   };
 }
+
+// One line of an import, naming its image by file name.
+export const rowFor = (
+  imageFileName: string,
+  overrides: Partial<CollectionImportRow> = {},
+): CollectionImportRow => ({
+  attributes: [{ trait: "Colour", value: "Blue" }],
+  description: "An item",
+  imageFileName,
+  name: `Item for ${imageFileName}`,
+  ...overrides,
+});

@@ -18,6 +18,7 @@ import {
   isApprovedCreator,
   lockCreation,
 } from "./guards.ts";
+import { createDrizzleImportOperation } from "./drizzle-import.ts";
 import { createDrizzleItemOperations } from "./drizzle-items.ts";
 import { collectionRecord, itemRecord } from "./views.ts";
 
@@ -68,6 +69,7 @@ export function createDrizzleCollectionRepository(
 ): CollectionRepository {
   return {
     ...createDrizzleItemOperations(database),
+    ...createDrizzleImportOperation(database),
 
     create(input) {
       return database.transaction(async (transaction) => {

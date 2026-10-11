@@ -195,6 +195,7 @@ function WizardBody({
           detail={detail}
           editor={editor}
           onUploaded={refreshLibrary}
+          services={services}
         />
       ) : null}
       {step === "review" ? (

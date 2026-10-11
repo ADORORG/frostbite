@@ -89,6 +89,7 @@ export function stubService(
     addItem: async () => missing,
     create: async () => missing,
     find: async () => null,
+    importItems: async () => missing,
     list: async () => [],
     removeItem: async () => missing,
     save: async () => missing,

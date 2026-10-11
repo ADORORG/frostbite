@@ -16,6 +16,7 @@ import {
   createReadDraftOperation,
   createSaveDraftOperation,
 } from "./application/draft-operations.ts";
+import { createImportItemsOperation } from "./application/import-operation.ts";
 import {
   createAddItemOperation,
   createRemoveItemOperation,
@@ -59,6 +60,7 @@ export function createCollectionStudioEntrypoint(
     operations: [
       registerHttpOperation(createAddItemOperation(getService)),
       registerHttpOperation(createCreateDraftOperation(dependencies)),
+      registerHttpOperation(createImportItemsOperation(getService)),
       registerHttpOperation(createListDraftsOperation(dependencies)),
       registerHttpOperation(createListSubmissionsOperation(getSubmissions)),
       registerHttpOperation(createReadDraftOperation(dependencies)),

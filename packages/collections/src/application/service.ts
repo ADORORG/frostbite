@@ -3,7 +3,9 @@ import {
   collectionDraftSchema,
   collectionItemSchema,
   collectionLimits,
+  importCollectionItemsInputSchema,
   type CollectionDraft,
+  type CollectionImportRow,
   type CollectionItem,
 } from "@ador/shared/collections";
 import { idempotencyKeySchema, requestFingerprint } from "@ador/shared/http";
@@ -15,6 +17,7 @@ import type {
   CollectionRepository,
   CollectionSummaryRecord,
   CreateResult,
+  ImportItemsResult,
   RemoveItemResult,
   SaveResult,
   UpdateItemResult,
@@ -96,6 +99,33 @@ export function createCollectionService(
       readonly ownerUserId: UuidV7;
     }): Promise<CollectionAggregate | null> {
       return dependencies.repository.find(input);
+    },
+
+    // Adds a list of items in one step, or none of them. The rows name their images by file name.
+    async importItems(
+      input: {
+        readonly collectionId: UuidV7;
+        readonly dryRun: boolean;
+        readonly rows: readonly CollectionImportRow[];
+      } & IdempotentRequest,
+    ): Promise<ImportItemsResult> {
+      const rows = importCollectionItemsInputSchema.shape.rows.parse(
+        input.rows,
+      );
+      return dependencies.repository.importItems({
+        changedAt: dependencies.clock(),
+        collectionId: input.collectionId,
+        dryRun: input.dryRun,
+        idempotencyKey: idempotencyKeySchema.parse(input.idempotencyKey),
+        itemLimit: collectionLimits.itemsPerCollection,
+        ownerUserId: input.ownerUserId,
+        requestFingerprint: requestFingerprint({
+          collectionId: input.collectionId,
+          operation: "import-items",
+          rows,
+        }),
+        rows: rows.map((row) => ({ itemId: dependencies.createId(), row })),
+      });
     },
 
     list(ownerUserId: UuidV7): Promise<readonly CollectionSummaryRecord[]> {

@@ -1,20 +1,10 @@
-import type {
-  DatabaseClient,
-  DatabaseTransaction,
-} from "@ador/database/connection";
-import {
-  collectionItems,
-  collections,
-} from "@ador/database/schema/collections";
+import type { DatabaseClient } from "@ador/database/connection";
+import { collectionItems } from "@ador/database/schema/collections";
 import { collectionAssetPurposes } from "@ador/shared/collections";
 import { and, count, eq, max } from "drizzle-orm";
 
 import type { CollectionRepository } from "../application/repository.ts";
-import {
-  editCollection,
-  firstInvalidAsset,
-  type LockedCollection,
-} from "./guards.ts";
+import { bump, editCollection, firstInvalidAsset } from "./guards.ts";
 import { itemRecord } from "./views.ts";
 
 const itemPurpose = collectionAssetPurposes.item;
@@ -162,17 +152,4 @@ export function createDrizzleItemOperations(
       );
     },
   };
-}
-
-async function bump(
-  transaction: DatabaseTransaction,
-  locked: LockedCollection,
-  changedAt: Date,
-): Promise<number> {
-  const revision = locked.revision + 1;
-  await transaction
-    .update(collections)
-    .set({ revision, updatedAt: changedAt })
-    .where(eq(collections.id, locked.id));
-  return revision;
 }

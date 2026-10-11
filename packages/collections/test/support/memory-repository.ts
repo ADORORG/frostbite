@@ -4,6 +4,7 @@ import type {
   CollectionRepository,
   CollectionSummaryRecord,
   CreateResult,
+  ImportItemsResult,
   RemoveItemResult,
   SaveResult,
   UpdateItemResult,
@@ -13,6 +14,7 @@ export interface QueuedResults {
   addItem: AddItemResult;
   create: CreateResult;
   find: CollectionAggregate | null;
+  importItems: ImportItemsResult;
   list: readonly CollectionSummaryRecord[];
   removeItem: RemoveItemResult;
   save: SaveResult;
@@ -46,6 +48,10 @@ export function createRecordingRepository(
     find: (input) => {
       record("find", input);
       return Promise.resolve(results.find ?? null);
+    },
+    importItems: (input) => {
+      record("importItems", input);
+      return Promise.resolve(results.importItems ?? missing);
     },
     listForOwner: (input) => {
       record("listForOwner", input);

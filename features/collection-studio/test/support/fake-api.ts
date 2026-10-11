@@ -78,6 +78,47 @@ export function fakeCollections(
     creatorStanding: vi.fn<CollectionsApi["creatorStanding"]>(async () => ({
       state: state.standing,
     })),
+    // The server's rules for an import: images found by file name among the library's processed item
+    // images, rows past the planned supply refused, and all of it or none of it written.
+    importItems: vi.fn<CollectionsApi["importItems"]>(
+      async ({ dryRun, rows }) => {
+        const room =
+          state.detail.collection.plannedSupply - state.detail.items.length;
+        const report = rows.map((row, at) => {
+          const found = state.library.find(
+            (asset) =>
+              asset.purpose === "collection-item-artwork" &&
+              asset.processingState === "processed" &&
+              asset.fileName?.toLowerCase() === row.imageFileName.toLowerCase(),
+          );
+          return {
+            imageAssetId: found?.id ?? null,
+            problems: [
+              ...(found === undefined ? (["image-not-found"] as const) : []),
+              ...(at >= room ? (["over-supply"] as const) : []),
+            ],
+            row: at + 1,
+          };
+        });
+        if (dryRun || report.some(({ problems }) => problems.length > 0))
+          return { imported: false, revision: null, rows: report };
+        state.detail = {
+          ...state.detail,
+          items: [
+            ...state.detail.items,
+            ...rows.map((row, at) => ({
+              attributes: row.attributes,
+              description: row.description,
+              id: id(),
+              imageAssetId: report[at]?.imageAssetId ?? "",
+              name: row.name,
+              position: state.detail.items.length + at + 1,
+            })),
+          ],
+        };
+        return { imported: true, revision: bump(), rows: report };
+      },
+    ),
     list: vi.fn<CollectionsApi["list"]>(async () => ({
       collections: state.summaries,
     })),

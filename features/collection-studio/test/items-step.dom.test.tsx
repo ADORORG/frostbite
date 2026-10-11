@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ItemsStep } from "../src/ui/components/items-step.tsx";
 import type { DraftEditor } from "../src/ui/hooks/use-draft-editor.ts";
 import { detail, imageAsset, itemRecord } from "./support/detail.ts";
+import { fakeCollections } from "./support/fake-api.ts";
 import { id } from "./support/stubs.ts";
 
 const assetId = id();
@@ -26,6 +27,7 @@ function view(updateItem: DraftEditor["updateItem"]) {
     busy: false,
     dismissNotice: vi.fn(),
     notice: null,
+    refresh: vi.fn(async () => undefined),
     reload: vi.fn(),
     removeItem: vi.fn(async () => true),
     save: vi.fn(async () => true),
@@ -39,6 +41,7 @@ function view(updateItem: DraftEditor["updateItem"]) {
       detail={detail({ plannedSupply: 3 }, [existing])}
       editor={editor}
       onUploaded={async () => undefined}
+      services={fakeCollections().services}
     />
   );
   return { editor, element, existing };
