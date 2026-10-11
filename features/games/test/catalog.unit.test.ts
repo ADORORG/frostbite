@@ -35,6 +35,7 @@ describe("the game catalog", () => {
       id: "template-game",
       milestones: templateGame.milestones,
       networkLabel: "Bitcoin signet",
+      playable: true,
       playUrl: "https://play.example.test/template",
       summary: "Shows what a registered game looks like.",
       title: "Template game",
@@ -45,12 +46,17 @@ describe("the game catalog", () => {
   it("serves a game the platform plays itself from its own folder, with no external address", () => {
     expect(
       createGameCatalog([embeddedGame], chains).find("embedded-game"),
-    ).toMatchObject({ embedSrc: "/play/embedded-game/", playUrl: null });
+    ).toMatchObject({
+      embedSrc: "/play/embedded-game/index.html",
+      playable: true,
+      playUrl: null,
+    });
   });
 
   it("has no play address for a game that is not configured, and names an unconfigured chain by its identifier", () => {
     expect(catalog.find("bare-game")).toMatchObject({
       networkLabel: "eip155:1",
+      playable: false,
       playUrl: null,
     });
   });

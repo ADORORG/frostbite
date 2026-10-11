@@ -45,6 +45,12 @@ describe("the games index", () => {
     expect(markup).toContain("Not playable yet");
     expect(markup).toContain("Bitcoin signet");
   });
+
+  it("lists a game the platform plays itself as playable", async () => {
+    const markup = await render([embeddedGame], "/games");
+    expect(markup).toContain("Playable");
+    expect(markup).not.toContain("Not playable yet");
+  });
 });
 
 describe("a game's page", () => {
@@ -88,8 +94,11 @@ describe("a game's page", () => {
       "embedded-game",
     );
     expect(markup).toContain("This game is played on this page.");
-    expect(markup).toContain('src="/play/embedded-game/"');
+    expect(markup).toContain('data-game-src="/play/embedded-game/index.html"');
     expect(markup).toContain('sandbox="allow-scripts"');
+    // Started by the page once the host is listening, never by the server's markup, so the game's first
+    // message cannot arrive before anyone is there to answer it.
+    expect(markup).not.toMatch(/<iframe[^>]* src=/u);
     expect(markup).not.toContain("allow-same-origin");
     expect(markup).toContain("Playable");
     expect(markup).not.toContain("not on this site");

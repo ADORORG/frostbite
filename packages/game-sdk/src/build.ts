@@ -50,6 +50,7 @@ export async function bundleGameScript(entry: string): Promise<string> {
     format: "iife",
     legalComments: "none",
     logLevel: "silent",
+    minify: true,
     platform: "browser",
     target: "es2022",
     write: false,

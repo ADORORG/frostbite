@@ -35,11 +35,12 @@ function browserStorage(): {
   }
 }
 
-// Connects the game running in `frame` to the platform: the page, not the game, owns the player's storage. The
+// Connects the game running in `frame` to the platform, then starts it: the page, not the game, owns the player's storage. The
 // game is identified by the window the message came from, because a sandboxed frame has no origin to check.
 export function useGameSession(
   game: HostedGame,
   frame: RefObject<HTMLIFrameElement | null>,
+  src: string,
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [connected, setConnected] = useState(false);
@@ -79,8 +80,13 @@ export function useGameSession(
       // only this game's own data, and goes to the one window the page created.
       reply: (message) => target.postMessage(message, "*"),
     });
-    return attachGameHost({ frame: target, host, listenOn: window });
-  }, [frame, id, milestones]);
+    const detach = attachGameHost({ frame: target, host, listenOn: window });
+    // The game is started only now, so the host is already listening when it first speaks. Started any
+    // earlier (by the markup the server sent) its opening message could arrive before the page is ready, and
+    // be lost.
+    element.setAttribute("src", src);
+    return detach;
+  }, [frame, id, milestones, src]);
 
   return { connected, kept, unlocked };
 }

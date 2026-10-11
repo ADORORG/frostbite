@@ -78,7 +78,10 @@ export const gameBasePathSchema = z
 
 // Where the platform serves the files of the games it plays itself, one folder per game identifier.
 export const embeddedGameRoot = "/play";
-export const embeddedGamePath = (id: string) => `${embeddedGameRoot}/${id}/`;
+// The page of a game, named in full: the platform's static files have no directory index, and the game's
+// own files are addressed relative to this page.
+export const embeddedGamePath = (id: string) =>
+  `${embeddedGameRoot}/${id}/index.html`;
 
 // How a player reaches the game. `external`: the game runs on its own address, which is the host (`url`) plus
 // its base path. A null host means the game is registered but has no play address configured, and is shown

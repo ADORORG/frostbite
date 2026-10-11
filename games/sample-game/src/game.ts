@@ -15,7 +15,9 @@ export function restore(saved: unknown): GameState {
   return startState;
 }
 
-export const tap = (state: GameState): GameState => ({ score: state.score + 1 });
+export const tap = (state: GameState): GameState => ({
+  score: state.score + 1,
+});
 
 // The milestones this game declares (see configs/games/sample.ts) and the score that earns each.
 export const milestoneThresholds = [

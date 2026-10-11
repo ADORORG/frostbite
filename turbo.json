@@ -31,8 +31,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "$TURBO_ROOT$/games/**"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "public/play/**"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]

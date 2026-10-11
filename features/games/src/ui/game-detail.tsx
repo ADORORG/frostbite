@@ -23,12 +23,11 @@ export function GameDetail({
   readonly game: PublicGame;
   readonly navigation: readonly NavigationItem[];
 }) {
-  const playable = game.playUrl !== null || game.embedSrc !== null;
   return (
     <GamesFrame navigation={navigation}>
       <StatusLamp
-        label={playable ? "Playable" : "Not playable yet"}
-        tone={playable ? "ready" : "attention"}
+        label={game.playable ? "Playable" : "Not playable yet"}
+        tone={game.playable ? "ready" : "attention"}
       />
       <ArcadePanel eyebrow={`Version ${game.version}`} title={game.title}>
         <p>{game.summary}</p>

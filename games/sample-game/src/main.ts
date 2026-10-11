@@ -4,7 +4,10 @@ import { earned, restore, tap, type GameState } from "./game.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and
 // asks nothing of the network.
-function element<Tag extends keyof HTMLElementTagNameMap>(id: string, tag: Tag) {
+function element<Tag extends keyof HTMLElementTagNameMap>(
+  id: string,
+  tag: Tag,
+) {
   const found = document.getElementById(id);
   if (found === null || found.tagName.toLowerCase() !== tag)
     throw new Error(`Missing #${id}`);
@@ -69,7 +72,8 @@ tapButton.addEventListener("click", () => {
   state = tap(state);
   show();
   scheduleSave();
-  for (const id of earned(state)) void client.milestones.unlock(id).then(showUnlocked);
+  for (const id of earned(state))
+    void client.milestones.unlock(id).then(showUnlocked);
 });
 
 // A check, for the platform's own tests, that this page really is cut off: it tries what a game must not be

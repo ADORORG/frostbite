@@ -33,8 +33,8 @@ export function GamesIndex({
                 <h3>{game.title}</h3>
                 <p>{game.summary}</p>
                 <p>
-                  <ArcadeBadge tone={game.playUrl === null ? "pink" : "mint"}>
-                    {game.playUrl === null ? "Not playable yet" : "Playable"}
+                  <ArcadeBadge tone={game.playable ? "mint" : "pink"}>
+                    {game.playable ? "Playable" : "Not playable yet"}
                   </ArcadeBadge>{" "}
                   <ArcadeBadge tone="cyan">{game.networkLabel}</ArcadeBadge>
                 </p>

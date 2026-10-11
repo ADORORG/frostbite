@@ -42,7 +42,11 @@ test("navigates to the games catalog, which says the registered game is not play
 
   await expect(page).toHaveURL(/\/games$/);
   await expect(page.getByRole("heading", { name: "Games" })).toBeVisible();
-  await expect(page.getByText("Not playable yet")).toBeVisible();
+  await expect(
+    page
+      .getByRole("article", { name: "FROST·BITE" })
+      .getByText("Not playable yet"),
+  ).toBeVisible();
 });
 
 test("keeps shell navigation keyboard-accessible at every viewport", async ({

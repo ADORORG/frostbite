@@ -22,7 +22,7 @@ export function GamePlayer({
   readonly title: string;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { connected, kept, unlocked } = useGameSession(game, frame);
+  const { connected, kept, unlocked } = useGameSession(game, frame, src);
   return (
     <>
       <ArcadePanel eyebrow="Playing here" title={title}>
@@ -32,10 +32,10 @@ export function GamePlayer({
         />
         <iframe
           allow={gameFramePermissions}
+          data-game-src={src}
           data-testid="game-frame"
           ref={frame}
           sandbox={gameFrameSandbox}
-          src={src}
           style={{ border: 0, minHeight: "32rem", width: "100%" }}
           title={title}
         />

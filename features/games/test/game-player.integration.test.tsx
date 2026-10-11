@@ -56,12 +56,25 @@ const send = (
 const flush = () =>
   act(() => new Promise<void>((resolve) => setTimeout(resolve, 20)));
 
+// jsdom replaces the frame's window when it is given an address, which a browser does not. So the address is
+// recorded instead of followed, and `atStart` runs at the moment the game would begin.
+const original = HTMLIFrameElement.prototype.setAttribute;
+const started: string[] = [];
+let atStart: (() => void) | undefined;
 async function mount() {
+  started.length = 0;
+  vi.spyOn(HTMLIFrameElement.prototype, "setAttribute").mockImplementation(
+    function (this: HTMLIFrameElement, name: string, value: string) {
+      if (name !== "src") return original.call(this, name, value);
+      started.push(value);
+      atStart?.();
+    },
+  );
   await act(async () => {
     root.render(
       <GamePlayer
         game={game}
-        src="/play/embedded-game/"
+        src="/play/embedded-game/index.html"
         title="Embedded game"
       />,
     );
@@ -74,11 +87,33 @@ async function mount() {
 }
 
 describe("the game player", () => {
+  it("starts the game only once the host is listening, so its first message is answered", async () => {
+    let answered = 0;
+    atStart = () => {
+      const frame = container.querySelector("iframe");
+      vi.spyOn(
+        frame?.contentWindow as Window,
+        "postMessage",
+      ).mockImplementation(() => {
+        answered += 1;
+      });
+      send(frame?.contentWindow, "ready", { sdkVersion: 1 });
+    };
+    await mount();
+    await flush();
+    atStart = undefined;
+    expect(started).toEqual(["/play/embedded-game/index.html"]);
+    expect(answered).toBe(1);
+  });
+
   it("frames the game with scripts only and no same-origin access", async () => {
     const { frame } = await mount();
     expect(frame.getAttribute("sandbox")).toBe("allow-scripts");
     expect(frame.getAttribute("allow")).toBe("fullscreen; autoplay; gamepad");
-    expect(frame.getAttribute("src")).toBe("/play/embedded-game/");
+    expect(frame.getAttribute("data-game-src")).toBe(
+      "/play/embedded-game/index.html",
+    );
+    expect(started).toEqual(["/play/embedded-game/index.html"]);
     expect(container.textContent).toContain("Connecting");
   });
 

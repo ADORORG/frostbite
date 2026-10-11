@@ -228,9 +228,9 @@ describe("a game the platform plays itself", () => {
       ).toBe(false);
   });
 
-  it("is served from a folder named for the game, under the platform's play root", () => {
+  it("has its page in a folder named for the game, under the platform's play root", () => {
     expect(embeddedGameRoot).toBe("/play");
-    expect(embeddedGamePath("tap-tower")).toBe("/play/tap-tower/");
+    expect(embeddedGamePath("tap-tower")).toBe("/play/tap-tower/index.html");
   });
 
   it("refuses a launch setting naming it, because it has no address to set", () => {

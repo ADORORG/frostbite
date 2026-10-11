@@ -36,6 +36,8 @@ export interface PublicGame {
   readonly id: string;
   readonly milestones: readonly GameMilestone[];
   readonly networkLabel: string;
+  // Whether a player can open it from here: it has an address, or the platform plays it itself.
+  readonly playable: boolean;
   // Where to play, or null when the game is registered but has no play address configured.
   readonly playUrl: string | null;
   readonly summary: string;
@@ -69,6 +71,8 @@ export function createGameCatalog(
     networkLabel:
       chains.find(({ chainId }) => chainId === game.network)?.displayName ??
       game.network,
+    playable:
+      game.launch.mode === "embedded" || gamePlayAddress(game.launch) !== null,
     playUrl: gamePlayAddress(game.launch),
     summary: game.summary,
     title: game.title,
