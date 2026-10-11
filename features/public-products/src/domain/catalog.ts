@@ -22,24 +22,12 @@ export const productCatalogs = [
     featureId: "creators",
     path: "/creators",
   },
-  {
-    detailNoun: "game",
-    emptyBody:
-      "No game build is published. Planned integrations are not presented as playable releases.",
-    emptyTitle: "No games online",
-    label: "Games",
-    navigationArea: "main",
-    navigationOrder: 20,
-    featureId: "games",
-    path: "/games",
-  },
 ] as const;
 
 export type ProductCatalog = (typeof productCatalogs)[number];
 
 export const launchesCatalog = productCatalogs[0];
 export const creatorsCatalog = productCatalogs[1];
-export const gamesCatalog = productCatalogs[2];
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

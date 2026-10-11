@@ -2,7 +2,6 @@ import { defineFeature } from "@ador/plugin-kit";
 
 import {
   creatorsCatalog,
-  gamesCatalog,
   launchesCatalog,
   type ProductCatalog,
 } from "./domain/catalog.ts";
@@ -41,4 +40,3 @@ function productFeature(catalog: ProductCatalog) {
 
 export const launchesFeature = productFeature(launchesCatalog);
 export const creatorsFeature = productFeature(creatorsCatalog);
-export const gamesFeature = productFeature(gamesCatalog);

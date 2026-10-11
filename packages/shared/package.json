@@ -12,6 +12,7 @@
     "./creator-admission": "./src/creator-admission/index.ts",
     "./decisions": "./src/decisions/gates.ts",
     "./features": "./src/features/manifest.ts",
+    "./games": "./src/games/index.ts",
     "./http": "./src/http/index.ts",
     "./identifiers": "./src/identifiers/uuid-v7.ts",
     "./platform": "./src/platform/status.ts",

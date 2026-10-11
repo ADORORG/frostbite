@@ -31,12 +31,15 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
     await page.goto("/");
     await where(page).getByRole("link", { name: label, exact: true }).click();
     await expect(page).toHaveURL(destination);
-    // Collections shows whatever has been approved; the other catalogs have nothing published yet.
+    // Collections shows whatever has been approved and Games the registered games; the other catalogs
+    // have nothing published yet.
     await expect(
       page.getByText(
         label === "Collections"
           ? /Catalog empty|Approved by review/u
-          : "Catalog empty",
+          : label === "Games"
+            ? "Registered games"
+            : "Catalog empty",
       ),
     ).toBeVisible();
   }

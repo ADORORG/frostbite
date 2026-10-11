@@ -149,17 +149,17 @@ stored in `references/task-list.md`.
 
 ## Week 8 — Frostbite catalog, hardening, and beta release
 
-| ID    | Task                                                                                                                  | Status  | Evidence or blocker                                                        |
-| ----- | --------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
-| W8-01 | Implement the versioned game manifest, games catalog, and game detail feature                                         | pending | Depends on public product routes; manifest must stay compatible with GP-01 |
-| W8-02 | Register Frostbite with configurable play URL, base path, return URL, and network                                     | pending | Depends on W8-01                                                           |
-| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | pending | Depends on W8-02                                                           |
-| W8-04 | Complete critical collector, creator, staff, transaction, game, and degradation E2E coverage                          | blocked | Depends on Weeks 3 through 7                                               |
-| W8-05 | Complete all-route visual, accessibility, responsive, keyboard, and state matrices                                    | blocked | Depends on all route families                                              |
-| W8-06 | Add rate limits, security headers, health checks, dashboards, and alerts                                              | pending | Depends on deployment configuration                                        |
-| W8-07 | Verify backup/restore and write authentication, upload, provider, indexer, transaction, launch, and rollback runbooks | pending | Depends on implemented operational flows                                   |
-| W8-08 | Deploy the beta and seed an honestly represented demonstration launch                                                 | blocked | Depends on all milestone acceptance gates, including W2-10B                |
-| W8-09 | Record the smoke test, rollback exercise, release notes, and remaining limitations                                    | blocked | Depends on W8-08                                                           |
+| ID    | Task                                                                                                                  | Status    | Evidence or blocker                                         |
+| ----- | --------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------- |
+| W8-01 | Implement the versioned game manifest, games catalog, and game detail feature                                         | completed | `references/games-catalog-task-record.md`                   |
+| W8-02 | Register Frostbite with configurable play URL, base path, return URL, and network                                     | pending   | Depends on W8-01                                            |
+| W8-03 | Verify subdomain-style and domain-path-style game hosting                                                             | pending   | Depends on W8-02                                            |
+| W8-04 | Complete critical collector, creator, staff, transaction, game, and degradation E2E coverage                          | blocked   | Depends on Weeks 3 through 7                                |
+| W8-05 | Complete all-route visual, accessibility, responsive, keyboard, and state matrices                                    | blocked   | Depends on all route families                               |
+| W8-06 | Add rate limits, security headers, health checks, dashboards, and alerts                                              | pending   | Depends on deployment configuration                         |
+| W8-07 | Verify backup/restore and write authentication, upload, provider, indexer, transaction, launch, and rollback runbooks | pending   | Depends on implemented operational flows                    |
+| W8-08 | Deploy the beta and seed an honestly represented demonstration launch                                                 | blocked   | Depends on all milestone acceptance gates, including W2-10B |
+| W8-09 | Record the smoke test, rollback exercise, release notes, and remaining limitations                                    | blocked   | Depends on W8-08                                            |
 
 ## Parallel security and product-decision gates
 

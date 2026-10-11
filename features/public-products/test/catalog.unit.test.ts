@@ -7,7 +7,6 @@ describe("public product catalog", () => {
     expect(productCatalogs.map(({ path }) => path)).toEqual([
       "/launches",
       "/creators",
-      "/games",
     ]);
   });
 

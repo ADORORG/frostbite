@@ -9,6 +9,7 @@
     "@ador/feature-creator-admission": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-collections": "workspace:*",
+    "@ador/feature-games": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
     "@ador/feature-wallet-connection": "workspace:*",

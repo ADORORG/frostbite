@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { createPublicProductEntrypoint } from "../src/entrypoint.tsx";
-import { gamesCatalog } from "../src/domain/catalog.ts";
+import { creatorsCatalog } from "../src/domain/catalog.ts";
 import { launchesFeature } from "../src/registration.ts";
 
 describe("public product entrypoint", () => {
@@ -24,8 +24,8 @@ describe("public product entrypoint", () => {
   });
 
   it("renders valid and invalid detail identifiers as unavailable", async () => {
-    const page = createPublicProductEntrypoint(gamesCatalog).pages?.find(
-      ({ path }) => path === "/games/[slug]",
+    const page = createPublicProductEntrypoint(creatorsCatalog).pages?.find(
+      ({ path }) => path === "/creators/[slug]",
     );
     const valid = renderToStaticMarkup(
       await page?.render({
@@ -41,7 +41,7 @@ describe("public product entrypoint", () => {
         params: { slug: "Frostbite" },
       }),
     );
-    expect(valid).toContain("No published game matches");
+    expect(valid).toContain("No published creator matches");
     expect(valid).toContain("frostbite");
     expect(invalid).toContain("Invalid route");
     expect(invalid).not.toContain("Frostbite");
