@@ -84,11 +84,22 @@ records, never from token ownership.
 6. Minting: the `game-rewards` contract with the verification level, the `mint-milestone` intent through the
    quote, sign, broadcast, observe pipeline (needs the mint pipeline, W6/W7, and the gated decisions).
 
-## 7. Open questions
+## 7. Product owner answers (2026-10-12) and what is still open
 
-- Size limit for a game's saved progress, and how many milestones a game may declare (typed policy).
-- Which wallet may mint: any connected wallet, or only one linked to the account? (Recommend: the wallet the
-  player is connected with, recorded on the claim.)
-- Merge conflicts of progress: confirm "newer save wins, with a choice when they differ a lot".
-- What the first verified level is (replay of a deterministic run is the likely one) and which games can offer it.
-- Whether the frame may go full-screen, and whether a game may request audio and input permissions.
+Answered:
+
+- **Which wallet mints:** whichever wallet is connected at that moment; the platform records which wallet claimed
+  each milestone.
+- **Progress merge:** milestones are always combined (earliest unlock wins); the main progress takes the newer
+  save, and the player is asked when the two differ a lot.
+- **Saved progress size:** 64 KB per game per player, as typed configuration (changeable without a release).
+- **First verified level:** explore replaying a recorded run on the platform's server (the game must be
+  deterministic). Self-reported stays until then.
+
+Still open:
+
+- How many milestones a game may declare (typed policy; suggest 64, the current manifest limit).
+- What counts as "differ a lot" for the merge question (suggest: the two saves disagree on any milestone-bearing
+  field, or the older one has more progress by the game's own measure).
+- Whether the frame may go full-screen, and which permissions (audio, input) a game may request.
+- The shape of a deterministic run record for replay verification (a spike with the first game).
