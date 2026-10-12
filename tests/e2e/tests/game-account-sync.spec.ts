@@ -69,7 +69,7 @@ test("progress and milestones follow a signed-in player to another browser", asy
   await expect(again.locator("#score")).toHaveText("5");
   await expect(
     second.page.locator('[data-milestone="first-five"]'),
-  ).toContainText("reached");
+  ).toContainText("Reached");
   await expect(second.page.getByText("saved to your account")).toBeVisible();
   await second.context.close();
 
@@ -84,7 +84,7 @@ test("progress and milestones follow a signed-in player to another browser", asy
   ).toHaveText("0");
   await expect(
     other.page.locator('[data-milestone="first-five"]'),
-  ).toContainText("not yet");
+  ).toContainText("Not yet");
   await other.context.close();
 });
 

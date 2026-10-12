@@ -22,10 +22,13 @@ test("the game connects, and the platform remembers what it does across a reload
   await expect(game.locator("#score")).toHaveText("5");
   // The platform, not the game, shows the milestone, and it is labelled as the game's own report.
   await expect(page.locator('[data-milestone="first-five"]')).toContainText(
-    "reached",
+    "Reached",
   );
   await expect(page.locator('[data-milestone="ten-taps"]')).toContainText(
-    "not yet",
+    "Not yet",
+  );
+  await expect(page.getByTestId("milestone-summary")).toHaveText(
+    "1 of 2 reached",
   );
   await expect(page.getByText("reports these itself")).toBeVisible();
   // The score is saved a second after the last tap.
@@ -42,7 +45,7 @@ test("the game connects, and the platform remembers what it does across a reload
   await expect(game.locator("#score")).toHaveText("5");
   await expect(game.locator('[data-milestone="first-five"]')).toHaveCount(1);
   await expect(page.locator('[data-milestone="first-five"]')).toContainText(
-    "reached",
+    "Reached",
   );
 });
 

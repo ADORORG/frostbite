@@ -5,6 +5,7 @@ import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
 import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import { useRef } from "react";
 
+import { MilestoneList } from "./milestone-list.tsx";
 import { useGameSession } from "./use-game-session.ts";
 
 // What the frame may do. Scripts only: no same-origin access, so the game has no storage, cookies or session
@@ -69,18 +70,7 @@ export function GamePlayer({
       </ArcadePanel>
       {game.milestones.length === 0 ? null : (
         <ArcadePanel eyebrow="Reported by the game" title="Your milestones">
-          <ul aria-label="Your milestones">
-            {game.milestones.map((milestone) => (
-              <li data-milestone={milestone.id} key={milestone.id}>
-                <strong>{milestone.title}</strong>
-                <span>
-                  {unlocked[milestone.id] === undefined
-                    ? " — not yet"
-                    : ` — reached ${unlocked[milestone.id]?.slice(0, 10)}`}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <MilestoneList milestones={game.milestones} unlocked={unlocked} />
           <p>
             The game reports these itself and the platform cannot check them
             yet, so nothing that carries value depends on them.
