@@ -110,10 +110,12 @@ Procedure and rationale: `providers/object-storage/r2/README.md`.
 
 ## Games
 
-- [ ] Set `GAME_LAUNCHES` per environment (it is optional; blank lists every game as not playable): the play host
-      (HTTPS in preview and production, no path), the base path (blank for a subdomain, `/play/<id>` for a path of
-      a domain), the return address (on `PUBLIC_BASE_URL`'s origin) and the network. See
-      `docs/product/game-onboarding.md`. A bad value stops the web service at start, so check the deploy logs.
+- [ ] FROST·BITE is played by the platform itself (`/games/frostbite`), so it needs no setting. `GAME_LAUNCHES` is
+      optional and applies only to a game played at an address of its own (none is registered today): naming
+      FROST·BITE or any game the platform plays itself stops the web service at start, so remove any old
+      `frostbite` entry from the environment. See `docs/product/game-onboarding.md`.
+- [ ] The games are built by the web build (`pnpm --filter web build`) into `apps/web/public/play`; check the deploy
+      log line `Built games: ...` lists every game.
 
 ## Hardening: health checks, security headers, rate limits
 

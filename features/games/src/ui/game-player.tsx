@@ -12,6 +12,8 @@ import { useGameSession } from "./use-game-session.ts";
 // of the platform, no forms, no popups, no top navigation. The response headers for the game's files repeat
 // this as a sandbox of their own, so it holds even if the files are opened outside this frame.
 export const gameFrameSandbox = "allow-scripts";
+// Tall enough for a game built for a window, not a strip: most of the screen, and no more than a page.
+export const gameFrameHeight = "min(85vh, 60rem)";
 export const gameFramePermissions = "fullscreen; autoplay; gamepad";
 
 // Where the progress is, said only as far as it is true.
@@ -63,7 +65,12 @@ export function GamePlayer({
           data-testid="game-frame"
           ref={frame}
           sandbox={gameFrameSandbox}
-          style={{ border: 0, minHeight: "32rem", width: "100%" }}
+          style={{
+            border: 0,
+            height: gameFrameHeight,
+            minHeight: "32rem",
+            width: "100%",
+          }}
           title={title}
         />
         <p>{kept ? keptCopy[sync] : blockedCopy[sync]}</p>

@@ -1,4 +1,4 @@
-import { gameManifestSchema, gamePlayAddress } from "@ador/shared/games";
+import { gameManifestSchema } from "@ador/shared/games";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { targetChains } from "../../../configs/chains.ts";
@@ -31,44 +31,23 @@ describe("the platform's game list", () => {
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
   });
 
-  it("registers FROST·BITE as not playable until a deployment says where it is played, and declares nothing the platform cannot honour yet", async () => {
+  it("plays FROST·BITE on the platform itself, with no address to set, and declares nothing the platform cannot honour yet", async () => {
     const [frostbite] = await gamesWith("");
-    expect(frostbite?.launch).toEqual({
-      basePath: "",
-      mode: "external",
-      returnUrl: null,
-      url: null,
-    });
+    expect(frostbite?.launch).toEqual({ mode: "embedded" });
     expect(frostbite?.capabilities).toEqual([]);
     expect(frostbite?.milestones).toEqual([]);
     expect(frostbite?.network).toBe(signet);
   });
 
-  it("is played at its own host when the deployment gives one (subdomain style)", async () => {
-    const [frostbite] = await gamesWith(
-      JSON.stringify({ frostbite: { url: "https://frostbite.example.com" } }),
-    );
-    expect(frostbite && gamePlayAddress(frostbite.launch)).toBe(
-      "https://frostbite.example.com/",
-    );
-  });
-
-  it("is played under a path of a host when the deployment gives a base path (domain-path style), and returns players to the platform", async () => {
-    const [frostbite] = await gamesWith(
-      JSON.stringify({
-        frostbite: {
-          basePath: "/play/frostbite",
-          returnUrl: "https://platform.example.com/games/frostbite",
-          url: "https://example.com",
-        },
-      }),
-    );
-    expect(frostbite && gamePlayAddress(frostbite.launch)).toBe(
-      "https://example.com/play/frostbite",
-    );
-    expect(
-      frostbite?.launch.mode === "external" && frostbite.launch.returnUrl,
-    ).toBe("https://platform.example.com/games/frostbite");
+  // The two hosting styles for a game that is played at an address of its own are checked on the launch rules
+  // themselves (packages/shared) and in a real browser (tests/e2e game-hosting); no game is registered that way
+  // today, so a deployment's address setting has nothing to name.
+  it("refuses an address setting for FROST·BITE, which the platform plays itself", async () => {
+    await expect(
+      gamesWith(
+        JSON.stringify({ frostbite: { url: "https://frostbite.example.com" } }),
+      ),
+    ).rejects.toThrow('Launch settings name "frostbite"');
   });
 
   it.each([
@@ -108,21 +87,21 @@ describe("the platform's game list", () => {
   });
 
   it("refuses to start with a game on a chain that is not configured", async () => {
-    await expect(
-      gamesWith(
-        JSON.stringify({
-          frostbite: { network: "eip155:1", url: "https://a.example.com" },
-        }),
-      ),
-    ).rejects.toThrow("not a configured chain");
+    vi.resetModules();
+    vi.doMock("../../../configs/games/frostbite.ts", async (original) => {
+      const { frostbite } =
+        await original<typeof import("../../../configs/games/frostbite.ts")>();
+      return { frostbite: { ...frostbite, network: "eip155:1" } };
+    });
+    try {
+      await expect(gamesWith("")).rejects.toThrow("not a configured chain");
+    } finally {
+      vi.doUnmock("../../../configs/games/frostbite.ts");
+    }
   });
 
-  it("accepts a configured chain as the game's network", async () => {
-    const [frostbite] = await gamesWith(
-      JSON.stringify({
-        frostbite: { network: signet, url: "https://a.example.com" },
-      }),
-    );
-    expect(frostbite?.network).toBe(signet);
+  it("starts with a game on a configured chain", async () => {
+    const games = await gamesWith("");
+    expect(games.every(({ network }) => network === signet)).toBe(true);
   });
 });

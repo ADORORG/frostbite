@@ -11,7 +11,12 @@ import { join } from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { buildGame, buildGames, checkGameHtml } from "../src/build.ts";
+import {
+  buildGame,
+  buildGames,
+  bundleGameStyles,
+  checkGameHtml,
+} from "../src/build.ts";
 
 let scratch = "";
 beforeEach(async () => {
@@ -137,5 +142,51 @@ describe("building a game", () => {
       "one",
       "two",
     ]);
+  });
+});
+
+describe("bundling a game's styles", () => {
+  it("inlines what the stylesheet imports and publishes its fonts beside it under hashed names", async () => {
+    const directory = await makeGame("styled");
+    await writeFile(join(directory, "base.css"), ".a{color:red}");
+    await writeFile(join(directory, "font.woff2"), "not really a font");
+    await writeFile(
+      join(directory, "styles.css"),
+      '@import "./base.css";@font-face{font-family:F;src:url("./font.woff2") format("woff2")}.b{font-family:F}',
+    );
+    const out = join(scratch, "out", "styled");
+    await buildGame({ directory, outDirectory: out });
+    const css = await readFile(join(out, "styles.css"), "utf8");
+    expect(css).toContain(".a{color:red}");
+    expect(css).not.toContain("@import");
+    const font = (await readdir(out)).find((name) => name.endsWith(".woff2"));
+    expect(font).toMatch(/^font-[A-Z0-9]+\.woff2$/u);
+    expect(css).toMatch(new RegExp(`url\\("?\\./${font ?? ""}"?\\)`, "u"));
+    expect(await readFile(join(out, font ?? ""), "utf8")).toBe(
+      "not really a font",
+    );
+  });
+
+  it.each([
+    ["an import by address", '@import "https://fonts.example.com/f.css";'],
+    ["an import by url()", '@import url("https://fonts.example.com/f.css");'],
+    [
+      "a background by address",
+      "body{background:url(https://x.example.com/a.png)}",
+    ],
+  ])("refuses styles with %s", async (_why, css) => {
+    const directory = await makeGame("remote");
+    await writeFile(join(directory, "styles.css"), css);
+    await expect(
+      bundleGameStyles(join(directory, "styles.css")),
+    ).rejects.toThrow(/another address/u);
+  });
+
+  it("refuses an import of a file that is not there", async () => {
+    const directory = await makeGame("missing");
+    await writeFile(join(directory, "styles.css"), '@import "./nope.css";');
+    await expect(
+      bundleGameStyles(join(directory, "styles.css")),
+    ).rejects.toThrow();
   });
 });

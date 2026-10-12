@@ -173,6 +173,13 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-other-game-player-session-token",
     userId: "01994b10-0000-7000-8000-00000000006e",
   },
+  // Counted against a rate limit on purpose, so no other spec may sign in as this person: a request of theirs in
+  // the same minute would push the count over (found when two specs shared one user).
+  rateLimitProbe: {
+    sessionId: "01994b10-0000-7000-8000-000000000071",
+    sessionToken: "e2e-rate-limit-probe-session-token",
+    userId: "01994b10-0000-7000-8000-000000000070",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",

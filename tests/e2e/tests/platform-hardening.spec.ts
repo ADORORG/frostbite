@@ -105,7 +105,7 @@ test("a person who does too much of one thing is told to slow down, with how lon
 }) => {
   if (baseURL === undefined) throw new Error("Expected configured base URL");
   // Signed in but not an approved creator: every attempt is refused, so nothing is created, yet each is counted.
-  await signIn(page, baseURL, creatorE2EFixtures.collectionUnapproved);
+  await signIn(page, baseURL, creatorE2EFixtures.rateLimitProbe);
   const attempt = (n: number) =>
     page.request.post("/api/v1/collection-drafts", {
       data: { not: "a draft" },

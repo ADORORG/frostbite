@@ -201,7 +201,7 @@ export const environmentDefinitions = [
   {
     key: "GAME_LAUNCHES",
     description:
-      "JSON object keyed by game id with each game's play host, base path, return address and network; blank lists every game as not playable.",
+      "JSON object keyed by the id of a game played at an address of its own, with its play host, base path, return address and network; none is registered today, so blank is the normal case.",
     exposure: "server",
     required: false,
     secret: false,

@@ -14,6 +14,7 @@
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
     "./library-asset": "./src/library-asset.ts",
+    "./memory-game-backend": "./src/memory-game-backend.ts",
     "./png": "./src/png.ts",
     "./race": "./src/race.ts",
     "./s3-runtime": "./src/s3-runtime.ts",

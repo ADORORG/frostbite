@@ -1,0 +1,577 @@
+/* FROST-BITE v0.7 — fixed square viewport, zero page scroll, collapsible everything */
+
+html,body{height:100%;overflow:hidden}
+body{background-attachment:local}
+
+.app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.shell{flex:1;min-height:0;max-width:none;width:100%;margin:0;padding:8px 10px 6px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+
+/* ---- compact chrome ---- */
+.shell>*{flex:0 0 auto}
+.hud{padding:7px 12px;border-radius:10px;gap:10px}
+.hud .brand .logo{width:30px;height:30px}
+.hud .brand .name{font-size:12px}
+.hud .brand .sub{font-size:11px}
+.hud-stats{gap:8px}
+.stat{padding:3px 9px}
+.stat .label{font-size:6px}
+.stat .val{font-size:16px;margin-top:2px}
+.marquee{display:none}
+.diesel-rail{padding:6px 10px!important;border-radius:9px}
+.diesel-rail .dr-mini{transform:scale(.72);transform-origin:left center}
+.block-clock{padding:7px 12px;gap:10px}
+.block-num{font-size:13px}
+.block-bar{height:12px}
+.venue-nav{padding:5px;gap:4px}
+.venue-tab{padding:6px 8px;min-width:0}
+.vt-n{font-size:7px}
+.vt-s{font-size:10px}
+.budget{gap:8px}
+.mode-pill button{padding:5px 8px;font-size:6.5px}
+.budget-bar{height:8px}
+
+/* ---- the play area owns the remaining height ---- */
+.venue-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.layout{flex:1;min-height:0;margin-top:0;display:grid;gap:8px;grid-template-columns:var(--railL,190px) minmax(0,1fr) var(--railR,190px);overflow:hidden}
+.layout.railL-closed{--railL:26px}
+.layout.railR-closed{--railR:26px}
+.rail{min-height:0;display:flex;flex-direction:column;gap:8px;overflow:hidden;position:relative}
+.rail-scroll{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.rail-scroll::-webkit-scrollbar{width:5px}
+.rail-scroll::-webkit-scrollbar-thumb{background:rgba(93,246,255,.28);border-radius:3px}
+.rail-scroll::-webkit-scrollbar-track{background:transparent}
+.rail.closed .rail-scroll{display:none}
+.rail-tab{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:6px;height:24px;border:1px solid var(--rim);border-radius:7px;background:rgba(7,11,26,.8);color:var(--silver);font-family:var(--f-display);font-size:6px;letter-spacing:.11em;cursor:pointer;transition:all .15s;white-space:nowrap}
+.rail-tab:hover{border-color:var(--frost);color:var(--frost);box-shadow:0 0 10px rgba(93,246,255,.3)}
+.rail.closed .rail-tab{height:100%;writing-mode:vertical-rl;text-orientation:mixed}
+
+/* ---- the 2x2 board grid fills whatever is left ---- */
+.board-col{min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.mega{flex:1;min-height:0;gap:8px;padding:9px;border-radius:14px}
+.mega::before{inset:4px;border-radius:11px}
+.board{min-height:0;padding:7px;border-radius:11px;display:flex;flex-direction:column;gap:4px}
+.board-head{margin-bottom:0;flex:0 0 auto}
+.board-head .ix{font-size:6.5px}
+.game-tag{font-size:6.5px!important;padding:2px 4px!important}
+.tag{font-size:6px!important;padding:2px 5px!important}
+.board .play-surface{flex:1;min-height:0;min-width:0}
+.board-foot{margin-top:0;flex:0 0 auto;font-size:10px}
+.picks-dim{font-size:11px}
+.mult{font-size:9px}
+.swap-btn{width:17px;height:17px;font-size:6.5px;top:6px;right:6px}
+.pick-hint{display:none}
+
+/* the cabinet surface stops being square and simply fills its board */
+.gp{aspect-ratio:auto;height:100%;width:100%}
+.mg-plinko,.mg-dice,.mg-reels,.mg-grid.tetra,.mg-wheel,.mg-race,.mg-invaders,.mg-grid-5{aspect-ratio:auto;height:100%}
+.board .play-surface{min-height:0}
+.mg-wheel,.mg-race{min-height:0}
+.gp-hud{padding:4px 7px}
+.gp-score{font-size:16px}
+.gp-label{font-size:5.5px}
+.gp-start{font-size:6.5px;padding:6px 10px}
+.gp-frozen{font-size:5px;bottom:5px}
+.gp-bust,.gp-clear{font-size:9px;padding:7px 11px}
+.gp-settled{font-size:6px}
+
+/* board dock under the grid */
+.dock{margin-top:0;gap:7px}
+.dock .btn{padding:8px 12px;font-size:8px}
+.dock .btn.lg{padding:9px 14px;font-size:9px}
+
+/* ---- panels inside rails get tighter ---- */
+.panel-head{padding:7px 10px;font-size:7.5px}
+.panel-body{padding:9px 10px}
+.kv{padding:4px 0;font-size:11px}
+.kv .k{font-size:8px}
+.kv .v{font-size:13px}
+.tiers{gap:5px}
+.badge-case{gap:4px}
+
+/* ---- BOTTOM SHEET: arcade / crew / ads live here now ---- */
+.sheet-bar{flex:0 0 auto;display:flex;gap:6px;padding:5px;border:1px solid var(--rim);border-radius:10px;background:rgba(7,11,26,.8)}
+.sheet-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 6px;border:1px solid transparent;border-radius:7px;background:0;cursor:pointer;font-family:var(--f-display);font-size:7px;letter-spacing:.1em;color:var(--grey);transition:all .15s;white-space:nowrap;overflow:hidden}
+.sheet-btn:hover{color:var(--frost);background:rgba(93,246,255,.07)}
+.sheet-btn[data-on]{color:var(--abyss);background:var(--frost);border-color:var(--frost);box-shadow:0 0 15px rgba(93,246,255,.45)}
+.sheet-btn i{font-style:normal;font-size:11px;line-height:1}
+.sheet-btn .sb-count{font-family:var(--f-term);font-size:12px;opacity:.8}
+
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;max-height:76dvh;display:flex;flex-direction:column;border-top:1.5px solid var(--frost);border-radius:16px 16px 0 0;background:linear-gradient(180deg,rgba(10,16,34,.985),rgba(4,6,13,.99));box-shadow:0 -14px 46px rgba(0,0,0,.7),0 0 40px rgba(93,246,255,.22);animation:sheetUp .3s cubic-bezier(.2,1.1,.4,1)}
+@keyframes sheetUp{from{transform:translateY(102%)}to{transform:none}}
+.sheet-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--rim)}
+.sheet-title{font-family:var(--f-display);font-size:9px;letter-spacing:.11em;color:var(--frost)}
+.sheet-sub{font-family:var(--f-term);font-size:13px;color:var(--silver)}
+.sheet-body{flex:1;min-height:0;overflow-y:auto;padding:12px 14px 16px}
+.sheet-body::-webkit-scrollbar{width:6px}
+.sheet-body::-webkit-scrollbar-thumb{background:rgba(93,246,255,.3);border-radius:3px}
+.sheet-grip{position:absolute;left:50%;top:5px;width:42px;height:3px;margin-left:-21px;border-radius:2px;background:rgba(93,246,255,.35)}
+.sheet-scrim{position:fixed;inset:0;z-index:59;background:rgba(3,5,11,.55);backdrop-filter:blur(1px)}
+
+/* arcade grid inside the sheet */
+.sheet .arcade-strip{margin-top:0;border:0;background:0}
+.sheet .arcade-strip .panel-head{display:none}
+.sheet .arcade-grid{padding:0;grid-template-columns:repeat(9,1fr)}
+@media(max-width:1000px){.sheet .arcade-grid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:680px){.sheet .arcade-grid{grid-template-columns:repeat(3,1fr)}}
+.sheet .crew-deck{margin-top:0;border:0;background:0}
+.sheet .crew-deck .panel-head{display:none}
+.sheet .crew-deck .panel-body{padding:0}
+.sheet .ad-strip{margin-top:0}
+
+/* ---- other venues scroll INSIDE their own pane, never the page ---- */
+.venue-pane{flex:1;min-height:0;overflow-y:auto;padding-right:3px}
+.venue-pane::-webkit-scrollbar{width:6px}
+.venue-pane::-webkit-scrollbar-thumb{background:rgba(93,246,255,.3);border-radius:3px}
+
+/* ---- fixed-viewport tweaks for the side drawers + companion ---- */
+.comp{bottom:14px;left:14px;width:104px}
+.comp-stage{width:88px;height:100px}
+.comp-hint{left:96px;bottom:44px;width:210px;font-size:14px;padding:8px 10px}
+.help-btn{bottom:14px;right:66px;width:32px;height:32px;font-size:11px}
+.bug-btn{bottom:52px;right:66px;width:32px;height:32px;font-size:13px}
+.juke{top:auto;bottom:96px}
+.satbag{top:auto;bottom:200px}
+.sb-body{max-height:64dvh}
+.wc-toast{bottom:96px;right:66px}
+.ghost-veil{bottom:14px;left:130px;max-width:min(380px,calc(100vw - 300px))}
+
+/* ---- tighten the crew carousel for a short viewport ---- */
+.crew-deck .crew{grid-template-columns:1fr 320px;gap:14px}
+.crew-deck .crew-stage{min-height:264px}
+@media(max-height:820px){
+  .crew-deck .crew-stage{min-height:230px}
+  .crew-deck .crew-slot{left:-64px;top:-92px;width:128px;height:186px}
+}
+
+/* ---- very short screens: shed the least useful chrome ---- */
+@media(max-height:700px){
+  .hud .brand .sub{display:none}
+  .diesel-rail{display:none}
+  .stat .label{font-size:5.5px}
+  .stat .val{font-size:14px}
+}
+@media(max-height:600px){
+  .venue-tab .vt-s{display:none}
+  .board-foot{display:none}
+}
+
+/* ============ CINEMATIC COLD OPEN ============ */
+.cine{position:fixed;inset:0;z-index:120;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#0a1430,#04060d 62%,#010204)}
+.cine-grain{position:absolute;inset:0;pointer-events:none;opacity:.5;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)}
+.cine-bars{position:absolute;inset:0;pointer-events:none}
+.cine-bars::before,.cine-bars::after{content:"";position:absolute;left:0;right:0;height:7vh;background:#000;z-index:3}
+.cine-bars::before{top:0}
+.cine-bars::after{bottom:0}
+.cine-flash{position:absolute;inset:0;background:#dff6ff;z-index:6;animation:cineFlash .24s ease-out forwards;pointer-events:none}
+@keyframes cineFlash{from{opacity:.92}to{opacity:0}}
+.cine-skip{position:absolute;right:22px;bottom:calc(7vh + 18px);z-index:8;padding:8px 14px;border:1px solid var(--rim);border-radius:7px;background:rgba(4,6,13,.8);color:var(--silver);font-family:var(--f-display);font-size:7px;letter-spacing:.13em;cursor:pointer;transition:all .15s}
+.cine-skip:hover{border-color:var(--frost);color:var(--frost);box-shadow:0 0 14px rgba(93,246,255,.4)}
+.cine-hint{position:absolute;left:22px;bottom:calc(7vh + 22px);z-index:8;font-family:var(--f-term);font-size:13px;color:var(--frozen)}
+.cine-hint b{color:var(--grey)}
+
+.cine-studio{text-align:center;animation:studioIn 1.7s ease both}
+@keyframes studioIn{0%{opacity:0;transform:scale(.9)}22%{opacity:1;transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(1.04)}}
+.cs-glyph{width:104px;height:104px;filter:drop-shadow(0 0 22px rgba(93,246,255,.75));animation:glyphSpin 6s linear infinite}
+@keyframes glyphSpin{to{transform:rotate(360deg)}}
+.cs-tag{margin-top:20px;font-family:var(--f-display);font-size:8px;letter-spacing:.42em;color:var(--grey)}
+
+.cine-boot{width:min(560px,86vw);font-family:var(--f-mono);font-size:12.5px;line-height:2;color:var(--silver)}
+.cb-line{animation:bootIn .16s ease both;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes bootIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.cb-ok{color:var(--mint);margin-right:12px;text-shadow:0 0 8px var(--mint)}
+.cb-caret{display:inline-block;width:8px;height:14px;background:var(--frost);animation:blink .8s steps(2) infinite;box-shadow:0 0 8px var(--frost)}
+
+.cine-title{text-align:center;position:relative}
+.ct-ring{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border:2px solid var(--frost);border-radius:50%;animation:ctRing 2.4s cubic-bezier(.15,.8,.3,1) forwards}
+@keyframes ctRing{0%{opacity:.95;transform:scale(1)}100%{opacity:0;transform:scale(64)}}
+.ct-word{font-family:var(--f-display);font-size:clamp(26px,6.4vw,62px);letter-spacing:.05em;color:#eaffff;text-shadow:0 0 26px rgba(93,246,255,.9),0 0 70px rgba(46,107,255,.7),0 5px 0 rgba(46,107,255,.45);animation:ctSlam .55s cubic-bezier(.15,1.6,.35,1) both}
+.ct-word span{color:var(--magenta);text-shadow:0 0 30px rgba(255,45,157,.95)}
+@keyframes ctSlam{0%{opacity:0;transform:scale(2.6);filter:blur(14px)}70%{opacity:1;transform:scale(.97);filter:blur(0)}100%{transform:scale(1)}}
+.ct-rule{height:1px;margin:20px auto 0;width:0;background:linear-gradient(90deg,transparent,var(--frost),transparent);box-shadow:0 0 12px var(--frost);animation:ctRule .9s .4s ease both}
+@keyframes ctRule{to{width:min(520px,80vw)}}
+.ct-sub{margin-top:14px;font-family:var(--f-term);font-size:clamp(14px,2vw,21px);color:var(--silver);opacity:0;animation:fadeUp .7s .7s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.cine-tx{width:min(640px,88vw);padding:22px 24px;border-left:2px solid var(--frost);background:linear-gradient(90deg,rgba(93,246,255,.07),transparent 70%);animation:fadeUp .5s ease both}
+.ctx-head{display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.ctx-dot{width:5px;height:5px;border-radius:50%;background:var(--frost);box-shadow:0 0 7px var(--frost);animation:sigPulse 1.4s ease-in-out infinite}
+.ctx-dot:nth-child(2){animation-delay:.2s}
+.ctx-dot:nth-child(3){animation-delay:.4s}
+.ctx-from{margin-left:6px;font-family:var(--f-display);font-size:7px;letter-spacing:.14em;color:var(--frost)}
+.ctx-body{min-height:180px}
+.ctx-body p{margin:0 0 13px;font-family:var(--f-term);font-size:clamp(17px,2.4vw,25px);line-height:1.42;color:#cdf3ff;text-wrap:pretty}
+.ctx-done{opacity:.42}
+.ctx-live{color:#eaffff}
+.ctx-caret{display:inline-block;width:9px;height:17px;margin-left:3px;vertical-align:-3px;background:var(--frost);animation:blink .85s steps(2) infinite;box-shadow:0 0 9px var(--frost)}
+.ctx-sig{margin-top:10px;font-family:var(--f-display);font-size:11px;letter-spacing:.24em;color:var(--frost);text-shadow:0 0 14px rgba(93,246,255,.7);animation:fadeUp .6s ease both}
+
+.cine-select{width:min(1120px,94vw);max-height:86dvh;display:flex;flex-direction:column;gap:10px;animation:fadeUp .45s ease both;padding:0 4px}
+.cselect-body{overflow-y:auto}
+.cselect-body::-webkit-scrollbar{width:5px}
+.cselect-body::-webkit-scrollbar-thumb{background:rgba(93,246,255,.3);border-radius:3px}
+.cselect-head{text-align:center}
+.csh-kicker{font-family:var(--f-display);font-size:12px;letter-spacing:.16em;color:var(--frost);text-shadow:0 0 18px rgba(93,246,255,.7)}
+.csh-sub{margin-top:8px;font-family:var(--f-term);font-size:16px;color:var(--silver)}
+.cselect-body{flex:1;min-height:0;overflow:hidden}
+.cselect-body .crew{grid-template-columns:1fr 320px;gap:16px}
+/* never hide the stats — stack them under the carousel on a narrow screen */
+@media(max-width:1000px){
+  .cselect-body .crew{grid-template-columns:1fr;gap:10px}
+  .cselect-body .crew-stage{min-height:min(34dvh,250px)}
+  .cselect-body .crew-panel{padding:12px}
+  .cselect-body .cp-head{padding-bottom:9px}
+  .cselect-body .cp-perk{margin-bottom:10px;font-size:12.5px;padding:7px 9px}
+  .cselect-body .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+}
+.cselect-body .crew-stage{min-height:min(44dvh,330px)}
+.cselect-body .cp-bio{display:none}
+.cselect-body .sr-hint{display:none}
+.cselect-body .stat-row{grid-template-columns:44px 1fr 16px;grid-template-areas:"l t v"}
+.cselect-body .crew-nameplate{margin-top:14px}
+.cselect-body .crew-active{margin-top:4px}
+.cselect-foot{text-align:center}
+.cselect-foot .btn{min-width:280px}
+
+
+/* ---- v0.7.1: reclaim vertical space for the boards ---- */
+.shell{gap:5px;padding:6px 8px 5px}
+
+/* venue nav: one row, horizontally scrollable, no wrap */
+.venue-nav{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:4px}
+.venue-nav::-webkit-scrollbar{display:none}
+.venue-tab{flex:0 0 auto;padding:5px 9px}
+.venue-tab .vt-s{display:none}
+.vt-n{font-size:6.5px;white-space:nowrap}
+
+/* mode row: drop the prose blurb, it repeats the tooltip */
+.budget+div>.ft.dim{display:none}
+
+/* block clock: fold into a single slim strip */
+.block-clock{grid-template-columns:auto 1fr auto;padding:5px 10px;gap:9px}
+.block-num{font-size:11px}
+.block-bar{height:9px}
+.block-clock .mempool{font-size:11px}
+.block-clock .mempool>div>div:first-child{display:none}
+
+/* HUD: tighter still */
+.hud{padding:5px 10px}
+.hud .brand .logo{width:26px;height:26px}
+.hud .brand .name{font-size:11px}
+.stat{padding:2px 8px}
+.stat .val{font-size:14px}
+
+/* boards get the space back */
+.mega{padding:7px;gap:6px}
+.board{padding:6px}
+.dock .btn{padding:7px 11px;font-size:7.5px}
+.dock .btn.lg{padding:7px 12px;font-size:8px}
+.sheet-btn{padding:6px 5px;font-size:6.5px}
+
+/* rails narrower so the square board grid stays square */
+.layout{--railL:172px;--railR:172px}
+.panel-head{padding:6px 9px;font-size:7px}
+.panel-body{padding:8px 9px}
+
+/* companion must not sit on top of the left rail */
+.comp{left:auto;right:112px;bottom:10px;width:84px}
+.comp-stage{width:74px;height:84px}
+.comp-plate{font-size:5px;padding:2px 5px}
+.comp-dots{display:none}
+.comp-hint{left:auto;right:92px;bottom:34px;width:216px;font-size:13.5px}
+.comp-hint::after{left:auto;right:-9px;border-right:0;border-left:9px solid var(--cc,var(--frost))}
+.comp-tapme{font-size:4.6px;padding:2px 4px}
+
+/* keep the right-edge drawers clear of the companion */
+.help-btn{right:14px;bottom:10px}
+.bug-btn{right:14px;bottom:48px}
+.wc-toast{right:14px;bottom:90px}
+
+@media(max-height:760px){
+  .venue-nav{padding:3px}
+  .venue-tab{padding:4px 8px}
+  .hud .brand .sub{display:none}
+}
+
+
+/* ---- v0.7.2: single action row, no venue-tab wrap, companion out of the play area ---- */
+
+/* venue tabs must never wrap to two lines */
+.venue-tab{white-space:nowrap}
+.venue-tab .vt-n{white-space:nowrap;overflow:visible}
+
+/* merge the dock and the sheet bar into one row so the boards gain a whole strip back */
+.board-col .dock{display:contents}
+.action-row{flex:0 0 auto;display:flex;gap:6px;align-items:stretch;padding:5px;border:1px solid var(--rim);border-radius:10px;background:rgba(7,11,26,.8)}
+.action-row .btn{padding:7px 10px;font-size:7.5px;white-space:nowrap}
+.action-row .sheet-btn{border:1px solid transparent}
+.action-row .divider{width:1px;background:var(--rim);margin:2px 3px}
+
+/* companion: small, bottom-left, clear of the board grid; hint opens upward */
+.comp{left:10px;right:auto;bottom:8px;width:72px;z-index:47}
+.comp-stage{width:64px;height:72px}
+.comp-plate{font-size:4.4px;padding:2px 4px}
+.comp-hint{left:78px;right:auto;bottom:26px;width:224px;font-size:13px;padding:7px 9px}
+.comp-hint::after{left:-9px;right:auto;border-left:0;border-right:9px solid var(--cc,var(--frost))}
+/* the left rail keeps its content above the companion */
+.layout .rail:first-child .rail-scroll{padding-bottom:78px}
+
+@media(max-height:700px){
+  .comp{width:60px}
+  .comp-stage{width:54px;height:60px}
+  .layout .rail:first-child .rail-scroll{padding-bottom:64px}
+}
+
+
+/* ---- v0.7.3: the hint must never cover a playable board ---- */
+.comp-hint{left:6px;right:auto;bottom:84px;width:200px;font-size:12.5px;line-height:1.3;padding:7px 9px;transform:translateY(6px)}
+.comp-hint.show{transform:none}
+.comp-hint::after{left:22px;right:auto;bottom:-9px;top:auto;border:0;border-top:9px solid var(--cc,var(--frost));border-left:6px solid transparent;border-right:6px solid transparent}
+@media(max-height:700px){.comp-hint{bottom:72px;width:184px;font-size:12px}}
+
+/* mode row uses the space the blurb left behind */
+.budget{flex:1;min-width:0}
+.budget-bar{max-width:none}
+
+/* board play surfaces breathe a little more */
+.board{gap:3px}
+.gp-hud{padding:3px 6px}
+.gp-score{font-size:14px}
+
+
+/* ---- v0.7.4: final squeeze — the boards are the point ---- */
+.shell{gap:4px;padding:5px 7px 4px}
+.layout{gap:6px}
+.mega{padding:5px;gap:5px}
+.mega::before{display:none}
+.board{padding:5px;border-radius:9px}
+.board-col{gap:4px}
+.action-row{padding:4px;gap:5px}
+.action-row .btn{padding:6px 9px;font-size:7px}
+.action-row .sheet-btn{padding:5px 4px;font-size:6px}
+.hud{padding:4px 9px;border-radius:9px}
+.hud::before{display:none}
+.venue-nav{padding:3px;border-radius:9px}
+.venue-tab{padding:4px 8px}
+.block-clock{padding:4px 9px}
+.block-num{font-size:10px}
+.block-bar{height:8px}
+.block-clock>div>div:last-child{font-size:11px;margin-top:3px}
+.mode-pill{padding:3px}
+.mode-pill button{padding:4px 7px;font-size:6px}
+.budget-bar{height:7px}
+
+/* the hint stays inside the left rail's column so it can never cover a board */
+.comp-hint{width:158px;left:5px;bottom:78px;font-size:12px;line-height:1.32;padding:6px 8px}
+.comp-hint::after{left:18px}
+
+/* short viewports shed the block-clock prose and the vault's fatter rows */
+@media(max-height:620px){
+  .block-clock>div>div:last-child{display:none}
+  .kv{padding:3px 0}
+}
+
+
+/* ---- v0.7.5: operator-select scroll fix + transmission dock ---- */
+
+/* CASCADE FIX: the later .cselect-body rule used the overflow SHORTHAND, which reset
+   overflow-y back to hidden and made the 9th stat + deploy button unreachable. */
+.cselect-body{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto}
+.cselect-body::-webkit-scrollbar{width:5px}
+.cselect-body::-webkit-scrollbar-thumb{background:rgba(93,246,255,.32);border-radius:3px}
+/* and shorten the panel so it fits without needing the scroll in the first place */
+@media(max-height:700px){
+  .cine-select{max-height:92dvh;gap:7px}
+  .csh-kicker{font-size:10px}
+  .csh-sub{font-size:13px;margin-top:5px}
+  .cselect-body .crew-stage{min-height:min(30dvh,210px)}
+  .cselect-body .crew-panel{padding:10px}
+  .cselect-body .cp-name{font-size:9px}
+  .cselect-body .cp-title{font-size:12.5px;margin-top:3px}
+  .cselect-body .cp-total b{font-size:20px}
+  .cselect-body .cp-head{padding-bottom:7px}
+  .cselect-body .cp-perk{margin:8px 0;padding:6px 8px;font-size:12px}
+  .cselect-body .stat-grid{gap:3px 12px}
+  .cselect-body .sr-track i{height:9px}
+  .cselect-body .sr-label{font-size:6px}
+  .cselect-body .sr-val{font-size:14px}
+  .cselect-body .crew-panel>.btn{margin-top:10px!important;padding:10px;font-size:9px}
+  .cselect-body .crew-panel>.ft{font-size:11.5px;margin-top:5px}
+  .cselect-foot .btn{padding:11px 20px;font-size:10px;min-width:240px}
+}
+
+/* TRANSMISSION: dock it over the left rail, never over a board.
+   The full read is opt-in, so an overlay there is the player's own choice. */
+.ghost-dock{position:fixed;left:8px;bottom:96px;z-index:56;width:168px;padding:9px 10px;
+  border:1px solid rgba(93,246,255,.55);border-left:2px solid var(--frost);border-radius:9px;
+  background:linear-gradient(180deg,rgba(4,14,20,.97),rgba(2,6,10,.98));
+  box-shadow:0 0 22px rgba(93,246,255,.28);cursor:pointer;
+  animation:ghostSlide .45s cubic-bezier(.2,1.2,.4,1);transition:box-shadow .18s,transform .18s}
+.ghost-dock:hover{box-shadow:0 0 30px rgba(93,246,255,.5);transform:translateX(2px)}
+.gd-head{display:flex;align-items:center;gap:4px}
+.gd-dot{width:4px;height:4px;border-radius:50%;background:var(--frost);box-shadow:0 0 6px var(--frost);animation:sigPulse 1.4s ease-in-out infinite}
+.gd-dot:nth-child(2){animation-delay:.2s}
+.gd-dot:nth-child(3){animation-delay:.4s}
+.gd-from{flex:1;margin-left:4px;font-family:var(--f-display);font-size:5px;letter-spacing:.11em;color:var(--frost);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gd-x{background:0;border:0;color:var(--grey);cursor:pointer;font-size:9px;padding:0 1px;line-height:1}
+.gd-x:hover{color:var(--paper)}
+.gd-title{margin-top:7px;font-family:var(--f-term);font-size:14.5px;line-height:1.28;color:#cdf3ff;text-wrap:pretty}
+.gd-cta{margin-top:7px;font-family:var(--f-display);font-size:5px;letter-spacing:.1em;color:var(--gold)}
+.gd-cta b{color:var(--frost)}
+/* the opened read is a real centred overlay again — deliberate, so it may cover things */
+.ghost-veil{position:fixed;inset:0;display:grid;place-items:center;padding:18px;
+  background:radial-gradient(ellipse at center,rgba(6,14,20,.9),rgba(2,4,8,.97));
+  max-width:none;pointer-events:auto}
+.ghost-card{width:min(560px,92vw);max-height:88dvh;overflow-y:auto}
+.ghost-body{min-height:0}
+@media(max-height:700px){
+  .ghost-dock{bottom:88px;width:158px}
+  .gd-title{font-size:13.5px}
+  .ghost-title{font-size:18px;margin:8px 0 6px}
+  .ghost-body{font-size:11px;line-height:1.62}
+  .ghost-card{padding:14px}
+}
+
+
+/* ---- v0.7.6: operator select is UI, not film ---- */
+.cine[data-beat="4"] .cine-bars{display:none}
+.cine[data-beat="4"] .cine-grain{opacity:.28}
+.cine-select{position:relative;z-index:4;padding:10px 4px}
+
+
+/* ---- v0.7.7: the coach tip always fits the viewport ---- */
+.wt-tip{max-height:calc(100dvh - 24px);overflow-y:auto;z-index:95}
+.wt-tip::-webkit-scrollbar{width:4px}
+.wt-tip::-webkit-scrollbar-thumb{background:rgba(93,246,255,.3);border-radius:2px}
+@media(max-height:700px){
+  .wt-tip{width:340px;padding:11px}
+  .wt-title{font-size:9.5px}
+  .wt-text{font-size:11px;line-height:1.55;margin-top:6px}
+  .wt-chapters{margin-bottom:8px}
+  .wt-foot{margin-top:10px;padding-top:9px}
+}
+/* the sheet must sit under the coach layer so the highlight reads */
+.sheet{z-index:60}
+.wt-layer{z-index:94}
+
+
+/* ---- v0.8: current board reads as THE one, gated boards read as locked ---- */
+
+/* the live board burns orange — it is unmistakably the one you play */
+.board[data-tier="now"]{border-color:#ff8a3d!important;
+  box-shadow:0 0 0 1px rgba(255,138,61,.5),0 0 30px rgba(255,107,53,.55),inset 0 0 30px rgba(255,107,53,.14)!important;
+  animation:nowBurn 1.9s ease-in-out infinite!important}
+@keyframes nowBurn{
+  0%,100%{box-shadow:0 0 0 1px rgba(255,138,61,.45),0 0 24px rgba(255,107,53,.45),inset 0 0 26px rgba(255,107,53,.12)}
+  50%{box-shadow:0 0 0 2px rgba(255,166,90,.85),0 0 46px rgba(255,107,53,.85),inset 0 0 38px rgba(255,107,53,.24)}}
+.board[data-tier="now"] .game-tag{color:#ffb98a!important}
+.board[data-tier="now"] .ix{color:#ffd7b8}
+
+/* PLAYING NOW: big, bold, impossible to miss */
+.tag.now{font-size:9px!important;padding:5px 9px!important;font-weight:700;
+  background:linear-gradient(180deg,#ffa65a,#ff6b35);color:#180702;letter-spacing:.11em;
+  box-shadow:0 0 18px rgba(255,107,53,.9),inset 0 1px 0 rgba(255,255,255,.5);
+  animation:nowTag 1.5s ease-in-out infinite}
+@keyframes nowTag{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+/* gated boards: dimmed, sealed, and told what to do */
+.board.gated{filter:saturate(.35) brightness(.6)}
+.board.gated .play-surface{position:relative}
+.gate-veil{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:linear-gradient(180deg,rgba(4,6,13,.72),rgba(4,6,13,.86));backdrop-filter:blur(1.5px);
+  border-radius:6px;cursor:not-allowed}
+.gv-lock{font-size:17px;color:var(--frost);opacity:.75;text-shadow:0 0 12px var(--frost)}
+.gv-t{font-family:var(--f-display);font-size:7px;letter-spacing:.14em;color:var(--frost)}
+.gv-s{font-family:var(--f-term);font-size:11.5px;color:var(--silver);text-align:center;padding:0 6px;line-height:1.2}
+
+/* in-cabinet coaching tip */
+.gp-tip{position:absolute;left:50%;top:26px;transform:translateX(-50%);z-index:9;
+  padding:5px 10px;border:1px solid var(--gc,var(--frost));border-radius:6px;
+  background:rgba(4,6,13,.93);color:var(--gc,var(--frost));
+  font-family:var(--f-display);font-size:5.6px;letter-spacing:.1em;text-align:center;
+  max-width:92%;line-height:1.6;pointer-events:none;
+  animation:tipIn .3s cubic-bezier(.2,1.3,.4,1),tipOut .5s ease 2.4s forwards}
+@keyframes tipIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%)}}
+@keyframes tipOut{to{opacity:0}}
+.gp-lives{margin-left:auto;font-family:var(--f-term);font-size:12px;color:var(--hot);letter-spacing:1px}
+.gp-lives i{color:var(--frozen);font-style:normal}
+
+/* SatBag: orange alert when a card is waiting */
+.sb-tab.alert{border-color:#ff8a3d;color:#ffb98a;background:rgba(30,12,4,.95);
+  box-shadow:-3px 0 22px rgba(255,107,53,.7);animation:bagAlert 1.15s ease-in-out infinite}
+@keyframes bagAlert{
+  0%,100%{box-shadow:-3px 0 16px rgba(255,107,53,.5)}
+  50%{box-shadow:-3px 0 32px rgba(255,138,61,.95),0 0 18px rgba(255,107,53,.6)}}
+.sb-tab.alert .sbt-ico,.sb-tab.alert .sbt-n{color:#ffd7b8}
+.sbt-new{position:absolute;left:-4px;top:-6px;padding:2px 5px;border-radius:4px;
+  background:linear-gradient(180deg,#ffa65a,#ff6b35);color:#180702;
+  font-family:var(--f-display);font-size:4.6px;letter-spacing:.08em;white-space:nowrap;
+  box-shadow:0 0 12px rgba(255,107,53,.9)}
+.sb-tab{position:relative}
+
+
+/* ---- v0.8.1: keep the PLAYING NOW tag inside the header ---- */
+.board-head{align-items:center;gap:5px;min-height:19px}
+.board[data-tier="now"] .board-head .ix{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag.now{font-size:7.5px!important;padding:4px 7px!important;flex:0 0 auto;white-space:nowrap;line-height:1}
+/* the in-cabinet tip sits below the header, not under it */
+.gp-tip{top:auto;bottom:22px;font-size:5.2px;padding:4px 8px}
+/* board 01's own start prompt clears the tip */
+.gp-start{font-size:6px;padding:5px 9px}
+@media(max-height:700px){
+  .tag.now{font-size:7px!important;padding:3px 6px!important}
+  .board-head .ix{font-size:6px}
+}
+
+
+/* ---- v0.7.8: equal board tracks + single-line status tags ----
+   1fr resolves to minmax(auto,1fr), so a track cannot shrink below its
+   content's min-content width. The MAZE header floored column 2 at 289px and
+   squeezed column 1 to 247px. minmax(0,1fr) removes the floor. Rows too, or
+   the same trap fires vertically as soon as a cabinet grows. */
+.mega{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+
+/* 6px display-type badges must never wrap */
+.tag,.game-tag{white-space:nowrap}
+/* let the descriptive run truncate instead of pushing the badge into a wrap */
+.board-head{gap:6px;min-width:0}
+.board-head .ix{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board-head .tag{flex:0 0 auto}
+
+
+/* ============ v0.9.1 — the play surface has a floor ============
+   The canvas was being handed 252×68 (3.71:1). These cabinets are authored for a
+   roughly square surface, so vertical geometry collapsed to 1px. Guarantee a minimum
+   and let the board column scroll internally if the chrome cannot yield enough —
+   a contained scroll is a fair trade for a playable cabinet. */
+.board .play-surface{min-height:118px}
+.board{min-height:158px}
+.board-col{overflow:hidden}
+.mega{overflow-y:auto;overflow-x:hidden;align-content:start;grid-auto-rows:minmax(158px,1fr)}
+.mega::-webkit-scrollbar{width:5px}
+.mega::-webkit-scrollbar-thumb{background:rgba(93,246,255,.3);border-radius:3px}
+
+/* reclaim height from the chrome first, so the scroll is a last resort */
+@media(max-height:640px){
+  /* the nav stays — it is the only guaranteed path to the other venues.
+     Shrink it instead; the sheet's VENUES picker is an addition, not a replacement. */
+  .venue-nav{padding:2px}
+  .venue-tab{padding:3px 7px}
+  .vt-n{font-size:6px}
+  .block-clock{padding:3px 9px}
+  .hud{padding:3px 8px}
+  .stat{padding:1px 7px}
+  .stat .val{font-size:12px}
+  .stat .label{font-size:5px}
+  .action-row{padding:3px}
+  .action-row .btn{padding:5px 8px}
+}
+/* on a genuinely short screen show two boards at full size rather than four crushed */
+@media(max-height:560px){
+  .mega{grid-template-columns:1fr 1fr;grid-auto-rows:minmax(168px,auto)}
+}
+
+
+/* boards came out 290/242 uneven: 1fr resolves to minmax(auto,1fr), so canvas
+   content widened its own column. Pin both to minmax(0,1fr). */
+.mega{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.board{min-width:0}

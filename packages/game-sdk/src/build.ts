@@ -7,14 +7,15 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 
 import { build } from "esbuild";
 
-// What a game folder contains and what is published from it. `index.html`, `styles.css` and `assets/` are
-// copied; `src/main.ts` (and what it imports, including the SDK) is bundled into the one `main.js` the page
-// loads. Nothing else in the folder (tests, config, notes) leaves it.
-const published = ["assets", "index.html", "styles.css"] as const;
+// What a game folder contains and what is published from it. `index.html` and `assets/` are copied;
+// `src/main.ts` (and what it imports, including the SDK) is bundled into the one `main.js` the page loads, and
+// `styles.css` (with the stylesheets and fonts it imports) into the one `styles.css`. Nothing else in the folder
+// (tests, config, notes) leaves it.
+const published = ["assets", "index.html"] as const;
 
 // The ways a page can reach beyond itself, which the isolated frame forbids: a script or style from another
 // address, an inline script (the policy allows only the game's own script file), an embedded frame or form.
@@ -60,6 +61,54 @@ export async function bundleGameScript(entry: string): Promise<string> {
   return output.text;
 }
 
+// A stylesheet an `@import` or `url()` reaches by address would be refused by the isolated frame, which allows
+// only the game's own files. Refusing it when the game is built tells the author at once.
+const remoteStyleReference =
+  /(?:@import\s*(?:url\(\s*)?|url\(\s*)["']?\s*(?:https?:)?\/\//iu;
+
+// The game's styles as files to publish: `styles.css` with every `@import` inlined, and each font or image it
+// names copied beside it under a hashed name the stylesheet points to. Imports resolve like a module's, so a
+// package's own stylesheet (a bundled font) can be imported by name.
+export async function bundleGameStyles(
+  entry: string,
+): Promise<
+  readonly { readonly contents: Uint8Array; readonly path: string }[]
+> {
+  const outdir = resolve("/", "game-styles");
+  const result = await build({
+    assetNames: "[name]-[hash]",
+    bundle: true,
+    entryPoints: [entry],
+    legalComments: "none",
+    loader: {
+      ".gif": "file",
+      ".jpg": "file",
+      ".png": "file",
+      ".svg": "file",
+      ".webp": "file",
+      ".woff": "file",
+      ".woff2": "file",
+    },
+    logLevel: "silent",
+    minify: true,
+    outdir,
+    write: false,
+  });
+  const files = result.outputFiles.map(({ contents, path }) => ({
+    contents,
+    path: relative(outdir, path),
+  }));
+  for (const file of files)
+    if (
+      file.path.endsWith(".css") &&
+      remoteStyleReference.test(new TextDecoder().decode(file.contents))
+    )
+      throw new Error(
+        `${entry}: the styles load something from another address; everything must be bundled with the game.`,
+      );
+  return files;
+}
+
 // Builds one game folder into `outDirectory`, replacing what was there.
 export async function buildGame(options: {
   readonly directory: string;
@@ -84,6 +133,15 @@ export async function buildGame(options: {
       await cp(source, join(options.outDirectory, name), { recursive: true });
   }
   await writeFile(join(options.outDirectory, "main.js"), script);
+  const styles = join(directory, "styles.css");
+  if (
+    await stat(styles).then(
+      () => true,
+      () => false,
+    )
+  )
+    for (const file of await bundleGameStyles(styles))
+      await writeFile(join(options.outDirectory, file.path), file.contents);
 }
 
 // Builds every game folder under `gamesDirectory` into `outRoot/<folder name>`.

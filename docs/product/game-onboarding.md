@@ -102,6 +102,20 @@ const { signedIn, walletConnected } = await client.player.info(); // yes/no only
   page tells the player which of the two is true.
 - A game does nothing for either: it only calls `progress.save` and `milestones.unlock`.
 
+## Bringing a game written for a plain web page
+
+FROST·BITE came in this way (`games/frostbite`), and is the worked example:
+
+- Its old code stays as it was, in a folder marked **legacy** (`src/legacy/README.md` says what was changed and the
+  plan to refactor it; the repository policy skips that folder by name, and it may only shrink). New code is
+  written to the usual rules.
+- `src/main.ts` gives the old code what it expects from the platform before it starts: React (bundled), a
+  `localStorage` (`@ador/game-sdk/storage-shim`: kept in memory, with the keys the game names saved through
+  `progress.save`), and a way to report its own progress marks as milestones.
+- Anything the frame forbids is removed or replaced, not worked around: network calls and live-chain code were
+  removed, CDN scripts and fonts were bundled, a page of tools that kept data in the browser was left out.
+- Where the old code claimed something it did not do (a wallet connection), it now says it is a simulation.
+
 ## What the browser enforces
 
 The frame is `sandbox="allow-scripts"`, and the files are served with `Content-Security-Policy: sandbox
@@ -142,9 +156,9 @@ within the game (at most 64) and every text bounded (`gameManifestLimits`); the 
 the page checks above; ≤300 lines per source and test file; the repository's lint, typecheck, unit, integration
 and coverage gates (above 90%).
 
-## External games (until FROST·BITE moves)
+## External games (none registered today)
 
-A game that cannot be bundled this way (today FROST·BITE: it calls its own server) can still be listed with
+FROST·BITE moved onto the SDK and is played here, so no game uses this mode now. A game that cannot be bundled this way (it needs its own server) could still be listed with
 `launch: { mode: "external", ... }` and played at an address a deployment sets through `GAME_LAUNCHES`. It is
 shown as an external link, gets no saving, no milestones and no frame, and its host must not be the platform's
 own origin. The hosting rules are:
@@ -156,7 +170,8 @@ own origin. The hosting rules are:
 audit:game -- <folder>` screens for root addresses. With path style, games on one host share an origin, so
   prefer one host per game for anything private.
 
-Moving FROST·BITE onto the SDK (task G5) removes the need for this mode for it.
+The launch rules are tested on their own (`packages/shared`) and in a real browser with fixture games (`tests/e2e`
+`game-hosting.spec.ts`). Naming a game the platform plays itself in `GAME_LAUNCHES` stops the platform starting.
 
 ## Not built yet
 

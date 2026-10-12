@@ -23,9 +23,14 @@ the account and (later) minting; the game owns only its rules and its drawing.
   reads and writes; the account is reconciled once before the game's first read, then sent the whole local
   state after each change (one request at a time). A missing account (`signed-out`) ends syncing; a failed
   sync is `pending` and retried with the next change. `status()` is what the page may truthfully say.
+- `./storage-shim`: `createPlatformStorage` gives a game written for `localStorage` a storage kept in memory,
+  with the keys it names saved through `progress.save` (one save after a burst, a refused save retried with the
+  next change). The page that owns the player's data stays the platform.
 - `./frame-headers`: the response headers (CSP `sandbox allow-scripts`, `connect-src 'none'`, …) the platform
   serves game files with.
-- `./build`: `checkGameHtml`, `bundleGameScript`, `buildGame(s)`: turns `/games/<id>` into `public/play/<id>`.
+- `./build`: `checkGameHtml`, `bundleGameScript`, `bundleGameStyles`, `buildGame(s)`: turns `/games/<id>` into
+  `public/play/<id>`. `styles.css` is bundled with what it imports; fonts and images it names are published beside it
+  under hashed names; a stylesheet that loads from another address fails the build.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
