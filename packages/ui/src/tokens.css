@@ -19,6 +19,8 @@
   --arcade-font-display: var(--font-bungee), Impact, sans-serif;
   --arcade-font-pixel: var(--font-press-start), ui-monospace, monospace;
   --arcade-content-width: 74rem;
+  /* The height of the sticky site header, so a bar can stick just below it. */
+  --arcade-header-height: 4.75rem;
   --arcade-radius-small: 0.25rem;
   --arcade-radius-medium: 0.625rem;
   --arcade-border-width: 0.1875rem;

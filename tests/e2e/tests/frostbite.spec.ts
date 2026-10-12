@@ -135,9 +135,7 @@ test("the platform page says what the game is: simulated, with nothing declared 
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(
-    page.getByText("This game is played on this page."),
-  ).toBeVisible();
+  await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
   await expect(
     page.getByText("This game does not ask the platform for anything."),
   ).toBeVisible();

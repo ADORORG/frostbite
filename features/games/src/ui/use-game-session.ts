@@ -16,6 +16,9 @@ import { useEffect, useEffectEvent, useState, type RefObject } from "react";
 
 import { createAccountPort } from "../client/account-sync.ts";
 
+// How long a "milestone reached" notice stays up.
+export const toastMs = 6_000;
+
 export interface UnlockedMilestones {
   readonly [id: string]: string;
 }
@@ -54,6 +57,7 @@ export function useGameSession(
   const [connected, setConnected] = useState(false);
   const [kept, setKept] = useState(true);
   const [sync, setSync] = useState<SyncStatus>("local");
+  const [toast, setToast] = useState<string | null>(null);
   const { id, milestones } = game;
   // The account is looked up when the session starts, not whenever the function that finds it is a new one: a
   // session restarted by a re-render would reload the game and lose what the player was doing.
@@ -74,8 +78,26 @@ export function useGameSession(
       onStatus: setSync,
       remote: remoteFor(id),
     });
+    // A milestone is announced when it is reported while the player is here, never for those they already had.
+    const seen = new Set<string>();
+    let baselined = false;
+    let toastTimer: ReturnType<typeof setTimeout> | undefined;
+    const announce = (ids: readonly string[]) => {
+      clearTimeout(toastTimer);
+      const titles = ids.map(
+        (found) =>
+          milestones.find((milestone) => milestone.id === found)?.title ??
+          found,
+      );
+      setToast(`${titles.join(", ")} reached`);
+      toastTimer = setTimeout(() => setToast(null), toastMs);
+    };
     const refresh = () =>
       void backend.milestones().then((records) => {
+        const fresh = Object.keys(records).filter((key) => !seen.has(key));
+        for (const key of fresh) seen.add(key);
+        if (baselined && fresh.length > 0) announce(fresh);
+        baselined = true;
         setKept(session.kept);
         setUnlocked(
           Object.fromEntries(
@@ -103,8 +125,11 @@ export function useGameSession(
     // earlier (by the markup the server sent) its opening message could arrive before the page is ready, and
     // be lost.
     element.setAttribute("src", src);
-    return detach;
+    return () => {
+      clearTimeout(toastTimer);
+      detach();
+    };
   }, [frame, id, milestones, src]);
 
-  return { connected, kept, sync, unlocked };
+  return { connected, kept, sync, toast, unlocked };
 }

@@ -1,12 +1,20 @@
 "use client";
 
 import type { HostedGame } from "@ador/game-sdk/host";
+import type { GameMilestone } from "@ador/shared/games";
 import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
-import { ArcadeActionButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
-import { useRef } from "react";
+import {
+  ArcadeActionButton,
+  ArcadeInfoCard,
+  ArcadeInfoRow,
+  ArcadeStage,
+  StatusLamp,
+} from "@repo/ui/arcade";
+import { useRef, useState, type ReactNode } from "react";
 
 import { MilestoneList } from "./milestone-list.tsx";
 import { useFullscreen } from "./use-fullscreen.ts";
+import { usePhoneLandscape } from "./use-phone-landscape.ts";
 import { useGameSession } from "./use-game-session.ts";
 
 // What the frame may do. Scripts only: no same-origin access, so the game has no storage, cookies or session
@@ -36,70 +44,116 @@ const keptCopy: Record<SyncStatus, string> = {
 
 export function GamePlayer({
   accountFor,
+  children,
   game,
   src,
   title,
 }: {
   // How the page reaches the account for a game; the real one unless a test supplies another.
   readonly accountFor?: (gameId: string) => AccountPort;
-  readonly game: HostedGame;
+  // More small cards for the row under the stage.
+  readonly children?: ReactNode;
+  readonly game: HostedGame & { readonly milestones: readonly GameMilestone[] };
   readonly src: string;
   readonly title: string;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { connected, kept, sync, unlocked } = useGameSession(
+  const { connected, kept, sync, toast, unlocked } = useGameSession(
     game,
     frame,
     src,
     accountFor,
   );
   const fullscreen = useFullscreen(frame);
+  const phoneLandscape = usePhoneLandscape();
+  const [promptDismissed, setPromptDismissed] = useState(false);
+  const prompt = phoneLandscape && fullscreen.supported && !promptDismissed;
   return (
     <>
-      <ArcadePanel eyebrow="Playing here" title={title}>
-        <StatusLamp
-          label={connected ? "Connected to the platform" : "Connecting"}
-          tone={connected ? "ready" : "attention"}
-        />
-        {fullscreen.supported ? (
+      <ArcadeStage
+        bar={
           <>
-            <ArcadeActionButton onClick={fullscreen.enter} tone="cyan">
-              Full screen
-            </ArcadeActionButton>
-            <p>Press Esc to leave full screen.</p>
-            {fullscreen.refused ? (
-              <p role="status">
-                The browser did not allow full screen. Try again, or use the
-                browser&apos;s own full screen.
-              </p>
+            <StatusLamp
+              label={connected ? "Connected to the platform" : "Connecting"}
+              tone={connected ? "ready" : "attention"}
+            />
+            <span>{kept ? keptCopy[sync] : blockedCopy[sync]}</span>
+            {fullscreen.supported ? (
+              <span className="arcade-stage__bar-end">
+                {fullscreen.refused ? (
+                  <span role="status">
+                    The browser did not allow full screen. Try again, or use the
+                    browser&apos;s own full screen.
+                  </span>
+                ) : null}
+                <span className="arcade-stage__hint">
+                  Press Esc to leave full screen.
+                </span>
+                <ArcadeActionButton onClick={fullscreen.enter} tone="cyan">
+                  Full screen
+                </ArcadeActionButton>
+              </span>
             ) : null}
           </>
-        ) : null}
+        }
+        overlay={
+          <>
+            <div
+              aria-live="polite"
+              className="arcade-toast"
+              data-testid="milestone-toast"
+              role="status"
+            >
+              {toast}
+            </div>
+            {prompt ? (
+              <div className="arcade-prompt" data-testid="fullscreen-prompt">
+                <p>
+                  Playing on a phone? Full screen gives the game the whole
+                  screen.
+                </p>
+                <ArcadeActionButton
+                  onClick={() => {
+                    setPromptDismissed(true);
+                    fullscreen.enter();
+                  }}
+                  tone="cyan"
+                >
+                  Full screen
+                </ArcadeActionButton>
+                <ArcadeActionButton
+                  onClick={() => setPromptDismissed(true)}
+                  tone="pink"
+                >
+                  Not now
+                </ArcadeActionButton>
+              </div>
+            ) : null}
+          </>
+        }
+      >
         <iframe
           allow={gameFramePermissions}
           data-game-src={src}
           data-testid="game-frame"
           ref={frame}
           sandbox={gameFrameSandbox}
-          style={{
-            border: 0,
-            height: gameFrameHeight,
-            minHeight: "32rem",
-            width: "100%",
-          }}
+          style={{ border: 0, height: gameFrameHeight, minHeight: "32rem" }}
           title={title}
         />
-        <p>{kept ? keptCopy[sync] : blockedCopy[sync]}</p>
-      </ArcadePanel>
-      {game.milestones.length === 0 ? null : (
-        <ArcadePanel eyebrow="Reported by the game" title="Your milestones">
-          <MilestoneList milestones={game.milestones} unlocked={unlocked} />
-          <p>
-            The game reports these itself and the platform cannot check them
-            yet, so nothing that carries value depends on them.
-          </p>
-        </ArcadePanel>
-      )}
+      </ArcadeStage>
+      <ArcadeInfoRow>
+        {game.milestones.length === 0 ? null : (
+          <ArcadeInfoCard title="Your milestones">
+            <MilestoneList milestones={game.milestones} unlocked={unlocked} />
+            <p>
+              The game reports these itself and the platform cannot check them
+              yet, so nothing that carries value depends on them.
+            </p>
+          </ArcadeInfoCard>
+        )}
+        {children}
+      </ArcadeInfoRow>
     </>
   );
 }

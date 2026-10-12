@@ -1,0 +1,172 @@
+/* A page built around one stage: a wide section, one title line, a slim sticky bar, the stage, small cards. */
+.arcade-section--stage {
+  padding: clamp(1rem, 3vw, 2rem)
+    max(1rem, calc((100vw - var(--arcade-content-width)) / 2));
+}
+.arcade-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 0.875rem;
+}
+.arcade-section .arcade-stage-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+}
+.arcade-stage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.arcade-stage {
+  position: relative;
+}
+.arcade-stage__bar {
+  position: sticky;
+  top: var(--arcade-header-height);
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  padding: 0.5rem 0.875rem;
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  border-bottom: 0;
+  border-radius: var(--arcade-radius-medium) var(--arcade-radius-medium) 0 0;
+  background: var(--arcade-surface-raised);
+  color: var(--arcade-text-muted);
+  font-size: 0.875rem;
+}
+.arcade-stage__bar-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  margin-inline-start: auto;
+}
+.arcade-stage__hint {
+  color: var(--arcade-text-subtle);
+  font-size: 0.75rem;
+}
+.arcade-stage__screen {
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  border-radius: 0 0 var(--arcade-radius-medium) var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow: var(--arcade-shadow-depth) var(--arcade-shadow-depth) 0
+    var(--arcade-red);
+  overflow: hidden;
+}
+.arcade-stage__screen iframe {
+  display: block;
+  width: 100%;
+}
+.arcade-stage__overlay {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  pointer-events: none;
+}
+.arcade-toast,
+.arcade-prompt {
+  max-width: 100%;
+  padding: 0.625rem 1rem;
+  border: var(--arcade-border-width) solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  color: var(--arcade-text);
+  pointer-events: auto;
+}
+.arcade-toast {
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.arcade-toast:empty {
+  display: none;
+}
+.arcade-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  border-color: var(--arcade-cyan);
+}
+.arcade-prompt p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arcade-toast:not(:empty) {
+    animation: arcade-toast-in 180ms ease-out;
+  }
+}
+@keyframes arcade-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+.arcade-info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.arcade-info-card {
+  padding: 1rem 1.125rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  color: var(--arcade-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+.arcade-info-card > * {
+  margin: 0;
+}
+.arcade-info-card > * + * {
+  margin-top: 0.625rem;
+}
+.arcade-info-card__title {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.arcade-info-card ul {
+  padding-inline-start: 1.125rem;
+}
+.arcade-info-card li + li {
+  margin-top: 0.5rem;
+}
+.arcade-section--stage > .arcade-button {
+  margin-top: 1.5rem;
+}
+/* Where the header is tall, or the screen is short, a sticky bar would take too much of the view. */
+@media (max-width: 40rem), (max-height: 40rem) {
+  .arcade-stage__bar {
+    position: static;
+  }
+}
+/* There is no Escape key to press on a touch screen. */
+@media (pointer: coarse) {
+  .arcade-stage__hint {
+    display: none;
+  }
+}

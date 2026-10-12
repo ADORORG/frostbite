@@ -61,7 +61,7 @@ describe("a game's page", () => {
       "/games/[slug]",
       "template-game",
     );
-    expect(markup).toContain("Version 0.3.0");
+    expect(markup).toContain("v0.3.0");
     expect(markup).toContain('href="https://play.example.test/template"');
     expect(markup).toContain("Play Template game");
     expect(markup).toContain(
@@ -94,7 +94,6 @@ describe("a game's page", () => {
       "/games/[slug]",
       "embedded-game",
     );
-    expect(markup).toContain("This game is played on this page.");
     expect(markup).toContain('data-game-src="/play/embedded-game/index.html"');
     expect(markup).toContain('sandbox="allow-scripts"');
     // Started by the page once the host is listening, never by the server's markup, so the game's first
@@ -104,6 +103,32 @@ describe("a game's page", () => {
     expect(markup).toContain("Playable");
     expect(markup).not.toContain("not on this site");
     expect(markup).toContain("Your milestones");
+  });
+
+  it("lays a game the platform plays out as a title line, a bar, the stage, then small cards in a row", async () => {
+    const markup = await render(
+      [embeddedGame],
+      "/games/[slug]",
+      "embedded-game",
+    );
+    const at = (text: string) => markup.indexOf(text);
+    // One line for the name and its small facts, before everything else.
+    expect(markup).toContain('class="arcade-section arcade-section--stage"');
+    expect(markup).toMatch(
+      /arcade-stage-title">Embedded game<\/h2><div class="arcade-stage-meta"><span>v1\.0\.0<\/span>/u,
+    );
+    expect(at("arcade-stage-title")).toBeLessThan(at("arcade-stage__bar"));
+    expect(at("arcade-stage__bar")).toBeLessThan(at("<iframe"));
+    expect(at("<iframe")).toBeLessThan(at("arcade-info-row"));
+    // The rest is small cards after the game, not panels before it.
+    for (const card of ["Your milestones", "About", "What it asks for"])
+      expect(at(`aria-label="${card}"`)).toBeGreaterThan(at("<iframe"));
+    expect(markup).not.toContain("arcade-panel");
+    // The digest lives in About, and there is no second milestone list of declarations.
+    expect(markup).toContain("Declarations digest:");
+    expect(markup.match(/aria-label="Milestones of this game"/gu)).toHaveLength(
+      1,
+    );
   });
 
   it("separates an address that cannot be a game from one that is only unknown", async () => {

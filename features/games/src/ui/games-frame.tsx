@@ -7,9 +7,12 @@ import type { ReactNode } from "react";
 export function GamesFrame({
   children,
   navigation,
+  variant = "catalog",
 }: {
   readonly children: ReactNode;
   readonly navigation: readonly NavigationItem[];
+  // `stage` is wide, for a page built around one thing (a game being played).
+  readonly variant?: "catalog" | "stage";
 }) {
   return (
     <AppShell
@@ -23,7 +26,7 @@ export function GamesFrame({
         "★ BITCOIN ALKANES",
       ]}
     >
-      <section className="arcade-section arcade-section--catalog">
+      <section className={`arcade-section arcade-section--${variant}`}>
         {children}
       </section>
     </AppShell>

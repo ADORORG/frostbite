@@ -36,9 +36,7 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 2, name: "FROST·BITE" }).first(),
   ).toBeVisible();
-  await expect(
-    page.getByText("This game is played on this page."),
-  ).toBeVisible();
+  await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
   // It is played here, not at another address, and nothing is declared that the platform cannot honour.
   await expect(page.getByRole("link", { name: /^Play/u })).toHaveCount(0);
   await expect(

@@ -87,6 +87,8 @@ describe("the game player", () => {
     const waiting = h.container.querySelector('[data-milestone="century"]');
     expect(waiting?.getAttribute("data-state")).toBe("not-earned");
     expect(waiting?.textContent).toContain("Not yet");
+    // The card stays short: detail is for what has been reached.
+    expect(waiting?.textContent).not.toContain("Not reported by the game yet");
     expect(
       h.container.querySelector('[data-testid="milestone-summary"]')
         ?.textContent,

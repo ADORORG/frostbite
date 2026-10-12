@@ -31,7 +31,10 @@ test("the game's frame goes full screen from the button, keeps working, and the 
   );
   const game = page.frameLocator(frameSelector);
   await expect(game.locator("#status")).toHaveText("Connected. Tap to score.");
-  await expect(page.getByText("Press Esc to leave full screen.")).toBeVisible();
+  // Hidden on a touch screen, where there is no Escape key to press.
+  await expect(
+    page.getByText("Press Esc to leave full screen."),
+  ).toBeAttached();
   await page.getByRole("button", { name: "Full screen" }).focus();
   await page.keyboard.press("Enter");
   await expect.poll(() => page.evaluate(fullscreenElement)).toBe("game-frame");
