@@ -6,6 +6,7 @@ import { requestFingerprint } from "../http/fingerprint.ts";
 // The limits on what a game declares about itself. They bound what a public page must render.
 export const gameManifestLimits = Object.freeze({
   capabilities: 16,
+  coverAlt: 200,
   description: 2_000,
   milestoneCriteria: 500,
   milestoneDescription: 500,
@@ -76,12 +77,30 @@ export const gameBasePathSchema = z
   .max(128)
   .regex(/^(?:\/[a-z0-9]+(?:[._~-][a-z0-9]+)*)*$/u);
 
+// A cover is a picture, and optionally a short silent clip, that the catalog shows as the game's preview. Each
+// is the name of one file in the game's `assets` folder, so it is published with the game, served from the
+// platform's own address, and cannot name another folder or another site.
+const coverImagePattern =
+  /^[a-z0-9][a-z0-9._-]{0,63}\.(?:avif|jpg|png|svg|webp)$/u;
+const coverVideoPattern = /^[a-z0-9][a-z0-9._-]{0,63}\.(?:mp4|webm)$/u;
+export const gameCoverSchema = z
+  .object({
+    // What the picture shows, for a person who cannot see it.
+    alt: z.string().trim().min(1).max(gameManifestLimits.coverAlt),
+    image: z.string().regex(coverImagePattern),
+    video: z.string().regex(coverVideoPattern).nullable(),
+  })
+  .strict();
+
 // Where the platform serves the files of the games it plays itself, one folder per game identifier.
 export const embeddedGameRoot = "/play";
 // The page of a game, named in full: the platform's static files have no directory index, and the game's
 // own files are addressed relative to this page.
 export const embeddedGamePath = (id: string) =>
   `${embeddedGameRoot}/${id}/index.html`;
+// A file of the game's `assets` folder, as the platform serves it.
+export const embeddedGameAssetPath = (id: string, file: string) =>
+  `${embeddedGameRoot}/${id}/assets/${file}`;
 
 // How a player reaches the game. `external`: the game runs on its own address, which is the host (`url`) plus
 // its base path. A null host means the game is registered but has no play address configured, and is shown
@@ -110,6 +129,8 @@ export const gameManifestSchema = z
       .refine((list) => new Set(list).size === list.length, {
         message: "A capability may be declared only once.",
       }),
+    // Only a game the platform serves can have one, because the files must come with the game.
+    cover: gameCoverSchema.optional(),
     description: z.string().trim().max(gameManifestLimits.description),
     id: gameIdSchema,
     launch: gameLaunchSchema,
@@ -128,8 +149,16 @@ export const gameManifestSchema = z
     // The game's own release version (any short text its team uses), separate from the manifest format.
     version: z.string().trim().min(1).max(gameManifestLimits.version),
   })
-  .strict();
+  .strict()
+  .refine(
+    ({ cover, launch }) => cover === undefined || launch.mode === "embedded",
+    {
+      message: "Only a game the platform plays itself can have a cover.",
+      path: ["cover"],
+    },
+  );
 
+export type GameCover = z.infer<typeof gameCoverSchema>;
 export type GameManifest = z.infer<typeof gameManifestSchema>;
 export type GameMilestone = z.infer<typeof gameMilestoneSchema>;
 export type GameCapability = z.infer<typeof gameCapabilitySchema>;

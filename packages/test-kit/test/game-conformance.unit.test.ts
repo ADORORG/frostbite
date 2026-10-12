@@ -59,4 +59,37 @@ describe("the conformance check for a game folder", () => {
     await checkGameConformance({ folder: fixture("good"), game, settleMs: 5 });
     expect(Date.now() - started).toBeLessThan(1_000);
   });
+
+  it("passes a game whose manifest names a cover that is in its assets", async () => {
+    expect(
+      await checkGameConformance({
+        cover: { alt: "A picture.", image: "cover.svg", video: null },
+        folder: fixture("good"),
+        game,
+      }),
+    ).toEqual([]);
+  });
+
+  it("reports each cover file the manifest names that the game does not have", async () => {
+    expect(
+      await checkGameConformance({
+        cover: { alt: "A picture.", image: "gone.png", video: "gone.mp4" },
+        folder: fixture("good"),
+        game,
+      }),
+    ).toEqual([
+      "The manifest's cover names assets/gone.png, which is missing.",
+      "The manifest's cover names assets/gone.mp4, which is missing.",
+    ]);
+  });
+
+  it("does not take a folder for a file", async () => {
+    expect(
+      await checkGameConformance({
+        cover: { alt: "A picture.", image: "folder", video: null },
+        folder: join(fixture("good")),
+        game,
+      }),
+    ).toEqual(["The manifest's cover names assets/folder, which is missing."]);
+  });
 });

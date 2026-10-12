@@ -1,7 +1,18 @@
-/* A page built around one stage: a wide section, one title line, a slim sticky bar, the stage, small cards. */
+/* A page built around one stage: nearly the whole width and height of the screen, a slim sticky bar with the
+   title, the stage, and a dock of small sections at the foot (dock.css). */
 .arcade-section--stage {
-  padding: clamp(1rem, 3vw, 2rem)
-    max(1rem, calc((100vw - var(--arcade-content-width)) / 2));
+  padding: 0.5rem clamp(0.5rem, 1.5vw, 1.25rem) 0;
+}
+/* The page's own status line sits above the header, so the stage is that much shorter and, at the top of the
+   page, the dock lands on the bottom edge of the screen. */
+.arcade-section--stage > .arcade-stage {
+  display: flex;
+  flex-direction: column;
+  height: calc(
+    100dvh - var(--arcade-ticker-height) - var(--arcade-header-height) -
+      var(--arcade-dock-height) - 0.5rem
+  );
+  min-height: 30rem;
 }
 .arcade-stage-head {
   display: flex;
@@ -29,10 +40,41 @@
 .arcade-stage {
   position: relative;
 }
+.arcade-stage__title {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.arcade-section .arcade-stage__title {
+  font-size: 1.25rem;
+}
+.arcade-stage__back {
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.arcade-stage__back:hover {
+  color: var(--arcade-cyan);
+}
+.arcade-stage__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+}
 .arcade-stage__bar {
   position: sticky;
   top: var(--arcade-header-height);
   z-index: 10;
+  flex: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -57,21 +99,24 @@
   font-size: 0.75rem;
 }
 .arcade-stage__screen {
+  flex: 1;
+  min-height: 0;
   border: var(--arcade-border-width) solid var(--arcade-text);
   border-radius: 0 0 var(--arcade-radius-medium) var(--arcade-radius-medium);
   background: var(--arcade-ink);
-  box-shadow: var(--arcade-shadow-depth) var(--arcade-shadow-depth) 0
-    var(--arcade-red);
+  box-shadow: 0 0 2rem color-mix(in srgb, var(--arcade-cyan) 22%, transparent);
   overflow: hidden;
 }
 .arcade-stage__screen iframe {
   display: block;
   width: 100%;
+  height: 100%;
 }
 .arcade-stage__overlay {
   position: absolute;
   inset-inline: 0;
   bottom: 1rem;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -156,7 +201,7 @@
   margin-top: 0.5rem;
 }
 .arcade-section--stage > .arcade-button {
-  margin-top: 1.5rem;
+  margin-block: 1.5rem;
 }
 /* Where the header is tall, or the screen is short, a sticky bar would take too much of the view. */
 @media (max-width: 40rem), (max-height: 40rem) {
@@ -168,5 +213,29 @@
 @media (pointer: coarse) {
   .arcade-stage__hint {
     display: none;
+  }
+}
+/* The hint is a second thing on the bar; where it would push the Full screen button to a line of its own, the
+   button's own words are enough. */
+@media (max-width: 90rem) {
+  .arcade-stage__hint {
+    display: none;
+  }
+}
+/* Where there is room the bar is one line, and the line about where progress is kept gives way first (its
+   whole words stay in its title). */
+@media (min-width: 64rem) {
+  .arcade-stage__bar {
+    flex-wrap: nowrap;
+  }
+  .arcade-stage__save {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arcade-stage__bar-end {
+    flex: none;
   }
 }

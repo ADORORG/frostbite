@@ -42,8 +42,6 @@ describe("the game player", () => {
     const { frame } = await mount();
     expect(frame.getAttribute("sandbox")).toBe("allow-scripts");
     expect(frame.getAttribute("allow")).toBe("fullscreen; autoplay; gamepad");
-    // Tall enough for a game built for a window, not a strip.
-    expect(frame.style.height).toBe("min(85vh, 60rem)");
     expect(frame.getAttribute("data-game-src")).toBe(
       "/play/embedded-game/index.html",
     );

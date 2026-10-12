@@ -7,6 +7,7 @@ import { createGamesFeature } from "../src/registration.ts";
 import {
   bareGame,
   chains,
+  coveredGame,
   embeddedGame,
   templateGame,
 } from "./support/template-game.ts";
@@ -45,6 +46,34 @@ describe("the games index", () => {
     expect(markup).toContain("Playable");
     expect(markup).toContain("Not playable yet");
     expect(markup).toContain("Bitcoin signet");
+  });
+
+  it("shows each game as a preview in a numbered wall, with a stand-in where there is no cover", async () => {
+    const markup = await render([embeddedGame, bareGame], "/games");
+    expect(markup).toContain("arcade-section--wall");
+    expect(markup).toContain("arcade-ticker");
+    expect(markup).toContain("Insert coin");
+    expect(markup).toContain(">01<");
+    expect(markup).toContain(">02<");
+    expect(markup).toContain("arcade-preview__stand-in");
+    expect(markup).not.toContain("<img");
+    expect(markup).toContain("2 milestones");
+    expect(markup).not.toContain("0 milestones");
+  });
+
+  it("shows a cover's picture with its words, and starts no clip on the server", async () => {
+    const markup = await render([coveredGame], "/games");
+    expect(markup).toContain('src="/play/covered-game/assets/cover.webp"');
+    expect(markup).toContain('alt="A tower of blocks, one tap from falling."');
+    expect(markup).not.toContain("<video");
+    expect(markup).not.toContain("arcade-preview__stand-in");
+  });
+
+  it("offers a way in named for the game, and says Play now only for one that can be played", async () => {
+    const markup = await render([embeddedGame, bareGame], "/games");
+    expect(markup).toContain('aria-label="View Embedded game"');
+    expect(markup).toContain("Play now");
+    expect(markup).toContain("View game");
   });
 
   it("lists a game the platform plays itself as playable", async () => {
@@ -100,35 +129,52 @@ describe("a game's page", () => {
     // message cannot arrive before anyone is there to answer it.
     expect(markup).not.toMatch(/<iframe[^>]* src=/u);
     expect(markup).not.toContain("allow-same-origin");
-    expect(markup).toContain("Playable");
     expect(markup).not.toContain("not on this site");
     expect(markup).toContain("Your milestones");
   });
 
-  it("lays a game the platform plays out as a title line, a bar, the stage, then small cards in a row", async () => {
+  it("lays a game the platform plays out as the title in the bar, the stage, then a dock of sections", async () => {
     const markup = await render(
       [embeddedGame],
       "/games/[slug]",
       "embedded-game",
     );
     const at = (text: string) => markup.indexOf(text);
-    // One line for the name and its small facts, before everything else.
     expect(markup).toContain('class="arcade-section arcade-section--stage"');
+    // The name and its small facts are in the bar over the game, not on a line of their own above it.
     expect(markup).toMatch(
-      /arcade-stage-title">Embedded game<\/h2><div class="arcade-stage-meta"><span>v1\.0\.0<\/span>/u,
+      /arcade-stage__title">Embedded game<\/h2><span class="arcade-stage__facts"><span>v1\.0\.0<\/span>/u,
     );
-    expect(at("arcade-stage-title")).toBeLessThan(at("arcade-stage__bar"));
+    expect(markup).not.toContain("arcade-stage-head");
+    // The way back to the list is in the bar too, before the title.
+    expect(markup).toMatch(
+      /arcade-stage__bar"><a class="arcade-stage__back" href="\/games">← All games<\/a><h2/u,
+    );
     expect(at("arcade-stage__bar")).toBeLessThan(at("<iframe"));
-    expect(at("<iframe")).toBeLessThan(at("arcade-info-row"));
-    // The rest is small cards after the game, not panels before it.
-    for (const card of ["Your milestones", "About", "What it asks for"])
-      expect(at(`aria-label="${card}"`)).toBeGreaterThan(at("<iframe"));
+    expect(at("<iframe")).toBeLessThan(at("arcade-dock"));
+    // Everything else is a section of the dock after the game, closed until asked for.
+    for (const section of ["Your milestones", "About", "What it asks for"])
+      expect(at(`aria-label="${section}"`)).toBeGreaterThan(at("<iframe"));
+    expect(markup.match(/class="arcade-dock__panel" hidden=""/gu)).toHaveLength(
+      3,
+    );
     expect(markup).not.toContain("arcade-panel");
-    // The digest lives in About, and there is no second milestone list of declarations.
     expect(markup).toContain("Declarations digest:");
     expect(markup.match(/aria-label="Milestones of this game"/gu)).toHaveLength(
       1,
     );
+  });
+
+  it("keeps a title line and small cards for a game that is played somewhere else", async () => {
+    const markup = await render(
+      [templateGame],
+      "/games/[slug]",
+      "template-game",
+    );
+    expect(markup).toContain("arcade-stage-head");
+    expect(markup).toContain("Not playable yet");
+    expect(markup).toContain(">All games<");
+    expect(markup).not.toContain("arcade-dock");
   });
 
   it("separates an address that cannot be a game from one that is only unknown", async () => {

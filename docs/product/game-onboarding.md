@@ -70,6 +70,17 @@ Only `index.html`, `styles.css`, `assets/` and the bundled `main.js` are publish
 the folder. `checkGameHtml` refuses a page that loads from another address, has an inline script or handler, or
 embeds a frame, form or object, and says which, when the game is built.
 
+## A cover for the list
+
+A game may declare a cover, which the games list shows as its preview: `cover: { alt, image, video }` in the manifest.
+`image` is the file name of a picture in the game's `assets/` folder (`avif`, `jpg`, `png`, `svg` or `webp`), `alt`
+says what it shows, and `video` is a short silent clip (`mp4` or `webm`) in the same folder, or `null`. The picture
+is always shown; the clip plays over it, muted and looping, only when the visitor has not asked for less motion, and
+falls back to the picture if it cannot play. Names are file names only (no folder, no address), so a cover always
+comes from the platform's own address, and only a game the platform plays itself may have one. A game with no cover
+gets a stand-in drawn from its title. Conformance fails if a named file is missing from `assets/`. Use 16:9; the
+list crops to fit.
+
 ## Talking to the platform
 
 ```ts
@@ -147,8 +158,8 @@ the platform's server, which needs a deterministic game) is future work and will
 **Conformance, run automatically.** `apps/web/test/games-conformance.unit.test.ts` runs `checkGameConformance`
 (`@ador/test-kit/game-conformance`) over every registered embedded game, so nobody has to remember to ask: the page
 must be one the frame can serve, the script must bundle, the game must tell the platform it is ready, the platform
-must never refuse what it asks (an undeclared milestone, a call too large or too fast), and nothing may be thrown
-uncaught. The same test fails if a folder under `/games` is not registered, or a registered embedded game has no
+must never refuse what it asks (an undeclared milestone, a call too large or too fast), nothing may be thrown
+uncaught, and the cover files the manifest names must exist. The same test fails if a folder under `/games` is not registered, or a registered embedded game has no
 folder. The runner starts the game in a simulated host with storage and network blocked.
 
 Strict manifest fields; identifier shape and uniqueness; capabilities from the known list; milestone ids unique

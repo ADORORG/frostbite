@@ -1,6 +1,6 @@
 import { gameChannel, protocolVersion } from "@ador/game-sdk/protocol";
 import type { AccountPort } from "@ador/game-sdk/synced-backend";
-import { act } from "react";
+import { act, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, beforeEach, vi } from "vitest";
 
@@ -77,6 +77,7 @@ export function registerHarness(): void {
 
 export async function mount(
   accountFor: (gameId: string) => AccountPort = noAccount,
+  extra: Partial<ComponentProps<typeof GamePlayer>> = {},
 ) {
   harness.started.length = 0;
   vi.spyOn(HTMLIFrameElement.prototype, "setAttribute").mockImplementation(
@@ -93,6 +94,7 @@ export async function mount(
         game={game}
         src="/play/embedded-game/index.html"
         title="Embedded game"
+        {...extra}
       />,
     );
   });

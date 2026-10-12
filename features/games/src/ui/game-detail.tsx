@@ -6,6 +6,7 @@ import {
   ArcadeInfoCard,
   ArcadeInfoRow,
   ArcadeStageHead,
+  type DockSection,
   StatusLamp,
 } from "@repo/ui/arcade";
 
@@ -50,64 +51,76 @@ export function GameDetail({
       )}
     </ArcadeInfoCard>
   );
+  const facts = (
+    <>
+      <span>{`v${game.version}`}</span>
+      <span>{game.networkLabel}</span>
+    </>
+  );
+  const sections: DockSection[] = [
+    { badge: null, content: about, id: "about", label: "About" },
+    { badge: null, content: asks, id: "asks", label: "What it asks for" },
+  ];
   return (
     <GamesFrame navigation={navigation} variant="stage">
-      <ArcadeStageHead
-        meta={
-          <>
-            <span>{`v${game.version}`}</span>
-            <span>{game.networkLabel}</span>
-            <StatusLamp
-              label={game.playable ? "Playable" : "Not playable yet"}
-              tone={game.playable ? "ready" : "attention"}
-            />
-          </>
-        }
-        title={game.title}
-      />
       {game.embedSrc !== null ? (
         <GamePlayer
+          back={
+            <a className="arcade-stage__back" href={gamesPath}>
+              ← All games
+            </a>
+          }
           game={{ id: game.id, milestones: game.milestones }}
+          meta={facts}
+          sections={sections}
           src={game.embedSrc}
           title={game.title}
-        >
-          {about}
-          {asks}
-        </GamePlayer>
+        />
       ) : (
-        <ArcadeInfoRow>
-          <ArcadeInfoCard title="Where to play">
-            {game.playUrl === null ? (
-              <p>
-                This game is registered, but it has no play address yet, so it
-                cannot be opened from here.
-              </p>
-            ) : (
+        <>
+          <ArcadeStageHead
+            meta={
               <>
-                <ArcadeButton href={game.playUrl} tone="mint">
-                  {`Play ${game.title}`}
-                </ArcadeButton>
-                <p>{`It opens at ${new URL(game.playUrl).host}, not on this site.`}</p>
+                {facts}
+                <StatusLamp label="Not playable yet" tone="attention" />
               </>
-            )}
-          </ArcadeInfoCard>
-          {about}
-          {asks}
-          {game.milestones.length === 0 ? null : (
-            <ArcadeInfoCard title="Milestones">
-              <MilestoneList milestones={game.milestones} unlocked={null} />
-              <p>
-                These are declared by the game. Earning and claiming them on
-                chain is not available yet, and the platform cannot verify what
-                happens inside a game.
-              </p>
+            }
+            title={game.title}
+          />
+          <ArcadeInfoRow>
+            <ArcadeInfoCard title="Where to play">
+              {game.playUrl === null ? (
+                <p>
+                  This game is registered, but it has no play address yet, so it
+                  cannot be opened from here.
+                </p>
+              ) : (
+                <>
+                  <ArcadeButton href={game.playUrl} tone="mint">
+                    {`Play ${game.title}`}
+                  </ArcadeButton>
+                  <p>{`It opens at ${new URL(game.playUrl).host}, not on this site.`}</p>
+                </>
+              )}
             </ArcadeInfoCard>
-          )}
-        </ArcadeInfoRow>
+            {about}
+            {asks}
+            {game.milestones.length === 0 ? null : (
+              <ArcadeInfoCard title="Milestones">
+                <MilestoneList milestones={game.milestones} unlocked={null} />
+                <p>
+                  These are declared by the game. Earning and claiming them on
+                  chain is not available yet, and the platform cannot verify
+                  what happens inside a game.
+                </p>
+              </ArcadeInfoCard>
+            )}
+          </ArcadeInfoRow>
+          <ArcadeButton href={gamesPath} tone="cyan">
+            All games
+          </ArcadeButton>
+        </>
       )}
-      <ArcadeButton href={gamesPath} tone="cyan">
-        All games
-      </ArcadeButton>
     </GamesFrame>
   );
 }

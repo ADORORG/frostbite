@@ -75,3 +75,15 @@ export const embeddedGame = defineGame({
   title: "Embedded game",
   version: "1.0.0",
 });
+
+// A game the platform plays itself that has a cover: a picture and a short clip, both files of the game.
+export const coveredGame = defineGame({
+  ...embeddedGame,
+  cover: {
+    alt: "A tower of blocks, one tap from falling.",
+    image: "cover.webp",
+    video: "cover.mp4",
+  },
+  id: "covered-game",
+  title: "Covered game",
+});

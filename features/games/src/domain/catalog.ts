@@ -1,5 +1,6 @@
 import type { ChainOption } from "@ador/shared/chain";
 import {
+  embeddedGameAssetPath,
   embeddedGamePath,
   gameIdSchema,
   gameManifestHash,
@@ -25,9 +26,18 @@ export const gameMilestonePolicyLabels: Readonly<
   repeatable: "Can be earned again",
 };
 
+// A game's preview as the pages show it: addresses the platform serves, never a place the game chose.
+export interface PublicCover {
+  readonly alt: string;
+  readonly image: string;
+  readonly video: string | null;
+}
+
 // One game as the public pages show it, taken from its manifest and nothing else.
 export interface PublicGame {
   readonly capabilities: readonly string[];
+  // The preview the catalog shows, or null for a game that has none (the pages draw a stand-in).
+  readonly cover: PublicCover | null;
   readonly description: string;
   // Where the platform serves the game's files when it plays the game itself, in an isolated frame, or null.
   readonly embedSrc: string | null;
@@ -62,6 +72,17 @@ export function createGameCatalog(
     capabilities: game.capabilities.map(
       (capability) => gameCapabilityLabels[capability],
     ),
+    cover:
+      game.cover === undefined
+        ? null
+        : {
+            alt: game.cover.alt,
+            image: embeddedGameAssetPath(game.id, game.cover.image),
+            video:
+              game.cover.video === null
+                ? null
+                : embeddedGameAssetPath(game.id, game.cover.video),
+          },
     description: game.description,
     embedSrc:
       game.launch.mode === "embedded" ? embeddedGamePath(game.id) : null,

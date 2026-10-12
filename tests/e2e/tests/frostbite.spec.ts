@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { openDock } from "./support/dock.ts";
+
 // FROST·BITE, the first real game, played on the platform in the isolated frame: it boots from one bundle with
 // nothing from the network, gets a storage the platform keeps, and is cut off like every game. Desktop only: the
 // game's interior is animated, so these steps drive and assert it rather than comparing pictures of it.
@@ -136,6 +138,7 @@ test("the platform page says what the game is: simulated, with nothing declared 
 }) => {
   await page.goto("/games/frostbite");
   await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
+  await openDock(page, "What it asks for");
   await expect(
     page.getByText("This game does not ask the platform for anything."),
   ).toBeVisible();
@@ -149,6 +152,7 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
 }) => {
   await page.goto("/games/frostbite");
   await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
     "0 of 3 reached",
   );
@@ -170,6 +174,7 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
     "Not yet",
   );
   await page.reload();
+  await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
     "1 of 3 reached",
   );

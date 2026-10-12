@@ -13,6 +13,11 @@ if (signet === undefined) throw new Error("No target chain is configured.");
 // own report: the platform cannot see inside the game, and nothing of value depends on them.
 export const frostbite = defineGame({
   capabilities: [],
+  cover: {
+    alt: "A glacier rising over a board of ice tiles, with a few red mines hidden among them.",
+    image: "cover.svg",
+    video: null,
+  },
   description:
     "Read the board, call the next move, and keep your streak alive.",
   id: "frostbite",

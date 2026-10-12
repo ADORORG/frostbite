@@ -197,4 +197,63 @@ describe("the declarations digest", () => {
   it("refuses to hash a manifest that is not valid", () => {
     expect(() => gameManifestHash({ ...manifest(), title: "" })).toThrow();
   });
+
+  describe("a cover", () => {
+    const embedded = { launch: { mode: "embedded" } } as const;
+    const cover = {
+      alt: "A glacier.",
+      image: "cover.webp",
+      video: "cover.mp4",
+    };
+
+    it("is a picture and optionally a clip, named by file, for a game the platform plays itself", () => {
+      expect(
+        gameManifestSchema.safeParse({ ...manifest(embedded), cover }).success,
+      ).toBe(true);
+      expect(
+        gameManifestSchema.safeParse({
+          ...manifest(embedded),
+          cover: { ...cover, video: null },
+        }).success,
+      ).toBe(true);
+    });
+
+    it("is optional, and a manifest without one hashes as it did before covers existed", () => {
+      expect(gameManifestSchema.safeParse(manifest(embedded)).success).toBe(
+        true,
+      );
+      expect(gameManifestHash(manifest(embedded))).not.toBe(
+        gameManifestHash({ ...manifest(embedded), cover }),
+      );
+    });
+
+    it("cannot be given to a game that lives at another address, because the files would not come with it", () => {
+      const result = gameManifestSchema.safeParse({ ...manifest(), cover });
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0]?.path).toEqual(["cover"]);
+    });
+
+    it.each([
+      ["a path", { image: "../cover.webp" }],
+      ["a folder", { image: "a/cover.webp" }],
+      ["a remote address", { image: "https://x.test/cover.webp" }],
+      ["a clip as the picture", { image: "cover.mp4" }],
+      ["a picture as the clip", { video: "cover.png" }],
+      ["a script as the picture", { image: "cover.js" }],
+      ["a name that starts with a dot", { image: ".cover.png" }],
+      ["no words for it", { alt: "  " }],
+      [
+        "too many words for it",
+        { alt: "a".repeat(gameManifestLimits.coverAlt + 1) },
+      ],
+      ["a field nobody knows", { poster: "x.png" }],
+    ])("refuses %s", (_what, change) => {
+      expect(
+        gameManifestSchema.safeParse({
+          ...manifest(embedded),
+          cover: { ...cover, ...change },
+        }).success,
+      ).toBe(false);
+    });
+  });
 });

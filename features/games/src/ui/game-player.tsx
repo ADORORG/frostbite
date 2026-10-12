@@ -5,10 +5,11 @@ import type { GameMilestone } from "@ador/shared/games";
 import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
 import {
   ArcadeActionButton,
+  ArcadeDock,
   ArcadeInfoCard,
-  ArcadeInfoRow,
   ArcadeStage,
   StatusLamp,
+  type DockSection,
 } from "@repo/ui/arcade";
 import { useRef, useState, type ReactNode } from "react";
 
@@ -21,8 +22,6 @@ import { useGameSession } from "./use-game-session.ts";
 // of the platform, no forms, no popups, no top navigation. The response headers for the game's files repeat
 // this as a sandbox of their own, so it holds even if the files are opened outside this frame.
 export const gameFrameSandbox = "allow-scripts";
-// Tall enough for a game built for a window, not a strip: most of the screen, and no more than a page.
-export const gameFrameHeight = "min(85vh, 60rem)";
 export const gameFramePermissions = "fullscreen; autoplay; gamepad";
 
 // Where the progress is, said only as far as it is true.
@@ -44,16 +43,22 @@ const keptCopy: Record<SyncStatus, string> = {
 
 export function GamePlayer({
   accountFor,
-  children,
+  back,
   game,
+  meta,
+  sections = [],
   src,
   title,
 }: {
   // How the page reaches the account for a game; the real one unless a test supplies another.
   readonly accountFor?: (gameId: string) => AccountPort;
-  // More small cards for the row under the stage.
-  readonly children?: ReactNode;
+  // A way back to the list, first in the bar.
+  readonly back?: ReactNode;
   readonly game: HostedGame & { readonly milestones: readonly GameMilestone[] };
+  // Small facts beside the title in the bar (version, network).
+  readonly meta?: ReactNode;
+  // More sections for the dock under the stage, after the player's milestones.
+  readonly sections?: readonly DockSection[];
   readonly src: string;
   readonly title: string;
 }) {
@@ -68,16 +73,53 @@ export function GamePlayer({
   const phoneLandscape = usePhoneLandscape();
   const [promptDismissed, setPromptDismissed] = useState(false);
   const prompt = phoneLandscape && fullscreen.supported && !promptDismissed;
+  const dock: DockSection[] = [
+    ...(game.milestones.length === 0
+      ? []
+      : [
+          {
+            badge:
+              unlocked === null
+                ? null
+                : `${String(game.milestones.filter(({ id }) => unlocked[id] !== undefined).length)}/${String(game.milestones.length)}`,
+            content: (
+              <ArcadeInfoCard title="Your milestones">
+                <MilestoneList
+                  milestones={game.milestones}
+                  unlocked={unlocked}
+                />
+                <p>
+                  The game reports these itself and the platform cannot check
+                  them yet, so nothing that carries value depends on them.
+                </p>
+              </ArcadeInfoCard>
+            ),
+            id: "milestones",
+            label: "Milestones",
+          },
+        ]),
+    ...sections,
+  ];
   return (
     <>
       <ArcadeStage
         bar={
           <>
+            {back}
+            <h2 className="arcade-stage__title">{title}</h2>
+            {meta === undefined ? null : (
+              <span className="arcade-stage__facts">{meta}</span>
+            )}
             <StatusLamp
               label={connected ? "Connected to the platform" : "Connecting"}
               tone={connected ? "ready" : "attention"}
             />
-            <span>{kept ? keptCopy[sync] : blockedCopy[sync]}</span>
+            <span
+              className="arcade-stage__save"
+              title={kept ? keptCopy[sync] : blockedCopy[sync]}
+            >
+              {kept ? keptCopy[sync] : blockedCopy[sync]}
+            </span>
             {fullscreen.supported ? (
               <span className="arcade-stage__bar-end">
                 {fullscreen.refused ? (
@@ -138,22 +180,11 @@ export function GamePlayer({
           data-testid="game-frame"
           ref={frame}
           sandbox={gameFrameSandbox}
-          style={{ border: 0, height: gameFrameHeight, minHeight: "32rem" }}
+          style={{ border: 0 }}
           title={title}
         />
       </ArcadeStage>
-      <ArcadeInfoRow>
-        {game.milestones.length === 0 ? null : (
-          <ArcadeInfoCard title="Your milestones">
-            <MilestoneList milestones={game.milestones} unlocked={unlocked} />
-            <p>
-              The game reports these itself and the platform cannot check them
-              yet, so nothing that carries value depends on them.
-            </p>
-          </ArcadeInfoCard>
-        )}
-        {children}
-      </ArcadeInfoRow>
+      <ArcadeDock label="About this game" sections={dock} />
     </>
   );
 }

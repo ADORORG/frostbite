@@ -1,8 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// The game page built around the game: one title line, a slim bar that stays in view, the game as the main
-// stage, small cards in a row below, a notice when a milestone is reported, and an offer of full screen to a
-// phone held sideways. Desktop checks the layout; a touch device in landscape checks the offer.
+import { openDock } from "./support/dock.ts";
+
+// The game page built as a game screen: the game on nearly the whole screen under a slim bar that holds its
+// title, a dock of sections at the foot that opens over the game, a notice when a milestone is reported, and an
+// offer of full screen to a phone held sideways. Desktop checks the layout; a touch device in landscape checks
+// the offer.
 const frameSelector = '[data-testid="game-frame"]';
 
 test.beforeEach(async ({ page }) => {
@@ -15,38 +18,109 @@ const box = async (page: Page, selector: string) => {
   return found;
 };
 
-test("the page is a title line, a bar, the game as the main stage, then small cards in a row", async ({
+test("the page is the game on nearly the whole screen, with its title in the bar and a dock at the foot", async ({
   page,
 }) => {
   await page.goto("/games/frostbite");
   await expect(page.getByText("Connected to the platform")).toBeVisible();
-  const title = await box(page, ".arcade-stage-title");
   const bar = await box(page, ".arcade-stage__bar");
   const stage = await box(page, frameSelector);
-  const row = await box(page, ".arcade-info-row");
-  expect(title.y).toBeLessThan(bar.y);
-  expect(bar.y + bar.height).toBeLessThanOrEqual(stage.y + 2);
-  expect(stage.y + stage.height).toBeLessThanOrEqual(row.y);
-  // The title line is one line: small facts share it, and it is not a card.
-  expect(title.height).toBeLessThan(80);
-  await expect(page.locator(".arcade-stage-meta")).toContainText("v0.2.0");
-  await expect(page.locator(".arcade-stage-meta")).toContainText("Playable");
-  // The game takes the page's width and most of its height; the cards are small and side by side.
+  const dock = await box(page, ".arcade-dock__strip");
   const viewport = page.viewportSize();
   if (viewport === null) throw new Error("No viewport");
-  expect(stage.width).toBeGreaterThan(Math.min(viewport.width, 1184) * 0.9);
-  expect(stage.height).toBeGreaterThan(Math.min(viewport.height * 0.8, 480));
-  const cards = page.locator(".arcade-info-card");
-  await expect(cards).toHaveCount(3);
-  await expect(page.getByRole("region", { name: "About" })).toContainText(
-    "Declarations digest:",
-  );
-  const first = await cards.nth(0).boundingBox();
-  const second = await cards.nth(1).boundingBox();
-  if (first === null || second === null) throw new Error("No cards");
-  if (viewport.width >= 900)
-    expect(Math.abs(first.y - second.y)).toBeLessThan(2);
+  // The title and the small facts are in the bar over the game, not a block of their own.
+  await expect(page.locator(".arcade-stage__bar h2")).toHaveText("FROST·BITE");
+  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.2.0");
+  await expect(page.locator(".arcade-stage-head")).toHaveCount(0);
+  expect(bar.y + bar.height).toBeLessThanOrEqual(stage.y + 2);
+  // Where the page is taller than the screen the dock is pulled up over the game's foot to stay in view; where
+  // it is not, the game ends where the dock begins.
+  if (stage.y + stage.height <= viewport.height)
+    expect(stage.y + stage.height).toBeLessThanOrEqual(dock.y + 2);
+  // The game takes the page's width, and is tall enough to be a screen.
+  expect(stage.width).toBeGreaterThan(viewport.width * 0.9);
+  expect(stage.height).toBeGreaterThan(Math.min(viewport.height * 0.55, 480));
+  // The dock is in view without scrolling, and nothing of the page's own is a card under the game.
+  expect(dock.y + dock.height).toBeLessThanOrEqual(viewport.height + 1);
+  await expect(page.locator(".arcade-info-row")).toHaveCount(0);
   await expect(page.locator(".arcade-panel")).toHaveCount(0);
+});
+
+test("the dock is closed until asked, opens one section over the game without moving it, and goes back", async ({
+  page,
+}) => {
+  await page.goto("/games/frostbite");
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  const before = await box(page, frameSelector);
+  await expect(page.getByRole("region", { name: "About" })).toBeHidden();
+  const about = await openDock(page, "About");
+  await expect(about).toContainText("Declarations digest:");
+  await expect(
+    page.getByRole("region", { name: "Your milestones" }),
+  ).toBeHidden();
+  // It is drawn over the game, so the game is where it was.
+  expect(await box(page, frameSelector)).toEqual(before);
+  const panel = await box(page, ".arcade-dock__panel:not([hidden])");
+  const strip = await box(page, ".arcade-dock__strip");
+  expect(panel.y + panel.height).toBeLessThanOrEqual(strip.y + 1);
+  await page.getByRole("button", { name: "What it asks for" }).click();
+  await expect(
+    page.getByRole("region", { name: "What it asks for" }),
+  ).toContainText("does not ask the platform for anything");
+  await expect(about).toBeHidden();
+  await page.getByRole("button", { name: "Hide" }).click();
+  await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
+    0,
+  );
+});
+
+test("Escape closes the dock and keeps the focus on its button", async ({
+  page,
+}) => {
+  await page.goto("/games/frostbite");
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await openDock(page, "About");
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "About" })).toBeFocused();
+});
+
+test("clicking into the game closes the dock", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "One check is enough.");
+  await page.goto("/games/frostbite");
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await openDock(page, "Milestones");
+  await page.locator(frameSelector).click({ position: { x: 40, y: 40 } });
+  await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
+    0,
+  );
+});
+
+test.describe("a short screen", () => {
+  test.use({ viewport: { height: 560, width: 1100 } });
+
+  test("keeps the dock in view over the foot of a game that is taller than the screen", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "One check is enough.");
+    await page.goto("/games/frostbite");
+    await expect(page.getByText("Connected to the platform")).toBeVisible();
+    const stage = await box(page, ".arcade-stage");
+    expect(stage.y + stage.height).toBeGreaterThan(560);
+    const dock = await box(page, ".arcade-dock__strip");
+    expect(Math.round(dock.y + dock.height)).toBe(560);
+  });
+});
+
+test("has a way back to the list in the bar", async ({ page }) => {
+  await page.goto("/games/frostbite");
+  await page
+    .locator(".arcade-stage__bar")
+    .getByRole("link", { name: "All games" })
+    .click();
+  await expect(page).toHaveURL(/\/games$/u);
 });
 
 test("the bar stays below the site header while the game is in view, on a large screen", async ({
@@ -104,14 +178,18 @@ test("a milestone the game reports is announced over the game, and the notice go
   });
   await expect(notice).toHaveText("First win reached");
   await expect(notice).toHaveText("", { timeout: 9_000 });
+  await expect(
+    page.getByRole("button", { name: /^Milestones/u }),
+  ).toContainText("1/3");
+  await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
     "1 of 3 reached",
   );
   // Seen again after a reload, it is not announced as new.
   await page.reload();
-  await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "1 of 3 reached",
-  );
+  await expect(
+    page.getByRole("button", { name: /^Milestones/u }),
+  ).toContainText("1/3");
   await expect(page.getByTestId("milestone-toast")).toHaveText("");
 });
 

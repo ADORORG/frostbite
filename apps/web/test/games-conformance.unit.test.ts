@@ -42,6 +42,7 @@ describe("the games the platform plays itself", () => {
     for (const game of embedded)
       expect(
         await checkGameConformance({
+          cover: game.cover,
           folder: join(gamesDirectory, game.id),
           game,
         }),

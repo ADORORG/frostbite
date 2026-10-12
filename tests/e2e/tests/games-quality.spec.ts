@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { openDock } from "./support/dock.ts";
 import { closeMatrix, skipToMain } from "./support/quality.ts";
 
 // Layout, keyboard, reduced-motion, accessibility and visual coverage of the public games pages on every
@@ -41,7 +42,7 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
   await expect(page.getByRole("link", { name: /^Play/u })).toHaveCount(0);
   await expect(
     page.getByText("does not ask the platform for anything"),
-  ).toBeVisible();
+  ).toBeAttached();
   // The digest changes whenever the manifest does, which is its job; the baseline is of the layout.
   await page
     .getByText(/^Declarations digest:/u)
@@ -54,6 +55,8 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
     content: '[data-testid="game-frame"]{visibility:hidden}',
   });
   await skipToMain(page);
+  // The picture is taken with a section of the dock open, which is the page's most crowded state.
+  await openDock(page, "About");
   await closeMatrix(page, "game-detail.png");
 });
 

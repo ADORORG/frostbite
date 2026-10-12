@@ -24,3 +24,11 @@ export {
   ArcadeStage,
   ArcadeStageHead,
 } from "./patterns/stage.tsx";
+export { ArcadePreview } from "./components/arcade-preview.tsx";
+export {
+  ArcadeCatalog,
+  ArcadeCatalogEntry,
+  ArcadeTicker,
+} from "./patterns/catalog.tsx";
+export { ArcadeDock } from "./patterns/dock.tsx";
+export type { DockSection } from "./patterns/dock.tsx";

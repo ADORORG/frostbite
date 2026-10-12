@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { openDock } from "./support/dock.ts";
 import { closeMatrix, skipToMain } from "./support/quality.ts";
 
 // The sample game, Tap Tower, played in the platform's isolated frame: it connects, saves through the platform,
@@ -21,6 +22,7 @@ test("the game connects, and the platform remembers what it does across a reload
   for (let tap = 0; tap < 5; tap += 1) await game.locator("#tap").click();
   await expect(game.locator("#score")).toHaveText("5");
   // The platform, not the game, shows the milestone, and it is labelled as the game's own report.
+  await openDock(page, "Milestones");
   await expect(page.locator('[data-milestone="first-five"]')).toContainText(
     "Reached",
   );

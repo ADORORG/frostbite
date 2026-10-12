@@ -1,8 +1,9 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 
 import { bundleGameScript, checkGameHtml } from "@ador/game-sdk/build";
 import type { HostedGame } from "@ador/game-sdk/host";
+import type { GameCover } from "@ador/shared/games";
 
 import { createMemoryGameBackend } from "./memory-game-backend.ts";
 import { runGameInSimulatedHost } from "./simulated-game-host.ts";
@@ -16,9 +17,12 @@ export const defaultSettleMs = 150;
 //   - has a page the isolated frame can serve (`checkGameHtml`) and a script that bundles;
 //   - tells the platform it is ready;
 //   - is never refused by the platform for what it asks (an unknown milestone, a call too large or too fast);
-//   - throws nothing nobody caught.
+//   - throws nothing nobody caught;
+//   - has the cover files its manifest names.
 // It is the same check for every game, so it is run over every registered game rather than left to each one.
 export async function checkGameConformance(options: {
+  // The preview the manifest declares: its files must be in the game's `assets` folder.
+  readonly cover?: GameCover | undefined;
   readonly folder: string;
   readonly game: HostedGame;
   readonly settleMs?: number;
@@ -29,6 +33,17 @@ export async function checkGameConformance(options: {
   );
   if (html === null) return ["The game has no index.html."];
   problems.push(...checkGameHtml(html));
+  for (const file of [options.cover?.image, options.cover?.video ?? undefined])
+    if (
+      file !== undefined &&
+      !(await stat(join(options.folder, "assets", file)).then(
+        (found) => found.isFile(),
+        () => false,
+      ))
+    )
+      problems.push(
+        `The manifest's cover names assets/${file}, which is missing.`,
+      );
   let script: string;
   try {
     script = await bundleGameScript(join(options.folder, "src/main.ts"));

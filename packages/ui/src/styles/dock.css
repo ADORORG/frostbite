@@ -1,0 +1,84 @@
+/* The strip at the foot of a game page. It stays in view while the page is, so what is behind it (the game) is
+   never pushed around: a section opens upward over the page instead. */
+.arcade-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+}
+.arcade-dock__strip {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.375rem;
+  height: var(--arcade-dock-height);
+  padding: 0.375rem 0.5rem;
+  overflow-x: auto;
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  border-radius: var(--arcade-radius-medium) var(--arcade-radius-medium) 0 0;
+  background: var(--arcade-surface-raised);
+}
+.arcade-dock__button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.875rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface);
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.arcade-dock__button:hover {
+  border-color: var(--arcade-cyan);
+}
+.arcade-dock__button[aria-expanded="true"] {
+  border-color: var(--arcade-yellow);
+  background: var(--arcade-ink);
+  color: var(--arcade-yellow);
+}
+.arcade-dock__hide {
+  margin-inline-start: auto;
+  border-color: var(--arcade-pink);
+}
+.arcade-dock__badge {
+  padding: 0.25rem 0.375rem;
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-yellow);
+  color: var(--arcade-ink);
+}
+.arcade-dock__panel {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  max-height: min(50dvh, 28rem);
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  border: var(--arcade-border-width) solid var(--arcade-yellow);
+  border-bottom: 0;
+  background: var(--arcade-surface);
+  box-shadow: 0 -0.5rem 1.5rem rgb(0 0 0 / 55%);
+}
+.arcade-dock__panel[hidden] {
+  display: none;
+}
+.arcade-dock__panel .arcade-info-card {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arcade-dock__panel:not([hidden]) {
+    animation: arcade-dock-in 160ms ease-out;
+  }
+}
+@keyframes arcade-dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}

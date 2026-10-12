@@ -8,6 +8,7 @@ import {
 import {
   bareGame,
   chains,
+  coveredGame,
   embeddedGame,
   templateGame,
 } from "./support/template-game.ts";
@@ -29,6 +30,7 @@ describe("the game catalog", () => {
         gameCapabilityLabels.wallet,
         gameCapabilityLabels["run:submit"],
       ],
+      cover: null,
       description: "A game written from the template.",
       embedSrc: null,
       hash: gameManifestHash(templateGame),
@@ -50,6 +52,31 @@ describe("the game catalog", () => {
       embedSrc: "/play/embedded-game/index.html",
       playable: true,
       playUrl: null,
+    });
+  });
+
+  it("gives a cover as addresses the platform serves from the game's own folder, never as the file names alone", () => {
+    expect(
+      createGameCatalog([coveredGame], chains).find("covered-game")?.cover,
+    ).toEqual({
+      alt: "A tower of blocks, one tap from falling.",
+      image: "/play/covered-game/assets/cover.webp",
+      video: "/play/covered-game/assets/cover.mp4",
+    });
+    expect(
+      createGameCatalog(
+        [
+          {
+            ...coveredGame,
+            cover: { alt: "Still only.", image: "cover.png", video: null },
+          },
+        ],
+        chains,
+      ).find("covered-game")?.cover,
+    ).toEqual({
+      alt: "Still only.",
+      image: "/play/covered-game/assets/cover.png",
+      video: null,
     });
   });
 

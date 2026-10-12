@@ -11,8 +11,9 @@ export function GamesFrame({
 }: {
   readonly children: ReactNode;
   readonly navigation: readonly NavigationItem[];
-  // `stage` is wide, for a page built around one thing (a game being played).
-  readonly variant?: "catalog" | "stage";
+  // `stage` is the whole screen, for a page built around one thing (a game being played); `wall` is wide, for
+  // a page of previews.
+  readonly variant?: "catalog" | "stage" | "wall";
 }) {
   return (
     <AppShell
