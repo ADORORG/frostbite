@@ -2,12 +2,13 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { bundleGameScript } from "../src/build.ts";
+import { bundleGameScript } from "@ador/game-sdk/build";
+
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "../src/conformance.ts";
-import { game, memoryBackend } from "./support.ts";
+} from "../src/simulated-game-host.ts";
+import { game, memoryBackend } from "./support/game-host.ts";
 
 const mini = join(import.meta.dirname, "fixtures/mini-game");
 let running: SimulatedGame | undefined;

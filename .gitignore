@@ -43,3 +43,4 @@ yarn-error.log*
 
 # Built from /games by scripts/build-games.ts
 /apps/web/public/play/
+/tooling/game-tools/.tmp-*

@@ -6,9 +6,9 @@ import {
   type GameHostBackend,
   type HostedGame,
   type HostEvent,
-} from "./host.ts";
-import type { GameHostPolicy } from "./policy.ts";
-import type { Response } from "./protocol.ts";
+} from "@ador/game-sdk/host";
+import type { GameHostPolicy } from "@ador/game-sdk/policy";
+import type { Response } from "@ador/game-sdk/protocol";
 
 export interface SimulatedGame {
   // Closes the page the game ran in.

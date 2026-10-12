@@ -1,9 +1,9 @@
 # Onboarding a game
 
 Status: ADR-018 Amendment 1 (client-only games) is accepted. This describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
-(isolated frame, SDK, local and account saving, milestones as self-reported). Minting, the registration
-generator and the replay-verified level do **not** exist yet; the last section says what each needs.
-The template is `games/sample-game` (Tap Tower). Copy it; do not start from nothing.
+(isolated frame, SDK, local and account saving, milestones as self-reported). Minting and the replay-verified level
+do **not** exist yet; the last section says what each needs.
+The template is `games/sample-game` (Tap Tower). Start from it with `pnpm game:new`; do not start from nothing.
 
 ## What a game is
 
@@ -20,11 +20,14 @@ A game is a folder of reviewed source plus one manifest:
 
 ## Add a game in four steps
 
-1. **Copy `games/sample-game` to `games/<id>`** and rename the package (`@game/<id>` in `package.json`).
-   `<id>` is lower-case words joined by hyphens; it is the page address and every record's key.
+1. **Run `pnpm game:new <id> [--title "My Game"]`, then `pnpm install`.** It copies `games/sample-game` to
+   `games/<id>` (package `@game/<id>`), writes `configs/games/<id>.ts` and adds the game's import and list entry
+   to `configs/games.ts`, above the `game:new` markers. `<id>` is lower-case words joined by hyphens; it is the
+   page address and every record's key. The new game already passes the conformance check. (By hand: copy the
+   folder, rename the package, write the manifest, add the two registry lines.)
 2. **Write the game** in `src/` (see "What the folder holds").
-3. **Write the manifest** in `configs/games/<id>.ts` with `launch: { mode: "embedded" }` and register it with
-   one line in `configs/games.ts`. Nothing else in the platform is edited.
+3. **Edit the manifest** in `configs/games/<id>.ts`: `launch: { mode: "embedded" }`, and the milestones, whose ids
+   must be ones the game's code unlocks. Nothing else in the platform is edited.
 4. **Open a pull request.** The checks in "Checks every game passes" must pass.
 
 ```ts
@@ -127,6 +130,13 @@ the platform's server, which needs a deterministic game) is future work and will
 
 ## Checks every game passes
 
+**Conformance, run automatically.** `apps/web/test/games-conformance.unit.test.ts` runs `checkGameConformance`
+(`@ador/test-kit/game-conformance`) over every registered embedded game, so nobody has to remember to ask: the page
+must be one the frame can serve, the script must bundle, the game must tell the platform it is ready, the platform
+must never refuse what it asks (an undeclared milestone, a call too large or too fast), and nothing may be thrown
+uncaught. The same test fails if a folder under `/games` is not registered, or a registered embedded game has no
+folder. The runner starts the game in a simulated host with storage and network blocked.
+
 Strict manifest fields; identifier shape and uniqueness; capabilities from the known list; milestone ids unique
 within the game (at most 64) and every text bounded (`gameManifestLimits`); the network is a configured chain;
 the page checks above; ≤300 lines per source and test file; the repository's lint, typecheck, unit, integration
@@ -152,7 +162,6 @@ Moving FROST·BITE onto the SDK (task G5) removes the need for this mode for it.
 
 | Missing                                                              | Task / blocked on                                      |
 | -------------------------------------------------------------------- | ------------------------------------------------------ |
-| Registration generator and the conformance runner in test-kit        | After the sign-off (G2)                                |
 | Milestone states beyond "reached" (claim pending, claimed, complete) | After minting exists (G4/G7)                           |
 | Minting: `game-rewards` contract, the `mint-milestone` intent        | Contract and mint pipeline (weeks 6 and 7), fee values |
 | A verified milestone level                                           | A run-record spike with a real game (G6)               |

@@ -26,7 +26,8 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./frame-headers`: the response headers (CSP `sandbox allow-scripts`, `connect-src 'none'`, …) the platform
   serves game files with.
 - `./build`: `checkGameHtml`, `bundleGameScript`, `buildGame(s)`: turns `/games/<id>` into `public/play/<id>`.
-- `./conformance`: runs a built game in jsdom against a simulated host, with storage and network blocked.
+- The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
+  test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
 ## Invariants
 

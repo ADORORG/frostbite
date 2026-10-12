@@ -11,6 +11,7 @@ import {
 import { targetChains } from "./chains.ts";
 import { frostbite } from "./games/frostbite.ts";
 import { sampleGame } from "./games/sample.ts";
+// game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
 function developmentGames(): GameManifest[] {
@@ -26,6 +27,7 @@ export const games = defineGames([
     parseGameLaunchEnvironment(process.env),
   ),
   ...developmentGames(),
+  // game:new adds games above this line.
 ]);
 
 // A game on a chain the platform is not configured for would be listed with nowhere to act, so the platform

@@ -9,6 +9,7 @@
     "./creator-database": "./src/creator-database.ts",
     "./docker": "./src/docker.ts",
     "./dom": "./src/dom.tsx",
+    "./game-conformance": "./src/game-conformance.ts",
     "./images": "./src/images.ts",
     "./inngest-runtime": "./src/inngest-runtime.ts",
     "./inngest-runtime-api": "./src/inngest-runtime-api.ts",
@@ -20,6 +21,7 @@
     "./service-process": "./src/service-process.ts",
     "./simulated-chain": "./src/simulated-chain/adapter.ts",
     "./simulated-chain-config": "./src/simulated-chain/config.ts",
+    "./simulated-game-host": "./src/simulated-game-host.ts",
     "./storage-registry": "./src/storage-registry.ts"
   },
   "scripts": {
@@ -32,6 +34,7 @@
   "dependencies": {
     "@ador/chain": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/game-sdk": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/jobs": "workspace:*",
     "@ador/object-storage": "workspace:*",
@@ -39,6 +42,7 @@
     "@ador/shared": "workspace:*",
     "@aws-sdk/client-s3": "3.1131.0",
     "drizzle-orm": "1.0.0-rc.4",
+    "jsdom": "30.0.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.5.4"
@@ -47,12 +51,12 @@
     "@aws-sdk/s3-request-presigner": "3.1131.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/jsdom": "30.0.0",
     "@types/node": "26.4.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
-    "jsdom": "30.0.1",
     "typescript": "5.9.3",
     "vitest": "4.1.11"
   }

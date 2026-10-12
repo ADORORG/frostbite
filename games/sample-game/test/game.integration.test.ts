@@ -6,7 +6,7 @@ import type { JsonValue } from "@ador/game-sdk/protocol";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/game-sdk/conformance";
+} from "@ador/test-kit/simulated-game-host";
 import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
 import { afterEach, describe, expect, it } from "vitest";
 

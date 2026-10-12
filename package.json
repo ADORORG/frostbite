@@ -45,7 +45,8 @@
     "stack": "pnpm --filter @repo/e2e stack",
     "test:e2e": "pnpm build && pnpm --filter @repo/e2e test:e2e",
     "repository:check": "pnpm --filter @repo/repository-policy check",
-    "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage"
+    "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
+    "game:new": "pnpm --filter @repo/game-tools new"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

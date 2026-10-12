@@ -1,4 +1,4 @@
-import { createGameClient } from "../../../../src/client.ts";
+import { createGameClient } from "@ador/game-sdk/client";
 
 const out = document.getElementById("out");
 const client = createGameClient({ timeoutMs: 200 });
