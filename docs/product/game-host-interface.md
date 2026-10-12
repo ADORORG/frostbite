@@ -1,7 +1,8 @@
-# Game host interface and milestone claims (draft amendment to ADR-018)
+# Game host interface and milestone claims (Amendment 1 to ADR-018)
 
-Status: draft for the product owner, **awaiting sign-off as the ADR-018 amendment** (it is not accepted until the
-owner says so; section 8 says what is built and where the build differs from the answers below). Product direction (2026-10-12), recorded here before anything is built:
+Status: **accepted by the product owner on 2026-10-12 as Amendment 1 to ADR-018** (`docs/decisions/`). Section 8
+says what is built and where the build differs from the answers below; the choice screen for differing saves is
+deferred, newest-wins stays. Product direction (2026-10-12), recorded here before anything is built:
 
 - Every game is **client-only**: a static bundle built from reviewed source, no server of its own.
 - Games run on the platform's domain, in an **isolated frame**, and talk to the platform through one **clean

@@ -1,6 +1,6 @@
 # Onboarding a game
 
-Status: describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
+Status: ADR-018 Amendment 1 (client-only games) is accepted. This describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
 (isolated frame, SDK, local and account saving, milestones as self-reported). Minting, the registration
 generator and the replay-verified level do **not** exist yet; the last section says what each needs.
 The template is `games/sample-game` (Tap Tower). Copy it; do not start from nothing.
@@ -152,7 +152,6 @@ Moving FROST·BITE onto the SDK (task G5) removes the need for this mode for it.
 
 | Missing                                                              | Task / blocked on                                      |
 | -------------------------------------------------------------------- | ------------------------------------------------------ |
-| Accepting the host interface as the ADR-018 amendment                | The owner's sign-off (G1)                              |
 | Registration generator and the conformance runner in test-kit        | After the sign-off (G2)                                |
 | Milestone states beyond "reached" (claim pending, claimed, complete) | After minting exists (G4/G7)                           |
 | Minting: `game-rewards` contract, the `mint-milestone` intent        | Contract and mint pipeline (weeks 6 and 7), fee values |
