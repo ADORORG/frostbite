@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { gameSyncRoute } from "@ador/shared/games";
 import { createGamesEntrypoint } from "../src/entrypoint.tsx";
 import { createGamesFeature } from "../src/registration.ts";
 import {
@@ -138,7 +139,7 @@ describe("the games feature registration", () => {
       id: "games",
       navigation: [{ area: "main", href: "/games", label: "Games" }],
       requiredProviderCapabilities: [],
-      routes: [],
+      routes: [gameSyncRoute],
     });
     const entrypoint = await feature.load({
       registeredFeatureCount: 1,

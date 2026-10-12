@@ -1,6 +1,7 @@
 "use client";
 
 import type { HostedGame } from "@ador/game-sdk/host";
+import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
 import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import { useRef } from "react";
 
@@ -12,17 +13,42 @@ import { useGameSession } from "./use-game-session.ts";
 export const gameFrameSandbox = "allow-scripts";
 export const gameFramePermissions = "fullscreen; autoplay; gamepad";
 
+// Where the progress is, said only as far as it is true.
+const blockedCopy: Record<SyncStatus, string> = {
+  account:
+    "This browser is blocking storage, so your progress is kept only on your account.",
+  local:
+    "This browser is blocking storage, so progress will be lost when you leave.",
+  pending:
+    "This browser is blocking storage and your account could not be reached, so progress will be lost when you leave.",
+};
+
+const keptCopy: Record<SyncStatus, string> = {
+  account: "Your progress is saved to your account and kept in this browser.",
+  local: "Your progress is kept in this browser only.",
+  pending:
+    "Your progress is kept in this browser. Saving it to your account is waiting for a connection.",
+};
+
 export function GamePlayer({
+  accountFor,
   game,
   src,
   title,
 }: {
+  // How the page reaches the account for a game; the real one unless a test supplies another.
+  readonly accountFor?: (gameId: string) => AccountPort;
   readonly game: HostedGame;
   readonly src: string;
   readonly title: string;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { connected, kept, unlocked } = useGameSession(game, frame, src);
+  const { connected, kept, sync, unlocked } = useGameSession(
+    game,
+    frame,
+    src,
+    accountFor,
+  );
   return (
     <>
       <ArcadePanel eyebrow="Playing here" title={title}>
@@ -39,11 +65,7 @@ export function GamePlayer({
           style={{ border: 0, minHeight: "32rem", width: "100%" }}
           title={title}
         />
-        <p>
-          {kept
-            ? "Your progress is kept in this browser."
-            : "This browser is blocking storage, so progress will be lost when you leave."}
-        </p>
+        <p>{kept ? keptCopy[sync] : blockedCopy[sync]}</p>
       </ArcadePanel>
       {game.milestones.length === 0 ? null : (
         <ArcadePanel eyebrow="Reported by the game" title="Your milestones">

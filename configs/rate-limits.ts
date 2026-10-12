@@ -24,6 +24,8 @@ export const rateLimits = rateLimitConfigSchema.parse({
     reviewCreatorApplication: perMinute(60),
     submitCollection: perMinute(10),
     submitCreatorApplication: perMinute(10),
+    // Sent when a game is opened and after each save or unlock, so it is the busiest write; one a second.
+    syncGameState: perMinute(120),
     unlinkPasskey: perMinute(10),
     verifyWalletQualification: perMinute(20),
   },

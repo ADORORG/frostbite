@@ -7,7 +7,14 @@ import {
   createLocalBackend,
   type KeyValueStorage,
 } from "@ador/game-sdk/local-backend";
-import { useEffect, useState, type RefObject } from "react";
+import {
+  createSyncedBackend,
+  type AccountPort,
+  type SyncStatus,
+} from "@ador/game-sdk/synced-backend";
+import { useEffect, useEffectEvent, useState, type RefObject } from "react";
+
+import { createAccountPort } from "../client/account-sync.ts";
 
 export interface UnlockedMilestones {
   readonly [id: string]: string;
@@ -41,20 +48,31 @@ export function useGameSession(
   game: HostedGame,
   frame: RefObject<HTMLIFrameElement | null>,
   src: string,
+  accountFor: (gameId: string) => AccountPort = createAccountPort,
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [connected, setConnected] = useState(false);
   const [kept, setKept] = useState(true);
+  const [sync, setSync] = useState<SyncStatus>("local");
   const { id, milestones } = game;
+  // The account is looked up when the session starts, not whenever the function that finds it is a new one: a
+  // session restarted by a re-render would reload the game and lose what the player was doing.
+  const remoteFor = useEffectEvent((gameId: string) => accountFor(gameId));
 
   useEffect(() => {
     const element = frame.current;
     const target = element?.contentWindow;
     if (element === null || target === null || target === undefined) return;
     const session = browserStorage();
-    const backend = createLocalBackend({
+    const local = createLocalBackend({
       gameId: id,
       storage: session.storage,
+    });
+    // The browser keeps the copy the game uses; the account is synced behind it when someone is signed in.
+    const backend = createSyncedBackend({
+      local,
+      onStatus: setSync,
+      remote: remoteFor(id),
     });
     const refresh = () =>
       void backend.milestones().then((records) => {
@@ -88,5 +106,5 @@ export function useGameSession(
     return detach;
   }, [frame, id, milestones, src]);
 
-  return { connected, kept, unlocked };
+  return { connected, kept, sync, unlocked };
 }

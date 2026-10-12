@@ -2,12 +2,13 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ChainOption } from "@ador/shared/chain";
 import {
   gamePagePath,
+  gameSyncRoute,
   gamesNavigationLabel,
   gamesPath,
   type GameManifest,
 } from "@ador/shared/games";
 
-// The public games catalog and detail pages. The games it lists are supplied explicitly (one line per game
+// The public games catalog and detail pages, and the one API route that saves a signed-in player's state. The games it lists are supplied explicitly (one line per game
 // in the platform's game configuration), so removing this one registration removes the pages and their
 // navigation, and adding a game never touches this feature.
 export function createGamesFeature(
@@ -16,8 +17,8 @@ export function createGamesFeature(
 ) {
   return defineFeature({
     manifest: {
-      capabilities: ["navigation", "public-page"],
-      dependencies: [],
+      capabilities: ["api-routes", "navigation", "public-page"],
+      dependencies: ["accounts"],
       id: "games",
       navigation: [
         {
@@ -34,7 +35,7 @@ export function createGamesFeature(
       ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: [],
-      routes: [],
+      routes: [gameSyncRoute],
       version: "1.0.0",
     },
     load: async () =>

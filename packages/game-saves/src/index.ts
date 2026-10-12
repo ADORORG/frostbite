@@ -1,0 +1,7 @@
+export { createDrizzleGameSyncRepository } from "./drizzle-repository.ts";
+export type { GameSyncRepository } from "./repository.ts";
+export {
+  createGameSyncService,
+  type GameSyncService,
+  type SyncOutcome,
+} from "./service.ts";

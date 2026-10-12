@@ -17,7 +17,11 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/client-http": "workspace:*",
+    "@ador/database": "workspace:*",
+    "@ador/game-saves": "workspace:*",
     "@ador/game-sdk": "workspace:*",
+    "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
     "@repo/ui": "workspace:*",

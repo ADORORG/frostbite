@@ -26,13 +26,38 @@ const recordsSchema = z.record(
 // is not signed in. A game never touches the storage; the page does, on its behalf. What the storage holds is
 // read back through the same schemas as anything else, so a corrupt or edited value is treated as empty rather
 // than trusted or thrown.
+// What the browser holds for one game, in the shape the account stores it, so the two can be merged.
+export interface LocalSnapshot {
+  readonly milestones: readonly {
+    readonly id: string;
+    readonly unlockedAt: string;
+    readonly verification: "self-reported";
+  }[];
+  readonly progress: {
+    readonly savedAt: string;
+    readonly state: JsonValue;
+  } | null;
+}
+
+export interface LocalBackend extends GameHostBackend {
+  // Replaces what the browser holds with a merged state from the account (the account's state already
+  // includes everything this browser sent).
+  replace(snapshot: LocalSnapshot): void;
+  snapshot(): LocalSnapshot;
+}
+
+// A save made before saves were dated has no time; it counts as the oldest possible, so it never outranks a
+// dated one but is not lost when the account has nothing.
+const undatedSave = "1970-01-01T00:00:00.000Z";
+
 export function createLocalBackend(options: {
   readonly gameId: string;
   readonly player?: () => PlayerInfo;
   readonly storage: KeyValueStorage;
-}): GameHostBackend {
+}): LocalBackend {
   const { gameId, storage } = options;
   const progressKey = `ador:game:${gameId}:progress`;
+  const savedAtKey = `ador:game:${gameId}:progress-at`;
   const milestonesKey = `ador:game:${gameId}:milestones`;
 
   function read<Output>(key: string, schema: z.ZodType<Output>): Output | null {
@@ -46,13 +71,48 @@ export function createLocalBackend(options: {
     }
   }
 
+  function readProgress(): LocalSnapshot["progress"] {
+    const state = read<JsonValue>(progressKey, jsonValueSchema);
+    if (state === null && storage.getItem(progressKey) !== "null") return null;
+    const savedAt = read(savedAtKey, z.iso.datetime({ offset: true }));
+    return { savedAt: savedAt ?? undatedSave, state };
+  }
+
   return {
+    replace: (snapshot) => {
+      if (snapshot.progress !== null) {
+        storage.setItem(progressKey, JSON.stringify(snapshot.progress.state));
+        storage.setItem(savedAtKey, JSON.stringify(snapshot.progress.savedAt));
+      }
+      storage.setItem(
+        milestonesKey,
+        JSON.stringify(
+          Object.fromEntries(
+            snapshot.milestones.map(({ id, unlockedAt, verification }) => [
+              id,
+              { unlockedAt, verification },
+            ]),
+          ),
+        ),
+      );
+    },
+    snapshot: () => ({
+      milestones: Object.entries(read(milestonesKey, recordsSchema) ?? {}).map(
+        ([id, { unlockedAt, verification }]) => ({
+          id,
+          unlockedAt,
+          verification,
+        }),
+      ),
+      progress: readProgress(),
+    }),
     loadProgress: async () => read<JsonValue>(progressKey, jsonValueSchema),
     milestones: async () => read(milestonesKey, recordsSchema) ?? {},
     player:
       options.player ?? (() => ({ signedIn: false, walletConnected: false })),
-    saveProgress: async (state) => {
+    saveProgress: async (state, now) => {
       storage.setItem(progressKey, JSON.stringify(state));
+      storage.setItem(savedAtKey, JSON.stringify(now.toISOString()));
     },
     unlock: async (id, now) => {
       const records = read(milestonesKey, recordsSchema) ?? {};

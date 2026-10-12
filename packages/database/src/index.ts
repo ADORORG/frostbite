@@ -92,3 +92,4 @@ export {
   type CollectionReviewEventRow,
   type CollectionSubmissionRow,
 } from "./schema/collection-submissions.ts";
+export { gameMilestoneUnlocks, gameSaves } from "./schema/game-saves.ts";

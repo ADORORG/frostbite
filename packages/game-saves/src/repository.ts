@@ -1,0 +1,12 @@
+import type { GameState } from "@ador/shared/games";
+
+// Where a player's saved state for a game lives. `change` is the only write: it hands the stored state to
+// `decide` while holding the player's rows for that game, stores what `decide` returns, and returns it, so
+// two syncs of one player and game cannot interleave and a lost update is impossible.
+export interface GameSyncRepository {
+  change(
+    userId: string,
+    gameId: string,
+    decide: (stored: GameState) => GameState,
+  ): Promise<GameState>;
+}

@@ -162,6 +162,17 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-applicant-feedback-session-token",
     userId: "01994b10-0000-7000-8000-000000000062",
   },
+  // Players whose game progress is saved to the account (G3): two, so a spec can show one never sees the other's.
+  gamePlayer: {
+    sessionId: "01994b10-0000-7000-8000-00000000006d",
+    sessionToken: "e2e-game-player-session-token",
+    userId: "01994b10-0000-7000-8000-00000000006c",
+  },
+  otherGamePlayer: {
+    sessionId: "01994b10-0000-7000-8000-00000000006f",
+    sessionToken: "e2e-other-game-player-session-token",
+    userId: "01994b10-0000-7000-8000-00000000006e",
+  },
   collectionUnapproved: {
     sessionId: "01994b10-0000-7000-8000-000000000027",
     sessionToken: "e2e-collection-unapproved-session-token",
