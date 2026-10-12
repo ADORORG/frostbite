@@ -145,3 +145,34 @@ test("the platform page says what the game is: simulated, with nothing declared 
     page.getByText("Your progress is kept in this browser only."),
   ).toBeVisible();
 });
+
+test("a mark the game makes shows on the platform as reached, and stays after a reload; a mark nobody declared does not", async ({
+  page,
+}) => {
+  await page.goto("/games/frostbite");
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expect(page.getByTestId("milestone-summary")).toHaveText(
+    "0 of 3 reached",
+  );
+  // The game calls this when the player wins; here it is called directly, since winning a board is chance.
+  await gameFrame(page).evaluate(() => {
+    const host = (
+      window as unknown as { FrostbiteHost: { milestone(mark: string): void } }
+    ).FrostbiteHost;
+    host.milestone("firstWin");
+    host.milestone("firstBust");
+  });
+  await expect(page.getByTestId("milestone-summary")).toHaveText(
+    "1 of 3 reached",
+  );
+  await expect(page.locator('[data-milestone="first-win"]')).toContainText(
+    "Reached",
+  );
+  await expect(page.locator('[data-milestone="first-glacier"]')).toContainText(
+    "Not yet",
+  );
+  await page.reload();
+  await expect(page.getByTestId("milestone-summary")).toHaveText(
+    "1 of 3 reached",
+  );
+});

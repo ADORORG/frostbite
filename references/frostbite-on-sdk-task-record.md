@@ -36,12 +36,13 @@ failed, all in specs that assumed FROST·BITE was "not playable yet" or its fram
 re-run. Two later full runs each failed one spec, both fixed: the game-detail picture (the frame's animated inside, now left blank in that picture) and a latent race in `platform-hardening.spec.ts` (two specs shared one user's rate-limit window; it now has its own user). The last full run: 319 passed, 21 skipped by design, 0 failed.
 Mutants: 17 on the new code, all killed.
 
-## Needs the owner
+## Milestones (approved by the owner, 2026-10-12)
 
-- **Milestones.** None is declared yet. The game's own marks are `firstPick`, `firstWin`, `firstBust`,
-  `firstGlacier`, `firstCashout`, `firstKots`, `firstCore`, `firstDog`. Proposed three: `first-win`,
-  `first-glacier`, `first-cashout`. To declare one, add it to `configs/games/frostbite.ts` with the id in slug form;
-  the game reports it with no further change. Self-reported only: nothing with value depends on them.
+Three of the game's own marks are declared in `configs/games/frostbite.ts`: `first-win`, `first-glacier`,
+`first-cashout` (its marks `firstWin`, `firstGlacier`, `firstCashout`). The game reports a mark only when the manifest
+declares the same-named milestone, so declaring another is one manifest entry. Self-reported only; nothing with
+value depends on them. A real-browser test calls the game's own bridge for a declared and an undeclared mark and
+checks the platform's panel and a reload.
 
 ## Not done / notes
 

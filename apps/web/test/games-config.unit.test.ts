@@ -31,11 +31,15 @@ describe("the platform's game list", () => {
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
   });
 
-  it("plays FROST·BITE on the platform itself, with no address to set, and declares nothing the platform cannot honour yet", async () => {
+  it("plays FROST·BITE on the platform itself, with no address to set, and declares only three of its own marks as milestones, and nothing the platform cannot honour yet", async () => {
     const [frostbite] = await gamesWith("");
     expect(frostbite?.launch).toEqual({ mode: "embedded" });
     expect(frostbite?.capabilities).toEqual([]);
-    expect(frostbite?.milestones).toEqual([]);
+    expect(frostbite?.milestones.map(({ id }) => id)).toEqual([
+      "first-win",
+      "first-glacier",
+      "first-cashout",
+    ]);
     expect(frostbite?.network).toBe(signet);
   });
 
