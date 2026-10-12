@@ -2,10 +2,11 @@
 
 import type { HostedGame } from "@ador/game-sdk/host";
 import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
-import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
+import { ArcadeActionButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import { useRef } from "react";
 
 import { MilestoneList } from "./milestone-list.tsx";
+import { useFullscreen } from "./use-fullscreen.ts";
 import { useGameSession } from "./use-game-session.ts";
 
 // What the frame may do. Scripts only: no same-origin access, so the game has no storage, cookies or session
@@ -52,6 +53,7 @@ export function GamePlayer({
     src,
     accountFor,
   );
+  const fullscreen = useFullscreen(frame);
   return (
     <>
       <ArcadePanel eyebrow="Playing here" title={title}>
@@ -59,6 +61,20 @@ export function GamePlayer({
           label={connected ? "Connected to the platform" : "Connecting"}
           tone={connected ? "ready" : "attention"}
         />
+        {fullscreen.supported ? (
+          <>
+            <ArcadeActionButton onClick={fullscreen.enter} tone="cyan">
+              Full screen
+            </ArcadeActionButton>
+            <p>Press Esc to leave full screen.</p>
+            {fullscreen.refused ? (
+              <p role="status">
+                The browser did not allow full screen. Try again, or use the
+                browser&apos;s own full screen.
+              </p>
+            ) : null}
+          </>
+        ) : null}
         <iframe
           allow={gameFramePermissions}
           data-game-src={src}

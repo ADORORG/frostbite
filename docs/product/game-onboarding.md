@@ -121,7 +121,7 @@ FROST·BITE came in this way (`games/frostbite`), and is the worked example:
 The frame is `sandbox="allow-scripts"`, and the files are served with `Content-Security-Policy: sandbox
 allow-scripts; connect-src 'none'; script-src 'self'; style-src 'self'; frame-src 'none'; form-action 'none'`
 and related headers. So a game has no cookies, no storage, no network and no way to read the platform page.
-Allowed: full-screen, sound and keyboard or gamepad input; not camera, microphone, location or files.
+Allowed: full-screen (the game's page also has a Full screen button of the platform's, which takes the frame full screen where the browser allows it; Esc leaves), sound and keyboard or gamepad input; not camera, microphone, location or files.
 Sample game's "Run safety probe" button demonstrates this and is checked in a real browser by
 `tests/e2e/tests/game-host.spec.ts`.
 
