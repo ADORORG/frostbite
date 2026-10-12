@@ -1,31 +1,48 @@
-# Onboarding a game (the template)
+# Onboarding a game
 
-Status: the manifest, the catalog and the game page exist (task W8-01). The host protocol, the milestone claim
-path and the generator are later tasks (GP-02 to GP-08, blocked on ADR-018); this page says what works now and
-what each later step adds.
+Status: describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
+(isolated frame, SDK, local and account saving, milestones as self-reported). Minting, the registration
+generator and the replay-verified level do **not** exist yet; the last section says what each needs.
+The template is `games/sample-game` (Tap Tower). Copy it; do not start from nothing.
 
 ## What a game is
 
-A game is one file: a manifest written with `defineGame` (`@ador/shared/games`). The platform lists the games in
-`configs/games.ts`, one line each. The catalog and the game page read that list; no platform code is edited to
-add a game. A manifest that fails its checks stops the platform from starting, so a mistake shows up at once.
+A game is a folder of reviewed source plus one manifest:
+
+- **Client-only.** No server, no `fetch`, no browser storage, no cookies, no CDN scripts or fonts. Everything
+  the game needs is bundled with it. It asks the platform page around it to remember things.
+- **Built by the platform.** A pull request adds source; CI builds it into static files served under the
+  platform's own domain at `/play/<id>/index.html`, in a frame the browser cuts off (below). No binary is
+  committed. Every game is reviewed before it is merged.
+- **Described by a manifest** (`defineGame`, `@ador/shared/games`): who it is, its version, the chain its
+  future on-chain actions use, and the milestones it can report. A manifest that fails its checks stops the
+  platform starting, so a mistake shows at once.
+
+## Add a game in four steps
+
+1. **Copy `games/sample-game` to `games/<id>`** and rename the package (`@game/<id>` in `package.json`).
+   `<id>` is lower-case words joined by hyphens; it is the page address and every record's key.
+2. **Write the game** in `src/` (see "What the folder holds").
+3. **Write the manifest** in `configs/games/<id>.ts` with `launch: { mode: "embedded" }` and register it with
+   one line in `configs/games.ts`. Nothing else in the platform is edited.
+4. **Open a pull request.** The checks in "Checks every game passes" must pass.
 
 ```ts
 import { defineGame } from "@ador/shared/games";
 
 export const myGame = defineGame({
   schemaVersion: 1, // the manifest format
-  id: "my-game", // lower-case words and hyphens; it is the page address
+  id: "my-game",
   title: "My game",
   summary: "One sentence for the list.",
   description: "A longer text for the game's page.",
-  version: "0.1.0", // the game's own release version
-  network: "bip122:00000008819873e925422c1ff0f99f7c", // the chain its on-chain actions use (must be configured)
-  launch: { mode: "external", url: null, basePath: "", returnUrl: null }, // no host = registered, not playable yet
-  capabilities: ["wallet", "run:submit"], // what it will ask the host for; declarations only for now
+  version: "0.1.0", // the game's own release; a change to a milestone is a new version, never an edit
+  network: "bip122:00000008819873e925422c1ff0f99f7c", // must be a chain the platform is configured for
+  launch: { mode: "embedded" }, // played in the platform's frame; no address to set
+  capabilities: [], // declarations only today: nothing is granted yet
   milestones: [
     {
-      id: "first-level",
+      id: "first-level", // unique within the game
       title: "First level",
       description: "You finished the first level.",
       criteria: "Finish level 1.", // shown to players: how it is earned
@@ -35,100 +52,111 @@ export const myGame = defineGame({
 });
 ```
 
-Then add `myGame` to the list in `configs/games.ts`.
+## What the folder holds
 
-## Where a game is played (deployment configuration)
+| Path          | Purpose                                                                                            |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `index.html`  | The page: one `<script src="main.js">`, one stylesheet. No inline script, handler, frame or form.  |
+| `styles.css`  | The only stylesheet.                                                                               |
+| `assets/`     | Static files, copied as they are. Name them relative to the page (`assets/a.png`), never `/a.png`. |
+| `src/game.ts` | The rules, free of the page and the platform, so they are testable alone.                          |
+| `src/main.ts` | Draws and calls the platform through `@ador/game-sdk/client`. The bundle entry.                    |
+| `test/`       | Unit tests for the rules, and an integration test that bundles the game and runs it (below).       |
 
-A deployment, not the manifest, says where each game is played. Set `GAME_LAUNCHES` (one JSON value, keyed by
-game id) in the environment; the same build then serves any hosting style:
+Only `index.html`, `styles.css`, `assets/` and the bundled `main.js` are published; tests and config never leave
+the folder. `checkGameHtml` refuses a page that loads from another address, has an inline script or handler, or
+embeds a frame, form or object, and says which, when the game is built.
 
-```json
-{
-  "my-game": {
-    "url": "https://play.example.com",
-    "basePath": "",
-    "returnUrl": "https://example.com/games/my-game",
-    "network": "bip122:00000008819873e925422c1ff0f99f7c"
-  }
-}
+## Talking to the platform
+
+```ts
+import { createGameClient, GameHostError } from "@ador/game-sdk/client";
+
+const client = createGameClient();
+await client.ready(); // first; the platform answers with the player's state
+const saved = await client.progress.load(); // JSON or null
+await client.progress.save({ score: 12 }); // JSON; at most 64 KB, batch to about one a second
+const list = await client.milestones.list(); // declared milestones with the player's status
+await client.milestones.unlock("first-level"); // idempotent; only declared ids
+const { signedIn, walletConnected } = await client.player.info(); // yes/no only, never the wallet
 ```
 
-- `url`: the host only, no path or trailing slash. The play address is the host plus the base path. It must
-  not be the platform's own origin: a game is code the platform did not write and must not run beside a
-  signed-in player's session. Use a separate host (for example `games.example.com`).
-- `basePath`: blank when the game has the whole host (subdomain style, `frostbite.example.com`); `/frostbite`
-  when it is served from a path of a games host (domain-path style, `games.example.com/frostbite`). Safe segments only, no trailing slash.
-- `returnUrl`: where the game sends the player back to; must be on `PUBLIC_BASE_URL`'s origin. Blank means the
-  platform's own page for the game.
-- `network`: optional chain reference; must be a chain the platform is configured for.
-- Preview and production require an HTTPS host. A setting that names a game that is not registered, a bad value,
-  or a chain that is not configured stops the platform from starting. Blank lists every game as not playable.
+- Every failure is a `GameHostError` with a stable code (`invalid_request`, `not_ready`, `rate_limited`,
+  `too_large`, `unavailable`, `unknown_method`, `unknown_milestone`). A call the platform does not answer in
+  ten seconds ends with `unavailable`; the game must still be playable.
+- Limits are platform policy, not game code: 64 KB of saved state, 60 saves and 60 unlocks a minute. Over a limit the
+  call is refused.
+- Save and load **plain JSON of your own making**, versioned by you: a save written by an older release must
+  still load. Treat what `progress.load()` returns as untrusted input; `restore()` in `game.ts` shows how.
+- Do not wait on the platform to start drawing; do not call `unlock` for a milestone not in the manifest.
 
-Adding a game never adds an environment key: it adds an entry to this value. A worked example with every field is the test fixture
-`features/games/test/support/template-game.ts`; the real first game is `configs/games/frostbite.ts`.
+## Where the player's progress lives
 
-## Hosting styles and how they are verified
+- **Signed out:** the platform page keeps it in the browser, under keys for this game only. The game never sees
+  the storage.
+- **Signed in:** the page also syncs it with the player's account (merged when a second browser
+  opens the game: the newest save wins, and every milestone from either side is kept with its earliest time). The
+  page tells the player which of the two is true.
+- A game does nothing for either: it only calls `progress.save` and `milestones.unlock`.
 
-A game can be hosted two ways, from the same build:
+## What the browser enforces
 
-- **Subdomain style:** the game has a host to itself (`frostbite.example.com`), base path blank.
-- **Domain-path style:** several games share one games host, each under its own path
-  (`games.example.com/frostbite`), base path `/frostbite`. Never the platform's own origin.
+The frame is `sandbox="allow-scripts"`, and the files are served with `Content-Security-Policy: sandbox
+allow-scripts; connect-src 'none'; script-src 'self'; style-src 'self'; frame-src 'none'; form-action 'none'`
+and related headers. So a game has no cookies, no storage, no network and no way to read the platform page.
+Allowed: full-screen, sound and keyboard or gamepad input; not camera, microphone, location or files.
+Sample game's "Run safety probe" button demonstrates this and is checked in a real browser by
+`tests/e2e/tests/game-host.spec.ts`.
 
-One build works in both only if the game names every file relative to its own page (`main.js`, `data/levels.json`)
-and never from the root of the host (`/main.js`, `fetch("/api/run")`). Verification, task W8-03:
+## Milestones are self-reported
 
-- `tests/e2e/tests/game-hosting.spec.ts` serves a fixture game both ways in a real browser: its script runs, its
-  data loads, its stylesheet and image apply, and no request fails. A second fixture that names files from the
-  root works with a host to itself and fails under a base path, so the passing runs prove something.
-- `pnpm --filter @repo/e2e audit:game -- <game folder>` screens a real game's files for root addresses and lists
-  the other hosts it loads from. Run it on every game before listing; a root address must be fixed or made
-  configurable. It is a screen, not a proof: an address built at run time is not seen.
-- Isolation: with path style every game on the host shares one origin (browser storage and cookies), so games
-  could read each other's data. Prefer one host per game (subdomain style) for games that keep anything private.
+The platform cannot see inside a game, so a milestone is the game's own report, recorded as `self-reported`
+and shown to the player that way. **Nothing that carries money or a privilege (a reward, access, a ranking
+prize) may depend on a self-reported milestone.** A verified level (for example replaying a recorded run on
+the platform's server, which needs a deterministic game) is future work and will be added, not retrofitted.
 
-## What the platform guarantees about a listed game
+## Test and run it
 
-- Its page shows exactly what the manifest declares, with a digest of those declarations, so a change to a
-  milestone or play address is visible as a new digest and a new `version`.
-- A game with no play address is "Not playable yet". It is never shown as live.
-- Capabilities and milestones are shown as **declarations**. The page says the platform does not grant the
-  capabilities yet, cannot claim milestones on chain yet, and cannot verify what happens inside a game.
+- `pnpm --filter @game/<id> test:unit` for the rules and `test:integration`, which bundles the game and runs it
+  in jsdom against a simulated host with storage and network blocked, so a game that reaches outside fails.
+- `pnpm --filter web dev` (or `build`) builds every folder under `/games` into the git-ignored
+  `apps/web/public/play/<id>`. Open `/games/<id>`: the game is playable on that page.
+- A listed game with `launch: embedded` is shown only where it is playable. The sample game is registered only
+  when `APP_ENV` is `local` or `test`; a real game is registered for every environment.
+- `pnpm test:e2e -- tests/game-host.spec.ts` plays the sample game in a real browser through reload.
 
-## Checks a manifest passes (enforced when the platform starts)
+## Checks every game passes
 
-Strict fields only; identifier shape and uniqueness across games; http or https play address (never `javascript:`
-or `file:`); capabilities from the known list, none twice; milestone ids unique within the game; every text
-bounded (see `gameManifestLimits`); the network is a valid chain reference. Production-only address rules
-(HTTPS, allowed origins) come with the play-address configuration in W8-02.
+Strict manifest fields; identifier shape and uniqueness; capabilities from the known list; milestone ids unique
+within the game (at most 64) and every text bounded (`gameManifestLimits`); the network is a configured chain;
+the page checks above; ≤300 lines per source and test file; the repository's lint, typecheck, unit, integration
+and coverage gates (above 90%).
 
-## Testing a first game today
+## External games (until FROST·BITE moves)
 
-1. Write the manifest and add it to `configs/games.ts`; run `pnpm typecheck` and the games feature tests.
-2. Start the local stack (`pnpm stack`) and open `/games` and `/games/<id>`: the card, the state, the milestones
-   as declared.
-3. Set `GAME_LAUNCHES` for the game (for local use, `http://localhost:<port>` is allowed) to play it from the page.
+A game that cannot be bundled this way (today FROST·BITE: it calls its own server) can still be listed with
+`launch: { mode: "external", ... }` and played at an address a deployment sets through `GAME_LAUNCHES`. It is
+shown as an external link, gets no saving, no milestones and no frame, and its host must not be the platform's
+own origin. The hosting rules are:
 
-## What "milestones minted to a player's account" still needs
+- `url` is the host only (no path, no trailing slash); `basePath` is blank for a subdomain-style host or
+  `/name` for domain-path style; `returnUrl` must be on `PUBLIC_BASE_URL`'s origin; preview and production
+  need HTTPS. A bad value stops the platform starting.
+- One build serves both styles only if it names every file relative to its own page. `pnpm --filter @repo/e2e
+audit:game -- <folder>` screens for root addresses. With path style, games on one host share an origin, so
+  prefer one host per game for anything private.
 
-Declaring a milestone does not make it earnable or mintable. The path in ADR-018 (still **proposed**) is:
-the game's own server decides a milestone was earned and asks a platform attestation service for a short-lived,
-single-use attestation for that player; the player's wallet signs the claim transaction with the attestation;
-a reviewed `game-rewards@1` contract checks it and mints. In the product the states are **earned**, **claim
-pending**, **claimed** and **complete**, and "minted" is never shown before the indexed state agrees.
+Moving FROST·BITE onto the SDK (task G5) removes the need for this mode for it.
 
-| Step                                                                    | Task  | Blocked on                              |
-| ----------------------------------------------------------------------- | ----- | --------------------------------------- |
-| Accept ADR-018 and the signature-verification spike on the target chain | GP-00 | the owner's decision; spike not started |
-| Manifest gains contracts, capabilities and hashed milestone definitions | GP-01 | GP-00                                   |
-| Game SDK and host protocol (`milestone:claim`, origin checks)           | GP-02 | GP-01                                   |
-| Conformance suite and a simulated game                                  | GP-03 | GP-02                                   |
-| Runnable template and one-line generator                                | GP-04 | GP-02, GP-03                            |
-| `game-rewards@1` contract                                               | GP-05 | GP-00, contract tooling                 |
-| Attestation service (keys, nonces, rate limits, pause, audit)           | GP-06 | GP-00, GP-01                            |
-| Milestone claim through the quote, sign, broadcast, observe pipeline    | GP-07 | GP-05, GP-06, the mint pipeline         |
-| Player milestone states in the host and game page                       | GP-08 | GP-07                                   |
+## Not built yet
 
-Until those exist, a first game can be listed, described and linked, and its milestones declared and reviewed
-as data. Linking milestones to a player's account is the work above; nothing in the current pages pretends
-otherwise.
+| Missing                                                              | Task / blocked on                                      |
+| -------------------------------------------------------------------- | ------------------------------------------------------ |
+| Accepting the host interface as the ADR-018 amendment                | The owner's sign-off (G1)                              |
+| Registration generator and the conformance runner in test-kit        | After the sign-off (G2)                                |
+| Milestone states beyond "reached" (claim pending, claimed, complete) | After minting exists (G4/G7)                           |
+| Minting: `game-rewards` contract, the `mint-milestone` intent        | Contract and mint pipeline (weeks 6 and 7), fee values |
+| A verified milestone level                                           | A run-record spike with a real game (G6)               |
+
+Until those exist a game can be played, its progress kept and its milestones shown as the game's own report.
+Nothing in the pages implies a milestone can be claimed on chain.

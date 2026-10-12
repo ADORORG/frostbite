@@ -1,19 +1,21 @@
 # `@ador/feature-games`
 
-The public games catalog and game detail pages. A game is a manifest (`@ador/shared/games`); this feature
-only reads manifests and presents them.
+The public games catalog and game detail pages, the frame that plays an embedded game, and the one API route
+that saves a signed-in player's progress and milestones. A game is a manifest (`@ador/shared/games`); the host
+page connects it to the platform through `@ador/game-sdk`.
 
 ## Public API
 
 `createGamesFeature(games, chains)` returns the feature registration: `/games`, `/games/[slug]`, and a
-"Games" navigation item. The games come from `configs/games.ts`, one line per game.
+"Games" navigation item, and `POST /api/v1/games/sync` (authenticated; rate limited as `syncGameState`; the
+service is `@ador/game-saves`). The games come from `configs/games.ts`, one line per game.
 
 ## Onboarding a game (the template)
 
-1. Write the game's manifest with `defineGame` (see `docs/product/game-onboarding.md` for the template and
-   every field).
-2. Add it to the list in `configs/games.ts`: `defineGames([frostbite, yourGame])`.
-3. Run the tests: the catalog, the detail page and the manifest checks pick it up with no other change.
+1. Copy `games/sample-game` and write the game (see `docs/product/game-onboarding.md`, the full guide).
+2. Write its manifest with `defineGame` (`launch: { mode: "embedded" }`) in `configs/games/`.
+3. Add it to the list in `configs/games.ts`: `defineGames([frostbite, yourGame])`.
+4. Run the tests: the catalog, the detail page and the manifest checks pick it up with no other change.
 
 The platform core is not edited to add a game.
 
@@ -25,7 +27,9 @@ The platform core is not edited to add a game.
 - A manifest that fails validation stops the platform from starting; it is not skipped.
 - Identifiers are unique and are the page address. An address that cannot be an identifier is "Invalid
   route"; a valid one with no game is "Record not published".
-- The feature performs no persistence, wallet, mint or on-chain operation.
+- The feature performs no wallet, mint or on-chain operation. The only persistence is the sync route, which
+  stores the player's own state for a listed game and its declared milestones, never anything a request names
+  for another player. Milestones are labelled self-reported.
 
 ## Dependencies and configuration
 

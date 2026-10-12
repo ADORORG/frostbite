@@ -1,6 +1,7 @@
 # Game host interface and milestone claims (draft amendment to ADR-018)
 
-Status: draft for the product owner. Product direction (2026-10-12), recorded here before anything is built:
+Status: draft for the product owner, **awaiting sign-off as the ADR-018 amendment** (it is not accepted until the
+owner says so; section 8 says what is built and where the build differs from the answers below). Product direction (2026-10-12), recorded here before anything is built:
 
 - Every game is **client-only**: a static bundle built from reviewed source, no server of its own.
 - Games run on the platform's domain, in an **isolated frame**, and talk to the platform through one **clean
@@ -108,3 +109,20 @@ Answered in a second round:
 Still open:
 
 - The shape of a deterministic run record for replay verification (a spike with the first game).
+
+## 8. What is built (2026-10-12) and where it differs
+
+Built and tested (steps 1 to 4 of section 6): the SDK and protocol, the isolated frame and its headers, the
+simulated and real-browser tests, local saving, account saving and sync, milestone list and unlock, the 64 KB
+limit and call rates. Not built: the registration generator, milestone states beyond "reached", FROST·BITE on the
+SDK, the run-record spike, and minting (steps 5 and 6).
+
+Differences the owner should confirm or change (the merge rule is one function, `mergeGameState`):
+
+- **Progress merge:** built as "the newest save wins, every milestone from either side is kept with its earliest
+  time". The answer in section 7 also asked for a choice screen when the two saves "differ a lot"; that screen
+  is **not built**, so today the older save is replaced silently on the account. Needs a game-defined measure of
+  progress, so it is deferred until a real game defines one.
+- **Wrong clocks:** a save dated more than five minutes ahead of the server is ignored, so a device with a wrong
+  clock keeps its local save but does not reach the account until its clock is right.
+- **Idempotency:** the sync takes no key because replaying it changes nothing.
