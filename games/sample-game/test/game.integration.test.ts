@@ -42,6 +42,7 @@ async function play(saved?: { score: number }) {
   const script = await bundleGameScript(join(root, "src/main.ts"));
   running = runGameInSimulatedHost({
     backend: {
+      identity: async () => ({ id: "sample-player-0001", kind: "local" }),
       loadProgress: async () => stored.progress,
       milestones: async () =>
         Object.fromEntries(
@@ -136,6 +137,7 @@ describe("Tap Tower, bundled and run against a simulated platform", () => {
     const script = await bundleGameScript(join(root, "src/main.ts"));
     running = runGameInSimulatedHost({
       backend: {
+        identity: async () => ({ id: "sample-player-0001", kind: "local" }),
         loadProgress: async () => {
           throw new Error("down");
         },

@@ -32,7 +32,8 @@ export function createAccountPort(
             signal: AbortSignal.timeout(timeoutMs),
           },
         );
-        return { kind: "synced", state: merged };
+        const { playerId, ...saved } = merged;
+        return { kind: "synced", playerId, state: saved };
       } catch (error) {
         return error instanceof ApiError && error.code === "unauthorized"
           ? { kind: "signed-out" }

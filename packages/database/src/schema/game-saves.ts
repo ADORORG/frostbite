@@ -6,6 +6,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -15,7 +16,9 @@ import { platformSchema } from "./platform.ts";
 // A signed-in player's latest save for one game. `progress_saved_at` is the time the player's device gave
 // the save (bounded to the server's clock), the value the merge rule compares; the row exists as soon as the
 // player first syncs the game, with no save yet, so a sync can lock it. The size is stored so a limit can be
-// checked without reading the document.
+// checked without reading the document. `player_id` is what the game is told the player is: random, made with the
+// row, and kept as long as the row, so it identifies the player to this game alone and cannot be worked out
+// from the account or from another game's id.
 export const gameSaves = platformSchema.table(
   "game_saves",
   {
@@ -23,6 +26,7 @@ export const gameSaves = platformSchema.table(
       .notNull()
       .references(() => authUsers.id, { onDelete: "cascade" }),
     gameId: text("game_id").notNull(),
+    playerId: uuid("player_id").notNull().defaultRandom(),
     progress: jsonb("progress"),
     progressBytes: integer("progress_bytes").notNull().default(0),
     progressSavedAt: timestamp("progress_saved_at", {
@@ -35,6 +39,7 @@ export const gameSaves = platformSchema.table(
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.gameId] }),
+    unique("game_saves_player_id_key").on(table.playerId),
     check(
       "game_saves_progress_coherent",
       sql`(${table.progress} is null) = (${table.progressSavedAt} is null)`,

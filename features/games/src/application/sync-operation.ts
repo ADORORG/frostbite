@@ -5,8 +5,8 @@ import {
   gameSyncRoute,
   syncGameStateInputSchema,
   syncGameStateResponseSchema,
-  type GameState,
   type SyncGameStateInput,
+  type SyncGameStateResponse,
 } from "@ador/shared/games";
 
 // Saves a signed-in player's local state for a game to their account and returns the merged state. Naturally
@@ -25,7 +25,10 @@ export function createSyncGameStateOperation(
       ).sync(context.actorUserId, input);
       switch (outcome.kind) {
         case "synced":
-          return { ok: true, value: outcome.state } as const;
+          return {
+            ok: true,
+            value: { ...outcome.state, playerId: outcome.playerId },
+          } as const;
         case "unknown-game":
           return failure("not_found", "The game was not found.");
         case "unknown-milestone":
@@ -42,5 +45,5 @@ export function createSyncGameStateOperation(
     inputSchema: syncGameStateInputSchema,
     outputSchema: syncGameStateResponseSchema,
     ...gameSyncRoute,
-  } satisfies HttpOperation<SyncGameStateInput, GameState>;
+  } satisfies HttpOperation<SyncGameStateInput, SyncGameStateResponse>;
 }

@@ -31,7 +31,12 @@ export const syncGameStateInputSchema = z
   .object({ gameId: gameIdSchema, state: gameStateSchema })
   .strict();
 
-export const syncGameStateResponseSchema = gameStateSchema;
+// What the account answers with: the merged state, and the player's id for this game. The id is random, made
+// when the player first syncs the game, and is what a game is told the player is; it cannot be worked out from
+// the account or from the id another game was given.
+export const syncGameStateResponseSchema = gameStateSchema
+  .extend({ playerId: z.uuid() })
+  .strict();
 
 export const gameSyncRoute = {
   method: "POST",
@@ -43,6 +48,7 @@ export type GameMilestoneRecord = z.infer<typeof gameMilestoneRecordSchema>;
 export type GameProgress = z.infer<typeof gameProgressSchema>;
 export type GameState = z.infer<typeof gameStateSchema>;
 export type SyncGameStateInput = z.infer<typeof syncGameStateInputSchema>;
+export type SyncGameStateResponse = z.infer<typeof syncGameStateResponseSchema>;
 
 // How far ahead of the server's clock a device's clock may be before its save is not believed. Phones and
 // laptops drift by seconds; a larger gap is a wrong clock or a forged time.

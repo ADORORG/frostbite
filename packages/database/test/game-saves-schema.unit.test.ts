@@ -23,6 +23,16 @@ describe("game save schema", () => {
     ]);
   });
 
+  it("gives each save a random player id of its own that is never empty and never shared", () => {
+    const config = getTableConfig(gameSaves);
+    const column = config.columns.find(({ name }) => name === "player_id");
+    expect(column?.notNull).toBe(true);
+    expect(column?.hasDefault).toBe(true);
+    expect(config.uniqueConstraints.map(({ name }) => name)).toEqual([
+      "game_saves_player_id_key",
+    ]);
+  });
+
   it("records a milestone once per player, game and milestone, as self-reported only", () => {
     const config = getTableConfig(gameMilestoneUnlocks);
     expect(config.primaryKeys[0]?.columns.map(({ name }) => name)).toEqual([

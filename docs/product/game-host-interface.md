@@ -43,6 +43,7 @@ accepts messages only from the game's own frame.
 | `milestones.list()`     | The milestones the game declared (from its manifest) with the player's status of each.                   |
 | `milestones.unlock(id)` | The player earned it. Idempotent; only declared ids; counted against limits.                             |
 | `player.info()`         | Signed in or not, wallet connected or not (a yes or no).                                                 |
+| `player.identity()`     | An opaque id for the player in this game; local until sign-in, then the account's (Amendment 3).         |
 | `wallet.get()`          | The connected wallet's public address and network, or none. Needs the `wallet` capability (Amendment 2). |
 | `capabilities.get()`    | The methods, events and limits the platform supports, and what this game was granted.                    |
 | `ui.toast(message)`     | Asks the page to show a short plain message, labelled with the game's name.                              |
@@ -133,3 +134,10 @@ Differences the owner should confirm or change (the merge rule is one function, 
 - **Wrong clocks:** a save dated more than five minutes ahead of the server is ignored, so a device with a wrong
   clock keeps its local save but does not reach the account until its clock is right.
 - **Idempotency:** the sync takes no key because replaying it changes nothing.
+
+## 9. Amendment 3 (owner, 2026-10-13): the player's id for a game
+
+A game is told an opaque, random id for the player in that game (`player.identity`, and the `player.changed` event
+when it changes). It is this browser's until the player signs in, then the account's, stored with the player's save
+for that game (migration `game_player_id`). It is not derived from the account or from another game's id, so games
+cannot link a player. Name and avatar are not exposed (no profile exists yet).

@@ -16,6 +16,7 @@ import {
   type JsonValue,
   type MethodName,
   type MilestoneStatus,
+  type PlayerIdentity,
   type PlayerInfo,
   type Request,
   type Response,
@@ -28,6 +29,9 @@ import { createRateLimiter } from "./rate-limit.ts";
 // What the host keeps for a player on behalf of a game. The host owns storage and, later, the account; a game
 // never sees where this lives.
 export interface GameHostBackend {
+  // Who the game is told the player is. A backend that reconciles with an account answers once that is done,
+  // so a signed-in player is never first shown an id that is about to change.
+  identity(): Promise<PlayerIdentity>;
   loadProgress(): Promise<JsonValue | null>;
   milestones(): Promise<
     Readonly<
@@ -138,6 +142,8 @@ export function createGameHost(options: {
           methods: methodNames,
           protocolVersion,
         };
+      case "player.identity":
+        return backend.identity();
       case "player.info":
         return backend.player();
       case "ui.toast": {

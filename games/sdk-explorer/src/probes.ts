@@ -27,6 +27,11 @@ export const probes: readonly Probe[] = [
     run: (client) => client.capabilities.get(),
   },
   {
+    id: "identity",
+    label: "player.identity",
+    run: (client) => client.player.identity(),
+  },
+  {
     id: "player",
     label: "player.info",
     run: (client) => client.player.info(),

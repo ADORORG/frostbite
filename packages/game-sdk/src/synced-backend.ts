@@ -1,10 +1,16 @@
 import type { GameHostBackend } from "./host.ts";
 import type { LocalBackend, LocalSnapshot } from "./local-backend.ts";
+import type { PlayerIdentity } from "./protocol.ts";
 
-// How the account answers a sync: the merged state, "signed-out" when there is no account to sync with (so
+// How the account answers a sync: the merged state and the player's id for this game, "signed-out" when there is no account to sync with (so
 // nothing more is tried), or "failed" when it could not be reached (so the next change tries again).
 export type AccountSyncResult =
-  | { readonly kind: "synced"; readonly state: LocalSnapshot }
+  | {
+      readonly kind: "synced";
+      // The account's id for this player in this game: random, and the same on every device.
+      readonly playerId: string;
+      readonly state: LocalSnapshot;
+    }
   | { readonly kind: "signed-out" }
   | { readonly kind: "failed" };
 
@@ -27,12 +33,16 @@ export interface SyncedBackend extends GameHostBackend {
 // sync is repaired by the next one, and the merge makes any replay harmless.
 export function createSyncedBackend(options: {
   readonly local: LocalBackend;
+  // Called when the player's id changes from this browser's to the account's, which happens once, when a sync
+  // first succeeds for a signed-in player. Not called for a player who stays signed out.
+  readonly onIdentity?: (identity: PlayerIdentity) => void;
   readonly onStatus?: (status: SyncStatus) => void;
   readonly remote: AccountPort;
 }): SyncedBackend {
   const { local, remote } = options;
   let status: SyncStatus = "local";
   let signedOut = false;
+  let accountId: string | null = null;
   let sending: Promise<void> | null = null;
   let dirty = false;
 
@@ -49,6 +59,10 @@ export function createSyncedBackend(options: {
       result = await remote.sync(local.snapshot());
       // Storage that refuses the merged state (full, or blocked) is a failed sync like any other.
       if (result.kind === "synced" && applyResult) local.replace(result.state);
+      if (result.kind === "synced" && result.playerId !== accountId) {
+        accountId = result.playerId;
+        options.onIdentity?.({ id: accountId, kind: "account" });
+      }
     } catch {
       result = { kind: "failed" };
     }
@@ -78,6 +92,14 @@ export function createSyncedBackend(options: {
   }
 
   return {
+    // The id waits for the first reconcile like the first read does, so a signed-in player's game starts with the
+    // account's id and not one that is about to change.
+    identity: async () => {
+      await reconciled;
+      return accountId === null
+        ? local.identity()
+        : { id: accountId, kind: "account" };
+    },
     loadProgress: async () => {
       await reconciled;
       return local.loadProgress();

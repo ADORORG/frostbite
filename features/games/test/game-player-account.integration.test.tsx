@@ -14,6 +14,8 @@ import {
 
 registerHarness();
 
+const playerId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
+
 describe("the game player with an account", () => {
   const merged = {
     milestones: [
@@ -29,6 +31,7 @@ describe("the game player with an account", () => {
   it("starts the game from the account's state and says the progress is saved there", async () => {
     const sync = vi.fn<AccountPort["sync"]>(async () => ({
       kind: "synced",
+      playerId,
       state: merged,
     }));
     const accountFor = () => ({ sync });
@@ -51,6 +54,7 @@ describe("the game player with an account", () => {
   it("sends a save made in the game to the account", async () => {
     const sync = vi.fn<AccountPort["sync"]>(async () => ({
       kind: "synced",
+      playerId,
       state: merged,
     }));
     const accountFor = () => ({ sync });
@@ -73,5 +77,52 @@ describe("the game player with an account", () => {
     expect(h.container.textContent).toContain(
       "Saving it to your account is waiting for a connection.",
     );
+  });
+
+  it("tells the game the account's id as who the player is, from the first answer", async () => {
+    const sync = vi.fn<AccountPort["sync"]>(async () => ({
+      kind: "synced",
+      playerId,
+      state: merged,
+    }));
+    const { reply, target } = await mount(() => ({ sync }));
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "player.identity", {}, "b");
+    await flush();
+    expect(
+      reply.mock.calls
+        .map(([message]) => message)
+        .find((message) => (message as { id?: string }).id === "b"),
+    ).toMatchObject({ ok: true, result: { id: playerId, kind: "account" } });
+  });
+
+  it("tells a game that began with this browser's id when the account's replaces it", async () => {
+    let up = false;
+    const sync = vi.fn<AccountPort["sync"]>(async () =>
+      up ? { kind: "synced", playerId, state: merged } : { kind: "failed" },
+    );
+    const { reply, target } = await mount(() => ({ sync }));
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "player.identity", {}, "b");
+    await flush();
+    const answer = (id: string) =>
+      reply.mock.calls
+        .map(([message]) => message)
+        .find((message) => (message as { id?: string }).id === id);
+    expect(answer("b")).toMatchObject({ result: { kind: "local" } });
+    up = true;
+    send(target, "progress.save", { state: { taps: 9 } }, "c");
+    await flush();
+    const events = reply.mock.calls
+      .map(([message]) => message)
+      .filter((message) => "event" in (message as object));
+    expect(events).toEqual([
+      {
+        channel: "ador-game",
+        data: { id: playerId, kind: "account" },
+        event: "player.changed",
+        version: 1,
+      },
+    ]);
   });
 });

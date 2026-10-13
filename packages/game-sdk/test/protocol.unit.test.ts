@@ -94,11 +94,12 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the nine the platform offers", () => {
+  it("are exactly the ten the platform offers", () => {
     expect(methodNames.sort()).toEqual([
       "capabilities.get",
       "milestones.list",
       "milestones.unlock",
+      "player.identity",
       "player.info",
       "progress.load",
       "progress.save",
@@ -209,10 +210,11 @@ describe("the wallet and the events", () => {
       expect(walletInfoSchema.safeParse(wallet).success).toBe(false);
   });
 
-  it("know three events, each with strict data", () => {
+  it("know four events, each with strict data", () => {
     expect(eventNames.sort()).toEqual([
       "fullscreen.changed",
       "lifecycle.changed",
+      "player.changed",
       "wallet.changed",
     ]);
     expect(

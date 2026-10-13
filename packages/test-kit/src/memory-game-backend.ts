@@ -12,6 +12,7 @@ export function createMemoryGameBackend(
     { unlockedAt: string; verification: "self-reported" }
   > = {};
   const backend: GameHostBackend = {
+    identity: async () => ({ id: "memory-player-0001", kind: "local" }),
     loadProgress: async () => progress,
     milestones: async () => ({ ...unlocked }),
     player: () => ({ signedIn: false, walletConnected: false }),

@@ -68,7 +68,12 @@ export interface GameClient {
     list(): Promise<Result<"milestones.list">["milestones"]>;
     unlock(id: string): Promise<Result<"milestones.unlock">>;
   };
-  readonly player: { info(): Promise<Result<"player.info">> };
+  readonly player: {
+    // An opaque id for this player in this game: made in this browser until the player signs in, then the
+    // account's. Listen for `player.changed` to learn of the change.
+    identity(): Promise<Result<"player.identity">>;
+    info(): Promise<Result<"player.info">>;
+  };
   readonly progress: {
     load(): Promise<JsonValue | null>;
     save(state: JsonValue): Promise<void>;
@@ -200,7 +205,10 @@ export function createGameClient(
       list: async () => (await call("milestones.list", {})).milestones,
       unlock: (id) => call("milestones.unlock", { id }),
     },
-    player: { info: () => call("player.info", {}) },
+    player: {
+      identity: () => call("player.identity", {}),
+      info: () => call("player.info", {}),
+    },
     progress: {
       load: async () => (await call("progress.load", {})).state,
       save: async (state) => void (await call("progress.save", { state })),

@@ -12,6 +12,8 @@ export interface KeyValueStorage {
   setItem(key: string, value: string): void;
 }
 
+const localIdSchema = z.string().regex(/^[A-Za-z0-9-]{8,64}$/u);
+
 const recordsSchema = z.record(
   z.string(),
   z
@@ -52,6 +54,8 @@ const undatedSave = "1970-01-01T00:00:00.000Z";
 
 export function createLocalBackend(options: {
   readonly gameId: string;
+  // Makes the id a browser without one is given; random, and kept. A test supplies a fixed one.
+  readonly newId?: () => string;
   readonly player?: () => PlayerInfo;
   readonly storage: KeyValueStorage;
 }): LocalBackend {
@@ -59,6 +63,8 @@ export function createLocalBackend(options: {
   const progressKey = `ador:game:${gameId}:progress`;
   const savedAtKey = `ador:game:${gameId}:progress-at`;
   const milestonesKey = `ador:game:${gameId}:milestones`;
+  const playerKey = `ador:game:${gameId}:player-id`;
+  const newId = options.newId ?? (() => globalThis.crypto.randomUUID());
 
   function read<Output>(key: string, schema: z.ZodType<Output>): Output | null {
     try {
@@ -78,7 +84,19 @@ export function createLocalBackend(options: {
     return { savedAt: savedAt ?? undatedSave, state };
   }
 
+  // This browser's id for the player in this game. A stored value that is not an id (edited by hand, or from a
+  // storage that lost part of it) is replaced rather than trusted, so a game is never handed text of unknown
+  // shape.
+  function localId(): string {
+    const stored = read(playerKey, localIdSchema);
+    if (stored !== null) return stored;
+    const made = newId();
+    storage.setItem(playerKey, JSON.stringify(made));
+    return made;
+  }
+
   return {
+    identity: async () => ({ id: localId(), kind: "local" }),
     replace: (snapshot) => {
       if (snapshot.progress !== null) {
         storage.setItem(progressKey, JSON.stringify(snapshot.progress.state));

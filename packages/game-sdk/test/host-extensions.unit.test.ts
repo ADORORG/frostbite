@@ -117,6 +117,7 @@ describe("the capabilities answer", () => {
     expect(result?.events.sort()).toEqual([
       "fullscreen.changed",
       "lifecycle.changed",
+      "player.changed",
       "wallet.changed",
     ]);
   });

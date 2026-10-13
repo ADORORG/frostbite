@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import type { GameState } from "@ador/shared/games";
 
 import type { GameSyncRepository } from "../../src/repository.ts";
@@ -8,6 +10,7 @@ export function createMemoryRepository(): GameSyncRepository & {
   readonly calls: { gameId: string; userId: string }[];
 } {
   const stored = new Map<string, GameState>();
+  const ids = new Map<string, string>();
   const calls: { gameId: string; userId: string }[] = [];
   return {
     calls,
@@ -18,7 +21,10 @@ export function createMemoryRepository(): GameSyncRepository & {
         stored.get(key) ?? { milestones: [], progress: null },
       );
       stored.set(key, next);
-      return next;
+      // One id per player and game, kept: what the real row does.
+      const playerId = ids.get(key) ?? randomUUID();
+      ids.set(key, playerId);
+      return { playerId, state: next };
     },
   };
 }

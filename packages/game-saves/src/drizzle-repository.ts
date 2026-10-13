@@ -26,6 +26,9 @@ export function createDrizzleGameSyncRepository(
             and(eq(gameSaves.userId, userId), eq(gameSaves.gameId, gameId)),
           )
           .for("update");
+        // The row was inserted above and is locked now; its absence would mean a concurrent delete of the player.
+        if (save === undefined)
+          throw new Error("The player's game row disappeared during a sync.");
         const unlocks = await transaction
           .select()
           .from(gameMilestoneUnlocks)
@@ -43,7 +46,7 @@ export function createDrizzleGameSyncRepository(
           })),
           // The column is read back through the contract, so a row edited by hand cannot become a state.
           progress:
-            save?.progressSavedAt != null
+            save.progressSavedAt != null
               ? {
                   savedAt: save.progressSavedAt.toISOString(),
                   state: gameProgressSchema.shape.state.parse(save.progress),
@@ -91,7 +94,7 @@ export function createDrizzleGameSyncRepository(
               ],
             });
         }
-        return merged;
+        return { playerId: save.playerId, state: merged };
       }),
   };
 }

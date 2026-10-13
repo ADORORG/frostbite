@@ -20,6 +20,7 @@ const environment = parseDatabaseEnvironment(process.env);
 const pool = createDatabasePool(environment);
 const database = createDatabaseClient(pool);
 const repository = createDrizzleGameSyncRepository(database);
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 const now = new Date("2026-10-12T12:00:00.000Z");
 const service = createGameSyncService({
   clock: () => now,
@@ -64,7 +65,11 @@ describe("the account's saved state in PostgreSQL", () => {
         gameId: "tap-tower",
         state: { milestones: [], progress: null },
       }),
-    ).toEqual({ kind: "synced", state: { milestones: [], progress: null } });
+    ).toEqual({
+      kind: "synced",
+      playerId: expect.stringMatching(uuid),
+      state: { milestones: [], progress: null },
+    });
     expect(await database.select().from(gameSaves)).toHaveLength(1);
   });
 
@@ -79,7 +84,11 @@ describe("the account's saved state in PostgreSQL", () => {
         gameId: "tap-tower",
         state: { milestones: [], progress: null },
       }),
-    ).toEqual({ kind: "synced", state: saved });
+    ).toEqual({
+      kind: "synced",
+      playerId: expect.stringMatching(uuid),
+      state: saved,
+    });
   });
 
   it("keeps the newer save when an older device syncs later, and a replay changes nothing", async () => {
@@ -96,7 +105,11 @@ describe("the account's saved state in PostgreSQL", () => {
       gameId: "tap-tower",
       state: older,
     });
-    expect(afterOlder).toEqual({ kind: "synced", state: newer });
+    expect(afterOlder).toEqual({
+      kind: "synced",
+      playerId: expect.stringMatching(uuid),
+      state: newer,
+    });
     const [before] = await database.select().from(gameSaves);
     await service.sync(userId, { gameId: "tap-tower", state: newer });
     const [after] = await database.select().from(gameSaves);
@@ -114,7 +127,11 @@ describe("the account's saved state in PostgreSQL", () => {
         gameId: "tap-tower",
         state: { milestones: [], progress: null },
       }),
-    ).toEqual({ kind: "synced", state: nullSave });
+    ).toEqual({
+      kind: "synced",
+      playerId: expect.stringMatching(uuid),
+      state: nullSave,
+    });
   });
 
   it("keeps the earliest unlock time and never removes a milestone", async () => {
@@ -137,6 +154,7 @@ describe("the account's saved state in PostgreSQL", () => {
     });
     expect(merged).toEqual({
       kind: "synced",
+      playerId: expect.stringMatching(uuid),
       state: {
         milestones: [
           milestone("first-five", "2026-10-03T00:00:00.000Z"),
@@ -163,12 +181,14 @@ describe("the account's saved state in PostgreSQL", () => {
       await service.sync(otherId, { gameId: "tap-tower", state: empty }),
     ).toEqual({
       kind: "synced",
+      playerId: expect.stringMatching(uuid),
       state: empty,
     });
     expect(
       await service.sync(userId, { gameId: "other-game", state: empty }),
     ).toEqual({
       kind: "synced",
+      playerId: expect.stringMatching(uuid),
       state: empty,
     });
   });
@@ -245,5 +265,24 @@ describe("the account's saved state in PostgreSQL", () => {
     await database.delete(authUsers).where(eq(authUsers.id, userId));
     expect(await database.select().from(gameSaves)).toEqual([]);
     expect(await database.select().from(gameMilestoneUnlocks)).toEqual([]);
+  });
+
+  it("keeps one player id per player and game, across syncs, and gives each player and game its own", async () => {
+    const empty: GameState = { milestones: [], progress: null };
+    const idOf = async (user: string, game: string) => {
+      const outcome = await service.sync(user, { gameId: game, state: empty });
+      return outcome.kind === "synced" ? outcome.playerId : "none";
+    };
+    const first = await idOf(userId, "tap-tower");
+    expect(first).toMatch(uuid);
+    expect(await idOf(userId, "tap-tower")).toBe(first);
+    expect(await idOf(otherId, "tap-tower")).not.toBe(first);
+    expect(await idOf(userId, "other-game")).not.toBe(first);
+    const [row] = await database
+      .select({ playerId: gameSaves.playerId })
+      .from(gameSaves)
+      .where(eq(gameSaves.userId, userId))
+      .limit(1);
+    expect([first, await idOf(userId, "other-game")]).toContain(row?.playerId);
   });
 });

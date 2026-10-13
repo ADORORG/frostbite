@@ -30,7 +30,7 @@ The platform core is not edited to add a game.
   route"; a valid one with no game is "Record not published".
 - The feature performs no mint or on-chain operation, and signs nothing. For a game that declared the `wallet`
   capability it mounts the wallet connection on the game's page and passes the game only the connected wallet's
-  public address and network (`wallet-game-player.tsx`); a game that did not declare it gets no wallet provider. The only persistence is the sync route, which
+  public address and network (`wallet-game-player.tsx`); a game that did not declare it gets no wallet provider. The only persistence is the sync route (which also returns the player's random per-game id, kept on the save row), which
   stores the player's own state for a listed game and its declared milestones, never anything a request names
   for another player. Milestones are labelled self-reported.
 

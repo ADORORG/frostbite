@@ -23,9 +23,12 @@ const remoteState: LocalSnapshot = {
   progress: { savedAt: "2026-10-02T00:00:00.000Z", state: { taps: 10 } },
 };
 
+const accountPlayer = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
+
 function setup(
   answer: (state: LocalSnapshot) => Promise<AccountSyncResult> = async () => ({
     kind: "synced",
+    playerId: accountPlayer,
     state: remoteState,
   }),
 ) {
@@ -63,6 +66,7 @@ describe("the backend that syncs with the account", () => {
     map.set("ador:game:g:progress-at", JSON.stringify(at.toISOString()));
     const sync = vi.fn<AccountPort["sync"]>(async () => ({
       kind: "synced",
+      playerId: accountPlayer,
       state: empty,
     }));
     createSyncedBackend({
@@ -120,7 +124,9 @@ describe("the backend that syncs with the account", () => {
   it("is pending after a failed sync, keeps the game working, and sends again with the next change", async () => {
     let fail = true;
     const { backend, sync } = setup(async () =>
-      fail ? { kind: "failed" } : { kind: "synced", state: remoteState },
+      fail
+        ? { kind: "failed" }
+        : { kind: "synced", playerId: accountPlayer, state: remoteState },
     );
     expect(await backend.loadProgress()).toBeNull();
     expect(backend.status()).toBe("pending");
@@ -149,7 +155,13 @@ describe("the backend that syncs with the account", () => {
           throw new Error("quota");
         },
       },
-      remote: { sync: async () => ({ kind: "synced", state: remoteState }) },
+      remote: {
+        sync: async () => ({
+          kind: "synced",
+          playerId: accountPlayer,
+          state: remoteState,
+        }),
+      },
     });
     await full.loadProgress();
     expect(full.status()).toBe("pending");
@@ -164,7 +176,7 @@ describe("the backend that syncs with the account", () => {
       peak = Math.max(peak, inFlight);
       await new Promise<void>((release) => releases.push(release));
       inFlight -= 1;
-      return { kind: "synced", state: empty };
+      return { kind: "synced", playerId: accountPlayer, state: empty };
     });
     releases.shift()?.call(undefined);
     await vi.waitFor(() => expect(sync).toHaveBeenCalledTimes(1));

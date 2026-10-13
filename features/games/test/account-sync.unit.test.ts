@@ -8,6 +8,7 @@ const state: LocalSnapshot = {
   milestones: [],
   progress: { savedAt: "2026-10-01T00:00:00.000Z", state: { taps: 1 } },
 };
+const playerId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 const json = (body: object, status = 200) =>
   new Response(JSON.stringify(body), { status });
 const denied = (code: string, status: number) =>
@@ -24,9 +25,12 @@ const denied = (code: string, status: number) =>
 
 describe("the account port", () => {
   it("posts the game and the state to the sync route and returns the merged state", async () => {
-    const fetchImpl = vi.fn<FetchLike>(async () => json(state));
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({ ...state, playerId }),
+    );
     const result = await createAccountPort("tap-tower", fetchImpl).sync(state);
-    expect(result).toEqual({ kind: "synced", state });
+    // The id is handed over apart from the state, which stays what the browser keeps.
+    expect(result).toEqual({ kind: "synced", playerId, state });
     const [path, init] = fetchImpl.mock.calls[0] ?? [];
     expect(path).toBe("/api/v1/games/sync");
     expect(init?.method).toBe("POST");
@@ -35,6 +39,18 @@ describe("the account port", () => {
       state,
     });
   });
+
+  it.each([
+    ["no player id", { ...state }],
+    ["a player id that is not an id", { ...state, playerId: "someone" }],
+    ["a field nobody declared", { ...state, playerId, email: "a@b.c" }],
+  ])(
+    "treats an answer with %s as a failure, never as a state",
+    async (_what, body) => {
+      const port = createAccountPort("g", async () => json(body));
+      expect(await port.sync(state)).toEqual({ kind: "failed" });
+    },
+  );
 
   it("reads a 401 as nobody signed in, not as a failure", async () => {
     const port = createAccountPort("g", async () =>

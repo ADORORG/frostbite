@@ -63,7 +63,7 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
       "Connected. Call anything below.",
     );
     const buttons = [...document.querySelectorAll("#probes button")];
-    expect(buttons).toHaveLength(8);
+    expect(buttons).toHaveLength(9);
     expect(buttons.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,
     );

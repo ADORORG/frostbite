@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createGameSyncService } from "../src/service.ts";
 import { createMemoryRepository } from "./support/memory-repository.ts";
 
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 const now = new Date("2026-10-12T12:00:00.000Z");
 const milestone = (id: string) => ({
   id,
@@ -20,7 +21,10 @@ function setup(maxProgressBytes = 20) {
   const repository = createMemoryRepository();
   const service = createGameSyncService({
     clock: () => now,
-    games: new Map([["tap-tower", new Set(["first-five", "ten-taps"])]]),
+    games: new Map([
+      ["tap-tower", new Set(["first-five", "ten-taps"])],
+      ["other-game", new Set<string>()],
+    ]),
     maxProgressBytes,
     repository,
   });
@@ -38,8 +42,25 @@ describe("syncing a game's state to the account", () => {
       await service.sync("u1", { gameId: "tap-tower", state: input }),
     ).toEqual({
       kind: "synced",
+      playerId: expect.stringMatching(uuid),
       state: input,
     });
+  });
+
+  it("answers with the same player id every time for one player and game, and a different one for another player or game", async () => {
+    const { service } = setup();
+    const idOf = async (user: string, game: string) => {
+      const outcome = await service.sync(user, {
+        gameId: game,
+        state: state(),
+      });
+      return outcome.kind === "synced" ? outcome.playerId : "none";
+    };
+    const first = await idOf("u1", "tap-tower");
+    expect(first).toMatch(uuid);
+    expect(await idOf("u1", "tap-tower")).toBe(first);
+    expect(await idOf("u2", "tap-tower")).not.toBe(first);
+    expect(await idOf("u1", "other-game")).not.toBe(first);
   });
 
   it("keeps players apart and merges a second device into the first", async () => {
@@ -60,7 +81,11 @@ describe("syncing a game's state to the account", () => {
       gameId: "tap-tower",
       state: state(),
     });
-    expect(other).toEqual({ kind: "synced", state: state() });
+    expect(other).toEqual({
+      kind: "synced",
+      playerId: expect.stringMatching(uuid),
+      state: state(),
+    });
   });
 
   it("refuses a game the platform does not list, before touching storage", async () => {

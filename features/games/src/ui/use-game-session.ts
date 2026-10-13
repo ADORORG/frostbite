@@ -94,8 +94,11 @@ export function useGameSession(
       storage: session.storage,
     });
     // The browser keeps the copy the game uses; the account is synced behind it when someone is signed in.
+    // Told to the game when sign-in replaces this browser's id with the account's; the host drops it for a game
+    // that has not said ready, and such a game asks and is answered with the account's id.
     const backend = createSyncedBackend({
       local,
+      onIdentity: (identity) => host.current?.emit("player.changed", identity),
       onStatus: setSync,
       remote: remoteFor(id),
     });

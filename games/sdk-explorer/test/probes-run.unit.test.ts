@@ -70,6 +70,11 @@ describe("each call, against the real host", () => {
     expect(value(outcome)).toMatchObject({ granted: ["wallet"] });
   });
 
+  it("player.identity gives an opaque id kept in this browser while nobody is signed in", async () => {
+    const { outcome } = await run("identity");
+    expect(value(outcome)).toEqual({ id: "memory-player-0001", kind: "local" });
+  });
+
   it("player.info says nobody is signed in", async () => {
     const { outcome } = await run("player");
     expect(value(outcome)).toEqual({ signedIn: false, walletConnected: false });

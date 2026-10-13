@@ -42,6 +42,7 @@ export function memoryBackend(overrides: Partial<GameHostBackend> = {}) {
     { unlockedAt: string; verification: "self-reported" }
   > = {};
   const backend: GameHostBackend = {
+    identity: async () => ({ id: "local-0001-test", kind: "local" }),
     loadProgress: async () => progress,
     milestones: async () => ({ ...unlocked }),
     player: () => ({ signedIn: false, walletConnected: false }),

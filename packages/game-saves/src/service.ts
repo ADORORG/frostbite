@@ -7,7 +7,11 @@ import {
 import type { GameSyncRepository } from "./repository.ts";
 
 export type SyncOutcome =
-  | { readonly kind: "synced"; readonly state: GameState }
+  | {
+      readonly kind: "synced";
+      readonly playerId: string;
+      readonly state: GameState;
+    }
   | { readonly kind: "unknown-game" }
   | { readonly kind: "unknown-milestone"; readonly id: string }
   | { readonly kind: "too-large" };
@@ -40,12 +44,12 @@ export function createGameSyncService(options: {
       )
         return { kind: "too-large" };
       const now = options.clock();
-      return {
-        kind: "synced",
-        state: await options.repository.change(userId, gameId, (stored) =>
-          mergeGameState(stored, state, now),
-        ),
-      };
+      const { playerId, state: merged } = await options.repository.change(
+        userId,
+        gameId,
+        (stored) => mergeGameState(stored, state, now),
+      );
+      return { kind: "synced", playerId, state: merged };
     },
   };
 }

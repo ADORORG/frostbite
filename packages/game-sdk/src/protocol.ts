@@ -39,6 +39,18 @@ export const errorCodes = [
 export const errorCodeSchema = z.enum(errorCodes);
 export type ErrorCode = z.infer<typeof errorCodeSchema>;
 
+// Who the game is told the player is: an opaque id for this game alone. `local` is made in this browser and
+// kept here; `account` is made for the signed-in player's account and is the same on every device. It changes
+// once, from local to account, when a player signs in, and the game is told (`player.changed`). It is random:
+// nothing in it identifies the person, and another game is given a different one.
+export const playerIdentitySchema = z
+  .object({
+    id: z.string().regex(/^[A-Za-z0-9-]{8,64}$/u),
+    kind: z.enum(["local", "account"]),
+  })
+  .strict();
+export type PlayerIdentity = z.infer<typeof playerIdentitySchema>;
+
 export const playerInfoSchema = z
   .object({ signedIn: z.boolean(), walletConnected: z.boolean() })
   .strict();
@@ -111,6 +123,7 @@ export const methods = {
       })
       .strict(),
   },
+  "player.identity": { params: empty, result: playerIdentitySchema },
   "player.info": { params: empty, result: playerInfoSchema },
   "progress.load": {
     params: empty,
@@ -162,6 +175,7 @@ export type Result<Name extends MethodName> = z.infer<
 // on an older SDK ignores it.
 export const events = {
   "fullscreen.changed": z.object({ active: z.boolean() }).strict(),
+  "player.changed": playerIdentitySchema,
   "lifecycle.changed": z
     .object({ state: z.enum(["active", "paused"]) })
     .strict(),

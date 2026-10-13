@@ -126,6 +126,13 @@ The full list, with the status of what is still to come, is `docs/product/game-s
   name so it cannot pass for the platform's. It resolves to whether it was shown. At most six a minute.
 - **`capabilities.get()`** lists the methods and events this platform knows, the limits, and what the game was
   granted. A game written for a newer platform should ask first and do without what is missing.
+- **`player.identity()`** returns `{ id, kind }`: an opaque id for this player **in this game only** (another game
+  is given a different one). `kind: "local"` is a random id kept in this browser; once the player signs in it
+  becomes `kind: "account"`, the same on every device, and the game is told with the `player.changed` event.
+  The id is random and says nothing about the person (no name, no account, no wallet), so it needs no capability.
+  **The id can change once**, from local to account: keep what you key by it in your own save, or re-key when
+  `player.changed` arrives. A signed-in player's game starts with the account's id (the answer waits for the
+  account's first reply). `player.changed` may repeat the id you already have; compare before acting.
 - **Reset a save** with `progress.save(null)`; there is no separate call.
 - **Compatibility rule:** a method or event that exists never changes shape. New abilities are new methods and
   events, so a game built on an older SDK keeps working on a newer platform.

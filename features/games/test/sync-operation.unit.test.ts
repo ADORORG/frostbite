@@ -17,6 +17,7 @@ const context = {
   correlationId: userId,
   idempotencyKey: idempotencyKeySchema.parse("request-key-00000001"),
 };
+const playerId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 const empty: GameState = { milestones: [], progress: null };
 const input = { gameId: "tap-tower", state: empty };
 
@@ -30,7 +31,7 @@ function stub(outcome: Awaited<ReturnType<GameSyncService["sync"]>>) {
 
 describe("the sync operation", () => {
   it("is an authenticated, keyless POST on its contract route", () => {
-    const { operation } = stub({ kind: "synced", state: empty });
+    const { operation } = stub({ kind: "synced", playerId, state: empty });
     expect(operation).toMatchObject({
       access: { kind: "authenticated" },
       idempotency: "none",
@@ -41,7 +42,11 @@ describe("the sync operation", () => {
   });
 
   it("refuses an anonymous caller without touching the service", async () => {
-    const { operation, sync } = stub({ kind: "synced", state: empty });
+    const { operation, sync } = stub({
+      kind: "synced",
+      playerId,
+      state: empty,
+    });
     expect(
       await operation.execute(input, { ...context, actorUserId: null }),
     ).toMatchObject({ error: "unauthorized", ok: false });
@@ -49,10 +54,14 @@ describe("the sync operation", () => {
   });
 
   it("syncs for the session's own user, whatever else the request says", async () => {
-    const { operation, sync } = stub({ kind: "synced", state: empty });
+    const { operation, sync } = stub({
+      kind: "synced",
+      playerId,
+      state: empty,
+    });
     expect(await operation.execute(input, context)).toEqual({
       ok: true,
-      value: empty,
+      value: { ...empty, playerId },
     });
     expect(sync).toHaveBeenCalledWith(userId, input);
     // The contract has no field through which a caller could name another player.
@@ -81,7 +90,10 @@ describe("the sync operation", () => {
       games: new Map([["tap-tower", new Set(["first-five"])]]),
       maxProgressBytes: 100,
       repository: {
-        change: async (_user, _game, decide) => (stored = decide(stored)),
+        change: async (_user, _game, decide) => ({
+          playerId,
+          state: (stored = decide(stored)),
+        }),
       },
     });
     const operation = createSyncGameStateOperation(async () => service);
@@ -96,7 +108,7 @@ describe("the sync operation", () => {
         { gameId: "tap-tower", state: unlocked },
         context,
       ),
-    ).toEqual({ ok: true, value: unlocked });
+    ).toEqual({ ok: true, value: { ...unlocked, playerId } });
     expect(
       await operation.execute(
         {

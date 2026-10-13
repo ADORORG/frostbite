@@ -1,0 +1,2 @@
+ALTER TABLE "ador"."game_saves" ADD COLUMN "player_id" uuid DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "ador"."game_saves" ADD CONSTRAINT "game_saves_player_id_key" UNIQUE("player_id");

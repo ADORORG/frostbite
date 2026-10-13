@@ -1,4 +1,4 @@
-import { gameStateSchema } from "@ador/shared/games";
+import { syncGameStateResponseSchema } from "@ador/shared/games";
 import { expect, test, type Browser } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
@@ -47,7 +47,7 @@ test("progress and milestones follow a signed-in player to another browser", asy
   await expect
     .poll(
       async () =>
-        gameStateSchema.parse(
+        syncGameStateResponseSchema.parse(
           await (
             await first.page.request.post(syncPath, {
               data: { gameId: "sample-game", state: empty },
@@ -170,13 +170,15 @@ test.describe("the sync route", () => {
         progress: { savedAt: "2999-01-01T00:00:00.000Z", state: { score: 1 } },
       },
     };
-    const first = gameStateSchema.parse(
+    const first = syncGameStateResponseSchema.parse(
       await (await post(page.request, baseURL, syncPath, forged)).json(),
     );
-    const again = gameStateSchema.parse(
+    const again = syncGameStateResponseSchema.parse(
       await (await post(page.request, baseURL, syncPath, forged)).json(),
     );
     expect(again).toEqual(first);
+    // The player's id for the game is the same each time, and is an id, not the account.
+    expect(first.playerId).toMatch(/^[0-9a-f-]{36}$/u);
     // Believed neither time: a wrong or forged clock cannot make a save outrank the real ones.
     expect(first.progress).toBeNull();
   });
