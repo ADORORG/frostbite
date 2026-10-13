@@ -72,6 +72,18 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   time-window queries and resets: window boundaries (UTC), what happens to an entry hidden by staff in a past
   window, and the page size per tab are to be fixed in the plan.
 
+### Third survey (2026-10-13)
+
+- **SDK-3 repeatable milestones:** **count each earning**; the total is shown, and a later minting step may claim
+  per count. Once-only milestones stay once.
+- **SDK-E builder tool:** **a command that opens a local test page** (runs the game in the same sandbox, fake
+  wallet, platform event buttons, a log of every call). Filed as task #50.
+- **Wallet connection (SDK-F, new):** the connect modal should be **callable from any screen**, not only
+  `/connect`, and a game should ask the platform to open it **through the API** (`wallet.connect()`); the game never
+  handles the wallet itself. Placement to be asked again after the real-wallet test. Filed as task #55.
+- **Order:** build the **player id (SDK-1b) first**; SDK-3 (#53), SDK-2 (#54), SDK-E (#50) and SDK-F (#55) are filed.
+- **CSP (#56):** the owner wants an enforced-policy test before deciding anything; the policy is not weakened.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
