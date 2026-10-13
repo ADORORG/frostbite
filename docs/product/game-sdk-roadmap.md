@@ -137,6 +137,18 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **Licence (SDK-8):** **MIT.** Still needed: the copyright holder's name for the LICENSE file, and confirmation
   that the `@ador` npm scope is owned. The package stays private until both are given.
 
+### Seventh survey (2026-10-13)
+
+- **Publisher (SDK-8):** the owner owns the GitHub organisation **ADORORG** (`github.com/ADORORG`). That is not the
+  npm scope: whether `@ador` exists and is owned on npm is **not confirmed**, and the licence holder name has not
+  been stated exactly (ADORORG is the likely name). Both to confirm before the package is published.
+- **Verified milestones (G6):** **verified milestones unlock leaderboard entries**, read as: only replay-verified
+  runs appear on boards. **This conflicts with the earlier decision** (global boards labelled self-reported) and
+  makes boards depend on G6, which also makes every board game deterministic. To be resolved in the next survey:
+  self-reported boards first and a verified tier later, or no boards until G6.
+- **First verified game (G6):** **FROST·BITE**, which needs its board generation made deterministic (seeded).
+- **Build order:** **milestone progress (SDK-3), then the wallet widget (SDK-F), then leaderboards (SDK-2).**
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
