@@ -133,6 +133,11 @@ export function createWalletAuthService(dependencies: {
         input.challengeId,
       );
       if (challenge === null) return { code: "challenge-invalid", ok: false };
+      if (
+        challenge.action !== input.expectedAction ||
+        challenge.expectedUserId !== (input.expectedUserId ?? null)
+      )
+        return { code: "challenge-invalid", ok: false };
       if (challenge.consumedAt !== null)
         return { code: "challenge-replayed", ok: false };
       const now = dependencies.clock();

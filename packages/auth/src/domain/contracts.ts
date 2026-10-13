@@ -76,5 +76,11 @@ export interface IssueWalletChallengeInput {
 
 export interface VerifyWalletChallengeInput {
   readonly challengeId: UuidV7;
+  // What the route verifying this challenge is for. A challenge made for another action, or for another account
+  // than the one named here, is refused before anything changes: a link challenge cannot be used to sign in, and
+  // one account's challenge cannot be completed from another's session.
+  readonly expectedAction: WalletAuthAction;
+  // The account the session verifying it belongs to; absent for sign-in, where there is no session yet.
+  readonly expectedUserId?: UuidV7;
   readonly signature: string;
 }

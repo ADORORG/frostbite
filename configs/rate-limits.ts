@@ -12,6 +12,11 @@ export const rateLimits = rateLimitConfigSchema.parse({
   operations: {
     addCollectionItem: perMinute(120),
     beginPasskeyRegistration: perMinute(10),
+    // Signing in is a guess an attacker can repeat, so every wallet step is tight: a challenge a few at a time, a
+    // signature a few more (a real player makes one of each).
+    beginWalletLink: perMinute(10),
+    beginWalletSignIn: perMinute(10),
+    beginWalletStepUp: perMinute(10),
     beginWalletQualification: perMinute(10),
     completeUploadIntent: perMinute(120),
     createCollectionDraft: perMinute(20),
@@ -22,11 +27,16 @@ export const rateLimits = rateLimitConfigSchema.parse({
     finishPasskeyRegistration: perMinute(10),
     importCollectionItems: perMinute(20),
     reviewCreatorApplication: perMinute(60),
+    signOut: perMinute(30),
     submitCollection: perMinute(10),
     submitCreatorApplication: perMinute(10),
     // Sent when a game is opened and after each save or unlock, so it is the busiest write; one a second.
     syncGameState: perMinute(120),
     unlinkPasskey: perMinute(10),
+    unlinkWallet: perMinute(10),
+    verifyWalletLink: perMinute(20),
+    verifyWalletSignIn: perMinute(20),
+    verifyWalletStepUp: perMinute(20),
     verifyWalletQualification: perMinute(20),
   },
   read: perMinute(600),

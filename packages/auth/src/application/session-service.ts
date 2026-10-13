@@ -1,4 +1,5 @@
 import type { ActiveSession, SessionRepository } from "./session-repository.ts";
+import type { UuidV7 } from "@ador/shared/identifiers";
 import { sha256 } from "../domain/crypto.ts";
 
 export function createSessionService(dependencies: {
@@ -16,6 +17,17 @@ export function createSessionService(dependencies: {
         now: dependencies.clock(),
         tokenHash: sha256(token),
       });
+    },
+    // Signs out the session a request came from: only that user's own, and only once.
+    revokeSession(session: {
+      readonly sessionId: UuidV7;
+      readonly userId: UuidV7;
+    }): Promise<boolean> {
+      return dependencies.repository.revokeById(
+        session.sessionId,
+        session.userId,
+        dependencies.clock(),
+      );
     },
     revoke(token: string): Promise<boolean> {
       if (token.length === 0) return Promise.resolve(false);

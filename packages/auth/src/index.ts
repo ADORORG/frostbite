@@ -67,3 +67,22 @@ export type {
   UnlinkWalletResult,
   WalletMethodsRepository,
 } from "./wallets/repository.ts";
+export { strictBip322Verifier } from "./bitcoin/verifier.ts";
+export {
+  authMethodsResponseSchema,
+  walletAuthRoutes,
+  walletAuthUriPath,
+  walletChallengeRequestSchema,
+  walletChallengeResponseSchema,
+  walletChangedResponseSchema,
+  walletEmptyRequestSchema,
+  walletNetworkSchema,
+  walletSignedInResponseSchema,
+  walletUnlinkRequestSchema,
+  walletVerifyRequestSchema,
+  type AuthMethodsResponse,
+  type WalletChallengeRequest,
+  type WalletChallengeResponse,
+  type WalletUnlinkRequest,
+  type WalletVerifyRequest,
+} from "./wallets/http.ts";

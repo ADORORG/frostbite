@@ -54,6 +54,7 @@ async function authenticate() {
   const challenge = await auth.issue(validChallengeInput());
   if (challenge === null) throw new Error("Expected challenge");
   const result = await auth.verify({
+    expectedAction: "sign-in",
     challengeId: challenge.challengeId,
     signature: signWalletMessage(challenge.message),
   });

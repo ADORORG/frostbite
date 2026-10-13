@@ -48,5 +48,19 @@ export function createDrizzleSessionRepository(
         .returning({ id: authSessions.id });
       return rows.length === 1;
     },
+    async revokeById(sessionId, userId, revokedAt) {
+      const rows = await database
+        .update(authSessions)
+        .set({ revokedAt, updatedAt: revokedAt })
+        .where(
+          and(
+            eq(authSessions.id, sessionId),
+            eq(authSessions.userId, userId),
+            isNull(authSessions.revokedAt),
+          ),
+        )
+        .returning({ id: authSessions.id });
+      return rows.length === 1;
+    },
   };
 }

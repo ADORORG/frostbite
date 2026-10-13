@@ -4,6 +4,9 @@ import type { UuidV7 } from "@ador/shared/identifiers";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
 import { createPasskeyOperations } from "./application/passkey-operations.ts";
+import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
+import { createWalletSignInOperations } from "./application/wallet-sign-in-operations.ts";
+import type { WalletAuthServices } from "./application/wallet-services.ts";
 import { getPasskeyLinkingService } from "./runtime.ts";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
@@ -36,9 +39,20 @@ async function account(
 }
 
 export function createAccountsEntrypoint(
+  getWalletServices: () => WalletAuthServices,
   getService: () => PasskeyService = getPasskeyLinkingService,
 ): FeatureEntrypoint {
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
+  const [beginSignIn, verifySignIn, signOut] =
+    createWalletSignInOperations(getWalletServices);
+  const [
+    beginLink,
+    verifyLink,
+    beginStepUp,
+    verifyStepUp,
+    unlinkWallet,
+    listMethods,
+  ] = createWalletMethodsOperations(getWalletServices);
   return {
     capabilities: ["api-routes", "authenticated-page", "navigation"],
     id: "accounts",
@@ -47,6 +61,15 @@ export function createAccountsEntrypoint(
       registerHttpOperation(begin),
       registerHttpOperation(finish),
       registerHttpOperation(unlink),
+      registerHttpOperation(beginSignIn),
+      registerHttpOperation(verifySignIn),
+      registerHttpOperation(signOut),
+      registerHttpOperation(beginLink),
+      registerHttpOperation(verifyLink),
+      registerHttpOperation(beginStepUp),
+      registerHttpOperation(verifyStepUp),
+      registerHttpOperation(unlinkWallet),
+      registerHttpOperation(listMethods),
     ],
     pages: [
       {

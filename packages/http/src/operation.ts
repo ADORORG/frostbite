@@ -31,10 +31,13 @@ export interface HttpAuthenticatedSession {
   readonly userId: UuidV7;
 }
 
-export type HttpResponseEffect = {
-  readonly kind: "replace-platform-session";
-  readonly token: string;
-};
+export type HttpResponseEffect =
+  | {
+      readonly kind: "replace-platform-session";
+      readonly token: string;
+    }
+  // Signs the browser out: the platform session cookie is removed.
+  | { readonly kind: "clear-platform-session" };
 
 export type HttpOperationResult<Output extends object> =
   | {

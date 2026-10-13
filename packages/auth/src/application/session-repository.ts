@@ -15,4 +15,10 @@ export interface SessionRepository {
     readonly tokenHash: string;
   }): Promise<ActiveSession | null>;
   revoke(tokenHash: string, revokedAt: Date): Promise<boolean>;
+  // Revokes one session of one user, by its id. False when it is not that user's or is already revoked.
+  revokeById(
+    sessionId: UuidV7,
+    userId: UuidV7,
+    revokedAt: Date,
+  ): Promise<boolean>;
 }

@@ -33,6 +33,14 @@ export async function executeNextOperation(
   );
 
   for (const effect of response.effects) {
+    if (effect.kind === "clear-platform-session")
+      (await cookies()).set(platformSessionCookieName, "", {
+        httpOnly: true,
+        maxAge: 0,
+        path: "/",
+        sameSite: "lax",
+        secure: true,
+      });
     if (effect.kind === "replace-platform-session") {
       const environment = parseAuthSessionEnvironment(process.env);
       (await cookies()).set(platformSessionCookieName, effect.token, {

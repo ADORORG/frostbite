@@ -9,7 +9,7 @@ import {
   walletChallenges,
   walletIdentities,
 } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -43,8 +43,15 @@ async function issue() {
   return challenge;
 }
 
-async function verifyIssued(challenge: Awaited<ReturnType<typeof issue>>) {
+async function verifyIssued(
+  challenge: Awaited<ReturnType<typeof issue>>,
+  expected: {
+    expectedAction: "link-wallet" | "sign-in" | "step-up";
+    expectedUserId?: UuidV7;
+  } = { expectedAction: "sign-in" },
+) {
   return service.verify({
+    ...expected,
     challengeId: challenge.challengeId,
     signature: signWalletMessage(challenge.message),
   });
@@ -73,6 +80,7 @@ describe("wallet authentication", () => {
     const issued = await issue();
     const signature = signWalletMessage(issued.message);
     const result = await service.verify({
+      expectedAction: "sign-in",
       challengeId: issued.challengeId,
       signature,
     });
@@ -94,8 +102,16 @@ describe("wallet authentication", () => {
     const issued = await issue();
     const signature = signWalletMessage(issued.message);
     const results = await Promise.all([
-      service.verify({ challengeId: issued.challengeId, signature }),
-      service.verify({ challengeId: issued.challengeId, signature }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: issued.challengeId,
+        signature,
+      }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: issued.challengeId,
+        signature,
+      }),
     ]);
     expect(results.filter((result) => result.ok)).toHaveLength(1);
     expect(results.filter((result) => !result.ok)).toEqual([
@@ -126,25 +142,67 @@ describe("wallet authentication", () => {
     await expect(sessions.revoke("")).resolves.toBe(false);
   });
 
+  it("signs out one session by its id, only for its own user and only once", async () => {
+    const result = await verifyIssued(await issue());
+    if (!result.ok) throw new Error("Expected authentication success");
+    const sessions = createSessionService({
+      clock: () => now,
+      idleLifetimeMs: walletAuthPolicy.sessionIdleLifetimeMs,
+      repository: createDrizzleSessionRepository(database),
+    });
+    const active = await sessions.find(result.sessionToken);
+    if (active === null) throw new Error("Expected an active session");
+    await expect(
+      sessions.revokeSession({
+        sessionId: active.sessionId,
+        userId: createUuidV7(),
+      }),
+    ).resolves.toBe(false);
+    await expect(sessions.find(result.sessionToken)).resolves.not.toBeNull();
+    await expect(sessions.revokeSession(active)).resolves.toBe(true);
+    await expect(sessions.revokeSession(active)).resolves.toBe(false);
+    await expect(sessions.find(result.sessionToken)).resolves.toBeNull();
+  });
+
   it("limits invalid attempts and rejects expired or missing challenges", async () => {
     const issued = await issue();
     await expect(
-      service.verify({ challengeId: issued.challengeId, signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: issued.challengeId,
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "signature-invalid", ok: false });
     await expect(
-      service.verify({ challengeId: issued.challengeId, signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: issued.challengeId,
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "signature-invalid", ok: false });
     await expect(
-      service.verify({ challengeId: issued.challengeId, signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: issued.challengeId,
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "challenge-invalid", ok: false });
     now = new Date(issued.expiresAt.getTime());
     const expired = await issue();
     now = expired.expiresAt;
     await expect(
-      service.verify({ challengeId: expired.challengeId, signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: expired.challengeId,
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "challenge-expired", ok: false });
     await expect(
-      service.verify({ challengeId: createUuidV7(), signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: createUuidV7(),
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "challenge-invalid", ok: false });
   });
 
@@ -205,7 +263,10 @@ describe("wallet authentication", () => {
       expectedUserId: firstResult.userId,
     });
     if (linked === null) throw new Error("Expected link challenge");
-    await verifyIssued(linked);
+    await verifyIssued(linked, {
+      expectedAction: "link-wallet",
+      expectedUserId: firstResult.userId,
+    });
     const storedSessions = await database.select().from(authSessions);
     expect(
       storedSessions.filter((session) => session.revokedAt === null),
@@ -228,7 +289,9 @@ describe("wallet authentication", () => {
       expectedUserId,
     });
     if (stepUp === null) throw new Error("Expected step-up challenge");
-    await expect(verifyIssued(stepUp)).resolves.toEqual({
+    await expect(
+      verifyIssued(stepUp, { expectedAction: "step-up", expectedUserId }),
+    ).resolves.toEqual({
       code: "identity-conflict",
       ok: false,
     });
@@ -239,7 +302,9 @@ describe("wallet authentication", () => {
       expectedUserId,
     });
     if (linked === null) throw new Error("Expected link challenge");
-    await expect(verifyIssued(linked)).resolves.toMatchObject({
+    await expect(
+      verifyIssued(linked, { expectedAction: "link-wallet", expectedUserId }),
+    ).resolves.toMatchObject({
       ok: true,
       userId: expectedUserId,
     });
@@ -253,11 +318,16 @@ describe("wallet authentication", () => {
       .set({ messageHash: "0".repeat(64) })
       .where(eq(walletChallenges.id, tampered.challengeId));
     await expect(
-      service.verify({ challengeId: tampered.challengeId, signature: "bad" }),
+      service.verify({
+        expectedAction: "sign-in",
+        challengeId: tampered.challengeId,
+        signature: "bad",
+      }),
     ).resolves.toEqual({ code: "challenge-invalid", ok: false });
 
     const original = await issue();
     await service.verify({
+      expectedAction: "sign-in",
       challengeId: original.challengeId,
       signature: signWalletMessage(original.message),
     });
@@ -273,7 +343,9 @@ describe("wallet authentication", () => {
       expectedUserId,
     });
     if (linked === null) throw new Error("Expected link challenge");
-    await expect(verifyIssued(linked)).resolves.toEqual({
+    await expect(
+      verifyIssued(linked, { expectedAction: "link-wallet", expectedUserId }),
+    ).resolves.toEqual({
       code: "identity-conflict",
       ok: false,
     });
@@ -299,5 +371,54 @@ describe("wallet authentication", () => {
     await expect(
       database.update(authSessions).set({ tokenHash: result.sessionToken }),
     ).rejects.toMatchObject({ cause: { code: "23514" } });
+  });
+
+  it("refuses a challenge made for another action or another account, before anything changes", async () => {
+    const owner = createUuidV7();
+    await database.insert(authUsers).values({
+      email: `wallet-${owner}@wallet.invalid`,
+      id: owner,
+      name: "Owner",
+    });
+    const link = await service.issue({
+      ...validChallengeInput(),
+      action: "link-wallet",
+      expectedUserId: owner,
+    });
+    if (link === null) throw new Error("Expected link challenge");
+    const refused = { code: "challenge-invalid", ok: false };
+    // A link challenge cannot be used to sign in, to step up, or from another account's session.
+    await expect(
+      verifyIssued(link, { expectedAction: "sign-in" }),
+    ).resolves.toEqual(refused);
+    await expect(
+      verifyIssued(link, { expectedAction: "link-wallet" }),
+    ).resolves.toEqual(refused);
+    await expect(
+      verifyIssued(link, {
+        expectedAction: "link-wallet",
+        expectedUserId: createUuidV7(),
+      }),
+    ).resolves.toEqual(refused);
+    await expect(
+      verifyIssued(link, { expectedAction: "step-up", expectedUserId: owner }),
+    ).resolves.toEqual(refused);
+    // Nothing was consumed or created by the refusals, so the right caller can still finish it.
+    expect(await database.select().from(walletIdentities)).toHaveLength(0);
+    expect(await database.select().from(authSessions)).toHaveLength(0);
+    await expect(
+      verifyIssued(link, {
+        expectedAction: "link-wallet",
+        expectedUserId: owner,
+      }),
+    ).resolves.toMatchObject({ ok: true, userId: owner });
+    // And a sign-in challenge cannot be completed as a link.
+    const signIn = await issue();
+    await expect(
+      verifyIssued(signIn, {
+        expectedAction: "link-wallet",
+        expectedUserId: owner,
+      }),
+    ).resolves.toEqual(refused);
   });
 });

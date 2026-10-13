@@ -92,6 +92,7 @@ async function signIn(): Promise<{
   const challenge = await auth.issue(validChallengeInput());
   if (challenge === null) throw new Error("challenge refused");
   const result = await auth.verify({
+    expectedAction: "sign-in",
     challengeId: challenge.challengeId,
     signature: signWalletMessage(challenge.message),
   });
@@ -288,6 +289,7 @@ describe("a removed wallet is held", () => {
     const challenge = await auth.issue(validChallengeInput());
     if (challenge === null) throw new Error("challenge refused");
     return auth.verify({
+      expectedAction: "sign-in",
       challengeId: challenge.challengeId,
       signature: signWalletMessage(challenge.message),
     });
@@ -319,6 +321,8 @@ describe("a removed wallet is held", () => {
     if (challenge === null) throw new Error("challenge refused");
     expect(
       await auth.verify({
+        expectedAction: "link-wallet",
+        expectedUserId: createUuidV7Of(other?.id ?? ""),
         challengeId: challenge.challengeId,
         signature: signWalletMessage(challenge.message),
       }),
@@ -334,6 +338,8 @@ describe("a removed wallet is held", () => {
     });
     if (challenge === null) throw new Error("challenge refused");
     const result = await auth.verify({
+      expectedAction: "link-wallet",
+      expectedUserId: userId,
       challengeId: challenge.challengeId,
       signature: signWalletMessage(challenge.message),
     });

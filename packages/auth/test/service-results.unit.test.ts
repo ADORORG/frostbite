@@ -72,6 +72,7 @@ describe("transaction outcome mapping", () => {
     });
     await expect(
       service.verify({
+        expectedAction: "sign-in",
         challengeId: challenge.challengeId,
         signature: "fixture",
       }),

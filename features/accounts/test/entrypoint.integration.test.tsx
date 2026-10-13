@@ -4,12 +4,17 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createAccountsEntrypoint } from "../src/entrypoint.tsx";
 
+// The pages never reach for the wallet services, so a call to them would be a bug.
+const noWalletServices = () => {
+  throw new Error("The wallet services are not needed to render a page.");
+};
+
 describe("accounts entrypoint", () => {
   it.each([
     ["/account", "Account console", "Authenticated session"],
     ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
-    const entrypoint = createAccountsEntrypoint(() => ({
+    const entrypoint = createAccountsEntrypoint(noWalletServices, () => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn(async () => []),
@@ -36,7 +41,7 @@ describe("accounts entrypoint", () => {
 
   it("does not render private content without an actor", async () => {
     const pages =
-      createAccountsEntrypoint(() => ({
+      createAccountsEntrypoint(noWalletServices, () => ({
         begin: vi.fn(),
         finish: vi.fn(),
         list: vi.fn(async () => []),
@@ -53,7 +58,7 @@ describe("accounts entrypoint", () => {
   });
 
   it("fails closed when passkey status persistence is unavailable", async () => {
-    const entrypoint = createAccountsEntrypoint(() => ({
+    const entrypoint = createAccountsEntrypoint(noWalletServices, () => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn().mockRejectedValue(new Error("database unavailable")),

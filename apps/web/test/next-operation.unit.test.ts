@@ -66,4 +66,47 @@ describe("Next operation response effects", () => {
       },
     );
   });
+
+  it("removes the session cookie, with the same attributes it was set with, when the operation signs the browser out", async () => {
+    const operation = registerHttpOperation({
+      access: { kind: "authenticated" },
+      applicationErrors: [],
+      execute: async () => ({
+        effects: [{ kind: "clear-platform-session" as const }],
+        ok: true as const,
+        value: { changed: true },
+      }),
+      idempotency: "none",
+      input: "json",
+      inputSchema: passkeyEmptyInputSchema,
+      method: "POST",
+      operationId: "signOutForTest",
+      outputSchema: passkeyMutationResponseSchema,
+      path: "/api/v1/sign-out-for-test",
+    });
+    setCookie.mockClear();
+    const now = new Date();
+    const response = await executeNextOperation(
+      operation,
+      new Request("https://launch.invalid/api/v1/sign-out-for-test", {
+        method: "POST",
+      }),
+      {},
+      {
+        absoluteExpiresAt: new Date(now.getTime() + 60_000),
+        authenticatedAt: now,
+        idleExpiresAt: new Date(now.getTime() + 30_000),
+        sessionId: createUuidV7(),
+        userId: createUuidV7(),
+      },
+    );
+    expect(await response.json()).toEqual({ changed: true });
+    expect(setCookie).toHaveBeenCalledWith(platformSessionCookieName, "", {
+      httpOnly: true,
+      maxAge: 0,
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+    });
+  });
 });
