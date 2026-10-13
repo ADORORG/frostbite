@@ -98,6 +98,20 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   compatibility or redirect burden). Still to confirm in the plan: what happens to the wallet-qualification tooling
   (physical-wallet evidence, W2-10B) once its page goes: keep it as a staff-only route, or remove it with the page.
 
+### Fourth survey (2026-10-13)
+
+- **Wallet-qualification tooling:** **removed now with `/connect`, rebuilt when needed.** The evidence records stay
+  in the docs; the page, its operations and its table go (the plan lists exactly what, and what the evidence
+  records referring to them become).
+- **Leaderboard boards (SDK-2):** declared **in the manifest** with id, title, order, minimum and maximum, reviewed
+  by pull request like milestones. No runtime boards.
+- **Leaderboard entries (SDK-2):** rank, score and date, always with the "reported by the game" label; the
+  entry's identity is the **generated avatar and shortened wallet address**, falling back to the **opaque player
+  id** ("Player 7f3a") when the player has no wallet known to the platform. To settle in the plan: where the
+  server learns a signed-in player's wallet address (the account's linked wallet, if any), and that a public board
+  links an address to scores (addresses are public; the player should be told before posting).
+- **Milestone progress UI (SDK-3):** a **toast plus the count in the dock** ("First win reached (x3)").
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
