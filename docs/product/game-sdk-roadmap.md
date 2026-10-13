@@ -178,6 +178,24 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   what the widget does while wallet sign-in is not qualified (connect without signing in, with the sign-in step shown
   as unavailable).
 
+### Tenth survey (2026-10-13): sign-in through the widget
+
+- **Interim behaviour:** the owner says the **wallets are already tested working**, so the widget goes straight to
+  **connect, then sign in and create a session cleanly** (the server side, BIP-322 challenge, verification and
+  sessions, was completed earlier). The ledger still lists W2-10B (exact-version physical evidence) as blocked: the
+  owner's statement is recorded here, and the evidence record should be written into the repository so that row can
+  be closed honestly.
+- **Adapter pattern:** sign-in is a set of adapters: **wallet now, email later** (for non-web3 users), and a player
+  can **link a wallet or an email** to one account.
+- **Several wallets per account:** **allowed**: a player can link more than one wallet, each proven by its own
+  signature; switching wallets does not create a new account.
+- **Passkeys:** kept as a **secondary** way to sign in, added from the widget menu.
+- **Test sign-in:** a **test-only sign-in route**, disabled outside tests and development, replaces the development
+  picker and the browser-test sign-in; it is not shown in the widget.
+- **Consequences for the plan:** an identity-adapter port with a wallet adapter; a link flow and proof per wallet and a
+  rule for the last remaining method (as for passkeys today); session rotation on link and unlink; the widget menu
+  lists linked wallets and the account's sign-in methods; the email adapter is designed for but not built.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
