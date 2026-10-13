@@ -8,6 +8,7 @@ import {
   authUsers,
   passkeyChallenges,
   passkeyCredentials,
+  releasedWallets,
   walletChallenges,
   walletIdentities,
 } from "../src/index.ts";
@@ -125,5 +126,18 @@ describe("authentication schema", () => {
     expect(config.columns.map((column) => column.name)).toEqual(
       expect.arrayContaining(["id", "email", "email_verified"]),
     );
+  });
+
+  it("holds a released wallet once, for a bounded time, and goes with the account that released it", () => {
+    const config = getTableConfig(releasedWallets);
+    expect(indexNames(config.indexes)).toEqual([
+      "released_wallets_network_script_unique",
+    ]);
+    expect(names(config.checks)).toEqual([
+      "released_wallets_network_supported",
+      "released_wallets_hold_after_release",
+    ]);
+    expect(referencedTables(config)).toEqual(["auth_users"]);
+    expect(config.foreignKeys.map((key) => key.onDelete)).toEqual(["cascade"]);
   });
 });

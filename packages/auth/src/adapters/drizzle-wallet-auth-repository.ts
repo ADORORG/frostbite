@@ -1,6 +1,8 @@
 import {
+  authSecurityEvents,
   authSessions,
   authUsers,
+  releasedWallets,
   walletChallenges,
   walletIdentities,
   type WalletChallenge,
@@ -20,6 +22,7 @@ import {
 } from "@ador/shared/identifiers";
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 
+import { sha256 } from "../domain/crypto.ts";
 import {
   walletAuthActions,
   type WalletAuthAction,
@@ -96,6 +99,7 @@ function rowMatchesChallenge(
 async function resolveUser(
   transaction: DatabaseTransaction,
   challenge: StoredWalletChallenge,
+  now: Date,
 ): Promise<
   { readonly ok: true; readonly userId: UuidV7 } | { readonly ok: false }
 > {
@@ -120,6 +124,25 @@ async function resolveUser(
       : { ok: true, userId };
   }
   if (challenge.action === "step-up") return { ok: false };
+  // A wallet an account removed is held for a while: only that account may take it back, and nobody may start a
+  // new account with it. The refusal is the same one as any other conflict, so it says nothing about who had it.
+  const [held] = await transaction
+    .select({ previousUserId: releasedWallets.previousUserId })
+    .from(releasedWallets)
+    .where(
+      and(
+        eq(releasedWallets.network, challenge.network),
+        eq(releasedWallets.scriptIdentity, challenge.scriptIdentity),
+        sql`${releasedWallets.heldUntil} > ${now}`,
+      ),
+    )
+    .limit(1);
+  if (
+    held !== undefined &&
+    (challenge.action === "sign-in" ||
+      challenge.expectedUserId !== held.previousUserId)
+  )
+    return { ok: false };
   if (challenge.action !== "sign-in" && challenge.expectedUserId === null) {
     return { ok: false };
   }
@@ -219,7 +242,7 @@ export function createDrizzleWalletAuthRepository(
         )
           return { kind: "invalid" };
 
-        const user = await resolveUser(transaction, challenge);
+        const user = await resolveUser(transaction, challenge, now);
         if (!user.ok) return { kind: "identity-conflict" };
         if (challenge.action !== "sign-in") {
           await transaction
@@ -236,14 +259,24 @@ export function createDrizzleWalletAuthRepository(
           .update(walletChallenges)
           .set({ consumedAt: now })
           .where(eq(walletChallenges.id, challenge.challengeId));
+        const sessionId = createUuidV7();
         await transaction.insert(authSessions).values({
           absoluteExpiresAt: session.absoluteExpiresAt,
           authenticatedAt: session.authenticatedAt,
-          id: createUuidV7(),
+          id: sessionId,
           idleExpiresAt: session.idleExpiresAt,
           tokenHash: session.tokenHash,
           userId: user.userId,
         });
+        if (challenge.action === "link-wallet")
+          await transaction.insert(authSecurityEvents).values({
+            action: "wallet-linked",
+            actorUserId: user.userId,
+            correlationId: challenge.requestId,
+            credentialFingerprint: sha256(challenge.scriptIdentity),
+            id: createUuidV7(),
+            sessionId,
+          });
         return { kind: "consumed", userId: user.userId };
       });
     },

@@ -1,4 +1,5 @@
 import {
+  authSecurityEvents,
   authSessions,
   authUsers,
   createDatabaseClient,
@@ -54,6 +55,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  // A wallet link records a security event that keeps its session and user, so the events go first.
+  await database.delete(authSecurityEvents);
   await database.delete(authSessions);
   await database.delete(walletChallenges);
   await database.delete(walletIdentities);

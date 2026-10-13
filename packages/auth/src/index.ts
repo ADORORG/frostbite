@@ -50,3 +50,20 @@ export {
   type PasskeyMutationResponse,
   type PasskeyUnlinkInput,
 } from "./passkeys/http.ts";
+export {
+  removalOutcome,
+  type AccountMethod,
+  type AccountMethodKind,
+  type RemovalOutcome,
+} from "./methods/rule.ts";
+export { createWalletMethodsService } from "./wallets/service.ts";
+export type {
+  UnlinkWalletOutcome,
+  WalletMethodsPolicy,
+} from "./wallets/service.ts";
+export { createDrizzleWalletMethodsRepository } from "./wallets/drizzle-repository.ts";
+export type {
+  LinkedWallet,
+  UnlinkWalletResult,
+  WalletMethodsRepository,
+} from "./wallets/repository.ts";

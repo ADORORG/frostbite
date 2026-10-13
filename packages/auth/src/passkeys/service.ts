@@ -2,6 +2,7 @@ import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
 import type { CorrelationId } from "@ador/shared/http";
 
 import type { ActiveSession } from "../application/session-repository.ts";
+import { createSessionMaterial } from "../application/session-material.ts";
 import { createOpaqueValue, sha256 } from "../domain/crypto.ts";
 import type {
   PasskeyLinkFailure,
@@ -13,17 +14,6 @@ import type { PasskeyRepository } from "./repository.ts";
 
 const CHALLENGE_BYTES = 32;
 const SESSION_TOKEN_BYTES = 32;
-
-function sessionMaterial(now: Date, token: string, policy: PasskeyPolicy) {
-  return {
-    absoluteExpiresAt: new Date(
-      now.getTime() + policy.sessionAbsoluteLifetimeMs,
-    ),
-    authenticatedAt: now,
-    idleExpiresAt: new Date(now.getTime() + policy.sessionIdleLifetimeMs),
-    tokenHash: sha256(token),
-  };
-}
 
 export function createPasskeyLinkingService(dependencies: {
   readonly adapter: PasskeyRegistrationAdapter;
@@ -133,7 +123,7 @@ export function createPasskeyLinkingService(dependencies: {
           now.getTime() - policy.recentAuthenticationWindowMs,
         ),
         now,
-        replacementSession: sessionMaterial(now, sessionToken, policy),
+        replacementSession: createSessionMaterial(now, sessionToken, policy),
       });
       if (result.kind === "conflict")
         return { ok: false, code: "credential-conflict" };
@@ -163,7 +153,7 @@ export function createPasskeyLinkingService(dependencies: {
           now.getTime() - policy.recentAuthenticationWindowMs,
         ),
         now,
-        replacementSession: sessionMaterial(now, sessionToken, policy),
+        replacementSession: createSessionMaterial(now, sessionToken, policy),
         sessionId: input.session.sessionId,
         userId: input.session.userId,
       });

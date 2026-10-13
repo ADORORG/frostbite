@@ -1,6 +1,6 @@
 # Plan: sign-in identity adapters and wallet sign-in (SDK-G, task #58)
 
-Status: **plan for approval, nothing built.** Written 2026-10-13 from the owner's decisions in
+Status: **approved by the owner on 2026-10-13 with the defaults** (no test-only route in the app; 24-hour hold on a removed wallet; sign-out ends only the current session; the W2-10B evidence was not supplied, so that ledger row stays blocked). Building on branch `feat/sign-in-adapters`. Written 2026-10-13 from the owner's decisions in
 `game-sdk-roadmap.md` (tenth and eleventh surveys) and from reading the current code. It comes before the wallet
 widget (SDK-F, #55), which is the screen on top of it.
 

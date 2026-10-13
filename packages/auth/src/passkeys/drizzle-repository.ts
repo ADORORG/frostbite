@@ -4,42 +4,15 @@ import {
   authSessions,
   passkeyChallenges,
   passkeyCredentials,
-  walletIdentities,
 } from "@ador/database/schema/auth";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
+import { lockActiveSession } from "../adapters/lock-active-session.ts";
 import { sha256 } from "../domain/crypto.ts";
-import { readAggregateCount } from "./count-result.ts";
+import { listAccountMethods } from "../methods/drizzle-account-methods.ts";
+import { removalOutcome } from "../methods/rule.ts";
 import type { PasskeyRepository } from "./repository.ts";
-
-async function lockActiveSession(
-  transaction: Parameters<Parameters<DatabaseClient["transaction"]>[0]>[0],
-  input: {
-    readonly minimumAuthenticatedAt: Date;
-    readonly now: Date;
-    readonly sessionId: string;
-    readonly userId: string;
-  },
-) {
-  const [session] = await transaction
-    .select({ id: authSessions.id })
-    .from(authSessions)
-    .where(
-      and(
-        eq(authSessions.id, input.sessionId),
-        eq(authSessions.userId, input.userId),
-        isNull(authSessions.revokedAt),
-        sql`${authSessions.idleExpiresAt} > ${input.now}`,
-        sql`${authSessions.absoluteExpiresAt} > ${input.now}`,
-        sql`${authSessions.authenticatedAt} >= ${input.minimumAuthenticatedAt}`,
-        sql`${authSessions.authenticatedAt} <= ${input.now}`,
-      ),
-    )
-    .for("update")
-    .limit(1);
-  return session !== undefined;
-}
 
 export function createDrizzlePasskeyRepository(
   database: DatabaseClient,
@@ -202,11 +175,12 @@ export function createDrizzlePasskeyRepository(
           )
           .limit(1);
         if (!credential) return { kind: "missing" };
-        const wallets = await transaction
-          .select({ count: sql<number>`count(*)::int` })
-          .from(walletIdentities)
-          .where(eq(walletIdentities.userId, userId));
-        if (readAggregateCount(wallets) === 0) return { kind: "final-method" };
+        // Whether the account would still have a way in is the shared rule's decision, on what it holds now.
+        const outcome = removalOutcome(
+          await listAccountMethods(transaction, userId),
+          { id: credentialId, kind: "passkey" },
+        );
+        if (outcome !== "ok") return { kind: outcome };
         await transaction
           .delete(passkeyCredentials)
           .where(eq(passkeyCredentials.id, credential.id));
