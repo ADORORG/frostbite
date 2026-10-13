@@ -149,6 +149,20 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **First verified game (G6):** **FROST·BITE**, which needs its board generation made deterministic (seeded).
 - **Build order:** **milestone progress (SDK-3), then the wallet widget (SDK-F), then leaderboards (SDK-2).**
 
+### Eighth survey (2026-10-13)
+
+- **Leaderboards (SDK-2): verified-only boards, so no boards until G6.** This settles the earlier conflict in
+  favour of verification: boards accept only replay-verified runs, every board game must be deterministic, and
+  SDK-2 (#54) now waits for G6 (#41). The self-reported board design above stays as the display design; only the
+  admission rule changes. Build order becomes: SDK-F wallet widget, then G6, then SDK-2.
+- **npm (SDK-8):** publish under a **scope that matches the GitHub organisation (e.g. `@adororg`)**, holder
+  **ADORORG**, licence **MIT**. The workspace package is named `@ador/game-sdk`; publishing under another scope
+  means a rename (workspace-wide) or a published name that differs from the workspace name. Decide at publish time;
+  the scope must also be created on npm by the owner.
+- **Wallet providers (SDK-F):** keep the **current 13 candidates**, detected wallets first.
+- **Network mismatch (SDK-F):** a **warning badge with the expected network** ("Mainnet - this game uses signet"),
+  the player may continue.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
