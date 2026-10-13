@@ -208,6 +208,12 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **Connected wallet not linked to the signed-in account:** the widget shows **"not linked" with a "Link this
   wallet" action** (a signature); the account stays signed in.
 
+### Plan written (2026-10-13)
+
+The plan for SDK-G is `docs/product/plan-sdk-g-sign-in.md`: what already exists in the auth code, the findings that change
+the work (the wallet sign-in core is built and has no routes or UI; a test-only route in the app is not needed),
+the design, phases, tests and risks. It is **awaiting owner approval**; four small questions are listed in section 8.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
