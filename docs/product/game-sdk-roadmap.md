@@ -122,6 +122,21 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   local id becoming the account id and `player.changed`), and tab-hidden / full-screen event buttons. Failure and
   slow-answer injection was not chosen.
 
+### Sixth survey (2026-10-13)
+
+- **Progress reporting (SDK-3):** the game sends the **current total** (`milestones.progress(id, current)`); the
+  platform keeps the highest value and unlocks the milestone at its target. Idempotent, so a retried message cannot
+  double count.
+- **Repeatable earnings (SDK-3):** the game calls **`milestones.unlock` again** and the platform counts it for a
+  repeatable milestone (rate limited). To settle in the plan: the call currently answers `already-unlocked`, so its
+  result needs a count without changing the existing shape (an additive field breaks strict old clients, so likely
+  a new `milestones.earn` result or a separate count read; the count is also readable in `milestones.list` through
+  a new method).
+- **Cap (SDK-3):** the **manifest sets a maximum per milestone** (reviewed by pull request); counts above it are
+  ignored.
+- **Licence (SDK-8):** **MIT.** Still needed: the copyright holder's name for the LICENSE file, and confirmation
+  that the `@ador` npm scope is owned. The package stays private until both are given.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
