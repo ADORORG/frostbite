@@ -6,9 +6,10 @@ import {
   type GameHostBackend,
   type HostedGame,
   type HostEvent,
+  type HostServices,
 } from "@ador/game-sdk/host";
 import type { GameHostPolicy } from "@ador/game-sdk/policy";
-import type { Response } from "@ador/game-sdk/protocol";
+import type { EventMessage, Response } from "@ador/game-sdk/protocol";
 
 export interface SimulatedGame {
   // Closes the page the game ran in.
@@ -16,6 +17,8 @@ export interface SimulatedGame {
   // Everything the host reported to the player, in order.
   readonly events: readonly HostEvent[];
   readonly host: GameHost;
+  // The messages the host sent to the game that it did not ask for (a wallet that changed, a pause).
+  readonly pushes: readonly EventMessage[];
   // The messages the host sent back to the game.
   readonly replies: readonly Response[];
   // The game's page, for reading what it showed and pressing what it offers.
@@ -34,6 +37,8 @@ export function runGameInSimulatedHost(options: {
   readonly now?: () => Date;
   readonly policy?: GameHostPolicy;
   readonly script: string;
+  // What the page lends the game: a wallet, a place to show a message.
+  readonly services?: HostServices;
 }): SimulatedGame {
   const dom = new JSDOM(options.html ?? "<!doctype html><body></body>", {
     pretendToBeVisual: true,
@@ -42,6 +47,7 @@ export function runGameInSimulatedHost(options: {
   const { window } = dom;
   const events: HostEvent[] = [];
   const replies: Response[] = [];
+  const pushes: EventMessage[] = [];
   const parent = {
     postMessage: (message: unknown) => void host.handle(message),
   };
@@ -51,13 +57,21 @@ export function runGameInSimulatedHost(options: {
     now: options.now,
     onEvent: (event) => events.push(event),
     policy: options.policy,
+    push: (message) => {
+      pushes.push(message);
+      deliver(message);
+    },
     reply: (response) => {
       replies.push(response);
-      const event = new window.Event("message");
-      Object.assign(event, { data: response, source: parent });
-      window.dispatchEvent(event);
+      deliver(response);
     },
+    services: options.services,
   });
+  function deliver(data: unknown) {
+    const event = new window.Event("message");
+    Object.assign(event, { data, source: parent });
+    window.dispatchEvent(event);
+  }
   // The page the game runs in is a frame of the host; its parent is the host.
   Object.defineProperty(window, "parent", {
     configurable: true,
@@ -81,5 +95,12 @@ export function runGameInSimulatedHost(options: {
     });
   }
   window.eval(options.script);
-  return { close: () => window.close(), events, host, replies, window };
+  return {
+    close: () => window.close(),
+    events,
+    host,
+    pushes,
+    replies,
+    window,
+  };
 }

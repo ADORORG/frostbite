@@ -1,9 +1,10 @@
 {
   "name": "@ador/game-sdk",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
+    "./attach": "./src/attach.ts",
     "./build": "./src/build.ts",
     "./client": "./src/client.ts",
     "./frame-headers": "./src/frame-headers.ts",
@@ -20,11 +21,11 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json",
+    "prepack": "pnpm run build:package"
   },
   "dependencies": {
-    "@ador/shared": "workspace:*",
-    "esbuild": "0.28.2",
     "zod": "4.5.4"
   },
   "devDependencies": {
@@ -33,9 +34,72 @@
     "@types/jsdom": "30.0.0",
     "@types/node": "26.4.0",
     "@vitest/coverage-v8": "4.1.11",
+    "esbuild": "0.28.2",
     "eslint": "10.9.1",
     "jsdom": "30.0.1",
     "typescript": "5.9.3",
     "vitest": "4.1.11"
+  },
+  "description": "Build a game that runs on the platform: the client for the game, the protocol, and the host side for testing it.",
+  "license": "UNLICENSED",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "publishConfig": {
+    "exports": {
+      "./attach": {
+        "types": "./dist/attach.d.ts",
+        "default": "./dist/attach.js"
+      },
+      "./build": {
+        "types": "./dist/build.d.ts",
+        "default": "./dist/build.js"
+      },
+      "./client": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
+      },
+      "./frame-headers": {
+        "types": "./dist/frame-headers.d.ts",
+        "default": "./dist/frame-headers.js"
+      },
+      "./host": {
+        "types": "./dist/host.d.ts",
+        "default": "./dist/host.js"
+      },
+      "./local-backend": {
+        "types": "./dist/local-backend.d.ts",
+        "default": "./dist/local-backend.js"
+      },
+      "./policy": {
+        "types": "./dist/policy.d.ts",
+        "default": "./dist/policy.js"
+      },
+      "./protocol": {
+        "types": "./dist/protocol.d.ts",
+        "default": "./dist/protocol.js"
+      },
+      "./storage-shim": {
+        "types": "./dist/storage-shim.d.ts",
+        "default": "./dist/storage-shim.js"
+      },
+      "./synced-backend": {
+        "types": "./dist/synced-backend.d.ts",
+        "default": "./dist/synced-backend.js"
+      }
+    }
+  },
+  "peerDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "peerDependenciesMeta": {
+    "esbuild": {
+      "optional": true
+    }
   }
 }

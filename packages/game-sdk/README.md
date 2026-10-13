@@ -13,8 +13,12 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./protocol`: the versioned message protocol (channel `ador-game`, version 1), as schemas. One `methods` table
   is the source of truth for names, parameters and results.
 - `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock`,
-  `player.info`. Failures surface as `GameHostError` with a stable code.
-- `./host`: `createGameHost()` and `attachGameHost()` for the platform page. A message is handled only when its
+  `player.info`, `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability),
+  `capabilities.get`, `ui.toast`, and `on(event, handler)` for what the platform tells the game
+  (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`). Failures surface as `GameHostError` with a stable
+  code (including `permission_denied` for a capability the game did not declare).
+- `./host`: `createGameHost()` for the platform page (`services` lend it a wallet and a place to show a toast;
+  `push` and `emit` send events). `./attach`: `attachGameHost()` connects it to a frame. A message is handled only when its
   `event.source` is the game's frame (a sandboxed frame has no origin to check). Sizes and call rates are
   limited by `./policy`.
 - `./local-backend`: keeps progress and milestones in the browser's storage, validated on read, and
@@ -34,7 +38,22 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
+## Installing it outside this repository
+
+The package builds to plain JavaScript with declarations (`pnpm --filter @ador/game-sdk build:package`) and is packed
+by `pnpm pack`, which runs that build first and swaps the source entries for the built ones (`publishConfig`).
+It depends only on `zod`; `esbuild` is an optional peer, needed only for `./build`. Installing the packed file in an
+empty project, type-checking against its declarations and running a conversation through it was done on
+2026-10-13 (see `references/game-sdk-api-task-record.md`). It stays `private` and `UNLICENSED` until the owner
+decides the package scope, licence and registry; publishing is then removing `private` and `pnpm publish`.
+
 ## Invariants
+
+- A method or event that exists never changes shape (result schemas are strict, so a new field would break every
+  game built on an older SDK). New abilities are new methods and events, found with `capabilities.get`.
+- A method that needs a capability (`requiredCapability`) is refused with `permission_denied` unless the game's
+  manifest declared it; an event that needs one (`requiredEventCapability`) is not sent. The wallet is given
+  as a public address and a network name only.
 
 - A milestone claim carries a verification level; only `self-reported` exists. Nothing with money or privilege may
   depend on a self-reported milestone.

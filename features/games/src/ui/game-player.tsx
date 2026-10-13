@@ -1,6 +1,7 @@
 "use client";
 
 import type { HostedGame } from "@ador/game-sdk/host";
+import type { WalletInfo } from "@ador/game-sdk/protocol";
 import type { GameMilestone } from "@ador/shared/games";
 import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
 import {
@@ -17,6 +18,7 @@ import { MilestoneList } from "./milestone-list.tsx";
 import { useFullscreen } from "./use-fullscreen.ts";
 import { usePhoneLandscape } from "./use-phone-landscape.ts";
 import { useGameSession } from "./use-game-session.ts";
+import { WalletCard } from "./wallet-card.tsx";
 
 // What the frame may do. Scripts only: no same-origin access, so the game has no storage, cookies or session
 // of the platform, no forms, no popups, no top navigation. The response headers for the game's files repeat
@@ -49,6 +51,7 @@ export function GamePlayer({
   sections = [],
   src,
   title,
+  wallet,
 }: {
   // How the page reaches the account for a game; the real one unless a test supplies another.
   readonly accountFor?: (gameId: string) => AccountPort;
@@ -61,6 +64,12 @@ export function GamePlayer({
   readonly sections?: readonly DockSection[];
   readonly src: string;
   readonly title: string;
+  // Set only for a game that declared the wallet capability: what the player has connected, and where to
+  // connect one. Without it the game is never told about a wallet and the dock has no wallet section.
+  readonly wallet?: {
+    readonly connectHref: string;
+    readonly current: WalletInfo | null;
+  };
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const { connected, kept, sync, toast, unlocked } = useGameSession(
@@ -68,6 +77,7 @@ export function GamePlayer({
     frame,
     src,
     accountFor,
+    { title, wallet: wallet?.current },
   );
   const fullscreen = useFullscreen(frame);
   const phoneLandscape = usePhoneLandscape();
@@ -96,6 +106,21 @@ export function GamePlayer({
             ),
             id: "milestones",
             label: "Milestones",
+          },
+        ]),
+    ...(wallet === undefined
+      ? []
+      : [
+          {
+            badge: wallet.current === null ? null : "Connected",
+            content: (
+              <WalletCard
+                connectHref={wallet.connectHref}
+                current={wallet.current}
+              />
+            ),
+            id: "wallet",
+            label: "Wallet",
           },
         ]),
     ...sections,

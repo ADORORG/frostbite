@@ -29,6 +29,7 @@ export const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
 export const errorCodes = [
   "invalid_request",
   "not_ready",
+  "permission_denied",
   "rate_limited",
   "too_large",
   "unavailable",
@@ -62,11 +63,41 @@ export const milestoneStatusSchema = z
   .strict();
 export type MilestoneStatus = z.infer<typeof milestoneStatusSchema>;
 
+// The wallet a player has connected, as far as a game that declared the `wallet` capability may see it: the
+// public address and the network name. Never a key, a signature, a wallet object or a transaction.
+export const walletInfoSchema = z
+  .object({
+    address: z.string().regex(/^[A-Za-z0-9]{14,90}$/u),
+    network: z.string().regex(/^[a-z0-9-]{1,32}$/u),
+  })
+  .strict();
+export type WalletInfo = z.infer<typeof walletInfoSchema>;
+
+// A message a game may ask the platform to show the player. Plain text, kept short.
+export const toastMaxLength = 140;
+
 const timestamp = z.iso.datetime({ offset: true });
 const empty = z.object({}).strict();
 
 // Each method: what the game sends, and what it gets back.
 export const methods = {
+  "capabilities.get": {
+    params: empty,
+    result: z
+      .object({
+        events: z.array(z.string()),
+        granted: z.array(z.string()),
+        limits: z
+          .object({
+            progressMaxBytes: z.number().int().positive(),
+            toastMaxLength: z.number().int().positive(),
+          })
+          .strict(),
+        methods: z.array(z.string()),
+        protocolVersion: z.literal(protocolVersion),
+      })
+      .strict(),
+  },
   "milestones.list": {
     params: empty,
     result: z.object({ milestones: z.array(milestoneStatusSchema) }).strict(),
@@ -89,6 +120,16 @@ export const methods = {
     params: z.object({ state: jsonValueSchema }).strict(),
     result: z.object({ savedAt: timestamp }).strict(),
   },
+  "ui.toast": {
+    params: z
+      .object({ message: z.string().trim().min(1).max(toastMaxLength) })
+      .strict(),
+    result: z.object({ shown: z.boolean() }).strict(),
+  },
+  "wallet.get": {
+    params: empty,
+    result: z.object({ wallet: walletInfoSchema.nullable() }).strict(),
+  },
   ready: {
     params: z.object({ sdkVersion: z.number().int().positive() }).strict(),
     result: z
@@ -106,12 +147,33 @@ export const methods = {
 
 export type MethodName = keyof typeof methods;
 export const methodNames = Object.keys(methods) as MethodName[];
+// The manifest capability a method needs before the host answers it. A method not listed needs none.
+export const requiredCapability: Readonly<Partial<Record<MethodName, string>>> =
+  { "wallet.get": "wallet" };
 export type Params<Name extends MethodName> = z.infer<
   (typeof methods)[Name]["params"]
 >;
 export type Result<Name extends MethodName> = z.infer<
   (typeof methods)[Name]["result"]
 >;
+
+// What the page tells a game without being asked. Each is delivered only to a game that has called `ready`
+// (and, for the wallet, declared the capability). A message in this shape is not a response, so a game built
+// on an older SDK ignores it.
+export const events = {
+  "fullscreen.changed": z.object({ active: z.boolean() }).strict(),
+  "lifecycle.changed": z
+    .object({ state: z.enum(["active", "paused"]) })
+    .strict(),
+  "wallet.changed": z.object({ wallet: walletInfoSchema.nullable() }).strict(),
+} as const;
+export type EventName = keyof typeof events;
+export const eventNames = Object.keys(events) as EventName[];
+export type EventData<Name extends EventName> = z.infer<(typeof events)[Name]>;
+// The capability a game must have declared to be sent an event. An event not listed needs none.
+export const requiredEventCapability: Readonly<
+  Partial<Record<EventName, string>>
+> = { "wallet.changed": "wallet" };
 
 const envelope = {
   channel: z.literal(gameChannel),
@@ -136,6 +198,16 @@ export const responseSchema = z.discriminatedUnion("ok", [
     })
     .strict(),
 ]);
+
+export const eventMessageSchema = z
+  .object({
+    channel: z.literal(gameChannel),
+    data: z.unknown(),
+    event: z.string().max(64),
+    version: z.literal(protocolVersion),
+  })
+  .strict();
+export type EventMessage = z.infer<typeof eventMessageSchema>;
 
 export type Request = z.infer<typeof requestSchema>;
 export type Response = z.infer<typeof responseSchema>;

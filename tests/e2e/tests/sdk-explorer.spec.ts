@@ -1,0 +1,137 @@
+import { expect, test } from "@playwright/test";
+
+import { openDock } from "./support/dock.ts";
+
+// The SDK explorer, played in the platform's isolated frame: every call of the game SDK answered by the real
+// platform page, and the events the platform sends on its own. The platform lists the explorer only when run
+// for tests or development.
+const frameSelector = '[data-testid="game-frame"]';
+
+test.beforeEach(async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "Desktop only.");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/games/sdk-explorer");
+});
+
+const newest = (page: import("@playwright/test").Page) =>
+  page.frameLocator(frameSelector).locator("#log li").first();
+
+test("every call is answered by the platform, in the real frame", async ({
+  page,
+}) => {
+  const game = page.frameLocator(frameSelector);
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
+  await game.locator("#capabilities").click();
+  await expect(newest(page)).toContainText('"granted":["wallet"]');
+  await expect(newest(page)).toContainText('"events":[');
+  await game.locator("#player").click();
+  await expect(newest(page)).toContainText(
+    'player.info → {"signedIn":false,"walletConnected":false}',
+  );
+  // No wallet is connected in a test browser, so the answer is none, not an error.
+  await game.locator("#wallet").click();
+  await expect(newest(page)).toHaveText('wallet.get → {"wallet":null}');
+  await game.locator("#progress-save").click();
+  await expect(newest(page)).toHaveText(
+    'progress.save → {"saved":{"calls":1}}',
+  );
+  await game.locator("#progress-save").click();
+  await expect(newest(page)).toHaveText(
+    'progress.save → {"saved":{"calls":2}}',
+  );
+  await game.locator("#milestones-unlock").click();
+  await expect(newest(page)).toContainText('"status":"unlocked"');
+  await game.locator("#milestones-list").click();
+  await expect(newest(page)).toContainText('"status":"unlocked"');
+});
+
+test("a message from the game is shown by the platform under the game's name", async ({
+  page,
+}) => {
+  const game = page.frameLocator(frameSelector);
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
+  await game.locator("#toast").click();
+  await expect(newest(page)).toHaveText('ui.toast → {"shown":true}');
+  await expect(page.getByTestId("milestone-toast")).toHaveText(
+    "SDK Explorer: Hello from the SDK explorer",
+  );
+});
+
+test("the platform says what the game can see of a wallet, and that none is connected", async ({
+  page,
+}) => {
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  const wallet = await openDock(page, "Wallet");
+  await expect(wallet).toContainText("No wallet is connected.");
+  await expect(
+    wallet.getByRole("link", { name: "Connect a wallet" }),
+  ).toHaveAttribute("href", "/connect");
+  const asks = await openDock(page, "What it asks for");
+  await expect(asks).toContainText("See the address of the wallet");
+  await expect(asks).toContainText("Available");
+});
+
+test("the platform tells the game when the tab is hidden and shown again", async ({
+  page,
+}) => {
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await page.evaluate(() => {
+    const set = (hidden: boolean) => {
+      Object.defineProperty(document, "hidden", {
+        configurable: true,
+        value: hidden,
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    };
+    set(true);
+    set(false);
+  });
+  const log = page
+    .frameLocator(frameSelector)
+    .locator('#log li[data-source="event"]');
+  await expect(log).toHaveText([
+    'event lifecycle.changed {"state":"active"}',
+    'event lifecycle.changed {"state":"paused"}',
+  ]);
+});
+
+test("a game that did not declare the wallet is refused it, in the real browser", async ({
+  page,
+}) => {
+  await page.goto("/games/frostbite");
+  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  const frame = page
+    .frames()
+    .find((candidate) =>
+      candidate.url().endsWith("/play/frostbite/index.html"),
+    );
+  if (frame === undefined) throw new Error("The game's frame is missing.");
+  const answer = await frame.evaluate(
+    () =>
+      new Promise<{ code: string; ok: boolean }>((resolve) => {
+        const listener = (event: MessageEvent) => {
+          const data = event.data as {
+            id?: string;
+            ok?: boolean;
+            error?: { code: string };
+          };
+          if (data.id !== "probe-1") return;
+          window.removeEventListener("message", listener);
+          resolve({ code: data.error?.code ?? "", ok: data.ok === true });
+        };
+        window.addEventListener("message", listener);
+        const send = (id: string, method: string, params: object) =>
+          window.parent.postMessage(
+            { channel: "ador-game", id, method, params, version: 1 },
+            "*",
+          );
+        send("probe-0", "ready", { sdkVersion: 1 });
+        send("probe-1", "wallet.get", {});
+      }),
+  );
+  expect(answer).toEqual({ code: "permission_denied", ok: false });
+});

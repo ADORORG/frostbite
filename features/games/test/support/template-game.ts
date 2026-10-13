@@ -87,3 +87,16 @@ export const coveredGame = defineGame({
   id: "covered-game",
   title: "Covered game",
 });
+
+// A game the platform plays itself that asks to see the player's wallet, and for something it does not grant.
+export const walletGame = defineGame({
+  ...embeddedGame,
+  capabilities: ["wallet", "balance:read"],
+  id: "wallet-game",
+  title: "Wallet game",
+});
+
+export const walletConfig = {
+  connectHref: "/connect",
+  network: "signet",
+} as const;

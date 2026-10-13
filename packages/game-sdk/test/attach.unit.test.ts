@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { attachGameHost } from "../src/host.ts";
+import { attachGameHost } from "../src/attach.ts";
 
 describe("attaching the host to a game's frame", () => {
   function windowStub() {

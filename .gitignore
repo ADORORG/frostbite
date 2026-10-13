@@ -29,6 +29,7 @@ test-results
 out/
 build
 dist
+dist
 target/
 
 

@@ -1,13 +1,18 @@
 import {
+  eventMessageSchema,
+  events,
   gameChannel,
   methods,
   protocolVersion,
   responseSchema,
   type ErrorCode,
+  type EventData,
+  type EventName,
   type JsonValue,
   type MethodName,
   type Params,
   type Result,
+  type WalletInfo,
 } from "./protocol.ts";
 
 export const sdkVersion = 1;
@@ -55,6 +60,9 @@ function windowMessages(window: Window): MessageSource {
 }
 
 export interface GameClient {
+  // What this platform supports: the methods and events it knows, what this game was granted, and the limits.
+  // A game written for a newer platform asks first and does without what is missing.
+  readonly capabilities: { get(): Promise<Result<"capabilities.get">> };
   dispose(): void;
   readonly milestones: {
     list(): Promise<Result<"milestones.list">["milestones"]>;
@@ -65,7 +73,20 @@ export interface GameClient {
     load(): Promise<JsonValue | null>;
     save(state: JsonValue): Promise<void>;
   };
+  // Listens for something the platform tells the game. Returns a function that stops listening. A message the
+  // platform did not send, or in a shape the protocol does not allow, is ignored.
+  on<Name extends EventName>(
+    name: Name,
+    handler: (data: EventData<Name>) => void,
+  ): () => void;
   ready(): Promise<Result<"ready">>;
+  readonly ui: {
+    // Asks the platform to show the player a short message. Resolves to whether it was shown.
+    toast(message: string): Promise<boolean>;
+  };
+  // The wallet the player has connected, or null. Refused with `permission_denied` unless the game declared the
+  // `wallet` capability in its manifest.
+  readonly wallet: { get(): Promise<WalletInfo | null> };
 }
 
 // The game's side: plain async functions over the one channel to the page that hosts it. The page it talks to
@@ -91,8 +112,26 @@ export function createGameClient(
     { fail: (error: GameHostError) => void; succeed: (value: unknown) => void }
   >();
 
+  const handlers = new Map<EventName, Set<(data: never) => void>>();
+
+  function deliver(data: unknown): void {
+    const message = eventMessageSchema.safeParse(data);
+    if (!message.success) return;
+    const { event } = message.data;
+    if (!Object.hasOwn(events, event)) return;
+    // `Object.hasOwn` above proved the name is a key of the event table.
+    const name = event as EventName;
+    const parsed = events[name].safeParse(message.data.data);
+    if (!parsed.success) return;
+    // Handlers are stored by event name and registered through `on`, which ties each to that name's data type;
+    // `parsed` has just been checked against the same name, so the data is what every handler there expects.
+    for (const handler of handlers.get(name) ?? [])
+      handler(parsed.data as never);
+  }
+
   const listener = (event: { data: unknown; source: unknown }) => {
     if (event.source !== host) return;
+    deliver(event.data);
     const response = responseSchema.safeParse(event.data);
     if (!response.success) return;
     const pending = waiting.get(response.data.id);
@@ -149,7 +188,9 @@ export function createGameClient(
   }
 
   return {
+    capabilities: { get: () => call("capabilities.get", {}) },
     dispose: () => {
+      handlers.clear();
       listenOn.removeEventListener("message", listener);
       for (const pending of waiting.values())
         pending.fail(new GameHostError("unavailable", "The game was closed."));
@@ -164,6 +205,16 @@ export function createGameClient(
       load: async () => (await call("progress.load", {})).state,
       save: async (state) => void (await call("progress.save", { state })),
     },
+    on: (name, handler) => {
+      const set = handlers.get(name) ?? new Set<(data: never) => void>();
+      set.add(handler);
+      handlers.set(name, set);
+      return () => void set.delete(handler);
+    },
     ready: () => call("ready", { sdkVersion }),
+    ui: {
+      toast: async (message) => (await call("ui.toast", { message })).shown,
+    },
+    wallet: { get: async () => (await call("wallet.get", {})).wallet },
   };
 }

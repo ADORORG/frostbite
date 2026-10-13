@@ -1,3 +1,4 @@
+import type { GameWalletConfig } from "@ador/feature-games";
 import type { WalletConnectionConfig } from "@ador/feature-wallet-connection";
 import { walletQualificationDefaults } from "@ador/shared/wallet-qualification";
 
@@ -20,3 +21,10 @@ export const walletConnectionConfig = {
   network: "signet",
   qualification: walletQualificationDefaults,
 } as const satisfies WalletConnectionConfig;
+
+// How the games pages reach a wallet: the same network as the connection page, and that page's address, where a
+// player connects one before a game that asked for it can see the address.
+export const gameWalletConfig = {
+  connectHref: "/connect",
+  network: walletConnectionConfig.network,
+} as const satisfies GameWalletConfig;

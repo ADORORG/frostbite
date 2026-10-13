@@ -35,17 +35,23 @@ A small versioned protocol over `postMessage`, wrapped by a `@ador/game-sdk` pac
 functions. Every message carries protocol version, request id and a payload validated on both sides; the host
 accepts messages only from the game's own frame.
 
-| Call                    | What it does                                                                           |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| `ready({ version })`    | The game has loaded; the host answers with the player's state and what it supports.    |
-| `progress.load()`       | Returns the game's saved state (a JSON value) or nothing.                              |
-| `progress.save(state)`  | Saves it. Size-limited (typed policy), versioned, validated as JSON.                   |
-| `milestones.list()`     | The milestones the game declared (from its manifest) with the player's status of each. |
-| `milestones.unlock(id)` | The player earned it. Idempotent; only declared ids; counted against limits.           |
-| `player.info()`         | Signed in or not, wallet connected or not (a yes or no), never the wallet itself.      |
+| Call                    | What it does                                                                                             |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| `ready({ version })`    | The game has loaded; the host answers with the player's state and what it supports.                      |
+| `progress.load()`       | Returns the game's saved state (a JSON value) or nothing.                                                |
+| `progress.save(state)`  | Saves it. Size-limited (typed policy), versioned, validated as JSON.                                     |
+| `milestones.list()`     | The milestones the game declared (from its manifest) with the player's status of each.                   |
+| `milestones.unlock(id)` | The player earned it. Idempotent; only declared ids; counted against limits.                             |
+| `player.info()`         | Signed in or not, wallet connected or not (a yes or no).                                                 |
+| `wallet.get()`          | The connected wallet's public address and network, or none. Needs the `wallet` capability (Amendment 2). |
+| `capabilities.get()`    | The methods, events and limits the platform supports, and what this game was granted.                    |
+| `ui.toast(message)`     | Asks the page to show a short plain message, labelled with the game's name.                              |
 
-The host never forwards cookies, wallet objects, addresses or raw transactions to the game. A call the game
-does not declare in its manifest is refused. A game that breaks the protocol is stopped and the player told.
+The host never forwards cookies, wallet objects, keys, signatures or raw transactions to the game. **Amendment 2
+(owner, 2026-10-13):** the wallet's public **address** and network name are given to a game that declared the
+`wallet` capability, because the game has no network access and an address is public. Every other call that
+needs a capability is refused with `permission_denied` unless the game declared it. The page also sends events
+(`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`); see `game-sdk-roadmap.md`. A game that breaks the protocol is stopped and the player told.
 
 ## 3. Where progress and milestones live
 

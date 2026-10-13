@@ -89,4 +89,55 @@ describe("a game built with the SDK, run against a simulated host", () => {
       "localStorage: blocked,sessionStorage: blocked,fetch: blocked,XMLHttpRequest: blocked",
     );
   });
+
+  describe("with what the page lends a game", () => {
+    const address =
+      "tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv";
+    // The game speaks the protocol directly, so this checks the host and the simulator, not the client.
+    const script = `
+      const out = document.getElementById("out");
+      const send = (id, method, params) =>
+        parent.postMessage({ channel: "ador-game", id, method, params, version: 1 }, "*");
+      addEventListener("message", (e) => {
+        const d = e.data;
+        if (d.event) out.textContent += " " + d.event + ":" + JSON.stringify(d.data);
+        else if (d.id === "w") out.textContent += d.ok ? " wallet:" + d.result.wallet.address : " refused:" + d.error.code;
+      });
+      send("a", "ready", { sdkVersion: 1 });
+      send("w", "wallet.get", {});
+    `;
+    const html = '<!doctype html><body><p id="out"></p></body>';
+    const text = () =>
+      running?.window.document.getElementById("out")?.textContent;
+
+    it("gives a game that declared the wallet its address, and tells it when that changes", async () => {
+      running = runGameInSimulatedHost({
+        backend: memoryBackend().backend,
+        game: { ...game, capabilities: ["wallet"] },
+        html,
+        script,
+        services: { wallet: () => ({ address, network: "signet" }) },
+      });
+      await settle();
+      running.host.emit("wallet.changed", { wallet: null });
+      await settle();
+      expect(text()).toBe(` wallet:${address} wallet.changed:{"wallet":null}`);
+      expect(running.pushes).toHaveLength(1);
+    });
+
+    it("refuses the address, and sends no wallet event, to a game that did not declare it", async () => {
+      running = runGameInSimulatedHost({
+        backend: memoryBackend().backend,
+        game,
+        html,
+        script,
+        services: { wallet: () => ({ address, network: "signet" }) },
+      });
+      await settle();
+      running.host.emit("wallet.changed", { wallet: null });
+      await settle();
+      expect(text()).toBe(" refused:permission_denied");
+      expect(running.pushes).toEqual([]);
+    });
+  });
 });

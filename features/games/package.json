@@ -24,6 +24,7 @@
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
+    "@ador/wallet": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8"
   },

@@ -1,8 +1,10 @@
+import { attachGameHost } from "@ador/game-sdk/attach";
 import {
-  attachGameHost,
   createGameHost,
+  type GameHost,
   type HostedGame,
 } from "@ador/game-sdk/host";
+import type { WalletInfo } from "@ador/game-sdk/protocol";
 import {
   createLocalBackend,
   type KeyValueStorage,
@@ -12,9 +14,16 @@ import {
   type AccountPort,
   type SyncStatus,
 } from "@ador/game-sdk/synced-backend";
-import { useEffect, useEffectEvent, useState, type RefObject } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 
 import { createAccountPort } from "../client/account-sync.ts";
+import { useHostEvents } from "./use-host-events.ts";
 
 // How long a "milestone reached" notice stays up.
 export const toastMs = 6_000;
@@ -52,13 +61,25 @@ export function useGameSession(
   frame: RefObject<HTMLIFrameElement | null>,
   src: string,
   accountFor: (gameId: string) => AccountPort = createAccountPort,
+  // `title` names the game on a message it asks the page to show. `wallet` is what the player has connected;
+  // undefined for a game that cannot see a wallet at all.
+  page: { readonly title: string; readonly wallet?: WalletInfo | null } = {
+    title: game.id,
+  },
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [connected, setConnected] = useState(false);
   const [kept, setKept] = useState(true);
   const [sync, setSync] = useState<SyncStatus>("local");
   const [toast, setToast] = useState<string | null>(null);
-  const { id, milestones } = game;
+  const { capabilities, id, milestones } = game;
+  const { title, wallet } = page;
+  const host = useRef<GameHost | null>(null);
+  // Read when the game asks, so a wallet that connects later is seen without restarting the game.
+  const walletNow = useRef(wallet);
+  useEffect(() => {
+    walletNow.current = wallet;
+  }, [wallet]);
   // The account is looked up when the session starts, not whenever the function that finds it is a new one: a
   // session restarted by a re-render would reload the game and lose what the player was doing.
   const remoteFor = useEffectEvent((gameId: string) => accountFor(gameId));
@@ -82,16 +103,21 @@ export function useGameSession(
     const seen = new Set<string>();
     let baselined = false;
     let toastTimer: ReturnType<typeof setTimeout> | undefined;
-    const announce = (ids: readonly string[]) => {
+    const show = (text: string) => {
       clearTimeout(toastTimer);
-      const titles = ids.map(
-        (found) =>
-          milestones.find((milestone) => milestone.id === found)?.title ??
-          found,
-      );
-      setToast(`${titles.join(", ")} reached`);
+      setToast(text);
       toastTimer = setTimeout(() => setToast(null), toastMs);
     };
+    const announce = (ids: readonly string[]) =>
+      show(
+        `${ids
+          .map(
+            (found) =>
+              milestones.find((milestone) => milestone.id === found)?.title ??
+              found,
+          )
+          .join(", ")} reached`,
+      );
     const refresh = () =>
       void backend.milestones().then((records) => {
         const fresh = Object.keys(records).filter((key) => !seen.has(key));
@@ -109,27 +135,41 @@ export function useGameSession(
         );
       });
     refresh();
-    const host = createGameHost({
+    const hosted = createGameHost({
       backend,
-      game: { id, milestones },
+      game: { capabilities, id, milestones },
       onEvent: (event) => {
         if (event.type === "ready") setConnected(true);
         if (event.type === "milestone-unlocked") refresh();
       },
       // The frame has no origin of its own, so the only address a message to it can name is "*". It carries
       // only this game's own data, and goes to the one window the page created.
+      push: (message) => target.postMessage(message, "*"),
       reply: (message) => target.postMessage(message, "*"),
+      // The game's words are shown as the game's: a message from it must not pass for the platform's.
+      services: {
+        toast: (message) => show(`${title}: ${message}`),
+        wallet: () => walletNow.current ?? null,
+      },
     });
-    const detach = attachGameHost({ frame: target, host, listenOn: window });
+    host.current = hosted;
+    const detach = attachGameHost({
+      frame: target,
+      host: hosted,
+      listenOn: window,
+    });
     // The game is started only now, so the host is already listening when it first speaks. Started any
     // earlier (by the markup the server sent) its opening message could arrive before the page is ready, and
     // be lost.
     element.setAttribute("src", src);
     return () => {
       clearTimeout(toastTimer);
+      host.current = null;
       detach();
     };
-  }, [frame, id, milestones, src]);
+  }, [capabilities, frame, id, milestones, src, title]);
+
+  useHostEvents(host, frame, wallet);
 
   return { connected, kept, sync, toast, unlocked };
 }

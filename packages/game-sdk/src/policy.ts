@@ -9,6 +9,8 @@ export const gameHostPolicySchema = z
     progressMaxBytes: z.number().int().min(1_024).max(1_048_576),
     // Saves and unlocks a game may make a minute; past it the call is refused with `rate_limited`.
     saveCallsPerMinute: z.number().int().min(1).max(600),
+    // Messages a game may ask the page to show a minute; the player is not to be spammed.
+    toastCallsPerMinute: z.number().int().min(1).max(60),
     unlockCallsPerMinute: z.number().int().min(1).max(600),
   })
   .strict();
@@ -18,6 +20,7 @@ export type GameHostPolicy = z.infer<typeof gameHostPolicySchema>;
 export const defaultGameHostPolicy: GameHostPolicy = Object.freeze({
   progressMaxBytes: 65_536,
   saveCallsPerMinute: 60,
+  toastCallsPerMinute: 6,
   unlockCallsPerMinute: 60,
 });
 

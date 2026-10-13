@@ -11,11 +11,14 @@ import {
 import { targetChains } from "./chains.ts";
 import { frostbite } from "./games/frostbite.ts";
 import { sampleGame } from "./games/sample.ts";
+import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 // game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
 function developmentGames(): GameManifest[] {
-  return developmentGamesEnabled(process.env) ? [sampleGame] : [];
+  return developmentGamesEnabled(process.env)
+    ? [sampleGame, sdkExplorerGame]
+    : [];
 }
 
 // The games the platform lists: one line per game. A game is added here and nowhere else; the catalog and the

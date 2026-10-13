@@ -75,6 +75,25 @@ export function registerHarness(): void {
   });
 }
 
+const player = (
+  accountFor: (gameId: string) => AccountPort,
+  extra: Partial<ComponentProps<typeof GamePlayer>>,
+) => (
+  <GamePlayer
+    accountFor={accountFor}
+    game={game}
+    src="/play/embedded-game/index.html"
+    title="Embedded game"
+    {...extra}
+  />
+);
+
+// Renders the player again with other properties, as the page does when the wallet connects.
+export const rerender = (
+  extra: Partial<ComponentProps<typeof GamePlayer>>,
+  accountFor: (gameId: string) => AccountPort = noAccount,
+) => act(async () => harness.root.render(player(accountFor, extra)));
+
 export async function mount(
   accountFor: (gameId: string) => AccountPort = noAccount,
   extra: Partial<ComponentProps<typeof GamePlayer>> = {},
@@ -88,15 +107,7 @@ export async function mount(
     },
   );
   await act(async () => {
-    harness.root.render(
-      <GamePlayer
-        accountFor={accountFor}
-        game={game}
-        src="/play/embedded-game/index.html"
-        title="Embedded game"
-        {...extra}
-      />,
-    );
+    harness.root.render(player(accountFor, extra));
   });
   const frame = harness.container.querySelector("iframe");
   if (frame === null || frame.contentWindow === null)

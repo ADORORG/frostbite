@@ -1,0 +1,51 @@
+:root {
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: #120a2e;
+  color: #f4efff;
+  font-family: system-ui, sans-serif;
+}
+main {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  padding: 1.5rem;
+}
+button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 0.125rem solid #2cf;
+  border-radius: 0.5rem;
+  background: #1c1450;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#probes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+#log {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 100%;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+#log li[data-source="event"] {
+  color: #7ff;
+}

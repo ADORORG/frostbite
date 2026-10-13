@@ -63,3 +63,9 @@ export function memoryBackend(overrides: Partial<GameHostBackend> = {}) {
 
 export const outcome = (response: Response | undefined) =>
   response === undefined ? "none" : response.ok ? "ok" : response.error.code;
+
+// The same game once it has declared the wallet capability in its manifest.
+export const walletGame: HostedGame = { ...game, capabilities: ["wallet"] };
+
+export const taprootAddress =
+  "tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv";

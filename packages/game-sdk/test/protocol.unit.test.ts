@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  eventMessageSchema,
+  eventNames,
+  events,
   jsonValueSchema,
   methodNames,
   methods,
   requestSchema,
+  requiredCapability,
+  requiredEventCapability,
   responseSchema,
+  toastMaxLength,
+  walletInfoSchema,
 } from "../src/protocol.ts";
 import {
   defaultGameHostPolicy,
@@ -87,22 +94,27 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the six the platform offers", () => {
+  it("are exactly the nine the platform offers", () => {
     expect(methodNames.sort()).toEqual([
+      "capabilities.get",
       "milestones.list",
       "milestones.unlock",
       "player.info",
       "progress.load",
       "progress.save",
       "ready",
+      "ui.toast",
+      "wallet.get",
     ]);
   });
 
   it("take no parameters where none are needed, and refuse extra ones", () => {
     for (const name of [
+      "capabilities.get",
       "milestones.list",
       "player.info",
       "progress.load",
+      "wallet.get",
     ] as const) {
       expect(methods[name].params.safeParse({}).success).toBe(true);
       expect(methods[name].params.safeParse({ extra: 1 }).success).toBe(false);
@@ -175,5 +187,74 @@ describe("the host policy", () => {
 
   it("is frozen", () => {
     expect(Object.isFrozen(resolveGameHostPolicy())).toBe(true);
+  });
+});
+
+describe("the wallet and the events", () => {
+  const address =
+    "tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv";
+
+  it("describe a wallet by its public address and network name, and nothing else", () => {
+    expect(
+      walletInfoSchema.safeParse({ address, network: "signet" }).success,
+    ).toBe(true);
+    for (const wallet of [
+      { address, network: "signet", publicKey: "02ab" },
+      { address: "", network: "signet" },
+      { address: "has space in it", network: "signet" },
+      { address: `${address}${address}`, network: "signet" },
+      { address, network: "Signet" },
+      { address, network: "" },
+    ])
+      expect(walletInfoSchema.safeParse(wallet).success).toBe(false);
+  });
+
+  it("know three events, each with strict data", () => {
+    expect(eventNames.sort()).toEqual([
+      "fullscreen.changed",
+      "lifecycle.changed",
+      "wallet.changed",
+    ]);
+    expect(
+      events["lifecycle.changed"].safeParse({ state: "paused" }).success,
+    ).toBe(true);
+    expect(
+      events["lifecycle.changed"].safeParse({ state: "asleep" }).success,
+    ).toBe(false);
+    expect(events["fullscreen.changed"].safeParse({ active: 1 }).success).toBe(
+      false,
+    );
+    expect(events["wallet.changed"].safeParse({ wallet: null }).success).toBe(
+      true,
+    );
+    expect(events["wallet.changed"].safeParse({}).success).toBe(false);
+  });
+
+  it("are not responses, so a game built before them ignores them", () => {
+    const message = {
+      channel: "ador-game",
+      data: { active: true },
+      event: "fullscreen.changed",
+      version: 1,
+    };
+    expect(eventMessageSchema.safeParse(message).success).toBe(true);
+    expect(responseSchema.safeParse(message).success).toBe(false);
+  });
+
+  it("bound a toast to a short plain message", () => {
+    const params = methods["ui.toast"].params;
+    expect(params.safeParse({ message: "Level up!" }).success).toBe(true);
+    expect(params.safeParse({ message: "   " }).success).toBe(false);
+    expect(
+      params.safeParse({ message: "x".repeat(toastMaxLength) }).success,
+    ).toBe(true);
+    expect(
+      params.safeParse({ message: "x".repeat(toastMaxLength + 1) }).success,
+    ).toBe(false);
+  });
+
+  it("need the wallet capability for the address and the wallet event, and nothing else", () => {
+    expect(requiredCapability).toEqual({ "wallet.get": "wallet" });
+    expect(requiredEventCapability).toEqual({ "wallet.changed": "wallet" });
   });
 });

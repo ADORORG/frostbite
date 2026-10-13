@@ -10,6 +10,8 @@ import {
   coveredGame,
   embeddedGame,
   templateGame,
+  walletConfig,
+  walletGame,
 } from "./support/template-game.ts";
 
 async function render(
@@ -17,7 +19,7 @@ async function render(
   path: "/games" | "/games/[slug]",
   slug?: string,
 ) {
-  const page = createGamesEntrypoint(games, chains).pages?.find(
+  const page = createGamesEntrypoint(games, chains, walletConfig).pages?.find(
     (candidate) => candidate.path === path,
   );
   if (page === undefined) throw new Error(`No page ${path}`);
@@ -96,8 +98,9 @@ describe("a game's page", () => {
     expect(markup).toContain(
       "It opens at play.example.test, not on this site.",
     );
-    expect(markup).toContain("Connect the player&#x27;s wallet");
-    expect(markup).toContain("These are requests only");
+    expect(markup).toContain("See the address of the wallet");
+    expect(markup).toContain("Not available yet");
+    expect(markup).toContain("declaration only");
     expect(markup).toContain("First level");
     expect(markup).toContain("How it is earned: Finish the first level.");
     expect(markup).toContain("Once per player");
@@ -203,9 +206,31 @@ describe("a game's page", () => {
   });
 });
 
+describe("a game that asks to see the player's wallet", () => {
+  it("shows what it asks for as available, and what is only declared as not, and gives it a wallet section", async () => {
+    const markup = await render([walletGame], "/games/[slug]", "wallet-game");
+    expect(markup).toContain("See the address of the wallet the player");
+    expect(markup).toContain("Available");
+    expect(markup).toContain("Read the player&#x27;s balance");
+    expect(markup).toContain("Not available yet");
+    expect(markup).toContain("Your wallet");
+    expect(markup).toContain('href="/connect"');
+  });
+
+  it("is given no wallet section when the game did not ask, and says it asks for nothing", async () => {
+    const markup = await render(
+      [embeddedGame],
+      "/games/[slug]",
+      "embedded-game",
+    );
+    expect(markup).not.toContain("Your wallet");
+    expect(markup).toContain("does not ask the platform for anything");
+  });
+});
+
 describe("the games feature registration", () => {
   it("declares its pages, its navigation item and no provider needs, and loads pages that match", async () => {
-    const feature = createGamesFeature([templateGame], chains);
+    const feature = createGamesFeature([templateGame], chains, walletConfig);
     expect(feature.manifest).toMatchObject({
       id: "games",
       navigation: [{ area: "main", href: "/games", label: "Games" }],

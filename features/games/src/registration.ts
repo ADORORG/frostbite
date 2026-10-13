@@ -8,12 +8,17 @@ import {
   type GameManifest,
 } from "@ador/shared/games";
 
+import type { GameWalletConfig } from "./wallet-config.ts";
+
+export type { GameWalletConfig } from "./wallet-config.ts";
+
 // The public games catalog and detail pages, and the one API route that saves a signed-in player's state. The games it lists are supplied explicitly (one line per game
 // in the platform's game configuration), so removing this one registration removes the pages and their
 // navigation, and adding a game never touches this feature.
 export function createGamesFeature(
   games: readonly GameManifest[],
   chains: readonly ChainOption[],
+  wallet: GameWalletConfig,
 ) {
   return defineFeature({
     manifest: {
@@ -40,7 +45,8 @@ export function createGamesFeature(
     },
     load: async () =>
       import("@ador/feature-games/entrypoint").then(
-        ({ createGamesEntrypoint }) => createGamesEntrypoint(games, chains),
+        ({ createGamesEntrypoint }) =>
+          createGamesEntrypoint(games, chains, wallet),
       ),
   });
 }

@@ -22,18 +22,23 @@ The platform core is not edited to add a game.
 ## Invariants
 
 - The pages show only what a manifest declares. A game with no play address is "Not playable yet", never
-  live; capabilities and milestones are shown as declarations, with the statement that the platform does not
-  yet grant capabilities, cannot claim milestones on chain, and cannot verify gameplay.
+  live. Each capability a game declares is marked "Available" only when the host answers it and the platform plays
+  the game itself (today: `wallet`); every other one is marked "Not available yet" and is a declaration only.
+  Milestones are shown with the statement that the platform cannot claim them on chain or verify gameplay.
 - A manifest that fails validation stops the platform from starting; it is not skipped.
 - Identifiers are unique and are the page address. An address that cannot be an identifier is "Invalid
   route"; a valid one with no game is "Record not published".
-- The feature performs no wallet, mint or on-chain operation. The only persistence is the sync route, which
+- The feature performs no mint or on-chain operation, and signs nothing. For a game that declared the `wallet`
+  capability it mounts the wallet connection on the game's page and passes the game only the connected wallet's
+  public address and network (`wallet-game-player.tsx`); a game that did not declare it gets no wallet provider. The only persistence is the sync route, which
   stores the player's own state for a listed game and its declared milestones, never anything a request names
   for another player. Milestones are labelled self-reported.
 
 ## Dependencies and configuration
 
-Depends on plugin contracts, `@ador/shared` (manifest schema, chain options), and shared UI. It reads no
+Depends on plugin contracts, `@ador/shared` (manifest schema, chain options), `@ador/wallet` (the wallet
+connection, mounted only for a game that declared `wallet`) and shared UI. `createGamesFeature` takes the wallet
+configuration (`GameWalletConfig`: network and the connection page's address) from `configs/wallet.ts`. It reads no
 environment value; where a game is played is supplied by the platform's configuration (`GAME_LAUNCHES`, applied
 in `configs/games.ts`) before the manifests reach the feature.
 

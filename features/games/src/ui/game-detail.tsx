@@ -11,9 +11,11 @@ import {
 } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";
+import type { GameWalletConfig } from "../wallet-config.ts";
 import { GamePlayer } from "./game-player.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
+import { WalletGamePlayer } from "./wallet-game-player.tsx";
 
 // One game as its manifest declares it, with the game itself as the main thing on the page when the platform
 // plays it. Nothing here implies a milestone can be claimed, or that the platform can see what happens inside
@@ -21,9 +23,11 @@ import { MilestoneList } from "./milestone-list.tsx";
 export function GameDetail({
   game,
   navigation,
+  wallet,
 }: {
   readonly game: PublicGame;
   readonly navigation: readonly NavigationItem[];
+  readonly wallet: GameWalletConfig;
 }) {
   const about = (
     <ArcadeInfoCard title="About">
@@ -42,11 +46,21 @@ export function GameDetail({
       ) : (
         <>
           <ul aria-label="Capabilities the game asks for">
-            {game.capabilities.map((label) => (
-              <li key={label}>{label}</li>
+            {game.capabilities.map(({ available, id, label }) => (
+              <li key={id}>
+                {label}{" "}
+                <ArcadeBadge tone={available ? "mint" : "pink"}>
+                  {available ? "Available" : "Not available yet"}
+                </ArcadeBadge>
+              </li>
             ))}
           </ul>
-          <p>These are requests only. The platform does not grant them yet.</p>
+          {game.capabilities.every(({ available }) => available) ? null : (
+            <p>
+              A request marked not available yet is a declaration only. The
+              platform does not grant it.
+            </p>
+          )}
         </>
       )}
     </ArcadeInfoCard>
@@ -61,22 +75,37 @@ export function GameDetail({
     { badge: null, content: about, id: "about", label: "About" },
     { badge: null, content: asks, id: "asks", label: "What it asks for" },
   ];
+  const player = {
+    back: (
+      <a className="arcade-stage__back" href={gamesPath}>
+        ← All games
+      </a>
+    ),
+    game: {
+      capabilities: game.capabilities.map(({ id }) => id),
+      id: game.id,
+      milestones: game.milestones,
+    },
+    meta: facts,
+    sections,
+    title: game.title,
+  };
+  const wantsWallet = game.capabilities.some(
+    ({ available, id }) => available && id === "wallet",
+  );
   return (
     <GamesFrame navigation={navigation} variant="stage">
-      {game.embedSrc !== null ? (
-        <GamePlayer
-          back={
-            <a className="arcade-stage__back" href={gamesPath}>
-              ← All games
-            </a>
-          }
-          game={{ id: game.id, milestones: game.milestones }}
-          meta={facts}
-          sections={sections}
+      {game.embedSrc === null ? null : wantsWallet ? (
+        <WalletGamePlayer
+          {...player}
+          connectHref={wallet.connectHref}
+          network={wallet.network}
           src={game.embedSrc}
-          title={game.title}
         />
       ) : (
+        <GamePlayer {...player} src={game.embedSrc} />
+      )}
+      {game.embedSrc !== null ? null : (
         <>
           <ArcadeStageHead
             meta={

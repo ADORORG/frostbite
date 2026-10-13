@@ -1,3 +1,4 @@
+import { requiredCapability } from "@ador/game-sdk/protocol";
 import type { ChainOption } from "@ador/shared/chain";
 import {
   embeddedGameAssetPath,
@@ -10,14 +11,26 @@ import {
   type GameMilestone,
 } from "@ador/shared/games";
 
-// What a person is told about each thing a game may ask the host for. Declarations only for now: the host
-// protocol that grants or refuses them is a later task, and the page says so.
+// What a person is told about each thing a game may ask the host for. Only the ones the host protocol answers
+// (see `requiredCapability`) are granted, and only to a game the platform plays itself; the rest are
+// declarations, and the page says which is which.
 export const gameCapabilityLabels: Readonly<Record<GameCapability, string>> = {
   "balance:read": "Read the player's balance",
   "run:submit": "Submit a finished run",
   "transaction:request": "Ask the player to sign a transaction",
-  wallet: "Connect the player's wallet",
+  wallet: "See the address of the wallet the player connected",
 };
+
+const hostGranted: ReadonlySet<string> = new Set(
+  Object.values(requiredCapability),
+);
+
+// One thing a game declared, and whether the platform will actually grant it.
+export interface PublicCapability {
+  readonly available: boolean;
+  readonly id: GameCapability;
+  readonly label: string;
+}
 
 export const gameMilestonePolicyLabels: Readonly<
   Record<GameMilestone["claimPolicy"], string>
@@ -35,7 +48,7 @@ export interface PublicCover {
 
 // One game as the public pages show it, taken from its manifest and nothing else.
 export interface PublicGame {
-  readonly capabilities: readonly string[];
+  readonly capabilities: readonly PublicCapability[];
   // The preview the catalog shows, or null for a game that has none (the pages draw a stand-in).
   readonly cover: PublicCover | null;
   readonly description: string;
@@ -69,9 +82,11 @@ export function createGameCatalog(
   chains: readonly ChainOption[],
 ): GameCatalog {
   const presented = games.map((game): PublicGame => ({
-    capabilities: game.capabilities.map(
-      (capability) => gameCapabilityLabels[capability],
-    ),
+    capabilities: game.capabilities.map((capability) => ({
+      available: game.launch.mode === "embedded" && hostGranted.has(capability),
+      id: capability,
+      label: gameCapabilityLabels[capability],
+    })),
     cover:
       game.cover === undefined
         ? null

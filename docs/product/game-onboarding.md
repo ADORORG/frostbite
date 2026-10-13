@@ -42,7 +42,7 @@ export const myGame = defineGame({
   version: "0.1.0", // the game's own release; a change to a milestone is a new version, never an edit
   network: "bip122:00000008819873e925422c1ff0f99f7c", // must be a chain the platform is configured for
   launch: { mode: "embedded" }, // played in the platform's frame; no address to set
-  capabilities: [], // declarations only today: nothing is granted yet
+  capabilities: [], // what the game asks to see; add "wallet" to receive the player's wallet address (see below)
   milestones: [
     {
       id: "first-level", // unique within the game
@@ -92,17 +92,45 @@ const saved = await client.progress.load(); // JSON or null
 await client.progress.save({ score: 12 }); // JSON; at most 64 KB, batch to about one a second
 const list = await client.milestones.list(); // declared milestones with the player's status
 await client.milestones.unlock("first-level"); // idempotent; only declared ids
-const { signedIn, walletConnected } = await client.player.info(); // yes/no only, never the wallet
+const { signedIn, walletConnected } = await client.player.info(); // yes/no only
+const wallet = await client.wallet.get(); // { address, network } or null; needs the "wallet" capability
+await client.ui.toast("Level up!"); // a short message the page shows, under the game's name
+const supported = await client.capabilities.get(); // methods, events, limits, what this game was granted
+const stop = client.on("lifecycle.changed", ({ state }) => {
+  /* "paused" when the tab is hidden: stop the loop; "active" when it is back */
+});
 ```
 
 - Every failure is a `GameHostError` with a stable code (`invalid_request`, `not_ready`, `rate_limited`,
-  `too_large`, `unavailable`, `unknown_method`, `unknown_milestone`). A call the platform does not answer in
+  `too_large`, `unavailable`, `unknown_method`, `unknown_milestone`, `permission_denied`). A call the platform does not answer in
   ten seconds ends with `unavailable`; the game must still be playable.
 - Limits are platform policy, not game code: 64 KB of saved state, 60 saves and 60 unlocks a minute. Over a limit the
   call is refused.
 - Save and load **plain JSON of your own making**, versioned by you: a save written by an older release must
   still load. Treat what `progress.load()` returns as untrusted input; `restore()` in `game.ts` shows how.
 - Do not wait on the platform to start drawing; do not call `unlock` for a milestone not in the manifest.
+
+## The wallet, the events and the other calls
+
+The full list, with the status of what is still to come, is `docs/product/game-sdk-roadmap.md`.
+
+- **`wallet.get()`** returns the connected wallet's **public address and network name**, or `null` when none is
+  connected. Declare `capabilities: ["wallet"]` in the manifest; without it the call is refused with
+  `permission_denied`, and the page's "What it asks for" shows the request. The game cannot see a key, sign
+  anything or move anything: the address is all it receives. The player connects a wallet on the platform's
+  connection page; the game's page has a "Wallet" section that says what the game can see.
+- **Events** arrive without a request, through `client.on(name, handler)`, which returns a function that stops
+  listening: `wallet.changed` (only for a game that declared `wallet`), `lifecycle.changed` (`paused` while the tab
+  is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`.
+- **`ui.toast(message)`** asks the page to show up to 140 characters of plain text; the page prefixes the game's
+  name so it cannot pass for the platform's. It resolves to whether it was shown. At most six a minute.
+- **`capabilities.get()`** lists the methods and events this platform knows, the limits, and what the game was
+  granted. A game written for a newer platform should ask first and do without what is missing.
+- **Reset a save** with `progress.save(null)`; there is no separate call.
+- **Compatibility rule:** a method or event that exists never changes shape. New abilities are new methods and
+  events, so a game built on an older SDK keeps working on a newer platform.
+- Try every call, in the real frame, with the SDK explorer (`games/sdk-explorer`, listed where the platform runs for
+  development or tests).
 
 ## Where the player's progress lives
 
@@ -184,7 +212,7 @@ audit:game -- <folder>` screens for root addresses. With path style, games on on
 The launch rules are tested on their own (`packages/shared`) and in a real browser with fixture games (`tests/e2e`
 `game-hosting.spec.ts`). Naming a game the platform plays itself in `GAME_LAUNCHES` stops the platform starting.
 
-## Not built yet
+## Not built yet (see also the roadmap)
 
 | Missing                                                              | Task / blocked on                                      |
 | -------------------------------------------------------------------- | ------------------------------------------------------ |

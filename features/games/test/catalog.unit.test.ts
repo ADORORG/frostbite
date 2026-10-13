@@ -11,6 +11,7 @@ import {
   coveredGame,
   embeddedGame,
   templateGame,
+  walletGame,
 } from "./support/template-game.ts";
 
 describe("the game catalog", () => {
@@ -27,8 +28,12 @@ describe("the game catalog", () => {
   it("presents a game from its manifest alone", () => {
     expect(catalog.find("template-game")).toEqual({
       capabilities: [
-        gameCapabilityLabels.wallet,
-        gameCapabilityLabels["run:submit"],
+        { available: false, id: "wallet", label: gameCapabilityLabels.wallet },
+        {
+          available: false,
+          id: "run:submit",
+          label: gameCapabilityLabels["run:submit"],
+        },
       ],
       cover: null,
       description: "A game written from the template.",
@@ -78,6 +83,21 @@ describe("the game catalog", () => {
       image: "/play/covered-game/assets/cover.png",
       video: null,
     });
+  });
+
+  it("grants a capability only when the host answers it and the platform plays the game itself", () => {
+    const granted = (game: Parameters<typeof createGameCatalog>[0][number]) =>
+      createGameCatalog([game], chains)
+        .list()[0]
+        ?.capabilities.map(({ available, id }) => [id, available]);
+    expect(granted(walletGame)).toEqual([
+      ["wallet", true],
+      ["balance:read", false],
+    ]);
+    // The same declaration on a game that runs elsewhere is never granted: the host is not in the way.
+    expect(granted({ ...templateGame, capabilities: ["wallet"] })).toEqual([
+      ["wallet", false],
+    ]);
   });
 
   it("has no play address for a game that is not configured, and names an unconfigured chain by its identifier", () => {

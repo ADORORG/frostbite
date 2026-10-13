@@ -16,7 +16,7 @@ import { authorizationPolicy } from "./authorization.ts";
 import { targetChains } from "./chains.ts";
 import { games } from "./games.ts";
 import { providerRegistry } from "./providers.ts";
-import { walletConnectionConfig } from "./wallet.ts";
+import { gameWalletConfig, walletConnectionConfig } from "./wallet.ts";
 
 export const featureRegistry = createFeatureRegistry([
   platformShellFeature,
@@ -25,7 +25,7 @@ export const featureRegistry = createFeatureRegistry([
   launchesFeature,
   createPublicCollectionsFeature(providerRegistry, targetChains),
   creatorsFeature,
-  createGamesFeature(games, targetChains),
+  createGamesFeature(games, targetChains, gameWalletConfig),
   createWalletConnectionFeature(walletConnectionConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),

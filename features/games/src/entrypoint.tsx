@@ -8,11 +8,13 @@ import { createGameCatalog } from "./domain/catalog.ts";
 import { createGameSyncResolver } from "./runtime.ts";
 import { GameDetail } from "./ui/game-detail.tsx";
 import { GamesIndex } from "./ui/games-index.tsx";
+import type { GameWalletConfig } from "./wallet-config.ts";
 import { GameNotFound, NoGames } from "./ui/states.tsx";
 
 export function createGamesEntrypoint(
   games: readonly GameManifest[],
   chains: readonly ChainOption[],
+  wallet: GameWalletConfig,
 ): FeatureEntrypoint {
   const catalog = createGameCatalog(games, chains);
   const access = { kind: "public" } as const;
@@ -43,7 +45,9 @@ export function createGamesEntrypoint(
         render: ({ navigation, params }) => {
           const game = catalog.find(params.slug);
           if (game !== null)
-            return <GameDetail game={game} navigation={navigation} />;
+            return (
+              <GameDetail game={game} navigation={navigation} wallet={wallet} />
+            );
           return (
             <GameNotFound
               navigation={navigation}
