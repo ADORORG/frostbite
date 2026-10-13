@@ -17,7 +17,6 @@ export const rateLimits = rateLimitConfigSchema.parse({
     beginWalletLink: perMinute(10),
     beginWalletSignIn: perMinute(10),
     beginWalletStepUp: perMinute(10),
-    beginWalletQualification: perMinute(10),
     completeUploadIntent: perMinute(120),
     createCollectionDraft: perMinute(20),
     // Browsers report policy violations here without being asked; a page that violates one reports it often.
@@ -37,7 +36,6 @@ export const rateLimits = rateLimitConfigSchema.parse({
     verifyWalletLink: perMinute(20),
     verifyWalletSignIn: perMinute(20),
     verifyWalletStepUp: perMinute(20),
-    verifyWalletQualification: perMinute(20),
   },
   read: perMinute(600),
   version: 1,

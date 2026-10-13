@@ -9,6 +9,8 @@ import { createWalletSignInOperations } from "./application/wallet-sign-in-opera
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import { getPasskeyLinkingService } from "./runtime.ts";
 import { AccountSurface } from "./ui/account-surface.tsx";
+import { SignInSurface } from "./ui/sign-in-surface.tsx";
+import type { WalletAuthConfig } from "./wallet-config.ts";
 import { AdminHome } from "./ui/admin-home.tsx";
 
 type PasskeyService = ReturnType<typeof getPasskeyLinkingService>;
@@ -17,6 +19,7 @@ async function account(
   actorUserId: UuidV7 | null,
   getService: () => PasskeyService,
   navigation: readonly NavigationItem[],
+  wallet: WalletAuthConfig,
 ) {
   if (actorUserId === null) return null;
   try {
@@ -25,6 +28,7 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeyCredentialIds={await getService().list(actorUserId)}
+        wallet={wallet}
       />
     );
   } catch {
@@ -33,6 +37,7 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeysUnavailable
+        wallet={wallet}
       />
     );
   }
@@ -40,6 +45,7 @@ async function account(
 
 export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
+  wallet: WalletAuthConfig,
   getService: () => PasskeyService = getPasskeyLinkingService,
 ): FeatureEntrypoint {
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
@@ -73,10 +79,21 @@ export function createAccountsEntrypoint(
     ],
     pages: [
       {
+        access: { kind: "public" },
+        path: "/sign-in",
+        render: ({ navigation }) => (
+          <SignInSurface
+            candidates={wallet.candidates}
+            navigation={navigation}
+            network={wallet.network}
+          />
+        ),
+      },
+      {
         access: { kind: "authenticated" },
         path: "/account",
         render: ({ actorUserId, navigation }) =>
-          account(actorUserId, getService, navigation),
+          account(actorUserId, getService, navigation, wallet),
       },
       {
         access: { capability: "platform:operate", kind: "platform" },

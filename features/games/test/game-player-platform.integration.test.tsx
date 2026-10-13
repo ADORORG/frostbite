@@ -22,7 +22,7 @@ const connected = { address, network: "signet" };
 const walletGame = { ...game, capabilities: ["wallet"] };
 const asking = (current: typeof connected | null) => ({
   game: walletGame,
-  wallet: { connectHref: "/connect", current },
+  wallet: { connectHref: "/sign-in", current },
 });
 const dockLabels = () =>
   [...h.container.querySelectorAll(".arcade-dock__strip button")].map(
@@ -54,7 +54,7 @@ describe("the wallet a game can see", () => {
     await flush();
     expect(dockLabels()).toEqual(["Milestones0/2", "Wallet"]);
     expect(h.container.textContent).toContain("No wallet is connected.");
-    expect(h.container.querySelector('a[href="/connect"]')?.textContent).toBe(
+    expect(h.container.querySelector('a[href="/sign-in"]')?.textContent).toBe(
       "Connect a wallet",
     );
     expect(answer(reply, "b")).toMatchObject({

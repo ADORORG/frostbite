@@ -76,7 +76,7 @@ test("the platform says what the game can see of a wallet, and that none is conn
   await expect(wallet).toContainText("No wallet is connected.");
   await expect(
     wallet.getByRole("link", { name: "Connect a wallet" }),
-  ).toHaveAttribute("href", "/connect");
+  ).toHaveAttribute("href", "/sign-in");
   const asks = await openDock(page, "What it asks for");
   await expect(asks).toContainText("See the address of the wallet");
   await expect(asks).toContainText("Available");

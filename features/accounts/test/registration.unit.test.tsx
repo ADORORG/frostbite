@@ -2,12 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { createAccountsFeature } from "../src/registration.ts";
 import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import { walletConfig } from "./support/wallet-config.ts";
 
-const accountsFeature = createAccountsFeature({
-  challengeLifetimeMs: 300_000,
-  maximumVerificationAttempts: 3,
-  releaseHoldMs: 86_400_000,
-});
+const accountsFeature = createAccountsFeature(walletConfig);
 const allRoutes = [
   ...Object.values(passkeyRoutes),
   ...Object.values(walletAuthRoutes),
@@ -21,6 +18,7 @@ describe("accounts feature registration", () => {
       capabilities: ["api-routes", "authenticated-page", "navigation"],
       id: "accounts",
       pages: [
+        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -43,6 +41,7 @@ describe("accounts feature registration", () => {
       version: accountsFeature.manifest.version,
     });
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
+      "/sign-in",
       "/account",
       "/admin",
     ]);

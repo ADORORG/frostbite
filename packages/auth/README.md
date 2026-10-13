@@ -12,8 +12,12 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
 - `createDrizzleSessionRepository` stores only SHA-256 token hashes and enforces idle, absolute,
   and revocation predicates in PostgreSQL.
 - `strictBip322Verifier` contains the `bip322-js` boundary.
-- `@ador/auth/qualification` exposes a separate diagnostic challenge service. Its Drizzle adapter
-  is exported through `@ador/auth/qualification-repository`; it never creates identities or sessions.
+- `removalOutcome` is the one rule for removing a sign-in method (wallet or passkey): an account keeps at least one
+  method that can sign in. `createWalletMethodsService` lists an account's wallets and removes one (recent session,
+  never the last way in, other sessions signed out, the removed wallet held before another account may take it).
+- `walletAuthRoutes` and the wallet request/response schemas are the contracts for wallet sign-in, link, step-up,
+  unlink, methods and sign-out; `verify` takes the action and account a route expects, so a link challenge cannot
+  sign anyone in.
 - `createPasskeyLinkingService` owns recent-auth registration, conflict-safe linking, final-method
   protection, session rotation, and provider-neutral contracts.
 - `simpleWebAuthnRegistrationAdapter` contains the exact-pinned SimpleWebAuthn server boundary.
@@ -25,11 +29,6 @@ registration and route adapter; no feature discovery or global registration is u
 
 - Challenges bind the canonical address, script identity, network, origin, URI, domain, action,
   request ID, nonce, timestamps, signature scheme, and schema version.
-- Diagnostic message qualification binds a distinct purpose, configured provider/network/origin,
-  validated address, nonce, challenge ID, issue time, and expiry. Its separate table stores only
-  the message hash and required metadata. Conditional settlement enforces expiry, attempt bounds,
-  single consumption, and concurrent-consumer exclusion. Settlement samples its injected clock
-  after acquiring the challenge row lock, so verification and lock waits cannot backdate consumption.
   A diagnostic signature cannot be used by
   the authentication repository. Public deployment requires rate limits and expired-row cleanup.
 - Only the canonical message hash is stored. The signature and full message are not persisted.

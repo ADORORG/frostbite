@@ -21,8 +21,6 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
 - `@ador/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
   `requestFingerprint`, a key-order-independent digest used to detect an idempotency key reused with
   different content.
-- `@ador/shared/wallet-qualification` — bounded diagnostic schemas, routes, and configurable
-  defaults. The strict result contract cannot carry a session or represent successful sign-in.
 - `@ador/shared/platform` — public platform-status input and output contracts.
 - `@ador/shared/providers` — provider identities and capability-bearing manifests.
 

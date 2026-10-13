@@ -18,7 +18,7 @@
     "./schema/platform": "./src/schema/platform.ts",
     "./schema/rate-limit": "./src/schema/rate-limit.ts",
     "./schema/uploads": "./src/schema/uploads.ts",
-    "./schema/wallet-qualification": "./src/schema/wallet-qualification.ts"
+    "./schema/wallet-release": "./src/schema/wallet-release.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

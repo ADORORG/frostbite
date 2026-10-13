@@ -214,7 +214,7 @@ describe("a game that asks to see the player's wallet", () => {
     expect(markup).toContain("Read the player&#x27;s balance");
     expect(markup).toContain("Not available yet");
     expect(markup).toContain("Your wallet");
-    expect(markup).toContain('href="/connect"');
+    expect(markup).toContain('href="/sign-in"');
   });
 
   it("is given no wallet section when the game did not ask, and says it asks for nothing", async () => {

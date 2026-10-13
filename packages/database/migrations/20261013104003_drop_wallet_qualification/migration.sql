@@ -1,0 +1,1 @@
+DROP TABLE "ador"."wallet_qualification_challenges";

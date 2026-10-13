@@ -41,7 +41,6 @@ export {
   authUsers,
   passkeyChallenges,
   passkeyCredentials,
-  releasedWallets,
   walletChallenges,
   walletIdentities,
   type AuthSession,
@@ -49,7 +48,6 @@ export {
   type AuthUser,
   type PasskeyChallenge,
   type PasskeyCredential,
-  type ReleasedWallet,
   type WalletChallenge,
   type WalletIdentity,
 } from "./schema/auth.ts";
@@ -99,3 +97,7 @@ export {
   gameMilestoneUnlocks,
   gameSaves,
 } from "./schema/game-saves.ts";
+export {
+  releasedWallets,
+  type ReleasedWallet,
+} from "./schema/wallet-release.ts";

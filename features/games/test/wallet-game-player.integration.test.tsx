@@ -65,7 +65,7 @@ const show = () =>
   act(async () =>
     root.render(
       <WalletGamePlayer
-        connectHref="/connect"
+        connectHref="/sign-in"
         game={{ ...game, capabilities: ["wallet"] }}
         network="signet"
         src="/play/embedded-game/index.html"

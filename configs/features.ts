@@ -11,13 +11,11 @@ import {
 } from "@ador/feature-public-products";
 import { createFeatureRegistry } from "@ador/plugin-kit";
 import { createUploadsFeature } from "@ador/feature-uploads";
-import { createWalletConnectionFeature } from "@ador/feature-wallet-connection";
 import { authorizationPolicy } from "./authorization.ts";
 import { targetChains } from "./chains.ts";
 import { games } from "./games.ts";
 import { providerRegistry } from "./providers.ts";
-import { walletAuthConfig } from "./wallet-auth.ts";
-import { gameWalletConfig, walletConnectionConfig } from "./wallet.ts";
+import { gameWalletConfig, walletAuthConfig } from "./wallet.ts";
 
 export const featureRegistry = createFeatureRegistry([
   platformShellFeature,
@@ -27,7 +25,6 @@ export const featureRegistry = createFeatureRegistry([
   createPublicCollectionsFeature(providerRegistry, targetChains),
   creatorsFeature,
   createGamesFeature(games, targetChains, gameWalletConfig),
-  createWalletConnectionFeature(walletConnectionConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),
   createCollectionReviewFeature(authorizationPolicy, providerRegistry),

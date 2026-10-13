@@ -2,11 +2,11 @@ import {
   authSecurityEvents,
   authSessions,
   authUsers,
-  releasedWallets,
   walletChallenges,
   walletIdentities,
   type WalletChallenge,
 } from "@ador/database/schema/auth";
+import { releasedWallets } from "@ador/database/schema/wallet-release";
 import type {
   DatabaseClient,
   DatabaseTransaction,

@@ -12,7 +12,6 @@
     "@ador/feature-games": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
-    "@ador/feature-wallet-connection": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/provider-media-processing-sharp": "workspace:*",

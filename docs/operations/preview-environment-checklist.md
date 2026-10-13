@@ -132,7 +132,7 @@ Written from the code; none of it has been exercised against a real platform yet
       A direct run with no proxy sets `0`; then address limits are skipped.
 - [ ] **`SECURITY_CSP_MODE`** (blank = `report-only`). Start in preview with `report-only`, open the main pages,
       and read the `csp-report` lines in the web service log: the only report expected is the wallet library's
-      probe of script evaluation on `/connect`. Then set `enforce`. In a browser run of the end-to-end suite
+      probe of script evaluation on `/sign-in` (reported there since the wallet library is mounted on that page). Then set `enforce`. In a browser run of the end-to-end suite
       with `enforce`, the wallet, passkey, upload, collection, bulk upload, import and acceptance journeys all pass.
 - [ ] `R2_ENDPOINT` also sets the one external origin the page policy allows images and uploads to; a different
       public asset domain for images needs adding to the policy.

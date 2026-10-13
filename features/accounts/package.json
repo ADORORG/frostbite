@@ -18,10 +18,12 @@
   },
   "dependencies": {
     "@ador/auth": "workspace:*",
+    "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",
+    "@ador/wallet": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/ui": "workspace:*",
     "@simplewebauthn/browser": "14.0.0",

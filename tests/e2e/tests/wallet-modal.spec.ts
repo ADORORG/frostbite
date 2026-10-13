@@ -5,7 +5,7 @@ test("wallet chooser contains focus, explains availability, and closes with Esca
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/connect");
+  await page.goto("/sign-in");
   const trigger = page.getByRole("button", {
     name: "Choose wallet",
     exact: true,

@@ -2,9 +2,9 @@ import type { DatabaseClient } from "@ador/database/connection";
 import {
   authSecurityEvents,
   authSessions,
-  releasedWallets,
   walletIdentities,
 } from "@ador/database/schema/auth";
+import { releasedWallets } from "@ador/database/schema/wallet-release";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
 import { and, eq, isNull, sql } from "drizzle-orm";
 

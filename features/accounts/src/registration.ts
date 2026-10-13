@@ -2,11 +2,15 @@ import { defineFeature } from "@ador/plugin-kit";
 import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 
 import { createWalletServicesResolver } from "./runtime.ts";
-import type { WalletAuthConfig } from "./wallet-config.ts";
+import {
+  validateWalletAuthConfig,
+  type WalletAuthConfig,
+} from "./wallet-config.ts";
 
-export type { WalletAuthConfig } from "./wallet-config.ts";
+export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
 
-export function createAccountsFeature(wallet: WalletAuthConfig) {
+export function createAccountsFeature(input: WalletAuthConfig) {
+  const wallet = validateWalletAuthConfig(input);
   return defineFeature({
     manifest: {
       capabilities: ["api-routes", "authenticated-page", "navigation"],
@@ -29,6 +33,7 @@ export function createAccountsFeature(wallet: WalletAuthConfig) {
       ],
       id: "accounts",
       pages: [
+        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -46,7 +51,10 @@ export function createAccountsFeature(wallet: WalletAuthConfig) {
     load: async () =>
       import("@ador/feature-accounts/entrypoint").then(
         ({ createAccountsEntrypoint }) =>
-          createAccountsEntrypoint(createWalletServicesResolver(wallet)),
+          createAccountsEntrypoint(
+            createWalletServicesResolver(wallet),
+            wallet,
+          ),
       ),
   });
 }

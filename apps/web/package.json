@@ -30,7 +30,6 @@
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-collections": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
-    "@ador/feature-wallet-connection": "workspace:*",
     "@ador/game-sdk": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/object-storage": "workspace:*",

@@ -1,0 +1,6236 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "61159ba3-ac60-45be-8874-4af47f2a3ad0",
+  "prevIds": ["c094cc31-8bfa-4d3d-b198-641c789a758d"],
+  "ddl": [
+    {
+      "name": "ador",
+      "entityType": "schemas"
+    },
+    {
+      "values": [
+        "organization-created",
+        "membership-created",
+        "membership-updated"
+      ],
+      "name": "account_audit_action",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["active", "suspended"],
+      "name": "account_status",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["owner", "admin", "editor", "analyst"],
+      "name": "organization_role",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["reviewer", "staff"],
+      "name": "platform_role",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["sign-in", "link-wallet", "step-up"],
+      "name": "auth_challenge_action",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "passkey-linked",
+        "passkey-unlinked",
+        "wallet-linked",
+        "wallet-unlinked"
+      ],
+      "name": "auth_security_action",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "submit",
+        "start-review",
+        "approve",
+        "request-changes",
+        "reject",
+        "suspend",
+        "reinstate",
+        "revoke"
+      ],
+      "name": "collection_submission_action",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "submitted",
+        "under-review",
+        "approved",
+        "changes-requested",
+        "rejected",
+        "suspended",
+        "revoked"
+      ],
+      "name": "collection_submission_state",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "save-draft",
+        "submit",
+        "start-review",
+        "approve",
+        "request-changes",
+        "reject",
+        "resubmit",
+        "suspend",
+        "reinstate",
+        "revoke"
+      ],
+      "name": "creator_admission_action",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "draft",
+        "submitted",
+        "under-review",
+        "approved",
+        "changes-requested",
+        "rejected",
+        "suspended",
+        "revoked"
+      ],
+      "name": "creator_application_state",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["thumbnail", "preview"],
+      "name": "derivative_kind",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["pending", "delivering", "delivered", "failed"],
+      "name": "outbox_status",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "pending-validation",
+        "validated",
+        "rejected",
+        "processed",
+        "unprocessable"
+      ],
+      "name": "asset_processing_state",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "unsupported-format",
+        "media-type-mismatch",
+        "size-exceeded",
+        "byte-length-mismatch",
+        "malformed",
+        "animation-unsupported",
+        "dimensions-exceeded",
+        "pixels-exceeded",
+        "decode-failed",
+        "decoded-size-mismatch",
+        "content-changed",
+        "processing-limit-exceeded"
+      ],
+      "name": "asset_rejection_reason",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["image/jpeg", "image/png", "image/webp"],
+      "name": "upload_content_type",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": ["reserved", "completed", "cancelled", "failed", "abandoned"],
+      "name": "upload_intent_state",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "values": [
+        "collection-artwork",
+        "collection-banner",
+        "collection-item-artwork",
+        "creator-avatar"
+      ],
+      "name": "upload_purpose",
+      "entityType": "enums",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "account_audit_events",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "organization_memberships",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "organizations",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "platform_role_assignments",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "auth_security_events",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "auth_sessions",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "auth_users",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "passkey_challenges",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "passkey_credentials",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "released_wallets",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "wallet_challenges",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "wallet_identities",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "collection_review_events",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "collection_submissions",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "collection_items",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "collections",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "creator_admission_events",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "creator_application_snapshots",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "creator_applications",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "asset_derivatives",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "game_milestone_counters",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "game_milestone_unlocks",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "game_saves",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "outbox_events",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "rate_limit_windows",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "assets",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "upload_intents",
+      "entityType": "tables",
+      "schema": "ador"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "account_audit_action",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actor_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "organization_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "target_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "organization_role",
+      "typeSchema": "ador",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "previous_role",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "account_status",
+      "typeSchema": "ador",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "previous_status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "organization_role",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "next_role",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "account_status",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "next_status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "policy_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "reason_code",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correlation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "organization_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "organization_role",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "account_status",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'active'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "type": "account_status",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'active'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "platform_role",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "account_status",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'active'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "auth_security_action",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actor_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "session_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "credential_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correlation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "token_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "authenticated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idle_expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "absolute_expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revoked_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ip_address",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_agent",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "email_verified",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "image",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "auth_users"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "session_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "challenge_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "origin",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "relying_party_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "consumed_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issued_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "credential_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "bytea",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "public_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "counter",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "device_type",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "backed_up",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "transports",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "network",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "script_identity",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "previous_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "released_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "held_until",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expected_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "auth_challenge_action",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "address",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "script_identity",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "network",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "domain",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "origin",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "uri",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "wallet_adapter",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "signature_scheme",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nonce",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "message_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "schema_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "attempts",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issued_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "consumed_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "network",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "address",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "script_identity",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "wallet_adapter",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "submission_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actor_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "collection_submission_action",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "collection_submission_state",
+      "typeSchema": "ador",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "previous_state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "collection_submission_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "next_state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "reason_code",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "''",
+      "generated": null,
+      "identity": null,
+      "name": "creator_feedback",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "''",
+      "generated": null,
+      "identity": null,
+      "name": "private_notes",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "policy_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correlation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idempotency_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "collection_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "owner_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sequence",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "collection_revision",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "schema_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "snapshot",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "payload_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "collection_submission_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'submitted'",
+      "generated": null,
+      "identity": null,
+      "name": "state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "collection_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "position",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "description",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "image_asset_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "attributes",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idempotency_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "owner_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "chain_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "description",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "provenance",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "planned_supply",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "cover_asset_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "banner_asset_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "revision",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idempotency_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "application_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "snapshot_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actor_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "creator_admission_action",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "creator_application_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "previous_state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "creator_application_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "next_state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "reason_code",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "''",
+      "generated": null,
+      "identity": null,
+      "name": "creator_feedback",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "''",
+      "generated": null,
+      "identity": null,
+      "name": "private_notes",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'[]'",
+      "generated": null,
+      "identity": null,
+      "name": "evidence_references",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "policy_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correlation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idempotency_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "application_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "submitted_by_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sequence",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "schema_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "verified_contact_email",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "payload",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "payload_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "applicant_user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "creator_application_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'draft'",
+      "generated": null,
+      "identity": null,
+      "name": "state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "draft",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "revision",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "asset_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "derivative_kind",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "kind",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "spec_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "storage_provider_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "object_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "upload_content_type",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "content_type",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "byte_length",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "width_pixels",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "height_pixels",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "content_sha256",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "milestone_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "current",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "milestone_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "unlocked_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "count",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'self-reported'",
+      "generated": null,
+      "identity": null,
+      "name": "verification",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "game_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "player_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "progress",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "progress_bytes",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "progress_saved_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "attempts",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "available_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "causation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correlation_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "delivered_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "event_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "event_name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "failure_reason",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "lease_expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "lease_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "occurred_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "payload",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "schema_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "outbox_status",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'pending'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "bucket",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "subject_hash",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "window_start",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "hits",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "upload_intent_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "storage_provider_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "object_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "observed_byte_length",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "observed_content_type",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "observed_entity_tag",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "observed_last_modified_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "asset_processing_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'pending-validation'",
+      "generated": null,
+      "identity": null,
+      "name": "processing_state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "validation_completed_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "processing_completed_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "validator_version",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "validated_entity_tag",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "content_sha256",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "upload_content_type",
+      "typeSchema": "ador",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "detected_content_type",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "width_pixels",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "height_pixels",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "asset_rejection_reason",
+      "typeSchema": "ador",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "rejection_reason",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "upload_purpose",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "purpose",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "file_name",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "upload_content_type",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "content_type",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "byte_length",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "storage_provider_id",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "object_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "upload_intent_state",
+      "typeSchema": "ador",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'reserved'",
+      "generated": null,
+      "identity": null,
+      "name": "state",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "idempotency_key",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_fingerprint",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "cleanup_eligible_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "retain_until",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "object_removed_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "organization_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "account_audit_events_org_created_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "organization_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "organization_memberships_org_user_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "organization_memberships_user_id_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "organization_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "role",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "organization_memberships_org_role_status_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "role",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "platform_role_assignments_user_role_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "role",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "platform_role_assignments_role_status_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "actor_user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_security_events_actor_created_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "token_hash",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_sessions_token_hash_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_sessions_user_id_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "expires_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "passkey_challenges_expiry_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "credential_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "passkey_credentials_credential_id_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "passkey_credentials_user_id_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "network",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "script_identity",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "released_wallets_network_script_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "nonce",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "wallet_challenges_nonce_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "expires_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "wallet_challenges_expiry_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "network",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "script_identity",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "wallet_identities_network_script_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "wallet_identities_user_id_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "idempotency_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_review_events_idempotency_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "submission_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_review_events_submission_created_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "collection_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "sequence",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_submissions_collection_sequence_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "collection_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": "\"state\" in ('submitted', 'under-review', 'approved', 'suspended')",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_submissions_one_live_per_collection",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "state",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "updated_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_submissions_state_updated_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "collection_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "position",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_items_collection_position_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "collection_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "idempotency_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collection_items_collection_idempotency_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "owner_user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "idempotency_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collections_owner_idempotency_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "owner_user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "updated_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "collections_owner_updated_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "idempotency_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "creator_events_idempotency_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "application_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "creator_events_application_created_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "application_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "sequence",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "creator_snapshots_application_sequence_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "applicant_user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "creator_applications_applicant_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "state",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "updated_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "creator_applications_state_updated_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "asset_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "kind",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "spec_version",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "asset_derivatives_asset_kind_spec_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "available_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "outbox_delivery_candidates",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "window_start",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "rate_limit_windows_start_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "upload_intent_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "assets_upload_intent_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "assets_user_created_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "idempotency_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "upload_intents_user_idempotency_unique",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "state",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "expires_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "upload_intents_active_user_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "cleanup_eligible_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": "\"state\" in ('reserved', 'failed') or (\"state\" = 'abandoned' and \"object_removed_at\" is null)",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "upload_intents_cleanup_idx",
+      "entityType": "indexes",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["actor_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "account_audit_events_actor_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["organization_id"],
+      "schemaTo": "ador",
+      "tableTo": "organizations",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "account_audit_events_organization_id_organizations_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["target_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "account_audit_events_target_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["organization_id"],
+      "schemaTo": "ador",
+      "tableTo": "organizations",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "organization_memberships_organization_id_organizations_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "organization_memberships_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "organization_memberships"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "platform_role_assignments_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "platform_role_assignments"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["actor_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "auth_security_events_actor_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["session_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_sessions",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "auth_security_events_session_id_auth_sessions_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "auth_sessions_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "passkey_challenges_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["session_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_sessions",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "passkey_challenges_session_id_auth_sessions_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "passkey_credentials_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["previous_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "released_wallets_previous_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["expected_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "wallet_challenges_expected_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "wallet_identities_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["submission_id"],
+      "schemaTo": "ador",
+      "tableTo": "collection_submissions",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_review_events_45kKpDSi5ty7_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["actor_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_review_events_actor_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["collection_id"],
+      "schemaTo": "ador",
+      "tableTo": "collections",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_submissions_collection_id_collections_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["owner_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_submissions_owner_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["collection_id"],
+      "schemaTo": "ador",
+      "tableTo": "collections",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_items_collection_id_collections_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["image_asset_id"],
+      "schemaTo": "ador",
+      "tableTo": "assets",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collection_items_image_asset_id_assets_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["owner_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collections_owner_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["cover_asset_id"],
+      "schemaTo": "ador",
+      "tableTo": "assets",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collections_cover_asset_id_assets_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["banner_asset_id"],
+      "schemaTo": "ador",
+      "tableTo": "assets",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "collections_banner_asset_id_assets_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["application_id"],
+      "schemaTo": "ador",
+      "tableTo": "creator_applications",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_admission_events_neS4CtPDyx1S_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["snapshot_id"],
+      "schemaTo": "ador",
+      "tableTo": "creator_application_snapshots",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_admission_events_p67iLwn7UB3R_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["actor_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_admission_events_actor_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["application_id"],
+      "schemaTo": "ador",
+      "tableTo": "creator_applications",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_application_snapshots_81VSL4Ifl3B9_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["submitted_by_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_application_snapshots_7LdMOFcYpJxb_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["applicant_user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "creator_applications_applicant_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["asset_id"],
+      "schemaTo": "ador",
+      "tableTo": "assets",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "asset_derivatives_asset_id_assets_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "game_milestone_counters_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "game_milestone_unlocks_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "game_saves_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["upload_intent_id"],
+      "schemaTo": "ador",
+      "tableTo": "upload_intents",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "assets_upload_intent_id_upload_intents_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "assets_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "ador",
+      "tableTo": "auth_users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "upload_intents_user_id_auth_users_id_fkey",
+      "entityType": "fks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "columns": ["user_id", "game_id", "milestone_id"],
+      "nameExplicit": false,
+      "name": "game_milestone_counters_pkey",
+      "entityType": "pks",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "columns": ["user_id", "game_id", "milestone_id"],
+      "nameExplicit": false,
+      "name": "game_milestone_unlocks_pkey",
+      "entityType": "pks",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "columns": ["user_id", "game_id"],
+      "nameExplicit": false,
+      "name": "game_saves_pkey",
+      "entityType": "pks",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "columns": ["bucket", "subject_hash", "window_start"],
+      "nameExplicit": false,
+      "name": "rate_limit_windows_pkey",
+      "entityType": "pks",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "account_audit_events_pkey",
+      "schema": "ador",
+      "table": "account_audit_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "organization_memberships_pkey",
+      "schema": "ador",
+      "table": "organization_memberships",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "organizations_pkey",
+      "schema": "ador",
+      "table": "organizations",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "platform_role_assignments_pkey",
+      "schema": "ador",
+      "table": "platform_role_assignments",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "auth_security_events_pkey",
+      "schema": "ador",
+      "table": "auth_security_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "auth_sessions_pkey",
+      "schema": "ador",
+      "table": "auth_sessions",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "auth_users_pkey",
+      "schema": "ador",
+      "table": "auth_users",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "passkey_challenges_pkey",
+      "schema": "ador",
+      "table": "passkey_challenges",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "passkey_credentials_pkey",
+      "schema": "ador",
+      "table": "passkey_credentials",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "released_wallets_pkey",
+      "schema": "ador",
+      "table": "released_wallets",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "wallet_challenges_pkey",
+      "schema": "ador",
+      "table": "wallet_challenges",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "wallet_identities_pkey",
+      "schema": "ador",
+      "table": "wallet_identities",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "collection_review_events_pkey",
+      "schema": "ador",
+      "table": "collection_review_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "collection_submissions_pkey",
+      "schema": "ador",
+      "table": "collection_submissions",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "collection_items_pkey",
+      "schema": "ador",
+      "table": "collection_items",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "collections_pkey",
+      "schema": "ador",
+      "table": "collections",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "creator_admission_events_pkey",
+      "schema": "ador",
+      "table": "creator_admission_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "creator_application_snapshots_pkey",
+      "schema": "ador",
+      "table": "creator_application_snapshots",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "creator_applications_pkey",
+      "schema": "ador",
+      "table": "creator_applications",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "asset_derivatives_pkey",
+      "schema": "ador",
+      "table": "asset_derivatives",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["event_id"],
+      "nameExplicit": false,
+      "name": "outbox_events_pkey",
+      "schema": "ador",
+      "table": "outbox_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "assets_pkey",
+      "schema": "ador",
+      "table": "assets",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "upload_intents_pkey",
+      "schema": "ador",
+      "table": "upload_intents",
+      "entityType": "pks"
+    },
+    {
+      "nameExplicit": true,
+      "columns": ["player_id"],
+      "nullsNotDistinct": false,
+      "name": "game_saves_player_id_key",
+      "entityType": "uniques",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["email"],
+      "nullsNotDistinct": false,
+      "name": "auth_users_email_key",
+      "schema": "ador",
+      "table": "auth_users",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["object_key"],
+      "nullsNotDistinct": false,
+      "name": "asset_derivatives_object_key_key",
+      "schema": "ador",
+      "table": "asset_derivatives",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["object_key"],
+      "nullsNotDistinct": false,
+      "name": "upload_intents_object_key_key",
+      "schema": "ador",
+      "table": "upload_intents",
+      "entityType": "uniques"
+    },
+    {
+      "value": "length(\"policy_version\") > 0 and \"policy_version\" = btrim(\"policy_version\")",
+      "name": "account_audit_events_policy_version_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "value": "\"reason_code\" ~ '^[a-z][a-z0-9-]{2,63}$'",
+      "name": "account_audit_events_reason_code_valid",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "account_audit_events"
+    },
+    {
+      "value": "length(\"name\") > 0 and \"name\" = btrim(\"name\")",
+      "name": "organizations_name_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "organizations"
+    },
+    {
+      "value": "\"credential_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "auth_security_events_credential_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "auth_security_events"
+    },
+    {
+      "value": "\"idle_expires_at\" <= \"absolute_expires_at\"",
+      "name": "auth_sessions_idle_before_absolute",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "value": "\"token_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "auth_sessions_token_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "auth_sessions"
+    },
+    {
+      "value": "\"challenge_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "passkey_challenges_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "value": "\"expires_at\" > \"issued_at\"",
+      "name": "passkey_challenges_expiry_after_create",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_challenges"
+    },
+    {
+      "value": "\"counter\" between 0 and 9007199254740991",
+      "name": "passkey_credentials_counter_nonnegative",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "value": "\"credential_id\" ~ '^[A-Za-z0-9_-]+$'",
+      "name": "passkey_credentials_id_base64url",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "value": "octet_length(\"public_key\") > 0",
+      "name": "passkey_credentials_public_key_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "value": "\"device_type\" in ('multiDevice', 'singleDevice')",
+      "name": "passkey_credentials_device_type_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "passkey_credentials"
+    },
+    {
+      "value": "\"network\" in ('mainnet', 'signet')",
+      "name": "released_wallets_network_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "value": "\"held_until\" > \"released_at\"",
+      "name": "released_wallets_hold_after_release",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "released_wallets"
+    },
+    {
+      "value": "\"attempts\" >= 0",
+      "name": "wallet_challenges_attempts_nonnegative",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"expires_at\" > \"issued_at\"",
+      "name": "wallet_challenges_expiry_after_issue",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"network\" in ('mainnet', 'signet')",
+      "name": "wallet_challenges_network_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"signature_scheme\" = 'bip322-simple'",
+      "name": "wallet_challenges_signature_scheme_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"schema_version\" = 1",
+      "name": "wallet_challenges_schema_version_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"message_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "wallet_challenges_message_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_challenges"
+    },
+    {
+      "value": "\"network\" in ('mainnet', 'signet')",
+      "name": "wallet_identities_network_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "value": "length(\"wallet_adapter\") > 0 and \"wallet_adapter\" = btrim(\"wallet_adapter\")",
+      "name": "wallet_identities_adapter_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "wallet_identities"
+    },
+    {
+      "value": "\"reason_code\" ~ '^[a-z][a-z0-9-]{2,63}$'",
+      "name": "collection_review_events_reason_code_valid",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "value": "length(\"policy_version\") > 0 and \"policy_version\" = btrim(\"policy_version\")",
+      "name": "collection_review_events_policy_version_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "value": "\"request_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "collection_review_events_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "value": "(\"action\" = 'submit') = (\"previous_state\" is null)",
+      "name": "collection_review_events_previous_state_coherent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_review_events"
+    },
+    {
+      "value": "\"sequence\" > 0",
+      "name": "collection_submissions_sequence_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "value": "\"collection_revision\" > 0",
+      "name": "collection_submissions_revision_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "value": "\"schema_version\" = 1",
+      "name": "collection_submissions_schema_version_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "value": "\"payload_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "collection_submissions_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_submissions"
+    },
+    {
+      "value": "\"position\" > 0",
+      "name": "collection_items_position_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "value": "length(\"name\") between 1 and 120 and \"name\" = btrim(\"name\")",
+      "name": "collection_items_name_valid",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "value": "length(\"description\") <= 1000",
+      "name": "collection_items_description_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "value": "jsonb_typeof(\"attributes\") = 'array' and jsonb_array_length(\"attributes\") <= 32",
+      "name": "collection_items_attributes_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "value": "\"request_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "collection_items_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collection_items"
+    },
+    {
+      "value": "\"revision\" > 0",
+      "name": "collections_revision_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "length(\"name\") between 1 and 120 and \"name\" = btrim(\"name\")",
+      "name": "collections_name_valid",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "length(\"description\") <= 4000 and length(\"provenance\") <= 2000",
+      "name": "collections_text_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "\"planned_supply\" between 1 and 1000000",
+      "name": "collections_planned_supply_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "\"chain_id\" ~ '^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}$'",
+      "name": "collections_chain_id_caip2",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "\"request_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "collections_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "collections"
+    },
+    {
+      "value": "\"reason_code\" ~ '^[a-z][a-z0-9-]{2,63}$'",
+      "name": "creator_events_reason_code_valid",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "value": "length(\"policy_version\") > 0 and \"policy_version\" = btrim(\"policy_version\")",
+      "name": "creator_events_policy_version_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "value": "\"request_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "creator_events_request_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_admission_events"
+    },
+    {
+      "value": "\"sequence\" > 0",
+      "name": "creator_snapshots_sequence_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "value": "\"schema_version\" = 1",
+      "name": "creator_snapshots_schema_version_supported",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "value": "length(\"verified_contact_email\") > 0 and \"verified_contact_email\" = btrim(\"verified_contact_email\")",
+      "name": "creator_snapshots_verified_email_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "value": "\"payload_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "creator_snapshots_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_application_snapshots"
+    },
+    {
+      "value": "\"revision\" > 0",
+      "name": "creator_applications_revision_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "creator_applications"
+    },
+    {
+      "value": "\"byte_length\" > 0",
+      "name": "asset_derivatives_bytes_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "value": "\"width_pixels\" > 0 AND \"height_pixels\" > 0",
+      "name": "asset_derivatives_dimensions_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "value": "\"content_sha256\" ~ '^[0-9a-f]{64}$'",
+      "name": "asset_derivatives_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "value": "length(btrim(\"spec_version\")) > 0",
+      "name": "asset_derivatives_spec_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "value": "length(btrim(\"storage_provider_id\")) > 0",
+      "name": "asset_derivatives_provider_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "asset_derivatives"
+    },
+    {
+      "value": "\"current\" between 0 and 1000000",
+      "name": "game_milestone_counter_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "game_milestone_counters"
+    },
+    {
+      "value": "\"verification\" in ('self-reported')",
+      "name": "game_milestone_verification_known",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "value": "\"count\" between 1 and 1000000",
+      "name": "game_milestone_count_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "game_milestone_unlocks"
+    },
+    {
+      "value": "(\"progress\" is null) = (\"progress_saved_at\" is null)",
+      "name": "game_saves_progress_coherent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "value": "\"progress_bytes\" between 0 and 1048576",
+      "name": "game_saves_bytes_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "game_saves"
+    },
+    {
+      "value": "\"attempts\" >= 0",
+      "name": "outbox_attempts_nonnegative",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "(\"status\" = 'delivering') = (\"lease_id\" is not null and \"lease_expires_at\" is not null)",
+      "name": "outbox_delivery_lease_consistent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "(\"status\" = 'delivered') = (\"delivered_at\" is not null)",
+      "name": "outbox_delivered_time_consistent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "\"status\" <> 'failed' or length(btrim(\"failure_reason\")) > 0",
+      "name": "outbox_failed_reason_required",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "\"event_name\" ~ ('\\.v' || \"schema_version\" || '$')",
+      "name": "outbox_name_version_consistent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "\"schema_version\" > 0",
+      "name": "outbox_schema_version_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "outbox_events"
+    },
+    {
+      "value": "\"hits\" > 0",
+      "name": "rate_limit_hits_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "value": "\"subject_hash\" ~ '^[0-9a-f]{64}$'",
+      "name": "rate_limit_subject_hash_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "value": "length(\"bucket\") between 1 and 128",
+      "name": "rate_limit_bucket_bounded",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "rate_limit_windows"
+    },
+    {
+      "value": "\"observed_byte_length\" > 0",
+      "name": "assets_observed_bytes_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "length(btrim(\"storage_provider_id\")) > 0",
+      "name": "assets_storage_provider_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "(\n    \"processing_state\"::text = 'pending-validation'\n    AND \"validation_completed_at\" IS NULL\n    AND \"validator_version\" IS NULL\n    AND \"validated_entity_tag\" IS NULL\n    AND \"content_sha256\" IS NULL\n    AND \"detected_content_type\" IS NULL\n    AND \"width_pixels\" IS NULL\n    AND \"height_pixels\" IS NULL\n    AND \"rejection_reason\" IS NULL\n    AND \"processing_completed_at\" IS NULL\n  ) OR (\n    \"processing_state\"::text = 'rejected'\n    AND \"validation_completed_at\" IS NOT NULL\n    AND \"validator_version\" IS NOT NULL\n    AND length(btrim(\"validator_version\")) > 0\n    AND \"rejection_reason\" IS NOT NULL\n    AND \"validated_entity_tag\" IS NULL\n    AND \"content_sha256\" IS NULL\n    AND \"detected_content_type\" IS NULL\n    AND \"width_pixels\" IS NULL\n    AND \"height_pixels\" IS NULL\n    AND \"processing_completed_at\" IS NULL\n  ) OR (\n    \"processing_state\"::text = 'validated'\n    AND \"validation_completed_at\" IS NOT NULL\n    AND \"validator_version\" IS NOT NULL\n    AND length(btrim(\"validator_version\")) > 0\n    AND \"validated_entity_tag\" IS NOT NULL\n    AND length(btrim(\"validated_entity_tag\")) > 0\n    AND \"content_sha256\" IS NOT NULL\n    AND \"content_sha256\" ~ '^[0-9a-f]{64}$'\n    AND \"detected_content_type\" IS NOT NULL\n    AND \"width_pixels\" IS NOT NULL\n    AND \"width_pixels\" > 0\n    AND \"height_pixels\" IS NOT NULL\n    AND \"height_pixels\" > 0\n    AND \"rejection_reason\" IS NULL\n    AND \"processing_completed_at\" IS NULL\n  ) OR (\n    \"processing_state\"::text = 'processed'\n    AND \"validation_completed_at\" IS NOT NULL\n    AND \"validator_version\" IS NOT NULL\n    AND length(btrim(\"validator_version\")) > 0\n    AND \"validated_entity_tag\" IS NOT NULL\n    AND length(btrim(\"validated_entity_tag\")) > 0\n    AND \"content_sha256\" IS NOT NULL\n    AND \"content_sha256\" ~ '^[0-9a-f]{64}$'\n    AND \"detected_content_type\" IS NOT NULL\n    AND \"width_pixels\" IS NOT NULL\n    AND \"width_pixels\" > 0\n    AND \"height_pixels\" IS NOT NULL\n    AND \"height_pixels\" > 0\n    AND \"rejection_reason\" IS NULL\n    AND \"processing_completed_at\" IS NOT NULL\n  ) OR (\n    \"processing_state\"::text = 'unprocessable'\n    AND \"validation_completed_at\" IS NOT NULL\n    AND \"validator_version\" IS NOT NULL\n    AND length(btrim(\"validator_version\")) > 0\n    AND \"validated_entity_tag\" IS NOT NULL\n    AND length(btrim(\"validated_entity_tag\")) > 0\n    AND \"content_sha256\" IS NOT NULL\n    AND \"content_sha256\" ~ '^[0-9a-f]{64}$'\n    AND \"detected_content_type\" IS NOT NULL\n    AND \"width_pixels\" IS NOT NULL\n    AND \"width_pixels\" > 0\n    AND \"height_pixels\" IS NOT NULL\n    AND \"height_pixels\" > 0\n    AND \"rejection_reason\" IS NOT NULL\n    AND \"processing_completed_at\" IS NOT NULL\n  )",
+      "name": "assets_validation_coherent",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "length(\"object_key\") > 0",
+      "name": "assets_object_key_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "length(btrim(\"observed_content_type\")) > 0",
+      "name": "assets_content_type_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "length(btrim(\"observed_entity_tag\")) > 0",
+      "name": "assets_entity_tag_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "assets"
+    },
+    {
+      "value": "\"object_removed_at\" is null or \"state\" = 'abandoned'",
+      "name": "upload_intents_removal_requires_abandoned",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "\"file_name\" is null or (length(\"file_name\") between 1 and 255 and \"file_name\" !~ '[/\\\\[:cntrl:]]')",
+      "name": "upload_intents_file_name_bare",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "\"byte_length\" > 0",
+      "name": "upload_intents_byte_length_positive",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "length(btrim(\"storage_provider_id\")) > 0",
+      "name": "upload_intents_storage_provider_nonempty",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "\"request_fingerprint\" ~ '^[0-9a-f]{64}$'",
+      "name": "upload_intents_fingerprint_sha256",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "\"cleanup_eligible_at\" > \"expires_at\"",
+      "name": "upload_intents_cleanup_after_expiry",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    },
+    {
+      "value": "\"retain_until\" > \"cleanup_eligible_at\"",
+      "name": "upload_intents_retention_after_cleanup",
+      "entityType": "checks",
+      "schema": "ador",
+      "table": "upload_intents"
+    }
+  ],
+  "renames": []
+}

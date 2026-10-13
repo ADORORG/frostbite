@@ -8,7 +8,6 @@
     "./allowlists": "./src/allowlists/index.ts",
     "./auth": "./src/auth/wallet-auth-action.ts",
     "./chain": "./src/chain/index.ts",
-    "./wallet-qualification": "./src/auth/qualification.ts",
     "./creator-admission": "./src/creator-admission/index.ts",
     "./decisions": "./src/decisions/gates.ts",
     "./features": "./src/features/manifest.ts",

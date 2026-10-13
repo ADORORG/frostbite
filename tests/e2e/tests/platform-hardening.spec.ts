@@ -77,7 +77,7 @@ test("pages and the studio break no part of the policy they report against, exce
     "/games",
     "/games/frostbite",
     "/collections",
-    "/connect",
+    "/sign-in",
   ])
     await visit(path);
   await signIn(page, baseURL, creatorE2EFixtures.collectionWizardCreator);
@@ -89,11 +89,13 @@ test("pages and the studio break no part of the policy they report against, exce
   ])
     await visit(path);
   // The wallet library tests whether script evaluation is allowed (and copes when it is not). That is the only
-  // thing the policy reports on any page; anything else is a page that would break once the policy is enforced.
+  // thing the policy reports on any page that mounts it (the sign-in page and the account page); anything else is
+  // a page that would break once the policy is enforced.
+  const walletPages = new Set(["/sign-in", "/account"]);
   expect(
     violations.filter(
       ({ message, path }) =>
-        path !== "/connect" ||
+        !walletPages.has(path) ||
         !/Evaluating a string as JavaScript/u.test(message),
     ),
   ).toEqual([]);

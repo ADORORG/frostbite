@@ -1,8 +1,9 @@
 import type { GameWalletConfig } from "@ador/feature-games";
-import type { WalletConnectionConfig } from "@ador/feature-wallet-connection";
-import { walletQualificationDefaults } from "@ador/shared/wallet-qualification";
+import type { WalletAuthConfig } from "@ador/feature-accounts";
 
-export const walletConnectionConfig = {
+// How wallet sign-in behaves and which wallets a player can choose, as the business decided them. A change is a
+// reviewed change to this record.
+export const walletAuthConfig = {
   candidates: [
     { id: "xverse", label: "Xverse" },
     { id: "unisat", label: "UniSat" },
@@ -18,13 +19,18 @@ export const walletConnectionConfig = {
     { id: "binance", label: "Binance" },
     { id: "op_net", label: "OP_NET" },
   ],
+  // A challenge can be signed for five minutes.
+  challengeLifetimeMs: 300_000,
+  // Three wrong signatures kill a challenge, so a guess at a signature is not worth making.
+  maximumVerificationAttempts: 3,
   network: "signet",
-  qualification: walletQualificationDefaults,
-} as const satisfies WalletConnectionConfig;
+  // A wallet an account removed cannot be taken by another account for 24 hours (owner decision, 2026-10-13).
+  releaseHoldMs: 86_400_000,
+} as const satisfies WalletAuthConfig;
 
-// How the games pages reach a wallet: the same network as the connection page, and that page's address, where a
-// player connects one before a game that asked for it can see the address.
+// How the games pages reach a wallet: the same network, and the page where a player connects one and signs in
+// before a game that asked for it can see the address.
 export const gameWalletConfig = {
-  connectHref: "/connect",
-  network: walletConnectionConfig.network,
+  connectHref: "/sign-in",
+  network: walletAuthConfig.network,
 } as const satisfies GameWalletConfig;
