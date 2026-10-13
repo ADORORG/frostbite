@@ -163,6 +163,21 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **Network mismatch (SDK-F):** a **warning badge with the expected network** ("Mainnet - this game uses signet"),
   the player may continue.
 
+### Ninth survey (2026-10-13)
+
+- **Placement (SDK-F):** top-right of the header on every page, replacing the Connect link; avatar and short
+  address when connected.
+- **Balance (SDK-F):** BTC balance in sats and BTC with a last-updated time, refreshed every 60 seconds only while the
+  menu is open, plus a manual refresh. Token balances and pending amounts were not chosen.
+- **Reconnect (SDK-F):** reconnect automatically to the last wallet; the player can disconnect to forget it.
+- **Sign-in (SDK-F): sign-in only through the widget, never elsewhere.** This makes the widget the single sign-in
+  entry point and so **needs wallet message signing to be qualified**, which the physical evidence (W2-10B) has not
+  done; the repository today says a wallet connection is not authentication and sign-in is disabled until that
+  evidence passes. It also touches every other sign-in path in the app (passkey sign-in and linking, the
+  development sign-in picker, the e2e sign-in fixtures). To settle before the plan: what happens to those paths, and
+  what the widget does while wallet sign-in is not qualified (connect without signing in, with the sign-in step shown
+  as unavailable).
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
