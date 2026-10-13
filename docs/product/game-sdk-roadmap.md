@@ -112,6 +112,16 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   links an address to scores (addresses are public; the player should be told before posting).
 - **Milestone progress UI (SDK-3):** a **toast plus the count in the dock** ("First win reached (x3)").
 
+### Fifth survey (2026-10-13)
+
+- **Windows (SDK-2):** **UTC, weeks start Monday**; the board says when it resets (00:00 UTC).
+- **Page size (SDK-2):** **top 50 plus the player's own rank**, per tab.
+- **Hidden entries (SDK-2):** hidden **everywhere** (daily, weekly, all-time) and **ranks recomputed**; the audit
+  record keeps who hid it and why. No replacement by a next-best score.
+- **Builder test tool (SDK-E):** a fake connected wallet with network switching, a signed-out / signed-in switch (shows the
+  local id becoming the account id and `player.changed`), and tab-hidden / full-screen event buttons. Failure and
+  slow-answer injection was not chosen.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
