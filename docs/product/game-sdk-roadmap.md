@@ -44,7 +44,24 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 | SDK-8  | Standalone installable SDK                                                                             | In progress (SDK-D)   | Publish-ready package with a local development host. Publishing itself needs the owner: the package scope, the licence and the registry account.                                                  |
 | SDK-9  | SDK explorer game                                                                                      | In progress (SDK-C)   | A development-only game that calls everything and shows what came back, driven by a real-browser test.                                                                                            |
 
-## Open decisions (for the owner)
+## Owner decisions (2026-10-13, by survey)
+
+- **SDK-1b:** an **opaque per-game player id**, derived on the server from the account, stable across devices once
+  signed in. No name or avatar for now. Status: decided, not built (needs a small server change; signed-out
+  players need a rule, suggested: a local id that is replaced by the account id on sign-in, told to the game with
+  an event).
+- **SDK-2:** **global leaderboards, labelled self-reported.** Boards declared in the manifest, shown as "reported
+  by the game"; needs a server table, rate limits, moderation and a cap on plausible values. Status: decided, not
+  built. Nothing of value may depend on a board.
+- **SDK-3:** progress counts live **in the account state, with a migration**: a target per milestone in the
+  manifest, and the count synced and merged like saves. Status: decided, not built.
+- **SDK-8:** **publish to npm under `@ador`.** Still needed from the owner: confirmation that the `@ador` scope is
+  owned, and the licence (the package says `UNLICENSED` until then; no licence is assumed).
+
+Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
+building, since each changes stored data or a public contract.
+
+## Earlier open questions (answered above)
 
 - **SDK-1b:** is a stable per-game player id wanted, and should it survive signing in (server-derived) or be
   per-browser (random, kept locally)?
