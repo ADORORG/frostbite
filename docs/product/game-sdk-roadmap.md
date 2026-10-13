@@ -58,6 +58,20 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **SDK-8:** **publish to npm under `@ador`.** Still needed from the owner: confirmation that the `@ador` scope is
   owned, and the licence (the package says `UNLICENSED` until then; no licence is assumed).
 
+### Follow-up decisions (2026-10-13, second survey)
+
+- **Signed-out id (SDK-1b):** a **local id replaced on sign-in**. The browser keeps a random id; on sign-in it
+  becomes the account-derived id and the game is told with an event (to be added, e.g. `player.changed`). Games
+  must handle the change; the SDK guide will say so.
+- **Who may post (SDK-2):** **signed-in players only**, one best entry per player per board. Signed-out players can
+  play but not post.
+- **Abuse limits (SDK-2):** a **minimum and maximum per board in the manifest** (out-of-range posts refused), a
+  **rate limit per player per board** (typed policy value), and **staff can hide or remove an entry**, with an audit
+  record. A report button was not chosen.
+- **Board shape (SDK-2):** **daily, weekly and all-time tabs** (chosen over the suggested top-100 all-time). Needs
+  time-window queries and resets: window boundaries (UTC), what happens to an entry hidden by staff in a past
+  window, and the page size per tab are to be fixed in the plan.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
