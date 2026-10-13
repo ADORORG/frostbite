@@ -196,6 +196,18 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   rule for the last remaining method (as for passkeys today); session rotation on link and unlink; the widget menu
   lists linked wallets and the account's sign-in methods; the email adapter is designed for but not built.
 
+### Eleventh survey (2026-10-13): linking rules (SDK-G)
+
+- **Wallet already on another account:** **refuse without saying whose it is** (a generic "cannot link", as passkey
+  linking does), so nobody can discover which wallets have accounts. No merge, no takeover.
+- **Unlinking:** an account **cannot remove its last sign-in method**; removal **needs a recent signature or passkey
+  step-up**; **all other sessions are signed out** on removal. A removed wallet may be linked elsewhere right away
+  was not chosen, so the plan should add a short hold on a removed wallet (to settle).
+- **Primary wallet:** the widget shows **the wallet currently connected in the browser**; a linked wallet that is not
+  connected is listed in the menu as "linked".
+- **Connected wallet not linked to the signed-in account:** the widget shows **"not linked" with a "Link this
+  wallet" action** (a signature); the account stays signed in.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
