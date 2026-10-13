@@ -87,6 +87,17 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   games open the same modal through `wallet.connect()`. Open for its plan: where a balance comes from, where an
   avatar comes from (no profile exists), and what happens to the wallet-qualification page. Task #55.
 
+### Wallet widget survey (2026-10-13)
+
+- **Balance:** from the **chain indexer through our server**, with loading, stale and error states shown honestly.
+- **Avatar:** **generated from the address** (deterministic, no profile or upload).
+- **Menu when connected:** address with a copy button, balance with refresh, switch wallet / disconnect. (A link to
+  the player's games and milestones was not chosen.)
+- **`/connect`:** the owner said the app is **not public and has no live deployment**, so `/connect` **can simply be
+  removed**, and the app should be treated as **fresh, expecting a lot of modification and reshaping** (no
+  compatibility or redirect burden). Still to confirm in the plan: what happens to the wallet-qualification tooling
+  (physical-wallet evidence, W2-10B) once its page goes: keep it as a staff-only route, or remove it with the page.
+
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.
 
