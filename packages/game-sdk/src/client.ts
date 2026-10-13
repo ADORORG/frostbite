@@ -65,7 +65,18 @@ export interface GameClient {
   readonly capabilities: { get(): Promise<Result<"capabilities.get">> };
   dispose(): void;
   readonly milestones: {
+    // How many times each milestone has been earned and, for one with a target, the total reported and the target.
+    counts(): Promise<Result<"milestones.counts">["counts"]>;
     list(): Promise<Result<"milestones.list">["milestones"]>;
+    // Reports the game's current total toward a milestone's target (7 of 10 wins). Send the total, not the change:
+    // the platform keeps the larger of it and what it holds, so a repeated or late report cannot count twice, and it
+    // earns the milestone when the total reaches the target.
+    progress(
+      id: string,
+      current: number,
+    ): Promise<Result<"milestones.progress">>;
+    // Reports a milestone earned. For a repeatable milestone each call is counted, up to the manifest's maximum;
+    // read the count with `counts()`. A milestone with a target is earned through `progress` instead.
     unlock(id: string): Promise<Result<"milestones.unlock">>;
   };
   readonly player: {
@@ -202,7 +213,9 @@ export function createGameClient(
       waiting.clear();
     },
     milestones: {
+      counts: async () => (await call("milestones.counts", {})).counts,
       list: async () => (await call("milestones.list", {})).milestones,
+      progress: (id, current) => call("milestones.progress", { current, id }),
       unlock: (id) => call("milestones.unlock", { id }),
     },
     player: {

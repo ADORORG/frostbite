@@ -15,7 +15,7 @@ import {
 import { game, memoryBackend, outcome, request } from "./support.ts";
 
 const accountId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
-const empty = { milestones: [], progress: null };
+const empty = { counters: [], milestones: [], progress: null };
 
 function memoryStorage(map = new Map<string, string>()): KeyValueStorage & {
   readonly map: Map<string, string>;

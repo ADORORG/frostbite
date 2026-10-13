@@ -8,7 +8,7 @@ import { signIn } from "../src/upload-helpers.ts";
 // signs in, then the account's, the same on every device. Read through the SDK explorer in the real frame.
 const frameSelector = '[data-testid="game-frame"]';
 const syncPath = "/api/v1/games/sync";
-const empty = { milestones: [], progress: null };
+const empty = { counters: [], milestones: [], progress: null };
 
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop only.");

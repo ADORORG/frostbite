@@ -12,7 +12,7 @@ the account and (later) minting; the game owns only its rules and its drawing.
 
 - `./protocol`: the versioned message protocol (channel `ador-game`, version 1), as schemas. One `methods` table
   is the source of truth for names, parameters and results.
-- `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock`,
+- `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock/progress/counts`,
   `player.info`, `player.identity` (an opaque per-game id; `player.changed` when it changes on sign-in), `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability),
   `capabilities.get`, `ui.toast`, and `on(event, handler)` for what the platform tells the game
   (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`). Failures surface as `GameHostError` with a stable

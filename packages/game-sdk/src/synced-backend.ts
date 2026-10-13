@@ -115,9 +115,19 @@ export function createSyncedBackend(options: {
       push();
     },
     status: () => status,
-    unlock: async (id, now) => {
+    counters: async () => {
       await reconciled;
-      const result = await local.unlock(id, now);
+      return local.counters();
+    },
+    reportProgress: async (id, current, target, now) => {
+      await reconciled;
+      const result = await local.reportProgress(id, current, target, now);
+      push();
+      return result;
+    },
+    unlock: async (id, now, max) => {
+      await reconciled;
+      const result = await local.unlock(id, now, max);
       push();
       return result;
     },

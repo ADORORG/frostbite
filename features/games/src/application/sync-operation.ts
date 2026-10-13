@@ -36,6 +36,11 @@ export function createSyncGameStateOperation(
             "invalid_request",
             "A milestone is not one this game declares.",
           );
+        case "no-target":
+          return failure(
+            "invalid_request",
+            "A total was reported for a milestone that has no target.",
+          );
         case "too-large":
           return failure("invalid_request", "The saved progress is too large.");
       }

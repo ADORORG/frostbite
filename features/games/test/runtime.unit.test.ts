@@ -12,7 +12,7 @@ const environment = {
   DATABASE_STATEMENT_TIMEOUT_MS: "1000",
   DATABASE_URL: "postgresql://nobody:nothing@127.0.0.1:1/none",
 } as const;
-const empty = { milestones: [], progress: null };
+const empty = { counters: [], milestones: [], progress: null };
 
 describe("the games' account service", () => {
   it("knows the listed games and the milestones each declares, and holds saves to the host policy's limit", async () => {
@@ -24,10 +24,12 @@ describe("the games' account service", () => {
       await service.sync("u1", {
         gameId: embeddedGame.id,
         state: {
+          counters: [],
           milestones: [
             {
               id: "never-declared",
               unlockedAt: "2026-10-01T00:00:00.000Z",
+              count: 1,
               verification: "self-reported",
             },
           ],
@@ -39,6 +41,7 @@ describe("the games' account service", () => {
       await service.sync("u1", {
         gameId: embeddedGame.id,
         state: {
+          counters: [],
           milestones: [],
           progress: {
             savedAt: "2026-10-01T00:00:00.000Z",

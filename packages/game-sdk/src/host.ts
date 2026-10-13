@@ -10,92 +10,29 @@ import {
   requiredEventCapability,
   toastMaxLength,
   type ErrorCode,
-  type EventData,
   type EventMessage,
-  type EventName,
-  type JsonValue,
   type MethodName,
-  type MilestoneStatus,
-  type PlayerIdentity,
-  type PlayerInfo,
   type Request,
   type Response,
-  type WalletInfo,
-  verificationSchema,
 } from "./protocol.ts";
 import { defaultGameHostPolicy, type GameHostPolicy } from "./policy.ts";
+export type {
+  GameHost,
+  GameHostBackend,
+  HostedGame,
+  HostEvent,
+  HostServices,
+} from "./host-types.ts";
+import type {
+  GameHost,
+  GameHostBackend,
+  HostedGame,
+  HostEvent,
+  HostServices,
+} from "./host-types.ts";
+import { createMilestoneHandlers } from "./host-milestones.ts";
 import { createRateLimiter } from "./rate-limit.ts";
-
-// What the host keeps for a player on behalf of a game. The host owns storage and, later, the account; a game
-// never sees where this lives.
-export interface GameHostBackend {
-  // Who the game is told the player is. A backend that reconciles with an account answers once that is done,
-  // so a signed-in player is never first shown an id that is about to change.
-  identity(): Promise<PlayerIdentity>;
-  loadProgress(): Promise<JsonValue | null>;
-  milestones(): Promise<
-    Readonly<
-      Record<string, { unlockedAt: string; verification: "self-reported" }>
-    >
-  >;
-  player(): PlayerInfo;
-  saveProgress(state: JsonValue, now: Date): Promise<void>;
-  unlock(
-    id: string,
-    now: Date,
-  ): Promise<{ alreadyUnlocked: boolean; unlockedAt: string }>;
-}
-
-// The parts of a game's manifest the host needs: who it is, what it asked for, and which milestones it
-// declared. A game that declares no capabilities is granted none.
-export interface HostedGame {
-  readonly capabilities?: readonly string[];
-  readonly id: string;
-  readonly milestones: readonly {
-    readonly claimPolicy: "once" | "repeatable";
-    readonly criteria: string;
-    readonly description: string;
-    readonly id: string;
-    readonly title: string;
-  }[];
-}
-
-// What the page shows the player as it happens.
-export type HostEvent =
-  | { readonly type: "ready" }
-  | { readonly type: "progress-saved"; readonly savedAt: string }
-  | { readonly id: string; readonly type: "milestone-unlocked" }
-  | {
-      readonly code: ErrorCode;
-      readonly method: string;
-      readonly type: "refused";
-    };
-
-// What the page lends a game, beyond the player's saved state. Each is optional: a page that cannot offer it
-// says so truthfully (no wallet, nothing shown) rather than pretending.
-export interface HostServices {
-  // Shows the player a short plain-text message from the game.
-  toast?(message: string): void;
-  // The wallet the player has connected right now, or none.
-  wallet?(): WalletInfo | null;
-}
-
-export interface GameHost {
-  // Tells the game something happened. Sent only after the game has called `ready`, and, for the wallet, only
-  // when the game declared the capability. The data is checked before it leaves.
-  emit<Name extends EventName>(name: Name, data: EventData<Name>): void;
-  // One message from the game's frame. The caller has already checked it came from that frame.
-  handle(data: unknown): Promise<void>;
-}
-
-class Refusal extends Error {
-  constructor(
-    readonly code: ErrorCode,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+import { Refusal } from "./refusal.ts";
 
 // The host side of the conversation. It answers only what the protocol lists, refuses anything else, checks
 // every value in both directions, and keeps a game from saving too much or calling too often. A failure in the
@@ -116,7 +53,23 @@ export function createGameHost(options: {
   const now = options.now ?? (() => new Date());
   const policy = options.policy ?? defaultGameHostPolicy;
   let ready = false;
-  const { within } = createRateLimiter(now, ["save", "toast", "unlock"]);
+  const { within } = createRateLimiter(now, [
+    "progress",
+    "save",
+    "toast",
+    "unlock",
+  ]);
+  const milestones = createMilestoneHandlers({
+    backend,
+    game,
+    limits: {
+      progress: policy.progressCallsPerMinute,
+      unlock: policy.unlockCallsPerMinute,
+    },
+    now,
+    onEvent,
+    within,
+  });
 
   async function run(name: MethodName, params: unknown): Promise<unknown> {
     switch (name) {
@@ -172,41 +125,18 @@ export function createGameHost(options: {
         onEvent?.({ savedAt: savedAt.toISOString(), type: "progress-saved" });
         return { savedAt: savedAt.toISOString() };
       }
-      case "milestones.list": {
-        const unlocked = await backend.milestones();
-        const milestones: MilestoneStatus[] = game.milestones.map(
-          (milestone) => {
-            const record = unlocked[milestone.id];
-            return {
-              ...milestone,
-              status: record === undefined ? "locked" : "unlocked",
-              unlockedAt: record?.unlockedAt ?? null,
-              verification:
-                record === undefined
-                  ? null
-                  : verificationSchema.parse(record.verification),
-            };
-          },
+      case "milestones.counts":
+        return milestones.counts();
+      case "milestones.list":
+        return milestones.list();
+      case "milestones.progress":
+        return milestones.progress(
+          methods["milestones.progress"].params.parse(params),
         );
-        return { milestones };
-      }
-      case "milestones.unlock": {
-        const { id } = methods["milestones.unlock"].params.parse(params);
-        if (!game.milestones.some((milestone) => milestone.id === id))
-          throw new Refusal(
-            "unknown_milestone",
-            "This game has no such milestone.",
-          );
-        if (!within("unlock", policy.unlockCallsPerMinute))
-          throw new Refusal("rate_limited", "Unlocking too often.");
-        const result = await backend.unlock(id, now());
-        if (!result.alreadyUnlocked)
-          onEvent?.({ id, type: "milestone-unlocked" });
-        return {
-          status: result.alreadyUnlocked ? "already-unlocked" : "unlocked",
-          unlockedAt: result.unlockedAt,
-        };
-      }
+      case "milestones.unlock":
+        return milestones.unlock(
+          methods["milestones.unlock"].params.parse(params),
+        );
     }
   }
 

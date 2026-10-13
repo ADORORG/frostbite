@@ -2,7 +2,12 @@ import { getTableName } from "drizzle-orm";
 import { getTableConfig } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 
-import { authUsers, gameMilestoneUnlocks, gameSaves } from "../src/index.ts";
+import {
+  authUsers,
+  gameMilestoneCounters,
+  gameMilestoneUnlocks,
+  gameSaves,
+} from "../src/index.ts";
 
 describe("game save schema", () => {
   it("belongs to a player, one save per game, and goes with the player", () => {
@@ -42,6 +47,23 @@ describe("game save schema", () => {
     ]);
     expect(config.checks.map(({ name }) => name)).toEqual([
       "game_milestone_verification_known",
+      "game_milestone_count_bounded",
+    ]);
+    const count = config.columns.find(({ name }) => name === "count");
+    expect(count?.notNull).toBe(true);
+    expect(count?.hasDefault).toBe(true);
+    expect(config.foreignKeys.map((key) => key.onDelete)).toEqual(["cascade"]);
+  });
+
+  it("keeps one running total per player, game and milestone, bounded, and goes with the player", () => {
+    const config = getTableConfig(gameMilestoneCounters);
+    expect(config.primaryKeys[0]?.columns.map(({ name }) => name)).toEqual([
+      "user_id",
+      "game_id",
+      "milestone_id",
+    ]);
+    expect(config.checks.map(({ name }) => name)).toEqual([
+      "game_milestone_counter_bounded",
     ]);
     expect(config.foreignKeys.map((key) => key.onDelete)).toEqual(["cascade"]);
   });

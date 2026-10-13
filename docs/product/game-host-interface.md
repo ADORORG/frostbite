@@ -35,18 +35,20 @@ A small versioned protocol over `postMessage`, wrapped by a `@ador/game-sdk` pac
 functions. Every message carries protocol version, request id and a payload validated on both sides; the host
 accepts messages only from the game's own frame.
 
-| Call                    | What it does                                                                                             |
-| ----------------------- | -------------------------------------------------------------------------------------------------------- |
-| `ready({ version })`    | The game has loaded; the host answers with the player's state and what it supports.                      |
-| `progress.load()`       | Returns the game's saved state (a JSON value) or nothing.                                                |
-| `progress.save(state)`  | Saves it. Size-limited (typed policy), versioned, validated as JSON.                                     |
-| `milestones.list()`     | The milestones the game declared (from its manifest) with the player's status of each.                   |
-| `milestones.unlock(id)` | The player earned it. Idempotent; only declared ids; counted against limits.                             |
-| `player.info()`         | Signed in or not, wallet connected or not (a yes or no).                                                 |
-| `player.identity()`     | An opaque id for the player in this game; local until sign-in, then the account's (Amendment 3).         |
-| `wallet.get()`          | The connected wallet's public address and network, or none. Needs the `wallet` capability (Amendment 2). |
-| `capabilities.get()`    | The methods, events and limits the platform supports, and what this game was granted.                    |
-| `ui.toast(message)`     | Asks the page to show a short plain message, labelled with the game's name.                              |
+| Call                               | What it does                                                                                             |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `ready({ version })`               | The game has loaded; the host answers with the player's state and what it supports.                      |
+| `progress.load()`                  | Returns the game's saved state (a JSON value) or nothing.                                                |
+| `progress.save(state)`             | Saves it. Size-limited (typed policy), versioned, validated as JSON.                                     |
+| `milestones.list()`                | The milestones the game declared (from its manifest) with the player's status of each.                   |
+| `milestones.unlock(id)`            | The player earned it. Idempotent; only declared ids; counted against limits.                             |
+| `player.info()`                    | Signed in or not, wallet connected or not (a yes or no).                                                 |
+| `milestones.progress(id, current)` | Reports the total toward a milestone's target; earned at the target (Amendment 4).                       |
+| `milestones.counts()`              | How often each milestone was earned and the total toward each target.                                    |
+| `player.identity()`                | An opaque id for the player in this game; local until sign-in, then the account's (Amendment 3).         |
+| `wallet.get()`                     | The connected wallet's public address and network, or none. Needs the `wallet` capability (Amendment 2). |
+| `capabilities.get()`               | The methods, events and limits the platform supports, and what this game was granted.                    |
+| `ui.toast(message)`                | Asks the page to show a short plain message, labelled with the game's name.                              |
 
 The host never forwards cookies, wallet objects, keys, signatures or raw transactions to the game. **Amendment 2
 (owner, 2026-10-13):** the wallet's public **address** and network name are given to a game that declared the
@@ -141,3 +143,10 @@ A game is told an opaque, random id for the player in that game (`player.identit
 when it changes). It is this browser's until the player signs in, then the account's, stored with the player's save
 for that game (migration `game_player_id`). It is not derived from the account or from another game's id, so games
 cannot link a player. Name and avatar are not exposed (no profile exists yet).
+
+## 10. Amendment 4 (owner, 2026-10-13): progress and counted milestones
+
+A manifest milestone may declare a `target` (earned once, reported as a running total) or, if repeatable, a required
+`maxCount`. The account holds the totals and counts (migration `game_milestone_progress`) and enforces the limits
+itself: a count is cut to its maximum, a total to its target, and a milestone whose total reaches its target is earned
+by the account, at the time it first saw the total reach it. Counts and totals merge by the larger side.

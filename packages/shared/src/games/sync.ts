@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { gameIdSchema } from "./manifest.ts";
+import { gameIdSchema, gameManifestLimits } from "./manifest.ts";
 
 const timestamp = z.iso.datetime({ offset: true });
 
@@ -14,14 +14,28 @@ export const gameProgressSchema = z
 // nothing with money or privilege may depend on it (ADR-018).
 export const gameMilestoneRecordSchema = z
   .object({
+    // How many times the player earned it: 1 for a milestone earned once, up to the manifest's maximum for a
+    // repeatable one. Merged by the larger side, so a replayed sync changes nothing; two devices that each earned it
+    // while offline are counted once between them, which the page says nowhere it could be mistaken for a total.
+    count: z.number().int().min(1).max(gameManifestLimits.milestoneCount),
     id: gameIdSchema,
     unlockedAt: timestamp,
     verification: z.literal("self-reported"),
   })
   .strict();
 
+// Progress toward the target of a milestone not yet earned (7 of 10 wins): the game's current total, merged by the
+// larger side. Reaching the target earns the milestone.
+export const gameCounterSchema = z
+  .object({
+    current: z.number().int().min(0).max(gameManifestLimits.milestoneCount),
+    id: gameIdSchema,
+  })
+  .strict();
+
 export const gameStateSchema = z
   .object({
+    counters: z.array(gameCounterSchema),
     milestones: z.array(gameMilestoneRecordSchema),
     progress: gameProgressSchema.nullable(),
   })
@@ -44,6 +58,7 @@ export const gameSyncRoute = {
   path: "/api/v1/games/sync",
 } as const;
 
+export type GameCounter = z.infer<typeof gameCounterSchema>;
 export type GameMilestoneRecord = z.infer<typeof gameMilestoneRecordSchema>;
 export type GameProgress = z.infer<typeof gameProgressSchema>;
 export type GameState = z.infer<typeof gameStateSchema>;
@@ -85,13 +100,22 @@ export function mergeGameState(
         ? { ...record, unlockedAt: now.toISOString() }
         : record;
     const existing = milestones.get(record.id);
-    if (
-      existing === undefined ||
+    // The earliest time and the larger count, each from whichever side has it.
+    milestones.set(record.id, {
+      ...(existing === undefined ||
       Date.parse(bounded.unlockedAt) < Date.parse(existing.unlockedAt)
-    )
-      milestones.set(record.id, bounded);
+        ? bounded
+        : existing),
+      count: Math.max(existing?.count ?? 0, record.count),
+    });
   }
+  const counters = new Map<string, number>();
+  for (const { current, id } of [...stored.counters, ...incoming.counters])
+    counters.set(id, Math.max(counters.get(id) ?? 0, current));
   return {
+    counters: [...counters]
+      .map(([id, current]) => ({ current, id }))
+      .sort((a, b) => a.id.localeCompare(b.id)),
     milestones: [...milestones.values()].sort((a, b) =>
       a.id.localeCompare(b.id),
     ),

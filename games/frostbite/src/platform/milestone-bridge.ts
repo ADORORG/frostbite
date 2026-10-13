@@ -10,9 +10,9 @@ export function milestoneIdOf(mark: string): string {
 // game calls this for every mark it makes; a mark the manifest does not declare is simply not reported, so which
 // of the game's marks count is the manifest's decision and not the game's. A failed call is dropped: the game
 // plays on and the mark is tried again the next time the game makes it.
-export async function createMilestoneBridge(
-  client: Pick<GameClient, "milestones">,
-) {
+export async function createMilestoneBridge(client: {
+  readonly milestones: Pick<GameClient["milestones"], "list" | "unlock">;
+}) {
   const declared = new Set(
     (await client.milestones.list().catch(() => [])).map(({ id }) => id),
   );

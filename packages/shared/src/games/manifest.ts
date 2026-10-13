@@ -8,6 +8,7 @@ export const gameManifestLimits = Object.freeze({
   capabilities: 16,
   coverAlt: 200,
   description: 2_000,
+  milestoneCount: 1_000_000,
   milestoneCriteria: 500,
   milestoneDescription: 500,
   milestoneTitle: 80,
@@ -52,9 +53,44 @@ export const gameMilestoneSchema = z
       .min(1)
       .max(gameManifestLimits.milestoneDescription),
     id: gameIdSchema,
+    // A repeatable milestone is counted each time the game reports it, up to this many; a count above it is
+    // ignored. Required for a repeatable milestone (so a game that misreports cannot inflate a count without
+    // limit) and meaningless for one earned once.
+    maxCount: z
+      .number()
+      .int()
+      .min(2)
+      .max(gameManifestLimits.milestoneCount)
+      .optional(),
+    // A milestone earned once may need progress toward a goal (7 of 10 wins): the game reports the current total
+    // and the milestone is earned when it reaches this number. Without one, the game reports it earned directly.
+    target: z
+      .number()
+      .int()
+      .min(2)
+      .max(gameManifestLimits.milestoneCount)
+      .optional(),
     title: z.string().trim().min(1).max(gameManifestLimits.milestoneTitle),
   })
-  .strict();
+  .strict()
+  .refine(
+    ({ claimPolicy, maxCount }) =>
+      claimPolicy === "repeatable"
+        ? maxCount !== undefined
+        : maxCount === undefined,
+    {
+      message:
+        "A repeatable milestone needs a maximum count, and a milestone earned once cannot have one.",
+      path: ["maxCount"],
+    },
+  )
+  .refine(
+    ({ claimPolicy, target }) => claimPolicy === "once" || target === undefined,
+    {
+      message: "Only a milestone earned once can have a target to reach.",
+      path: ["target"],
+    },
+  );
 
 const webUrlSchema = z.url({ protocol: /^https?$/u });
 

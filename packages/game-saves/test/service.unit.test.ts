@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createGameSyncService } from "../src/service.ts";
 import { createMemoryRepository } from "./support/memory-repository.ts";
+import { rules } from "./support/rules.ts";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 const now = new Date("2026-10-12T12:00:00.000Z");
@@ -10,8 +11,10 @@ const milestone = (id: string) => ({
   id,
   unlockedAt: "2026-10-01T00:00:00.000Z",
   verification: "self-reported" as const,
+  count: 1,
 });
 const state = (overrides: Partial<GameState> = {}): GameState => ({
+  counters: [],
   milestones: [],
   progress: null,
   ...overrides,
@@ -22,8 +25,8 @@ function setup(maxProgressBytes = 20) {
   const service = createGameSyncService({
     clock: () => now,
     games: new Map([
-      ["tap-tower", new Set(["first-five", "ten-taps"])],
-      ["other-game", new Set<string>()],
+      ["tap-tower", rules(["first-five", "ten-taps"])],
+      ["other-game", rules([])],
     ]),
     maxProgressBytes,
     repository,

@@ -72,7 +72,7 @@ export function GamePlayer({
   };
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { connected, kept, sync, toast, unlocked } = useGameSession(
+  const { connected, kept, progress, sync, toast, unlocked } = useGameSession(
     game,
     frame,
     src,
@@ -96,6 +96,7 @@ export function GamePlayer({
               <ArcadeInfoCard title="Your milestones">
                 <MilestoneList
                   milestones={game.milestones}
+                  progress={progress}
                   unlocked={unlocked}
                 />
                 <p>

@@ -50,6 +50,8 @@ export const myGame = defineGame({
       description: "You finished the first level.",
       criteria: "Finish level 1.", // shown to players: how it is earned
       claimPolicy: "once", // "once" per player, or "repeatable"
+      // target: 10, // optional, "once" only: the game reports a running total and the milestone is earned at 10
+      // maxCount: 100, // required for "repeatable": each report is counted, up to this many
     },
   ],
 });
@@ -133,6 +135,16 @@ The full list, with the status of what is still to come, is `docs/product/game-s
   **The id can change once**, from local to account: keep what you key by it in your own save, or re-key when
   `player.changed` arrives. A signed-in player's game starts with the account's id (the answer waits for the
   account's first reply). `player.changed` may repeat the id you already have; compare before acting.
+- **Progress toward a target.** Declare `target: 10` on a milestone earned once and report the running total with
+  `client.milestones.progress("ten-wins", wins)`: send the **total, not the change**. The platform keeps the larger
+  of your report and what it holds, never above the target, so a repeated or late report cannot count twice, and it
+  earns the milestone when the total reaches the target (do not call `unlock` for it: that is refused). The answer
+  says the total held, the target and whether it is earned. At most 120 reports a minute.
+- **Repeatable milestones.** Declare `claimPolicy: "repeatable"` with a `maxCount`. Each `milestones.unlock` call
+  after the first is counted, up to `maxCount`, and ignored after; the call still answers `already-unlocked`, so
+  read the count with `client.milestones.counts()`, which gives for every milestone `{ count, current, target,
+max }`. The page shows the count ("Reached x3") and announces each counting. Counts merge by the larger side, so
+  two devices that each earned it while offline are counted once between them.
 - **Reset a save** with `progress.save(null)`; there is no separate call.
 - **Compatibility rule:** a method or event that exists never changes shape. New abilities are new methods and
   events, so a game built on an older SDK keeps working on a newer platform.

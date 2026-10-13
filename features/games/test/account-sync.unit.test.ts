@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createAccountPort } from "../src/client/account-sync.ts";
 
 const state: LocalSnapshot = {
+  counters: [],
   milestones: [],
   progress: { savedAt: "2026-10-01T00:00:00.000Z", state: { taps: 1 } },
 };

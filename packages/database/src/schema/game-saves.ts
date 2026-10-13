@@ -65,6 +65,9 @@ export const gameMilestoneUnlocks = platformSchema.table(
       mode: "date",
       withTimezone: true,
     }).notNull(),
+    // How many times the player earned it (1 for a milestone earned once). The manifest's maximum is enforced by
+    // the sync service; the column only bounds it.
+    count: integer("count").notNull().default(1),
     verification: text("verification").notNull().default("self-reported"),
   },
   (table) => [
@@ -72,6 +75,34 @@ export const gameMilestoneUnlocks = platformSchema.table(
     check(
       "game_milestone_verification_known",
       sql`${table.verification} in ('self-reported')`,
+    ),
+    check(
+      "game_milestone_count_bounded",
+      sql`${table.count} between 1 and 1000000`,
+    ),
+  ],
+);
+
+// The game's current total toward a milestone's target, kept until the milestone is earned (7 of 10 wins). One
+// row per player, game and milestone; the total only ever rises.
+export const gameMilestoneCounters = platformSchema.table(
+  "game_milestone_counters",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    gameId: text("game_id").notNull(),
+    milestoneId: text("milestone_id").notNull(),
+    current: integer("current").notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.gameId, table.milestoneId] }),
+    check(
+      "game_milestone_counter_bounded",
+      sql`${table.current} between 0 and 1000000`,
     ),
   ],
 );

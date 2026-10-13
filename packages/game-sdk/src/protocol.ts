@@ -114,6 +114,44 @@ export const methods = {
     params: empty,
     result: z.object({ milestones: z.array(milestoneStatusSchema) }).strict(),
   },
+  "milestones.counts": {
+    params: empty,
+    result: z
+      .object({
+        counts: z.array(
+          z
+            .object({
+              // The total the game last reported toward `target`, or null for a milestone with no target.
+              current: z.number().int().min(0).nullable(),
+              // How many times it has been earned: 0 while locked, 1 for one earned once, more for a repeatable one.
+              count: z.number().int().min(0),
+              id: z.string(),
+              // The most a repeatable milestone is counted, or null for one earned once.
+              max: z.number().int().positive().nullable(),
+              target: z.number().int().positive().nullable(),
+            })
+            .strict(),
+        ),
+      })
+      .strict(),
+  },
+  "milestones.progress": {
+    params: z
+      .object({
+        current: z.number().int().min(0).max(1_000_000),
+        id: z.string().min(1).max(64),
+      })
+      .strict(),
+    result: z
+      .object({
+        // The total the platform holds: the larger of this report and what it had, never above the target.
+        current: z.number().int().min(0),
+        status: z.enum(["locked", "unlocked"]),
+        target: z.number().int().positive(),
+        unlockedAt: timestamp.nullable(),
+      })
+      .strict(),
+  },
   "milestones.unlock": {
     params: z.object({ id: z.string().min(1).max(64) }).strict(),
     result: z

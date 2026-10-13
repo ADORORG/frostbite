@@ -45,6 +45,13 @@ test("every call is answered by the platform, in the real frame", async ({
   await expect(newest(page)).toContainText('"status":"unlocked"');
   await game.locator("#milestones-list").click();
   await expect(newest(page)).toContainText('"status":"unlocked"');
+  // A repeatable milestone is counted again, up to the manifest's maximum of five.
+  for (let press = 0; press < 6; press += 1)
+    await game.locator("#milestones-unlock").click();
+  await game.locator("#milestones-counts").click();
+  await expect(newest(page)).toContainText(
+    '{"current":null,"count":5,"id":"first-call","max":5,"target":null}',
+  );
 });
 
 test("a message from the game is shown by the platform under the game's name", async ({
@@ -134,4 +141,30 @@ test("a game that did not declare the wallet is refused it, in the real browser"
       }),
   );
   expect(answer).toEqual({ code: "permission_denied", ok: false });
+});
+
+test("progress toward a target is held by the platform, shown on the page, and earns the milestone at the target", async ({
+  page,
+}) => {
+  const game = page.frameLocator(frameSelector);
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
+  for (let press = 1; press <= 4; press += 1) {
+    await game.locator("#milestones-progress").click();
+    await expect(newest(page)).toContainText(`"current":${String(press)}`);
+  }
+  const dock = await openDock(page, "Milestones");
+  await expect(dock.locator('[data-milestone="ten-presses"]')).toContainText(
+    "4 of 10",
+  );
+  for (let press = 5; press <= 10; press += 1)
+    await game.locator("#milestones-progress").click();
+  await expect(newest(page)).toContainText('"status":"unlocked"');
+  await expect(dock.locator('[data-milestone="ten-presses"]')).toContainText(
+    "Reached",
+  );
+  // Reported again, the total stays at the target.
+  await game.locator("#milestones-progress").click();
+  await expect(newest(page)).toContainText('"current":10');
 });

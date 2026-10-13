@@ -9,6 +9,7 @@ import {
 import { describe, expect, it, vi } from "vitest";
 
 import { createSyncGameStateOperation } from "../src/application/sync-operation.ts";
+import { rules } from "./support/rules.ts";
 
 const userId = uuidV7Schema.parse("01890f0e-7c8a-7b3a-8a3e-0123456789ab");
 const context = {
@@ -18,7 +19,7 @@ const context = {
   idempotencyKey: idempotencyKeySchema.parse("request-key-00000001"),
 };
 const playerId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
-const empty: GameState = { milestones: [], progress: null };
+const empty: GameState = { counters: [], milestones: [], progress: null };
 const input = { gameId: "tap-tower", state: empty };
 
 function stub(outcome: Awaited<ReturnType<GameSyncService["sync"]>>) {
@@ -74,6 +75,7 @@ describe("the sync operation", () => {
   it.each([
     [{ kind: "unknown-game" }, "not_found"],
     [{ id: "x", kind: "unknown-milestone" }, "invalid_request"],
+    [{ id: "x", kind: "no-target" }, "invalid_request"],
     [{ kind: "too-large" }, "invalid_request"],
   ] as const)("reports %j as %s", async (outcome, error) => {
     const { operation } = stub(outcome);
@@ -87,7 +89,7 @@ describe("the sync operation", () => {
     let stored: GameState = empty;
     const service = createGameSyncService({
       clock: () => new Date("2026-10-12T00:00:00.000Z"),
-      games: new Map([["tap-tower", new Set(["first-five"])]]),
+      games: new Map([["tap-tower", rules(["first-five"])]]),
       maxProgressBytes: 100,
       repository: {
         change: async (_user, _game, decide) => ({
@@ -100,9 +102,14 @@ describe("the sync operation", () => {
     const first = {
       id: "first-five",
       unlockedAt: "2026-10-01T00:00:00.000Z",
+      count: 1,
       verification: "self-reported",
     } as const;
-    const unlocked: GameState = { milestones: [first], progress: null };
+    const unlocked: GameState = {
+      counters: [],
+      milestones: [first],
+      progress: null,
+    };
     expect(
       await operation.execute(
         { gameId: "tap-tower", state: unlocked },
@@ -114,6 +121,7 @@ describe("the sync operation", () => {
         {
           gameId: "tap-tower",
           state: {
+            counters: [],
             milestones: [{ ...first, id: "made-up" }],
             progress: null,
           },

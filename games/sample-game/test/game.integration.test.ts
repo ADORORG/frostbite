@@ -42,13 +42,19 @@ async function play(saved?: { score: number }) {
   const script = await bundleGameScript(join(root, "src/main.ts"));
   running = runGameInSimulatedHost({
     backend: {
+      counters: async () => ({}),
       identity: async () => ({ id: "sample-player-0001", kind: "local" }),
       loadProgress: async () => stored.progress,
+      reportProgress: async () => ({
+        current: 0,
+        newlyUnlocked: false,
+        unlockedAt: null,
+      }),
       milestones: async () =>
         Object.fromEntries(
           Object.entries(stored.unlocked).map(([id, unlockedAt]) => [
             id,
-            { unlockedAt, verification: "self-reported" as const },
+            { count: 1, unlockedAt, verification: "self-reported" as const },
           ]),
         ),
       player: () => ({ signedIn: false, walletConnected: false }),
@@ -58,6 +64,8 @@ async function play(saved?: { score: number }) {
         stored.unlocked[id] ??= now.toISOString();
         return {
           alreadyUnlocked: already !== undefined,
+          count: 1,
+          counted: false,
           unlockedAt: stored.unlocked[id] ?? "",
         };
       },
@@ -137,14 +145,25 @@ describe("Tap Tower, bundled and run against a simulated platform", () => {
     const script = await bundleGameScript(join(root, "src/main.ts"));
     running = runGameInSimulatedHost({
       backend: {
+        counters: async () => ({}),
         identity: async () => ({ id: "sample-player-0001", kind: "local" }),
+        reportProgress: async () => ({
+          current: 0,
+          newlyUnlocked: false,
+          unlockedAt: null,
+        }),
         loadProgress: async () => {
           throw new Error("down");
         },
         milestones: async () => ({}),
         player: () => ({ signedIn: false, walletConnected: false }),
         saveProgress: async () => undefined,
-        unlock: async () => ({ alreadyUnlocked: false, unlockedAt: "" }),
+        unlock: async () => ({
+          alreadyUnlocked: false,
+          count: 1,
+          counted: false,
+          unlockedAt: "",
+        }),
       },
       game: manifest,
       html,

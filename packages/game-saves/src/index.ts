@@ -5,3 +5,4 @@ export {
   type GameSyncService,
   type SyncOutcome,
 } from "./service.ts";
+export type { MilestoneRule, MilestoneRules } from "./rules.ts";

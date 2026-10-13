@@ -10,7 +10,7 @@ import { signIn } from "../src/upload-helpers.ts";
 // only when the platform runs for tests or development.
 const frameSelector = '[data-testid="game-frame"]';
 const syncPath = "/api/v1/games/sync";
-const empty = { milestones: [], progress: null };
+const empty = { counters: [], milestones: [], progress: null };
 
 async function playerBrowser(
   browser: Browser,
@@ -130,13 +130,14 @@ test.describe("the sync route", () => {
     const unknownGame = await send({ gameId: "no-such-game", state: empty });
     expect(unknownGame.status()).toBe(404);
     const made = {
+      count: 1,
       id: "made-up",
       unlockedAt: "2026-10-01T00:00:00.000Z",
       verification: "self-reported",
     };
     const unknownMilestone = await send({
       gameId: "sample-game",
-      state: { milestones: [made], progress: null },
+      state: { counters: [], milestones: [made], progress: null },
     });
     expect(unknownMilestone.status()).toBe(400);
     const extra = await send({
@@ -148,6 +149,7 @@ test.describe("the sync route", () => {
     const large = await send({
       gameId: "sample-game",
       state: {
+        counters: [],
         milestones: [],
         progress: {
           savedAt: "2026-10-01T00:00:00.000Z",
@@ -166,6 +168,7 @@ test.describe("the sync route", () => {
     const forged = {
       gameId: "sample-game",
       state: {
+        counters: [],
         milestones: [],
         progress: { savedAt: "2999-01-01T00:00:00.000Z", state: { score: 1 } },
       },

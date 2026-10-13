@@ -18,8 +18,10 @@ const playerId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 
 describe("the game player with an account", () => {
   const merged = {
+    counters: [],
     milestones: [
       {
+        count: 1,
         id: game.milestones[0]?.id ?? "",
         unlockedAt: "2026-10-01T00:00:00.000Z",
         verification: "self-reported",

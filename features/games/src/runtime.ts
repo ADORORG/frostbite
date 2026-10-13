@@ -23,7 +23,14 @@ export function createGameSyncResolver(
       games: new Map(
         games.map(({ id, milestones }) => [
           id,
-          new Set(milestones.map((milestone) => milestone.id)),
+          new Map(
+            milestones.map(
+              ({ claimPolicy, id: milestoneId, maxCount, target }) => [
+                milestoneId,
+                { claimPolicy, maxCount, target },
+              ],
+            ),
+          ),
         ]),
       ),
       maxProgressBytes: resolveGameHostPolicy().progressMaxBytes,

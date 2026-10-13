@@ -32,6 +32,15 @@ export interface UnlockedMilestones {
   readonly [id: string]: string;
 }
 
+// What the player's records say beyond "earned": how many times each milestone has been earned, and the total
+// reported toward the target of each that has one.
+export interface MilestoneProgress {
+  readonly counts: Readonly<Record<string, number>>;
+  readonly totals: Readonly<Record<string, number>>;
+}
+
+const noProgress: MilestoneProgress = { counts: {}, totals: {} };
+
 // The browser's own storage, or a stand-in that lasts only as long as the page when the browser refuses it
 // (a blocked-storage setting), so the game still plays and the player is told nothing will be kept.
 function browserStorage(): {
@@ -68,6 +77,7 @@ export function useGameSession(
   },
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
+  const [progress, setProgress] = useState<MilestoneProgress>(noProgress);
   const [connected, setConnected] = useState(false);
   const [kept, setKept] = useState(true);
   const [sync, setSync] = useState<SyncStatus>("local");
@@ -102,8 +112,9 @@ export function useGameSession(
       onStatus: setSync,
       remote: remoteFor(id),
     });
-    // A milestone is announced when it is reported while the player is here, never for those they already had.
-    const seen = new Set<string>();
+    // A milestone is announced when it is reported while the player is here, never for those they already had: when
+    // it is newly earned, and again, with its count, each time a repeatable one is counted.
+    const seen = new Map<string, number>();
     let baselined = false;
     let toastTimer: ReturnType<typeof setTimeout> | undefined;
     const show = (text: string) => {
@@ -111,39 +122,51 @@ export function useGameSession(
       setToast(text);
       toastTimer = setTimeout(() => setToast(null), toastMs);
     };
-    const announce = (ids: readonly string[]) =>
-      show(
-        `${ids
-          .map(
-            (found) =>
-              milestones.find((milestone) => milestone.id === found)?.title ??
-              found,
-          )
-          .join(", ")} reached`,
-      );
+    const titleOf = (found: string) =>
+      milestones.find((milestone) => milestone.id === found)?.title ?? found;
     const refresh = () =>
-      void backend.milestones().then((records) => {
-        const fresh = Object.keys(records).filter((key) => !seen.has(key));
-        for (const key of fresh) seen.add(key);
-        if (baselined && fresh.length > 0) announce(fresh);
-        baselined = true;
-        setKept(session.kept);
-        setUnlocked(
-          Object.fromEntries(
-            Object.entries(records).map(([key, { unlockedAt }]) => [
-              key,
-              unlockedAt,
-            ]),
-          ),
-        );
-      });
+      void Promise.all([backend.milestones(), backend.counters()]).then(
+        ([records, totals]) => {
+          const reached = Object.entries(records)
+            .filter(([key, { count }]) => count > (seen.get(key) ?? 0))
+            .map(([key, { count }]) => {
+              const first = !seen.has(key);
+              seen.set(key, count);
+              return first || count === 1
+                ? `${titleOf(key)} reached`
+                : `${titleOf(key)} reached (x${String(count)})`;
+            });
+          if (baselined && reached.length > 0) show(reached.join(", "));
+          baselined = true;
+          setKept(session.kept);
+          setProgress({
+            counts: Object.fromEntries(
+              Object.entries(records).map(([key, { count }]) => [key, count]),
+            ),
+            totals,
+          });
+          setUnlocked(
+            Object.fromEntries(
+              Object.entries(records).map(([key, { unlockedAt }]) => [
+                key,
+                unlockedAt,
+              ]),
+            ),
+          );
+        },
+      );
     refresh();
     const hosted = createGameHost({
       backend,
       game: { capabilities, id, milestones },
       onEvent: (event) => {
         if (event.type === "ready") setConnected(true);
-        if (event.type === "milestone-unlocked") refresh();
+        if (
+          event.type === "milestone-unlocked" ||
+          event.type === "milestone-counted" ||
+          event.type === "milestone-progress"
+        )
+          refresh();
       },
       // The frame has no origin of its own, so the only address a message to it can name is "*". It carries
       // only this game's own data, and goes to the one window the page created.
@@ -174,5 +197,5 @@ export function useGameSession(
 
   useHostEvents(host, frame, wallet);
 
-  return { connected, kept, sync, toast, unlocked };
+  return { connected, kept, progress, sync, toast, unlocked };
 }

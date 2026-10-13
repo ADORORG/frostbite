@@ -35,6 +35,7 @@ export const templateGame = defineGame({
     },
     {
       claimPolicy: "repeatable",
+      maxCount: 100,
       criteria: "Score 100 points in a run.",
       description: "A century.",
       id: "century",

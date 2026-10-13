@@ -1,5 +1,6 @@
 import type { DatabaseClient } from "@ador/database/connection";
 import {
+  gameMilestoneCounters,
   gameMilestoneUnlocks,
   gameSaves,
 } from "@ador/database/schema/game-saves";
@@ -38,8 +39,22 @@ export function createDrizzleGameSyncRepository(
               eq(gameMilestoneUnlocks.gameId, gameId),
             ),
           );
+        const totals = await transaction
+          .select()
+          .from(gameMilestoneCounters)
+          .where(
+            and(
+              eq(gameMilestoneCounters.userId, userId),
+              eq(gameMilestoneCounters.gameId, gameId),
+            ),
+          );
         const stored: GameState = {
+          counters: totals.map((row) => ({
+            current: row.current,
+            id: row.milestoneId,
+          })),
           milestones: unlocks.map((row) => ({
+            count: row.count,
             id: row.milestoneId,
             unlockedAt: row.unlockedAt.toISOString(),
             verification: "self-reported",
@@ -76,21 +91,52 @@ export function createDrizzleGameSyncRepository(
             );
         const known = new Map(stored.milestones.map((m) => [m.id, m]));
         for (const record of merged.milestones) {
-          if (known.get(record.id)?.unlockedAt === record.unlockedAt) continue;
+          const before = known.get(record.id);
+          if (
+            before?.unlockedAt === record.unlockedAt &&
+            before.count === record.count
+          )
+            continue;
           await transaction
             .insert(gameMilestoneUnlocks)
             .values({
+              count: record.count,
               gameId,
               milestoneId: record.id,
               unlockedAt: new Date(record.unlockedAt),
               userId,
             })
             .onConflictDoUpdate({
-              set: { unlockedAt: new Date(record.unlockedAt) },
+              set: {
+                count: record.count,
+                unlockedAt: new Date(record.unlockedAt),
+              },
               target: [
                 gameMilestoneUnlocks.userId,
                 gameMilestoneUnlocks.gameId,
                 gameMilestoneUnlocks.milestoneId,
+              ],
+            });
+        }
+        const totalsBefore = new Map(
+          stored.counters.map((c) => [c.id, c.current]),
+        );
+        for (const counter of merged.counters) {
+          if (totalsBefore.get(counter.id) === counter.current) continue;
+          await transaction
+            .insert(gameMilestoneCounters)
+            .values({
+              current: counter.current,
+              gameId,
+              milestoneId: counter.id,
+              userId,
+            })
+            .onConflictDoUpdate({
+              set: { current: counter.current, updatedAt: new Date() },
+              target: [
+                gameMilestoneCounters.userId,
+                gameMilestoneCounters.gameId,
+                gameMilestoneCounters.milestoneId,
               ],
             });
         }

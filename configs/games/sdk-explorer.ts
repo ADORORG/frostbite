@@ -17,11 +17,20 @@ export const sdkExplorerGame = defineGame({
   launch: { mode: "embedded" },
   milestones: [
     {
-      claimPolicy: "once",
-      criteria: "Call the platform to unlock a milestone.",
+      claimPolicy: "repeatable",
+      criteria: "Press milestones.unlock; each press is counted, up to five.",
       description: "You made a call to the platform and it answered.",
       id: "first-call",
+      maxCount: 5,
       title: "First call",
+    },
+    {
+      claimPolicy: "once",
+      criteria: "Press milestones.progress ten times.",
+      description: "You reported progress ten times.",
+      id: "ten-presses",
+      target: 10,
+      title: "Ten presses",
     },
   ],
   network: signet.chainId,

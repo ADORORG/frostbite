@@ -5,6 +5,7 @@ import {
 } from "@ador/shared/games";
 
 import type { GameSyncRepository } from "./repository.ts";
+import { boundState, earnReached, type MilestoneRules } from "./rules.ts";
 
 export type SyncOutcome =
   | {
@@ -14,6 +15,8 @@ export type SyncOutcome =
     }
   | { readonly kind: "unknown-game" }
   | { readonly kind: "unknown-milestone"; readonly id: string }
+  // A total reported for a milestone that has no target to reach.
+  | { readonly kind: "no-target"; readonly id: string }
   | { readonly kind: "too-large" };
 
 export interface GameSyncService {
@@ -25,18 +28,24 @@ export interface GameSyncService {
 // must fit the configured size. The merge is the shared rule, so the page and the server cannot disagree.
 export function createGameSyncService(options: {
   readonly clock: () => Date;
-  // Each listed game with the milestones it declares.
-  readonly games: ReadonlyMap<string, ReadonlySet<string>>;
+  // Each listed game with the milestones it declares and what each allows.
+  readonly games: ReadonlyMap<string, MilestoneRules>;
   readonly maxProgressBytes: number;
   readonly repository: GameSyncRepository;
 }): GameSyncService {
   return {
     sync: async (userId, { gameId, state }) => {
-      const declared = options.games.get(gameId);
-      if (declared === undefined) return { kind: "unknown-game" };
-      const unknown = state.milestones.find(({ id }) => !declared.has(id));
+      const rules = options.games.get(gameId);
+      if (rules === undefined) return { kind: "unknown-game" };
+      const unknown = [...state.milestones, ...state.counters].find(
+        ({ id }) => !rules.has(id),
+      );
       if (unknown !== undefined)
         return { id: unknown.id, kind: "unknown-milestone" };
+      const noTarget = state.counters.find(
+        ({ id }) => rules.get(id)?.target === undefined,
+      );
+      if (noTarget !== undefined) return { id: noTarget.id, kind: "no-target" };
       if (
         state.progress !== null &&
         Buffer.byteLength(JSON.stringify(state.progress.state)) >
@@ -47,7 +56,17 @@ export function createGameSyncService(options: {
       const { playerId, state: merged } = await options.repository.change(
         userId,
         gameId,
-        (stored) => mergeGameState(stored, state, now),
+        // Bounded on the way in and on the way out: what the game sends, and what the account holds (a manifest
+        // may have lowered a limit since).
+        (stored) =>
+          earnReached(
+            boundState(
+              mergeGameState(stored, boundState(state, rules), now),
+              rules,
+            ),
+            rules,
+            now,
+          ),
       );
       return { kind: "synced", playerId, state: merged };
     },

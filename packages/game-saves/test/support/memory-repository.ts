@@ -18,7 +18,7 @@ export function createMemoryRepository(): GameSyncRepository & {
       calls.push({ gameId, userId });
       const key = `${userId}:${gameId}`;
       const next = decide(
-        stored.get(key) ?? { milestones: [], progress: null },
+        stored.get(key) ?? { counters: [], milestones: [], progress: null },
       );
       stored.set(key, next);
       // One id per player and game, kept: what the real row does.

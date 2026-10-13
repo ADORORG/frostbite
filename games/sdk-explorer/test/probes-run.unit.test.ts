@@ -4,7 +4,12 @@ import type { JsonValue } from "@ador/game-sdk/protocol";
 import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
 import { describe, expect, it } from "vitest";
 
-import { attempt, exploredMilestone, probes } from "../src/probes.ts";
+import {
+  attempt,
+  exploredMilestone,
+  probes,
+  progressMilestone,
+} from "../src/probes.ts";
 
 const address =
   "tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv";
@@ -25,11 +30,20 @@ function connect(capabilities: string[]) {
     id: "sdk-explorer",
     milestones: [
       {
-        claimPolicy: "once",
+        claimPolicy: "repeatable",
         criteria: "Call it.",
         description: "Called.",
         id: exploredMilestone,
+        maxCount: 5,
         title: "First call",
+      },
+      {
+        claimPolicy: "once",
+        criteria: "Ten presses.",
+        description: "Ten.",
+        id: progressMilestone,
+        target: 10,
+        title: "Ten presses",
       },
     ],
   };
@@ -131,7 +145,10 @@ describe("each call, against the real host", () => {
 
   it("milestones.list shows it locked, and milestones.unlock earns it", async () => {
     expect(value((await run("milestones-list")).outcome)).toMatchObject({
-      milestones: [{ id: exploredMilestone, status: "locked" }],
+      milestones: [
+        { id: exploredMilestone, status: "locked" },
+        { id: progressMilestone, status: "locked" },
+      ],
     });
     const { memory, outcome } = await run("milestones-unlock");
     expect(value(outcome)).toMatchObject({ status: "unlocked" });
@@ -144,5 +161,53 @@ describe("each call, against the real host", () => {
     const { outcome, shown } = await run("toast");
     expect(value(outcome)).toEqual({ shown: true });
     expect(shown).toEqual(["Hello from the SDK explorer"]);
+  });
+
+  it("milestones.unlock counts each press up to the manifest's maximum of five", async () => {
+    const { client, memory } = connect(["wallet"]);
+    await client.ready();
+    const unlock = probes.find(({ id }) => id === "milestones-unlock");
+    for (let press = 0; press < 7; press += 1)
+      await attempt(
+        () => unlock?.run(client) ?? Promise.reject(new Error("no probe")),
+      );
+    expect((await memory.backend.milestones())[exploredMilestone]?.count).toBe(
+      5,
+    );
+    const counts = probes.find(({ id }) => id === "milestones-counts");
+    const outcome = await attempt(
+      () => counts?.run(client) ?? Promise.reject(new Error("no probe")),
+    );
+    expect(value(outcome)).toMatchObject({
+      counts: [
+        { count: 5, id: exploredMilestone, max: 5 },
+        { id: progressMilestone, target: 10 },
+      ],
+    });
+  });
+
+  it("milestones.progress reports one more each press, and earns its milestone on the tenth", async () => {
+    const { client, memory } = connect(["wallet"]);
+    await client.ready();
+    const press = probes.find(({ id }) => id === "milestones-progress");
+    const results: JsonValue[] = [];
+    for (let at = 0; at < 10; at += 1)
+      results.push(
+        value(
+          await attempt(
+            () => press?.run(client) ?? Promise.reject(new Error("no probe")),
+          ),
+        ) as JsonValue,
+      );
+    expect(results[0]).toMatchObject({
+      current: 1,
+      status: "locked",
+      target: 10,
+    });
+    expect(results[8]).toMatchObject({ current: 9, status: "locked" });
+    expect(results[9]).toMatchObject({ current: 10, status: "unlocked" });
+    expect(Object.keys(await memory.backend.milestones())).toEqual([
+      progressMilestone,
+    ]);
   });
 });

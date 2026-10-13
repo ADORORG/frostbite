@@ -17,6 +17,7 @@ export const game: HostedGame = {
     },
     {
       claimPolicy: "repeatable",
+      maxCount: 100,
       criteria: "Score 10.",
       description: "Ten taps.",
       id: "ten-taps",

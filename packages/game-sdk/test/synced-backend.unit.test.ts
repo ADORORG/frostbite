@@ -11,13 +11,15 @@ import {
 } from "../src/synced-backend.ts";
 
 const at = new Date("2026-10-12T10:00:00.000Z");
-const empty: LocalSnapshot = { milestones: [], progress: null };
+const empty: LocalSnapshot = { counters: [], milestones: [], progress: null };
 const remoteState: LocalSnapshot = {
+  counters: [],
   milestones: [
     {
       id: "ten-taps",
       unlockedAt: "2026-10-01T00:00:00.000Z",
       verification: "self-reported",
+      count: 1,
     },
   ],
   progress: { savedAt: "2026-10-02T00:00:00.000Z", state: { taps: 10 } },
@@ -80,6 +82,7 @@ describe("the backend that syncs with the account", () => {
       remote: { sync },
     });
     expect(sync).toHaveBeenCalledWith({
+      counters: [],
       milestones: [],
       progress: { savedAt: at.toISOString(), state: 5 },
     });
@@ -91,7 +94,7 @@ describe("the backend that syncs with the account", () => {
     }));
     expect(await backend.loadProgress()).toBeNull();
     await backend.saveProgress({ taps: 1 }, at);
-    await backend.unlock("first-five", at);
+    await backend.unlock("first-five", at, 1);
     await Promise.resolve();
     expect(sync).toHaveBeenCalledTimes(1);
     expect(backend.status()).toBe("local");
@@ -109,9 +112,11 @@ describe("the backend that syncs with the account", () => {
       savedAt: at.toISOString(),
       state: { taps: 11 },
     });
-    const unlocked = await backend.unlock("first-five", at);
+    const unlocked = await backend.unlock("first-five", at, 1);
     expect(unlocked).toEqual({
       alreadyUnlocked: false,
+      count: 1,
+      counted: false,
       unlockedAt: at.toISOString(),
     });
     await vi.waitFor(() => expect(sync).toHaveBeenCalledTimes(3));

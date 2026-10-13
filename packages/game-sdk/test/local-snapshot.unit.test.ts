@@ -20,7 +20,11 @@ describe("the local backend's snapshot", () => {
       gameId: "g",
       storage: storage().store,
     });
-    expect(backend.snapshot()).toEqual({ milestones: [], progress: null });
+    expect(backend.snapshot()).toEqual({
+      counters: [],
+      milestones: [],
+      progress: null,
+    });
   });
 
   it("dates a save with the time it was made, and lists the milestones", async () => {
@@ -29,13 +33,15 @@ describe("the local backend's snapshot", () => {
       storage: storage().store,
     });
     await backend.saveProgress({ taps: 3 }, at);
-    await backend.unlock("first-five", at);
+    await backend.unlock("first-five", at, 1);
     expect(backend.snapshot()).toEqual({
+      counters: [],
       milestones: [
         {
           id: "first-five",
           unlockedAt: at.toISOString(),
           verification: "self-reported",
+          count: 1,
         },
       ],
       progress: { savedAt: at.toISOString(), state: { taps: 3 } },
@@ -80,11 +86,13 @@ describe("the local backend's snapshot", () => {
       storage: storage().store,
     });
     backend.replace({
+      counters: [],
       milestones: [
         {
           id: "ten-taps",
           unlockedAt: at.toISOString(),
           verification: "self-reported",
+          count: 1,
         },
       ],
       progress: { savedAt: at.toISOString(), state: { taps: 10 } },
@@ -100,7 +108,7 @@ describe("the local backend's snapshot", () => {
       storage: storage().store,
     });
     await backend.saveProgress({ taps: 2 }, at);
-    backend.replace({ milestones: [], progress: null });
+    backend.replace({ counters: [], milestones: [], progress: null });
     expect(await backend.loadProgress()).toEqual({ taps: 2 });
   });
 });

@@ -11,6 +11,8 @@ export interface Probe {
 
 // The milestone this game declares (configs/games/sdk-explorer.ts); calling it from the explorer earns it.
 export const exploredMilestone = "first-call";
+// The milestone with a target (configs/games/sdk-explorer.ts); each press of the progress probe reports one more.
+export const progressMilestone = "ten-presses";
 
 // The counter this game keeps in its save: how many times it has been saved from here. Anything else a save
 // might hold is a counter that starts again at nothing.
@@ -53,6 +55,22 @@ export const probes: readonly Probe[] = [
       const calls = savedCalls(await client.progress.load());
       await client.progress.save({ calls: calls + 1 });
       return { saved: { calls: calls + 1 } };
+    },
+  },
+  {
+    id: "milestones-counts",
+    label: "milestones.counts",
+    run: async (client) => ({ counts: await client.milestones.counts() }),
+  },
+  {
+    id: "milestones-progress",
+    label: "milestones.progress",
+    // Reports the total the platform holds plus one: the call takes a total, never a change.
+    run: async (client) => {
+      const held = (await client.milestones.counts()).find(
+        ({ id }) => id === progressMilestone,
+      )?.current;
+      return client.milestones.progress(progressMilestone, (held ?? 0) + 1);
     },
   },
   {

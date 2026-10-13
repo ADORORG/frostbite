@@ -94,10 +94,12 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the ten the platform offers", () => {
+  it("are exactly the twelve the platform offers", () => {
     expect(methodNames.sort()).toEqual([
       "capabilities.get",
+      "milestones.counts",
       "milestones.list",
+      "milestones.progress",
       "milestones.unlock",
       "player.identity",
       "player.info",
@@ -112,6 +114,7 @@ describe("the methods", () => {
   it("take no parameters where none are needed, and refuse extra ones", () => {
     for (const name of [
       "capabilities.get",
+      "milestones.counts",
       "milestones.list",
       "player.info",
       "progress.load",

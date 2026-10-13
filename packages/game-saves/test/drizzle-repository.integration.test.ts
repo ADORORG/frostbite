@@ -15,6 +15,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createDrizzleGameSyncRepository } from "../src/drizzle-repository.ts";
 import { createGameSyncService } from "../src/service.ts";
+import { rules } from "./support/rules.ts";
 
 const environment = parseDatabaseEnvironment(process.env);
 const pool = createDatabasePool(environment);
@@ -25,8 +26,8 @@ const now = new Date("2026-10-12T12:00:00.000Z");
 const service = createGameSyncService({
   clock: () => now,
   games: new Map([
-    ["tap-tower", new Set(["first-five", "ten-taps"])],
-    ["other-game", new Set(["first-five"])],
+    ["tap-tower", rules(["first-five", "ten-taps"])],
+    ["other-game", rules(["first-five"])],
   ]),
   maxProgressBytes: 65_536,
   repository,
@@ -35,6 +36,7 @@ const milestone = (id: string, unlockedAt: string) => ({
   id,
   unlockedAt,
   verification: "self-reported" as const,
+  count: 1,
 });
 let userId = "";
 let otherId = "";
@@ -63,18 +65,19 @@ describe("the account's saved state in PostgreSQL", () => {
     expect(
       await service.sync(userId, {
         gameId: "tap-tower",
-        state: { milestones: [], progress: null },
+        state: { counters: [], milestones: [], progress: null },
       }),
     ).toEqual({
       kind: "synced",
       playerId: expect.stringMatching(uuid),
-      state: { milestones: [], progress: null },
+      state: { counters: [], milestones: [], progress: null },
     });
     expect(await database.select().from(gameSaves)).toHaveLength(1);
   });
 
   it("stores a save and milestones, and a second device reads them back", async () => {
     const saved: GameState = {
+      counters: [],
       milestones: [milestone("first-five", "2026-10-01T00:00:00.000Z")],
       progress: { savedAt: "2026-10-01T00:00:00.000Z", state: { taps: 5 } },
     };
@@ -82,7 +85,7 @@ describe("the account's saved state in PostgreSQL", () => {
     expect(
       await service.sync(userId, {
         gameId: "tap-tower",
-        state: { milestones: [], progress: null },
+        state: { counters: [], milestones: [], progress: null },
       }),
     ).toEqual({
       kind: "synced",
@@ -93,10 +96,12 @@ describe("the account's saved state in PostgreSQL", () => {
 
   it("keeps the newer save when an older device syncs later, and a replay changes nothing", async () => {
     const newer: GameState = {
+      counters: [],
       milestones: [],
       progress: { savedAt: "2026-10-02T00:00:00.000Z", state: { taps: 9 } },
     };
     const older: GameState = {
+      counters: [],
       milestones: [],
       progress: { savedAt: "2026-10-01T00:00:00.000Z", state: { taps: 1 } },
     };
@@ -118,6 +123,7 @@ describe("the account's saved state in PostgreSQL", () => {
 
   it("stores a save whose state is JSON null as a save, not as no save", async () => {
     const nullSave: GameState = {
+      counters: [],
       milestones: [],
       progress: { savedAt: "2026-10-01T00:00:00.000Z", state: null },
     };
@@ -125,7 +131,7 @@ describe("the account's saved state in PostgreSQL", () => {
     expect(
       await service.sync(userId, {
         gameId: "tap-tower",
-        state: { milestones: [], progress: null },
+        state: { counters: [], milestones: [], progress: null },
       }),
     ).toEqual({
       kind: "synced",
@@ -138,6 +144,7 @@ describe("the account's saved state in PostgreSQL", () => {
     await service.sync(userId, {
       gameId: "tap-tower",
       state: {
+        counters: [],
         milestones: [milestone("first-five", "2026-10-05T00:00:00.000Z")],
         progress: null,
       },
@@ -145,6 +152,7 @@ describe("the account's saved state in PostgreSQL", () => {
     const merged = await service.sync(userId, {
       gameId: "tap-tower",
       state: {
+        counters: [],
         milestones: [
           milestone("first-five", "2026-10-03T00:00:00.000Z"),
           milestone("ten-taps", "2026-10-04T00:00:00.000Z"),
@@ -156,6 +164,7 @@ describe("the account's saved state in PostgreSQL", () => {
       kind: "synced",
       playerId: expect.stringMatching(uuid),
       state: {
+        counters: [],
         milestones: [
           milestone("first-five", "2026-10-03T00:00:00.000Z"),
           milestone("ten-taps", "2026-10-04T00:00:00.000Z"),
@@ -172,11 +181,12 @@ describe("the account's saved state in PostgreSQL", () => {
 
   it("keeps players and games apart", async () => {
     const mine: GameState = {
+      counters: [],
       milestones: [milestone("first-five", "2026-10-01T00:00:00.000Z")],
       progress: { savedAt: "2026-10-01T00:00:00.000Z", state: "mine" },
     };
     await service.sync(userId, { gameId: "tap-tower", state: mine });
-    const empty: GameState = { milestones: [], progress: null };
+    const empty: GameState = { counters: [], milestones: [], progress: null };
     expect(
       await service.sync(otherId, { gameId: "tap-tower", state: empty }),
     ).toEqual({
@@ -198,6 +208,7 @@ describe("the account's saved state in PostgreSQL", () => {
       service.sync(userId, {
         gameId: "tap-tower",
         state: {
+          counters: [],
           milestones: [milestone(id, "2026-10-01T00:00:00.000Z")],
           progress: null,
         },
@@ -206,7 +217,7 @@ describe("the account's saved state in PostgreSQL", () => {
     await Promise.all(attempts);
     const final = await service.sync(userId, {
       gameId: "tap-tower",
-      state: { milestones: [], progress: null },
+      state: { counters: [], milestones: [], progress: null },
     });
     expect(
       final.kind === "synced" && final.state.milestones.map(({ id }) => id),
@@ -215,6 +226,7 @@ describe("the account's saved state in PostgreSQL", () => {
 
   it("loses no save when two devices sync at the same moment: the newer one remains", async () => {
     const save = (taps: number, day: string): GameState => ({
+      counters: [],
       milestones: [],
       progress: { savedAt: `2026-10-${day}T00:00:00.000Z`, state: { taps } },
     });
@@ -227,7 +239,7 @@ describe("the account's saved state in PostgreSQL", () => {
   });
 
   it("waits for whoever holds the player's rows before it decides", async () => {
-    const empty: GameState = { milestones: [], progress: null };
+    const empty: GameState = { counters: [], milestones: [], progress: null };
     await service.sync(userId, { gameId: "tap-tower", state: empty });
     // Another transaction holds the rows, as a sync in flight on another device would.
     let release: () => void = () => undefined;
@@ -258,6 +270,7 @@ describe("the account's saved state in PostgreSQL", () => {
     await service.sync(userId, {
       gameId: "tap-tower",
       state: {
+        counters: [],
         milestones: [milestone("first-five", "2026-10-01T00:00:00.000Z")],
         progress: { savedAt: "2026-10-01T00:00:00.000Z", state: 1 },
       },
@@ -268,7 +281,7 @@ describe("the account's saved state in PostgreSQL", () => {
   });
 
   it("keeps one player id per player and game, across syncs, and gives each player and game its own", async () => {
-    const empty: GameState = { milestones: [], progress: null };
+    const empty: GameState = { counters: [], milestones: [], progress: null };
     const idOf = async (user: string, game: string) => {
       const outcome = await service.sync(user, { gameId: game, state: empty });
       return outcome.kind === "synced" ? outcome.playerId : "none";
@@ -281,8 +294,7 @@ describe("the account's saved state in PostgreSQL", () => {
     const [row] = await database
       .select({ playerId: gameSaves.playerId })
       .from(gameSaves)
-      .where(eq(gameSaves.userId, userId))
-      .limit(1);
+      .where(eq(gameSaves.userId, userId));
     expect([first, await idOf(userId, "other-game")]).toContain(row?.playerId);
   });
 });

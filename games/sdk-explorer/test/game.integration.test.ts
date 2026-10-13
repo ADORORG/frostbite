@@ -18,11 +18,20 @@ const manifest = (capabilities: string[]): HostedGame => ({
   id: "sdk-explorer",
   milestones: [
     {
-      claimPolicy: "once",
+      claimPolicy: "repeatable",
       criteria: "Call it.",
       description: "Called.",
       id: "first-call",
+      maxCount: 5,
       title: "First call",
+    },
+    {
+      claimPolicy: "once",
+      criteria: "Ten presses.",
+      description: "Ten.",
+      id: "ten-presses",
+      target: 10,
+      title: "Ten presses",
     },
   ],
 });
@@ -63,7 +72,7 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
       "Connected. Call anything below.",
     );
     const buttons = [...document.querySelectorAll("#probes button")];
-    expect(buttons).toHaveLength(9);
+    expect(buttons).toHaveLength(11);
     expect(buttons.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,
     );

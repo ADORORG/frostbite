@@ -3,22 +3,29 @@ import { ArcadeBadge } from "@repo/ui/arcade";
 
 import { gameMilestonePolicyLabels } from "../domain/catalog.ts";
 import { presentMilestone, reachedSummary } from "../domain/milestone-state.ts";
+import type { MilestoneProgress } from "./use-game-session.ts";
 
 // A game's milestones. With the player's records (`unlocked`), each is in the state the platform's records say and
 // a polite live region tells a screen reader when the game reports a new one; with none (`null`: the game cannot
 // be played here), they are only what the game declares. Either way each says how it is earned.
 export function MilestoneList({
   milestones,
+  progress,
   unlocked,
 }: {
   readonly milestones: readonly GameMilestone[];
+  // How often each was earned and the total toward each target, when the player's records say.
+  readonly progress?: MilestoneProgress;
   readonly unlocked: Readonly<Record<string, string>> | null;
 }) {
   const views =
     unlocked === null
       ? null
       : milestones.map((milestone) =>
-          presentMilestone(milestone, unlocked[milestone.id]),
+          presentMilestone(milestone, unlocked[milestone.id], {
+            count: progress?.counts[milestone.id],
+            total: progress?.totals[milestone.id],
+          }),
         );
   return (
     <>

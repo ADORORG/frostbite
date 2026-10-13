@@ -40,21 +40,34 @@ describe("the local backend", () => {
       storage: storage().store,
     });
     expect(
-      await backend.unlock("first-five", new Date("2026-10-12T10:00:00.000Z")),
+      await backend.unlock(
+        "first-five",
+        new Date("2026-10-12T10:00:00.000Z"),
+        1,
+      ),
     ).toEqual({
       alreadyUnlocked: false,
+      count: 1,
+      counted: false,
       unlockedAt: "2026-10-12T10:00:00.000Z",
     });
     expect(
-      await backend.unlock("first-five", new Date("2026-10-13T10:00:00.000Z")),
+      await backend.unlock(
+        "first-five",
+        new Date("2026-10-13T10:00:00.000Z"),
+        1,
+      ),
     ).toEqual({
       alreadyUnlocked: true,
+      count: 1,
+      counted: false,
       unlockedAt: "2026-10-12T10:00:00.000Z",
     });
     expect(await backend.milestones()).toEqual({
       "first-five": {
         unlockedAt: "2026-10-12T10:00:00.000Z",
         verification: "self-reported",
+        count: 1,
       },
     });
   });
@@ -87,7 +100,7 @@ describe("the local backend", () => {
       expect(await backend.milestones()).toEqual({});
       expect(await backend.loadProgress()).toBeNull();
       // And the next unlock replaces the bad value.
-      expect((await backend.unlock("a", new Date())).alreadyUnlocked).toBe(
+      expect((await backend.unlock("a", new Date(), 1)).alreadyUnlocked).toBe(
         false,
       );
     },
