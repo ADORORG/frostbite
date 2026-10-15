@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { WalletConnectionClient } from "../src/client/provider.tsx";
+import type { WalletConnectionClient } from "../src/client/connection-client.ts";
 
 const connect = vi.fn(async () => undefined);
 const disconnect = vi.fn();
@@ -59,7 +59,7 @@ vi.mock("@omnisat/lasereyes-react", () => ({
   useLaserEyes: () => state,
 }));
 
-import { useWalletConnection } from "../src/client/provider.tsx";
+import { useLiveWalletConnection as useWalletConnection } from "../src/client/live-connection.tsx";
 
 let captured: WalletConnectionClient | null = null;
 function Probe() {

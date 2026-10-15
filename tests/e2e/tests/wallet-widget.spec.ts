@@ -42,6 +42,27 @@ test("is in the header of every public page, and opens the chooser from any of t
   ).toBeVisible();
 });
 
+test("does not fetch the wallet library until a wallet is wanted", async ({
+  page,
+}) => {
+  // The library is large; a page that only reads should not pay for it. It is recognised by its own name in its code.
+  let libraryFetches = 0;
+  page.on("response", async (response) => {
+    if (response.request().resourceType() !== "script") return;
+    const body = await response.text().catch(() => "");
+    if (/lasereyes/iu.test(body)) libraryFetches += 1;
+  });
+  await page.goto("/games");
+  await expect(walletButton(page)).toHaveText("Connect wallet");
+  await page.waitForLoadState("networkidle");
+  expect(libraryFetches).toBe(0);
+  await walletButton(page).click();
+  await expect(
+    page.getByRole("dialog", { name: "Choose your wallet" }),
+  ).toBeVisible();
+  await expect.poll(() => libraryFetches).toBeGreaterThan(0);
+});
+
 test("shows the connected wallet, reconnects after a reload, and forgets it when disconnected", async ({
   page,
 }) => {

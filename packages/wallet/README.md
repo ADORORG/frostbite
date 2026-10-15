@@ -7,6 +7,11 @@ The single platform boundary around the exact-pinned LaserEyes React/Core pair.
 - `WalletProvider` composes LaserEyes without exposing wallet-specific adapters, and the wallet-chooser state:
   `useWalletChooser()` returns `{ open, request, dismiss }`. A feature that needs a wallet calls `request()`; the app's
   header widget renders the chooser. Mount the provider once for the whole app (the layout does).
+- **The LaserEyes library (about 600 KB gzipped) is loaded on demand**, as a chunk of its own (`live-connection.tsx`), and not on
+  a page that never needs a wallet. It is fetched when a wallet was remembered from an earlier visit (so it can reconnect),
+  when the chooser is requested, or when something connects. Until it loads, `useWalletConnection()` is an idle connection
+  (nothing connected, nothing installed); a connect made meanwhile waits for the library and for it to find the wallet asked for
+  (up to 3 seconds), then connects. A test in a real browser fails if the library is fetched on page load.
 - `useWalletConnection().signMessage` requires a connected account and explicitly requests BIP-322
   for its address. This diagnostic primitive does not establish a session or qualify wallet support.
 - `@ador/wallet/registration` contributes LaserEyes through one explicit provider-registry entry.

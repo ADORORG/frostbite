@@ -19,9 +19,19 @@ interface WalletChooser {
 
 const Chooser = createContext<WalletChooser | null>(null);
 
-export function WalletChooserProvider({ children }: { children: ReactNode }) {
+export function WalletChooserProvider({
+  children,
+  onRequest,
+}: {
+  children: ReactNode;
+  // Called whenever the chooser is asked for, before it opens (the app starts loading the wallet library here).
+  onRequest?: () => void;
+}) {
   const [open, setOpen] = useState(false);
-  const request = useCallback(() => setOpen(true), []);
+  const request = useCallback(() => {
+    onRequest?.();
+    setOpen(true);
+  }, [onRequest]);
   const dismiss = useCallback(() => setOpen(false), []);
   const value = useMemo(
     () => ({ dismiss, open, request }),
