@@ -12,6 +12,7 @@
     "./local-backend": "./src/local-backend.ts",
     "./policy": "./src/policy.ts",
     "./protocol": "./src/protocol.ts",
+    "./run-record": "./src/run-record.ts",
     "./storage-shim": "./src/storage-shim.ts",
     "./synced-backend": "./src/synced-backend.ts"
   },
@@ -83,6 +84,10 @@
       "./protocol": {
         "types": "./dist/protocol.d.ts",
         "default": "./dist/protocol.js"
+      },
+      "./run-record": {
+        "types": "./dist/run-record.d.ts",
+        "default": "./dist/run-record.js"
       },
       "./storage-shim": {
         "types": "./dist/storage-shim.d.ts",
