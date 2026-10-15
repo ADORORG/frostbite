@@ -14,6 +14,8 @@ import { pickDistinct } from "./seeded.ts";
 // The numbers mirror the game's own economy (`games/frostbite/src/legacy/app.jsx` and `progression.jsx`): the base
 // payout, its factor, the bonus for clearing a board, and the glacier tier costs.
 
+// The game this verifier belongs to: the id its manifest (`configs/games/frostbite.ts`) is registered under.
+export const iceFieldGameId = "frostbite";
 export const iceFieldVerifierId = "ice-field";
 export const iceFieldVersion = 1;
 

@@ -5,6 +5,7 @@ import {
   defaultMines,
   firstGlacier,
   firstWin,
+  iceFieldGameId,
   iceFieldMines,
   iceFieldVerifierId,
   iceFieldVersion,
@@ -19,7 +20,7 @@ export function iceFieldSampleRun(): RunRecord {
   const mines = iceFieldMines(seed, 0, defaultMines);
   const recorder = createRunRecorder({
     config: { mines: defaultMines },
-    gameId: "frostbite",
+    gameId: iceFieldGameId,
     seed,
     verifier: iceFieldVerifierId,
     verifierVersion: iceFieldVersion,
