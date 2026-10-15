@@ -15,7 +15,12 @@ const byOperation = (a: { operationId: string }, b: { operationId: string }) =>
 describe("accounts feature registration", () => {
   it("declares the complete detachable access contract", () => {
     expect(accountsFeature.manifest).toMatchObject({
-      capabilities: ["api-routes", "authenticated-page", "navigation"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "public-page",
+      ],
       id: "accounts",
       pages: [
         { access: { kind: "public" }, path: "/sign-in" },
@@ -26,6 +31,21 @@ describe("accounts feature registration", () => {
         },
       ],
       routes: allRoutes,
+    });
+  });
+
+  it("offers visitors a public way to the sign-in page and shows staff only the admin entry", () => {
+    const entries = accountsFeature.manifest.navigation ?? [];
+    expect(entries.find(({ href }) => href === "/sign-in")).toMatchObject({
+      access: { kind: "public" },
+      label: "Sign in",
+    });
+    expect(entries.find(({ href }) => href === "/account")?.access).toEqual({
+      kind: "authenticated",
+    });
+    expect(entries.find(({ href }) => href === "/admin")?.access).toEqual({
+      capability: "platform:operate",
+      kind: "platform",
     });
   });
 

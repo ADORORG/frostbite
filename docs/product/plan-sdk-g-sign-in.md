@@ -135,7 +135,7 @@ every file in the task record when it is deleted.
 
 ## 7. Risks
 
-- Enforcing the CSP (task #56) would break the wallet library: signing from the widget stops working.
+- Enforcing the CSP (task #56) may affect the wallet library (it evaluates code and the report-only policy reports it). Unverified: the repository checklist says the library copes with the blocked probe; task #56 tests it.
 - Removing `/connect` removes the only physical-evidence tool. If the owner wants to re-test wallets, the tool must be
   rebuilt (accepted by the owner).
 - Wallet users have a placeholder email; the future email adapter needs the rule in section 3.

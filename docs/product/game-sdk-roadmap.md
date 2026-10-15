@@ -212,7 +212,10 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 
 The plan for SDK-G is `docs/product/plan-sdk-g-sign-in.md`: what already exists in the auth code, the findings that change
 the work (the wallet sign-in core is built and has no routes or UI; a test-only route in the app is not needed),
-the design, phases, tests and risks. It is **awaiting owner approval**; four small questions are listed in section 8.
+the design, phases, tests and risks. It was **approved with the defaults on 2026-10-13** and is built on branch `feat/sign-in-adapters` (task #58, record
+`references/sign-in-adapters-task-record.md`): wallet sign-in, link, step-up, unlink (24-hour hold), methods list and
+sign-out; the interim page and panel at `/sign-in` (and on `/account`); `/connect` and the qualification tooling removed.
+The header widget (SDK-F, #55) is the next screen on top of it.
 
 Each decided item becomes its own task (SDK-1b, SDK-2, SDK-3, SDK-8 publish) with a plan to be approved before
 building, since each changes stored data or a public contract.

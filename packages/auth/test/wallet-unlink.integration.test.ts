@@ -125,6 +125,25 @@ describe("removing a wallet in PostgreSQL", () => {
     expect(await walletsOf(userId)).toHaveLength(2);
   });
 
+  it("refuses a session that was signed out after the request loaded it, and changes nothing", async () => {
+    const { token, userId } = await signIn();
+    const spare = await addWallet(userId);
+    const session = await activeSession(userId, token);
+    await database
+      .update(authSessions)
+      .set({ revokedAt: clock.now })
+      .where(eq(authSessions.id, session.sessionId));
+    expect(
+      await methods.unlink({
+        correlationId: createUuidV7(),
+        session,
+        walletId: spare,
+      }),
+    ).toEqual({ code: "missing", ok: false });
+    expect(await walletsOf(userId)).toHaveLength(2);
+    expect(await database.select().from(releasedWallets)).toEqual([]);
+  });
+
   it("lets only one of two removals at once through, so the account keeps a way in", async () => {
     const { token, userId } = await signIn();
     const [first] = await walletsOf(userId);

@@ -60,7 +60,12 @@ export function createAccountsEntrypoint(
     listMethods,
   ] = createWalletMethodsOperations(getWalletServices);
   return {
-    capabilities: ["api-routes", "authenticated-page", "navigation"],
+    capabilities: [
+      "api-routes",
+      "authenticated-page",
+      "navigation",
+      "public-page",
+    ],
     id: "accounts",
     operations: [
       registerHttpOperation(list),

@@ -15,7 +15,7 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
   await expect(bar(page).getByRole("link")).toHaveText([
     "Collections",
     "Games",
-    "Connect",
+    "Sign in",
   ]);
   await expect(page.getByRole("link", { name: "Studio" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Admin" })).toHaveCount(0);
@@ -45,10 +45,10 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
   }
 
   await page.goto("/");
-  await bar(page).getByRole("link", { name: "Connect", exact: true }).click();
-  await expect(page).toHaveURL(/\/connect$/);
+  await bar(page).getByRole("link", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
   await expect(
-    page.getByRole("heading", { name: "Connect a candidate wallet" }),
+    page.getByRole("heading", { name: "Sign in", level: 1 }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Choose wallet", exact: true })
@@ -65,7 +65,7 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
     page.getByRole("button", { name: "Choose wallet", exact: true }),
   ).toBeFocused();
   await expect(
-    page.getByText("Signing in remains disabled", { exact: false }),
+    page.getByText("Connect a wallet to sign in.", { exact: false }),
   ).toBeVisible();
 });
 

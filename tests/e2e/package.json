@@ -14,6 +14,7 @@
     "audit:game": "node --experimental-strip-types scripts/audit-game.ts"
   },
   "devDependencies": {
+    "@ador/auth": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/test-kit": "workspace:*",
