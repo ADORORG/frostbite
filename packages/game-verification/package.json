@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./conformance": "./src/conformance.ts",
     "./policy": "./src/policy.ts",
     "./registry": "./src/registry.ts",
     "./verifier": "./src/verifier.ts",

@@ -1,3 +1,5 @@
+import type { RunRecord } from "@ador/game-sdk/run-record";
+
 import type { GameVerifier } from "../src/verifier.ts";
 
 // A tiny deterministic game for the tests: add 1 to 3 to a counter until it reaches a target, then stop. It earns
@@ -57,4 +59,25 @@ export const crashingRules: GameVerifier<number> = {
     throw new Error("a bug in the game's rules");
   },
   version: 1,
+};
+
+export const counterSample: RunRecord = {
+  claims: ["reached"],
+  config: { target: 5 },
+  gameId: "counting",
+  inputs: [
+    { data: 3, type: "add" },
+    { data: 2, type: "add" },
+  ],
+  schemaVersion: 1,
+  seed: 0,
+  verifier: "counter",
+  verifierVersion: 1,
+};
+
+export const crashingSample: RunRecord = {
+  ...counterSample,
+  claims: [],
+  gameId: "crashy",
+  verifier: "crashing",
 };

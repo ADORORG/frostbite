@@ -6,7 +6,7 @@ specification is `docs/product/run-record.md`.
 
 ## Public API
 
-- `@ador/game-verification/verifier`: `GameVerifier<State>` (a pure state machine: `init`, `step`, `earned`) and
+- `@ador/game-verification/verifier`: re-exports `GameVerifier<State>` (a pure state machine: `init`, `step`, `earned`; defined in the SDK so a game needs nothing from the platform) and
   `defineVerifier`, which folds the state type away so different games share a registry.
 - `@ador/game-verification/registry`: `createVerifierRegistry` (explicit, one entry per verifier id, bound to a game).
 - `@ador/game-verification/policy`: typed limits (`maxInputs`, `maxRecordBytes`), never above the SDK's ceilings.

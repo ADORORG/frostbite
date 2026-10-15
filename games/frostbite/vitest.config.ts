@@ -9,7 +9,7 @@ const coverage = {
     lines: 90.01,
     statements: 90.01,
   },
-  include: ["src/platform/**/*.ts"],
+  include: ["src/platform/**/*.ts", "src/verifier/**/*.ts"],
 };
 
 export default defineConfig({

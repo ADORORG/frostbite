@@ -47,6 +47,9 @@ importers:
       '@ador/feature-uploads':
         specifier: workspace:*
         version: link:features/uploads
+      '@ador/game-verification':
+        specifier: workspace:*
+        version: link:packages/game-verification
       '@ador/http':
         specifier: workspace:*
         version: link:packages/http
@@ -68,6 +71,9 @@ importers:
       '@ador/wallet':
         specifier: workspace:*
         version: link:packages/wallet
+      '@game/frostbite':
+        specifier: workspace:*
+        version: link:games/frostbite
       '@repo/config':
         specifier: workspace:*
         version: link:packages/config
@@ -132,6 +138,9 @@ importers:
       '@ador/game-sdk':
         specifier: workspace:*
         version: link:../../packages/game-sdk
+      '@ador/game-verification':
+        specifier: workspace:*
+        version: link:../../packages/game-verification
       '@ador/http':
         specifier: workspace:*
         version: link:../../packages/http

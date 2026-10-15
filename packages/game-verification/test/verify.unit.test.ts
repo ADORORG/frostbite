@@ -7,11 +7,24 @@ import { resolveVerificationPolicy } from "../src/policy.ts";
 import { createVerifierRegistry } from "../src/registry.ts";
 import { defineVerifier } from "../src/verifier.ts";
 import { verifyRun } from "../src/verify.ts";
-import { counterRules, crashingRules } from "./counter-game.ts";
+import {
+  counterRules,
+  counterSample,
+  crashingRules,
+  crashingSample,
+} from "./counter-game.ts";
 
 const registry = createVerifierRegistry([
-  { gameId: "counting", verifier: defineVerifier(counterRules) },
-  { gameId: "crashy", verifier: defineVerifier(crashingRules) },
+  {
+    gameId: "counting",
+    sample: counterSample,
+    verifier: defineVerifier(counterRules),
+  },
+  {
+    gameId: "crashy",
+    sample: crashingSample,
+    verifier: defineVerifier(crashingRules),
+  },
 ]);
 const good = (over: Partial<RunRecord> = {}): RunRecord => ({
   claims: ["reached"],
@@ -79,6 +92,11 @@ describe("verifying a run record", () => {
       JSON.stringify(Object.fromEntries(Object.entries(record).reverse())),
     );
     expect(digestOf(reordered)).toBe(digestOf(record));
+    // Keys inside the record, not only its top level: the same settings written in another order.
+    const settings = (config: Record<string, number>) =>
+      digestOf(good({ config: { target: 5, ...config } }));
+    expect(settings({ a: 1, b: 2 })).toBe(settings({ b: 2, a: 1 }));
+    expect(settings({ a: 1, b: 2 })).not.toBe(settings({ a: 1, b: 3 }));
     expect(digestOf(good({ seed: 2 }))).not.toBe(digestOf(record));
     expect(digestOf(good({ claims: [] }))).not.toBe(digestOf(record));
   });

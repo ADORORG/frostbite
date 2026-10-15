@@ -31,6 +31,7 @@
     "@ador/feature-public-collections": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/game-sdk": "workspace:*",
+    "@ador/game-verification": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/object-storage": "workspace:*",
     "@ador/plugin-kit": "workspace:*",

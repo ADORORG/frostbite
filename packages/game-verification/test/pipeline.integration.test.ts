@@ -4,12 +4,16 @@ import { describe, expect, it } from "vitest";
 import { createVerifierRegistry } from "../src/registry.ts";
 import { defineVerifier } from "../src/verifier.ts";
 import { verifyRun } from "../src/verify.ts";
-import { counterRules } from "./counter-game.ts";
+import { counterRules, counterSample } from "./counter-game.ts";
 
 // The whole path a run takes: a game records it as it plays, the record travels as JSON text, and the platform checks
 // what arrives.
 const registry = createVerifierRegistry([
-  { gameId: "counting", verifier: defineVerifier(counterRules) },
+  {
+    gameId: "counting",
+    sample: counterSample,
+    verifier: defineVerifier(counterRules),
+  },
 ]);
 const play = (
   moves: readonly number[],

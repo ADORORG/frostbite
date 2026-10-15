@@ -7,11 +7,12 @@
     "@ador/feature-collection-review": "workspace:*",
     "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
+    "@ador/feature-games": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-collections": "workspace:*",
-    "@ador/feature-games": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
+    "@ador/game-verification": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/provider-media-processing-sharp": "workspace:*",
@@ -19,6 +20,7 @@
     "@ador/provider-workflows-inngest": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/wallet": "workspace:*",
+    "@game/frostbite": "workspace:*",
     "@repo/config": "workspace:*"
   },
   "scripts": {

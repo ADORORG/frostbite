@@ -91,3 +91,27 @@ export function createRunRecorder(start: RunStart) {
     },
   };
 }
+
+// A game's rules for replay, as a pure state machine the platform can run on its own server. A game exports one of
+// these (it needs nothing from the platform to write it); the platform holds and runs it, never the game's browser
+// bundle. It owns its seeded generator and nothing else: no clock, no `Math.random`, no network, no storage, and the
+// same seed and inputs always give the same end state. It refuses an input that is not legal in the state it is in; it
+// never throws for one.
+export type Stepped<State> =
+  | { readonly ok: true; readonly state: State }
+  | { readonly ok: false; readonly reason: string };
+
+export interface GameVerifier<State> {
+  // The milestones the run has earned in this state (the ones the game's own rules say are reached).
+  earned(state: State): readonly string[];
+  // What a record names to be replayed by these rules.
+  readonly id: string;
+  // Starts a run. Refuses settings the game does not allow (a mine count out of range, say).
+  init(
+    seed: number,
+    config: Readonly<Record<string, JsonValue>>,
+  ): Stepped<State>;
+  step(state: State, input: RunInput): Stepped<State>;
+  // The version of these rules; a record made under another version is not replayed.
+  readonly version: number;
+}

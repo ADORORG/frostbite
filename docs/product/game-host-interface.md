@@ -117,9 +117,9 @@ Answered in a second round:
   microphone, location or file access).
 - **Build first:** the SDK, the isolated frame and a simulated test game, before touching FROST·BITE.
 
-Still open:
-
-- The shape of a deterministic run record for replay verification (a spike with the first game).
+Settled by the G6 spike (2026-10-15): the shape of a deterministic run record, the verifier contract and the replay
+pipeline are in `docs/product/run-record.md`. Still open: the claim path that submits a record (task #62), and a game
+that records its own runs (FROST·BITE's real-time cabinets cannot yet; task #61 and #63).
 
 ## 8. What is built (2026-10-12) and where it differs
 

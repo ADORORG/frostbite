@@ -1,8 +1,13 @@
+import type { RunRecord } from "@ador/game-sdk/run-record";
+
 import type { Verifier } from "./verifier.ts";
 
 export interface RegisteredVerifier {
   // The game this verifier belongs to: a record for another game is refused even if it names this verifier.
   readonly gameId: string;
+  // One legal run of the game that earns something, supplied with the verifier. Conformance replays it and mutates it,
+  // so a verifier cannot be registered without a run that shows what it accepts.
+  readonly sample: RunRecord;
   readonly verifier: Verifier;
 }
 
