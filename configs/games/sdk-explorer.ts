@@ -10,7 +10,7 @@ if (signet === undefined) throw new Error("No target chain is configured.");
 // platform is run for development or tests (see configs/games.ts), never in a deployment players use. It
 // declares the wallet capability so that the address call can be seen answering.
 export const sdkExplorerGame = defineGame({
-  capabilities: ["wallet"],
+  capabilities: ["run:submit", "wallet"],
   description:
     "Press a button to call the platform and see what comes back. Events the platform sends on its own appear in the same list.",
   id: "sdk-explorer",

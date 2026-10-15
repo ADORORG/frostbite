@@ -3,6 +3,7 @@ import {
   createGameHost,
   type GameHost,
   type HostedGame,
+  type RunsService,
 } from "@ador/game-sdk/host";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
 import {
@@ -23,6 +24,7 @@ import {
 } from "react";
 
 import { createAccountPort } from "../client/account-sync.ts";
+import { createRunsService } from "../client/runs-port.ts";
 import { useHostEvents } from "./use-host-events.ts";
 
 // How long a "milestone reached" notice stays up.
@@ -77,6 +79,8 @@ export function useGameSession(
     readonly title: string;
     readonly wallet?: WalletInfo | null;
   } = { title: game.id },
+  // How the game reaches the platform to start and settle replay-verified runs.
+  runsFor: (gameId: string) => RunsService = createRunsService,
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [progress, setProgress] = useState<MilestoneProgress>(noProgress);
@@ -101,6 +105,7 @@ export function useGameSession(
   // The account is looked up when the session starts, not whenever the function that finds it is a new one: a
   // session restarted by a re-render would reload the game and lose what the player was doing.
   const remoteFor = useEffectEvent((gameId: string) => accountFor(gameId));
+  const runsOf = useEffectEvent((gameId: string) => runsFor(gameId));
 
   useEffect(() => {
     const element = frame.current;
@@ -172,7 +177,8 @@ export function useGameSession(
         if (
           event.type === "milestone-unlocked" ||
           event.type === "milestone-counted" ||
-          event.type === "milestone-progress"
+          event.type === "milestone-progress" ||
+          event.type === "run-verified"
         )
           refresh();
       },
@@ -182,6 +188,7 @@ export function useGameSession(
       reply: (message) => target.postMessage(message, "*"),
       // The game's words are shown as the game's: a message from it must not pass for the platform's.
       services: {
+        runs: runsOf(id),
         toast: (message) => show(`${title}: ${message}`),
         wallet: () => walletNow.current ?? null,
         // Offered only when the page has a way to open the chooser; otherwise the game is told it is unavailable.

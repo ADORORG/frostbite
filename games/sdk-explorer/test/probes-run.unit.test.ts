@@ -94,6 +94,24 @@ describe("each call, against the real host", () => {
     expect(value(outcome)).toEqual({ signedIn: false, walletConnected: false });
   });
 
+  it("run.start says the platform has no run for a game that publishes no rules, and is refused without the capability", async () => {
+    expect(value((await run("run-start", ["run:submit"])).outcome)).toEqual({
+      reason: "not-supported",
+      status: "unavailable",
+    });
+    expect(value((await run("run-start", [])).outcome)).toMatchObject({
+      code: "permission_denied",
+      kind: "refused",
+    });
+  });
+
+  it("run.submit shows the refusal for a run that was never issued", async () => {
+    expect(value((await run("run-submit", ["run:submit"])).outcome)).toEqual({
+      reason: "unknown-run",
+      status: "refused",
+    });
+  });
+
   it("wallet.get returns the address when declared, and a refusal when not", async () => {
     expect(value((await run("wallet")).outcome)).toEqual({
       wallet: { address, network: "signet" },

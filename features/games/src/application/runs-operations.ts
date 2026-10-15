@@ -1,6 +1,6 @@
 import type { GameRunsService } from "@ador/game-runs";
 import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import { unauthenticated } from "@ador/http/outcome";
 import {
   startGameRunInputSchema,
   startGameRunResponseSchema,
@@ -15,25 +15,33 @@ import {
 } from "@ador/shared/games";
 
 // Starts a run for the signed-in player. The owner is the session, never a field of the request. A game the platform has no
-// verifier for answers not found: it cannot be replayed, so there is no run to give.
+// verifier for, or a player with too many open runs, is an answer ("unavailable", with why), not an error.
 export function createStartGameRunOperation(
   getService: () => Promise<GameRunsService>,
 ) {
   return {
     access: { kind: "authenticated" },
-    applicationErrors: ["conflict", "not_found", "unauthorized"],
+    applicationErrors: ["unauthorized"],
     execute: async (input, context) => {
       if (context.actorUserId === null) return unauthenticated;
       const outcome = await (
         await getService()
       ).start(context.actorUserId, input.gameId);
-      if (outcome.ok) return { ok: true, value: outcome.run } as const;
-      return outcome.code === "unavailable"
-        ? failure("not_found", "This game has no replay verification.")
-        : failure(
-            "conflict",
-            "This player has too many unfinished runs of this game.",
-          );
+      if (outcome.ok)
+        return {
+          ok: true,
+          value: { ...outcome.run, status: "started" },
+        } as const;
+      return {
+        ok: true,
+        value: {
+          reason:
+            outcome.code === "unavailable"
+              ? "not-supported"
+              : "too-many-open-runs",
+          status: "unavailable",
+        },
+      } as const;
     },
     idempotency: "none",
     input: "json",
@@ -43,37 +51,40 @@ export function createStartGameRunOperation(
   } satisfies HttpOperation<StartGameRunInput, StartGameRunResponse>;
 }
 
-const refusals = {
-  "already-submitted": "This run was already submitted.",
-  expired: "This run has expired.",
-  stale: "The game's rules changed since this run was started.",
+const refusalOf = {
+  "already-submitted": "already-submitted",
+  expired: "expired",
+  "not-found": "unknown-run",
+  stale: "stale",
 } as const;
 
-// Submits the record of a run the player was issued. A record the replay rejects is an answer, not an error: the run is
-// spent either way (the seed is not reusable), and the response says which it was.
+// Submits the record of a run the player was issued. Every outcome is an answer: verified, rejected with the reason (the run
+// is spent either way, so the seed is not reusable), or refused because nothing could be replayed. Only a caller with no
+// session is an error.
 export function createSubmitGameRunOperation(
   getService: () => Promise<GameRunsService>,
 ) {
   return {
     access: { kind: "authenticated" },
-    applicationErrors: ["conflict", "not_found", "unauthorized"],
+    applicationErrors: ["unauthorized"],
     execute: async (input, context) => {
       if (context.actorUserId === null) return unauthenticated;
       const outcome = await (
         await getService()
       ).submit(context.actorUserId, input.gameId, input.runId, input.record);
-      if (outcome.ok)
+      if (!outcome.ok)
         return {
           ok: true,
-          value: {
-            earned: [...outcome.verdict.earned],
-            reason: outcome.verdict.reason,
-            status: outcome.verdict.status,
-          },
+          value: { reason: refusalOf[outcome.code], status: "refused" },
         } as const;
-      return outcome.code === "not-found"
-        ? failure("not_found", "The run was not found.")
-        : failure("conflict", refusals[outcome.code]);
+      const { earned, reason, status } = outcome.verdict;
+      return {
+        ok: true,
+        value:
+          status === "verified"
+            ? { earned: [...earned], status }
+            : { reason: reason ?? "rejected", status },
+      } as const;
     },
     idempotency: "none",
     input: "json",

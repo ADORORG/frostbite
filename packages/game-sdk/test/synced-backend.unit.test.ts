@@ -199,3 +199,64 @@ describe("the backend that syncs with the account", () => {
     expect(sync.mock.calls[2]?.[0].progress?.state).toEqual({ taps: 3 });
   });
 });
+
+describe("taking back what the platform verified", () => {
+  const verified = {
+    count: 1,
+    id: "first-win",
+    unlockedAt: "2026-10-05T00:00:00.000Z",
+    verification: "replay-verified" as const,
+  };
+
+  it("syncs once more and takes only the replay-verified milestones into the browser's copy", async () => {
+    let answers = 0;
+    const { backend, sync } = setup(async () => {
+      answers += 1;
+      return {
+        kind: "synced",
+        playerId: accountPlayer,
+        state:
+          answers === 1
+            ? empty
+            : {
+                counters: [],
+                milestones: [...remoteState.milestones, verified],
+                progress: remoteState.progress,
+              },
+      };
+    });
+    await backend.unlock("local-only", at, 1);
+    await backend.refreshVerified?.();
+    const held = await backend.milestones();
+    expect(held["first-win"]).toEqual({
+      count: 1,
+      unlockedAt: verified.unlockedAt,
+      verification: "replay-verified",
+    });
+    // The reported milestone the account also holds, and the game's own progress, are not brought in by this sync.
+    expect(held["ten-taps"]).toBeUndefined();
+    expect(await backend.loadProgress()).toBeNull();
+    expect(held["local-only"]).toMatchObject({ verification: "self-reported" });
+    expect(sync.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("changes nothing when nobody is signed in", async () => {
+    const { backend, sync } = setup(async () => ({ kind: "signed-out" }));
+    await backend.refreshVerified?.();
+    expect(await backend.milestones()).toEqual({});
+    expect(sync).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves the browser's copy alone when the account cannot be reached, and says the account is behind", async () => {
+    let answers = 0;
+    const { backend, statuses } = setup(async () => {
+      answers += 1;
+      return answers === 1
+        ? { kind: "synced", playerId: accountPlayer, state: empty }
+        : { kind: "failed" };
+    });
+    await backend.refreshVerified?.();
+    expect(await backend.milestones()).toEqual({});
+    expect(statuses.at(-1)).toBe("pending");
+  });
+});

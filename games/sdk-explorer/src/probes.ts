@@ -14,6 +14,9 @@ export const exploredMilestone = "first-call";
 // The milestone with a target (configs/games/sdk-explorer.ts); each press of the progress probe reports one more.
 export const progressMilestone = "ten-presses";
 
+// A run id no run has: the platform answers `unknown-run` whoever is signed in, which is what the probe shows.
+export const neverIssuedRun = "00000000-0000-4000-8000-000000000000";
+
 // The counter this game keeps in its save: how many times it has been saved from here. Anything else a save
 // might hold is a counter that starts again at nothing.
 function savedCalls(saved: JsonValue | null): number {
@@ -48,6 +51,20 @@ export const probes: readonly Probe[] = [
     label: "wallet.connect",
     // Opens the platform's wallet chooser; the outcome comes back as the `wallet.changed` event, not as an answer.
     run: (client) => client.wallet.connect().then((status) => ({ status })),
+  },
+  {
+    id: "run-start",
+    label: "run.start",
+    // Asks for a run. This game has no replay verifier, so the platform says `not-supported` (or `signed-out`): the
+    // answer a game without rules for the platform to replay always gets.
+    run: (client) => client.run.start(),
+  },
+  {
+    id: "run-submit",
+    label: "run.submit",
+    // Submits a record for a run that was never issued, to show the shape of a refusal. A game submits the record of
+    // the run `run.start` gave it, built with `@ador/game-sdk/run-record`.
+    run: (client) => client.run.submit(neverIssuedRun, {}),
   },
   {
     id: "progress-load",

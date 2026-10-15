@@ -22,6 +22,7 @@ export type {
   HostedGame,
   HostEvent,
   HostServices,
+  RunsService,
 } from "./host-types.ts";
 import type {
   GameHost,
@@ -56,6 +57,7 @@ export function createGameHost(options: {
   const { within } = createRateLimiter(now, [
     "connect",
     "progress",
+    "run",
     "save",
     "toast",
     "unlock",
@@ -119,6 +121,35 @@ export function createGameHost(options: {
         if (open === undefined) return { status: "unavailable" };
         open();
         return { status: "requested" };
+      }
+      case "run.start": {
+        if (!within("run", policy.runCallsPerMinute))
+          throw new Refusal("rate_limited", "Starting runs too often.");
+        return (
+          (await services?.runs?.start()) ?? {
+            reason: "not-supported",
+            status: "unavailable",
+          }
+        );
+      }
+      case "run.submit": {
+        const { record, runId } = methods["run.submit"].params.parse(params);
+        if (
+          new TextEncoder().encode(JSON.stringify(record)).length >
+          policy.runRecordMaxBytes
+        )
+          throw new Refusal("too_large", "The run record is too large.");
+        if (!within("run", policy.runCallsPerMinute))
+          throw new Refusal("rate_limited", "Submitting runs too often.");
+        const settled = (await services?.runs?.submit(runId, record)) ?? {
+          reason: "unknown-run",
+          status: "refused",
+        };
+        if (settled.status === "verified" && settled.earned.length > 0) {
+          await backend.refreshVerified?.();
+          onEvent?.({ earned: settled.earned, type: "run-verified" });
+        }
+        return settled;
       }
       case "progress.load":
         return { state: await backend.loadProgress() };

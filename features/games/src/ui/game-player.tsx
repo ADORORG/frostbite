@@ -1,6 +1,6 @@
 "use client";
 
-import type { HostedGame } from "@ador/game-sdk/host";
+import type { HostedGame, RunsService } from "@ador/game-sdk/host";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { GameMilestone } from "@ador/shared/games";
@@ -49,6 +49,7 @@ export function GamePlayer({
   back,
   game,
   meta,
+  runsFor,
   sections = [],
   src,
   title,
@@ -61,6 +62,8 @@ export function GamePlayer({
   readonly game: HostedGame & { readonly milestones: readonly GameMilestone[] };
   // Small facts beside the title in the bar (version, network).
   readonly meta?: ReactNode;
+  // How the page reaches the platform to start and settle runs; the real one unless a test supplies another.
+  readonly runsFor?: (gameId: string) => RunsService;
   // More sections for the dock under the stage, after the player's milestones.
   readonly sections?: readonly DockSection[];
   readonly src: string;
@@ -81,6 +84,7 @@ export function GamePlayer({
     src,
     accountFor,
     { connectWallet: wallet?.connect, title, wallet: wallet?.current },
+    runsFor,
   );
   const fullscreen = useFullscreen(frame);
   const phoneLandscape = usePhoneLandscape();

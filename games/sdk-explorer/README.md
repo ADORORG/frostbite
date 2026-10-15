@@ -8,6 +8,9 @@ It declares the `wallet` capability so `wallet.get` can be seen answering; witho
 is `null`. `wallet.connect` asks the platform to open its wallet chooser (the outcome arrives as `wallet.changed`). The game keeps one counter in its save (`progress.save`) and declares one milestone, `first-call`,
 earned by `milestones.unlock`.
 
+It declares `run:submit` so `run.start` and `run.submit` can be seen answering. It publishes no replay rules, so the platform
+answers `run.start` with `not-supported` (or `signed-out`), and `run.submit` is shown refusing a run that was never issued.
+
 It is registered only where the platform runs for development or tests (`configs/games.ts`).
 
 `src/probes.ts` is the list of calls and how a result is described; `src/main.ts` is the page.

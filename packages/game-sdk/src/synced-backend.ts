@@ -52,13 +52,21 @@ export function createSyncedBackend(options: {
     options.onStatus?.(next);
   }
 
-  async function exchange(applyResult: boolean): Promise<void> {
+  // What a sync does with the merged state it gets back: `all` replaces the browser's copy (only the first, before the game
+  // reads), `verified` takes only the milestones the account has replay-verified, `none` leaves the copy alone.
+  type Apply = "all" | "none" | "verified";
+  let verifiedWanted = false;
+
+  async function exchange(apply: Apply): Promise<void> {
     if (signedOut) return;
     let result: AccountSyncResult;
     try {
       result = await remote.sync(local.snapshot());
       // Storage that refuses the merged state (full, or blocked) is a failed sync like any other.
-      if (result.kind === "synced" && applyResult) local.replace(result.state);
+      if (result.kind === "synced" && apply === "all")
+        local.replace(result.state);
+      if (result.kind === "synced" && apply === "verified")
+        local.adoptVerified(result.state.milestones);
       if (result.kind === "synced" && result.playerId !== accountId) {
         accountId = result.playerId;
         options.onIdentity?.({ id: accountId, kind: "account" });
@@ -73,7 +81,7 @@ export function createSyncedBackend(options: {
   }
 
   // The first read waits for one reconcile, so the game starts from the merged state.
-  const reconciled = exchange(true);
+  const reconciled = exchange("all");
 
   // Sends the latest state; changes made while a send is under way are covered by one more send afterwards,
   // so the account is never sent more than one request at a time and ends with the latest state.
@@ -84,7 +92,9 @@ export function createSyncedBackend(options: {
       await reconciled;
       while (dirty) {
         dirty = false;
-        await exchange(false);
+        const apply = verifiedWanted ? "verified" : "none";
+        verifiedWanted = false;
+        await exchange(apply);
       }
     })().finally(() => {
       sending = null;
@@ -92,6 +102,14 @@ export function createSyncedBackend(options: {
   }
 
   return {
+    // After the platform verified a run: one more sync, taking back the milestones it verified. Resolves when that sync is
+    // done, so the game reads the verified level on its next call.
+    refreshVerified: async () => {
+      await reconciled;
+      verifiedWanted = true;
+      push();
+      while (sending !== null) await sending;
+    },
     // The id waits for the first reconcile like the first read does, so a signed-in player's game starts with the
     // account's id and not one that is about to change.
     identity: async () => {

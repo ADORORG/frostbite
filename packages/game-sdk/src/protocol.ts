@@ -1,97 +1,38 @@
 import "./zod-config.ts";
 import { z } from "zod";
 
-// The one conversation between a game and the page that hosts it. Versioned, every message validated on both
-// sides. A game cannot do anything the platform has not put in this list.
-export const gameChannel = "ador-game";
-export const protocolVersion = 1;
+import {
+  errorCodeSchema,
+  gameChannel,
+  jsonValueSchema,
+  milestoneStatusSchema,
+  playerIdentitySchema,
+  playerInfoSchema,
+  protocolVersion,
+  toastMaxLength,
+  walletInfoSchema,
+} from "./protocol-values.ts";
 
-export type JsonValue =
-  | boolean
-  | number
-  | string
-  | null
-  | readonly JsonValue[]
-  | { readonly [key: string]: JsonValue };
-
-// Anything the game saves is plain JSON: what survives being copied between frames and stored as text.
-export const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
-  z.union([
-    z.null(),
-    z.boolean(),
-    z.number().refine(Number.isFinite, "Numbers must be finite."),
-    z.string(),
-    z.array(jsonValueSchema),
-    z.record(z.string(), jsonValueSchema),
-  ]),
-);
-
-export const errorCodes = [
-  "invalid_request",
-  "not_ready",
-  "permission_denied",
-  "rate_limited",
-  "too_large",
-  "unavailable",
-  "unknown_method",
-  "unknown_milestone",
-] as const;
-export const errorCodeSchema = z.enum(errorCodes);
-export type ErrorCode = z.infer<typeof errorCodeSchema>;
-
-// Who the game is told the player is: an opaque id for this game alone. `local` is made in this browser and
-// kept here; `account` is made for the signed-in player's account and is the same on every device. It changes
-// once, from local to account, when a player signs in, and the game is told (`player.changed`). It is random:
-// nothing in it identifies the person, and another game is given a different one.
-export const playerIdentitySchema = z
-  .object({
-    id: z.string().regex(/^[A-Za-z0-9-]{8,64}$/u),
-    kind: z.enum(["local", "account"]),
-  })
-  .strict();
-export type PlayerIdentity = z.infer<typeof playerIdentitySchema>;
-
-export const playerInfoSchema = z
-  .object({ signedIn: z.boolean(), walletConnected: z.boolean() })
-  .strict();
-export type PlayerInfo = z.infer<typeof playerInfoSchema>;
-
-// How a claim was established: `self-reported` (the game said so) or `replay-verified` (the platform replayed a run under
-// the game's published rules; it proves the run was legal, not that a person played it). The platform's manifest names
-// the same two levels; a test keeps the lists equal.
-export const verificationLevels = ["self-reported", "replay-verified"] as const;
-export const verificationSchema = z.enum(verificationLevels);
-export type VerificationLevel = z.infer<typeof verificationSchema>;
-
-export const milestoneStatusSchema = z
-  .object({
-    claimPolicy: z.enum(["once", "repeatable"]),
-    criteria: z.string(),
-    description: z.string(),
-    id: z.string(),
-    status: z.enum(["locked", "unlocked"]),
-    title: z.string(),
-    unlockedAt: z.iso.datetime({ offset: true }).nullable(),
-    verification: verificationSchema.nullable(),
-  })
-  .strict();
-export type MilestoneStatus = z.infer<typeof milestoneStatusSchema>;
-
-// The wallet a player has connected, as far as a game that declared the `wallet` capability may see it: the
-// public address and the network name. Never a key, a signature, a wallet object or a transaction.
-export const walletInfoSchema = z
-  .object({
-    address: z.string().regex(/^[A-Za-z0-9]{14,90}$/u),
-    network: z.string().regex(/^[a-z0-9-]{1,32}$/u),
-  })
-  .strict();
-export type WalletInfo = z.infer<typeof walletInfoSchema>;
-
-// A message a game may ask the platform to show the player. Plain text, kept short.
-export const toastMaxLength = 140;
+// The values the protocol is built from (its channel and version, JSON, error codes, who the player is, a milestone's status
+// and a wallet) are in protocol-values.ts; they are re-exported here, so this stays the one place a game imports them from.
+export * from "./protocol-values.ts";
 
 const timestamp = z.iso.datetime({ offset: true });
 const empty = z.object({}).strict();
+
+// A run's seed is 32 bits, the same as a run record's.
+export const runSeedMax = 4_294_967_295;
+export const runUnavailableReasons = [
+  "not-supported",
+  "signed-out",
+  "too-many-open-runs",
+] as const;
+export const runRefusalReasons = [
+  "already-submitted",
+  "expired",
+  "stale",
+  "unknown-run",
+] as const;
 
 // Each method: what the game sends, and what it gets back.
 export const methods = {
@@ -193,6 +134,56 @@ export const methods = {
       })
       .strict(),
   },
+  // Asks the platform for a run of the game: a seed to play it from, and one right to submit its record. Needs the
+  // `run:submit` capability. A player who is not signed in, a game the platform cannot replay, and a player with too many
+  // runs open are answered `unavailable`, with why; the game plays on and its milestones stay self-reported.
+  "run.start": {
+    params: empty,
+    result: z.discriminatedUnion("status", [
+      z
+        .object({
+          expiresAt: timestamp,
+          runId: z.string().min(1).max(64),
+          seed: z.number().int().min(0).max(runSeedMax),
+          status: z.literal("started"),
+        })
+        .strict(),
+      z
+        .object({
+          reason: z.enum(runUnavailableReasons),
+          status: z.literal("unavailable"),
+        })
+        .strict(),
+    ]),
+  },
+  // Hands the platform the record of a run it issued (`@ador/game-sdk/run-record`). The platform replays it under the
+  // game's published rules: `verified` (and which milestones that earned), `rejected` (with why; the run is spent), or
+  // `refused` (nothing was replayed). One record per run.
+  "run.submit": {
+    params: z
+      .object({ record: jsonValueSchema, runId: z.string().min(1).max(64) })
+      .strict(),
+    result: z.discriminatedUnion("status", [
+      z
+        .object({
+          earned: z.array(z.string().max(64)),
+          status: z.literal("verified"),
+        })
+        .strict(),
+      z
+        .object({
+          reason: z.string().min(1).max(64),
+          status: z.literal("rejected"),
+        })
+        .strict(),
+      z
+        .object({
+          reason: z.enum(runRefusalReasons),
+          status: z.literal("refused"),
+        })
+        .strict(),
+    ]),
+  },
   ready: {
     params: z.object({ sdkVersion: z.number().int().positive() }).strict(),
     result: z
@@ -212,7 +203,12 @@ export type MethodName = keyof typeof methods;
 export const methodNames = Object.keys(methods) as MethodName[];
 // The manifest capability a method needs before the host answers it. A method not listed needs none.
 export const requiredCapability: Readonly<Partial<Record<MethodName, string>>> =
-  { "wallet.connect": "wallet", "wallet.get": "wallet" };
+  {
+    "run.start": "run:submit",
+    "run.submit": "run:submit",
+    "wallet.connect": "wallet",
+    "wallet.get": "wallet",
+  };
 export type Params<Name extends MethodName> = z.infer<
   (typeof methods)[Name]["params"]
 >;

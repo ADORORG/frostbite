@@ -96,6 +96,15 @@ export interface GameClient {
     handler: (data: EventData<Name>) => void,
   ): () => void;
   ready(): Promise<Result<"ready">>;
+  // Replay-verified runs. Refused with `permission_denied` unless the game declared the `run:submit` capability.
+  readonly run: {
+    // Asks for a run: `started` with the seed to play it from (a seed the game made itself would let it choose an easy
+    // board), or `unavailable` with why (`signed-out`: play on with a local seed; milestones stay self-reported).
+    start(): Promise<Result<"run.start">>;
+    // Submits the record of a run once. The platform replays it under the game's published rules and answers `verified`
+    // (with the milestones it earned), `rejected` (with why) or `refused`. A rejected record spends the run.
+    submit(runId: string, record: JsonValue): Promise<Result<"run.submit">>;
+  };
   readonly ui: {
     // Asks the platform to show the player a short message. Resolves to whether it was shown.
     toast(message: string): Promise<boolean>;
@@ -239,6 +248,10 @@ export function createGameClient(
       return () => void set.delete(handler);
     },
     ready: () => call("ready", { sdkVersion }),
+    run: {
+      start: () => call("run.start", {}),
+      submit: (runId, record) => call("run.submit", { record, runId }),
+    },
     ui: {
       toast: async (message) => (await call("ui.toast", { message })).shown,
     },

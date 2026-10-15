@@ -54,6 +54,9 @@ export interface LocalSnapshot {
 }
 
 export interface LocalBackend extends GameHostBackend {
+  // Takes the replay-verified milestones among the account's into this browser (a reported one is ignored): each is set to the account's record (its level, its
+  // unlock time and the larger count), and nothing else is touched, so what the game is doing meanwhile is not lost.
+  adoptVerified(records: LocalSnapshot["milestones"]): void;
   // Replaces what the browser holds with a merged state from the account (the account's state already
   // includes everything this browser sent).
   replace(snapshot: LocalSnapshot): void;
@@ -109,6 +112,17 @@ export function createLocalBackend(options: {
   }
 
   return {
+    adoptVerified: (adopted) => {
+      const records = read(milestonesKey, recordsSchema) ?? {};
+      for (const { count, id, unlockedAt, verification } of adopted)
+        if (verification === "replay-verified")
+          records[id] = {
+            count: Math.max(count, records[id]?.count ?? 0),
+            unlockedAt,
+            verification,
+          };
+      storage.setItem(milestonesKey, JSON.stringify(records));
+    },
     identity: async () => ({ id: localId(), kind: "local" }),
     replace: (snapshot) => {
       if (snapshot.progress !== null) {

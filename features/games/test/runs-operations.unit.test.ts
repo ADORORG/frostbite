@@ -22,6 +22,7 @@ const context = {
 };
 const runId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 const run = { expiresAt: "2026-10-16T12:00:00.000Z", runId, seed: 7 };
+const ids = { gameId: "any-game" };
 const verdict = {
   digest: "d".repeat(64),
   earned: ["first-win"],
@@ -69,24 +70,22 @@ describe("the start operation", () => {
     const { service, start } = stub();
     expect(await start.execute({ gameId: "any-game" }, context)).toEqual({
       ok: true,
-      value: run,
+      value: { ...run, status: "started" },
     });
     expect(service.start).toHaveBeenCalledWith(userId, "any-game");
   });
 
-  it("says a game with no verifier is not found, and a player with too many open runs has a conflict", async () => {
-    const unavailable = stub({
-      start: async () => ({ code: "unavailable", ok: false }),
-    });
-    expect(
-      await unavailable.start.execute({ gameId: "any-game" }, context),
-    ).toMatchObject({ error: "not_found", ok: false });
-    const crowded = stub({
-      start: async () => ({ code: "too-many-open-runs", ok: false }),
-    });
-    expect(
-      await crowded.start.execute({ gameId: "any-game" }, context),
-    ).toMatchObject({ error: "conflict", ok: false });
+  it("answers, not fails, for a game with no verifier and for a player with too many open runs, each with its reason", async () => {
+    for (const [code, reason] of [
+      ["unavailable", "not-supported"],
+      ["too-many-open-runs", "too-many-open-runs"],
+    ] as const) {
+      const { start } = stub({ start: async () => ({ code, ok: false }) });
+      expect(await start.execute(ids, context)).toEqual({
+        ok: true,
+        value: { reason, status: "unavailable" },
+      });
+    }
   });
 });
 
@@ -113,7 +112,7 @@ describe("the submit operation", () => {
     const { service, submit } = stub();
     expect(await submit.execute(submission, context)).toEqual({
       ok: true,
-      value: { earned: ["first-win"], reason: null, status: "verified" },
+      value: { earned: ["first-win"], status: "verified" },
     });
     expect(service.submit).toHaveBeenCalledWith(
       userId,
@@ -144,25 +143,20 @@ describe("the submit operation", () => {
     });
     expect(await submit.execute(submission, context)).toEqual({
       ok: true,
-      value: { earned: [], reason: "illegal-input", status: "rejected" },
+      value: { reason: "illegal-input", status: "rejected" },
     });
   });
 
   it.each([
-    ["not-found", "not_found", "The run was not found."],
-    ["already-submitted", "conflict", "This run was already submitted."],
-    ["expired", "conflict", "This run has expired."],
-    [
-      "stale",
-      "conflict",
-      "The game's rules changed since this run was started.",
-    ],
-  ] as const)("answers %s as %s", async (code, error, message) => {
+    ["not-found", "unknown-run"],
+    ["already-submitted", "already-submitted"],
+    ["expired", "expired"],
+    ["stale", "stale"],
+  ] as const)("answers %s as a refusal, %s", async (code, reason) => {
     const { submit } = stub({ submit: async () => ({ code, ok: false }) });
     expect(await submit.execute(submission, context)).toEqual({
-      error,
-      message,
-      ok: false,
+      ok: true,
+      value: { reason, status: "refused" },
     });
   });
 });

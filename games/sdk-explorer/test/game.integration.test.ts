@@ -72,7 +72,7 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
       "Connected. Call anything below.",
     );
     const buttons = [...document.querySelectorAll("#probes button")];
-    expect(buttons).toHaveLength(12);
+    expect(buttons).toHaveLength(14);
     expect(buttons.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,
     );
@@ -97,6 +97,28 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
     await press("wallet-connect");
     expect(lines()[0]).toContain(
       "wallet.connect → refused (permission_denied)",
+    );
+  });
+
+  it("asks for a run and says the platform has none to give a game with no rules to replay", async () => {
+    const { lines, press } = await open(["run:submit"]);
+    await press("run-start");
+    expect(lines()[0]).toBe(
+      'run.start → {"reason":"not-supported","status":"unavailable"}',
+    );
+  });
+
+  it("shows the refusal for a run that was never issued, and the permission it needs", async () => {
+    const declared = await open(["run:submit"]);
+    await declared.press("run-submit");
+    expect(declared.lines()[0]).toBe(
+      'run.submit → {"reason":"unknown-run","status":"refused"}',
+    );
+    running?.close();
+    const undeclared = await open([]);
+    await undeclared.press("run-start");
+    expect(undeclared.lines()[0]).toContain(
+      "run.start → refused (permission_denied)",
     );
   });
 

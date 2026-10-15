@@ -66,7 +66,8 @@ async function seedPlayer() {
 
 async function startRun(userId: string) {
   const outcome = await start.execute({ gameId }, sessionFor(userId));
-  if (!outcome.ok) throw new Error(`The run did not start: ${outcome.message}`);
+  if (!outcome.ok || outcome.value.status !== "started")
+    throw new Error("The run did not start.");
   return outcome.value;
 }
 
@@ -105,7 +106,7 @@ describe("starting and submitting a replay-verified run", () => {
     );
     expect(outcome).toEqual({
       ok: true,
-      value: { earned: [adderMilestone], reason: null, status: "verified" },
+      value: { earned: [adderMilestone], status: "verified" },
     });
     expect(await milestonesOf(userId)).toMatchObject([
       { milestoneId: adderMilestone, verification: "replay-verified" },
@@ -127,9 +128,8 @@ describe("starting and submitting a replay-verified run", () => {
     };
     expect((await submit.execute(input, sessionFor(userId))).ok).toBe(true);
     expect(await submit.execute(input, sessionFor(userId))).toEqual({
-      error: "conflict",
-      message: "This run was already submitted.",
-      ok: false,
+      ok: true,
+      value: { reason: "already-submitted", status: "refused" },
     });
     expect(await milestonesOf(userId)).toHaveLength(1);
   });
@@ -163,7 +163,7 @@ describe("starting and submitting a replay-verified run", () => {
       );
       expect(outcome).toEqual({
         ok: true,
-        value: { earned: [], reason, status: "rejected" },
+        value: { reason, status: "rejected" },
       });
     }
     expect(await milestonesOf(userId)).toEqual([]);
@@ -200,16 +200,19 @@ describe("starting and submitting a replay-verified run", () => {
         },
         sessionFor(other),
       ),
-    ).toMatchObject({ error: "not_found", ok: false });
+    ).toEqual({
+      ok: true,
+      value: { reason: "unknown-run", status: "refused" },
+    });
     expect(await milestonesOf(other)).toEqual([]);
   });
 
   it("limits the runs a player may hold open, by the policy", async () => {
     const userId = await seedPlayer();
     for (let count = 0; count < 3; count += 1) await startRun(userId);
-    expect(await start.execute({ gameId }, sessionFor(userId))).toMatchObject({
-      error: "conflict",
-      ok: false,
+    expect(await start.execute({ gameId }, sessionFor(userId))).toEqual({
+      ok: true,
+      value: { reason: "too-many-open-runs", status: "unavailable" },
     });
   });
 
@@ -226,7 +229,10 @@ describe("starting and submitting a replay-verified run", () => {
     const userId = await seedPlayer();
     expect(
       await start.execute({ gameId: "no-such-game" }, sessionFor(userId)),
-    ).toMatchObject({ error: "not_found", ok: false });
+    ).toEqual({
+      ok: true,
+      value: { reason: "not-supported", status: "unavailable" },
+    });
   });
 
   it("leaves a game self-reported, and says why in the log, when its verifier file is not served", async () => {
@@ -239,9 +245,10 @@ describe("starting and submitting a replay-verified run", () => {
       ),
     );
     const userId = await seedPlayer();
-    expect(await missing.execute({ gameId }, sessionFor(userId))).toMatchObject(
-      { error: "not_found", ok: false },
-    );
+    expect(await missing.execute({ gameId }, sessionFor(userId))).toEqual({
+      ok: true,
+      value: { reason: "not-supported", status: "unavailable" },
+    });
     expect(logged).toHaveBeenCalledWith(
       expect.stringContaining(
         `game verifier ${gameId} not loaded (missing-artifact)`,

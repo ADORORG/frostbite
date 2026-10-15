@@ -94,7 +94,7 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the thirteen the platform offers", () => {
+  it("are exactly the fifteen the platform offers", () => {
     expect(methodNames.sort()).toEqual([
       "capabilities.get",
       "milestones.counts",
@@ -106,6 +106,8 @@ describe("the methods", () => {
       "progress.load",
       "progress.save",
       "ready",
+      "run.start",
+      "run.submit",
       "ui.toast",
       "wallet.connect",
       "wallet.get",
@@ -260,8 +262,10 @@ describe("the wallet and the events", () => {
     ).toBe(false);
   });
 
-  it("need the wallet capability for the address, asking for a wallet and the wallet event, and nothing else", () => {
+  it("need the wallet capability for the address, asking for a wallet and the wallet event, the run capability for runs, and nothing else", () => {
     expect(requiredCapability).toEqual({
+      "run.start": "run:submit",
+      "run.submit": "run:submit",
       "wallet.connect": "wallet",
       "wallet.get": "wallet",
     });

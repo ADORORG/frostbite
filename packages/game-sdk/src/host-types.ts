@@ -5,6 +5,7 @@ import type {
   JsonValue,
   PlayerIdentity,
   PlayerInfo,
+  Result,
   VerificationLevel,
   WalletInfo,
 } from "./protocol.ts";
@@ -44,6 +45,9 @@ export interface GameHostBackend {
     unlockedAt: string | null;
   }>;
   player(): PlayerInfo;
+  // Brings the account's replay-verified milestones into the copy the game reads, after the platform verified a run. A
+  // backend with no account has nothing to bring.
+  refreshVerified?(): Promise<void>;
   saveProgress(state: JsonValue, now: Date): Promise<void>;
   // Earns a milestone. `max` is how many times it can be counted: 1 for one earned once. A repeat of one
   // already earned is counted while below it (`counted`), and is `alreadyUnlocked` either way.
@@ -81,6 +85,8 @@ export type HostEvent =
   | { readonly type: "ready" }
   | { readonly type: "progress-saved"; readonly savedAt: string }
   | { readonly id: string; readonly type: "milestone-unlocked" }
+  // The platform replayed a run and these milestones are now replay-verified on the player's account.
+  | { readonly earned: readonly string[]; readonly type: "run-verified" }
   | {
       readonly count: number;
       readonly id: string;
@@ -100,7 +106,15 @@ export type HostEvent =
 
 // What the page lends a game, beyond the player's saved state. Each is optional: a page that cannot offer it
 // says so truthfully (no wallet, nothing shown) rather than pretending.
+export interface RunsService {
+  // Asks the platform for a run for this game; the page answers `signed-out` itself when nobody is signed in.
+  start(): Promise<Result<"run.start">>;
+  submit(runId: string, record: JsonValue): Promise<Result<"run.submit">>;
+}
+
 export interface HostServices {
+  // Starts and settles replay-verified runs. A page that cannot offers none, and the game is told runs are unavailable.
+  runs?: RunsService;
   // Opens the platform's wallet chooser for the player. A page that has none leaves it out, and the game is told so.
   connectWallet?(): void;
   // Shows the player a short plain-text message from the game.
