@@ -9,6 +9,12 @@ import { address, anonymous } from "./support/wallet-operations.ts";
 
 const now = new Date("2026-10-15T12:00:00.000Z");
 const clock = () => now;
+// A source that accepts every address on signet only, as a real one that reads one network would.
+const reads = (satoshis: () => Promise<number>) => ({
+  accepts: (candidate: string, network: "mainnet" | "signet") =>
+    network === "signet" && candidate.startsWith("tb1q"),
+  satoshis,
+});
 const ask = (
   source: Parameters<typeof createBalanceOperation>[0]["source"],
   input: { address: string; network: "mainnet" | "signet" } = {
@@ -43,7 +49,7 @@ describe("the wallet balance", () => {
 
   it("asks the source for the canonical address on the named network and answers with the time it was asked", async () => {
     const satoshis = vi.fn(async () => 123_456);
-    const result = await ask({ satoshis });
+    const result = await ask(reads(satoshis));
     expect(satoshis).toHaveBeenCalledWith(address, "signet");
     expect(result).toEqual({
       ok: true,
@@ -60,20 +66,20 @@ describe("the wallet balance", () => {
   });
 
   it("answers a real zero as a zero", async () => {
-    expect(await ask({ satoshis: async () => 0 })).toMatchObject({
+    expect(await ask(reads(async () => 0))).toMatchObject({
       ok: true,
       value: { satoshis: 0, status: "ready" },
     });
   });
 
-  it("refuses an address that is not valid for the network, without asking the source", async () => {
+  it("refuses an address the source does not accept for the network, without looking it up", async () => {
     const satoshis = vi.fn(async () => 1);
     for (const input of [
-      { address: "tb1qnotanaddressatall0000000", network: "signet" as const },
+      { address: "bc1pnotforthissource0000000", network: "signet" as const },
       // A signet address is not a mainnet address.
       { address, network: "mainnet" as const },
     ])
-      expect(await ask({ satoshis }, input)).toMatchObject({
+      expect(await ask(reads(satoshis), input)).toMatchObject({
         error: "invalid_request",
         ok: false,
       });
@@ -89,7 +95,7 @@ describe("the wallet balance", () => {
   ])(
     "says the source failed for %s, never showing a number",
     async (_name, satoshis) => {
-      expect(await ask({ satoshis })).toEqual({
+      expect(await ask(reads(satoshis))).toEqual({
         ok: true,
         value: { reason: "source-failed", status: "unavailable" },
       });
@@ -97,7 +103,7 @@ describe("the wallet balance", () => {
   );
 
   it("accepts the largest balance that can exist", async () => {
-    expect(await ask({ satoshis: async () => maxSatoshis })).toMatchObject({
+    expect(await ask(reads(async () => maxSatoshis))).toMatchObject({
       value: { satoshis: maxSatoshis, status: "ready" },
     });
   });

@@ -31,7 +31,9 @@ export function ArcadeDialog({
       onClose={onClose}
       ref={dialog}
     >
-      <header className="arcade-modal__header">
+      {/* A plain row, not a <header>: the dialog is opened from the page's own header, and a header inside it would
+          be a second banner landmark. */}
+      <div className="arcade-modal__header">
         <h2 id={titleId}>{title}</h2>
         <button
           className="arcade-button arcade-button--cyan"
@@ -40,7 +42,7 @@ export function ArcadeDialog({
         >
           Close
         </button>
-      </header>
+      </div>
       <div className="arcade-modal__body">{children}</div>
     </dialog>
   );

@@ -119,8 +119,14 @@ The full list, with the status of what is still to come, is `docs/product/game-s
 - **`wallet.get()`** returns the connected wallet's **public address and network name**, or `null` when none is
   connected. Declare `capabilities: ["wallet"]` in the manifest; without it the call is refused with
   `permission_denied`, and the page's "What it asks for" shows the request. The game cannot see a key, sign
-  anything or move anything: the address is all it receives. The player connects a wallet on the platform's
-  connection page; the game's page has a "Wallet" section that says what the game can see.
+  anything or move anything: the address is all it receives. The player connects a wallet with the wallet
+  button in the platform's header (on every page); the game's page has a "Wallet" section that says what the game
+  can see.
+- **`wallet.connect()`** asks the platform to open that wallet chooser, for a game that wants a wallet. It needs the
+  same `wallet` capability and resolves to `requested` (the player now chooses), `already-connected` or
+  `unavailable` (this page cannot offer a chooser). The game never handles the wallet: when the player connects it
+  receives the `wallet.changed` event, and a player who closes the chooser changes nothing. At most six asks a
+  minute.
 - **Events** arrive without a request, through `client.on(name, handler)`, which returns a function that stops
   listening: `wallet.changed` (only for a game that declared `wallet`), `lifecycle.changed` (`paused` while the tab
   is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`.

@@ -72,13 +72,7 @@ test("pages and the studio break no part of the policy they report against, exce
       page.locator("main, [role=main], #main-content").first(),
     ).toBeVisible();
   };
-  for (const path of [
-    "/",
-    "/games",
-    "/games/frostbite",
-    "/collections",
-    "/sign-in",
-  ])
+  for (const path of ["/", "/games", "/games/frostbite", "/collections"])
     await visit(path);
   await signIn(page, baseURL, creatorE2EFixtures.collectionWizardCreator);
   for (const path of [
@@ -88,15 +82,12 @@ test("pages and the studio break no part of the policy they report against, exce
     "/account",
   ])
     await visit(path);
-  // The wallet library tests whether script evaluation is allowed (and copes when it is not). That is the only
-  // thing the policy reports on any page that mounts it (the sign-in page and the account page); anything else is
-  // a page that would break once the policy is enforced.
-  const walletPages = new Set(["/sign-in", "/account"]);
+  // The wallet library tests whether script evaluation is allowed (and copes when it is not). The header wallet
+  // widget mounts it on every page, so that probe is reported everywhere and is the only thing the policy reports;
+  // anything else is a page that would break once the policy is enforced.
   expect(
     violations.filter(
-      ({ message, path }) =>
-        !walletPages.has(path) ||
-        !/Evaluating a string as JavaScript/u.test(message),
+      ({ message }) => !/Evaluating a string as JavaScript/u.test(message),
     ),
   ).toEqual([]);
 });

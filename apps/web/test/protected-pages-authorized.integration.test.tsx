@@ -36,8 +36,8 @@ describe("authorized protected page delivery", () => {
     // The work areas are bar entries; a staff member sees both.
     expect(markup).toContain('href="/studio"');
     expect(markup).toContain('href="/admin"');
-    // The account links share one menu.
-    expect(markup).toContain('<details class="account-menu">');
+    // A person whose only account page is their account has one link to it, not a menu of one.
+    expect(markup).not.toContain('<details class="account-menu">');
     expect(markup).toContain('href="/account"');
   });
 

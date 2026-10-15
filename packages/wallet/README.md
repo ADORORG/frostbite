@@ -4,7 +4,9 @@ The single platform boundary around the exact-pinned LaserEyes React/Core pair.
 
 ## Public API
 
-- `WalletProvider` composes LaserEyes without exposing wallet-specific adapters.
+- `WalletProvider` composes LaserEyes without exposing wallet-specific adapters, and the wallet-chooser state:
+  `useWalletChooser()` returns `{ open, request, dismiss }`. A feature that needs a wallet calls `request()`; the app's
+  header widget renders the chooser. Mount the provider once for the whole app (the layout does).
 - `useWalletConnection().signMessage` requires a connected account and explicitly requests BIP-322
   for its address. This diagnostic primitive does not establish a session or qualify wallet support.
 - `@ador/wallet/registration` contributes LaserEyes through one explicit provider-registry entry.

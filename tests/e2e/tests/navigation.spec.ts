@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
+import { walletButton } from "./support/fake-wallet.ts";
 import { useE2ESession } from "../src/session.ts";
 
 const bar = (page: Page) =>
@@ -11,12 +12,12 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
   page,
 }) => {
   await page.goto("/");
-  // The bar is short: the public catalogs and one way to connect. No private areas, no account page.
+  // The bar is short: the public catalogs. No private areas, no account page. The wallet widget sits beside it.
   await expect(bar(page).getByRole("link")).toHaveText([
     "Collections",
     "Games",
-    "Sign in",
   ]);
+  await expect(walletButton(page)).toHaveText("Connect wallet");
   await expect(page.getByRole("link", { name: "Studio" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Admin" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Account" })).toHaveCount(0);
@@ -43,33 +44,9 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
       ),
     ).toBeVisible();
   }
-
-  await page.goto("/");
-  await bar(page).getByRole("link", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/sign-in$/);
-  await expect(
-    page.getByRole("heading", { name: "Sign in", level: 1 }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Choose wallet", exact: true })
-    .click();
-  await expect(
-    page.getByRole("dialog", { name: "Choose your wallet" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Connect Xverse", exact: true }),
-  ).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).not.toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Choose wallet", exact: true }),
-  ).toBeFocused();
-  await expect(
-    page.getByText("Connect a wallet to sign in.", { exact: false }),
-  ).toBeVisible();
 });
 
-test("a signed-in person keeps their links on public pages and finds the account menu", async ({
+test("a signed-in person keeps their links on public pages and finds the account link", async ({
   baseURL,
   context,
   page,
@@ -85,7 +62,6 @@ test("a signed-in person keeps their links on public pages and finds the account
     bar(page).getByRole("link", { name: "Studio", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Admin" })).toHaveCount(0);
-  await bar(page).locator("summary", { hasText: "Account" }).click();
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(

@@ -77,20 +77,22 @@ describe("accounts entrypoint", () => {
     expect(markup).not.toContain("Passkey 1");
   });
 
-  it("offers the sign-in page to everyone, with the wallets the platform configured, and says connecting is not signing in", async () => {
+  it("has no page for signing in: the wallet widget in the header is the only way in, and the account page says so", async () => {
     const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn(async () => []),
       unlink: vi.fn(),
     }));
-    const page = entrypoint.pages?.find(({ path }) => path === "/sign-in");
-    expect(page?.access).toEqual({ kind: "public" });
+    expect(entrypoint.pages?.map(({ path }) => path)).not.toContain("/sign-in");
+    const page = entrypoint.pages?.find(({ path }) => path === "/account");
     const markup = renderToStaticMarkup(
-      await page?.render({ actorUserId: null, navigation: [], params: {} }),
+      await page?.render({
+        actorUserId: createUuidV7(),
+        navigation: [],
+        params: {},
+      }),
     );
-    expect(markup).toContain("Sign in");
-    expect(markup).toContain("Connect your wallet and sign a message");
-    expect(markup).toContain("Checking whether you are signed in");
+    expect(markup).toContain("wallet button in the header");
   });
 });

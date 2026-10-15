@@ -41,13 +41,26 @@ export async function installFakeWallet(page: Page, wallet: TestWallet) {
   );
 }
 
-// Opens the chooser on the sign-in page and connects the (fake) UniSat, as a player does.
-export async function connectWallet(page: Page) {
-  await page
-    .getByRole("button", { name: "Choose wallet", exact: true })
-    .click();
+// The wallet widget at the end of every page's header, and the menu it opens.
+export const walletButton = (page: Page) =>
+  page.locator(".wallet-widget__trigger");
+export const walletMenu = (page: Page) =>
+  page.getByRole("group", { name: "Wallet" });
+
+// Opens the wallet chooser from the header and connects the (fake) UniSat, as a player does, and waits until the
+// widget shows the connected wallet's address.
+export async function connectWallet(page: Page, wallet: TestWallet) {
+  await walletButton(page).click();
   await page
     .getByRole("button", { name: "Connect UniSat", exact: true })
     .click();
-  await expect(page.getByText("Connected to unisat on signet")).toBeVisible();
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+}
+
+// Opens the widget's menu if it is not open.
+export async function openWalletMenu(page: Page) {
+  if ((await walletButton(page).getAttribute("aria-expanded")) !== "true")
+    await walletButton(page).click();
+  await expect(walletMenu(page)).toBeVisible();
+  return walletMenu(page);
 }

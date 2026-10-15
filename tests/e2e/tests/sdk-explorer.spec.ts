@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
+import { installFakeWallet } from "./support/fake-wallet.ts";
+import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
 
 // The SDK explorer, played in the platform's isolated frame: every call of the game SDK answered by the real
 // platform page, and the events the platform sends on its own. The platform lists the explorer only when run
@@ -74,12 +76,46 @@ test("the platform says what the game can see of a wallet, and that none is conn
   await expect(page.getByText("Connected to the platform")).toBeVisible();
   const wallet = await openDock(page, "Wallet");
   await expect(wallet).toContainText("No wallet is connected.");
+  // The game's page asks the app's own wallet chooser to open; it has none of its own.
+  await wallet.getByRole("button", { name: "Connect a wallet" }).click();
   await expect(
-    wallet.getByRole("link", { name: "Connect a wallet" }),
-  ).toHaveAttribute("href", "/sign-in");
+    page.getByRole("dialog", { name: "Choose your wallet" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
   const asks = await openDock(page, "What it asks for");
   await expect(asks).toContainText("See the address of the wallet");
   await expect(asks).toContainText("Available");
+});
+
+test("a game asks for the wallet chooser, the player connects, and the game is told through the event", async ({
+  page,
+}) => {
+  // Connecting a wallet changes no account, so any test wallet will do.
+  await installFakeWallet(page, testWallets[0]);
+  await page.goto("/games/sdk-explorer");
+  const game = page.frameLocator(frameSelector);
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
+  await game.locator("#wallet-connect").click();
+  await expect(newest(page)).toHaveText(
+    'wallet.connect → {"status":"requested"}',
+  );
+  const chooser = page.getByRole("dialog", { name: "Choose your wallet" });
+  await expect(chooser).toBeVisible();
+  await chooser
+    .getByRole("button", { name: "Connect UniSat", exact: true })
+    .click();
+  await expect(chooser).not.toBeVisible();
+  await expect(
+    game.locator('#log li[data-source="event"]').first(),
+  ).toContainText(
+    `event wallet.changed {"wallet":{"address":"${testWallets[0].address}"`,
+  );
+  await game.locator("#wallet-connect").click();
+  await expect(newest(page)).toHaveText(
+    'wallet.connect → {"status":"already-connected"}',
+  );
 });
 
 test("the platform tells the game when the tab is hidden and shown again", async ({

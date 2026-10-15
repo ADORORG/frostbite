@@ -13,11 +13,11 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./protocol`: the versioned message protocol (channel `ador-game`, version 1), as schemas. One `methods` table
   is the source of truth for names, parameters and results.
 - `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock/progress/counts`,
-  `player.info`, `player.identity` (an opaque per-game id; `player.changed` when it changes on sign-in), `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability),
+  `player.info`, `player.identity` (an opaque per-game id; `player.changed` when it changes on sign-in), `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability), `wallet.connect` (asks the platform to open its wallet chooser; the same capability),
   `capabilities.get`, `ui.toast`, and `on(event, handler)` for what the platform tells the game
   (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`). Failures surface as `GameHostError` with a stable
   code (including `permission_denied` for a capability the game did not declare).
-- `./host`: `createGameHost()` for the platform page (`services` lend it a wallet and a place to show a toast;
+- `./host`: `createGameHost()` for the platform page (`services` lend it a wallet, a way to open the wallet chooser and a place to show a toast;
   `push` and `emit` send events). `./attach`: `attachGameHost()` connects it to a frame. A message is handled only when its
   `event.source` is the game's frame (a sandboxed frame has no origin to check). Sizes and call rates are
   limited by `./policy`.

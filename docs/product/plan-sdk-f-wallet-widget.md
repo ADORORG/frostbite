@@ -1,6 +1,6 @@
 # Plan: the wallet widget (SDK-F, task #55)
 
-Status: **building on the documented defaults** (owner away, 2026-10-15). Branch `feat/wallet-widget`, stacked on
+Status: **built on the documented defaults** (owner away, 2026-10-15); record `references/wallet-widget-task-record.md`. Branch `feat/wallet-widget`, stacked on
 `feat/sign-in-adapters`. It is the screen on top of SDK-G: sign-in, link, unlink and sign-out already exist as routes
 and a client store; this task gives them their one home in the header and removes the interim page.
 
@@ -24,8 +24,8 @@ and a client store; this task gives them their one home in the header and remove
 
 1. **There is no balance source.** The neutral port `ChainReader.balances` exists (`packages/chain/src/ports.ts`) but
    nothing implements it, and the indexer is an open decision gate (`maximum_indexer_lag_blocks`, SUBFROST plus
-   fallbacks). The repository forbids inventing provider values, so **the balance route is built against the port and
-   answers "unavailable" until a reader is configured**; the widget says so ("Balance unavailable: no data source is
+   fallbacks). The repository forbids inventing provider values, so **the balance route is built against a narrow `BalanceSource`
+   port (which an adapter can implement over the reader) and answers "unavailable" until one is configured**; the widget says so ("Balance unavailable: no data source is
    configured") and never shows a number it did not get. Tests use a fake reader. **Owner decision needed:** which
    indexer and which network endpoint(s) the signet beta reads from.
 2. **The shell is rendered by about eight pages** and the wallet library is mounted per page today. The widget needs

@@ -4,12 +4,22 @@ Detachable authenticated account, studio, and staff route contributions.
 
 ## Public API
 
-`accountsFeature` is the only registration export. Adding or removing it from `configs/features.ts`
+`createAccountsFeature(walletConfig, balanceSource)` is the registration export; `./widget` exports `WalletRoot`,
+which the app layout mounts once. The wallet widget (header, every page) is how a player connects a wallet, signs in
+with it, links and removes wallets and signs out; there is no sign-in page. The route family also has
+`POST /api/v1/wallet/balance`. `balanceSource` is where the widget's balance comes from: the platform has **not
+chosen an indexer**, so the beta passes `null` and the widget says "Balance unavailable: no data source is
+configured" (it never shows a number it did not get). An adapter implementing `BalanceSource` is the only thing
+missing. Adding or removing it from `configs/features.ts`
 adds or removes the complete page and passkey API route family. The lazy entrypoint is validated
 against its manifest. Its manifest also contributes the public account entry, authenticated studio,
 and capability-gated admin navigation items.
 
 ## Invariants
+
+- The balance is asked for only while the widget's menu is open (every `balanceRefreshMs`, a policy value), is
+  read for the wallet connected now, and is forgotten when the wallet changes; an answer that arrives for a
+  replaced wallet is dropped. A failed refresh keeps the older number marked as older.
 
 - Access requirements are manifest data and are enforced before `render` is called.
 - Account and studio require an active platform session.

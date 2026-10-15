@@ -36,11 +36,10 @@ async function heading(page: Page, name: string) {
   await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
 }
 
-// The top bar with the account menu open, kept as a baseline on desktop and mobile.
+// The top bar, kept as a baseline on desktop and mobile. A person with only the account page has one link to it, not a menu.
 async function pictureOfTheBar(page: Page, name: string) {
   const project = test.info().project.name;
   if (project !== "desktop" && project !== "mobile") return;
-  await bar(page).locator("summary", { hasText: "Account" }).click();
   await loadFonts(page);
   await expect(page.getByRole("banner")).toHaveScreenshot(
     `journey-${name}-bar.png`,
@@ -72,8 +71,6 @@ test("a visitor follows the public catalogs and finds the way to connect", async
   await expect(page).toHaveURL(/\/launches$/u);
   await more(page).getByRole("link", { name: "Creators", exact: true }).click();
   await expect(page).toHaveURL(/\/creators$/u);
-  await bar(page).getByRole("link", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/sign-in$/u);
   await page.getByRole("link", { name: "Adorbitals home" }).click();
   await expect(page).toHaveURL(/\/$/u);
   await expect(page.getByRole("link", { name: "Studio" })).toHaveCount(0);
@@ -96,7 +93,6 @@ test("someone who never applied is led from the studio to the application and ba
   await heading(page, "Apply to create");
   await breadcrumb(page).getByRole("link", { name: "Studio" }).click();
   await heading(page, "Creator studio");
-  await bar(page).locator("summary", { hasText: "Account" }).click();
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
   await heading(page, "Account console");
   await pictureOfTheBar(page, "applicant");
@@ -184,7 +180,6 @@ test("staff without the reviewer role see their console and no review links", as
   await expect(page.getByRole("link", { name: "Creator reviews" })).toHaveCount(
     0,
   );
-  await bar(page).locator("summary", { hasText: "Account" }).click();
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
   await heading(page, "Account console");
   await pictureOfTheBar(page, "staff");

@@ -1,4 +1,3 @@
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
 import type { HttpOperation } from "@ador/http";
 
 import {
@@ -11,9 +10,9 @@ import {
 } from "../balance/contract.ts";
 import type { BalanceSource } from "../balance/source.ts";
 
-// A wallet's balance for the widget. Only an address valid for the network it names is looked up. With no source
-// configured, or a source that fails or answers something no balance can be, the answer says there is none: it never
-// invents a number.
+// A wallet's balance for the widget. Only an address the source accepts for the network it names is looked up. With no
+// source configured, or a source that fails or answers something no balance can be, the answer says there is none: it
+// never invents a number.
 export function createBalanceOperation(dependencies: {
   readonly clock: () => Date;
   readonly source: BalanceSource | null;
@@ -24,23 +23,19 @@ export function createBalanceOperation(dependencies: {
       access: { kind: "public" },
       applicationErrors: ["invalid_request"],
       execute: async (input) => {
-        const checked = validateBitcoinAddress(input.address, input.network);
-        if (!checked.ok)
-          return {
-            error: "invalid_request",
-            message: "That is not a supported address for that network.",
-            ok: false,
-          };
         if (source === null)
           return {
             ok: true,
             value: { reason: "not-configured", status: "unavailable" },
           };
+        if (!source.accepts(input.address, input.network))
+          return {
+            error: "invalid_request",
+            message: "That is not a supported address for that network.",
+            ok: false,
+          };
         try {
-          const satoshis = await source.satoshis(
-            checked.value.address,
-            input.network,
-          );
+          const satoshis = await source.satoshis(input.address, input.network);
           if (
             !Number.isSafeInteger(satoshis) ||
             satoshis < 0 ||

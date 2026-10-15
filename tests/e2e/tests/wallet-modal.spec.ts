@@ -1,15 +1,16 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+import { walletButton } from "./support/fake-wallet.ts";
+
 test("wallet chooser contains focus, explains availability, and closes with Escape", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/sign-in");
-  const trigger = page.getByRole("button", {
-    name: "Choose wallet",
-    exact: true,
-  });
+  // The chooser opens from the header of any page, not from a page of its own.
+  await page.goto("/");
+  const trigger = walletButton(page);
+  await expect(trigger).toHaveText("Connect wallet");
   await trigger.click();
   const modal = page.getByRole("dialog", { name: "Choose your wallet" });
   await expect(modal).toBeVisible();

@@ -23,7 +23,8 @@ describe("home navigation", () => {
     expect(markup).toContain("Frostbite");
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/creators"');
-    expect(markup).toContain('href="/sign-in"');
+    // Signing in is the wallet widget's job (the layout supplies it), not a page or a link of its own.
+    expect(markup).not.toContain("/sign-in");
     expect(markup).not.toContain('href="/account"');
     expect(markup).not.toContain('href="/studio"');
     expect(markup).not.toContain('href="/admin"');
