@@ -11,6 +11,8 @@ export const gameHostPolicySchema = z
     saveCallsPerMinute: z.number().int().min(1).max(600),
     // Progress totals a game may report a minute (a game reports on each kill or coin, so this is generous).
     progressCallsPerMinute: z.number().int().min(1).max(6_000),
+    // Times a game may ask the page to open the wallet chooser a minute; a game must not keep a dialog in the way.
+    connectCallsPerMinute: z.number().int().min(1).max(60),
     // Messages a game may ask the page to show a minute; the player is not to be spammed.
     toastCallsPerMinute: z.number().int().min(1).max(60),
     unlockCallsPerMinute: z.number().int().min(1).max(600),
@@ -20,6 +22,7 @@ export const gameHostPolicySchema = z
 export type GameHostPolicy = z.infer<typeof gameHostPolicySchema>;
 
 export const defaultGameHostPolicy: GameHostPolicy = Object.freeze({
+  connectCallsPerMinute: 6,
   progressCallsPerMinute: 120,
   progressMaxBytes: 65_536,
   saveCallsPerMinute: 60,

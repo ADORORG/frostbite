@@ -84,6 +84,38 @@ describe("the wallet a game can see", () => {
     });
   });
 
+  it("opens the app's wallet chooser when the game asks for one, and not when a wallet is already connected", async () => {
+    const { reply, target } = await mount(undefined, asking(null));
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "wallet.connect", {}, "b");
+    await flush();
+    expect(answer(reply, "b")).toMatchObject({
+      result: { status: "requested" },
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    await rerender(asking(connected));
+    send(target, "wallet.connect", {}, "c");
+    await flush();
+    expect(answer(reply, "c")).toMatchObject({
+      result: { status: "already-connected" },
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+  });
+
+  it("tells a game that asks for a wallet on a page with no chooser that there is none", async () => {
+    const { reply, target } = await mount(undefined, {
+      game: walletGame,
+      wallet: undefined,
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "wallet.connect", {}, "b");
+    await flush();
+    expect(answer(reply, "b")).toMatchObject({
+      ok: true,
+      result: { status: "unavailable" },
+    });
+  });
+
   it("warns, on the card, when the connected wallet is on another network than the game uses, and still lets the game see it", async () => {
     const mainnet = { address, network: "mainnet" };
     const { reply, target } = await mount(undefined, {

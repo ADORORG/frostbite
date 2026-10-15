@@ -100,6 +100,8 @@ export type HostEvent =
 // What the page lends a game, beyond the player's saved state. Each is optional: a page that cannot offer it
 // says so truthfully (no wallet, nothing shown) rather than pretending.
 export interface HostServices {
+  // Opens the platform's wallet chooser for the player. A page that has none leaves it out, and the game is told so.
+  connectWallet?(): void;
   // Shows the player a short plain-text message from the game.
   toast?(message: string): void;
   // The wallet the player has connected right now, or none.

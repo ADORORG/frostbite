@@ -46,6 +46,22 @@ describe("the wallet, the capabilities and the message", () => {
     await expect(none).resolves.toBeNull();
   });
 
+  it("asks the platform to open its wallet chooser and says what the platform did", async () => {
+    const p = pair();
+    for (const status of ["requested", "already-connected", "unavailable"]) {
+      const asked = p.client.wallet.connect();
+      expect(p.sent.at(-1)).toMatchObject({
+        method: "wallet.connect",
+        params: {},
+      });
+      p.reply({ status });
+      await expect(asked).resolves.toBe(status);
+    }
+    const odd = p.client.wallet.connect();
+    p.reply({ status: "opened" });
+    await expect(odd).rejects.toBeDefined();
+  });
+
   it("reports a refusal as an error with the platform's code", async () => {
     const p = pair();
     const pending = p.client.wallet.get();

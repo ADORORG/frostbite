@@ -54,6 +54,7 @@ export function createGameHost(options: {
   const policy = options.policy ?? defaultGameHostPolicy;
   let ready = false;
   const { within } = createRateLimiter(now, [
+    "connect",
     "progress",
     "save",
     "toast",
@@ -109,6 +110,16 @@ export function createGameHost(options: {
       }
       case "wallet.get":
         return { wallet: services?.wallet?.() ?? null };
+      case "wallet.connect": {
+        if (!within("connect", policy.connectCallsPerMinute))
+          throw new Refusal("rate_limited", "Asking to connect too often.");
+        if (services?.wallet?.() != null)
+          return { status: "already-connected" };
+        const open = services?.connectWallet;
+        if (open === undefined) return { status: "unavailable" };
+        open();
+        return { status: "requested" };
+      }
       case "progress.load":
         return { state: await backend.loadProgress() };
       case "progress.save": {

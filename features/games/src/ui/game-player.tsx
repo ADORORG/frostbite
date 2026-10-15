@@ -80,7 +80,7 @@ export function GamePlayer({
     frame,
     src,
     accountFor,
-    { title, wallet: wallet?.current },
+    { connectWallet: wallet?.connect, title, wallet: wallet?.current },
   );
   const fullscreen = useFullscreen(frame);
   const phoneLandscape = usePhoneLandscape();

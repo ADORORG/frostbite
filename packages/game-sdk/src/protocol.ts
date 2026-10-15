@@ -181,6 +181,16 @@ export const methods = {
     params: empty,
     result: z.object({ wallet: walletInfoSchema.nullable() }).strict(),
   },
+  // Asks the platform to open its wallet chooser. The game never handles the wallet: it learns the outcome from the
+  // `wallet.changed` event (or `wallet.get`), and a player who closes the chooser changes nothing.
+  "wallet.connect": {
+    params: empty,
+    result: z
+      .object({
+        status: z.enum(["already-connected", "requested", "unavailable"]),
+      })
+      .strict(),
+  },
   ready: {
     params: z.object({ sdkVersion: z.number().int().positive() }).strict(),
     result: z
@@ -200,7 +210,7 @@ export type MethodName = keyof typeof methods;
 export const methodNames = Object.keys(methods) as MethodName[];
 // The manifest capability a method needs before the host answers it. A method not listed needs none.
 export const requiredCapability: Readonly<Partial<Record<MethodName, string>>> =
-  { "wallet.get": "wallet" };
+  { "wallet.connect": "wallet", "wallet.get": "wallet" };
 export type Params<Name extends MethodName> = z.infer<
   (typeof methods)[Name]["params"]
 >;

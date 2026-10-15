@@ -94,7 +94,7 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the twelve the platform offers", () => {
+  it("are exactly the thirteen the platform offers", () => {
     expect(methodNames.sort()).toEqual([
       "capabilities.get",
       "milestones.counts",
@@ -107,6 +107,7 @@ describe("the methods", () => {
       "progress.save",
       "ready",
       "ui.toast",
+      "wallet.connect",
       "wallet.get",
     ]);
   });
@@ -118,6 +119,7 @@ describe("the methods", () => {
       "milestones.list",
       "player.info",
       "progress.load",
+      "wallet.connect",
       "wallet.get",
     ] as const) {
       expect(methods[name].params.safeParse({}).success).toBe(true);
@@ -258,8 +260,11 @@ describe("the wallet and the events", () => {
     ).toBe(false);
   });
 
-  it("need the wallet capability for the address and the wallet event, and nothing else", () => {
-    expect(requiredCapability).toEqual({ "wallet.get": "wallet" });
+  it("need the wallet capability for the address, asking for a wallet and the wallet event, and nothing else", () => {
+    expect(requiredCapability).toEqual({
+      "wallet.connect": "wallet",
+      "wallet.get": "wallet",
+    });
     expect(requiredEventCapability).toEqual({ "wallet.changed": "wallet" });
   });
 });

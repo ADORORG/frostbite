@@ -5,7 +5,7 @@ can see each answer (and each refusal) in the real isolated frame. It also lists
 the game on its own: the wallet connecting, the tab being hidden, full screen starting.
 
 It declares the `wallet` capability so `wallet.get` can be seen answering; without a connected wallet the answer
-is `null`. The game keeps one counter in its save (`progress.save`) and declares one milestone, `first-call`,
+is `null`. `wallet.connect` asks the platform to open its wallet chooser (the outcome arrives as `wallet.changed`). The game keeps one counter in its save (`progress.save`) and declares one milestone, `first-call`,
 earned by `milestones.unlock`.
 
 It is registered only where the platform runs for development or tests (`configs/games.ts`).

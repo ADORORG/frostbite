@@ -72,9 +72,11 @@ export function useGameSession(
   accountFor: (gameId: string) => AccountPort = createAccountPort,
   // `title` names the game on a message it asks the page to show. `wallet` is what the player has connected;
   // undefined for a game that cannot see a wallet at all.
-  page: { readonly title: string; readonly wallet?: WalletInfo | null } = {
-    title: game.id,
-  },
+  page: {
+    readonly connectWallet?: () => void;
+    readonly title: string;
+    readonly wallet?: WalletInfo | null;
+  } = { title: game.id },
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [progress, setProgress] = useState<MilestoneProgress>(noProgress);
@@ -83,13 +85,19 @@ export function useGameSession(
   const [sync, setSync] = useState<SyncStatus>("local");
   const [toast, setToast] = useState<string | null>(null);
   const { capabilities, id, milestones } = game;
-  const { title, wallet } = page;
+  const { connectWallet, title, wallet } = page;
+  // Whether the page can open the chooser at all is fixed for the page; the function itself is read when asked.
+  const canConnect = connectWallet !== undefined;
   const host = useRef<GameHost | null>(null);
   // Read when the game asks, so a wallet that connects later is seen without restarting the game.
   const walletNow = useRef(wallet);
   useEffect(() => {
     walletNow.current = wallet;
   }, [wallet]);
+  const connectNow = useRef(connectWallet);
+  useEffect(() => {
+    connectNow.current = connectWallet;
+  }, [connectWallet]);
   // The account is looked up when the session starts, not whenever the function that finds it is a new one: a
   // session restarted by a re-render would reload the game and lose what the player was doing.
   const remoteFor = useEffectEvent((gameId: string) => accountFor(gameId));
@@ -176,6 +184,8 @@ export function useGameSession(
       services: {
         toast: (message) => show(`${title}: ${message}`),
         wallet: () => walletNow.current ?? null,
+        // Offered only when the page has a way to open the chooser; otherwise the game is told it is unavailable.
+        ...(canConnect ? { connectWallet: () => connectNow.current?.() } : {}),
       },
     });
     host.current = hosted;
@@ -193,7 +203,7 @@ export function useGameSession(
       host.current = null;
       detach();
     };
-  }, [capabilities, frame, id, milestones, src, title]);
+  }, [canConnect, capabilities, frame, id, milestones, src, title]);
 
   useHostEvents(host, frame, wallet);
 

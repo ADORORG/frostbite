@@ -72,7 +72,7 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
       "Connected. Call anything below.",
     );
     const buttons = [...document.querySelectorAll("#probes button")];
-    expect(buttons).toHaveLength(11);
+    expect(buttons).toHaveLength(12);
     expect(buttons.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,
     );
@@ -83,6 +83,20 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
     await press("wallet");
     expect(lines()[0]).toBe(
       `wallet.get → {"wallet":{"address":"${address}","network":"signet"}}`,
+    );
+  });
+
+  it("asks the platform for its wallet chooser, and is told one is already connected", async () => {
+    const { lines, press } = await open(["wallet"]);
+    await press("wallet-connect");
+    expect(lines()[0]).toBe('wallet.connect → {"status":"already-connected"}');
+  });
+
+  it("shows the refusal when asking for a wallet without declaring the capability", async () => {
+    const { lines, press } = await open([]);
+    await press("wallet-connect");
+    expect(lines()[0]).toContain(
+      "wallet.connect → refused (permission_denied)",
     );
   });
 

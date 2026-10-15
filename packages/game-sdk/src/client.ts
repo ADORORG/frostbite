@@ -102,7 +102,13 @@ export interface GameClient {
   };
   // The wallet the player has connected, or null. Refused with `permission_denied` unless the game declared the
   // `wallet` capability in its manifest.
-  readonly wallet: { get(): Promise<WalletInfo | null> };
+  readonly wallet: {
+    // Asks the platform to open its wallet chooser. Resolves to what the platform did: `requested` (the player now
+    // chooses; watch `wallet.changed`), `already-connected`, or `unavailable` (this page cannot offer one). Refused
+    // with `permission_denied` unless the game declared the `wallet` capability, and rate limited.
+    connect(): Promise<"already-connected" | "requested" | "unavailable">;
+    get(): Promise<WalletInfo | null>;
+  };
 }
 
 // The game's side: plain async functions over the one channel to the page that hosts it. The page it talks to
@@ -236,6 +242,9 @@ export function createGameClient(
     ui: {
       toast: async (message) => (await call("ui.toast", { message })).shown,
     },
-    wallet: { get: async () => (await call("wallet.get", {})).wallet },
+    wallet: {
+      connect: async () => (await call("wallet.connect", {})).status,
+      get: async () => (await call("wallet.get", {})).wallet,
+    },
   };
 }

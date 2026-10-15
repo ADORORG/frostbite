@@ -104,6 +104,16 @@ describe("each call, against the real host", () => {
     });
   });
 
+  it("wallet.connect says a wallet is already connected when declared, and a refusal when not", async () => {
+    expect(value((await run("wallet-connect")).outcome)).toEqual({
+      status: "already-connected",
+    });
+    expect(value((await run("wallet-connect", [])).outcome)).toMatchObject({
+      code: "permission_denied",
+      kind: "refused",
+    });
+  });
+
   it("progress.load returns nothing before a save, and progress.save counts up", async () => {
     expect(value((await run("progress-load")).outcome)).toEqual({
       state: null,

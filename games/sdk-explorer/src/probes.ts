@@ -44,6 +44,12 @@ export const probes: readonly Probe[] = [
     run: (client) => client.wallet.get().then((wallet) => ({ wallet })),
   },
   {
+    id: "wallet-connect",
+    label: "wallet.connect",
+    // Opens the platform's wallet chooser; the outcome comes back as the `wallet.changed` event, not as an answer.
+    run: (client) => client.wallet.connect().then((status) => ({ status })),
+  },
+  {
     id: "progress-load",
     label: "progress.load",
     run: async (client) => ({ state: await client.progress.load() }),
