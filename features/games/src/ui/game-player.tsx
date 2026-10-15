@@ -44,6 +44,16 @@ const keptCopy: Record<SyncStatus, string> = {
     "Your progress is kept in this browser. Saving it to your account is waiting for a connection.",
 };
 
+// What the player is told about how these milestones are known. A game that declared none replay-verifiable is told only
+// that the game reports them; one that did is told the platform may check those, and that nothing is claimed until it has.
+export function milestoneCopy(milestones: readonly GameMilestone[]): string {
+  return milestones.some(
+    ({ verification }) => verification === "replay-verified",
+  )
+    ? "Some of these can be replay-checked by the platform when you are signed in: it replays a run under the game's published rules. The rest the game reports itself and the platform cannot check. Nothing that carries value depends on any of them yet."
+    : "The game reports these itself and the platform cannot check them yet, so nothing that carries value depends on them.";
+}
+
 export function GamePlayer({
   accountFor,
   back,
@@ -106,10 +116,7 @@ export function GamePlayer({
                   progress={progress}
                   unlocked={unlocked}
                 />
-                <p>
-                  The game reports these itself and the platform cannot check
-                  them yet, so nothing that carries value depends on them.
-                </p>
+                <p>{milestoneCopy(game.milestones)}</p>
               </ArcadeInfoCard>
             ),
             id: "milestones",

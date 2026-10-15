@@ -5,6 +5,11 @@ import { gameMilestonePolicyLabels } from "../domain/catalog.ts";
 import { presentMilestone, reachedSummary } from "../domain/milestone-state.ts";
 import type { MilestoneProgress } from "./use-game-session.ts";
 
+// What a milestone the game declared replay-verifiable says before it is checked. It promises nothing: the platform can
+// replay a run only for a player who is signed in, and only if it holds the game's rules.
+export const replayCheckable =
+  "The platform can replay a run to check this one when you are signed in; otherwise it is reported by the game.";
+
 // A game's milestones. With the player's records (`unlocked`), each is in the state the platform's records say and
 // a polite live region tells a screen reader when the game reports a new one; with none (`null`: the game cannot
 // be played here), they are only what the game declares. Either way each says how it is earned.
@@ -25,6 +30,7 @@ export function MilestoneList({
           presentMilestone(milestone, unlocked[milestone.id], {
             count: progress?.counts[milestone.id],
             total: progress?.totals[milestone.id],
+            verification: progress?.levels[milestone.id],
           }),
         );
   return (
@@ -53,8 +59,21 @@ export function MilestoneList({
               <ArcadeBadge tone="yellow">
                 {gameMilestonePolicyLabels[milestone.claimPolicy]}
               </ArcadeBadge>
+              {view?.assurance === "replay-checked" ? (
+                <>
+                  {" "}
+                  <ArcadeBadge tone="mint">Replay-checked</ArcadeBadge>
+                </>
+              ) : null}
               <br />
               <small>{`How it is earned: ${milestone.criteria}`}</small>
+              {milestone.verification === "replay-verified" &&
+              view?.assurance !== "replay-checked" ? (
+                <>
+                  <br />
+                  <small>{replayCheckable}</small>
+                </>
+              ) : null}
               {view?.state === "earned" ? (
                 <>
                   <br />

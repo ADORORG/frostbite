@@ -1,3 +1,4 @@
+import type { VerificationLevel } from "@ador/game-sdk/protocol";
 import type { GameMilestone } from "@ador/shared/games";
 
 // Where a milestone stands for a player. Only these two can be true today: the game reports a milestone, and
@@ -6,7 +7,12 @@ import type { GameMilestone } from "@ador/shared/games";
 export const milestoneStates = ["not-earned", "earned"] as const;
 export type MilestoneState = (typeof milestoneStates)[number];
 
+// How an earned milestone is known, as the page says it: the game's own report, or a run the platform replayed.
+export type MilestoneAssurance = "replay-checked" | "reported";
+
 export interface MilestoneView {
+  // Absent while not earned.
+  readonly assurance?: MilestoneAssurance;
   readonly detail: string;
   readonly id: string;
   readonly label: string;
@@ -14,13 +20,18 @@ export interface MilestoneView {
   readonly title: string;
 }
 
-// An earned milestone is the game's own report (the platform cannot see inside a game), so it is described as
-// reported, with the day, and with what it cannot yet do. Never "verified", never "minted".
+// An earned milestone is the game's own report (the platform cannot see inside a game) unless the platform replayed a run
+// that earned it, so it is described as reported, or as replay-checked and what that does and does not show, with the day,
+// and with what it cannot yet do. Never "verified" alone, never "minted".
 export function presentMilestone(
   milestone: Pick<GameMilestone, "id" | "maxCount" | "target" | "title">,
   unlockedAt: string | undefined,
   // How many times it was earned, and the total reported toward its target; absent when nothing is known.
-  progress: { readonly count?: number; readonly total?: number } = {},
+  progress: {
+    readonly count?: number;
+    readonly total?: number;
+    readonly verification?: VerificationLevel;
+  } = {},
 ): MilestoneView {
   const { id, maxCount, target, title } = milestone;
   if (unlockedAt === undefined) {
@@ -46,8 +57,12 @@ export function presentMilestone(
     maxCount !== undefined && count > 1
       ? ` Reported ${String(count)} times (counted up to ${String(maxCount)}).`
       : "";
+  const checked = progress.verification === "replay-verified";
   return {
-    detail: `Reported by the game on ${unlockedAt.slice(0, 10)}.${times} It cannot be minted yet.`,
+    assurance: checked ? "replay-checked" : "reported",
+    detail: checked
+      ? `Replay-checked on ${unlockedAt.slice(0, 10)}: the platform replayed the run under the game's published rules, which shows the run followed them, not that a person played it. It cannot be minted yet.`
+      : `Reported by the game on ${unlockedAt.slice(0, 10)}.${times} It cannot be minted yet.`,
     id,
     label: count > 1 ? `Reached x${String(count)}` : "Reached",
     state: "earned",

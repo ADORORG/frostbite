@@ -121,5 +121,6 @@ describe("runs on the game page", () => {
     await flush();
     expect(sync).toHaveBeenCalledTimes(2);
     expect(h.container.textContent).toContain("2026-10-05");
+    expect(h.container.textContent).toContain("Replay-checked");
   });
 });

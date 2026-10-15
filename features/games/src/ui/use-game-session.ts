@@ -5,7 +5,7 @@ import {
   type HostedGame,
   type RunsService,
 } from "@ador/game-sdk/host";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
+import type { VerificationLevel, WalletInfo } from "@ador/game-sdk/protocol";
 import {
   createLocalBackend,
   type KeyValueStorage,
@@ -38,10 +38,12 @@ export interface UnlockedMilestones {
 // reported toward the target of each that has one.
 export interface MilestoneProgress {
   readonly counts: Readonly<Record<string, number>>;
+  // How each earned milestone is known: the game's report, or a run the platform replayed.
+  readonly levels: Readonly<Record<string, VerificationLevel>>;
   readonly totals: Readonly<Record<string, number>>;
 }
 
-const noProgress: MilestoneProgress = { counts: {}, totals: {} };
+const noProgress: MilestoneProgress = { counts: {}, levels: {}, totals: {} };
 
 // The browser's own storage, or a stand-in that lasts only as long as the page when the browser refuses it
 // (a blocked-storage setting), so the game still plays and the player is told nothing will be kept.
@@ -155,6 +157,12 @@ export function useGameSession(
           setProgress({
             counts: Object.fromEntries(
               Object.entries(records).map(([key, { count }]) => [key, count]),
+            ),
+            levels: Object.fromEntries(
+              Object.entries(records).map(([key, { verification }]) => [
+                key,
+                verification,
+              ]),
             ),
             totals,
           });
