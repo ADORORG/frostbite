@@ -1,8 +1,10 @@
+import { WalletRoot } from "@ador/feature-accounts/widget";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import "@repo/ui/styles.css";
 import "./globals.css";
+import { walletAuthConfig } from "../../../../configs/wallet";
 
 const bodyFont = Chakra_Petch({
   subsets: ["latin"],
@@ -44,7 +46,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           nonce={nonce}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <WalletRoot
+          balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
+          candidates={walletAuthConfig.candidates}
+          network={walletAuthConfig.network}
+        >
+          {children}
+        </WalletRoot>
+      </body>
     </html>
   );
 }

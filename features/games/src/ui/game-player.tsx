@@ -2,6 +2,7 @@
 
 import type { HostedGame } from "@ador/game-sdk/host";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
+import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { GameMilestone } from "@ador/shared/games";
 import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
 import {
@@ -64,11 +65,13 @@ export function GamePlayer({
   readonly sections?: readonly DockSection[];
   readonly src: string;
   readonly title: string;
-  // Set only for a game that declared the wallet capability: what the player has connected, and where to
-  // connect one. Without it the game is never told about a wallet and the dock has no wallet section.
+  // Set only for a game that declared the wallet capability: what the player has connected, how to ask for the
+  // wallet chooser, and the network the game expects. Without it the game is never told about a wallet and the
+  // dock has no wallet section.
   readonly wallet?: {
-    readonly connectHref: string;
+    readonly connect: () => void;
     readonly current: WalletInfo | null;
+    readonly expectedNetwork: WalletNetwork;
   };
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -116,8 +119,9 @@ export function GamePlayer({
             badge: wallet.current === null ? null : "Connected",
             content: (
               <WalletCard
-                connectHref={wallet.connectHref}
+                connect={wallet.connect}
                 current={wallet.current}
+                expectedNetwork={wallet.expectedNetwork}
               />
             ),
             id: "wallet",

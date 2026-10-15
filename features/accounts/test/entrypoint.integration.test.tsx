@@ -3,7 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 import { createAccountsEntrypoint } from "../src/entrypoint.tsx";
-import { walletConfig } from "./support/wallet-config.ts";
 
 // The pages never reach for the wallet services, so a call to them would be a bug.
 const noWalletServices = () => {
@@ -15,17 +14,12 @@ describe("accounts entrypoint", () => {
     ["/account", "Account console", "Authenticated session"],
     ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
-    const entrypoint = createAccountsEntrypoint(
-      noWalletServices,
-      walletConfig,
-      null,
-      () => ({
-        begin: vi.fn(),
-        finish: vi.fn(),
-        list: vi.fn(async () => []),
-        unlink: vi.fn(),
-      }),
-    );
+    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+      begin: vi.fn(),
+      finish: vi.fn(),
+      list: vi.fn(async () => []),
+      unlink: vi.fn(),
+    }));
     const page = entrypoint.pages?.find((candidate) => candidate.path === path);
     expect(page).toBeDefined();
     const markup = renderToStaticMarkup(
@@ -47,7 +41,7 @@ describe("accounts entrypoint", () => {
 
   it("does not render private content without an actor", async () => {
     const pages =
-      createAccountsEntrypoint(noWalletServices, walletConfig, null, () => ({
+      createAccountsEntrypoint(noWalletServices, null, () => ({
         begin: vi.fn(),
         finish: vi.fn(),
         list: vi.fn(async () => []),
@@ -65,17 +59,12 @@ describe("accounts entrypoint", () => {
   });
 
   it("fails closed when passkey status persistence is unavailable", async () => {
-    const entrypoint = createAccountsEntrypoint(
-      noWalletServices,
-      walletConfig,
-      null,
-      () => ({
-        begin: vi.fn(),
-        finish: vi.fn(),
-        list: vi.fn().mockRejectedValue(new Error("database unavailable")),
-        unlink: vi.fn(),
-      }),
-    );
+    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+      begin: vi.fn(),
+      finish: vi.fn(),
+      list: vi.fn().mockRejectedValue(new Error("database unavailable")),
+      unlink: vi.fn(),
+    }));
     const page = entrypoint.pages?.find(({ path }) => path === "/account");
     const markup = renderToStaticMarkup(
       await page?.render({
@@ -89,17 +78,12 @@ describe("accounts entrypoint", () => {
   });
 
   it("offers the sign-in page to everyone, with the wallets the platform configured, and says connecting is not signing in", async () => {
-    const entrypoint = createAccountsEntrypoint(
-      noWalletServices,
-      walletConfig,
-      null,
-      () => ({
-        begin: vi.fn(),
-        finish: vi.fn(),
-        list: vi.fn(async () => []),
-        unlink: vi.fn(),
-      }),
-    );
+    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+      begin: vi.fn(),
+      finish: vi.fn(),
+      list: vi.fn(async () => []),
+      unlink: vi.fn(),
+    }));
     const page = entrypoint.pages?.find(({ path }) => path === "/sign-in");
     expect(page?.access).toEqual({ kind: "public" });
     const markup = renderToStaticMarkup(

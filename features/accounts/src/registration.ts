@@ -20,12 +20,7 @@ export function createAccountsFeature(
   const wallet = validateWalletAuthConfig(input);
   return defineFeature({
     manifest: {
-      capabilities: [
-        "api-routes",
-        "authenticated-page",
-        "navigation",
-        "public-page",
-      ],
+      capabilities: ["api-routes", "authenticated-page", "navigation"],
       dependencies: [],
       navigation: [
         {
@@ -34,13 +29,6 @@ export function createAccountsFeature(
           href: "/account",
           label: "Account",
           order: 0,
-        },
-        {
-          access: { kind: "public" },
-          area: "account",
-          href: "/sign-in",
-          label: "Sign in",
-          order: 10,
         },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -52,7 +40,6 @@ export function createAccountsFeature(
       ],
       id: "accounts",
       pages: [
-        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -73,7 +60,6 @@ export function createAccountsFeature(
         ({ createAccountsEntrypoint }) =>
           createAccountsEntrypoint(
             createWalletServicesResolver(wallet),
-            wallet,
             balanceSource,
           ),
       ),

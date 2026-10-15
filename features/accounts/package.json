@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
-    "./entrypoint": "./src/entrypoint.tsx"
+    "./entrypoint": "./src/entrypoint.tsx",
+    "./widget": "./src/widget/wallet-root.tsx"
   },
   "scripts": {
     "build": "tsc --noEmit",

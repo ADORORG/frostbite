@@ -22,20 +22,15 @@ const state = vi.hoisted(() => ({
   address: "",
   connected: false,
   network: "signet" as "mainnet" | "signet",
-  providerNetwork: "" as string,
+  requests: 0,
 }));
 vi.mock("@ador/wallet/client", () => ({
+  useWalletChooser: () => ({
+    request: () => {
+      state.requests += 1;
+    },
+  }),
   useWalletConnection: () => state,
-  WalletProvider: ({
-    children,
-    network,
-  }: {
-    children: unknown;
-    network: string;
-  }) => {
-    state.providerNetwork = network;
-    return children;
-  },
 }));
 
 const address =
@@ -50,7 +45,12 @@ beforeEach(() => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  Object.assign(state, { address: "", connected: false, network: "signet" });
+  Object.assign(state, {
+    address: "",
+    connected: false,
+    network: "signet",
+    requests: 0,
+  });
   vi.spyOn(HTMLIFrameElement.prototype, "setAttribute").mockImplementation(
     () => undefined,
   );
@@ -65,7 +65,6 @@ const show = () =>
   act(async () =>
     root.render(
       <WalletGamePlayer
-        connectHref="/sign-in"
         game={{ ...game, capabilities: ["wallet"] }}
         network="signet"
         src="/play/embedded-game/index.html"
@@ -75,10 +74,14 @@ const show = () =>
   );
 
 describe("the stage with the player's wallet behind it", () => {
-  it("connects the wallet library on the network the platform names, and shows no wallet while none is connected", async () => {
+  it("shows no wallet while none is connected, and asks for the app's chooser rather than building its own", async () => {
     await show();
-    expect(state.providerNetwork).toBe("signet");
     expect(container.textContent).toContain("No wallet is connected.");
+    const connect = [...container.querySelectorAll("button")].find(
+      (button) => button.textContent === "Connect a wallet",
+    );
+    await act(async () => connect?.click());
+    expect(state.requests).toBe(1);
   });
 
   it("shows the connected wallet's address and network", async () => {

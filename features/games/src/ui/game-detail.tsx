@@ -98,7 +98,6 @@ export function GameDetail({
       {game.embedSrc === null ? null : wantsWallet ? (
         <WalletGamePlayer
           {...player}
-          connectHref={wallet.connectHref}
           network={wallet.network}
           src={game.embedSrc}
         />

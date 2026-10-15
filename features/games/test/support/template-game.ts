@@ -98,6 +98,5 @@ export const walletGame = defineGame({
 });
 
 export const walletConfig = {
-  connectHref: "/sign-in",
   network: "signet",
 } as const;

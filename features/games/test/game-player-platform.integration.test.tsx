@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { act } from "react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { shortAddress } from "../src/ui/wallet-card.tsx";
 import {
@@ -20,9 +20,11 @@ const address =
   "tb1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqp3mvzv";
 const connected = { address, network: "signet" };
 const walletGame = { ...game, capabilities: ["wallet"] };
+const connect = vi.fn();
+beforeEach(() => connect.mockClear());
 const asking = (current: typeof connected | null) => ({
   game: walletGame,
-  wallet: { connectHref: "/sign-in", current },
+  wallet: { connect, current, expectedNetwork: "signet" as const },
 });
 const dockLabels = () =>
   [...h.container.querySelectorAll(".arcade-dock__strip button")].map(
@@ -54,9 +56,13 @@ describe("the wallet a game can see", () => {
     await flush();
     expect(dockLabels()).toEqual(["Milestones0/2", "Wallet"]);
     expect(h.container.textContent).toContain("No wallet is connected.");
-    expect(h.container.querySelector('a[href="/sign-in"]')?.textContent).toBe(
-      "Connect a wallet",
+    const connectButton = [...h.container.querySelectorAll("button")].find(
+      (button) => button.textContent === "Connect a wallet",
     );
+    expect(connect).not.toHaveBeenCalled();
+    await act(async () => connectButton?.click());
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(h.container.querySelector('a[href="/sign-in"]')).toBeNull();
     expect(answer(reply, "b")).toMatchObject({
       ok: true,
       result: { wallet: null },
@@ -76,6 +82,23 @@ describe("the wallet a game can see", () => {
       ok: true,
       result: { wallet: connected },
     });
+  });
+
+  it("warns, on the card, when the connected wallet is on another network than the game uses, and still lets the game see it", async () => {
+    const mainnet = { address, network: "mainnet" };
+    const { reply, target } = await mount(undefined, {
+      game: walletGame,
+      wallet: { connect, current: mainnet, expectedNetwork: "signet" },
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "wallet.get", {}, "b");
+    await flush();
+    expect(h.container.textContent).toContain(
+      "⚠ Mainnet — this game uses Signet",
+    );
+    expect(answer(reply, "b")).toMatchObject({ result: { wallet: mainnet } });
+    await rerender(asking(connected));
+    expect(h.container.textContent).not.toContain("this game uses");
   });
 
   it("tells the game when the wallet connects or leaves, without restarting it", async () => {

@@ -2,6 +2,7 @@
 
 export { walletNetworkUnavailableReason } from "./network-availability.ts";
 export { classifyWalletConnectionError } from "./connection-error.ts";
+export { useWalletChooser } from "./chooser.tsx";
 export type { WalletConnectionFailure } from "./connection-error.ts";
 
 import type {} from "../vendor/lasereyes-react.d.ts";
@@ -14,6 +15,7 @@ import {
 import type { ReactNode } from "react";
 
 import type { WalletNetwork } from "../contracts.ts";
+import { WalletChooserProvider } from "./chooser.tsx";
 import type { LaserEyesProviderId } from "../conformance/contracts.ts";
 
 // Core 0.0.85 maps this normalized protocol to UniSat's "bip322-simple" and Xverse BIP322.
@@ -96,5 +98,9 @@ interface WalletProviderProps {
 }
 
 export function WalletProvider({ children, network }: WalletProviderProps) {
-  return <LaserEyesProvider config={{ network }}>{children}</LaserEyesProvider>;
+  return (
+    <LaserEyesProvider config={{ network }}>
+      <WalletChooserProvider>{children}</WalletChooserProvider>
+    </LaserEyesProvider>
+  );
 }

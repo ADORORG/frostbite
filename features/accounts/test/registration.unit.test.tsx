@@ -17,15 +17,9 @@ const byOperation = (a: { operationId: string }, b: { operationId: string }) =>
 describe("accounts feature registration", () => {
   it("declares the complete detachable access contract", () => {
     expect(accountsFeature.manifest).toMatchObject({
-      capabilities: [
-        "api-routes",
-        "authenticated-page",
-        "navigation",
-        "public-page",
-      ],
+      capabilities: ["api-routes", "authenticated-page", "navigation"],
       id: "accounts",
       pages: [
-        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -36,16 +30,16 @@ describe("accounts feature registration", () => {
     });
   });
 
-  it("offers visitors a public way to the sign-in page and shows staff only the admin entry", () => {
-    const entries = accountsFeature.manifest.navigation ?? [];
-    expect(entries.find(({ href }) => href === "/sign-in")).toMatchObject({
-      access: { kind: "public" },
-      label: "Sign in",
-    });
-    expect(entries.find(({ href }) => href === "/account")?.access).toEqual({
+  it("has no page or navigation entry of its own for signing in: that is the wallet widget's job", () => {
+    const { navigation = [], pages = [] } = accountsFeature.manifest;
+    expect(pages.some(({ access }) => access.kind === "public")).toBe(false);
+    expect(navigation.some(({ access }) => access.kind === "public")).toBe(
+      false,
+    );
+    expect(navigation.find(({ href }) => href === "/account")?.access).toEqual({
       kind: "authenticated",
     });
-    expect(entries.find(({ href }) => href === "/admin")?.access).toEqual({
+    expect(navigation.find(({ href }) => href === "/admin")?.access).toEqual({
       capability: "platform:operate",
       kind: "platform",
     });
@@ -63,7 +57,6 @@ describe("accounts feature registration", () => {
       version: accountsFeature.manifest.version,
     });
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
-      "/sign-in",
       "/account",
       "/admin",
     ]);

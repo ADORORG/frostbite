@@ -11,8 +11,6 @@ import { createWalletSignInOperations } from "./application/wallet-sign-in-opera
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import { getPasskeyLinkingService } from "./runtime.ts";
 import { AccountSurface } from "./ui/account-surface.tsx";
-import { SignInSurface } from "./ui/sign-in-surface.tsx";
-import type { WalletAuthConfig } from "./wallet-config.ts";
 import { AdminHome } from "./ui/admin-home.tsx";
 
 type PasskeyService = ReturnType<typeof getPasskeyLinkingService>;
@@ -21,7 +19,6 @@ async function account(
   actorUserId: UuidV7 | null,
   getService: () => PasskeyService,
   navigation: readonly NavigationItem[],
-  wallet: WalletAuthConfig,
 ) {
   if (actorUserId === null) return null;
   try {
@@ -30,7 +27,6 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeyCredentialIds={await getService().list(actorUserId)}
-        wallet={wallet}
       />
     );
   } catch {
@@ -39,7 +35,6 @@ async function account(
         actorUserId={actorUserId}
         navigation={navigation}
         passkeysUnavailable
-        wallet={wallet}
       />
     );
   }
@@ -47,7 +42,6 @@ async function account(
 
 export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
-  wallet: WalletAuthConfig,
   balanceSource: BalanceSource | null,
   getService: () => PasskeyService = getPasskeyLinkingService,
 ): FeatureEntrypoint {
@@ -63,12 +57,7 @@ export function createAccountsEntrypoint(
     listMethods,
   ] = createWalletMethodsOperations(getWalletServices);
   return {
-    capabilities: [
-      "api-routes",
-      "authenticated-page",
-      "navigation",
-      "public-page",
-    ],
+    capabilities: ["api-routes", "authenticated-page", "navigation"],
     id: "accounts",
     operations: [
       registerHttpOperation(list),
@@ -93,21 +82,10 @@ export function createAccountsEntrypoint(
     ],
     pages: [
       {
-        access: { kind: "public" },
-        path: "/sign-in",
-        render: ({ navigation }) => (
-          <SignInSurface
-            candidates={wallet.candidates}
-            navigation={navigation}
-            network={wallet.network}
-          />
-        ),
-      },
-      {
         access: { kind: "authenticated" },
         path: "/account",
         render: ({ actorUserId, navigation }) =>
-          account(actorUserId, getService, navigation, wallet),
+          account(actorUserId, getService, navigation),
       },
       {
         access: { capability: "platform:operate", kind: "platform" },

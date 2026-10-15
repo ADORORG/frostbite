@@ -1,3 +1,4 @@
+import { WalletProvider } from "@ador/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -23,12 +24,15 @@ async function render(
     (candidate) => candidate.path === path,
   );
   if (page === undefined) throw new Error(`No page ${path}`);
+  // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
   return renderToStaticMarkup(
-    await page.render({
-      actorUserId: null,
-      navigation: [],
-      params: slug === undefined ? {} : { slug },
-    }),
+    <WalletProvider network="signet">
+      {await page.render({
+        actorUserId: null,
+        navigation: [],
+        params: slug === undefined ? {} : { slug },
+      })}
+    </WalletProvider>,
   );
 }
 
@@ -214,7 +218,8 @@ describe("a game that asks to see the player's wallet", () => {
     expect(markup).toContain("Read the player&#x27;s balance");
     expect(markup).toContain("Not available yet");
     expect(markup).toContain("Your wallet");
-    expect(markup).toContain('href="/sign-in"');
+    expect(markup).toContain("Connect a wallet");
+    expect(markup).not.toContain("/sign-in");
   });
 
   it("is given no wallet section when the game did not ask, and says it asks for nothing", async () => {

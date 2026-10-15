@@ -1,6 +1,5 @@
 "use client";
 
-import { ArcadeModal } from "@repo/ui/arcade";
 import {
   classifyWalletConnectionError,
   walletNetworkUnavailableReason,
@@ -11,10 +10,10 @@ import { useState } from "react";
 
 import type { WalletCandidate } from "../wallet-config.ts";
 
-// The wallet chooser: a dialog listing the wallets the platform offers, those found in the browser first. A wallet
-// that cannot work on the configured network is shown as unavailable, and a wallet that is not installed offers
-// where to get it once connecting fails. Connecting is not signing in; it only lets the platform see an address.
-export function WalletPicker({
+// The wallets the platform offers, those found in the browser first. A wallet that cannot work on the configured
+// network is shown as unavailable, and a wallet that is not installed offers where to get it once connecting fails.
+// Connecting is not signing in; it only lets the platform see an address.
+export function WalletChoices({
   candidates,
   wallet,
 }: {
@@ -29,7 +28,7 @@ export function WalletPicker({
   const unavailable = (candidate: WalletCandidate) =>
     walletNetworkUnavailableReason(candidate.id, wallet.network);
   return (
-    <ArcadeModal title="Choose your wallet" triggerLabel="Choose wallet">
+    <>
       <p className="arcade-wallet-help">Select a wallet · {wallet.network}</p>
       <ul className="arcade-wallet-list">
         {[...candidates]
@@ -90,6 +89,6 @@ export function WalletPicker({
           Install {error.candidate.label}
         </a>
       ) : null}
-    </ArcadeModal>
+    </>
   );
 }
