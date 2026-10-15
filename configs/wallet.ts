@@ -26,6 +26,9 @@ export const walletAuthConfig = {
   // Three wrong signatures kill a challenge, so a guess at a signature is not worth making.
   maximumVerificationAttempts: 3,
   network: "signet",
+  // The connection library reconnects to the last wallet about two seconds after load (it waits for extensions);
+  // a wallet that has not come back within ten seconds is not coming back.
+  reconnectWaitMs: 10_000,
   // A wallet an account removed cannot be taken by another account for 24 hours (owner decision, 2026-10-13).
   releaseHoldMs: 86_400_000,
 } as const satisfies WalletAuthConfig;

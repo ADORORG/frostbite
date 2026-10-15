@@ -64,6 +64,14 @@ export const testWallets = [
     address: "tb1qjg2yhc9l0esc86f7rak0psclgqf3yd9qcas794",
     privateKey: "cUA5RiKwBWxEmj9y8FBjR9WeetWJEfECzrQb3sihjqV3MZiNYMAe",
   },
+  {
+    address: "tb1q8lthtjpmwdx7a8xwqk44cqzp03ngjknqsuk96n",
+    privateKey: "cPzhqwcJaJpeS3M8dX5QK7vKAuT34V34erT12zw2kU1X4atqggHB",
+  },
+  {
+    address: "tb1qhyszzra4m43tzz89l25xtherl8g0cxgsa5ztus",
+    privateKey: "cVRSxgLY8SznXTBXSmydG98h1FZhXdJx3HptGtZfxgdE8eF4uNGP",
+  },
 ] as const;
 
 export function signAs(

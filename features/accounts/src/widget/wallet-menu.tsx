@@ -30,6 +30,7 @@ export function WalletMenu({
   id,
   onChoose,
   onRefreshBalance,
+  onSessionChange,
   session,
   wallet,
 }: {
@@ -38,6 +39,8 @@ export function WalletMenu({
   readonly id: string;
   readonly onChoose: () => void;
   readonly onRefreshBalance: () => void;
+  // Called after signing in or out succeeded, so the page can show what the new session may see.
+  readonly onSessionChange: () => void;
   readonly session: Session;
   readonly wallet: WalletConnectionClient;
 }) {
@@ -76,7 +79,9 @@ export function WalletMenu({
           <button
             className="wallet-menu__primary"
             disabled={working}
-            onClick={() => void actions.signIn()}
+            onClick={() =>
+              void actions.signIn().then((ok) => ok && onSessionChange())
+            }
             type="button"
           >
             {busy === "sign-in" ? waiting : "Sign in with wallet"}
@@ -137,7 +142,9 @@ export function WalletMenu({
           <button
             className="wallet-menu__action"
             disabled={working}
-            onClick={() => void actions.signOut()}
+            onClick={() =>
+              void actions.signOut().then((ok) => ok && onSessionChange())
+            }
             type="button"
           >
             Sign out

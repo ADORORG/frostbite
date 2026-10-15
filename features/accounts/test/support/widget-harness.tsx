@@ -10,6 +10,7 @@ import { WalletWidget } from "../../src/widget/wallet-widget.tsx";
 import { walletConfig } from "./wallet-config.ts";
 
 const mocks = vi.hoisted(() => ({
+  remembered: { value: false },
   chooser: { dismiss: vi.fn(), open: false, request: vi.fn() },
   connection: {
     address: "",
@@ -42,10 +43,13 @@ export const connection: ConnectionMock = mocks.connection;
 vi.mock("@ador/wallet/client", () => ({
   classifyWalletConnectionError: () => ({ kind: "failed", message: "x" }),
   useWalletChooser: () => mocks.chooser,
+  hasRememberedWallet: () => mocks.remembered.value,
   useWalletConnection: () => mocks.connection,
   walletNetworkUnavailableReason: () => null,
 }));
 
+export const remembered = mocks.remembered;
+export const sessionChanged: Mock = vi.fn();
 export const address = "tb1q9vza2e8x573nczrlzms0wvx3gsqjx7vaxwd45v";
 export const second = "tb1qsecondwalletaddress000000000000000000";
 export const requests: { body: unknown; path: string }[] = [];
@@ -100,6 +104,8 @@ beforeEach(() => {
   });
   Object.assign(chooser, { open: false });
   connection.disconnect.mockClear();
+  remembered.value = false;
+  sessionChanged.mockClear();
   chooser.request.mockClear();
   vi.stubGlobal("fetch", async (path: string, init?: { body?: string }) => {
     requests.push({
@@ -124,6 +130,8 @@ export const show = () =>
         balanceRefreshMs={60_000}
         candidates={walletConfig.candidates}
         network="signet"
+        onSessionChange={sessionChanged}
+        reconnectWaitMs={10_000}
       />,
     );
   });

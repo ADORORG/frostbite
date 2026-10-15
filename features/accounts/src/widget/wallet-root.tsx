@@ -16,11 +16,16 @@ export function WalletRoot({
   candidates,
   children,
   network,
+  onSessionChange,
+  reconnectWaitMs,
 }: {
   readonly balanceRefreshMs: number;
   readonly candidates: readonly WalletCandidate[];
   readonly children: ReactNode;
   readonly network: WalletNetwork;
+  // What the app does after the player signs in or out (it refreshes the page, which is rendered on the server).
+  readonly onSessionChange: () => void;
+  readonly reconnectWaitMs: number;
 }) {
   return (
     <WalletProvider network={network}>
@@ -30,6 +35,8 @@ export function WalletRoot({
             balanceRefreshMs={balanceRefreshMs}
             candidates={candidates}
             network={network}
+            onSessionChange={onSessionChange}
+            reconnectWaitMs={reconnectWaitMs}
           />
         }
       >

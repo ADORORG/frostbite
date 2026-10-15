@@ -17,6 +17,12 @@ and capability-gated admin navigation items.
 
 ## Invariants
 
+- After a successful sign-in or sign-out the widget calls `onSessionChange` (the app refreshes the server-rendered
+  page); a failed sign-in does not. While a remembered wallet is reconnecting the button says so, for at most
+  `reconnectWaitMs`.
+- The wallet chooser closes when the choice is made (a wallet connected that was not, or a different one), never merely
+  because a wallet is connected, so "Switch wallet" works.
+
 - The balance is asked for only while the widget's menu is open (every `balanceRefreshMs`, a policy value), is
   read for the wallet connected now, and is forgotten when the wallet changes; an answer that arrives for a
   replaced wallet is dropped. A failed refresh keeps the older number marked as older.

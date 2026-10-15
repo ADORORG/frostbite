@@ -15,6 +15,7 @@ import {
   methods,
   openMenu,
   requests,
+  sessionChanged,
   second,
   settle,
   show,
@@ -38,7 +39,10 @@ describe("the wallet widget: signing in", () => {
     await openMenu();
     expect(container.textContent).toContain("Connected, not signed in.");
     expect(container.textContent).not.toContain("Signed in with this wallet");
+    expect(sessionChanged).not.toHaveBeenCalled();
     await click("Sign in with wallet");
+    // The page is told, once, so it can show what the new session may see.
+    expect(sessionChanged).toHaveBeenCalledTimes(1);
     expect(container.textContent).toContain("Signed in with this wallet.");
     expect(button("Sign out")).toBeDefined();
     expect(
@@ -51,6 +55,24 @@ describe("the wallet widget: signing in", () => {
       "/api/v1/auth/wallet/verify",
       "/api/v1/auth/methods",
     ]);
+  });
+
+  it("does not ask the page to refresh when signing in did not work", async () => {
+    Object.assign(connection, { address, connected: true, provider: "xverse" });
+    Object.assign(answers, {
+      "/api/v1/auth/methods": () => denied("unauthorized", 401),
+      "/api/v1/auth/wallet/challenge": challenge,
+      "/api/v1/auth/wallet/verify": () => denied("unauthorized", 401),
+    });
+    await show();
+    await settle();
+    await openMenu();
+    await click("Sign in with wallet");
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+      "The wallet could not be verified. Try again with a fresh signature.",
+    );
+    expect(sessionChanged).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("Connected, not signed in.");
   });
 
   it("says a connected wallet is not linked, offers to link it, and says what went wrong in plain words when it cannot be", async () => {
@@ -75,6 +97,8 @@ describe("the wallet widget: signing in", () => {
       "This wallet cannot be used for that.",
     );
     expect(button("Link this wallet")).toBeDefined();
+    // Nothing changed about who is signed in, so the page is not asked to refresh.
+    expect(sessionChanged).not.toHaveBeenCalled();
   });
 
   it("lists the wallets that sign in, lets one be removed only while another remains, and says why the last cannot be", async () => {
@@ -126,6 +150,7 @@ describe("the wallet widget: signing in", () => {
     await settle();
     await openMenu();
     await click("Sign out");
+    expect(sessionChanged).toHaveBeenCalledTimes(1);
     expect(container.textContent).toContain("Connected, not signed in.");
     expect(container.textContent).not.toContain("Your wallets");
   });

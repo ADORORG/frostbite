@@ -65,3 +65,26 @@ unavailable|failed`, 60 s only while the menu is open, answers for a replaced wa
 ## Open
 
 - Indexer choice (balance). Lazy loading (#59). W2-10B evidence still missing. The email adapter is not built.
+
+## Owner testing, 2026-10-15: three defects found with a real wallet, and fixed
+
+1. **After a reload the button said "Account" instead of the wallet.** The connection library waits about 1.5 s after
+   load before it reconnects to the last wallet (it waits for extensions), then waits for the extension, so for a
+   moment there really is no connected wallet. The button now says "Reconnecting wallet…" while the library has a
+   remembered wallet (`hasRememberedWallet`, in `@ador/wallet/client`, reads the library's own `defaultWallet` key) and
+   until `reconnectWaitMs` (10 s, in `configs/wallet.ts`) runs out. My e2e wallet answered instantly, so it could not
+   show this; the fake wallet now has a delay option and the e2e checks the label and then the address.
+2. **Signing out on `/account` kept showing the session.** Pages are rendered on the server and the widget changed only
+   its own state. After a successful sign-in or sign-out the widget now calls `onSessionChange`; the app supplies
+   `router.refresh()` (`apps/web/src/app/wallet-shell.tsx`), so the navigation and private pages follow at once and the
+   menu keeps its state. A failed sign-in does not refresh. Disconnecting a wallet does not end the session (by
+   design), so a signed-in person still sees the session after Disconnect; the button then says "Account".
+3. **"Switch wallet" closed the menu and did nothing.** The chooser dialog closed itself whenever a wallet was
+   connected, and one already was. It now closes when the choice is made: a wallet that was not connected when it
+   opened is connected, a different wallet is connected, or the same one was chosen again and connecting finished.
+
+Tests: unit tests for each (including a failed sign-in not refreshing), e2e for all three (reload with a slow wallet,
+sign-in and sign-out following the page, Switch wallet), mutation proof (12 more guards; two survivors found and
+fixed: a failed sign-in telling the page, and a test that read the library's storage key from the constant under test).
+The e2e tests that sign in now have wallets of their own: sharing one account between tests running in parallel made the
+suite intermittently fail.

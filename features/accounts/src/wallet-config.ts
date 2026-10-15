@@ -12,6 +12,8 @@ export interface WalletCandidate {
 // The platform's wallet sign-in settings: values that are the business's to decide, not the environment's.
 // Supplied by the platform's configuration (`configs/wallet.ts`), so changing one is a reviewed change.
 export interface WalletAuthConfig {
+  // How long the widget says it is reconnecting a remembered wallet before it gives up and shows none.
+  readonly reconnectWaitMs: number;
   // How often the widget refreshes the balance while its menu is open.
   readonly balanceRefreshMs: number;
   // The wallets a player can choose from, in the order the platform prefers (wallets detected in the browser are
@@ -34,6 +36,7 @@ export function validateWalletAuthConfig(
   const positive = (value: number) => Number.isSafeInteger(value) && value > 0;
   if (
     !positive(config.balanceRefreshMs) ||
+    !positive(config.reconnectWaitMs) ||
     !positive(config.challengeLifetimeMs) ||
     !positive(config.maximumVerificationAttempts) ||
     !positive(config.releaseHoldMs)

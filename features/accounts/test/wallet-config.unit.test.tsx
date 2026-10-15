@@ -14,6 +14,11 @@ describe("the wallet sign-in settings", () => {
 
   it.each([
     [
+      "no reconnect wait",
+      { reconnectWaitMs: 0 },
+      "Invalid wallet sign-in limits.",
+    ],
+    [
       "no balance refresh",
       { balanceRefreshMs: 0 },
       "Invalid wallet sign-in limits.",

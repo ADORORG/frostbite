@@ -14,6 +14,7 @@ import {
   json,
   methods,
   openMenu,
+  remembered,
   settle,
   show,
   trigger,
@@ -209,5 +210,46 @@ describe("the wallet widget: copying the address", () => {
     expect(container.textContent).toContain("Could not copy");
     expect(container.textContent).not.toContain("Copied");
     expect(button("Copy address")).toBeDefined();
+  });
+});
+
+describe("the wallet widget: a wallet coming back after a reload", () => {
+  it("says it is reconnecting, not 'Account' or 'Connect wallet', while a remembered wallet is on its way", async () => {
+    remembered.value = true;
+    answers["/api/v1/auth/methods"] = () => methods([address]);
+    await show();
+    await settle();
+    expect(trigger()?.textContent).toBe("Reconnecting wallet…");
+    expect(trigger()?.getAttribute("aria-busy")).toBe("true");
+    // It is the wallet that arrives, and the label becomes the wallet.
+    Object.assign(connection, { address, connected: true });
+    await show();
+    expect(trigger()?.textContent).toBe(
+      `${address.slice(0, 8)}…${address.slice(-8)}`,
+    );
+    expect(trigger()?.hasAttribute("aria-busy")).toBe(false);
+  });
+
+  it("gives up after the wait and shows what is true: an account, or no wallet", async () => {
+    vi.useFakeTimers();
+    try {
+      remembered.value = true;
+      answers["/api/v1/auth/methods"] = () => methods([address]);
+      await show();
+      await act(async () => vi.advanceTimersByTimeAsync(9_999));
+      expect(trigger()?.textContent).toBe("Reconnecting wallet…");
+      await act(async () => vi.advanceTimersByTimeAsync(1));
+      expect(trigger()?.textContent).toBe("Account");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not claim to be reconnecting when no wallet is remembered", async () => {
+    answers["/api/v1/auth/methods"] = () => json({}, 401);
+    await show();
+    await settle();
+    expect(trigger()?.textContent).toBe("Connect wallet");
+    expect(trigger()?.hasAttribute("aria-busy")).toBe(false);
   });
 });

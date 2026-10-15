@@ -12,6 +12,9 @@ import {
 // The wallet widget in the header, in a real browser: on every page, honest about what it knows, and a connection
 // that survives a reload. Connecting changes no account, so the wallet is shared; signing in is covered elsewhere.
 const wallet = testWallets[0];
+// Signing in creates an account that lasts the whole run, so the tests that do it have wallets of their own.
+const signingWallet = testWallets[8];
+const slowWallet = testWallets[9];
 
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop only.");
@@ -102,4 +105,85 @@ test("closes its menu with Escape, returning focus, and when the page is clicked
   await page.locator("main").click({ position: { x: 5, y: 5 } });
   await expect(walletMenu(page)).not.toBeVisible();
   await expect(walletButton(page)).toHaveAttribute("aria-expanded", "false");
+});
+
+test("shows the wallet again after a reload even when the extension is slow to answer, signed in or not", async ({
+  baseURL,
+  browser,
+}) => {
+  const context = await browser.newContext({ baseURL });
+  const page = await context.newPage();
+  await installFakeWallet(page, slowWallet);
+  await page.goto("/");
+  await connectWallet(page, slowWallet);
+  await openWalletMenu(page);
+  await walletMenu(page)
+    .getByRole("button", { name: "Sign in with wallet" })
+    .click();
+  await expect(walletMenu(page)).toContainText("Signed in with this wallet.");
+  // A fresh page of the same browser, whose wallet takes a second and a half to answer.
+  const slow = await context.newPage();
+  await installFakeWallet(slow, slowWallet, 1500);
+  await slow.goto("/");
+  // While the remembered wallet is on its way the button says so; it does not say "Account" as if there were none.
+  await expect(walletButton(slow)).toHaveText("Reconnecting wallet…");
+  await expect(walletButton(slow)).toContainText(
+    slowWallet.address.slice(0, 8),
+    {
+      timeout: 10_000,
+    },
+  );
+  await context.close();
+});
+
+test("the page follows signing in and out: the navigation changes at once, and a private page stops showing the session", async ({
+  baseURL,
+  browser,
+}) => {
+  const context = await browser.newContext({ baseURL });
+  const page = await context.newPage();
+  await installFakeWallet(page, signingWallet);
+  await page.goto("/");
+  const links = page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link");
+  await expect(links).toHaveText(["Collections", "Games"]);
+  await connectWallet(page, signingWallet);
+  await openWalletMenu(page);
+  await walletMenu(page)
+    .getByRole("button", { name: "Sign in with wallet" })
+    .click();
+  // No reload: the server-rendered bar now offers what a signed-in person may open.
+  await expect(links).toHaveText(["Collections", "Games", "Studio", "Account"]);
+  await page.goto("/account");
+  await expect(
+    page.getByRole("heading", { name: "Account console" }),
+  ).toBeVisible();
+  await openWalletMenu(page);
+  await walletMenu(page).getByRole("button", { name: "Sign out" }).click();
+  // The private page does not go on showing the session that has just ended.
+  await expect(
+    page.getByRole("heading", { name: "Account console" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("Authentication required")).toBeVisible();
+  await context.close();
+});
+
+test("'Switch wallet' opens the chooser even though a wallet is connected", async ({
+  page,
+}) => {
+  await installFakeWallet(page, wallet);
+  await page.goto("/");
+  await connectWallet(page, wallet);
+  const menu = await openWalletMenu(page);
+  await menu.getByRole("button", { name: "Switch wallet" }).click();
+  const chooser = page.getByRole("dialog", { name: "Choose your wallet" });
+  await expect(chooser).toBeVisible();
+  await expect(menu).not.toBeVisible();
+  // Choosing the same wallet again finishes the choice and closes the chooser.
+  await chooser
+    .getByRole("button", { name: "Connect UniSat", exact: true })
+    .click();
+  await expect(chooser).not.toBeVisible();
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
 });

@@ -16,28 +16,35 @@ export interface TestWallet {
 // A deterministic stand-in for a wallet extension: the page sees a UniSat-shaped provider with this address, and
 // every signature is made for real with this wallet's test key, then checked by the platform's real verifier. It
 // is not evidence about any physical wallet, and no test signer is part of production code or bundles.
-export async function installFakeWallet(page: Page, wallet: TestWallet) {
+// `delayMs` makes the extension slow to answer, as a real one is, so a page that reconnects on load is seen waiting.
+export async function installFakeWallet(
+  page: Page,
+  wallet: TestWallet,
+  delayMs = 0,
+) {
   await page.exposeFunction("walletSign", (message: string, scheme: string) => {
     expect(scheme).toBe("bip322-simple");
     return signAs(wallet, message);
   });
   await page.addInitScript(
-    ({ address }) => {
+    ({ address, delayMs: delay }) => {
+      const later = <T>(value: T) =>
+        new Promise<T>((resolve) => setTimeout(() => resolve(value), delay));
       Object.defineProperty(window, "unisat", {
         value: {
-          getAccounts: async () => [address],
+          getAccounts: () => later([address]),
           getBalance: async () => ({ confirmed: 0, total: 0, unconfirmed: 0 }),
           getChain: async () => ({ enum: "BITCOIN_SIGNET" }),
           getPublicKey: async () => "02" + "11".repeat(32),
           on: () => undefined,
           removeListener: () => undefined,
-          requestAccounts: async () => [address],
+          requestAccounts: () => later([address]),
           signMessage: (message: string, scheme: string) =>
             window.walletSign(message, scheme),
         },
       });
     },
-    { address: wallet.address },
+    { address: wallet.address, delayMs },
   );
 }
 
