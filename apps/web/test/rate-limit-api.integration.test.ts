@@ -2,7 +2,15 @@ import { randomUUID } from "node:crypto";
 
 import { httpErrorEnvelopeSchema } from "@ador/shared/http";
 import { parseDatabaseEnvironment, runMigrations } from "@ador/database";
-import { beforeAll, describe, expect, it } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import { GET } from "../src/app/api/v1/[...segments]/route.js";
 
@@ -21,6 +29,13 @@ const uniqueAddress = () =>
   `203.0.113.${String(Math.floor(Math.random() * 250) + 1)}-${randomUUID()}`;
 
 beforeAll(async () => runMigrations(parseDatabaseEnvironment(process.env)));
+// The limits count in fixed one-minute windows, so a test whose requests straddled a boundary would see its count reset
+// halfway. The clock (the date only; real timers keep running) is held a second into a window for each test.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date(Math.floor(Date.now() / 60_000) * 60_000 + 1_000));
+});
+afterEach(() => vi.useRealTimers());
 
 describe("rate limiting at the API boundary", () => {
   it("answers 429 with the platform's error envelope and how long to wait, once an address is over its allowance", async () => {
