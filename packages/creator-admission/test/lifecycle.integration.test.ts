@@ -1,101 +1,21 @@
 import {
-  authUsers,
-  createDatabaseClient,
-  createDatabasePool,
   creatorAdmissionEvents,
-  creatorApplications,
   creatorApplicationSnapshots,
-  parseDatabaseEnvironment,
-  platformRoleAssignments,
-  runMigrations,
 } from "@ador/database";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import type {
-  CreatorApplicationDraft,
-  CreatorReviewDecision,
-} from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import type { CreatorReviewDecision } from "@ador/shared/creator-admission";
+import { describe, expect, it } from "vitest";
 
-import { createDrizzleCreatorAdmissionRepository } from "../src/adapters/drizzle-repository.ts";
-import { createCreatorAdmissionService } from "../src/application/service.ts";
+import {
+  database,
+  decision,
+  draft,
+  registerAdmissionDatabase,
+  request,
+  service,
+  user,
+} from "./support/admission-database.ts";
 
-const environment = parseDatabaseEnvironment(process.env);
-const pool = createDatabasePool(environment);
-const database = createDatabaseClient(pool);
-const policy: AuthorizationPolicy = {
-  organization: { admin: [], analyst: [], editor: [], owner: [] },
-  platform: { reviewer: ["creator:review"], staff: ["platform:operate"] },
-  version: "test-v1",
-};
-const draft: CreatorApplicationDraft = {
-  contentDeclarationAccepted: true,
-  displayName: "Creator",
-  expectedLaunchSize: "Small",
-  expectedLaunchTiming: "After review",
-  jurisdictionAcknowledged: true,
-  portfolioLinks: [],
-  projectSummary: "Summary",
-  provenanceDeclarationAccepted: true,
-  rightsDeclarationAccepted: true,
-};
-const dependencies = {
-  clock: () => new Date(),
-  createId: createUuidV7,
-  queuePageSize: 25,
-  repository: createDrizzleCreatorAdmissionRepository(database),
-};
-const service = createCreatorAdmissionService({
-  ...dependencies,
-  authorizationPolicy: policy,
-});
-
-beforeAll(async () => runMigrations(environment));
-beforeEach(async () => {
-  await database.delete(creatorAdmissionEvents);
-  await database.delete(creatorApplicationSnapshots);
-  await database.delete(creatorApplications);
-  await database.delete(platformRoleAssignments);
-  await database.delete(authUsers);
-});
-afterAll(async () => pool.end());
-
-async function user(role?: "reviewer") {
-  const id = createUuidV7();
-  await database.insert(authUsers).values({
-    email: `${id}@example.test`,
-    emailVerified: true,
-    id,
-    name: role ?? "Applicant",
-  });
-  if (role) {
-    await database.insert(platformRoleAssignments).values({
-      id: createUuidV7(),
-      role,
-      status: "active",
-      userId: id,
-    });
-  }
-  return id;
-}
-
-function request(actorUserId: Awaited<ReturnType<typeof user>>, key: string) {
-  return { actorUserId, correlationId: createUuidV7(), idempotencyKey: key };
-}
-
-function decision(
-  applicationId: CreatorReviewDecision["applicationId"],
-  action: CreatorReviewDecision["action"],
-): CreatorReviewDecision {
-  return {
-    action,
-    applicationId,
-    creatorFeedback: "Lifecycle review",
-    evidenceReferences: [],
-    privateNotes: "Checked",
-    reasonCode: "lifecycle-review",
-  };
-}
+registerAdmissionDatabase();
 
 describe("creator admission lifecycle", () => {
   it("supports corrections, approval, suspension, reinstatement, and revocation", async () => {
@@ -218,83 +138,5 @@ describe("creator admission lifecycle", () => {
     await expect(
       database.select().from(creatorAdmissionEvents),
     ).resolves.toHaveLength(3);
-  });
-
-  it("denies missing applications and a policy with no reviewer role", async () => {
-    const actor = await user("reviewer");
-    const missingApplicant = createUuidV7();
-    await expect(
-      dependencies.repository.findForApplicant(missingApplicant),
-    ).resolves.toBeNull();
-    await expect(
-      dependencies.repository.submit({
-        actorUserId: missingApplicant,
-        changedAt: new Date(),
-        correlationId: createUuidV7(),
-        idempotencyKey: "submit-missing-001",
-        policyVersion: "test-v1",
-        requestFingerprint: "0".repeat(64),
-        schemaVersion: 1,
-      }),
-    ).resolves.toEqual({ kind: "not-found" });
-    await expect(
-      service.review(
-        decision(createUuidV7(), "approve"),
-        request(actor, "review-missing-001"),
-      ),
-    ).resolves.toEqual({ kind: "not-found" });
-    const noReviewerService = createCreatorAdmissionService({
-      ...dependencies,
-      authorizationPolicy: { ...policy, platform: { reviewer: [], staff: [] } },
-    });
-    const applicant = await user();
-    await service.saveDraft(draft, request(applicant, "draft-no-role-001"));
-    await service.submit(request(applicant, "submit-no-role-01"));
-    const application = await service.findMine(applicant);
-    if (application === null) throw new Error("Expected application");
-    await expect(
-      noReviewerService.review(
-        decision(application.id, "start-review"),
-        request(actor, "review-no-role-01"),
-      ),
-    ).resolves.toEqual({ kind: "forbidden" });
-  });
-
-  it("rechecks reviewer assignment inside the decision transaction", async () => {
-    const applicant = await user();
-    const reviewer = await user("reviewer");
-    await service.saveDraft(draft, request(applicant, "draft-revoked-role"));
-    await service.submit(request(applicant, "submit-revoked-role"));
-    const application = await service.findMine(applicant);
-    if (application === null) throw new Error("Expected application");
-    await service.review(
-      decision(application.id, "start-review"),
-      request(reviewer, "review-before-revoke"),
-    );
-    await database.update(platformRoleAssignments).set({ status: "suspended" });
-    await expect(
-      service.review(
-        decision(application.id, "approve"),
-        request(reviewer, "review-after-revoke"),
-      ),
-    ).resolves.toEqual({ kind: "forbidden" });
-  });
-
-  it("refuses review when no immutable submission snapshot exists", async () => {
-    const applicant = await user();
-    const reviewer = await user("reviewer");
-    const applicationId = createUuidV7();
-    await database.insert(creatorApplications).values({
-      applicantUserId: applicant,
-      draft,
-      id: applicationId,
-      state: "submitted",
-    });
-    await expect(
-      service.review(
-        decision(applicationId, "start-review"),
-        request(reviewer, "review-missing-snapshot"),
-      ),
-    ).resolves.toEqual({ kind: "conflict" });
   });
 });
