@@ -97,6 +97,7 @@ export {
   gameMilestoneUnlocks,
   gameSaves,
 } from "./schema/game-saves.ts";
+export { gameRuns } from "./schema/game-runs.ts";
 export {
   releasedWallets,
   type ReleasedWallet,
