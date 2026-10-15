@@ -20,6 +20,8 @@ export const walletAuthConfig = {
     { id: "op_net", label: "OP_NET" },
   ],
   // A challenge can be signed for five minutes.
+  // The owner's choice: refresh the balance every minute, and only while the wallet menu is open.
+  balanceRefreshMs: 60_000,
   challengeLifetimeMs: 300_000,
   // Three wrong signatures kill a challenge, so a guess at a signature is not worth making.
   maximumVerificationAttempts: 3,

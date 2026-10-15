@@ -3,6 +3,8 @@ import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
+import { createBalanceOperation } from "./application/balance-operation.ts";
+import type { BalanceSource } from "./balance/source.ts";
 import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
 import { createWalletSignInOperations } from "./application/wallet-sign-in-operations.ts";
@@ -46,6 +48,7 @@ async function account(
 export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
   wallet: WalletAuthConfig,
+  balanceSource: BalanceSource | null,
   getService: () => PasskeyService = getPasskeyLinkingService,
 ): FeatureEntrypoint {
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
@@ -81,6 +84,12 @@ export function createAccountsEntrypoint(
       registerHttpOperation(verifyStepUp),
       registerHttpOperation(unlinkWallet),
       registerHttpOperation(listMethods),
+      registerHttpOperation(
+        createBalanceOperation({
+          clock: () => new Date(),
+          source: balanceSource,
+        }),
+      ),
     ],
     pages: [
       {

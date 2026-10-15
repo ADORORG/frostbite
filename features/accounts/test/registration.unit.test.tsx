@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { createAccountsFeature } from "../src/registration.ts";
 import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import { walletBalanceRoute } from "../src/balance/contract.ts";
 import { walletConfig } from "./support/wallet-config.ts";
 
-const accountsFeature = createAccountsFeature(walletConfig);
+const accountsFeature = createAccountsFeature(walletConfig, null);
 const allRoutes = [
   ...Object.values(passkeyRoutes),
   ...Object.values(walletAuthRoutes),
+  walletBalanceRoute,
 ];
 const byOperation = (a: { operationId: string }, b: { operationId: string }) =>
   a.operationId.localeCompare(b.operationId);

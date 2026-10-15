@@ -19,7 +19,7 @@ import { gameWalletConfig, walletAuthConfig } from "./wallet.ts";
 
 export const featureRegistry = createFeatureRegistry([
   platformShellFeature,
-  createAccountsFeature(walletAuthConfig),
+  createAccountsFeature(walletAuthConfig, null),
   creatorAdmissionFeature,
   launchesFeature,
   createPublicCollectionsFeature(providerRegistry, targetChains),

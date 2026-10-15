@@ -1,6 +1,7 @@
 import type { WalletAuthConfig } from "../../src/wallet-config.ts";
 
 export const walletConfig: WalletAuthConfig = {
+  balanceRefreshMs: 60_000,
   candidates: [
     { id: "xverse", label: "Xverse" },
     { id: "unisat", label: "UniSat" },

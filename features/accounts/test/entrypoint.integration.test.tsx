@@ -18,6 +18,7 @@ describe("accounts entrypoint", () => {
     const entrypoint = createAccountsEntrypoint(
       noWalletServices,
       walletConfig,
+      null,
       () => ({
         begin: vi.fn(),
         finish: vi.fn(),
@@ -46,7 +47,7 @@ describe("accounts entrypoint", () => {
 
   it("does not render private content without an actor", async () => {
     const pages =
-      createAccountsEntrypoint(noWalletServices, walletConfig, () => ({
+      createAccountsEntrypoint(noWalletServices, walletConfig, null, () => ({
         begin: vi.fn(),
         finish: vi.fn(),
         list: vi.fn(async () => []),
@@ -67,6 +68,7 @@ describe("accounts entrypoint", () => {
     const entrypoint = createAccountsEntrypoint(
       noWalletServices,
       walletConfig,
+      null,
       () => ({
         begin: vi.fn(),
         finish: vi.fn(),
@@ -90,6 +92,7 @@ describe("accounts entrypoint", () => {
     const entrypoint = createAccountsEntrypoint(
       noWalletServices,
       walletConfig,
+      null,
       () => ({
         begin: vi.fn(),
         finish: vi.fn(),

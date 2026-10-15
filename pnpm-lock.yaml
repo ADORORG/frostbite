@@ -259,6 +259,9 @@ importers:
       "@ador/auth":
         specifier: workspace:*
         version: link:../../packages/auth
+      "@ador/chain":
+        specifier: workspace:*
+        version: link:../../packages/chain
       "@ador/client-http":
         specifier: workspace:*
         version: link:../../packages/client-http
@@ -292,6 +295,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      zod:
+        specifier: 4.5.4
+        version: 4.5.4
     devDependencies:
       "@repo/eslint-config":
         specifier: workspace:*

@@ -1,6 +1,8 @@
 import { defineFeature } from "@ador/plugin-kit";
 import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 
+import { walletBalanceRoute } from "./balance/contract.ts";
+import type { BalanceSource } from "./balance/source.ts";
 import { createWalletServicesResolver } from "./runtime.ts";
 import {
   validateWalletAuthConfig,
@@ -9,7 +11,12 @@ import {
 
 export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
 
-export function createAccountsFeature(input: WalletAuthConfig) {
+// `balanceSource` is where the widget's balance comes from. The platform has not chosen an indexer, so the beta passes
+// `null` and the widget says no balance is available.
+export function createAccountsFeature(
+  input: WalletAuthConfig,
+  balanceSource: BalanceSource | null,
+) {
   const wallet = validateWalletAuthConfig(input);
   return defineFeature({
     manifest: {
@@ -57,6 +64,7 @@ export function createAccountsFeature(input: WalletAuthConfig) {
       routes: [
         ...Object.values(passkeyRoutes),
         ...Object.values(walletAuthRoutes),
+        walletBalanceRoute,
       ],
       version: "1.0.0",
     },
@@ -66,6 +74,7 @@ export function createAccountsFeature(input: WalletAuthConfig) {
           createAccountsEntrypoint(
             createWalletServicesResolver(wallet),
             wallet,
+            balanceSource,
           ),
       ),
   });

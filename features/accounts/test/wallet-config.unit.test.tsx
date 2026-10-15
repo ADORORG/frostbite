@@ -14,6 +14,11 @@ describe("the wallet sign-in settings", () => {
 
   it.each([
     [
+      "no balance refresh",
+      { balanceRefreshMs: 0 },
+      "Invalid wallet sign-in limits.",
+    ],
+    [
       "no challenge lifetime",
       { challengeLifetimeMs: 0 },
       "Invalid wallet sign-in limits.",

@@ -24,6 +24,9 @@ export const rateLimits = rateLimitConfigSchema.parse({
     createUploadIntent: perMinute(120),
     decideCollectionReview: perMinute(60),
     finishPasskeyRegistration: perMinute(10),
+    // A balance asks an outside data source, and anyone may ask: a few a minute covers the widget's refresh and a
+    // manual one with room to spare.
+    getWalletBalance: perMinute(30),
     importCollectionItems: perMinute(20),
     reviewCreatorApplication: perMinute(60),
     signOut: perMinute(30),
