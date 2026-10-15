@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import { bundleGameScript } from "@ador/game-sdk/build";
 import { runRecordSchema } from "@ador/game-sdk/run-record";
+import type { HostServices } from "@ador/game-sdk/host";
 import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
 import {
   runGameInSimulatedHost,
@@ -16,6 +17,8 @@ import { iceFieldRules } from "../src/verifier/ice-field.ts";
 // platform: what a player clicks is what is recorded, and the record is a legal run of the platform's rules.
 const root = join(import.meta.dirname, "..");
 const manifest = {
+  // Granted as the platform grants it; the page offers no runs here, so the cabinet falls back to a local seed.
+  capabilities: ["run:submit"],
   id: "frostbite",
   milestones: ["first-win", "first-glacier", "first-cashout"].map((id) => ({
     claimPolicy: "once" as const,
@@ -30,13 +33,14 @@ const pause = (ms = 60) => new Promise((resolve) => setTimeout(resolve, ms));
 let running: SimulatedGame | undefined;
 afterEach(() => running?.close());
 
-async function start() {
+async function start(services?: HostServices) {
   const memory = createMemoryGameBackend();
   running = runGameInSimulatedHost({
     backend: memory.backend,
     game: manifest,
     html: await readFile(join(root, "index.html"), "utf8"),
     script: await bundleGameScript(join(root, "src/main.ts")),
+    services,
   });
   await pause(400);
   const { document } = running.window;
@@ -105,5 +109,49 @@ describe("the ice-field cabinet in the bundled game", () => {
     await click(buttonNamed("Start a run"));
     await click(buttonNamed("End run"));
     expect(Object.keys(memory.unlocked)).not.toContain("first-cashout");
+  });
+
+  it("is played on the platform's seed when the page gives a run, and sends the record it leaves for that run", async () => {
+    const runId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
+    const submitted: { record: unknown; runId: string }[] = [];
+    const { buttonNamed, click, document } = await start({
+      runs: {
+        start: async () => ({
+          expiresAt: "2026-10-16T12:00:00.000Z",
+          runId,
+          seed: 4_000_000_000,
+          status: "started",
+        }),
+        submit: async (id, record) => {
+          submitted.push({ record, runId: id });
+          return { earned: [], status: "verified" };
+        },
+      },
+    });
+    await click(buttonNamed("Ice field"));
+    await click(buttonNamed("Start a run"));
+    await click(buttonNamed("End run"));
+    const text =
+      document.querySelector<HTMLTextAreaElement>(".if-record-text")?.value ??
+      "";
+    expect(runRecordSchema.parse(JSON.parse(text)).seed).toBe(4_000_000_000);
+    expect(submitted).toHaveLength(1);
+    expect(submitted[0]?.runId).toBe(runId);
+    expect(runRecordSchema.parse(submitted[0]?.record)).toMatchObject({
+      gameId: "frostbite",
+      seed: 4_000_000_000,
+    });
+    expect(document.querySelector(".if-note")?.textContent).toContain(
+      "The platform replayed this run and it followed the rules.",
+    );
+  });
+
+  it("is played on a local seed, and says so, when the page offers no runs", async () => {
+    const { buttonNamed, click, document } = await start();
+    await click(buttonNamed("Ice field"));
+    await click(buttonNamed("Start a run"));
+    expect(document.querySelector(".if-status")?.textContent).toContain(
+      "The platform cannot check runs here.",
+    );
   });
 });

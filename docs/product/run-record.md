@@ -1,8 +1,10 @@
 # The run record: how a milestone is replay-verified
 
-Status: **spike built and tested** (G6, task #41, 2026-10-15). Nothing in the product reads a run record yet: the claim
-path that submits one is task #62. This document is the answer to the open question in `game-host-interface.md`
-section 7, "the shape of a deterministic run record for replay verification".
+Status: **built and tested** (G6, task #41, and the claim path G6c, task #62, 2026-10-15). A signed-in player can start a
+run, play it from a seed the platform issued, submit its record once, and have the milestones it earned held on their
+account as `replay-verified`. This document is the answer to the open question in `game-host-interface.md` section 7, "the
+shape of a deterministic run record for replay verification", and describes the claim path that uses it (section "The claim
+path" below; the plan is `plan-g6c-claim-path.md`).
 
 ## What replay verification is, and is not
 
@@ -12,8 +14,8 @@ game's own rules and see what it earned. That is the `replay-verified` level of 
 - **It shows** that the recorded inputs were legal at every step, and that they lead to the claimed result.
 - **It does not show** that a person played them. A program can write a legal record. Replay stops _impossible_ results
   (a mine-free field that was not, a glacier nobody could afford), not _scripted_ ones. Rate limits, server-issued seeds
-  and single use (task #62) narrow that, and the product must never describe a replay-verified milestone as proof of
-  human play.
+  and single use narrow that, and the product never describes a replay-verified milestone as proof of human play (the
+  page says "Replay-checked", and what that does and does not show).
 - **Nothing that carries value depends on a self-reported milestone** (guardrail, unchanged). A replay-verified one may.
 
 ## The record
@@ -23,7 +25,7 @@ A strict JSON document, defined and validated by `@ador/game-sdk/run-record`:
 | Field                         | Meaning                                                                                                                                        |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `schemaVersion`               | `1`.                                                                                                                                           |
-| `gameId`                      | The game (a slug). A verifier is bound to one game; a record for another is refused.                                                           |
+| `gameId`                      | The game (a slug). The platform holds one verifier per game and looks it up by this id.                                                        |
 | `verifier`, `verifierVersion` | Which platform-held rules replay it, and which version of them. A record made under another version is refused, never replayed.                |
 | `seed`                        | An integer from 0 to 2^32-1. All of the run's randomness comes from it, so every JavaScript engine reproduces it exactly.                      |
 | `config`                      | The game's own settings for the run (for example `{ "mines": 5 }`), JSON only. The verifier checks every key and refuses one it does not have. |
@@ -44,8 +46,19 @@ platform to write one): `init(seed, config)`, `step(state, input)` and `earned(s
 state or refuses the input with a reason. It uses its own seeded generator and nothing else: **no clock, no
 `Math.random`, no network, no storage**. It never throws for an input; it refuses.
 
-It is **platform code**: held in `configs/verifiers.ts`, reviewed by pull request like a game manifest, registered one
-explicit line per game together with a **sample run**. The game's browser bundle is never executed on the server.
+It is **the game's own code, published with the game and pinned by the manifest**; the platform contains none of it. A game
+publishes its rules by having `src/replay.ts` (a default export of the `GameVerifier`, and a named export `sample()` returning
+one legal run). The SDK's build turns it into `verifier.js` and `verifier.json` (`{ bytes, id, sha256, version }`) beside the
+game. The game's manifest pins them (`verification: { replay: { id, sha256, version } }`, which needs the `run:submit`
+capability and at least one milestone with `verification: "replay-verified"`), and a test fails until the pin matches what the
+source builds. The platform loads the file by that digest (`@ador/game-verification/loader`): a file whose hash differs, whose
+identity differs from the manifest's, or whose sample run does not verify is not loaded, and its game stays self-reported (the
+reason is logged at startup). The game's browser bundle is never executed on the server; only this file is.
+
+Who runs it matters: the artifact is the game's code, running on our server. Today only the platform's own games (`embedded`,
+built from this repository and reviewed) are loaded, replayed by an in-process runner with a per-call time limit (`node:vm`),
+**which is not a security boundary**. A game from anyone else would need a sandboxed runner with an ADR (task #65); until
+then outside games stay self-reported, and the loader says so rather than loading them.
 
 ## What the platform does with a record (`verifyRun`)
 
@@ -53,8 +66,7 @@ explicit line per game together with a **sample run**. The game's browser bundle
 
 1. The record must be well formed (`malformed`), within the size limit (`too-large`) and the input limit
    (`too-many-inputs`). The caller limits the body before parsing it.
-2. It must name a verifier the platform holds (`unknown-verifier`), for that game (`wrong-game`), at that version
-   (`version-mismatch`).
+2. It must name the verifier the platform holds for that game (`unknown-verifier`), at that version (`version-mismatch`).
 3. The replay must accept the settings (`invalid-config`) and every input (`illegal-input`, with the index of the first
    one refused). A verifier that fails is reported as such (`verifier-error`), not as a verdict on the run.
 4. Every claim must have been earned (`claim-not-earned`).
@@ -68,6 +80,33 @@ Every registered verifier passes `runVerifierConformance` (run by `apps/web/test
 sample run: it verifies its own sample, refuses a claim it did not earn, refuses an input the game does not have, gives the
 same verdict every time, uses neither the clock nor `Math.random` (the check makes both throw), and answers a verdict, not
 an error, for odd inputs. A game cannot be registered without proving this.
+
+## The claim path
+
+Generic: the platform names no game. A game is client-only and reaches it only through the SDK.
+
+1. **`run.start()`** (capability `run:submit`) asks the platform for a run. A signed-in player is given
+   `{ runId, seed, expiresAt }`: a random 32-bit seed, bound to the digest of the verifier the platform has loaded for that game.
+   Otherwise the game is told `unavailable` with why (`signed-out`, `not-supported`, `too-many-open-runs`) and plays on a seed of
+   its own, **self-reported**. At most `maxOpenRuns` (3) runs are open per player and game; a run lives `runLifetimeMs` (24 h).
+2. The game plays from that seed and builds its record (`createRunRecorder`).
+3. **`run.submit(runId, record)`** hands the record over once. The platform replays it and answers `verified` (with the
+   milestones it earned that the manifest declares replay-verifiable), `rejected` (with the reason) or `refused` (nothing was
+   replayed: `already-submitted`, `expired`, `stale`, `unknown-run`).
+4. A verified verdict **and** the milestones it earned are written in one transaction. A milestone the player already held as
+   self-reported is upgraded and keeps its unlock time and count; a verified level is never lowered, and a browser that sends
+   the level in a sync is read as self-reported, so only a replay can create it.
+
+Rules the platform holds the run to: a run is settled once (a row lock, so two submissions at once settle one); a record for a
+seed other than the issued one is rejected without a replay, and a claim of a milestone the manifest does not declare
+replay-verifiable is rejected without one; every submission that reaches a verdict spends the run; a run whose game's rules
+changed since it was issued is `stale` and spent; the canonical record is kept up to 64 KB for audit (retention of rejected
+ones is not implemented yet). Over HTTP: `POST /api/v1/games/runs/start` and `POST /api/v1/games/runs/submit` (signed in,
+same origin, rate limited, bodies read under a 1 MiB ceiling before parsing); the records and runs are in `ador.game_runs`.
+
+Scope in this version: milestones earned once. Repeatable milestones and ones with a target stay self-reported. A game with
+**hidden information** (the layout of mines) stays peekable: see the limit below. The platform cannot detect that, so the page
+describes exactly what was checked, and leaderboards (task #54) will require a game to declare it has none.
 
 ## FROST·BITE: what is verified, and what cannot be yet
 
@@ -86,19 +125,23 @@ that plays through `iceFieldRules` and builds its run with `createRunRecorder`. 
 verifier (`apps/web/test/verifiers.unit.test.ts`, and a real-browser test that plays in the platform's frame and has the
 platform verify what the page produced). It keeps its own icicles and glaciers, apart from the game's legacy economy.
 
-**It does not make FROST·BITE verified.** Nothing can submit a record yet (task #62), so the cabinet reports
-`first-win` and `first-glacier` through the game's milestone bridge, which is **self-reported**, and the cabinet says so
-on screen. The game's other nine cabinets are real-time canvas games driven by an animation loop and elapsed time, with
+**FROST·BITE adopts the claim path (task #62).** Its manifest declares `run:submit`, pins the verifier it publishes
+(`src/replay.ts`, id `ice-field`) and marks `first-win` and `first-glacier` replay-verifiable. A signed-in player's cabinet
+starts a run on the platform's seed, and when they end the run it submits the record; the platform replays it and the two
+milestones are held as replay-verified on their account. Signed out (or when the platform has no run to give), the cabinet
+plays on a seed of its own and says its milestones are the game's own report. It still reports a milestone to the platform's
+milestone bridge as soon as it is earned, so a player sees it at once as self-reported and sees it upgraded after the replay.
+`first-cashout` is never upgraded. The game's other nine cabinets are real-time canvas games driven by an animation loop and elapsed time, with
 `Math.random` in places and round seeds from `Date.now()`, so they cannot be replayed as they are; porting one to a
-fixed-step simulation is task #63. Until the claim path exists, every FROST·BITE milestone is, and must be shown as,
-**self-reported**.
+fixed-step simulation is task #63.
 
-**A limit replay cannot remove.** The seed is chosen by the player's browser and the rules are public, so the browser knows
-where the mines are. Replay shows a record is _legal_, not that the player did not read the layout. Server-issued seeds do
-not fix this for a hidden-information board, because the rules that place the mines are deterministic and public. A game
-whose result depends on hidden information needs a secret the player does not hold (a commit and reveal with the server),
-or should be a game of skill rather than concealment. The claim path (#62) and the choice of games to verify must account
-for it.
+**A limit replay cannot remove.** The seed is known to the player's browser and the rules are public, so the browser knows
+where the mines are, whoever chose the seed. Replay shows a record is _legal_, not that the player did not read the layout.
+Server-issued seeds stop a player choosing an easy board; they do not fix this for a hidden-information board, because the
+rules that place the mines are deterministic and public. A game whose result depends on hidden information needs a secret the
+player does not hold (the platform "dealer", task #64) or should be a game of skill rather than concealment. FROST·BITE's ice
+field is a hidden-information board, so its "Replay-checked" label means exactly "the run followed the rules", which the page
+says; nothing that carries value may depend on it, and a leaderboard must not accept it until the dealer exists.
 
 ## Limits (typed policy)
 

@@ -4,6 +4,11 @@ import { useEffect, useReducer, useRef, useState } from "react";
 
 import { IceBoard } from "./ice-board.tsx";
 import { IceControls } from "./ice-controls.tsx";
+import {
+  startNote,
+  type IceFieldRuns,
+  type SubmitState,
+} from "./platform-run.ts";
 import { markOf, neighbourMines } from "./neighbours.ts";
 import { RecordView } from "./record-view.tsx";
 import { randomSeed } from "./seed.ts";
@@ -11,6 +16,8 @@ import { createIceFieldSession, type IceFieldSession } from "./session.ts";
 
 export interface IceFieldHost {
   milestone(mark: string): void;
+  // The platform's runs, where it offers them: a run started there has the platform's seed and can be replay-checked.
+  readonly runs?: IceFieldRuns;
 }
 
 type Phase = "ended" | "idle" | "playing";
@@ -30,6 +37,9 @@ export function IceField({
   const [message, setMessage] = useState("");
   const [session, setSession] = useState<IceFieldSession | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
+  // The platform's run this session was started on, if it was, and what became of its record.
+  const [runId, setRunId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<SubmitState | null>(null);
   // The session changes inside itself; the screen is drawn again after each input.
   const [, redraw] = useReducer((count: number) => count + 1, 0);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -42,15 +52,20 @@ export function IceField({
     setOpen(false);
     launcher.current?.focus();
   };
-  const start = () => {
+  const start = async () => {
+    // A run on the platform's seed when the platform gives one; otherwise the browser's own, reported as such.
+    const run = await host.runs?.start().catch(() => null);
+    const started = run?.status === "started" ? run : null;
     setSession(
       createIceFieldSession({
         onEarned: (milestone) => host.milestone(markOf(milestone)),
-        seed: newSeed(),
+        seed: started?.seed ?? newSeed(),
       }),
     );
+    setRunId(started?.runId ?? null);
+    setSubmitted(null);
     setPhase("playing");
-    setMessage("Pick a tile. A mine ends the board.");
+    setMessage(startNote(run ?? null));
   };
   const state = session?.state();
   const nextCost = session?.nextGlacierCost() ?? null;
@@ -95,9 +110,16 @@ export function IceField({
   };
   const end = () => {
     if (session === null) return;
-    setRecord(session.record());
+    const finished = session.record();
+    setRecord(finished);
     setPhase("ended");
     setMessage("");
+    if (runId === null || host.runs === undefined) return;
+    setSubmitted({ kind: "pending" });
+    host.runs.submit(runId, finished).then(
+      (result) => setSubmitted({ kind: "settled", result }),
+      () => setSubmitted({ kind: "failed" }),
+    );
   };
 
   return (
@@ -142,7 +164,11 @@ export function IceField({
                 Every step you take is written into a run record that the
                 platform can replay.
               </p>
-              <button className="if-button" onClick={start} type="button">
+              <button
+                className="if-button"
+                onClick={() => void start()}
+                type="button"
+              >
                 Start a run
               </button>
             </div>
@@ -166,7 +192,11 @@ export function IceField({
             </div>
           ) : null}
           {phase === "ended" && record !== null ? (
-            <RecordView onAgain={start} record={record} />
+            <RecordView
+              onAgain={() => void start()}
+              record={record}
+              submit={submitted}
+            />
           ) : null}
           {phase === "playing" ? null : (
             <p aria-live="polite" className="if-status" role="status">

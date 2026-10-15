@@ -1,16 +1,20 @@
 import * as React from "react";
 import { canonicalJson, type RunRecord } from "@ador/game-sdk/run-record";
 
+import { submitNote, type SubmitState } from "./platform-run.ts";
+
 // What a finished run leaves: a summary and the record itself, in a text box to select and copy (the frame has no
-// clipboard permission). The record is the canonical text the platform measures and hashes. Nothing here says the run
-// is verified: it can be replayed by the platform once submission exists, and until then the milestones are the player's
-// own claim.
+// clipboard permission). The record is the canonical text the platform measures and hashes. What it says about the run is
+// what the platform said: replay-checked only when it replayed the record, otherwise the player's own claim.
 export function RecordView({
   onAgain,
   record,
+  submit,
 }: {
   readonly onAgain: () => void;
   readonly record: RunRecord;
+  // What became of the record sent to the platform; null when none was sent.
+  readonly submit: SubmitState | null;
 }) {
   return (
     <section aria-label="Run record" className="if-record">
@@ -21,9 +25,8 @@ export function RecordView({
           ? "No milestone was earned in this run."
           : `Claims: ${record.claims.join(", ")}.`}
       </p>
-      <p className="if-note">
-        Milestones earned here are your own claim today. The platform can replay
-        this record to check it once submitting records opens.
+      <p className="if-note" role="status">
+        {submitNote(submit)}
       </p>
       <label>
         The record

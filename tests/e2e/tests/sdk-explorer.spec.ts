@@ -26,7 +26,7 @@ test("every call is answered by the platform, in the real frame", async ({
     "Connected. Call anything below.",
   );
   await game.locator("#capabilities").click();
-  await expect(newest(page)).toContainText('"granted":["wallet"]');
+  await expect(newest(page)).toContainText('"granted":["run:submit","wallet"]');
   await expect(newest(page)).toContainText('"events":[');
   await game.locator("#player").click();
   await expect(newest(page)).toContainText(

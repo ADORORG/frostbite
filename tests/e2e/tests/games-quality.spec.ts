@@ -40,9 +40,7 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
   await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
   // It is played here, not at another address, and nothing is declared that the platform cannot honour.
   await expect(page.getByRole("link", { name: /^Play/u })).toHaveCount(0);
-  await expect(
-    page.getByText("does not ask the platform for anything"),
-  ).toBeAttached();
+  await expect(page.getByText("Submit a finished run")).toBeAttached();
   // The digest changes whenever the manifest does, which is its job; the baseline is of the layout.
   await page
     .getByText(/^Declarations digest:/u)

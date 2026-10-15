@@ -30,7 +30,7 @@ test("the page is the game on nearly the whole screen, with its title in the bar
   if (viewport === null) throw new Error("No viewport");
   // The title and the small facts are in the bar over the game, not a block of their own.
   await expect(page.locator(".arcade-stage__bar h2")).toHaveText("FROST·BITE");
-  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.2.0");
+  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.3.0");
   await expect(page.locator(".arcade-stage-head")).toHaveCount(0);
   expect(bar.y + bar.height).toBeLessThanOrEqual(stage.y + 2);
   // Where the page is taller than the screen the dock is pulled up over the game's foot to stay in view; where
@@ -66,7 +66,7 @@ test("the dock is closed until asked, opens one section over the game without mo
   await page.getByRole("button", { name: "What it asks for" }).click();
   await expect(
     page.getByRole("region", { name: "What it asks for" }),
-  ).toContainText("does not ask the platform for anything");
+  ).toContainText("Submit a finished run");
   await expect(about).toBeHidden();
   await page.getByRole("button", { name: "Hide" }).click();
   await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(

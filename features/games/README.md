@@ -1,14 +1,16 @@
 # `@ador/feature-games`
 
-The public games catalog and game detail pages, the frame that plays an embedded game, and the one API route
-that saves a signed-in player's progress and milestones. A game is a manifest (`@ador/shared/games`); the host
+The public games catalog and game detail pages, the frame that plays an embedded game, and the API routes that save a
+signed-in player's progress and milestones and start and settle their replay-verified runs. A game is a manifest (`@ador/shared/games`); the host
 page connects it to the platform through `@ador/game-sdk`.
 
 ## Public API
 
-`createGamesFeature(games, chains)` returns the feature registration: `/games`, `/games/[slug]`, and a
-"Games" navigation item, and `POST /api/v1/games/sync` (authenticated; rate limited as `syncGameState`; the
-service is `@ador/game-saves`). The games come from `configs/games.ts`, one line per game.
+`createGamesFeature(games, chains, wallet, runs)` returns the feature registration: `/games`, `/games/[slug]`, and a
+"Games" navigation item, `POST /api/v1/games/sync` (authenticated; rate limited as `syncGameState`; the service is
+`@ador/game-saves`), and `POST /api/v1/games/runs/start` and `/submit` (authenticated; rate limited as `startGameRun` and
+`submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
+`configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
 ## Onboarding a game (the template)
 
@@ -24,7 +26,10 @@ The platform core is not edited to add a game.
 - The pages show only what a manifest declares. A game with no play address is "Not playable yet", never
   live. Each capability a game declares is marked "Available" only when the host answers it and the platform plays
   the game itself (today: `wallet`); every other one is marked "Not available yet" and is a declaration only.
-  Milestones are shown with the statement that the platform cannot claim them on chain or verify gameplay.
+  Milestones are shown with how each is known: reported by the game, or replay-checked by the platform, with what that does
+  and does not show; the statement that the platform cannot claim them on chain stays.
+- A run is started and settled only through the platform's service. The page answers `signed-out` itself when nobody is
+  signed in, never invents a seed, and shows "Replay-checked" only for a milestone the account holds as replay-verified.
 - A manifest that fails validation stops the platform from starting; it is not skipped.
 - Identifiers are unique and are the page address. An address that cannot be an identifier is "Invalid
   route"; a valid one with no game is "Record not published".

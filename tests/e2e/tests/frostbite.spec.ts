@@ -133,15 +133,13 @@ test("the game is cut off from the network and the platform's cookies", async ({
   });
 });
 
-test("the platform page says what the game is: simulated, with nothing declared that cannot be honoured", async ({
+test("the platform page says what the game is: simulated, asking only for what the platform grants", async ({
   page,
 }) => {
   await page.goto("/games/frostbite");
   await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
   await openDock(page, "What it asks for");
-  await expect(
-    page.getByText("This game does not ask the platform for anything."),
-  ).toBeVisible();
+  await expect(page.getByText("Submit a finished run")).toBeVisible();
   await expect(
     page.getByText("Your progress is kept in this browser only."),
   ).toBeVisible();

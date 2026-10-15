@@ -62,7 +62,7 @@ export function createDrizzleGameRunRepository(
               lte(gameRuns.expiresAt, now),
             ),
           );
-        const [open] = await transaction
+        const counted = await transaction
           .select({ count: sql<number>`count(*)::int` })
           .from(gameRuns)
           .where(
@@ -72,7 +72,9 @@ export function createDrizzleGameRunRepository(
               eq(gameRuns.state, "issued"),
             ),
           );
-        if ((open?.count ?? 0) >= maxOpenRuns)
+        // One row holds the count; summing it leaves no case for a missing row.
+        const open = counted.reduce((total, { count }) => total + count, 0);
+        if (open >= maxOpenRuns)
           return { code: "too-many-open-runs", ok: false } as const;
         await transaction.insert(gameRuns).values(run);
         return { ok: true } as const;

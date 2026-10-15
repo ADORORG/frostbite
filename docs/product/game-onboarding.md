@@ -189,12 +189,30 @@ Allowed: full-screen (the game's page also has a Full screen button of the platf
 Sample game's "Run safety probe" button demonstrates this and is checked in a real browser by
 `tests/e2e/tests/game-host.spec.ts`.
 
-## Milestones are self-reported
+## Milestones are self-reported, unless the platform replays them
 
 The platform cannot see inside a game, so a milestone is the game's own report, recorded as `self-reported`
 and shown to the player that way. **Nothing that carries money or a privilege (a reward, access, a ranking
-prize) may depend on a self-reported milestone.** A verified level (for example replaying a recorded run on
-the platform's server, which needs a deterministic game) is future work and will be added, not retrofitted.
+prize) may depend on a self-reported milestone.**
+
+A game can offer a stronger level, `replay-verified`, for milestones its rules can decide. It needs no platform change:
+
+1. Write the rules as a pure state machine (`GameVerifier`, `@ador/game-sdk/run-record`: `init(seed, config)`,
+   `step(state, input)`, `earned(state)`; no clock, no `Math.random`, no I/O) and play through the same module.
+2. Add `src/replay.ts` to the game: a default export of the verifier and a named export `sample()` returning one legal
+   run. `pnpm game:build` (the SDK's build) emits `verifier.js` and `verifier.json` beside the game.
+3. In the manifest, declare the `run:submit` capability, `verification: { replay: { id, sha256, version } }` with the
+   digest from `verifier.json`, and `verification: "replay-verified"` on each milestone the rules decide (only
+   milestones earned once, with no target). A test prints the digest to pin when it does not match.
+4. In the game, call `client.run.start()` for a seed (signed-in players are given one; others get `unavailable` and play on a
+   seed of their own, self-reported), record the run with `createRunRecorder`, and `client.run.submit(runId, record)` when
+   it ends. The answer is `verified` (with the milestones earned), `rejected` or `refused`.
+
+The platform replays the record on its server and holds the milestone on the account as `replay-verified`; the page shows
+it as "Replay-checked", and says what that shows (the run followed the game's rules) and what it does not (that a person
+played it; or, for a game with hidden information such as mine positions, that the player did not look). **Only games the
+platform plays itself are loaded today**; a game hosted elsewhere stays self-reported until the sandboxed runner exists
+(task #65). The explorer game (`games/sdk-explorer`) shows both calls answering.
 
 ## Test and run it
 

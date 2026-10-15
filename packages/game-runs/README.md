@@ -41,8 +41,7 @@ None of its own. The policy, clock, ids, seeds and the `verify` function are sup
 
 `pnpm --filter @ador/game-runs test:unit` (the service against an in-memory repository),
 `test:integration` (the adapter and the table's checks on real PostgreSQL, including concurrent starts and
-submissions), `test:coverage`. Two branches are unreachable defensive reads (a `count()` returning no row; a
-verifier that rejects a record the schema parsed as malformed), left uncovered on purpose.
+submissions), `test:coverage` (100% of statements, branches, functions and lines).
 
 ## Ownership
 

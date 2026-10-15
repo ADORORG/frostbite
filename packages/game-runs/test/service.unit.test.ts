@@ -172,37 +172,22 @@ describe("submitting a run", () => {
       verdict: { earned: [], reason: "illegal-input", status: "rejected" },
     });
 
-    const malformed = setup({
-      verify: () => ({
-        detail: "bad",
-        digest: null,
-        reason: "malformed",
-        status: "rejected",
-      }),
-    });
-    await malformed.service.start("player", "any-game");
-    expect(
-      await malformed.service.submit("player", "any-game", "run-1", {
-        nonsense: true,
-      }),
-    ).toMatchObject({
-      verdict: { digest: null, reason: "malformed", status: "rejected" },
-    });
-    expect(malformed.store.verdicts.get("run-1")).toMatchObject({
-      recordDigest: null,
-      recordText: null,
-    });
-    // Anything that is not even an object reaches the verifier unchanged, and the run is spent.
-    const junk = setup({
-      verify: () => ({
-        detail: "bad",
-        digest: null,
-        reason: "malformed",
-        status: "rejected",
-      }),
-    });
-    await junk.service.start("player", "any-game");
-    await junk.service.submit("player", "any-game", "run-1", "not a record");
-    expect(junk.verify.mock.calls[0]?.[1]).toBe("not a record");
+    // Anything that is not a run record (an object of the wrong shape, or not even an object) is rejected without a replay,
+    // keeps nothing, and spends the run.
+    for (const junk of [{ nonsense: true }, "not a record", null]) {
+      const malformed = setup();
+      await malformed.service.start("player", "any-game");
+      expect(
+        await malformed.service.submit("player", "any-game", "run-1", junk),
+      ).toMatchObject({
+        verdict: { digest: null, reason: "malformed", status: "rejected" },
+      });
+      expect(malformed.store.verdicts.get("run-1")).toMatchObject({
+        recordDigest: null,
+        recordText: null,
+      });
+      expect(malformed.verify).not.toHaveBeenCalled();
+      expect(malformed.store.runs.get("run-1")?.state).toBe("submitted");
+    }
   });
 });

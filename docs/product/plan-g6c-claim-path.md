@@ -1,8 +1,23 @@
 # Plan: the claim path for run records (G6c, task #62)
 
-Status: **plan, awaiting owner review** (written 2026-10-15). Branch `feat/claim-path`, stacked on `feat/ice-field-cabinet`. It
+Status: **built on the documented defaults** (owner away, 2026-10-15; section 13 is what was decided and may be reviewed at
+merge). Branch `feat/claim-path`, stacked on `feat/ice-field-cabinet`; record `references/claim-path-task-record.md`. It
 turns the G6 spike (a run record and a replay verifier that nothing calls) into something a player's milestone can use,
 **without tying the platform to any game**.
+
+**Where the build differs from this plan** (the plan below is kept as written):
+
+- The capability is the existing `run:submit`, not a new `runs`; there was already one in the manifest.
+- Operations in this API take a JSON body at a fixed path, so the routes are `POST /api/v1/games/runs/start` and
+  `/api/v1/games/runs/submit` (with `gameId` and `runId` in the body), not paths with parameters.
+- Refusals are answers, not errors: `submit` returns `verified`, `rejected` (with why) or `refused` (`already-submitted`,
+  `expired`, `stale`, `unknown-run`), and `start` returns `started` or `unavailable` (`not-supported`, `too-many-open-runs`;
+  the SDK adds `signed-out` itself). Only a caller with no session gets an error.
+- The verifier artifact is built from `src/replay.ts` (not `src/verifier.ts`), and the manifest pins `{ id, sha256, version }`;
+  the file is found by game id under the folder the games are served from (`configs/game-runs.ts`).
+- Request bodies of every route are now read under a 1 MiB ceiling before parsing (`readJsonBody`), which the record needed.
+- Retention of rejected records (the 90-day prune of section 4.3) is **not implemented**; the column and the policy default
+  are in the plan only.
 
 ## 1. The principle (owner, 2026-10-15)
 

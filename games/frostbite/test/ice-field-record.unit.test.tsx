@@ -61,13 +61,15 @@ describe("ending a run", () => {
     expect(summary).not.toContain("Claims:");
   });
 
-  it("never calls a run verified: the milestones are the player's own claim until records are submitted", async () => {
+  it("never calls a run verified when none was sent to the platform: the milestones are the player's own claim", async () => {
     await startRun();
     await clearBoard(0);
     await clickButton("Settle board");
     await clickButton("End run");
     const text = container.textContent ?? "";
-    expect(text).toContain("your own claim today");
+    expect(text).toContain(
+      "Milestones earned here are your own claim: this run was not sent to the platform to be checked.",
+    );
     expect(text).not.toMatch(/verified/iu);
   });
 
@@ -81,7 +83,7 @@ describe("ending a run", () => {
     expect(
       container.querySelectorAll(".if-tile[data-state='open']"),
     ).toHaveLength(25);
-    expect(status()).toBe("Pick a tile. A mine ends the board.");
+    expect(status()).toContain("Pick a tile. A mine ends the board.");
   });
 
   it("selects the whole record when the box is focused, for copying by hand", async () => {

@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, beforeEach, vi, type Mock } from "vitest";
 
-import { IceField } from "../../src/ice-field/ice-field.tsx";
+import { IceField, type IceFieldHost } from "../../src/ice-field/ice-field.tsx";
 import {
   cells,
   defaultMines,
@@ -35,9 +35,9 @@ afterEach(() => {
   container.remove();
 });
 
-export const show = () =>
+export const show = (platform: IceFieldHost = host) =>
   act(async () => {
-    root.render(<IceField host={host} newSeed={seeds} />);
+    root.render(<IceField host={platform} newSeed={seeds} />);
   });
 export const mines = (board = 0) => iceFieldMines(seed, board, defaultMines);
 export const safeTiles = (board = 0) =>
@@ -70,12 +70,12 @@ export const press = (key: string) =>
     );
   });
 
-export const open = async () => {
-  await show();
+export const open = async (platform?: IceFieldHost) => {
+  await show(platform);
   await clickButton("Ice field");
 };
-export const startRun = async () => {
-  await open();
+export const startRun = async (platform?: IceFieldHost) => {
+  await open(platform);
   await clickButton("Start a run");
 };
 export const clearBoard = async (board = 0) => {

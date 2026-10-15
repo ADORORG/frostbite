@@ -1,26 +1,42 @@
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+import { bundleVerifier } from "@ador/game-sdk/build";
 import { runVerifierConformance } from "@ador/game-verification/conformance";
-import { createVerifierRegistry } from "@ador/game-verification/registry";
-import { defineVerifier } from "@ador/game-verification/verifier";
+import { createGameVerifiers } from "@ador/game-verification/node";
 import { verifyRun } from "@ador/game-verification/verify";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { frostbite } from "../../../configs/games/frostbite.ts";
 import { createIceFieldSession } from "../../../games/frostbite/src/ice-field/session.ts";
-import {
-  iceFieldMines,
-  iceFieldRules,
-} from "../../../games/frostbite/src/verifier/ice-field.ts";
+import { iceFieldMines } from "../../../games/frostbite/src/verifier/ice-field.ts";
 import { iceFieldSampleRun } from "../../../games/frostbite/src/verifier/sample-run.ts";
 
-// FROST·BITE's ice-field rules, as the platform would hold them once the game publishes them as an artifact (it does not
-// yet: that is the game's adoption of the claim path). Built here from the rules themselves, so this file checks the cabinet's
-// records against them; no part of the platform names the game.
+// FROST·BITE's ice-field rules exactly as the platform holds them: the artifact its source builds, placed where the game is
+// served, loaded through its manifest's pinned digest and replayed by the in-process runner. No part of the platform names
+// the game, so a mismatch between the manifest and the source would show here as a problem loading it.
+const scratch = await mkdtemp(join(tmpdir(), "frostbite-play-"));
+afterAll(async () => rm(scratch, { force: true, recursive: true }));
+const built = await bundleVerifier(
+  join(import.meta.dirname, "../../../games/frostbite"),
+);
+if (built === null) throw new Error("FROST·BITE builds no verifier.");
+await mkdir(join(scratch, frostbite.id), { recursive: true });
+await writeFile(join(scratch, frostbite.id, "verifier.js"), built.code);
+const loaded = await createGameVerifiers({
+  games: [frostbite],
+  playRoot: scratch,
+});
+const verifierRegistry = loaded.registry;
 const sample = iceFieldSampleRun();
-const verifierRegistry = createVerifierRegistry([
-  { gameId: "frostbite", sample, verifier: defineVerifier(iceFieldRules) },
-]);
 
 describe("FROST·BITE's ice-field rules as a verifier", () => {
+  it("loads from the file the manifest pins, with no problem", () => {
+    expect(loaded.problems).toEqual([]);
+    expect(verifierRegistry.gameIds()).toEqual([frostbite.id]);
+  });
+
   it("passes the conformance checks with its sample run", () => {
     const entry = verifierRegistry.find("frostbite");
     if (entry === undefined) throw new Error("Not registered");

@@ -64,7 +64,9 @@ describe("playing a board", () => {
     expect(tile(0)?.getAttribute("aria-label")).toBe(
       "Tile 1 of 25, not picked",
     );
-    expect(status()).toBe("Pick a tile. A mine ends the board.");
+    expect(status()).toBe(
+      "Pick a tile. A mine ends the board. This run is on a local seed, so its milestones are the game's own report. The platform cannot check runs here.",
+    );
     expect(container.querySelector(".if-stats")?.textContent).toContain(
       "Icicles0",
     );

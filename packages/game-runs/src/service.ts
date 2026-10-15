@@ -83,14 +83,8 @@ export function createGameRunsService(dependencies: GameRunsDependencies) {
     raw: unknown,
   ): RunVerdict {
     const parsed = runRecordSchema.safeParse(raw);
-    if (!parsed.success) {
-      const result = verify(run.gameId, raw);
-      return rejection(
-        result.status === "rejected" ? result.reason : "malformed",
-        result.digest,
-        null,
-      );
-    }
+    // Not a run record at all: there is nothing to replay or to keep, and the run is spent.
+    if (!parsed.success) return rejection("malformed", null, null);
     const record = parsed.data;
     const text = canonicalJson(record);
     const digest = createHash("sha256").update(text).digest("hex");
@@ -101,7 +95,7 @@ export function createGameRunsService(dependencies: GameRunsDependencies) {
       return rejection("claim-not-verifiable", digest, kept);
     const result = verify(run.gameId, record);
     if (result.status === "rejected")
-      return rejection(result.reason, result.digest ?? digest, kept);
+      return rejection(result.reason, digest, kept);
     return {
       earned: result.earned.filter((id) => current.verifiable.has(id)),
       reason: null,

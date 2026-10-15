@@ -1,4 +1,6 @@
 import { createGameClient } from "@ador/game-sdk/client";
+import { jsonValueSchema } from "@ador/game-sdk/protocol";
+import { canonicalJson } from "@ador/game-sdk/run-record";
 import { createPlatformStorage } from "@ador/game-sdk/storage-shim";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
@@ -39,7 +41,21 @@ async function start(): Promise<void> {
   });
   await import("./legacy-boot.ts");
   // The ice-field cabinet, beside the game: its own root, its own rules, no legacy file touched.
-  mountIceField(window.FrostbiteHost);
+  mountIceField({
+    milestone: bridge.report,
+    runs: {
+      // Outside the platform, or for a player it cannot give a run, the cabinet plays on a local seed.
+      start: () =>
+        client.run
+          .start()
+          .catch(() => ({ reason: "not-supported", status: "unavailable" })),
+      submit: (runId, record) =>
+        client.run.submit(
+          runId,
+          jsonValueSchema.parse(JSON.parse(canonicalJson(record))),
+        ),
+    },
+  });
 }
 
 void start();

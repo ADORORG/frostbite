@@ -50,6 +50,8 @@ accepts messages only from the game's own frame.
 | `wallet.connect()`                 | Asks the page to open its wallet chooser; says `requested`, `already-connected` or `unavailable`. Needs `wallet`. |
 | `capabilities.get()`               | The methods, events and limits the platform supports, and what this game was granted.                             |
 | `ui.toast(message)`                | Asks the page to show a short plain message, labelled with the game's name.                                       |
+| `run.start()`                      | Asks for a run: `started` (`runId`, a platform seed, `expiresAt`) or `unavailable` with why. Needs `run:submit`.  |
+| `run.submit(runId, record)`        | Hands over the run's record once; `verified` (what it earned), `rejected` (why) or `refused`. Needs `run:submit`. |
 
 The host never forwards cookies, wallet objects, keys, signatures or raw transactions to the game. **Amendment 2
 (owner, 2026-10-13):** the wallet's public **address** and network name are given to a game that declared the
@@ -69,8 +71,10 @@ needs a capability is refused with `permission_denied` unless the game declared 
 
 ## 4. Milestones are real and honestly labelled
 
-- A claim has a **verification level**: `self-reported` today. Later levels (for example `replay-verified`: the
-  game is deterministic and the platform re-checks a recorded run on its own server) are added, not retrofitted.
+- A claim has a **verification level**: `self-reported` (the game said so) or `replay-verified` (the game is deterministic,
+  publishes its rules, and the platform re-checked a run it issued a seed for, on its own server: `run-record.md`). The level
+  is held on the account and the page says which a milestone has. Replay shows the run followed the rules, not that a person
+  played it.
 - The mint records the level. On-chain the token (or its record) says `self-reported`; a verified token is
   distinguishable forever. The product says "claimed by the player" for self-reported milestones, never
   "verified".
@@ -117,9 +121,11 @@ Answered in a second round:
   microphone, location or file access).
 - **Build first:** the SDK, the isolated frame and a simulated test game, before touching FROST·BITE.
 
-Settled by the G6 spike (2026-10-15): the shape of a deterministic run record, the verifier contract and the replay
-pipeline are in `docs/product/run-record.md`. Still open: the claim path that submits a record (task #62), and a game
-that records its own runs (FROST·BITE's real-time cabinets cannot yet; task #61 and #63).
+Settled by the G6 spike and the claim path (2026-10-15): the shape of a deterministic run record, the verifier contract,
+the replay pipeline and the claim path (`run.start`, `run.submit`, server-issued single-use runs, a verified level on the
+account) are in `docs/product/run-record.md`; FROST·BITE's ice-field cabinet uses them. Still open: a real-time cabinet that
+can be replayed (task #63), hidden information the player cannot read (the dealer, task #64), and running an outside
+game's rules on our server (a sandbox and an ADR, task #65).
 
 ## 8. What is built (2026-10-12) and where it differs
 
