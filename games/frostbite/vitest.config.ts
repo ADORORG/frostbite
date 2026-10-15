@@ -9,18 +9,22 @@ const coverage = {
     lines: 90.01,
     statements: 90.01,
   },
-  include: ["src/platform/**/*.ts", "src/verifier/**/*.ts"],
+  include: [
+    "src/platform/**/*.ts",
+    "src/verifier/**/*.ts",
+    "src/ice-field/**/*.{ts,tsx}",
+  ],
 };
 
 export default defineConfig({
   test: {
     coverage,
     projects: [
-      { test: { name: "unit", include: ["test/**/*.unit.test.ts"] } },
+      { test: { name: "unit", include: ["test/**/*.unit.test.{ts,tsx}"] } },
       {
         test: {
           name: "integration",
-          include: ["test/**/*.integration.test.ts"],
+          include: ["test/**/*.integration.test.{ts,tsx}"],
         },
       },
     ],

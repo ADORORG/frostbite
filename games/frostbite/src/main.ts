@@ -3,6 +3,7 @@ import { createPlatformStorage } from "@ador/game-sdk/storage-shim";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
+import { mountIceField } from "./ice-field/mount.tsx";
 import { createMilestoneBridge } from "./platform/milestone-bridge.ts";
 import { persistedKeys } from "./platform/storage-keys.ts";
 
@@ -37,6 +38,8 @@ async function start(): Promise<void> {
     if (document.visibilityState === "hidden") void storage.flush();
   });
   await import("./legacy-boot.ts");
+  // The ice-field cabinet, beside the game: its own root, its own rules, no legacy file touched.
+  mountIceField(window.FrostbiteHost);
 }
 
 void start();
