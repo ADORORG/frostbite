@@ -24,7 +24,7 @@
   z-index: 9000;
   display: grid;
   gap: 10px;
-  width: min(92vw, 360px);
+  width: min(94vw, 500px);
   max-height: calc(100vh - 76px);
   padding: 12px;
   overflow: auto;
@@ -54,9 +54,20 @@
   font: 11px/1.4 var(--f-display);
   text-transform: uppercase;
 }
+.if-play {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.if-side {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
 .if-board {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 46px);
   gap: 4px;
 }
 .if-tile {
@@ -92,7 +103,7 @@
 }
 .if-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 6px;
   margin: 0;
 }
@@ -165,4 +176,12 @@
   color: var(--paper);
   font: 10px/1.4 var(--f-mono);
   resize: vertical;
+}
+@media (max-width: 440px) {
+  .if-play {
+    grid-template-columns: 1fr;
+  }
+  .if-board {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }

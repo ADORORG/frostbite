@@ -3,6 +3,8 @@ import { verifyRun } from "@ador/game-verification/verify";
 import { describe, expect, it } from "vitest";
 
 import { frostbite } from "../../../configs/games/frostbite.ts";
+import { createIceFieldSession } from "../../../games/frostbite/src/ice-field/session.ts";
+import { iceFieldMines } from "../../../games/frostbite/src/verifier/ice-field.ts";
 import { verifierRegistry } from "../../../configs/verifiers.ts";
 
 const frostbiteEntry = verifierRegistry.find("ice-field");
@@ -82,5 +84,72 @@ describe("replay verification of FROST·BITE's ice field", () => {
     });
     expect(changed.status).toBe("verified");
     expect(changed.digest).not.toBe(first.digest);
+  });
+});
+
+// What the cabinet in the game records as a player plays, checked by the verifier the platform registered.
+describe("a run played through the ice-field cabinet", () => {
+  const seed = 7_070_707;
+  const safe = (board: number) => {
+    const mine = iceFieldMines(seed, board, 5);
+    return Array.from({ length: 25 }, (_, tile) => tile).filter(
+      (tile) => !mine.includes(tile),
+    );
+  };
+
+  it("is verified, with what the cabinet claimed", () => {
+    const session = createIceFieldSession({ seed });
+    for (const tile of safe(0)) session.pick(tile);
+    session.settle();
+    session.buildGlacier();
+    expect(verifyRun(verifierRegistry, session.record())).toMatchObject({
+      earned: ["first-win", "first-glacier"],
+      status: "verified",
+    });
+  });
+
+  it("is verified when the run earned nothing, a busted board included", () => {
+    const session = createIceFieldSession({ seed });
+    session.pick(iceFieldMines(seed, 0, 5)[0] ?? 0);
+    session.settle();
+    expect(verifyRun(verifierRegistry, session.record())).toMatchObject({
+      earned: [],
+      status: "verified",
+    });
+  });
+
+  it("is refused once it is changed to claim more than was played", () => {
+    const session = createIceFieldSession({ seed });
+    session.pick(safe(0)[0] ?? 0);
+    const record = session.record();
+    expect(
+      verifyRun(verifierRegistry, { ...record, claims: ["first-win"] }),
+    ).toMatchObject({
+      reason: "claim-not-earned",
+    });
+    session.settle();
+    const played = session.record();
+    expect(
+      verifyRun(verifierRegistry, {
+        ...played,
+        claims: [...played.claims, "first-glacier"],
+      }),
+    ).toMatchObject({
+      reason: "claim-not-earned",
+    });
+  });
+
+  it("is refused when a step is added that the board would not allow", () => {
+    const session = createIceFieldSession({ seed });
+    session.pick(iceFieldMines(seed, 0, 5)[0] ?? 0);
+    const record = session.record();
+    const forged = {
+      ...record,
+      inputs: [...record.inputs, { data: safe(0)[0], type: "pick" }],
+    };
+    expect(verifyRun(verifierRegistry, forged)).toMatchObject({
+      detail: "the board is over: settle it",
+      reason: "illegal-input",
+    });
   });
 });

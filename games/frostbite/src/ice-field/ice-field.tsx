@@ -49,7 +49,6 @@ export function IceField({
         seed: newSeed(),
       }),
     );
-    setRecord(null);
     setPhase("playing");
     setMessage("Pick a tile. A mine ends the board.");
   };
@@ -149,24 +148,31 @@ export function IceField({
             </div>
           ) : null}
           {phase === "playing" && state !== undefined ? (
-            <>
+            <div className="if-play">
               <IceBoard disabled={false} onPick={pick} state={state} />
-              <IceControls
-                canBuild={nextCost !== null && state.icicles >= nextCost}
-                nextCost={nextCost}
-                onBuild={build}
-                onEnd={end}
-                onSettle={settle}
-                state={state}
-              />
-            </>
+              <div className="if-side">
+                <IceControls
+                  canBuild={nextCost !== null && state.icicles >= nextCost}
+                  nextCost={nextCost}
+                  onBuild={build}
+                  onEnd={end}
+                  onSettle={settle}
+                  state={state}
+                />
+                <p aria-live="polite" className="if-status" role="status">
+                  {message}
+                </p>
+              </div>
+            </div>
           ) : null}
           {phase === "ended" && record !== null ? (
             <RecordView onAgain={start} record={record} />
           ) : null}
-          <p aria-live="polite" className="if-status" role="status">
-            {message}
-          </p>
+          {phase === "playing" ? null : (
+            <p aria-live="polite" className="if-status" role="status">
+              {message}
+            </p>
+          )}
         </section>
       ) : null}
     </>

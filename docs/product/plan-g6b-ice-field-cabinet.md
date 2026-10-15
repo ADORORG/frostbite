@@ -1,6 +1,6 @@
 # Plan: the ice-field cabinet in FROST·BITE (G6b, task #61)
 
-Status: **building on the documented defaults** (owner away, 2026-10-15). Branch `feat/ice-field-cabinet`, stacked on
+Status: **built on the documented defaults** (owner away, 2026-10-15); record `references/ice-field-cabinet-task-record.md`. Branch `feat/ice-field-cabinet`, stacked on
 `feat/replay-verification`. It puts the deterministic core from G6 in front of a player and has the game record its own
 run, so the platform's verifier has a real record to check.
 

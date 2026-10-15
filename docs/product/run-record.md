@@ -81,11 +81,24 @@ board to bank icicles by the game's own payout formula, and building glaciers at
 | `first-glacier` | **Yes**: the first tier built, which needs 300 icicles won on boards.                                                 |
 | `first-cashout` | **No, by design**: the cash-out is a simulation event (a diesel pot with no chain behind it). It stays self-reported. |
 
-**The shipped game does not use this core yet.** Its nine cabinets are real-time canvas games driven by an animation loop
-and elapsed time, with `Math.random` in places and round seeds from `Date.now()`, so they cannot be replayed as they
-are. Until the ice-field cabinet is in the game (task #61) and the claim path exists (task #62), every FROST·BITE
-milestone is, and must be shown as, **self-reported**. Porting a real-time cabinet to a fixed-step simulation is task
-#63.
+**The ice-field cabinet is in the game** (task #61, `games/frostbite/src/ice-field`): a launcher and panel beside the game
+that plays through `iceFieldRules` and builds its run with `createRunRecorder`. Its record is accepted by the registered
+verifier (`apps/web/test/verifiers.unit.test.ts`, and a real-browser test that plays in the platform's frame and has the
+platform verify what the page produced). It keeps its own icicles and glaciers, apart from the game's legacy economy.
+
+**It does not make FROST·BITE verified.** Nothing can submit a record yet (task #62), so the cabinet reports
+`first-win` and `first-glacier` through the game's milestone bridge, which is **self-reported**, and the cabinet says so
+on screen. The game's other nine cabinets are real-time canvas games driven by an animation loop and elapsed time, with
+`Math.random` in places and round seeds from `Date.now()`, so they cannot be replayed as they are; porting one to a
+fixed-step simulation is task #63. Until the claim path exists, every FROST·BITE milestone is, and must be shown as,
+**self-reported**.
+
+**A limit replay cannot remove.** The seed is chosen by the player's browser and the rules are public, so the browser knows
+where the mines are. Replay shows a record is _legal_, not that the player did not read the layout. Server-issued seeds do
+not fix this for a hidden-information board, because the rules that place the mines are deterministic and public. A game
+whose result depends on hidden information needs a secret the player does not hold (a commit and reveal with the server),
+or should be a game of skill rather than concealment. The claim path (#62) and the choice of games to verify must account
+for it.
 
 ## Limits (typed policy)
 

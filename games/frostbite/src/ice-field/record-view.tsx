@@ -22,8 +22,8 @@ export function RecordView({
           : `Claims: ${record.claims.join(", ")}.`}
       </p>
       <p className="if-note">
-        These milestones are your own claim today. The platform can replay this
-        record to check it once submitting records opens.
+        Milestones earned here are your own claim today. The platform can replay
+        this record to check it once submitting records opens.
       </p>
       <label>
         The record
