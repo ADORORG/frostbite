@@ -47,13 +47,16 @@ export function abortableSleep(
 export function createBrowserServices(
   overrides: Partial<UploadsClientServices> = {},
 ): UploadsClientServices {
+  const policy = overrides.policy ?? resolveUploadClientPolicy();
   return {
     api: createUploadsApi(sameOriginFetch),
     createIdempotencyKey: () => idempotencyKeySchema.parse(crypto.randomUUID()),
     now: () => Date.now(),
-    policy: resolveUploadClientPolicy(),
+    policy,
     sleep: abortableSleep,
-    transfer: createXhrTransfer(),
+    transfer: createXhrTransfer(undefined, {
+      stallMs: policy.transferStallMs,
+    }),
     ...overrides,
   };
 }

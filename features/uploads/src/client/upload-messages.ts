@@ -42,7 +42,9 @@ function describeFailure(cause: FailureCause): string {
     ? apiFailureText[cause.code]
     : cause.failure === "network"
       ? "The file could not be sent. Check your connection and retry."
-      : "The storage service did not accept the upload. The upload link may have expired; retry.";
+      : cause.failure === "stalled"
+        ? "The file stopped sending. Check your connection and retry."
+        : "The storage service did not accept the upload. The upload link may have expired; retry.";
 }
 
 // The one line the user reads for each state. Nothing here claims success before the server has

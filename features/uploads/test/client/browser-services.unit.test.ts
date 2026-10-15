@@ -58,6 +58,44 @@ describe("browser services", () => {
     expect(createBrowserServices({ policy }).policy).toBe(policy);
   });
 
+  it("gives the transfer the policy's stall limit, so a send that goes silent is given up on", async () => {
+    vi.useFakeTimers();
+    try {
+      const transfer = createBrowserServices({
+        policy: { ...defaultUploadClientPolicy, transferStallMs: 1_000 },
+      }).transfer;
+      class Silent {
+        onabort: (() => void) | null = null;
+        onerror = null;
+        onload = null;
+        status = 0;
+        upload = { onprogress: null };
+        abort() {
+          this.onabort?.();
+        }
+        open() {}
+        send() {}
+        setRequestHeader() {}
+      }
+      const original = globalThis.XMLHttpRequest;
+      Object.assign(globalThis, { XMLHttpRequest: Silent });
+      const sent = transfer
+        .upload({
+          body: new Blob(["x"]),
+          headers: {},
+          onProgress: () => undefined,
+          signal: new AbortController().signal,
+          url: "https://storage.example.test/up",
+        })
+        .catch((error: unknown) => error);
+      await vi.advanceTimersByTimeAsync(1_000);
+      Object.assign(globalThis, { XMLHttpRequest: original });
+      expect(await sent).toMatchObject({ failure: "stalled" });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("sends same-origin requests with credentials through the global fetch", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ assets: [], truncated: false }), {

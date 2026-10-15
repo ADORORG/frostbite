@@ -12,6 +12,8 @@ export interface UploadClientPolicy {
   readonly pollMaxAttempts: number;
   // Signed rendition URLs are refreshed this long before they expire.
   readonly signedUrlRefreshMarginMs: number;
+  // How long a file may be sent with no sign of progress before the upload is given up on and offered again.
+  readonly transferStallMs: number;
   // Floor for any scheduled refresh, so a clock skew cannot create a tight loop.
   readonly minimumRefreshDelayMs: number;
 }
@@ -23,6 +25,7 @@ export const defaultUploadClientPolicy: UploadClientPolicy = Object.freeze({
   pollIntervalMs: 1_500,
   pollMaxAttempts: 80,
   signedUrlRefreshMarginMs: 30_000,
+  transferStallMs: 30_000,
 });
 
 export function resolveUploadClientPolicy(

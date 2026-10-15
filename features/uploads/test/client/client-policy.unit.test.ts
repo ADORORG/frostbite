@@ -15,6 +15,10 @@ describe("upload client policy", () => {
     expect(Object.isFrozen(resolveUploadClientPolicy())).toBe(true);
   });
 
+  it("gives a stalled send thirty seconds by default", () => {
+    expect(defaultUploadClientPolicy.transferStallMs).toBe(30_000);
+  });
+
   it.each([0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
     "rejects %s",
     (value) => {

@@ -89,7 +89,13 @@ describe("upload messages", () => {
     const aborted = describeUploadState(
       failed({ failure: "aborted", kind: "transfer" }),
     )?.text;
+    const stalled = describeUploadState(
+      failed({ failure: "stalled", kind: "transfer" }),
+    )?.text;
     expect(network).toContain("connection");
+    expect(stalled).toBe(
+      "The file stopped sending. Check your connection and retry.",
+    );
     expect(rejected).toContain("expired");
     expect(aborted).toBe(rejected);
   });

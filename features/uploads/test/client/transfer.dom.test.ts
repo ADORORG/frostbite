@@ -157,3 +157,99 @@ describe("script-settable headers", () => {
     ).toEqual({ "content-type": "image/png", "x-amz-meta": "1" });
   });
 });
+
+describe("a send that goes silent", () => {
+  // Timers the test runs by hand, so no real time passes.
+  function stallSetup(stallMs = 1_000) {
+    const request = new FakeRequest();
+    const timers = new Map<number, { at: number; run: () => void }>();
+    let now = 0;
+    let next = 0;
+    const transfer = createXhrTransfer(() => request, {
+      clearTimer: (handle) => void timers.delete(Number(handle)),
+      setTimer: (run, ms) => {
+        const id = (next += 1);
+        timers.set(id, { at: now + ms, run });
+        return id as unknown as ReturnType<typeof setTimeout>;
+      },
+      stallMs,
+    });
+    const upload = () =>
+      transfer
+        .upload({
+          body: new Blob(["abc"]),
+          headers: {},
+          onProgress: () => undefined,
+          signal: new AbortController().signal,
+          url: "https://storage.example.test/up",
+        })
+        .catch((error: unknown) => error);
+    const advance = (ms: number) => {
+      now += ms;
+      for (const [id, timer] of [...timers])
+        if (timer.at <= now) {
+          timers.delete(id);
+          timer.run();
+        }
+    };
+    return { advance, request, timers, upload };
+  }
+
+  it("is given up on after the limit with no progress, and says it stalled, not that it was cancelled", async () => {
+    const { advance, request, upload } = stallSetup();
+    const sent = upload();
+    advance(999);
+    expect(request.aborted).toBe(false);
+    advance(1);
+    expect(request.aborted).toBe(true);
+    expect(await sent).toMatchObject({ failure: "stalled" });
+  });
+
+  it("waits again after every sign of progress, so a slow send that keeps moving is not cut off", async () => {
+    const { advance, request, upload } = stallSetup();
+    const sent = upload();
+    for (let step = 0; step < 5; step += 1) {
+      advance(900);
+      request.upload.onprogress?.(
+        new ProgressEvent("progress", {
+          lengthComputable: true,
+          loaded: step,
+          total: 9,
+        }),
+      );
+    }
+    expect(request.aborted).toBe(false);
+    request.status = 200;
+    request.onload?.(new ProgressEvent("load"));
+    expect(await sent).toBeUndefined();
+  });
+
+  it("stops watching once the send has finished or failed", async () => {
+    const finished = stallSetup();
+    const done = finished.upload();
+    finished.request.status = 200;
+    finished.request.onload?.(new ProgressEvent("load"));
+    await done;
+    expect(finished.timers.size).toBe(0);
+    const failed = stallSetup();
+    const lost = failed.upload();
+    failed.request.onerror?.(new ProgressEvent("error"));
+    expect(await lost).toMatchObject({ failure: "network" });
+    expect(failed.timers.size).toBe(0);
+  });
+
+  it("is never watched when no limit was given", async () => {
+    const request = new FakeRequest();
+    const sent = createXhrTransfer(() => request)
+      .upload({
+        body: new Blob(["abc"]),
+        headers: {},
+        onProgress: () => undefined,
+        signal: new AbortController().signal,
+        url: "https://storage.example.test/up",
+      })
+      .catch((error: unknown) => error);
+    request.onabort?.(new ProgressEvent("abort"));
+    expect(await sent).toMatchObject({ failure: "aborted" });
+  });
+});
