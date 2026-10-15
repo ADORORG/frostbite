@@ -181,3 +181,15 @@
     justify-content: flex-start;
   }
 }
+.app-header__end {
+  display: flex;
+  align-items: center;
+}
+.avatar {
+  display: block;
+  flex: none;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+  image-rendering: pixelated;
+}
