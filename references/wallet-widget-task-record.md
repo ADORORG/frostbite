@@ -88,3 +88,21 @@ sign-in and sign-out following the page, Switch wallet), mutation proof (12 more
 fixed: a failed sign-in telling the page, and a test that read the library's storage key from the constant under test).
 The e2e tests that sign in now have wallets of their own: sharing one account between tests running in parallel made the
 suite intermittently fail.
+
+## Owner testing, second round: the wallet flickered on every page change
+
+Every link was a plain `<a href>`, so each click loaded the whole app again and the connection library, which waits before
+it reconnects, showed "Reconnecting wallet" on every page. Shortening the wait would only have hidden it. The app now
+moves between pages with the router (`apps/web/src/app/client-navigation.tsx`, deciding in
+`apps/web/src/client-navigation.ts`), so the layout and the wallet connection live on. Pages are still rendered on the
+server. Left to the browser: modified clicks, other targets, downloads, `rel=external`, other sites, `/api/` and
+`/play/` paths, and jumps within the current page. A hard reload still shows the short "Reconnecting wallet" wait; that
+is the library's.
+
+Tests: unit tests for every rule of the decision function (11 mutations, all caught); e2e with a deliberately slow
+wallet that marks the page, moves through four pages and back, and shows the page was never reloaded and the button
+never showed anything but the address (it fails with the fix removed, which I checked by rebuilding without it); and a
+check that a modified click and the skip link still behave as links.
+
+Found while verifying: the rate-limit 429 integration test is intermittent (61 requests in a one-minute window can
+straddle the boundary). Not from this change; filed as task #60.

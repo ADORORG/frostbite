@@ -187,3 +187,76 @@ test("'Switch wallet' opens the chooser even though a wallet is connected", asyn
   await expect(chooser).not.toBeVisible();
   await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
 });
+
+test("moving between pages keeps the wallet connected: the app is not loaded again and the button never flickers", async ({
+  page,
+}) => {
+  // A slow wallet, so a page that started the app over would show the wait.
+  await installFakeWallet(page, wallet, 1_500);
+  await page.goto("/");
+  await connectWallet(page, wallet);
+  // Mark this page, and record every text the wallet button shows from now on.
+  await page.evaluate(() => {
+    Reflect.set(window, "stillThisPage", true);
+    const seen: string[] = [];
+    Reflect.set(window, "buttonTexts", seen);
+    const note = () => {
+      const text = document.querySelector(
+        ".wallet-widget__trigger",
+      )?.textContent;
+      if (text !== undefined && text !== null) seen.push(text);
+    };
+    note();
+    new MutationObserver(note).observe(document.body, {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+  });
+  const bar = page.getByRole("navigation", { name: "Primary navigation" });
+  await bar.getByRole("link", { name: "Games", exact: true }).click();
+  await expect(page).toHaveURL(/\/games$/u);
+  await bar.getByRole("link", { name: "Collections", exact: true }).click();
+  await expect(page).toHaveURL(/\/collections$/u);
+  await page.getByRole("link", { name: "Adorbitals home" }).click();
+  await expect(page).toHaveURL(/\/$/u);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/collections$/u);
+  expect(await page.evaluate(() => Reflect.get(window, "stillThisPage"))).toBe(
+    true,
+  );
+  const texts = await page.evaluate(() => Reflect.get(window, "buttonTexts"));
+  expect(texts.length).toBeGreaterThan(0);
+  for (const text of texts) expect(text).toContain(wallet.address.slice(0, 8));
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+});
+
+test("links that are not for the app to move between still behave as links", async ({
+  page,
+}) => {
+  await page.goto("/");
+  // Whether anything cancelled the click by the time it reached the window (the app cancels one it takes over).
+  await page.evaluate(() => {
+    window.addEventListener("click", (event) =>
+      Reflect.set(window, "clickWasCancelled", event.defaultPrevented),
+    );
+  });
+  const bar = page.getByRole("navigation", { name: "Primary navigation" });
+  // A modified click is the browser's (a new tab): the app leaves it alone and this page does not move.
+  await bar
+    .getByRole("link", { name: "Games", exact: true })
+    .click({ modifiers: ["ControlOrMeta"] });
+  expect(
+    await page.evaluate(() => Reflect.get(window, "clickWasCancelled")),
+  ).toBe(false);
+  await expect(page).toHaveURL(/\/$/u);
+  // An ordinary click is taken over by the app, and the skip link still jumps within the page.
+  await bar.getByRole("link", { name: "Games", exact: true }).click();
+  await expect(page).toHaveURL(/\/games$/u);
+  expect(
+    await page.evaluate(() => Reflect.get(window, "clickWasCancelled")),
+  ).toBe(true);
+  await page.getByRole("link", { name: "Skip to main content" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#main-content$/u);
+});

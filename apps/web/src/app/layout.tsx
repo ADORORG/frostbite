@@ -4,6 +4,7 @@ import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import "@repo/ui/styles.css";
 import "./globals.css";
 import { walletAuthConfig } from "../../../../configs/wallet";
+import { ClientNavigation } from "./client-navigation";
 import { WalletShell } from "./wallet-shell";
 
 const bodyFont = Chakra_Petch({
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body>
+        <ClientNavigation />
         <WalletShell
           balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
           candidates={walletAuthConfig.candidates}
