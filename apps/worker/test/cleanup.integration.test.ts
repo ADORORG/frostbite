@@ -106,7 +106,15 @@ describe("abandoned upload cleanup through the real worker and database", () => 
       expect(outage).toHaveLength(1);
       expect(outage[0]).toMatchObject({ claimed: 1, removed: 0 });
       expect(outage[0]?.failures).toHaveLength(1);
-      // A later run (after a restart, say) finds it again and finishes the job.
+      // The failure is recorded and the next try put off, so a key that always fails does not take a place in every pass.
+      const failed = await intent(abandoned.intentId);
+      expect(failed?.cleanupAttempts).toBe(1);
+      expect(failed?.cleanupRetryAt?.getTime()).toBeGreaterThan(Date.now());
+      // Once the wait has passed, a later run (after a restart, say) finds it again and finishes the job.
+      await database
+        .update(uploadIntents)
+        .set({ cleanupRetryAt: new Date(Date.now() - 1_000) })
+        .where(eq(uploadIntents.id, abandoned.intentId));
       scenario.storage.failDeletes(false);
       await scenario.runCleanupUntil(removed(abandoned.intentId));
       expect(scenario.storage.objects.has(abandoned.objectKey)).toBe(false);

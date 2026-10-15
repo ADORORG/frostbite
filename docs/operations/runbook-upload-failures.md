@@ -140,8 +140,11 @@ from ador.upload_intents where state = 'abandoned' and object_removed_at is null
 ```
 
 Rows that stay for more than a few cleanup passes (the loop runs about every five minutes) mean storage
-deletion is failing: check the worker's logs and R2 permissions (delete on the private bucket). A single
-poison key can currently slow a batch (backlog item). Never delete an object by hand that an asset points to.
+deletion is failing: check the worker's logs and R2 permissions (delete on the private bucket). A removal that fails (or takes
+longer than 30 seconds) is put off and tried again after 5 minutes, then 10, 20 and so on up to 6 hours, so one poison key no
+longer slows or crowds out the rest; see its `cleanup_attempts` and `cleanup_retry_at` columns, and the worker's logged
+failures for why. Removals run five at a time (typed policy: `cleanupConcurrency`, `cleanupDeleteTimeoutMs`,
+`cleanupRetryBaseMs`, `cleanupRetryMaxMs`). Never delete an object by hand that an asset points to.
 
 ## H. Too many requests (HTTP 429)
 
@@ -181,5 +184,5 @@ with a preview, and the outbox event shows `delivered`.
   liveness only.
 - A verified operator action (or admin tool) to re-queue a failed outbox event and to re-run processing for
   one asset.
-- Library pagination, and isolation of poison keys in the cleanup batch.
+- Library pagination.
 - Retention for refused originals and intent rows (approval briefs).

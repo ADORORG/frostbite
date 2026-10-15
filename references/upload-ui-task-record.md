@@ -150,8 +150,8 @@ three passes, over an unchanged tree after the last fix, were M6, M8, and M2, an
   (W8-07) before any real deployment.
 - Library polling signs every processed asset's renditions on each reload; that is cheap now and worth
   revisiting with pagination.
-- The browser transfer sets no timeout, so a storage endpoint that accepts the connection and then stalls
-  leaves the progress bar still until the user cancels; the presigned URL still expires server-side.
+- ~~The browser transfer sets no timeout~~ Fixed in the upload hardening pass: a send with no progress for 30 seconds
+  (`transferStallMs`) is given up on and offered again; every progress event restarts the wait.
 - Coverage holes that remain are outside this task: `packages/test-kit` (`inngest-runtime-api`,
   `s3-runtime`), `packages/uploads` (`drizzle-repository`), the R2 adapter's `create-adapter` and
   `r2-client` branches, and `packages/shared` `uuid-v7`. All packages remain above their thresholds.

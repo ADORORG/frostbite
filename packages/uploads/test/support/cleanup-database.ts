@@ -126,3 +126,13 @@ export async function stateOf(id: UuidV7) {
   if (row === undefined) throw new Error("Intent row is missing.");
   return row;
 }
+
+// How many removals of this intent's object have failed.
+export async function attemptsOf(id: UuidV7): Promise<number> {
+  const [row] = await database
+    .select({ attempts: uploadIntents.cleanupAttempts })
+    .from(uploadIntents)
+    .where(eqId(id));
+  if (row === undefined) throw new Error("Intent row is missing.");
+  return row.attempts;
+}

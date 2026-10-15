@@ -24,6 +24,10 @@ describe("upload policy", () => {
       derivativeReadLifetimeMs: 300_000,
       libraryPageSize: 48,
       cleanupBatchSize: 50,
+      cleanupConcurrency: 5,
+      cleanupDeleteTimeoutMs: 30_000,
+      cleanupRetryBaseMs: 300_000,
+      cleanupRetryMaxMs: 21_600_000,
     });
     expect(resolveUploadPolicy({ activeIntentLimitPerUser: 1 })).toMatchObject({
       activeIntentLimitPerUser: 1,
@@ -82,5 +86,27 @@ describe("upload policy", () => {
       expect(() => resolveUploadPolicy({ maxImageDimension })).toThrow();
     for (const maxImagePixels of [0, -1, 1.5])
       expect(() => resolveUploadPolicy({ maxImagePixels })).toThrow();
+  });
+
+  it("bounds how cleanup runs and backs off, and never lets the longest wait be shorter than the first", () => {
+    expect(
+      resolveUploadPolicy({ cleanupConcurrency: 20 }).cleanupConcurrency,
+    ).toBe(20);
+    for (const bad of [
+      { cleanupConcurrency: 0 },
+      { cleanupConcurrency: 21 },
+      { cleanupDeleteTimeoutMs: 999 },
+      { cleanupDeleteTimeoutMs: 300_001 },
+      { cleanupRetryBaseMs: 59_999 },
+      { cleanupRetryMaxMs: 59_999 },
+      { cleanupRetryBaseMs: 600_000, cleanupRetryMaxMs: 300_000 },
+    ])
+      expect(() => resolveUploadPolicy(bad)).toThrow();
+    expect(
+      resolveUploadPolicy({
+        cleanupRetryBaseMs: 600_000,
+        cleanupRetryMaxMs: 600_000,
+      }).cleanupRetryMaxMs,
+    ).toBe(600_000);
   });
 });

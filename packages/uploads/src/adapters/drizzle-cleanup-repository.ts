@@ -2,7 +2,17 @@ import type { DatabaseClient } from "@ador/database/connection";
 import { assets, uploadIntents } from "@ador/database/schema/uploads";
 import { parseObjectKey } from "@ador/object-storage/contracts";
 import { uuidV7Schema } from "@ador/shared/identifiers";
-import { and, asc, eq, inArray, isNull, lte, notExists, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNull,
+  lte,
+  notExists,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import type { UploadCleanupRepository } from "../application/cleanup-repository.ts";
 
@@ -18,6 +28,7 @@ export function createDrizzleUploadCleanupRepository(
             id: uploadIntents.id,
             objectKey: uploadIntents.objectKey,
             state: uploadIntents.state,
+            attempts: uploadIntents.cleanupAttempts,
           })
           .from(uploadIntents)
           .where(
@@ -38,6 +49,11 @@ export function createDrizzleUploadCleanupRepository(
                 and(
                   eq(uploadIntents.state, "abandoned"),
                   isNull(uploadIntents.objectRemovedAt),
+                  // A removal that failed waits for its retry time.
+                  or(
+                    isNull(uploadIntents.cleanupRetryAt),
+                    lte(uploadIntents.cleanupRetryAt, now),
+                  ),
                 ),
               ),
             ),
@@ -54,10 +70,26 @@ export function createDrizzleUploadCleanupRepository(
             .set({ state: "abandoned", updatedAt: now })
             .where(inArray(uploadIntents.id, fresh));
         return rows.map((row) => ({
+          attempts: row.attempts,
           intentId: uuidV7Schema.parse(row.id),
           objectKey: parseObjectKey(row.objectKey),
         }));
       });
+    },
+    async recordFailure({ intentId, retryAt }) {
+      await database
+        .update(uploadIntents)
+        .set({
+          cleanupAttempts: sql`${uploadIntents.cleanupAttempts} + 1`,
+          cleanupRetryAt: retryAt,
+        })
+        .where(
+          and(
+            eq(uploadIntents.id, intentId),
+            eq(uploadIntents.state, "abandoned"),
+            isNull(uploadIntents.objectRemovedAt),
+          ),
+        );
     },
     async markObjectRemoved({ intentId, removedAt }) {
       await database

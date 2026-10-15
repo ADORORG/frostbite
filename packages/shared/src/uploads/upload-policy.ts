@@ -48,12 +48,33 @@ const policySchema = z
     libraryPageSize: z.number().int().min(1).max(100),
     // Abandoned uploads claimed per cleanup pass; each one costs a storage delete.
     cleanupBatchSize: z.number().int().min(1).max(500),
+    // Removals of one pass in flight at once: a slow key delays only its own slot, not the whole batch.
+    cleanupConcurrency: z.number().int().min(1).max(20),
+    // How long one removal may take before it counts as failed.
+    cleanupDeleteTimeoutMs: z
+      .number()
+      .int()
+      .min(1_000)
+      .max(5 * minuteMs),
+    // A removal that failed is not tried again for this long, doubling with each failure up to the maximum, so a key
+    // that always fails stops taking a place in every pass.
+    cleanupRetryBaseMs: z.number().int().min(minuteMs).max(dayMs),
+    cleanupRetryMaxMs: z
+      .number()
+      .int()
+      .min(minuteMs)
+      .max(7 * dayMs),
   })
   .strict()
   .refine(
     ({ cleanupDelayMs, presignedUrlLifetimeMs }) =>
       cleanupDelayMs > presignedUrlLifetimeMs,
     "Cleanup delay must exceed the presigned URL lifetime.",
+  )
+  .refine(
+    ({ cleanupRetryBaseMs, cleanupRetryMaxMs }) =>
+      cleanupRetryMaxMs >= cleanupRetryBaseMs,
+    "The cleanup retry maximum cannot be less than its base.",
   )
   .refine(
     ({ derivativeReadLifetimeMs, presignedUrlLifetimeMs }) =>
@@ -86,6 +107,10 @@ export const defaultUploadPolicy: UploadPolicy = Object.freeze({
   derivativeReadLifetimeMs: 5 * minuteMs,
   libraryPageSize: 48,
   cleanupBatchSize: 50,
+  cleanupConcurrency: 5,
+  cleanupDeleteTimeoutMs: 30_000,
+  cleanupRetryBaseMs: 5 * minuteMs,
+  cleanupRetryMaxMs: 6 * hourMs,
 });
 
 export function resolveUploadPolicy(

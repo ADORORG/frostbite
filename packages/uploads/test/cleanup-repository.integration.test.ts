@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  attemptsOf,
   cleanupRepository,
   completeWithAsset,
   createUser,
@@ -30,6 +31,7 @@ describe("abandoned upload claiming", () => {
       [reserved.id, failed.id].sort(),
     );
     expect(claimed.find(({ intentId }) => intentId === reserved.id)).toEqual({
+      attempts: 0,
       intentId: reserved.id,
       objectKey: reserved.objectKey,
     });
@@ -122,5 +124,69 @@ describe("abandoned upload claiming", () => {
       objectRemovedAt: removedAt,
       state: "abandoned",
     });
+  });
+
+  it("puts a failed removal off until its retry time, counts the attempt, and then returns it again", async () => {
+    const userId = await createUser();
+    const poison = await seedIntent(userId, { cleanupDueInMs: -9_000 });
+    const other = await seedIntent(userId, { cleanupDueInMs: -1_000 });
+    await claim();
+    const retryAt = new Date(now.getTime() + 60_000);
+    await cleanupRepository.recordFailure({ intentId: poison.id, retryAt });
+    // Though it is the oldest, it waits; the rest are not crowded out.
+    await expect(claim(1)).resolves.toMatchObject([{ intentId: other.id }]);
+    await expect(
+      cleanupRepository.claim({
+        limit: 10,
+        now: new Date(retryAt.getTime() - 1),
+        storageProviderId: providerId,
+      }),
+    ).resolves.toMatchObject([{ intentId: other.id }]);
+    const later = await cleanupRepository.claim({
+      limit: 10,
+      now: retryAt,
+      storageProviderId: providerId,
+    });
+    expect(later.find(({ intentId }) => intentId === poison.id)).toMatchObject({
+      attempts: 1,
+    });
+    await cleanupRepository.recordFailure({
+      intentId: poison.id,
+      retryAt: new Date(retryAt.getTime() + 60_000),
+    });
+    const again = await cleanupRepository.claim({
+      limit: 10,
+      now: new Date(retryAt.getTime() + 60_000),
+      storageProviderId: providerId,
+    });
+    expect(again.find(({ intentId }) => intentId === poison.id)).toMatchObject({
+      attempts: 2,
+    });
+  });
+
+  it("does not record a failure against an intent whose object is already gone or that is not abandoned", async () => {
+    const userId = await createUser();
+    const gone = await seedIntent(userId);
+    await claim();
+    await cleanupRepository.markObjectRemoved({
+      intentId: gone.id,
+      removedAt: now,
+    });
+    const reserved = await seedIntent(userId, { cleanupDueInMs: 1_000 });
+    for (const id of [gone.id, reserved.id])
+      await cleanupRepository.recordFailure({
+        intentId: id,
+        retryAt: new Date(now.getTime() + 60_000),
+      });
+    await expect(claim()).resolves.toEqual([]);
+    expect(await attemptsOf(gone.id)).toBe(0);
+    expect(await attemptsOf(reserved.id)).toBe(0);
+    await expect(
+      cleanupRepository.claim({
+        limit: 10,
+        now: new Date(now.getTime() + 2_000),
+        storageProviderId: providerId,
+      }),
+    ).resolves.toMatchObject([{ attempts: 0, intentId: reserved.id }]);
   });
 });

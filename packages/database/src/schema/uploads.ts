@@ -85,6 +85,13 @@ export const uploadIntents = platformSchema.table(
       mode: "date",
       withTimezone: true,
     }).notNull(),
+    // How many times removing the object failed, and the earliest the next try may be: a key that always fails backs off
+    // instead of taking a place in every pass.
+    cleanupAttempts: integer("cleanup_attempts").notNull().default(0),
+    cleanupRetryAt: timestamp("cleanup_retry_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
     objectRemovedAt: timestamp("object_removed_at", {
       mode: "date",
       withTimezone: true,
@@ -120,6 +127,10 @@ export const uploadIntents = platformSchema.table(
     check(
       "upload_intents_file_name_bare",
       sql`${table.fileName} is null or (length(${table.fileName}) between 1 and ${sql.raw(String(uploadFileNameMaxLength))} and ${table.fileName} !~ '[/\\\\[:cntrl:]]')`,
+    ),
+    check(
+      "upload_intents_cleanup_attempts_nonnegative",
+      sql`${table.cleanupAttempts} >= 0`,
     ),
     check("upload_intents_byte_length_positive", sql`${table.byteLength} > 0`),
     check(
