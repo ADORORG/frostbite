@@ -36,6 +36,14 @@ export const gameCapabilitySchema = z.enum(gameCapabilities);
 
 export const gameMilestoneClaimPolicies = ["once", "repeatable"] as const;
 
+// How a milestone can be trusted. `self-reported` (the default when nothing is declared): the game said so, and nothing
+// proves it. `replay-verified`: the game's own published rules decide it, and the platform replays a run on its server to
+// check the claim (docs/product/run-record.md). It proves the run followed those rules, not that a person played it.
+export const gameMilestoneVerifications = [
+  "self-reported",
+  "replay-verified",
+] as const;
+
 // A milestone a game says a player can earn, as data. Declaring one does not make it claimable: earning and
 // claiming on chain need the attestation service and contract (ADR-018), which do not exist yet. A change to
 // what a milestone means is a new manifest version, never an edit.
@@ -71,6 +79,9 @@ export const gameMilestoneSchema = z
       .max(gameManifestLimits.milestoneCount)
       .optional(),
     title: z.string().trim().min(1).max(gameManifestLimits.milestoneTitle),
+    // How this milestone can be trusted; left out, it is self-reported. Only a milestone earned once, with no target,
+    // can be replay-verified: one run's verdict says what one run earned, not a running total.
+    verification: z.enum(gameMilestoneVerifications).optional(),
   })
   .strict()
   .refine(
@@ -90,7 +101,28 @@ export const gameMilestoneSchema = z
       message: "Only a milestone earned once can have a target to reach.",
       path: ["target"],
     },
+  )
+  .refine(
+    ({ claimPolicy, target, verification }) =>
+      verification !== "replay-verified" ||
+      (claimPolicy === "once" && target === undefined),
+    {
+      message:
+        "Only a milestone earned once, with no target, can be replay-verified.",
+      path: ["verification"],
+    },
   );
+
+// The game's published rules, which the platform replays runs with: the id and version the rules name themselves by (what a
+// run record names), and the SHA-256 of the built `verifier.js` the platform loads from the game's own files. The digest is
+// a pin: an artifact that does not match it is never run, so the rules change only with a new manifest.
+export const gameReplayVerifierSchema = z
+  .object({
+    id: z.string().regex(/^[a-z][a-z0-9-]{0,63}$/u),
+    sha256: z.string().regex(/^[0-9a-f]{64}$/u),
+    version: z.number().int().min(1).max(0xffff),
+  })
+  .strict();
 
 const webUrlSchema = z.url({ protocol: /^https?$/u });
 
@@ -184,6 +216,11 @@ export const gameManifestSchema = z
     title: z.string().trim().min(1).max(gameManifestLimits.title),
     // The game's own release version (any short text its team uses), separate from the manifest format.
     version: z.string().trim().min(1).max(gameManifestLimits.version),
+    // How the game's milestones can be checked, beyond what the game says: left out, none can.
+    verification: z
+      .object({ replay: gameReplayVerifierSchema })
+      .strict()
+      .optional(),
   })
   .strict()
   .refine(
@@ -192,12 +229,53 @@ export const gameManifestSchema = z
       message: "Only a game the platform plays itself can have a cover.",
       path: ["cover"],
     },
+  )
+  .refine(
+    ({ launch, verification }) =>
+      verification === undefined || launch.mode === "embedded",
+    {
+      message:
+        "Only a game the platform plays itself can publish a replay verifier, because the artifact comes with its files.",
+      path: ["verification"],
+    },
+  )
+  .refine(
+    ({ capabilities, verification }) =>
+      verification === undefined || capabilities.includes("run:submit"),
+    {
+      message:
+        "A game with a replay verifier must declare the run:submit capability, which is how it sends a run to be checked.",
+      path: ["capabilities"],
+    },
+  )
+  .refine(
+    ({ milestones, verification }) =>
+      verification !== undefined ||
+      milestones.every(
+        ({ verification: level }) => level !== "replay-verified",
+      ),
+    {
+      message:
+        "A milestone cannot be replay-verified in a game that publishes no replay verifier.",
+      path: ["verification"],
+    },
+  )
+  .refine(
+    ({ milestones, verification }) =>
+      verification === undefined ||
+      milestones.some(({ verification: level }) => level === "replay-verified"),
+    {
+      message:
+        "A replay verifier needs at least one milestone that declares replay verification.",
+      path: ["verification"],
+    },
   );
 
 export type GameCover = z.infer<typeof gameCoverSchema>;
 export type GameManifest = z.infer<typeof gameManifestSchema>;
 export type GameMilestone = z.infer<typeof gameMilestoneSchema>;
 export type GameCapability = z.infer<typeof gameCapabilitySchema>;
+export type GameReplayVerifier = z.infer<typeof gameReplayVerifierSchema>;
 
 // Checks a manifest and freezes it: what a game file exports, so a mistake fails when the platform starts,
 // not when a player opens the page.
