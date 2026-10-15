@@ -85,8 +85,24 @@ export interface HttpAdapterResponse<Output extends object> {
   readonly status: number;
 }
 
+// Why a request was answered with an internal error. Nothing here reaches the caller; it is for the operator.
+export type InternalErrorReport = {
+  readonly correlationId: CorrelationId;
+  readonly operationId: string;
+} &
+  // The operation threw.
+  (
+    | { readonly kind: "exception"; readonly error: unknown }
+    // The operation answered with an application error its declaration does not list.
+    | { readonly kind: "undeclared-error"; readonly code: string }
+    // The operation's answer did not match its output contract.
+    | { readonly kind: "invalid-output" }
+  );
+
 export interface HttpExecutionDependencies {
   readonly createCorrelationId: () => string;
+  // Told of every internal error, so a 500 can be found by its correlation id. Optional; a failure of its own is ignored.
+  readonly report?: (report: InternalErrorReport) => void;
 }
 
 const errorStatuses: Readonly<Record<HttpErrorCode, number>> = {
@@ -178,6 +194,27 @@ export async function executeHttpOperation<Input, Output extends object>(
     return errorResponse("invalid_request", "Invalid request.", correlationId);
   }
 
+  const internal = (
+    detail:
+      | { readonly kind: "exception"; readonly error: unknown }
+      | { readonly kind: "undeclared-error"; readonly code: string }
+      | { readonly kind: "invalid-output" },
+  ): HttpAdapterResponse<Output> => {
+    try {
+      dependencies.report?.({
+        ...detail,
+        correlationId,
+        operationId: operation.operationId,
+      });
+    } catch {
+      // Reporting must never change the answer.
+    }
+    return errorResponse(
+      "internal_error",
+      "Internal server error.",
+      correlationId,
+    );
+  };
   try {
     const result = await operation.execute(inputResult.data, {
       actorUserId: request.actorUserId,
@@ -188,13 +225,8 @@ export async function executeHttpOperation<Input, Output extends object>(
         : {}),
     });
     if (!result.ok) {
-      if (!operation.applicationErrors.includes(result.error)) {
-        return errorResponse(
-          "internal_error",
-          "Internal server error.",
-          correlationId,
-        );
-      }
+      if (!operation.applicationErrors.includes(result.error))
+        return internal({ code: result.error, kind: "undeclared-error" });
       return errorResponse(result.error, result.message, correlationId);
     }
     const outputResult = operation.outputSchema.safeParse(result.value);
@@ -205,16 +237,8 @@ export async function executeHttpOperation<Input, Output extends object>(
           headers: { [correlationHeaderName]: correlationId },
           status: 200,
         }
-      : errorResponse(
-          "internal_error",
-          "Internal server error.",
-          correlationId,
-        );
-  } catch {
-    return errorResponse(
-      "internal_error",
-      "Internal server error.",
-      correlationId,
-    );
+      : internal({ kind: "invalid-output" });
+  } catch (error) {
+    return internal({ error, kind: "exception" });
   }
 }

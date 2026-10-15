@@ -13,6 +13,7 @@ import {
   getOpenApiDocument,
   resolveApiOperation,
 } from "../../../../../../../configs/api";
+import { logAuthUnavailable } from "../../../../server/http/internal-error-log";
 import { executeNextOperation } from "../../../../server/http/next-operation";
 import { resolvePageAccess } from "../../../../server/auth/page-access";
 import { getPageAccessDependencies } from "../../../../server/auth/runtime";
@@ -89,6 +90,11 @@ async function handle(request: Request, context: RouteContext) {
     );
     if (access.kind !== "allowed") {
       const correlationId = randomUUID();
+      if (access.kind === "unavailable")
+        logAuthUnavailable({
+          correlationId,
+          operationId: operation.route.operationId,
+        });
       const code =
         access.kind === "forbidden"
           ? "forbidden"

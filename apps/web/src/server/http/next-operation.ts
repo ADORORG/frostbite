@@ -10,6 +10,8 @@ import { platformSessionCookieName } from "@ador/shared/auth";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 import type { ActiveSession } from "@ador/auth";
 
+import { logInternalError } from "./internal-error-log.ts";
+
 export async function executeNextOperation(
   operation: RegisteredHttpOperation,
   request: Request,
@@ -29,7 +31,7 @@ export async function executeNextOperation(
       method: request.method,
       rawInput,
     },
-    { createCorrelationId: randomUUID },
+    { createCorrelationId: randomUUID, report: logInternalError },
   );
 
   for (const effect of response.effects) {

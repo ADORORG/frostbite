@@ -106,7 +106,9 @@ confirm the session row shows a fresh `authenticated_at` and a future `idle_expi
 ## Gaps to close (feed the backlog)
 
 - A public wallet sign-in route and its failure copy (then rewrite the wallet section).
-- Structured logs with the correlation id, so a ticket can be traced without database access.
+- Shipping the logs somewhere searchable. An internal error (`http.internal_error`) and an unreachable session service
+  (`http.auth_unavailable`) already write one JSON line each with the correlation id to the web process's error output; the
+  other failures above are answered with a code and are not logged.
 - An alert on a spike of `challenge-invalid` or `signature-invalid`. Rate limits now exist for the wallet
   challenge and passkey operations (10 a minute per address or person to start one, 20 to verify; see
   `configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.

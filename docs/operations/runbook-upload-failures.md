@@ -1,9 +1,9 @@
 # Runbook: upload failures
 
 Status: **early draft (W8-07).** Written from the code as it is today; nothing below has been exercised
-against real R2 or a deployed worker. Commands are read-only unless marked **write**. There is no structured
-error logging yet, so diagnosis uses the database, the response's `correlationId`, the worker's logs and the
-Inngest and Cloudflare dashboards.
+against real R2 or a deployed worker. Commands are read-only unless marked **write**. A 500 from the API writes one JSON line
+(`http.internal_error`, with the same `correlationId` the caller was given) to the web process's error output; diagnosis also
+uses the database, the worker's logs and the Inngest and Cloudflare dashboards.
 
 ## The path an upload takes (what can fail where)
 
