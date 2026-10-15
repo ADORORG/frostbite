@@ -1,28 +1,30 @@
 import { runVerifierConformance } from "@ador/game-verification/conformance";
+import { createVerifierRegistry } from "@ador/game-verification/registry";
+import { defineVerifier } from "@ador/game-verification/verifier";
 import { verifyRun } from "@ador/game-verification/verify";
 import { describe, expect, it } from "vitest";
 
 import { frostbite } from "../../../configs/games/frostbite.ts";
 import { createIceFieldSession } from "../../../games/frostbite/src/ice-field/session.ts";
-import { iceFieldMines } from "../../../games/frostbite/src/verifier/ice-field.ts";
-import { verifierRegistry } from "../../../configs/verifiers.ts";
+import {
+  iceFieldMines,
+  iceFieldRules,
+} from "../../../games/frostbite/src/verifier/ice-field.ts";
+import { iceFieldSampleRun } from "../../../games/frostbite/src/verifier/sample-run.ts";
 
-const frostbiteEntry = verifierRegistry.find("ice-field");
-const sample = frostbiteEntry?.sample;
+// FROST·BITE's ice-field rules, as the platform would hold them once the game publishes them as an artifact (it does not
+// yet: that is the game's adoption of the claim path). Built here from the rules themselves, so this file checks the cabinet's
+// records against them; no part of the platform names the game.
+const sample = iceFieldSampleRun();
+const verifierRegistry = createVerifierRegistry([
+  { gameId: "frostbite", sample, verifier: defineVerifier(iceFieldRules) },
+]);
 
-describe("the verifiers the platform registers", () => {
-  it("are the ones reviewed here: FROST·BITE's ice field, for the game of that id", () => {
-    expect(verifierRegistry.ids()).toEqual(["ice-field"]);
-    expect(frostbiteEntry?.gameId).toBe(frostbite.id);
-  });
-
-  it("each pass the conformance checks with the sample run they were registered with", () => {
-    for (const id of verifierRegistry.ids()) {
-      const entry = verifierRegistry.find(id);
-      if (entry === undefined) throw new Error(`No verifier ${id}`);
-      const failed = runVerifierConformance(entry).filter(({ ok }) => !ok);
-      expect(failed).toEqual([]);
-    }
+describe("FROST·BITE's ice-field rules as a verifier", () => {
+  it("passes the conformance checks with its sample run", () => {
+    const entry = verifierRegistry.find("frostbite");
+    if (entry === undefined) throw new Error("Not registered");
+    expect(runVerifierConformance(entry).filter(({ ok }) => !ok)).toEqual([]);
   });
 
   it("can only earn milestones the game's manifest declares", () => {
@@ -46,7 +48,7 @@ describe("replay verification of FROST·BITE's ice field", () => {
     expect(
       verifyRun(verifierRegistry, {
         ...sample,
-        claims: [...(sample?.claims ?? []), "first-cashout"],
+        claims: [...sample.claims, "first-cashout"],
       }),
     ).toMatchObject({ reason: "claim-not-earned", status: "rejected" });
   });

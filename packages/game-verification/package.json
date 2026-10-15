@@ -5,8 +5,10 @@
   "type": "module",
   "exports": {
     "./conformance": "./src/conformance.ts",
+    "./loader": "./src/loader.ts",
     "./policy": "./src/policy.ts",
     "./registry": "./src/registry.ts",
+    "./runner": "./src/runner.ts",
     "./verifier": "./src/verifier.ts",
     "./verify": "./src/verify.ts"
   },
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "@ador/game-sdk": "workspace:*",
+    "@ador/shared": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {

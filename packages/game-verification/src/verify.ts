@@ -17,8 +17,7 @@ export type RejectionReason =
   | "too-many-inputs"
   | "unknown-verifier"
   | "verifier-error"
-  | "version-mismatch"
-  | "wrong-game";
+  | "version-mismatch";
 
 export type VerificationResult =
   | {
@@ -71,11 +70,13 @@ export function verifyRun(
       "The record has too many inputs.",
       digest,
     );
-  const entry = registry.find(record.verifier);
-  if (entry === undefined)
-    return rejected("unknown-verifier", "No such verifier.", digest);
-  if (entry.gameId !== record.gameId)
-    return rejected("wrong-game", "That verifier is for another game.", digest);
+  const entry = registry.find(record.gameId);
+  if (entry === undefined || entry.verifier.id !== record.verifier)
+    return rejected(
+      "unknown-verifier",
+      "The platform has no such verifier for that game.",
+      digest,
+    );
   if (entry.verifier.version !== record.verifierVersion)
     return rejected(
       "version-mismatch",

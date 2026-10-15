@@ -11,6 +11,7 @@ describe("the verification policy", () => {
     expect(defaultVerificationPolicy).toEqual({
       maxInputs: maxRunInputs,
       maxRecordBytes: maxRunRecordBytes,
+      replayTimeoutMs: 2_000,
     });
     expect(Object.isFrozen(resolveVerificationPolicy())).toBe(true);
   });
@@ -26,6 +27,9 @@ describe("the verification policy", () => {
       { maxInputs: 1.5 },
       { maxRecordBytes: 255 },
       { maxRecordBytes: maxRunRecordBytes + 1 },
+      { replayTimeoutMs: 49 },
+      { replayTimeoutMs: 10_001 },
+      { replayTimeoutMs: 1.5 },
     ])
       expect(() => resolveVerificationPolicy(bad)).toThrow();
     expect(() => resolveVerificationPolicy({ extra: 1 } as never)).toThrow();

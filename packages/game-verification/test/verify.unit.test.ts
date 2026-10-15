@@ -166,17 +166,18 @@ describe("verifying a run record", () => {
     const text = canonicalJson(multi);
     const bytes = new TextEncoder().encode(text).length;
     expect(bytes).toBeGreaterThan(text.length);
-    expect(reason(multi, { maxInputs: 5000, maxRecordBytes: bytes - 1 })).toBe(
-      "too-large",
-    );
-    expect(reason(multi, { maxInputs: 5000, maxRecordBytes: bytes })).toBe(
-      "verified",
-    );
+    expect(
+      reason(multi, resolveVerificationPolicy({ maxRecordBytes: bytes - 1 })),
+    ).toBe("too-large");
+    expect(
+      reason(multi, resolveVerificationPolicy({ maxRecordBytes: bytes })),
+    ).toBe("verified");
   });
 
-  it("refuses a verifier the platform does not hold, one for another game, and another version of the rules", () => {
+  it("refuses a game or verifier the platform does not hold, and another version of the rules", () => {
+    // A game with no verifier, and a game whose verifier is named something else, are both unknown.
+    expect(reason(good({ gameId: "other" }))).toBe("unknown-verifier");
     expect(reason(good({ verifier: "nothing" }))).toBe("unknown-verifier");
-    expect(reason(good({ gameId: "other" }))).toBe("wrong-game");
     const old = verifyRun(registry, good({ verifierVersion: 2 }));
     expect(old).toMatchObject({
       detail:

@@ -13,30 +13,37 @@ const counter = defineVerifier(counterRules);
 const crashing = defineVerifier(crashingRules);
 
 describe("the verifier registry", () => {
-  it("finds a verifier by the id a record names, with the game it belongs to", () => {
+  it("finds a game's verifier by the game a record names", () => {
     const registry = createVerifierRegistry([
       { gameId: "counting", sample: counterSample, verifier: counter },
       { gameId: "crashy", sample: crashingSample, verifier: crashing },
     ]);
-    expect(registry.find("counter")).toEqual({
+    expect(registry.find("counting")).toEqual({
       gameId: "counting",
       sample: counterSample,
       verifier: counter,
     });
     expect(registry.find("nothing")).toBeUndefined();
-    expect(registry.ids()).toEqual(["counter", "crashing"]);
+    expect(registry.gameIds()).toEqual(["counting", "crashy"]);
   });
 
-  it("refuses the same id twice, so a verifier cannot be quietly replaced", () => {
+  it("refuses a game twice, so its verifier cannot be quietly replaced", () => {
     expect(() =>
       createVerifierRegistry([
         { gameId: "a", sample: counterSample, verifier: counter },
-        { gameId: "b", sample: counterSample, verifier: counter },
+        { gameId: "a", sample: counterSample, verifier: crashing },
       ]),
     ).toThrow("registered twice");
+    // Two games may name their rules alike without being mistaken for each other.
+    expect(
+      createVerifierRegistry([
+        { gameId: "a", sample: counterSample, verifier: counter },
+        { gameId: "b", sample: counterSample, verifier: counter },
+      ]).gameIds(),
+    ).toEqual(["a", "b"]);
   });
 
   it("can be empty", () => {
-    expect(createVerifierRegistry([]).ids()).toEqual([]);
+    expect(createVerifierRegistry([]).gameIds()).toEqual([]);
   });
 });

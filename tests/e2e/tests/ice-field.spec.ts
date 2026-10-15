@@ -1,12 +1,23 @@
 import { expect, test } from "@playwright/test";
 
+import { createVerifierRegistry } from "../../../packages/game-verification/src/registry.ts";
+import { defineVerifier } from "../../../packages/game-verification/src/verifier.ts";
 import { verifyRun } from "../../../packages/game-verification/src/verify.ts";
-import { verifierRegistry } from "../../../configs/verifiers.ts";
+import { iceFieldRules } from "../../../games/frostbite/src/verifier/ice-field.ts";
+import { iceFieldSampleRun } from "../../../games/frostbite/src/verifier/sample-run.ts";
 import { openDock } from "./support/dock.ts";
 
 // The ice-field cabinet in FROST·BITE, played in the platform's isolated frame: it plays through the platform's own rules,
 // the platform records the milestone it reports (as the game's own claim), and the run record it leaves is accepted by the
 // verifier the platform registered. Desktop only: the board is random, so these steps drive and assert it.
+// FROST·BITE's rules as a verifier, built here from the rules themselves until the game publishes them as an artifact.
+const verifierRegistry = createVerifierRegistry([
+  {
+    gameId: "frostbite",
+    sample: iceFieldSampleRun(),
+    verifier: defineVerifier(iceFieldRules),
+  },
+]);
 const frameSelector = '[data-testid="game-frame"]';
 
 test.beforeEach(async ({ page }, testInfo) => {
