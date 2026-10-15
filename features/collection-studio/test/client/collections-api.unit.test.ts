@@ -117,11 +117,11 @@ describe("collections API client", () => {
   it("lists the creator's uploads through the uploads contract", async () => {
     const asset = imageAsset("collection-artwork");
     const { api, fetchImpl } = apiWith(async () =>
-      json({ assets: [asset], truncated: false }),
+      json({ assets: [asset], nextCursor: null }),
     );
     await expect(api.listImages()).resolves.toEqual({
       assets: [asset],
-      truncated: false,
+      nextCursor: null,
     });
     expect(fetchImpl).toHaveBeenCalledWith("/api/v1/uploads/assets", {
       headers: {},

@@ -7,7 +7,7 @@ import {
   ArcadeEmptyState,
   StatusLamp,
 } from "@repo/ui/arcade";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   createBrowserServices,
@@ -26,12 +26,20 @@ export function ImageDetailWorkspace({
   readonly services?: UploadsClientServices;
 }) {
   const [services] = useState(() => provided ?? createBrowserServices());
-  const { refresh, state } = useAssetLibrary(services);
+  const { loadMore, loadingMore, refresh, state } = useAssetLibrary(services);
   const loaded = state.status === "loading" ? null : state.library;
   const asset = loaded?.assets.find(({ id }) => id === assetId);
+  // An image older than the newest page is looked for page by page, until it is found or the list ends.
+  const searching =
+    state.status === "ready" &&
+    asset === undefined &&
+    state.library.nextCursor !== null;
+  useEffect(() => {
+    if (searching && !loadingMore) loadMore();
+  }, [searching, loadingMore, loadMore]);
   return (
     <div className="arcade-stack">
-      {state.status === "loading" ? (
+      {state.status === "loading" || searching ? (
         <StatusLamp label="Loading the image…" tone="attention" />
       ) : null}
       {state.status === "error" ? (
@@ -48,7 +56,7 @@ export function ImageDetailWorkspace({
         </div>
       ) : null}
       {asset === undefined ? null : <ImageDetails asset={asset} />}
-      {loaded !== null && asset === undefined ? (
+      {loaded !== null && asset === undefined && !searching ? (
         <ArcadeEmptyState
           action={
             <ArcadeButton href={uploadsStudioPath} tone="mint">
@@ -57,9 +65,8 @@ export function ImageDetailWorkspace({
           }
           title="Image not found"
         >
-          {loaded.truncated
-            ? "It may be older than the images listed. Your newest images are in your library."
-            : "It is not in your library. It may belong to another account, or it no longer exists."}
+          It is not in your library. It may belong to another account, or it no
+          longer exists.
         </ArcadeEmptyState>
       ) : null}
     </div>

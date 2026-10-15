@@ -46,8 +46,9 @@ export function setup(
     createIntent: vi.fn(async () => intent),
     listAssets: vi.fn(async () => ({
       assets: [processedAsset()],
-      truncated: false,
+      nextCursor: null,
     })),
+    listOlderAssets: vi.fn(async () => ({ assets: [], nextCursor: null })),
     ...overrides.api,
   };
   const transfer: ObjectTransfer = overrides.transfer ?? {

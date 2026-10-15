@@ -18,6 +18,7 @@ describe("uploads entrypoint", () => {
     ).toEqual([
       "completeUploadIntent",
       "createUploadIntent",
+      "listOlderUploadedAssets",
       "listUploadedAssets",
     ]);
     expect(

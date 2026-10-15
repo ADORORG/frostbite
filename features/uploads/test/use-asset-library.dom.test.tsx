@@ -51,12 +51,12 @@ describe("asset library hook", () => {
     await act(async () => library().refresh());
     expect(pending).toHaveLength(2);
     // The newer request answers first, then the superseded one answers late with different data.
-    await act(async () => pending[1]?.({ assets: [], truncated: false }));
+    await act(async () => pending[1]?.({ assets: [], nextCursor: null }));
     await act(async () => {
-      pending[0]?.({ assets: [stale], truncated: false });
+      pending[0]?.({ assets: [stale], nextCursor: null });
     });
     expect(library().state).toEqual({
-      library: { assets: [], truncated: false },
+      library: { assets: [], nextCursor: null },
       status: "ready",
     });
   });
@@ -78,7 +78,7 @@ describe("asset library hook", () => {
     await mount(<Probe />);
     await act(async () => library().refresh());
     await act(async () =>
-      pending[1]?.resolve({ assets: [], truncated: false }),
+      pending[1]?.resolve({ assets: [], nextCursor: null }),
     );
     await act(async () => pending[0]?.reject(new Error("late failure")));
     expect(library().state.status).toBe("ready");
@@ -91,7 +91,7 @@ describe("asset library hook", () => {
         api: {
           listAssets: async () => ({
             assets: [libraryAsset()],
-            truncated: false,
+            nextCursor: null,
           }),
         },
       }),
@@ -104,5 +104,131 @@ describe("asset library hook", () => {
     expect(vi.getTimerCount()).toBe(1);
     await unmountAll();
     expect(vi.getTimerCount()).toBe(0);
+  });
+
+  describe("older pages", () => {
+    const cursorOf = (n: number) =>
+      `${String(1_760_000_000_000 + n)}.0198a000-0000-7000-8000-00000000000${String(n)}`;
+    const asset = (n: number) =>
+      processedAsset({ id: `018f22f2-9c1a-7b21-8c45-00000000000${String(n)}` });
+
+    it("adds the next page to what is shown, and offers no more once the list ends", async () => {
+      const services = fakeServices({
+        api: {
+          listAssets: async () => ({
+            assets: [asset(1)],
+            nextCursor: cursorOf(1),
+          }),
+          listOlderAssets: async (before) =>
+            before === cursorOf(1)
+              ? { assets: [asset(2)], nextCursor: cursorOf(2) }
+              : { assets: [asset(3)], nextCursor: null },
+        },
+      });
+      const { Probe, library } = probe(services);
+      await mount(<Probe />);
+      await act(async () => library().loadMore());
+      await act(async () => library().loadMore());
+      const state = library().state;
+      expect(
+        state.status === "ready" && state.library.assets.map(({ id }) => id),
+      ).toEqual([1, 2, 3].map((n) => asset(n).id));
+      expect(state.status === "ready" && state.library.nextCursor).toBeNull();
+      services.api.listOlderAssets.mockClear();
+      await act(async () => library().loadMore());
+      expect(services.api.listOlderAssets).not.toHaveBeenCalled();
+    });
+
+    it("does not fetch a second page while one is on its way", async () => {
+      let release: (value: LibraryResponse) => void = () => undefined;
+      const services = fakeServices({
+        api: {
+          listAssets: async () => ({
+            assets: [asset(1)],
+            nextCursor: cursorOf(1),
+          }),
+          listOlderAssets: () => new Promise((resolve) => (release = resolve)),
+        },
+      });
+      const { Probe, library } = probe(services);
+      await mount(<Probe />);
+      await act(async () => library().loadMore());
+      expect(library().loadingMore).toBe(true);
+      await act(async () => library().loadMore());
+      expect(services.api.listOlderAssets).toHaveBeenCalledTimes(1);
+      await act(async () => release({ assets: [asset(2)], nextCursor: null }));
+      expect(library().loadingMore).toBe(false);
+    });
+
+    it("reloads as many pages as are shown, so older images' signed links are renewed too", async () => {
+      const services = fakeServices({
+        api: {
+          listAssets: async () => ({
+            assets: [asset(1)],
+            nextCursor: cursorOf(1),
+          }),
+          listOlderAssets: async () => ({
+            assets: [asset(2)],
+            nextCursor: null,
+          }),
+        },
+      });
+      const { Probe, library } = probe(services);
+      await mount(<Probe />);
+      await act(async () => library().loadMore());
+      services.api.listAssets.mockClear();
+      services.api.listOlderAssets.mockClear();
+      await act(async () => library().refresh());
+      expect(services.api.listAssets).toHaveBeenCalledTimes(1);
+      expect(services.api.listOlderAssets).toHaveBeenCalledTimes(1);
+      const state = library().state;
+      expect(state.status === "ready" && state.library.assets).toHaveLength(2);
+    });
+
+    it("drops an older page that arrives after a reload replaced the list it continued", async () => {
+      let first = true;
+      let release: (value: LibraryResponse) => void = () => undefined;
+      const services = fakeServices({
+        api: {
+          listAssets: async () => {
+            const cursor = first ? cursorOf(1) : cursorOf(5);
+            first = false;
+            return { assets: [asset(1)], nextCursor: cursor };
+          },
+          listOlderAssets: () => new Promise((resolve) => (release = resolve)),
+        },
+      });
+      const { Probe, library } = probe(services);
+      await mount(<Probe />);
+      await act(async () => library().loadMore());
+      await act(async () => library().refresh());
+      await act(async () => release({ assets: [asset(2)], nextCursor: null }));
+      const state = library().state;
+      expect(state.status === "ready" && state.library.assets).toHaveLength(1);
+      expect(state.status === "ready" && state.library.nextCursor).toBe(
+        cursorOf(5),
+      );
+    });
+
+    it("keeps what is shown and says so when an older page cannot be fetched", async () => {
+      const services = fakeServices({
+        api: {
+          listAssets: async () => ({
+            assets: [asset(1)],
+            nextCursor: cursorOf(1),
+          }),
+          listOlderAssets: async () => {
+            throw new Error("offline");
+          },
+        },
+      });
+      const { Probe, library } = probe(services);
+      await mount(<Probe />);
+      await act(async () => library().loadMore());
+      const state = library().state;
+      expect(state.status).toBe("error");
+      expect(state.status === "error" && state.library?.assets).toHaveLength(1);
+      expect(library().loadingMore).toBe(false);
+    });
   });
 });

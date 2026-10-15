@@ -112,10 +112,10 @@ describe("upload API test helpers", () => {
     ).resolves.toEqual({ id, processingState: "processed" });
     await expect(assetOf(json({ asset: { id } }))).rejects.toThrow();
     await expect(
-      libraryOf(json({ assets: [], truncated: false })),
+      libraryOf(json({ assets: [], nextCursor: null })),
     ).resolves.toEqual({
       assets: [],
-      truncated: false,
+      nextCursor: null,
     });
     await expect(libraryOf(json({ assets: "no" }))).rejects.toThrow();
     await expect(

@@ -124,7 +124,7 @@ export function fakeCollections(
     })),
     listImages: vi.fn<CollectionsApi["listImages"]>(async () => ({
       assets: state.library,
-      truncated: false,
+      nextCursor: null,
     })),
     read: vi.fn<CollectionsApi["read"]>(async () => state.detail),
     removeItem: vi.fn<CollectionsApi["removeItem"]>(async ({ itemId }) => {

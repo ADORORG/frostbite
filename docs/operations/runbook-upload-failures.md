@@ -126,8 +126,8 @@ and the public/private bucket configuration and `R2_ENDPOINT`.
 ## F. Image "missing" from the library
 
 The library lists the newest 48 uploads. An older image is not gone; open it by its image page, or use it in a
-collection by file name (an item import matches by upload file name, not by the library page). Pagination is
-a known backlog item.
+collection by file name (an item import matches by upload file name, not by the library page). The library page loads 48 at a time and offers "Load older images"; an image's own page searches
+the older pages until it finds it.
 
 ## G. Abandoned uploads and storage cleanup
 
@@ -184,5 +184,4 @@ with a preview, and the outbox event shows `delivered`.
   liveness only.
 - A verified operator action (or admin tool) to re-queue a failed outbox event and to re-run processing for
   one asset.
-- Library pagination.
 - Retention for refused originals and intent rows (approval briefs).

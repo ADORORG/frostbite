@@ -33,7 +33,7 @@ describe("new upload workspace", () => {
         }),
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -77,7 +77,7 @@ describe("new upload workspace", () => {
         },
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -110,7 +110,7 @@ describe("new upload workspace", () => {
         },
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
       transfer: { upload },
@@ -146,7 +146,7 @@ describe("new upload workspace", () => {
     });
     const services = fakeServices({
       api: {
-        listAssets: async () => ({ assets: [rejected], truncated: false }),
+        listAssets: async () => ({ assets: [rejected], nextCursor: null }),
       },
     });
     const container = await mount(<NewUploadWorkspace services={services} />);

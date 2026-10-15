@@ -67,7 +67,7 @@ export function ImagesStep({
             selectedId={form.bannerAssetId}
             onUploaded={onUploaded}
           />
-          {loaded.truncated ? (
+          {loaded.nextCursor !== null ? (
             <StatusLamp
               label="Showing your newest images. Older ones are not listed yet."
               tone="attention"

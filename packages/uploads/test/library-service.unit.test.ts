@@ -153,7 +153,7 @@ describe("asset library service", () => {
           widthPixels: 40,
         },
       ],
-      truncated: false,
+      nextCursor: null,
     });
   });
 
@@ -220,7 +220,7 @@ describe("asset library service", () => {
     await expect(service.list(userId)).rejects.toThrow("bug");
   });
 
-  it("asks for one extra row to report truncation and returns only a page", async () => {
+  it("asks for one extra row to know whether more follow, and returns only a page with a cursor to the next", async () => {
     const records = Array.from({ length: 3 }, () =>
       record({ processingState: "validated" }),
     );
@@ -232,17 +232,54 @@ describe("asset library service", () => {
     expect(result.assets.map(({ id }) => id)).toEqual(
       records.slice(0, 2).map(({ id }) => id),
     );
-    expect(result.truncated).toBe(true);
+    expect(result.nextCursor).toBe(
+      `${String(records[1]?.createdAt.getTime()).padStart(13, "0")}.${records[1]?.id}`,
+    );
     const exact = setup(records.slice(0, 2), {
       policy: { libraryPageSize: 2 },
     });
-    expect((await exact.service.list(userId)).truncated).toBe(false);
+    expect((await exact.service.list(userId)).nextCursor).toBeNull();
+  });
+
+  it("starts after the cursor it is given, parsing it for the query, and gives the next cursor from the last asset it returns", async () => {
+    const records = Array.from({ length: 3 }, () =>
+      record({ processingState: "validated" }),
+    );
+    const { listNewestForUser, service } = setup(records, {
+      policy: { libraryPageSize: 2 },
+    });
+    const before = `1760000000123.${userId}`;
+    const page = await service.list(userId, before);
+    expect(listNewestForUser).toHaveBeenCalledWith({
+      before: { createdAtMs: 1_760_000_000_123, id: userId },
+      limit: 3,
+      userId,
+    });
+    expect(page.assets).toHaveLength(2);
+    expect(page.nextCursor).toBe(
+      `${String(records[1]?.createdAt.getTime()).padStart(13, "0")}.${records[1]?.id}`,
+    );
+  });
+
+  it("refuses a cursor whose id is not an id, before it reaches a query", async () => {
+    const { listNewestForUser, service } = setup([]);
+    await expect(
+      service.list(userId, "1760000000123.not-an-id"),
+    ).rejects.toThrow();
+    expect(listNewestForUser).not.toHaveBeenCalled();
+  });
+
+  it("ends with no cursor on an empty older page", async () => {
+    const { service } = setup([]);
+    await expect(
+      service.list(userId, `1760000000123.${userId}`),
+    ).resolves.toEqual({ assets: [], nextCursor: null });
   });
 
   it("returns an empty library", async () => {
     expect(await setup([]).service.list(userId)).toEqual({
       assets: [],
-      truncated: false,
+      nextCursor: null,
     });
   });
 

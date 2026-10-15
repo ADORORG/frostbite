@@ -18,10 +18,19 @@ import {
 
 const withLibrary = (
   assets: ReturnType<typeof libraryAsset>[],
-  truncated = false,
+  older: ReturnType<typeof libraryAsset>[] | null = null,
 ) =>
   fakeServices({
-    api: { listAssets: async () => ({ assets, truncated }) },
+    api: {
+      listAssets: async () => ({
+        assets,
+        nextCursor:
+          older === null
+            ? null
+            : "1760000000000.0198a000-0000-7000-8000-000000000001",
+      }),
+      listOlderAssets: async () => ({ assets: older ?? [], nextCursor: null }),
+    },
   });
 
 const hrefOf = (container: HTMLElement, text: string) =>
@@ -99,15 +108,50 @@ describe("image detail", () => {
     expect(hrefOf(container, "Back to your library")).toBe("/studio/uploads");
   });
 
-  it("says an old image may simply be beyond the listed ones", async () => {
+  it("looks for an image older than the newest page, page after page, and shows it when found", async () => {
     const container = await mount(
       <ImageDetailWorkspace
         assetId={assetId}
-        services={withLibrary([], true)}
+        services={withLibrary(
+          [libraryAsset({ id: `${assetId.slice(0, -1)}9` })],
+          [processedAsset()],
+        )}
+      />,
+    );
+    await settle(() => expect(container.querySelector("img")).not.toBeNull());
+    expect(textOf(container)).not.toContain("Image not found");
+  });
+
+  it("does not say the image is missing while it is still looking", async () => {
+    const services = fakeServices({
+      api: {
+        listAssets: async () => ({
+          assets: [],
+          nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
+        }),
+        listOlderAssets: () => new Promise(() => undefined),
+      },
+    });
+    const container = await mount(
+      <ImageDetailWorkspace assetId={assetId} services={services} />,
+    );
+    await settle(() => expect(services.api.listOlderAssets).toHaveBeenCalled());
+    expect(textOf(container)).toContain("Loading the image");
+    expect(textOf(container)).not.toContain("Image not found");
+  });
+
+  it("says it is not there only after the whole list has been searched", async () => {
+    const container = await mount(
+      <ImageDetailWorkspace
+        assetId={assetId}
+        services={withLibrary(
+          [libraryAsset({ id: `${assetId.slice(0, -1)}9` })],
+          [],
+        )}
       />,
     );
     await settle(() => expect(textOf(container)).toContain("Image not found"));
-    expect(textOf(container)).toContain("older than the images listed");
+    expect(textOf(container)).toContain("It is not in your library");
   });
 
   it("tells a failed load apart from a missing image, and recovers on retry", async () => {
@@ -116,7 +160,7 @@ describe("image detail", () => {
       api: {
         listAssets: async () => {
           if (failing) throw new ApiError("network", null, "offline");
-          return { assets: [processedAsset()], truncated: false };
+          return { assets: [processedAsset()], nextCursor: null };
         },
       },
     });

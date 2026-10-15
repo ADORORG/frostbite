@@ -17,7 +17,7 @@ const signal = new AbortController().signal;
 function setup(...pages: ReturnType<typeof libraryAsset>[][]) {
   const listAssets = vi.fn();
   for (const assets of pages)
-    listAssets.mockResolvedValueOnce({ assets, truncated: false });
+    listAssets.mockResolvedValueOnce({ assets, nextCursor: null });
   const sleep = vi.fn(async () => undefined);
   return { api: { listAssets }, listAssets, sleep };
 }

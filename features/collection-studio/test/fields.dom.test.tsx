@@ -99,7 +99,7 @@ describe("images step choices", () => {
         disabled={false}
         form={newDraftForm(signet)}
         library={{
-          data: { assets: [cover, banner], truncated: false },
+          data: { assets: [cover, banner], nextCursor: null },
           status: "ready",
         }}
         onChange={onChange}

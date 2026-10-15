@@ -22,7 +22,7 @@ describe("inline upload", () => {
       api: {
         listAssets: async () => ({
           assets: [processedAsset({ purpose: "collection-banner" })],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -55,7 +55,7 @@ describe("inline upload", () => {
               rejectionReason: "dimensions-exceeded",
             }),
           ],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -102,7 +102,7 @@ describe("inline upload", () => {
         },
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });

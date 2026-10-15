@@ -99,7 +99,7 @@ test("another user never sees that image, and anonymous callers cannot list asse
   await page.goto(uploadsStudioPath);
   await expect(page.getByText("Nothing uploaded yet")).toBeVisible();
   const own = await page.request.get("/api/v1/uploads/assets");
-  expect(await own.json()).toEqual({ assets: [], truncated: false });
+  expect(await own.json()).toEqual({ assets: [], nextCursor: null });
 
   const anonymous = await browser.newContext({ baseURL });
   const response = await anonymous.request.get("/api/v1/uploads/assets");

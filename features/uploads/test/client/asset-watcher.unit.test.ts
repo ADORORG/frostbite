@@ -22,7 +22,7 @@ describe("asset watcher", () => {
   it("answers for many assets with one read of the library per check", async () => {
     const { listAssets, watcher } = setup(async () => ({
       assets: [processedAsset({ id: first }), processedAsset({ id: second })],
-      truncated: false,
+      nextCursor: null,
     }));
     const signal = new AbortController().signal;
     const results = await Promise.all([
@@ -39,7 +39,7 @@ describe("asset watcher", () => {
   it("keeps waiting while an asset is not in a final state, and gives up after the allowed checks", async () => {
     const { listAssets, watcher } = setup(async () => ({
       assets: [libraryAsset({ id: first })],
-      truncated: false,
+      nextCursor: null,
     }));
     await expect(
       watcher.watch(first, new AbortController().signal),
@@ -58,7 +58,7 @@ describe("asset watcher", () => {
             ? libraryAsset({ id: second })
             : processedAsset({ id: second }),
         ],
-        truncated: false,
+        nextCursor: null,
       };
     });
     const signal = new AbortController().signal;
@@ -73,7 +73,7 @@ describe("asset watcher", () => {
   it("stops watching an asset whose upload was cancelled, and rejects with the reason", async () => {
     const { watcher } = setup(async () => ({
       assets: [libraryAsset({ id: first }), processedAsset({ id: second })],
-      truncated: false,
+      nextCursor: null,
     }));
     const controller = new AbortController();
     const cancelled = watcher.watch(first, controller.signal);
@@ -86,7 +86,7 @@ describe("asset watcher", () => {
   it("does not keep reading the library for an asset nobody waits on any more", async () => {
     const { listAssets, watcher } = setup(async () => ({
       assets: [libraryAsset({ id: first })],
-      truncated: false,
+      nextCursor: null,
     }));
     const controller = new AbortController();
     const watched = watcher.watch(first, controller.signal);
@@ -99,7 +99,7 @@ describe("asset watcher", () => {
   it("rejects at once for a signal that is already aborted", async () => {
     const { listAssets, watcher } = setup(async () => ({
       assets: [],
-      truncated: false,
+      nextCursor: null,
     }));
     const controller = new AbortController();
     controller.abort(new Error("gone"));
@@ -113,7 +113,7 @@ describe("asset watcher", () => {
     let healthy = false;
     const { watcher } = setup(async () => {
       if (!healthy) throw new Error("offline");
-      return { assets: [processedAsset({ id: first })], truncated: false };
+      return { assets: [processedAsset({ id: first })], nextCursor: null };
     });
     const signal = new AbortController().signal;
     const failures = await Promise.allSettled([

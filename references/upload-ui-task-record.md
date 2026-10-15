@@ -138,7 +138,7 @@ three passes, over an unchanged tree after the last fix, were M6, M8, and M2, an
 
 - **R2 itself is unverified.** Everything runs against MinIO. The smoke script and checklist are the
   verification to run with real credentials; the conditional-copy extension is a beta Cloudflare feature.
-- No pagination (newest 48 only, flagged `truncated`). Private draft access rules and abandoned-upload and
+- ~~No pagination (newest 48 only, flagged `truncated`).~~ Paged since the upload hardening pass: `nextCursor`, `POST /api/v1/uploads/assets/older`, "Load older images". The collection image picker still shows the newest page only and says so. Private draft access rules and abandoned-upload and
   object cleanup are W3-07; signed URLs issued before a deletion keep working until they expire (ADR-016).
 - Client size hints use the default upload policy at build time; the server stays authoritative if policy
   changes later.

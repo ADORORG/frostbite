@@ -12,6 +12,7 @@ import {
   intentOf,
   intentsPath,
   libraryOf,
+  olderAssetsPath,
   origin,
   post,
 } from "../src/upload-api.ts";
@@ -157,7 +158,7 @@ test("intent creation, completion, and processing are idempotent, and another us
   ]);
   expect(await libraryOf(await other.request.get(assetsPath))).toEqual({
     assets: [],
-    truncated: false,
+    nextCursor: null,
   });
   await other.close();
 
@@ -184,4 +185,39 @@ test("intent creation, completion, and processing are idempotent, and another us
     asset.id,
     "processed",
   ]);
+});
+
+test("paging back through the library needs a session and a well-formed cursor, and reaches only the caller's own list", async ({
+  baseURL,
+  browser,
+  page,
+}) => {
+  const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
+  const anonymous = await browser.newContext({ baseURL });
+  const refused = await post(anonymous.request, baseURL, olderAssetsPath, {
+    before: cursor,
+  });
+  expect(refused.status()).toBe(401);
+  await anonymous.close();
+
+  await signIn(page, baseURL, creatorE2EFixtures.acceptanceApiOther);
+  const noOrigin = await page.request.post(olderAssetsPath, {
+    data: { before: cursor },
+  });
+  expect(noOrigin.status()).toBe(403);
+  for (const bad of [
+    {},
+    { before: "yesterday" },
+    { before: cursor, userId: "x" },
+  ]) {
+    const response = await post(page.request, baseURL, olderAssetsPath, bad);
+    expect(response.status()).toBe(400);
+    expect(await errorCode(response)).toBe("invalid_request");
+  }
+  // A cursor for the far future still lists only this person's own assets, of which a fresh account has none.
+  const page2 = await post(page.request, baseURL, olderAssetsPath, {
+    before: "9999999999999.0198a000-0000-7000-8000-000000000001",
+  });
+  expect(page2.status()).toBe(200);
+  expect(await libraryOf(page2)).toEqual({ assets: [], nextCursor: null });
 });

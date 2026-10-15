@@ -55,7 +55,7 @@ describe("upload session hook", () => {
       api: {
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -156,7 +156,7 @@ describe("upload session hook", () => {
       api: {
         listAssets: async () => ({
           assets: [processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
       transfer: {

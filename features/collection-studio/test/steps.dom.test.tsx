@@ -14,7 +14,7 @@ describe("images step", () => {
   const noop = () => undefined;
   const library = {
     assets: [imageAsset("collection-artwork"), imageAsset("collection-banner")],
-    truncated: false,
+    nextCursor: null,
   };
 
   it("shows loading, and a failure with retry, without hiding the rest", async () => {
@@ -54,7 +54,13 @@ describe("images step", () => {
       <ImagesStep
         disabled={false}
         form={form}
-        library={{ data: { ...library, truncated: true }, status: "ready" }}
+        library={{
+          data: {
+            ...library,
+            nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
+          },
+          status: "ready",
+        }}
         onChange={noop}
         onRefresh={noop}
         onUploaded={async () => undefined}

@@ -98,7 +98,7 @@ describe("browser services", () => {
 
   it("sends same-origin requests with credentials through the global fetch", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ assets: [], truncated: false }), {
+      new Response(JSON.stringify({ assets: [], nextCursor: null }), {
         status: 200,
       }),
     );

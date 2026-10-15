@@ -1,6 +1,7 @@
 import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import {
+  libraryOlderRoute,
   libraryRoute,
   uploadDetailPath,
   uploadIntentRoutes,
@@ -37,6 +38,7 @@ export function createUploadsFeature(providers: ProviderRegistry) {
       requiredDecisionGates: [],
       requiredProviderCapabilities: ["object-storage:s3-compatible"],
       routes: [
+        libraryOlderRoute,
         libraryRoute,
         uploadIntentRoutes.complete,
         uploadIntentRoutes.create,

@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   libraryAssetSchema,
   libraryDerivativeSchema,
+  libraryCursorSchema,
   libraryEmptyInputSchema,
+  libraryOlderInputSchema,
+  libraryOlderRoute,
   libraryResponseSchema,
   libraryRoute,
 } from "../src/uploads/index.ts";
@@ -53,8 +56,10 @@ describe("asset library contracts", () => {
       }).success,
     ).toBe(true);
     expect(
-      libraryResponseSchema.safeParse({ assets: [asset], truncated: true })
-        .success,
+      libraryResponseSchema.safeParse({
+        assets: [asset],
+        nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
+      }).success,
     ).toBe(true);
   });
 
@@ -97,7 +102,8 @@ describe("asset library contracts", () => {
       path: "/api/v1/uploads/assets",
     });
     expect(
-      libraryResponseSchema.safeParse({ assets: [], truncated: "yes" }).success,
+      libraryResponseSchema.safeParse({ assets: [], nextCursor: "yes" })
+        .success,
     ).toBe(false);
   });
 
@@ -110,6 +116,49 @@ describe("asset library contracts", () => {
     ).toBe(false);
     expect(
       libraryAssetSchema.safeParse({ ...asset, fileName: undefined }).success,
+    ).toBe(false);
+  });
+
+  it("takes a cursor of a time and an id, and nothing else, to page back", () => {
+    const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
+    expect(libraryCursorSchema.safeParse(cursor).success).toBe(true);
+    for (const bad of [
+      "",
+      "yesterday",
+      "1760000000000",
+      "176000000000.0198a000-0000-7000-8000-000000000001",
+      "1760000000000.not-a-uuid",
+      `${cursor}0`,
+      `; drop table assets;--`,
+    ])
+      expect(libraryCursorSchema.safeParse(bad).success).toBe(false);
+    expect(libraryOlderInputSchema.safeParse({ before: cursor }).success).toBe(
+      true,
+    );
+    expect(libraryOlderInputSchema.safeParse({}).success).toBe(false);
+    expect(
+      libraryOlderInputSchema.safeParse({ before: cursor, userId: "x" })
+        .success,
+    ).toBe(false);
+    expect(libraryOlderRoute).toEqual({
+      method: "POST",
+      operationId: "listOlderUploadedAssets",
+      path: "/api/v1/uploads/assets/older",
+    });
+  });
+
+  it("answers with a cursor for the next page or null for the last", () => {
+    const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
+    expect(
+      libraryResponseSchema.safeParse({ assets: [], nextCursor: cursor })
+        .success,
+    ).toBe(true);
+    expect(
+      libraryResponseSchema.safeParse({ assets: [], nextCursor: null }).success,
+    ).toBe(true);
+    expect(libraryResponseSchema.safeParse({ assets: [] }).success).toBe(false);
+    expect(
+      libraryResponseSchema.safeParse({ assets: [], truncated: true }).success,
     ).toBe(false);
   });
 });

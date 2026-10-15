@@ -2,6 +2,7 @@ import { createRequester, type FetchLike } from "@ador/client-http";
 import type { IdempotencyKey } from "@ador/shared/http";
 import {
   completedUploadResponseSchema,
+  libraryOlderRoute,
   libraryResponseSchema,
   libraryRoute,
   uploadIntentResponseSchema,
@@ -30,6 +31,11 @@ export interface UploadsApi {
   listAssets(options?: {
     readonly signal?: AbortSignal;
   }): Promise<LibraryResponse>;
+  // The page after the cursor an earlier answer gave.
+  listOlderAssets(
+    before: string,
+    options?: { readonly signal?: AbortSignal },
+  ): Promise<LibraryResponse>;
 }
 
 // The browser's view of the uploads HTTP API; requests and error handling are the shared requester's.
@@ -48,5 +54,10 @@ export function createUploadsApi(fetchImpl: FetchLike): UploadsApi {
       }),
     listAssets: (options = {}) =>
       request(libraryRoute, libraryResponseSchema, options),
+    listOlderAssets: (before, options = {}) =>
+      request(libraryOlderRoute, libraryResponseSchema, {
+        body: { before },
+        ...options,
+      }),
   };
 }

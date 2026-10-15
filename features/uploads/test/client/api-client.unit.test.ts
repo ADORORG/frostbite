@@ -65,14 +65,14 @@ describe("uploads API client", () => {
         ? json({
             asset: { id: assetId, processingState: "pending-validation" },
           })
-        : json({ assets: [], truncated: false }),
+        : json({ assets: [], nextCursor: null }),
     );
     await expect(api.completeIntent({ intentId })).resolves.toEqual({
       asset: { id: assetId, processingState: "pending-validation" },
     });
     await expect(api.listAssets()).resolves.toEqual({
       assets: [],
-      truncated: false,
+      nextCursor: null,
     });
     expect(fetchImpl).toHaveBeenLastCalledWith("/api/v1/uploads/assets", {
       headers: {},
@@ -80,9 +80,24 @@ describe("uploads API client", () => {
     });
   });
 
+  it("asks for the page after a cursor with a POST of the cursor alone", async () => {
+    const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
+    const { api, fetchImpl } = apiWith(async () =>
+      json({ assets: [], nextCursor: null }),
+    );
+    await expect(api.listOlderAssets(cursor)).resolves.toEqual({
+      assets: [],
+      nextCursor: null,
+    });
+    const [path, init] = fetchImpl.mock.calls[0] ?? [];
+    expect(path).toBe("/api/v1/uploads/assets/older");
+    expect(init?.method).toBe("POST");
+    expect(JSON.parse(init?.body ?? "")).toEqual({ before: cursor });
+  });
+
   it("passes the abort signal through", async () => {
     const { api, fetchImpl } = apiWith(async () =>
-      json({ assets: [], truncated: false }),
+      json({ assets: [], nextCursor: null }),
     );
     const { signal } = new AbortController();
     await api.listAssets({ signal });
@@ -117,14 +132,14 @@ describe("uploads API client", () => {
 
   it("rejects a success body that violates the contract", async () => {
     const { api } = apiWith(async () =>
-      json({ assets: [{ id: "x" }], truncated: false }),
+      json({ assets: [{ id: "x" }], nextCursor: null }),
     );
     await expect(api.listAssets()).rejects.toMatchObject({
       code: "invalid-response",
       status: 200,
     });
     const extra = apiWith(async () =>
-      json({ assets: [], truncated: false, extra: 1 }),
+      json({ assets: [], nextCursor: null, extra: 1 }),
     );
     await expect(extra.api.listAssets()).rejects.toMatchObject({
       code: "invalid-response",

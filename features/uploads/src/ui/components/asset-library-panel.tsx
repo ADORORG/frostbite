@@ -26,7 +26,7 @@ export function AssetLibraryPanel({
 }: {
   readonly library: AssetLibrary;
 }) {
-  const { refresh, state } = library;
+  const { loadMore, loadingMore, refresh, state } = library;
   const [chosen, setChosen] = useState<PurposeFilter>("all");
   const loaded = state.status === "loading" ? null : state.library;
   const assets = loaded?.assets ?? null;
@@ -78,12 +78,17 @@ export function AssetLibraryPanel({
           <AssetGrid assets={visibleAssets(assets, filter)} />
         </>
       ) : null}
-      {loaded?.truncated === true ? (
-        <StatusLamp
-          label="Showing your newest images. Older ones are not listed yet."
-          tone="attention"
-        />
-      ) : null}
+      {loaded?.nextCursor == null ? null : (
+        <div className="arcade-actions">
+          <ArcadeActionButton
+            disabled={loadingMore}
+            onClick={loadMore}
+            tone="yellow"
+          >
+            {loadingMore ? "Loading older images…" : "Load older images"}
+          </ArcadeActionButton>
+        </div>
+      )}
     </ArcadePanel>
   );
 }

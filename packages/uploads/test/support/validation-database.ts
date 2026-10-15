@@ -11,6 +11,7 @@ import {
   uploadIntents,
 } from "@ador/database";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleAssetValidationRepository } from "../../src/adapters/drizzle-validation-repository.ts";
@@ -82,6 +83,43 @@ export async function seed(
     userId,
   });
   return { assetId: uuidV7Schema.parse(assetId), objectKey };
+}
+
+// Another asset for a user that already has one, made at the given time (to the microsecond, as the database keeps it).
+export async function seedMoreFor(userId: string, createdAt: string) {
+  const intentId = createUuidV7();
+  const assetId = createUuidV7();
+  const objectKey = `drafts/${createUuidV7()}`;
+  await database.insert(uploadIntents).values({
+    byteLength: png.length,
+    cleanupEligibleAt: new Date(now.getTime() + 86_400_000),
+    contentType: "image/png",
+    expiresAt: new Date(now.getTime() + 60_000),
+    id: intentId,
+    idempotencyKey: `upload-request-${intentId.slice(-8)}`,
+    objectKey,
+    purpose: "collection-artwork",
+    requestFingerprint: "b".repeat(64),
+    retainUntil: new Date(now.getTime() + 2_592_000_000),
+    state: "completed",
+    storageProviderId: providerId,
+    userId,
+  });
+  await database.insert(assets).values({
+    id: assetId,
+    objectKey,
+    observedByteLength: png.length,
+    observedContentType: "image/png",
+    observedEntityTag: "completion-etag",
+    observedLastModifiedAt: now,
+    storageProviderId: providerId,
+    uploadIntentId: intentId,
+    userId,
+  });
+  await database.execute(
+    sql`update ador.assets set created_at = ${createdAt}::timestamptz where id = ${assetId}`,
+  );
+  return uuidV7Schema.parse(assetId);
 }
 
 export const validated: AssetValidationOutcome = {

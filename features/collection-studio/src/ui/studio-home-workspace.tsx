@@ -63,8 +63,8 @@ export function StudioHomeWorkspace({
         </li>
         <li>
           <Loadable label="your images" resource={images}>
-            {({ assets, truncated }) => (
-              <ImagesCard assets={assets} truncated={truncated} />
+            {({ assets, nextCursor }) => (
+              <ImagesCard assets={assets} truncated={nextCursor !== null} />
             )}
           </Loadable>
         </li>

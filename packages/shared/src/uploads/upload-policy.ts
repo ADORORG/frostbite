@@ -44,7 +44,7 @@ const policySchema = z
     presignedUrlLifetimeMs: z.number().int().min(minuteMs).max(hourMs),
     // How long a signed derivative URL stays valid (ADR-016). A bearer URL, so kept short.
     derivativeReadLifetimeMs: z.number().int().min(minuteMs).max(hourMs),
-    // Newest assets returned by the library; there is no pagination yet.
+    // Assets in one page of the library; older pages follow a cursor.
     libraryPageSize: z.number().int().min(1).max(100),
     // Abandoned uploads claimed per cleanup pass; each one costs a storage delete.
     cleanupBatchSize: z.number().int().min(1).max(500),

@@ -3,7 +3,7 @@ import { assetDerivatives } from "@ador/database/schema/derivatives";
 import { assets, uploadIntents } from "@ador/database/schema/uploads";
 import { parseObjectKey } from "@ador/object-storage/contracts";
 import { uuidV7Schema } from "@ador/shared/identifiers";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
 import type {
   AssetLibraryRepository,
@@ -80,7 +80,9 @@ export function createDrizzleAssetLibraryRepository(
       return withDerivatives(database, rows);
     },
 
-    async listNewestForUser({ limit, userId }) {
+    async listNewestForUser({ before, limit, userId }) {
+      // Ordered and compared at the millisecond, which is all a cursor carries, so a page never skips or repeats a row.
+      const createdMs = sql`date_trunc('milliseconds', ${assets.createdAt})`;
       const rows = await database
         .select({
           asset: assets,
@@ -89,8 +91,15 @@ export function createDrizzleAssetLibraryRepository(
         })
         .from(assets)
         .innerJoin(uploadIntents, eq(uploadIntents.id, assets.uploadIntentId))
-        .where(eq(assets.userId, userId))
-        .orderBy(desc(assets.createdAt), desc(assets.id))
+        .where(
+          and(
+            eq(assets.userId, userId),
+            before === undefined
+              ? undefined
+              : sql`(${createdMs}, ${assets.id}) < (${new Date(before.createdAtMs)}, ${before.id})`,
+          ),
+        )
+        .orderBy(desc(createdMs), desc(assets.id))
         .limit(limit);
       return withDerivatives(database, rows);
     },

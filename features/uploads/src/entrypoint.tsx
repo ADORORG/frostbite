@@ -13,7 +13,10 @@ import { createUploadsContextResolver } from "./context.ts";
 import { ImageDetailSurface } from "./ui/image-detail-surface.tsx";
 import { NewUploadSurface } from "./ui/new-upload-surface.tsx";
 import { UploadsSurface } from "./ui/uploads-surface.tsx";
-import { createListUploadedAssetsOperation } from "./application/library-operation.ts";
+import {
+  createListOlderUploadedAssetsOperation,
+  createListUploadedAssetsOperation,
+} from "./application/library-operation.ts";
 import { createLibraryServiceResolver } from "./library-runtime.ts";
 import { createUploadServiceResolver } from "./runtime.ts";
 
@@ -36,6 +39,9 @@ export function createUploadsEntrypoint(
         createCompleteUploadIntentOperation(resolveService),
       ),
       registerHttpOperation(createListUploadedAssetsOperation(resolveLibrary)),
+      registerHttpOperation(
+        createListOlderUploadedAssetsOperation(resolveLibrary),
+      ),
       registerHttpOperation(createUploadIntentOperation(resolveService)),
     ],
     pages: [

@@ -31,8 +31,10 @@ export interface LibraryAssetRecord {
 }
 
 export interface AssetLibraryRepository {
-  // The caller's own assets, newest first. Never returns another user's asset.
+  // The caller's own assets, newest first, starting after `before` when given (the creation time to the millisecond, and
+  // the id, of the last asset already seen). Never returns another user's asset.
   listNewestForUser(input: {
+    readonly before?: { readonly createdAtMs: number; readonly id: UuidV7 };
     readonly limit: number;
     readonly userId: UuidV7;
   }): Promise<readonly LibraryAssetRecord[]>;

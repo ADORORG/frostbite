@@ -25,7 +25,7 @@ describe("library workspace", () => {
       api: {
         listAssets: async () => ({
           assets: [++calls < 3 ? libraryAsset() : processedAsset()],
-          truncated: false,
+          nextCursor: null,
         }),
       },
     });
@@ -42,7 +42,7 @@ describe("library workspace", () => {
       api: {
         listAssets: async () => {
           if (++calls > 1) throw new ApiError("network", null, "offline");
-          return { assets: [libraryAsset()], truncated: false };
+          return { assets: [libraryAsset()], nextCursor: null };
         },
       },
     });
@@ -59,7 +59,7 @@ describe("library workspace", () => {
       api: {
         listAssets: async () => {
           if (failing) throw new ApiError("network", null, "offline");
-          return { assets: [], truncated: false };
+          return { assets: [], nextCursor: null };
         },
       },
     });
@@ -112,7 +112,7 @@ describe("library workspace: filters and use", () => {
   const withAssets = () =>
     fakeServices({
       api: {
-        listAssets: async () => ({ assets: purposes, truncated: false }),
+        listAssets: async () => ({ assets: purposes, nextCursor: null }),
       },
     });
   const links = (container: HTMLElement, text: string) =>

@@ -8,6 +8,7 @@ import {
 export const intentsPath = "/api/v1/uploads/intents";
 export const completePath = "/api/v1/uploads/intents/complete";
 export const assetsPath = "/api/v1/uploads/assets";
+export const olderAssetsPath = "/api/v1/uploads/assets/older";
 
 export function origin(baseURL: string | undefined): string {
   if (baseURL === undefined) throw new Error("Expected configured base URL");

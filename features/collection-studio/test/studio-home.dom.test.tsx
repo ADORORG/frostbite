@@ -133,7 +133,7 @@ describe("studio home", () => {
     ];
     fake.api.listImages.mockResolvedValue({
       assets: fake.state.library,
-      truncated: true,
+      nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
     });
     const container = await mount(view(fake));
     await settle(() => expect(textOf(container)).toContain("1+ ready"));

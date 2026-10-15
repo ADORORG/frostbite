@@ -58,7 +58,17 @@ describe("asset card", () => {
 
 function view(state: AssetLibrary["state"]) {
   const refresh = vi.fn();
-  return { refresh, library: { refresh, state } satisfies AssetLibrary };
+  const loadMore = vi.fn();
+  return {
+    loadMore,
+    refresh,
+    library: {
+      loadMore,
+      loadingMore: false,
+      refresh,
+      state,
+    } satisfies AssetLibrary,
+  };
 }
 
 describe("asset library panel", () => {
@@ -74,7 +84,7 @@ describe("asset library panel", () => {
     const container = await mount(
       <AssetLibraryPanel
         library={
-          view({ library: { assets: [], truncated: false }, status: "ready" })
+          view({ library: { assets: [], nextCursor: null }, status: "ready" })
             .library
         }
       />,
@@ -83,31 +93,47 @@ describe("asset library panel", () => {
     expect(container.querySelector("ul")).toBeNull();
   });
 
-  it("lists the assets and tells the user when older ones are not shown", async () => {
+  it("lists the assets and offers the older ones only while there are some", async () => {
     const assets = [
       processedAsset(),
       libraryAsset({ id: "018f22f2-9c1a-7b21-8c45-0000000000bb" }),
     ];
-    const container = await mount(
-      <AssetLibraryPanel
-        library={
-          view({ library: { assets, truncated: true }, status: "ready" })
-            .library
-        }
-      />,
-    );
+    const more = view({
+      library: {
+        assets,
+        nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
+      },
+      status: "ready",
+    });
+    const container = await mount(<AssetLibraryPanel library={more.library} />);
     expect(container.querySelectorAll("li")).toHaveLength(2);
     expect(textOf(container)).not.toContain("Nothing uploaded");
-    expect(textOf(container)).toContain("Showing your newest images");
+    await click(button(container, "Load older images"));
+    expect(more.loadMore).toHaveBeenCalledOnce();
     const full = await mount(
       <AssetLibraryPanel
         library={
-          view({ library: { assets, truncated: false }, status: "ready" })
+          view({ library: { assets, nextCursor: null }, status: "ready" })
             .library
         }
       />,
     );
-    expect(textOf(full)).not.toContain("newest");
+    expect(textOf(full)).not.toContain("older images");
+  });
+
+  it("disables the button and says so while an older page is on its way", async () => {
+    const { library } = view({
+      library: {
+        assets: [processedAsset()],
+        nextCursor: "1760000000000.0198a000-0000-7000-8000-000000000001",
+      },
+      status: "ready",
+    });
+    const container = await mount(
+      <AssetLibraryPanel library={{ ...library, loadingMore: true }} />,
+    );
+    expect(textOf(container)).toContain("Loading older images…");
+    expect(button(container, "Loading older images…")?.disabled).toBe(true);
   });
 
   it("reports a failed first load with a retry and no invented content", async () => {
@@ -122,7 +148,7 @@ describe("asset library panel", () => {
 
   it("keeps showing earlier data when a refresh fails, and says so", async () => {
     const { library } = view({
-      library: { assets: [processedAsset()], truncated: false },
+      library: { assets: [processedAsset()], nextCursor: null },
       status: "error",
     });
     const container = await mount(<AssetLibraryPanel library={library} />);

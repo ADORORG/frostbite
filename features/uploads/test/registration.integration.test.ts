@@ -17,6 +17,11 @@ describe("uploads feature registration", () => {
         requiredProviderCapabilities: ["object-storage:s3-compatible"],
         routes: [
           {
+            method: "POST",
+            operationId: "listOlderUploadedAssets",
+            path: "/api/v1/uploads/assets/older",
+          },
+          {
             method: "GET",
             operationId: "listUploadedAssets",
             path: "/api/v1/uploads/assets",

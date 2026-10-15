@@ -71,7 +71,7 @@ describe("upload runner", () => {
         api: {
           listAssets: vi.fn(async () => ({
             assets: [asset],
-            truncated: false,
+            nextCursor: null,
           })),
         },
       });
@@ -85,7 +85,7 @@ describe("upload runner", () => {
       api: {
         listAssets: vi.fn(async () => ({
           assets: [libraryAsset()],
-          truncated: false,
+          nextCursor: null,
         })),
       },
     });

@@ -56,6 +56,7 @@ export interface FakeApi {
   completeIntent: Mock<UploadsApi["completeIntent"]>;
   createIntent: Mock<UploadsApi["createIntent"]>;
   listAssets: Mock<UploadsApi["listAssets"]>;
+  listOlderAssets: Mock<UploadsApi["listOlderAssets"]>;
 }
 
 // Services whose every call is a spy with a sensible default; each test overrides what it cares about.
@@ -77,7 +78,11 @@ export function fakeServices(
     ),
     listAssets: vi.fn<UploadsApi["listAssets"]>(
       overrides.api?.listAssets ??
-        (async () => ({ assets: [], truncated: false })),
+        (async () => ({ assets: [], nextCursor: null })),
+    ),
+    listOlderAssets: vi.fn<UploadsApi["listOlderAssets"]>(
+      overrides.api?.listOlderAssets ??
+        (async () => ({ assets: [], nextCursor: null })),
     ),
   };
   return {

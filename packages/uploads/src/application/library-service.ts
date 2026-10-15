@@ -1,6 +1,6 @@
 import type { ObjectStoragePort } from "@ador/object-storage/contracts";
 import { ObjectStorageError } from "@ador/object-storage/errors";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
 import {
   resolveUploadPolicy,
   type LibraryAsset,
@@ -14,6 +14,16 @@ import type {
 } from "./library-repository.ts";
 
 const millisecondsPerSecond = 1_000;
+
+// A cursor is the creation time in milliseconds, then the id. The contract has checked its shape; the id is parsed again here
+// because it reaches a query.
+const formatCursor = (record: { createdAt: Date; id: UuidV7 }): string =>
+  `${String(record.createdAt.getTime()).padStart(13, "0")}.${record.id}`;
+
+function parseCursor(cursor: string): { createdAtMs: number; id: UuidV7 } {
+  const [ms, id] = cursor.split(".");
+  return { createdAtMs: Number(ms), id: uuidV7Schema.parse(id) };
+}
 
 // Lists the caller's assets with short-lived signed derivative URLs (ADR-016). Ownership is enforced
 // by the repository query; this service never signs a key it did not receive from that query.
@@ -81,15 +91,21 @@ export function createAssetLibraryService(dependencies: {
       return Promise.all(records.map(present));
     },
 
-    async list(userId: UuidV7): Promise<LibraryResponse> {
+    // The newest page of the caller's assets, or, given a `before` cursor from an earlier answer, the page after it.
+    async list(userId: UuidV7, before?: string): Promise<LibraryResponse> {
       const records = await dependencies.repository.listNewestForUser({
+        ...(before === undefined ? {} : { before: parseCursor(before) }),
         limit: policy.libraryPageSize + 1,
         userId,
       });
       const page = records.slice(0, policy.libraryPageSize);
+      const last = page.at(-1);
       return {
         assets: await Promise.all(page.map(present)),
-        truncated: records.length > policy.libraryPageSize,
+        nextCursor:
+          records.length > policy.libraryPageSize && last !== undefined
+            ? formatCursor(last)
+            : null,
       };
     },
   };
