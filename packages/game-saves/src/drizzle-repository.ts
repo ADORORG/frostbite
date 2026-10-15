@@ -4,7 +4,11 @@ import {
   gameMilestoneUnlocks,
   gameSaves,
 } from "@ador/database/schema/game-saves";
-import { gameProgressSchema, type GameState } from "@ador/shared/games";
+import {
+  gameMilestoneRecordSchema,
+  gameProgressSchema,
+  type GameState,
+} from "@ador/shared/games";
 import { and, eq, sql } from "drizzle-orm";
 
 import type { GameSyncRepository } from "./repository.ts";
@@ -57,7 +61,10 @@ export function createDrizzleGameSyncRepository(
             count: row.count,
             id: row.milestoneId,
             unlockedAt: row.unlockedAt.toISOString(),
-            verification: "self-reported",
+            // Read back through the contract, so a value edited by hand cannot become a level.
+            verification: gameMilestoneRecordSchema.shape.verification.parse(
+              row.verification,
+            ),
           })),
           // The column is read back through the contract, so a row edited by hand cannot become a state.
           progress:
@@ -94,7 +101,8 @@ export function createDrizzleGameSyncRepository(
           const before = known.get(record.id);
           if (
             before?.unlockedAt === record.unlockedAt &&
-            before.count === record.count
+            before.count === record.count &&
+            before.verification === record.verification
           )
             continue;
           await transaction
@@ -105,11 +113,13 @@ export function createDrizzleGameSyncRepository(
               milestoneId: record.id,
               unlockedAt: new Date(record.unlockedAt),
               userId,
+              verification: record.verification,
             })
             .onConflictDoUpdate({
               set: {
                 count: record.count,
                 unlockedAt: new Date(record.unlockedAt),
+                verification: record.verification,
               },
               target: [
                 gameMilestoneUnlocks.userId,

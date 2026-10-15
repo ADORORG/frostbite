@@ -51,8 +51,8 @@ export const gameSaves = platformSchema.table(
   ],
 );
 
-// A milestone a player earned, once per player, game and milestone. Only self-reported milestones exist
-// (the column says so, and a stronger level is a migration), so nothing here can be mistaken for proof.
+// A milestone a player earned, once per player, game and milestone, with how it is known: self-reported (the game said
+// so) or replay-verified (the platform replayed a run). The column names both, and a new level is a migration.
 export const gameMilestoneUnlocks = platformSchema.table(
   "game_milestone_unlocks",
   {
@@ -74,7 +74,7 @@ export const gameMilestoneUnlocks = platformSchema.table(
     primaryKey({ columns: [table.userId, table.gameId, table.milestoneId] }),
     check(
       "game_milestone_verification_known",
-      sql`${table.verification} in ('self-reported')`,
+      sql`${table.verification} in ('self-reported', 'replay-verified')`,
     ),
     check(
       "game_milestone_count_bounded",

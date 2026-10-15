@@ -567,12 +567,18 @@ importers:
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/game-runs':
+        specifier: workspace:*
+        version: link:../../packages/game-runs
       '@ador/game-saves':
         specifier: workspace:*
         version: link:../../packages/game-saves
       '@ador/game-sdk':
         specifier: workspace:*
         version: link:../../packages/game-sdk
+      '@ador/game-verification':
+        specifier: workspace:*
+        version: link:../../packages/game-verification
       '@ador/http':
         specifier: workspace:*
         version: link:../../packages/http
@@ -1540,6 +1546,9 @@ importers:
         specifier: 4.5.4
         version: 4.5.4
     devDependencies:
+      '@ador/test-kit':
+        specifier: workspace:*
+        version: link:../test-kit
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config

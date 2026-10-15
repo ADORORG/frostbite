@@ -13,6 +13,7 @@ import { createFeatureRegistry } from "@ador/plugin-kit";
 import { createUploadsFeature } from "@ador/feature-uploads";
 import { authorizationPolicy } from "./authorization.ts";
 import { targetChains } from "./chains.ts";
+import { gameRunsConfig } from "./game-runs.ts";
 import { games } from "./games.ts";
 import { providerRegistry } from "./providers.ts";
 import { gameWalletConfig, walletAuthConfig } from "./wallet.ts";
@@ -24,7 +25,7 @@ export const featureRegistry = createFeatureRegistry([
   launchesFeature,
   createPublicCollectionsFeature(providerRegistry, targetChains),
   creatorsFeature,
-  createGamesFeature(games, targetChains, gameWalletConfig),
+  createGamesFeature(games, targetChains, gameWalletConfig, gameRunsConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),
   createCollectionReviewFeature(authorizationPolicy, providerRegistry),

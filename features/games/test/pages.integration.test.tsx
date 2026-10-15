@@ -2,7 +2,11 @@ import { WalletProvider } from "@ador/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { gameSyncRoute } from "@ador/shared/games";
+import {
+  gameSyncRoute,
+  startGameRunRoute,
+  submitGameRunRoute,
+} from "@ador/shared/games";
 import { createGamesEntrypoint } from "../src/entrypoint.tsx";
 import { createGamesFeature } from "../src/registration.ts";
 import {
@@ -11,6 +15,7 @@ import {
   coveredGame,
   embeddedGame,
   templateGame,
+  runsConfig,
   walletConfig,
   walletGame,
 } from "./support/template-game.ts";
@@ -20,9 +25,12 @@ async function render(
   path: "/games" | "/games/[slug]",
   slug?: string,
 ) {
-  const page = createGamesEntrypoint(games, chains, walletConfig).pages?.find(
-    (candidate) => candidate.path === path,
-  );
+  const page = createGamesEntrypoint(
+    games,
+    chains,
+    walletConfig,
+    runsConfig,
+  ).pages?.find((candidate) => candidate.path === path);
   if (page === undefined) throw new Error(`No page ${path}`);
   // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
   return renderToStaticMarkup(
@@ -235,12 +243,17 @@ describe("a game that asks to see the player's wallet", () => {
 
 describe("the games feature registration", () => {
   it("declares its pages, its navigation item and no provider needs, and loads pages that match", async () => {
-    const feature = createGamesFeature([templateGame], chains, walletConfig);
+    const feature = createGamesFeature(
+      [templateGame],
+      chains,
+      walletConfig,
+      runsConfig,
+    );
     expect(feature.manifest).toMatchObject({
       id: "games",
       navigation: [{ area: "main", href: "/games", label: "Games" }],
       requiredProviderCapabilities: [],
-      routes: [gameSyncRoute],
+      routes: [gameSyncRoute, startGameRunRoute, submitGameRunRoute],
     });
     const entrypoint = await feature.load({
       registeredFeatureCount: 1,

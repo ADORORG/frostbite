@@ -5,7 +5,12 @@ import {
 } from "@ador/shared/games";
 
 import type { GameSyncRepository } from "./repository.ts";
-import { boundState, earnReached, type MilestoneRules } from "./rules.ts";
+import {
+  asReported,
+  boundState,
+  earnReached,
+  type MilestoneRules,
+} from "./rules.ts";
 
 export type SyncOutcome =
   | {
@@ -61,7 +66,7 @@ export function createGameSyncService(options: {
         (stored) =>
           earnReached(
             boundState(
-              mergeGameState(stored, boundState(state, rules), now),
+              mergeGameState(stored, boundState(asReported(state), rules), now),
               rules,
             ),
             rules,

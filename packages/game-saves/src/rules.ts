@@ -36,6 +36,19 @@ export function boundState(state: GameState, rules: MilestoneRules): GameState {
   };
 }
 
+// What a browser sends is only ever its own report: a verified level can come from the platform's own replay and from
+// nowhere else, so whatever level a request names is read as self-reported. (The account keeps a stronger level it
+// already holds: the merge takes the stronger side.)
+export function asReported(state: GameState): GameState {
+  return {
+    ...state,
+    milestones: state.milestones.map((record) => ({
+      ...record,
+      verification: "self-reported" as const,
+    })),
+  };
+}
+
 // A milestone whose total has reached its target is earned, whoever reported the total: the account, not the page,
 // decides it, at the time the account first saw the total reach it.
 export function earnReached(

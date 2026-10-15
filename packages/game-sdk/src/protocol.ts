@@ -56,10 +56,12 @@ export const playerInfoSchema = z
   .strict();
 export type PlayerInfo = z.infer<typeof playerInfoSchema>;
 
-// How a claim was established. Only `self-reported` exists today: the game said so. A later level (a run the
-// platform re-checked) adds a value here; nothing that is stored or minted needs to change shape.
-export const verificationLevels = ["self-reported"] as const;
+// How a claim was established: `self-reported` (the game said so) or `replay-verified` (the platform replayed a run under
+// the game's published rules; it proves the run was legal, not that a person played it). The platform's manifest names
+// the same two levels; a test keeps the lists equal.
+export const verificationLevels = ["self-reported", "replay-verified"] as const;
 export const verificationSchema = z.enum(verificationLevels);
+export type VerificationLevel = z.infer<typeof verificationSchema>;
 
 export const milestoneStatusSchema = z
   .object({

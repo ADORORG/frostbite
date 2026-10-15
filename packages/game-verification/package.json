@@ -6,6 +6,7 @@
   "exports": {
     "./conformance": "./src/conformance.ts",
     "./loader": "./src/loader.ts",
+    "./node": "./src/node.ts",
     "./policy": "./src/policy.ts",
     "./registry": "./src/registry.ts",
     "./runner": "./src/runner.ts",
@@ -25,6 +26,7 @@
     "zod": "4.5.4"
   },
   "devDependencies": {
+    "@ador/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.0",

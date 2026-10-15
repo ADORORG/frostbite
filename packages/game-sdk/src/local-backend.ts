@@ -5,6 +5,8 @@ import {
   jsonValueSchema,
   type JsonValue,
   type PlayerInfo,
+  type VerificationLevel,
+  verificationSchema,
 } from "./protocol.ts";
 
 export interface KeyValueStorage {
@@ -21,7 +23,7 @@ const recordsSchema = z.record(
       // A record written before milestones were counted has none: it was earned once.
       count: z.number().int().min(1).default(1),
       unlockedAt: z.iso.datetime({ offset: true }),
-      verification: z.literal("self-reported"),
+      verification: verificationSchema,
     })
     .strict(),
 );
@@ -43,7 +45,7 @@ export interface LocalSnapshot {
     readonly count: number;
     readonly id: string;
     readonly unlockedAt: string;
-    readonly verification: "self-reported";
+    readonly verification: VerificationLevel;
   }[];
   readonly progress: {
     readonly savedAt: string;

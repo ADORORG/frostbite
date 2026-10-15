@@ -5,7 +5,9 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
-    "./entrypoint": "./src/entrypoint.tsx"
+    "./entrypoint": "./src/entrypoint.tsx",
+    "./runs-operations": "./src/application/runs-operations.ts",
+    "./runs-runtime": "./src/runs-runtime.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -19,8 +21,10 @@
   "dependencies": {
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/game-runs": "workspace:*",
     "@ador/game-saves": "workspace:*",
     "@ador/game-sdk": "workspace:*",
+    "@ador/game-verification": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",

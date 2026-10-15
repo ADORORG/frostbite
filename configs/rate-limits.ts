@@ -30,8 +30,12 @@ export const rateLimits = rateLimitConfigSchema.parse({
     importCollectionItems: perMinute(20),
     reviewCreatorApplication: perMinute(60),
     signOut: perMinute(30),
+    // A run is started when a game begins a round and submitted when it ends; a replay costs the server real work, so these
+    // are far tighter than a save.
+    startGameRun: perMinute(30),
     submitCollection: perMinute(10),
     submitCreatorApplication: perMinute(10),
+    submitGameRun: perMinute(30),
     // Sent when a game is opened and after each save or unlock, so it is the busiest write; one a second.
     syncGameState: perMinute(120),
     unlinkPasskey: perMinute(10),

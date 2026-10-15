@@ -1,10 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { loadGameVerifiers } from "@ador/game-verification/loader";
-import { resolveVerificationPolicy } from "@ador/game-verification/policy";
-import { createInProcessRunner } from "@ador/game-verification/runner";
 import type { GameManifest } from "@ador/shared/games";
+
+import { loadGameVerifiers } from "./loader.ts";
+import { resolveVerificationPolicy } from "./policy.ts";
+import { createInProcessRunner } from "./runner.ts";
 
 // The platform's replay verifiers, built from the games' own manifests and built artifacts: nothing here names a game. A
 // game the platform plays itself (`embedded`, built from this repository and reviewed) is first-party and replayed by the

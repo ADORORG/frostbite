@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { gameIdSchema, gameManifestLimits } from "./manifest.ts";
+import {
+  gameIdSchema,
+  gameManifestLimits,
+  gameMilestoneVerifications,
+} from "./manifest.ts";
 
 const timestamp = z.iso.datetime({ offset: true });
 
@@ -10,8 +14,9 @@ export const gameProgressSchema = z
   .object({ savedAt: timestamp, state: z.json() })
   .strict();
 
-// A milestone the player earned. Only `self-reported` exists: nothing here proves the player earned it, so
-// nothing with money or privilege may depend on it (ADR-018).
+// A milestone the player earned, and how that is known: `self-reported` (the game said so; nothing with money or
+// privilege may depend on it, ADR-018) or `replay-verified` (the platform replayed a run under the game's published
+// rules). A browser may send either, but the account only ever believes a verdict it reached itself (see game-saves).
 export const gameMilestoneRecordSchema = z
   .object({
     // How many times the player earned it: 1 for a milestone earned once, up to the manifest's maximum for a
@@ -20,7 +25,7 @@ export const gameMilestoneRecordSchema = z
     count: z.number().int().min(1).max(gameManifestLimits.milestoneCount),
     id: gameIdSchema,
     unlockedAt: timestamp,
-    verification: z.literal("self-reported"),
+    verification: z.enum(gameMilestoneVerifications),
   })
   .strict();
 
@@ -100,12 +105,18 @@ export function mergeGameState(
         ? { ...record, unlockedAt: now.toISOString() }
         : record;
     const existing = milestones.get(record.id);
-    // The earliest time and the larger count, each from whichever side has it.
-    milestones.set(record.id, {
-      ...(existing === undefined ||
-      Date.parse(bounded.unlockedAt) < Date.parse(existing.unlockedAt)
+    // The larger count, and the stronger level with its own time: a verified level is never lost to a side that only
+    // reported the milestone, and a time the platform verified is not moved by one a device reports. Between sides of
+    // the same level, the earliest time.
+    const winner =
+      existing === undefined ||
+      (bounded.verification === existing.verification
+        ? Date.parse(bounded.unlockedAt) < Date.parse(existing.unlockedAt)
+        : bounded.verification === "replay-verified")
         ? bounded
-        : existing),
+        : existing;
+    milestones.set(record.id, {
+      ...winner,
       count: Math.max(existing?.count ?? 0, record.count),
     });
   }

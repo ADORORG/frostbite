@@ -5,6 +5,7 @@ import type {
   JsonValue,
   PlayerIdentity,
   PlayerInfo,
+  VerificationLevel,
   WalletInfo,
 } from "./protocol.ts";
 
@@ -23,7 +24,7 @@ export interface GameHostBackend {
         {
           count: number;
           unlockedAt: string;
-          verification: "self-reported";
+          verification: VerificationLevel;
         }
       >
     >

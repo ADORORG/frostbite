@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
+import { readJsonBody } from "@ador/http/json-body";
 import {
   correlationHeaderName,
   httpErrorEnvelopeSchema,
@@ -125,7 +126,7 @@ async function handle(request: Request, context: RouteContext) {
     }
   }
   const rawInput: unknown =
-    request.method === "GET" ? {} : await request.json().catch(() => undefined);
+    request.method === "GET" ? {} : await readJsonBody(request);
   return executeNextOperation(operation, request, rawInput, actorSession);
 }
 

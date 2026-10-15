@@ -1,0 +1,1 @@
+ALTER TABLE "ador"."game_milestone_unlocks" DROP CONSTRAINT "game_milestone_verification_known", ADD CONSTRAINT "game_milestone_verification_known" CHECK ("verification" in ('self-reported', 'replay-verified'));

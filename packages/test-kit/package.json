@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./adder-game": "./src/adder-game.ts",
     "./chain-conformance": "./src/chain-conformance.ts",
     "./collection-database": "./src/collection-database.ts",
     "./creator-database": "./src/creator-database.ts",

@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/operation.ts",
+    "./json-body": "./src/json-body.ts",
     "./openapi": "./src/openapi.ts",
     "./outcome": "./src/outcome.ts",
     "./registered-operation": "./src/registered-operation.ts",

@@ -3,8 +3,14 @@ import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ChainOption } from "@ador/shared/chain";
 import { gamePagePath, gamesPath, type GameManifest } from "@ador/shared/games";
 
+import {
+  createStartGameRunOperation,
+  createSubmitGameRunOperation,
+} from "./application/runs-operations.ts";
 import { createSyncGameStateOperation } from "./application/sync-operation.ts";
 import { createGameCatalog } from "./domain/catalog.ts";
+import type { GameRunsConfig } from "./runs-config.ts";
+import { createGameRunsResolver } from "./runs-runtime.ts";
 import { createGameSyncResolver } from "./runtime.ts";
 import { GameDetail } from "./ui/game-detail.tsx";
 import { GamesIndex } from "./ui/games-index.tsx";
@@ -15,8 +21,10 @@ export function createGamesEntrypoint(
   games: readonly GameManifest[],
   chains: readonly ChainOption[],
   wallet: GameWalletConfig,
+  runs: GameRunsConfig,
 ): FeatureEntrypoint {
   const catalog = createGameCatalog(games, chains);
+  const runsService = createGameRunsResolver(games, runs);
   const access = { kind: "public" } as const;
   return {
     capabilities: ["api-routes", "navigation", "public-page"],
@@ -25,6 +33,8 @@ export function createGamesEntrypoint(
       registerHttpOperation(
         createSyncGameStateOperation(createGameSyncResolver(games)),
       ),
+      registerHttpOperation(createStartGameRunOperation(runsService)),
+      registerHttpOperation(createSubmitGameRunOperation(runsService)),
     ],
     pages: [
       {

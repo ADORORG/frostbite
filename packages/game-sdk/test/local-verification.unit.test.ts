@@ -1,0 +1,46 @@
+import { describe, expect, it } from "vitest";
+
+import { createLocalBackend } from "../src/local-backend.ts";
+
+const storage = () => {
+  const map = new Map<string, string>();
+  return {
+    getItem: (k: string) => map.get(k) ?? null,
+    setItem: (k: string, v: string) => void map.set(k, v),
+  };
+};
+const record = (verification: string) => ({
+  count: 1,
+  id: "first-win",
+  unlockedAt: "2026-10-01T00:00:00.000Z",
+  verification,
+});
+
+describe("the browser's copy of a milestone the account verified", () => {
+  it("keeps the replay-verified level the account gave it, and tells the game", async () => {
+    const backend = createLocalBackend({ gameId: "g", storage: storage() });
+    backend.replace({
+      counters: [],
+      milestones: [
+        { ...record("replay-verified"), verification: "replay-verified" },
+      ],
+      progress: null,
+    });
+    expect((await backend.milestones())["first-win"]).toEqual({
+      count: 1,
+      unlockedAt: "2026-10-01T00:00:00.000Z",
+      verification: "replay-verified",
+    });
+    expect(backend.snapshot().milestones).toEqual([record("replay-verified")]);
+  });
+
+  it("treats a stored level it does not know as a corrupt value, not a milestone", async () => {
+    const store = storage();
+    store.setItem(
+      "ador:game:g:milestones",
+      JSON.stringify({ "first-win": { ...record("trusted"), id: undefined } }),
+    );
+    const backend = createLocalBackend({ gameId: "g", storage: store });
+    expect(await backend.milestones()).toEqual({});
+  });
+});

@@ -100,3 +100,6 @@ export const walletGame = defineGame({
 export const walletConfig = {
   network: "signet",
 } as const;
+
+// Never read by a page; the runs routes read it only when a run is started.
+export const runsConfig = { playRoot: "/nonexistent/play" } as const;
