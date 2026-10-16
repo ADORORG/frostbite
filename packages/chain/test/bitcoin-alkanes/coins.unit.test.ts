@@ -6,7 +6,8 @@ import { idA, idB, idC, utxo } from "../support/claims.ts";
 
 const base = {
   changeDustSats: 294n,
-  claimOutputSats: 546n,
+  fixedOutputs: ["p2wpkh"] as const,
+  fixedSats: 546n,
   feeRate: 2,
   kind: "p2wpkh" as const,
   opReturnScriptLength: 51,
@@ -18,6 +19,12 @@ describe("the size and fee of a transaction", () => {
     expect(estimateVsize(["p2wpkh"], ["p2wpkh"], 51)).toBe(170);
     expect(estimateVsize(["p2wpkh", "p2tr"], ["p2wpkh", "p2tr"], 51)).toBe(
       11 + 68 + 58 + 31 + 43 + 9 + 51,
+    );
+  });
+
+  it("leave out the call when there is none", () => {
+    expect(estimateVsize(["p2wpkh"], ["p2tr", "p2wpkh"], null)).toBe(
+      11 + 68 + 43 + 31,
     );
   });
 

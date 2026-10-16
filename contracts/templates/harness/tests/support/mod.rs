@@ -18,6 +18,8 @@ pub const REWARDS: &[u8] =
 
 /// Where the collectible template is deployed (`{3, TEMPLATE}`; instances are made from `{6, TEMPLATE}`).
 pub const TEMPLATE: u128 = 1000;
+/// Where the game contract is published as a template when games are made from it.
+pub const GAME_TEMPLATE: u128 = 2000;
 /// The most bytes a milestone drawing may have, as the game is initialised in these tests.
 pub const MAX_ART: u128 = 4096;
 /// Enough fuel for any view in these tests.

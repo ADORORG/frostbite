@@ -14,6 +14,7 @@ export const gameRewardsOpcodes = {
 } as const;
 
 export const collectibleOpcodes = {
+  getName: 99n,
   getAttributes: 1002n,
   getContentType: 1001n,
   getData: 1000n,

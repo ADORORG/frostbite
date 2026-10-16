@@ -61,8 +61,9 @@ export function createClaimBuilder(
       const call = claimScript(game, milestoneKey(intent.milestoneId));
       const selection = selectCoins({
         changeDustSats: options.changeDustSats,
-        claimOutputSats: options.claimOutputSats,
         feeRate: await node.feeRate(options.feeTargetBlocks),
+        fixedOutputs: [sender.value.type],
+        fixedSats: options.claimOutputSats,
         kind: sender.value.type,
         opReturnScriptLength: call.length,
         utxos: await node.utxos(sender.value.address),

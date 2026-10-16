@@ -16,17 +16,19 @@ const fixedVbytes = 11;
 // An output's value (8 bytes) and the length of its script (1 byte), before the script itself.
 const outputFramingVbytes = 9;
 
+// `opReturnScriptLength` is the length of the `OP_RETURN` output's script, or null when the transaction has no such output.
 export function estimateVsize(
   inputs: readonly ScriptKind[],
   outputs: readonly ScriptKind[],
-  opReturnScriptLength: number,
+  opReturnScriptLength: number | null,
 ): number {
   return (
     fixedVbytes +
     inputs.reduce((sum, kind) => sum + inputVbytes[kind], 0) +
     outputs.reduce((sum, kind) => sum + outputVbytes[kind], 0) +
-    outputFramingVbytes +
-    opReturnScriptLength
+    (opReturnScriptLength === null
+      ? 0
+      : outputFramingVbytes + opReturnScriptLength)
   );
 }
 

@@ -11,15 +11,20 @@ export interface CoinSelection {
 export interface CoinRequest {
   // Below this a change output is not worth making; the remainder is paid as fee.
   readonly changeDustSats: bigint;
-  // What the claim output (output 0) carries: it must be above the dust limit so the collectible has somewhere to land.
-  readonly claimOutputSats: bigint;
+  // Inputs the transaction already has (for example the output that holds an auth token), which add to its size.
+  readonly existingInputs?: readonly ScriptKind[];
   readonly feeRate: number;
+  // What the outputs that must be paid carry (for a claim, the claimant's output, which must be above the dust limit so the
+  // collectible has somewhere to land), and their script kinds. Change, if any, is added to these.
+  readonly fixedOutputs: readonly ScriptKind[];
+  readonly fixedSats: bigint;
+  // The kind of script the coins being spent, and the change, are locked to.
   readonly kind: ScriptKind;
-  readonly opReturnScriptLength: number;
+  readonly opReturnScriptLength: number | null;
   readonly utxos: readonly NodeUtxo[];
 }
 
-// Picks the fewest, largest confirmed outputs that pay for the claim output and the fee. Unconfirmed outputs are never spent: a
+// Picks the fewest, largest confirmed outputs that pay for the fixed outputs and the fee. Unconfirmed outputs are never spent: a
 // claim built on one would fail if that transaction were replaced.
 export function selectCoins(request: CoinRequest): CoinSelection | null {
   const candidates = request.utxos
@@ -30,24 +35,27 @@ export function selectCoins(request: CoinRequest): CoinSelection | null {
   for (const utxo of candidates) {
     chosen.push(utxo);
     total += utxo.value;
-    const kinds = chosen.map(() => request.kind);
+    const kinds = [
+      ...(request.existingInputs ?? []),
+      ...chosen.map(() => request.kind),
+    ];
     const without = feeFor(
-      estimateVsize(kinds, [request.kind], request.opReturnScriptLength),
+      estimateVsize(kinds, request.fixedOutputs, request.opReturnScriptLength),
       request.feeRate,
     );
-    if (total < request.claimOutputSats + without) continue;
+    if (total < request.fixedSats + without) continue;
     const withChange = feeFor(
       estimateVsize(
         kinds,
-        [request.kind, request.kind],
+        [...request.fixedOutputs, request.kind],
         request.opReturnScriptLength,
       ),
       request.feeRate,
     );
-    const change = total - request.claimOutputSats - withChange;
+    const change = total - request.fixedSats - withChange;
     return change >= request.changeDustSats
       ? { change, chosen, fee: withChange }
-      : { change: 0n, chosen, fee: total - request.claimOutputSats };
+      : { change: 0n, chosen, fee: total - request.fixedSats };
   }
   return null;
 }

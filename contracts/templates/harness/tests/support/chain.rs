@@ -10,9 +10,9 @@ use protorune::test_helpers::{get_address, ADDRESS1, ADDRESS2};
 use protorune_support::balance_sheet::{BalanceSheetOperations, ProtoruneRuneId};
 use protorune_support::protostone::Protostone;
 use rewards_core::holder::Holder;
-use rewards_core::opcode::game;
+use rewards_core::opcode::{collectible, game};
 
-use super::{COLLECTIBLE, MAX_ART, REWARDS, TEMPLATE};
+use super::{COLLECTIBLE, GAME_TEMPLATE, MAX_ART, REWARDS, TEMPLATE};
 
 /// A claim is made to the script output 0 pays to, so a wallet is just a script.
 #[derive(Clone, Copy)]
@@ -86,6 +86,64 @@ impl Chain {
                 cellpack((3, AUTH_TOKEN_FACTORY_ID), vec![100]),
                 cellpack((3, TEMPLATE), vec![]),
                 cellpack((1, 0), vec![game::INITIALIZE, TEMPLATE, MAX_ART]),
+            ],
+        );
+        let admin_tip = OutPoint {
+            txid: block.txdata[block.txdata.len() - 1].compute_txid(),
+            vout: 0,
+        };
+        Self {
+            block,
+            admin_tip,
+            spent_nothing: 0,
+        }
+    }
+
+    /// Publishing a template runs its code once with the call's inputs, so a template is published with a view (`get-name`) that
+    /// changes nothing; with no inputs the call would run `initialize` on the template itself.
+    ///
+    /// Only the code: the auth-token factory and both templates, published. A game is made afterwards by a transaction of the
+    /// test's own (or the platform's), and `adopt_token` then names where its auth token is.
+    pub fn deploy_templates() -> Self {
+        h::clear();
+        let block = h::init_with_multiple_cellpacks_with_tx(
+            vec![
+                alkanes_std_auth_token_build::get_bytes(),
+                COLLECTIBLE.to_vec(),
+                REWARDS.to_vec(),
+            ],
+            vec![
+                cellpack((3, AUTH_TOKEN_FACTORY_ID), vec![100]),
+                cellpack((3, TEMPLATE), vec![collectible::GET_NAME]),
+                cellpack((3, GAME_TEMPLATE), vec![game::GET_NAME]),
+            ],
+        );
+        Self {
+            block,
+            admin_tip: OutPoint::null(),
+            spent_nothing: 0,
+        }
+    }
+
+    /// The same deployment, but the game is made the way the platform makes it: the game's code is published once as a template
+    /// (`{3, GAME_TEMPLATE}`) and the game is an instance created from it (`{6, GAME_TEMPLATE}`), initialised in the same call.
+    pub fn deploy_from_templates() -> Self {
+        h::clear();
+        let block = h::init_with_multiple_cellpacks_with_tx(
+            vec![
+                alkanes_std_auth_token_build::get_bytes(),
+                COLLECTIBLE.to_vec(),
+                REWARDS.to_vec(),
+                vec![],
+            ],
+            vec![
+                cellpack((3, AUTH_TOKEN_FACTORY_ID), vec![100]),
+                cellpack((3, TEMPLATE), vec![collectible::GET_NAME]),
+                cellpack((3, GAME_TEMPLATE), vec![game::GET_NAME]),
+                cellpack(
+                    (6, GAME_TEMPLATE),
+                    vec![game::INITIALIZE, TEMPLATE, MAX_ART],
+                ),
             ],
         );
         let admin_tip = OutPoint {
@@ -181,6 +239,23 @@ impl Chain {
     pub fn push_transaction(&mut self, transaction: Transaction) -> Sent {
         self.block.txdata.push(transaction);
         self.sent(self.block.txdata.len() - 1)
+    }
+
+    /// A transaction that spends the auth token: its input `index` is pointed at wherever the token is now, and afterwards the token
+    /// is taken to be at its output 0, where a correct call returns it.
+    pub fn push_admin_transaction(&mut self, mut transaction: Transaction, index: usize) -> Sent {
+        transaction.input[index].previous_output = self.admin_tip;
+        let sent = self.push_transaction(transaction);
+        self.adopt_token(sent);
+        sent
+    }
+
+    /// Takes the auth token to be at output 0 of `sent`.
+    pub fn adopt_token(&mut self, sent: Sent) {
+        self.admin_tip = OutPoint {
+            txid: self.block.txdata[sent.index].compute_txid(),
+            vout: 0,
+        };
     }
 
     /// `wallet` claims `milestone`; the collectible is sent to that wallet's script.

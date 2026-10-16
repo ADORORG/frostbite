@@ -9,6 +9,7 @@ import type { JsonRpc } from "./transport.ts";
 // this boundary handles an unchecked response.
 export interface AlkanesNode extends EsploraClient {
   bytecode: IndexerClient["bytecode"];
+  holdings: IndexerClient["holdings"];
   indexedHeight: IndexerClient["indexedHeight"];
   trace: IndexerClient["trace"];
   // Runs a call that changes nothing, at the chain's current height, optionally inside a given transaction. `ok: false` means the
@@ -27,6 +28,7 @@ export function createRpcNode(rpc: JsonRpc): AlkanesNode {
   return {
     ...esplora,
     bytecode: indexer.bytecode,
+    holdings: indexer.holdings,
     indexedHeight: indexer.indexedHeight,
     trace: indexer.trace,
     view: async (target, opcode, inputs, transaction) =>
