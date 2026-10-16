@@ -29,7 +29,7 @@ describe("the published package", () => {
     expect(entries.map(([name]) => name).sort()).toEqual(
       Object.keys(manifest.exports).sort(),
     );
-    const built = new Set(await readdir(out));
+    const built = new Set(await readdir(out, { recursive: true }));
     for (const [, target] of entries) {
       expect(built.has(target.default.replace("./dist/", ""))).toBe(true);
       expect(built.has(target.types.replace("./dist/", ""))).toBe(true);
@@ -41,13 +41,13 @@ describe("the published package", () => {
       ...Object.keys(manifest.dependencies),
       ...Object.keys(manifest.peerDependencies),
     ]);
-    for (const file of (await readdir(out)).filter((name) =>
-      name.endsWith(".js"),
+    for (const file of (await readdir(out, { recursive: true })).filter(
+      (name) => name.endsWith(".js"),
     )) {
       const source = await readFile(join(out, file), "utf8");
       for (const [, specifier] of source.matchAll(/from "([^"]+)"/gu)) {
         if (specifier === undefined) continue;
-        if (specifier.startsWith("./")) {
+        if (specifier.startsWith("./") || specifier.startsWith("../")) {
           // A relative import must name the built file, not the source it came from.
           expect(specifier, file).toMatch(/\.js$/u);
         } else if (!specifier.startsWith("node:")) {
@@ -59,7 +59,19 @@ describe("the published package", () => {
     }
   });
 
-  it("keeps esbuild optional, because only the build tool needs it", () => {
+  it("gives the command that opens the local test page, built where the package says", async () => {
+    expect(manifest.bin).toEqual({ "ador-game-dev": "./dist/dev-host/bin.js" });
+    const built = new Set(await readdir(out, { recursive: true }));
+    expect(built.has("dev-host/bin.js")).toBe(true);
+    expect(built.has("dev-host/client.js")).toBe(true);
+    expect(
+      (await readFile(join(out, "dev-host/bin.js"), "utf8")).startsWith(
+        "#!/usr/bin/env node\n",
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps esbuild optional, because only the build tool and the test page need it", () => {
     expect(manifest.peerDependenciesMeta.esbuild).toEqual({ optional: true });
     expect(Object.keys(manifest.dependencies)).toEqual(["zod"]);
   });

@@ -40,6 +40,19 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
+## The local test page
+
+`ador-game-dev <game-folder> [--game game.json] [--port 5173]` (and `pnpm game:dev <id>` inside this repository) opens a page
+that frames the game in the same sandbox, serves its files with the headers the platform gives them, and builds it again on
+every reload. Beside the game is a panel for the platform's side: sign the player in and out (the id changes from this browser's
+to the account's and the game gets `player.changed`), connect a fake wallet and move it between networks (`wallet.changed`),
+send `lifecycle.changed` (tab hidden) and `fullscreen.changed`, take a claim through its states one press at a time
+(`claim.changed`), clear what the game saved, and read a log of every call, answer, refusal and event. `game.json` holds what the
+page needs of the manifest: `{ "id", "capabilities", "milestones" }` (the same fields as the manifest's own). **Everything on the
+panel is made up**: it shows how a game answers each case, not what the platform will decide (runs are not replayed, nothing is
+minted, no failure or slow answer is injected). It needs `esbuild`, the same optional peer as the build.
+`import { startDevHost } from "@ador/game-sdk/dev-host"` starts the same page from code, for a test.
+
 ## Installing it outside this repository
 
 The package builds to plain JavaScript with declarations (`pnpm --filter @ador/game-sdk build:package`) and is packed
