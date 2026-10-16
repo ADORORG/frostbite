@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@ador/chain": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
     "@ador/feature-collection-review": "workspace:*",
     "@ador/feature-collection-studio": "workspace:*",

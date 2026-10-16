@@ -17,7 +17,8 @@ export type FetchLike = (
     readonly signal: AbortSignal;
   },
 ) => Promise<{
-  readonly json: () => Promise<JsonValue>;
+  // `unknown` is what a response body is; `createJsonRpc` validates it as JSON before anything reads it.
+  readonly json: () => Promise<unknown>;
   readonly ok: boolean;
   readonly status: number;
 }>;

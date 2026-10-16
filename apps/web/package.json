@@ -21,6 +21,7 @@
   "dependencies": {
     "@ador/auth": "workspace:*",
     "@ador/authorization": "workspace:*",
+    "@ador/chain": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
     "@ador/feature-collection-review": "workspace:*",

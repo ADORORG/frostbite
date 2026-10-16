@@ -20,6 +20,9 @@ importers:
 
   .:
     dependencies:
+      '@ador/chain':
+        specifier: workspace:*
+        version: link:packages/chain
       '@ador/feature-accounts':
         specifier: workspace:*
         version: link:features/accounts
@@ -105,6 +108,9 @@ importers:
       '@ador/authorization':
         specifier: workspace:*
         version: link:../../packages/authorization
+      '@ador/chain':
+        specifier: workspace:*
+        version: link:../../packages/chain
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database

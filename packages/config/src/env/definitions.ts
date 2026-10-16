@@ -222,6 +222,62 @@ export const environmentDefinitions = [
     required: false,
     secret: false,
   },
+  {
+    key: "REWARDS_CHAIN_RPC_URL",
+    description:
+      "Address of the JSON-RPC node (Bitcoin and Alkanes methods) the games' rewards contracts are reached through; blank means no rewards chain, and claims and staff administration answer not available. It may carry a key, so it is secret.",
+    exposure: "server",
+    required: false,
+    secret: true,
+  },
+  {
+    key: "REWARDS_CHAIN_RPC_TIMEOUT_MS",
+    description:
+      "Milliseconds before a call to the rewards chain node gives up; blank means 15000.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_CHAIN_RELEASE_GATE",
+    description:
+      "closed or open. While closed the platform builds, sends and watches nothing on the rewards chain; the owner opens it after review. Blank means closed.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_MAX_FEE_SATS",
+    description:
+      "The most, in satoshis, a player's claim or a staff step may pay in fee. Required when REWARDS_CHAIN_RPC_URL is set.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_TEMPLATES_DIR",
+    description:
+      "Directory holding the built game-rewards.wasm and milestone-collectible.wasm (contracts/templates/build.sh). Set together with REWARDS_TEMPLATE_IDS; blank means staff cannot publish templates or create games.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_TEMPLATE_IDS",
+    description:
+      'JSON object giving the Alkane (block:tx) each template is published at: {"game-rewards":"4:1","milestone-collectible":"4:2"}. Set together with REWARDS_TEMPLATES_DIR.',
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_CONTRACTS",
+    description:
+      'JSON object keyed by game id giving its deployed rewards contract and the largest drawing it was created to accept: {"my-game":{"id":"4:3","maxDrawingBytes":4096}}. Blank when none is deployed.',
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
 ] as const satisfies readonly EnvironmentDefinition[];
 
 export const environmentKeys = environmentDefinitions.map(({ key }) => key);

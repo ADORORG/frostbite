@@ -76,3 +76,11 @@ decoders against a real node; without it the test is skipped and no suite needs 
 
 Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. The conformance suite and the
 simulated second family live in `@ador/test-kit` (`chain-conformance`, `simulated-chain`).
+
+## Configured chains (`@ador/chain/configured`)
+
+The one entry the platform's configuration uses to reach a chain. A `ConfiguredChain` is the chain's record plus its family's
+adapter settings (`AdapterSettings`, a union with one member today: `bitcoin-alkanes`). `createConfiguredRegistry` builds the
+adapters and the registry; `feeCeiling` states the fee limit in the chain's own currency. A new family adds its settings to the
+union and its cases to `configured.ts`; callers reach it through the same neutral ports. The Alkanes assembly (node, transaction
+options, administration templates) is `bitcoin-alkanes/settings.ts`; nothing in it has a default, the caller states every value.

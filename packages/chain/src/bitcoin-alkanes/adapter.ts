@@ -32,6 +32,7 @@ export {
   type JsonRpcOptions,
 } from "./node/transport.ts";
 export type { TransactionOptions } from "./options.ts";
+export { templateEntries, type TemplateSetting } from "./settings.ts";
 export {
   templateKey,
   type AdminOptions,

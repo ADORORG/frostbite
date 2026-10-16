@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./env": "./src/env/runtime.ts",
+    "./rewards-chain": "./src/env/rewards-chain.ts",
     "./authorization": "./src/policy/authorization.ts",
     "./transport": "./src/transport/loopback-transport.ts"
   },

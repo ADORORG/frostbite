@@ -1,6 +1,10 @@
 import type { GameAdminConfig } from "@ador/feature-game-admin";
 
-import { rewardsChain, rewardsContracts } from "./game-rewards.ts";
+import {
+  rewardsChain,
+  rewardsContracts,
+  rewardsMaxDrawingBytes,
+} from "./game-rewards.ts";
 
 // What the platform needs to let staff administer games' rewards contracts (see `game-rewards.ts`), and the limits a milestone's
 // drawing is held to. The byte limit is each contract's own (`max_art_bytes`, set when the contract is created), so it is listed
@@ -13,5 +17,5 @@ export const gameAdminConfig = {
     maxDepth: 8,
     maxElements: 200,
   },
-  maxDrawingBytes: new Map(),
+  maxDrawingBytes: rewardsMaxDrawingBytes,
 } satisfies GameAdminConfig;
