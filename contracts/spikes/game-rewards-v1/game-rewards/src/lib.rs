@@ -3,6 +3,7 @@
 use alkanes_runtime::declare_alkane;
 use alkanes_runtime::message::MessageDispatch;
 use alkanes_runtime::{runtime::AlkaneResponder, storage::StoragePointer};
+use alkanes_support::witness::find_witness_payload;
 use alkanes_support::{
     cellpack::Cellpack, id::AlkaneId, parcel::AlkaneTransferParcel, response::CallResponse,
 };
@@ -29,7 +30,7 @@ enum GameRewardsMessage {
 
     /// Spike only: the real contract restricts this to the platform admin.
     #[opcode(2)]
-    SetArt { milestone: u128, svg: String },
+    SetArt { milestone: u128 },
 
     #[opcode(101)]
     #[returns(Vec<u8>)]
@@ -82,12 +83,16 @@ impl GameRewards {
             .select(&milestone.to_le_bytes().to_vec())
     }
 
-    fn set_art(&self, milestone: u128, svg: String) -> Result<CallResponse> {
+    /// The drawing travels in the transaction witness (an ordinals-style envelope), not in the
+    /// call inputs, because the call itself sits in the `OP_RETURN`, which relays carry only to
+    /// about 80 bytes. The same route `merkle-distributor` uses for its proof.
+    fn set_art(&self, milestone: u128) -> Result<CallResponse> {
+        let tx = self.transaction_object()?;
+        let svg = find_witness_payload(&tx, 0).ok_or_else(|| anyhow!("no art in the witness"))?;
         if svg.len() as u128 > self.config("/max-art").get_value::<u128>() {
             return Err(anyhow!("art too large"));
         }
-        self.art_pointer(milestone)
-            .set(std::sync::Arc::new(svg.into_bytes()));
+        self.art_pointer(milestone).set(std::sync::Arc::new(svg));
         Ok(CallResponse::forward(&self.context()?.incoming_alkanes))
     }
 

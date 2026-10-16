@@ -35,6 +35,11 @@ enum CollectibleMessage {
     #[opcode(1000)]
     #[returns(Vec<u8>)]
     GetData,
+
+    /// What kind of bytes `get-data` returns (an Orbital convention: 1001 sits beside 1000).
+    #[opcode(1001)]
+    #[returns(String)]
+    GetContentType,
 }
 
 impl Collectible {
@@ -69,6 +74,10 @@ impl Collectible {
 
     fn get_symbol(&self) -> Result<CallResponse> {
         self.text("MILE")
+    }
+
+    fn get_content_type(&self) -> Result<CallResponse> {
+        self.text("image/svg+xml")
     }
 
     fn get_total_supply(&self) -> Result<CallResponse> {

@@ -8,7 +8,7 @@ audit, and it has not been mutation-tested.
 - `game-rewards/`: opcode 0 initialise (collectible template id, per-wallet limit), 1 claim
   (milestone), 99 name, 100 claimed count by holder and milestone.
 - `collectible/`: one collectible, supply one, opcodes 0, 99, 100, 101 and 1000 (`get-data`).
-- `harness/tests/claim.rs`: eight tests through `index_block`, the mainnet code path.
+- `harness/tests/claim.rs`: ten tests through `index_block`, the mainnet code path.
 
 Run: `cargo build --release --target wasm32-unknown-unknown -p milestone-collectible -p game-rewards`
 then `cd harness && cargo test --test claim` (needs `wasm-bindgen-test-runner` 0.2.100). It is its own
@@ -39,11 +39,21 @@ collectible stores only its game, milestone and serial. `get-data` asks the game
   the sprite code should be made cheaper before use;
 - a drawing over the contract's limit (4096 bytes in the test, set at initialise) is refused.
 
-Not solved: `SetArt` carried the drawing as call inputs (16 bytes each). The call travels in the
-transaction's `OP_RETURN`, which standard relay limits to about 80 bytes, so a real drawing must travel
-in the witness (as `merkle-distributor` reads its proof) and be read from there. Also open: the
-builder's SVG is not sanitised here (that happens off chain, before submission); `SetArt` has no admin
-check; the drawing cannot contain a zero byte (strings end at one).
+The drawing travels in the witness of its own transaction (an ordinals-style envelope), not in the call
+inputs, because the call sits in the `OP_RETURN`, which relays carry only to about 80 bytes. `SetArt`
+(opcode 2) reads it with `find_witness_payload`, the way `merkle-distributor` reads its proof. Tested: a
+3 KB drawing, larger than one 520-byte script push, arrives whole, and a drawing over the limit is
+refused. The envelope must be built **uncompressed**: the indexer compresses contract code but
+`find_witness_payload` does not decompress, so a compressed envelope stores gzip bytes. The test
+helper's default compresses, so the harness builds this transaction itself.
+
+`get-data` (1000) returns the SVG and `get-content-type` (1001) returns `image/svg+xml`. The 1000 to
+1005 range is the Orbital convention listed in the `alkanes-rs` TypeScript SDK tests (998 collection
+identifier, 999 index, 1000 data, 1001 content type, 1002 attributes); nothing in the contract source
+enforces it, so explorers may or may not read 1001.
+
+Still open: the builder's SVG is not sanitised here (that happens off chain, before submission);
+`SetArt` has no admin check; whether explorers render the SVG; the sprite should be made cheaper.
 
 ## What this means for the adapter (ports in `@ador/chain`)
 

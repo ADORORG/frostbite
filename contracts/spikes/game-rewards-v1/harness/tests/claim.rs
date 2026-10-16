@@ -2,6 +2,7 @@ use alkanes::indexer::index_block;
 use alkanes::tests::helpers::{self as h, assert_revert_context, clear};
 use alkanes::view;
 use alkanes_support::cellpack::Cellpack;
+use alkanes_support::envelope::RawEnvelope;
 use alkanes_support::id::AlkaneId;
 use bitcoin::{Block, OutPoint, Witness};
 use protorune_support::balance_sheet::BalanceSheetOperations;
@@ -51,6 +52,8 @@ fn claims(milestones: &[u128]) -> Block {
     claims_with_art(milestones, &[])
 }
 
+/// Art travels in the witness of its own transaction, uncompressed: the indexer compresses
+/// contract code but `find_witness_payload` does not decompress, so the contract reads raw bytes.
 fn claims_with_art(milestones: &[u128], art: &[(u128, String)]) -> Block {
     clear();
     let mut binaries = vec![COLLECTIBLE.to_vec(), REWARDS.to_vec()];
@@ -58,17 +61,19 @@ fn claims_with_art(milestones: &[u128], art: &[(u128, String)]) -> Block {
         cp(3, TEMPLATE, vec![]),
         cp(1, 0, vec![0, TEMPLATE, 2, 4096]),
     ];
-    for (milestone, svg) in art {
-        let mut inputs = vec![2, *milestone];
-        inputs.extend(alkanes_support::utils::string_to_u128_list(svg.clone()));
-        binaries.push(vec![]);
-        packs.push(cp(2, 1, inputs));
-    }
     for m in milestones {
         binaries.push(vec![]);
         packs.push(cp(2, 1, vec![1, *m]));
     }
-    let block = h::init_with_multiple_cellpacks_with_tx(binaries, packs);
+    let mut block = h::init_with_multiple_cellpacks_with_tx(binaries, packs);
+    for (milestone, svg) in art {
+        let witness = RawEnvelope::from(svg.clone().into_bytes()).to_witness(false);
+        block.txdata.push(h::create_multiple_cellpack_with_witness(
+            witness,
+            vec![cp(2, 1, vec![2, *milestone])],
+            false,
+        ));
+    }
     index_block(&block, 880_000).expect("block indexes");
     block
 }
@@ -208,5 +213,32 @@ fn reading_a_picture_costs_this_much_fuel() -> anyhow::Result<()> {
         drawn < sprite,
         "drawing is cheaper than generating the sprite"
     );
+    Ok(())
+}
+
+#[wasm_bindgen_test]
+fn a_drawing_larger_than_one_script_push_arrives_whole_through_the_witness() -> anyhow::Result<()> {
+    let body: String = (0..80)
+        .map(|n| {
+            format!(
+                "<circle cx=\"{}\" cy=\"{}\" r=\"3\" fill=\"#7fd8ff\"/>",
+                n % 100,
+                n % 90
+            )
+        })
+        .collect();
+    let big =
+        format!("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">{body}</svg>");
+    assert!(big.len() > 3000 && big.len() <= 4096, "{}", big.len());
+    claims_with_art(&[7], &[(7, big.clone())]);
+    assert!(data(2)?.contains(&big));
+    Ok(())
+}
+
+#[wasm_bindgen_test]
+fn the_content_type_says_svg() -> anyhow::Result<()> {
+    claims(&[7]);
+    let kind = view::call_view(&AlkaneId { block: 2, tx: 2 }, &vec![1001u128], VIEW_FUEL)?;
+    assert_eq!(String::from_utf8(kind)?, "image/svg+xml");
     Ok(())
 }
