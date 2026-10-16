@@ -11,10 +11,11 @@ if (signet === undefined) throw new Error("No target chain is configured.");
 // mark only when a milestone of the same name is declared here (`first-win` for its `firstWin`), so declaring another is
 // the whole change. They are the game's own report, and nothing of value depends on them.
 //
-// Two of them (`first-win`, `first-glacier`) can also be replay-checked. The game publishes the rules of its ice-field
-// cabinet (`games/frostbite/src/replay.ts`), the platform replays a run it issued a seed for, and the milestone is then
-// held as replay-verified. That shows the run followed the rules, not that a person played it, and the cabinet's board
-// is one a browser that knows the seed can read. `first-cashout` is a simulation event no replay can decide, so it stays
+// Three of the game's milestones can also be replay-checked: `first-win` and `first-glacier` from the ice-field cabinet and
+// `snake-ten` from SAT SNAKE. The game publishes the rules of those cabinets as one verifier
+// (`games/frostbite/src/replay.ts`), the platform replays a run it issued a seed for, and the milestone is then held as
+// replay-verified. That shows the run followed the rules, not that a person played it. The ice field's board is one a
+// browser that knows the seed can read; SAT SNAKE hides nothing, but a program could still steer it. `first-cashout` is a simulation event no replay can decide, so it stays
 // the game's report. The digest pins the built file: a change to the rules is a change here, and a test fails until it is.
 export const frostbite = defineGame({
   capabilities: ["run:submit"],
@@ -46,6 +47,14 @@ export const frostbite = defineGame({
     },
     {
       claimPolicy: "once",
+      criteria: "Grow the snake to ten links in the SAT SNAKE cabinet.",
+      description: "You grew the sat snake to ten links.",
+      id: "snake-ten",
+      title: "Ten links",
+      verification: "replay-verified",
+    },
+    {
+      claimPolicy: "once",
       criteria: "Cash out your icicles.",
       description: "You cashed out for the first time.",
       id: "first-cashout",
@@ -58,11 +67,11 @@ export const frostbite = defineGame({
   title: "FROST·BITE",
   verification: {
     replay: {
-      id: "ice-field",
+      id: "frostbite",
       sha256:
-        "899c429d932e38b6f5d2cba4df556b500524524942cb3bce13aaf7041cc765b4",
-      version: 1,
+        "09fb43aa50ef14d416f73a7e6b88d70400d437ea875a5ecbe3bf29ee2df51096",
+      version: 2,
     },
   },
-  version: "0.3.0",
+  version: "0.4.0",
 });

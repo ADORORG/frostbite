@@ -1,3 +1,4 @@
+import { replayRecord } from "@ador/game-sdk/replay";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -11,7 +12,7 @@ import {
 } from "@ador/test-kit/simulated-game-host";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { iceFieldRules } from "../src/verifier/ice-field.ts";
+import { frostbiteRules } from "../src/verifier/frostbite.ts";
 
 // The real bundle of FROST·BITE, with the ice-field cabinet in it, played through its own DOM against a simulated
 // platform: what a player clicks is what is recorded, and the record is a legal run of the platform's rules.
@@ -92,15 +93,10 @@ describe("the ice-field cabinet in the bundled game", () => {
     expect(record.claims).toEqual(["first-win"]);
     expect(record.gameId).toBe("frostbite");
 
-    const started = iceFieldRules.init(record.seed, record.config);
-    if (!started.ok) throw new Error(started.reason);
-    let state = started.state;
-    for (const input of record.inputs) {
-      const stepped = iceFieldRules.step(state, input);
-      if (!stepped.ok) throw new Error(stepped.reason);
-      state = stepped.state;
-    }
-    expect(iceFieldRules.earned(state)).toEqual(record.claims);
+    expect(replayRecord(frostbiteRules, record)).toEqual({
+      earned: record.claims,
+      ok: true,
+    });
   });
 
   it("does not report first-cashout, which only the game's own simulation can reach", async () => {

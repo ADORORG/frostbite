@@ -208,6 +208,12 @@ A game can offer a stronger level, `replay-verified`, for milestones its rules c
    seed of their own, self-reported), record the run with `createRunRecorder`, and `client.run.submit(runId, record)` when
    it ends. The answer is `verified` (with the milestones earned), `rejected` or `refused`.
 
+A game with several replayable cabinets still publishes one verifier: `combineCabinets` (`@ador/game-sdk/cabinets`) takes
+each cabinet's rules (`cabinet(rules)`), and a record names its cabinet in `config.cabinet`. A real-time game ports to the same
+shape by making its rules count ticks instead of reading a clock, recording the player's choices with the tick each was made on,
+and letting the screen's timer drive the same step function (FROST·BITE's SAT SNAKE is the worked example,
+`docs/product/run-record.md`).
+
 The platform replays the record on its server and holds the milestone on the account as `replay-verified`; the page shows
 it as "Replay-checked", and says what that shows (the run followed the game's rules) and what it does not (that a person
 played it; or, for a game with hidden information such as mine positions, that the player did not look). **Only games the

@@ -1,14 +1,16 @@
+import { replayRecord } from "@ador/game-sdk/replay";
 import { describe, expect, it } from "vitest";
 
 import {
   cells,
   defaultMines,
   iceFieldMines,
-  iceFieldRules,
-  iceFieldVerifierId,
-  iceFieldVersion,
-  type IceFieldState,
 } from "../src/verifier/ice-field.ts";
+import {
+  frostbiteRules,
+  frostbiteVerifierId,
+  frostbiteVerifierVersion,
+} from "../src/verifier/frostbite.ts";
 import { iceFieldSampleRun } from "../src/verifier/sample-run.ts";
 
 describe("the sample run the verifier is registered with", () => {
@@ -17,10 +19,10 @@ describe("the sample run the verifier is registered with", () => {
   it("names this game's verifier, at this version, and its seed, settings and claims", () => {
     expect(run).toMatchObject({
       claims: ["first-win", "first-glacier"],
-      config: { mines: defaultMines },
+      config: { cabinet: "ice-field", mines: defaultMines },
       gameId: "frostbite",
-      verifier: iceFieldVerifierId,
-      verifierVersion: iceFieldVersion,
+      verifier: frostbiteVerifierId,
+      verifierVersion: frostbiteVerifierVersion,
     });
   });
 
@@ -39,15 +41,10 @@ describe("the sample run the verifier is registered with", () => {
     ]);
   });
 
-  it("is a legal run of the rules that earns what it claims", () => {
-    const started = iceFieldRules.init(run.seed, run.config);
-    if (!started.ok) throw new Error(started.reason);
-    let state: IceFieldState = started.state;
-    for (const input of run.inputs) {
-      const stepped = iceFieldRules.step(state, input);
-      if (!stepped.ok) throw new Error(stepped.reason);
-      state = stepped.state;
-    }
-    expect(iceFieldRules.earned(state)).toEqual(run.claims);
+  it("is a legal run of the published rules that earns what it claims", () => {
+    expect(replayRecord(frostbiteRules, run)).toEqual({
+      earned: run.claims,
+      ok: true,
+    });
   });
 });

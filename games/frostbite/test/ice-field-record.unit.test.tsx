@@ -30,11 +30,11 @@ describe("ending a run", () => {
     const record = JSON.parse(recordText());
     expect(record).toMatchObject({
       claims: ["first-win", "first-glacier"],
-      config: { mines: 5 },
+      config: { cabinet: "ice-field", mines: 5 },
       gameId: "frostbite",
       seed,
-      verifier: "ice-field",
-      verifierVersion: 1,
+      verifier: "frostbite",
+      verifierVersion: 2,
     });
     expect(record.inputs).toHaveLength(22);
     expect(record.inputs.at(-2)).toEqual({ type: "settle" });
@@ -47,7 +47,9 @@ describe("ending a run", () => {
     await clickButton("End run");
     const text = recordText();
     expect(
-      text.startsWith('{"claims":[],"config":{"mines":5},"gameId":"frostbite"'),
+      text.startsWith(
+        '{"claims":[],"config":{"cabinet":"ice-field","mines":5},"gameId":"frostbite"',
+      ),
     ).toBe(true);
     expect(text).not.toMatch(/\s/u);
   });

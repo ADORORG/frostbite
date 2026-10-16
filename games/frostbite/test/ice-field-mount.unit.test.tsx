@@ -3,7 +3,7 @@ import { act } from "react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { mountIceField } from "../src/ice-field/mount.tsx";
-import { randomSeed } from "../src/ice-field/seed.ts";
+import { randomSeed } from "../src/cabinet/seed.ts";
 
 beforeAll(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });

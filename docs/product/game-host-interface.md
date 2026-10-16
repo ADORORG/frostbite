@@ -123,9 +123,10 @@ Answered in a second round:
 
 Settled by the G6 spike and the claim path (2026-10-15): the shape of a deterministic run record, the verifier contract,
 the replay pipeline and the claim path (`run.start`, `run.submit`, server-issued single-use runs, a verified level on the
-account) are in `docs/product/run-record.md`; FROST·BITE's ice-field cabinet uses them. Still open: a real-time cabinet that
-can be replayed (task #63), hidden information the player cannot read (the dealer, task #64), and running an outside
-game's rules on our server (a sandbox and an ADR, task #65).
+account) are in `docs/product/run-record.md`; FROST·BITE's ice-field and SAT SNAKE cabinets use them (a real-time cabinet
+ported to fixed steps, task #63, done for one cabinet). Still open: porting the other real-time cabinets, hidden information
+the player cannot read (the dealer, task #64), and running an outside game's rules on our server (a sandbox and an ADR,
+task #65).
 
 ## 8. What is built (2026-10-12) and where it differs
 

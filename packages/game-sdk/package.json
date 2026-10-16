@@ -6,6 +6,7 @@
   "exports": {
     "./attach": "./src/attach.ts",
     "./build": "./src/build.ts",
+    "./cabinets": "./src/cabinets.ts",
     "./client": "./src/client.ts",
     "./frame-headers": "./src/frame-headers.ts",
     "./host": "./src/host.ts",
@@ -62,6 +63,10 @@
       "./build": {
         "types": "./dist/build.d.ts",
         "default": "./dist/build.js"
+      },
+      "./cabinets": {
+        "types": "./dist/cabinets.d.ts",
+        "default": "./dist/cabinets.js"
       },
       "./client": {
         "types": "./dist/client.d.ts",

@@ -5,12 +5,25 @@ const multiplier = 1_664_525;
 const increment = 1_013_904_223;
 const modulus = 4_294_967_296;
 
+// One step of the generator for callers that keep the state themselves (a state machine has no closure to keep it in):
+// the next state, and the number it gives in [0, 1).
+export function stepSeed(state: number): {
+  readonly state: number;
+  readonly value: number;
+} {
+  const next = (Math.imul(state >>> 0, multiplier) + increment) >>> 0;
+  return { state: next, value: next / modulus };
+}
+
+// A zero seed would be a fixed point of the multiplication alone, so it starts from a constant instead.
+export const startState = (seed: number): number => seed >>> 0 || 3;
+
 export function seeded(seed: number): () => number {
-  // A zero seed would be a fixed point of the multiplication alone, so it starts from a constant instead.
-  let state = seed >>> 0 || 3;
+  let state = startState(seed);
   return () => {
-    state = (Math.imul(state, multiplier) + increment) >>> 0;
-    return state / modulus;
+    const step = stepSeed(state);
+    state = step.state;
+    return step.value;
   };
 }
 

@@ -30,7 +30,7 @@ test("the page is the game on nearly the whole screen, with its title in the bar
   if (viewport === null) throw new Error("No viewport");
   // The title and the small facts are in the bar over the game, not a block of their own.
   await expect(page.locator(".arcade-stage__bar h2")).toHaveText("FROST·BITE");
-  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.3.0");
+  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.4.0");
   await expect(page.locator(".arcade-stage-head")).toHaveCount(0);
   expect(bar.y + bar.height).toBeLessThanOrEqual(stage.y + 2);
   // Where the page is taller than the screen the dock is pulled up over the game's foot to stay in view; where
@@ -180,16 +180,16 @@ test("a milestone the game reports is announced over the game, and the notice go
   await expect(notice).toHaveText("", { timeout: 9_000 });
   await expect(
     page.getByRole("button", { name: /^Milestones/u }),
-  ).toContainText("1/3");
+  ).toContainText("1/4");
   await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "1 of 3 reached",
+    "1 of 4 reached",
   );
   // Seen again after a reload, it is not announced as new.
   await page.reload();
   await expect(
     page.getByRole("button", { name: /^Milestones/u }),
-  ).toContainText("1/3");
+  ).toContainText("1/4");
   await expect(page.getByTestId("milestone-toast")).toHaveText("");
 });
 

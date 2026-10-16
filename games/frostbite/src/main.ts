@@ -1,11 +1,13 @@
 import { createGameClient } from "@ador/game-sdk/client";
 import { jsonValueSchema } from "@ador/game-sdk/protocol";
-import { canonicalJson } from "@ador/game-sdk/run-record";
+import { canonicalJson, type RunRecord } from "@ador/game-sdk/run-record";
 import { createPlatformStorage } from "@ador/game-sdk/storage-shim";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
+import type { CabinetHost } from "./cabinet/host.ts";
 import { mountIceField } from "./ice-field/mount.tsx";
+import { mountSatSnake } from "./snake/mount.tsx";
 import { createMilestoneBridge } from "./platform/milestone-bridge.ts";
 import { persistedKeys } from "./platform/storage-keys.ts";
 
@@ -40,22 +42,24 @@ async function start(): Promise<void> {
     if (document.visibilityState === "hidden") void storage.flush();
   });
   await import("./legacy-boot.ts");
-  // The ice-field cabinet, beside the game: its own root, its own rules, no legacy file touched.
-  mountIceField({
+  // The replayable cabinets, beside the game: each in a root of its own, with its own rules, no legacy file touched.
+  const cabinetHost: CabinetHost = {
     milestone: bridge.report,
     runs: {
-      // Outside the platform, or for a player it cannot give a run, the cabinet plays on a local seed.
+      // Outside the platform, or for a player it cannot give a run, a cabinet plays on a local seed.
       start: () =>
         client.run
           .start()
           .catch(() => ({ reason: "not-supported", status: "unavailable" })),
-      submit: (runId, record) =>
+      submit: (runId: string, record: RunRecord) =>
         client.run.submit(
           runId,
           jsonValueSchema.parse(JSON.parse(canonicalJson(record))),
         ),
     },
-  });
+  };
+  mountIceField(cabinetHost);
+  mountSatSnake(cabinetHost);
 }
 
 void start();

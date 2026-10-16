@@ -1,17 +1,20 @@
 import type { Result } from "@ador/game-sdk/protocol";
 import type { RunRecord } from "@ador/game-sdk/run-record";
 
-// How the cabinet reaches the platform's runs: ask for one (its seed is the platform's, so a player cannot pick an easy board)
+// How a cabinet reaches the platform's runs: ask for one (its seed is the platform's, so a player cannot pick an easy board)
 // and hand back the record. The page the cabinet runs in supplies it; none means the platform offers no runs here.
-export interface IceFieldRuns {
+export interface CabinetRuns {
   start(): Promise<Result<"run.start">>;
   submit(runId: string, record: RunRecord): Promise<Result<"run.submit">>;
 }
 
 // What a player is told when a run begins, and why it is or is not one the platform will check. A run without the platform's
 // seed is played on a seed the browser made, and its milestones are only the game's own report.
-export function startNote(start: Result<"run.start"> | null): string {
-  const base = "Pick a tile. A mine ends the board.";
+export function startNote(
+  start: Result<"run.start"> | null,
+  instruction: string,
+): string {
+  const base = instruction;
   if (start?.status === "started")
     return `${base} The platform will check this run when you end it.`;
   const why =

@@ -152,7 +152,7 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
   await expect(page.getByText("Connected to the platform")).toBeVisible();
   await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "0 of 3 reached",
+    "0 of 4 reached",
   );
   // The game calls this when the player wins; here it is called directly, since winning a board is chance.
   await gameFrame(page).evaluate(() => {
@@ -163,7 +163,7 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
     host.milestone("firstBust");
   });
   await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "1 of 3 reached",
+    "1 of 4 reached",
   );
   await expect(page.locator('[data-milestone="first-win"]')).toContainText(
     "Reached",
@@ -174,6 +174,6 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
   await page.reload();
   await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "1 of 3 reached",
+    "1 of 4 reached",
   );
 });

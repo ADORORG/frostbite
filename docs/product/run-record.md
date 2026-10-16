@@ -131,9 +131,29 @@ starts a run on the platform's seed, and when they end the run it submits the re
 milestones are held as replay-verified on their account. Signed out (or when the platform has no run to give), the cabinet
 plays on a seed of its own and says its milestones are the game's own report. It still reports a milestone to the platform's
 milestone bridge as soon as it is earned, so a player sees it at once as self-reported and sees it upgraded after the replay.
-`first-cashout` is never upgraded. The game's other nine cabinets are real-time canvas games driven by an animation loop and elapsed time, with
-`Math.random` in places and round seeds from `Date.now()`, so they cannot be replayed as they are; porting one to a
-fixed-step simulation is task #63.
+`first-cashout` is never upgraded.
+
+**A real-time cabinet, ported (task #63): SAT SNAKE.** The game's nine other cabinets are real-time canvas games driven by an
+animation loop and elapsed time, with `Math.random` in places and round seeds from `Date.now()`, so they cannot be replayed as
+they are. The pattern for porting one, proved on the snake (`games/frostbite/src/snake`, rules in `src/verifier/snake.ts`):
+
+- **The rules know ticks, not time.** One tick is one move. The screen runs a timer (`tickMs`, 235 ms, the cabinet's old
+  pace) and calls the same `moveOnce` the server calls; the clock decides how fast the game feels and never what a record
+  means. All randomness is a seeded stream the state carries (`stepSeed`), so the same seed and choices give the same game.
+- **The record holds choices, not moves.** `turn { dir, tick }` points the snake from a tick; `end { tick }` closes the run. The
+  snake just keeps going between choices, so a record is a few dozen inputs instead of one per tick. `end` is what makes the
+  last stretch count, so the cabinet always writes it (a crash writes it too).
+- **Replay cost is bounded**: a run may last at most 10,000 ticks, and the record caps (5,000 inputs, 64 KB) apply as ever.
+- **Nothing is hidden**: the mines are drawn on the board, so unlike the ice field the "followed the rules" claim is close to
+  the whole truth. It still does not show that a person steered: a program could play the same legal moves.
+- **Several cabinets, one verifier.** The platform holds one set of rules per game, so FROST·BITE publishes one verifier,
+  `frostbite` (version 2), built with the SDK's `combineCabinets`: a record names its cabinet in `config.cabinet`
+  (`ice-field` or `sat-snake`) and that cabinet's rules replay the rest. The platform learned nothing about either.
+  Any change to any cabinet's rules raises the version and changes the pinned digest.
+- **Milestone `snake-ten`**: the snake grew to ten links; declared `replay-verified` in the manifest.
+
+The legacy snake inside the game's boards is untouched (the legacy files are frozen) and stays the game's own report; SAT SNAKE
+is a cabinet beside the game, like the ice field, with its own launcher and its own run. Eight real-time cabinets are not ported.
 
 **A limit replay cannot remove.** The seed is known to the player's browser and the rules are public, so the browser knows
 where the mines are, whoever chose the seed. Replay shows a record is _legal_, not that the player did not read the layout.

@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  columns,
-  markOf,
-  neighbourMines,
-} from "../src/ice-field/neighbours.ts";
+import { markOf } from "../src/cabinet/marks.ts";
+import { columns, neighbourMines } from "../src/ice-field/neighbours.ts";
 
 describe("neighbouring mines", () => {
   it("counts the mines among up to eight neighbours, and not the tile itself", () => {

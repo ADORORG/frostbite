@@ -1,3 +1,4 @@
+import { replayRecord } from "@ador/game-sdk/replay";
 import { describe, expect, it, vi } from "vitest";
 
 import { createIceFieldSession } from "../src/ice-field/session.ts";
@@ -10,6 +11,7 @@ import {
   maxBoards,
   maxMines,
 } from "../src/verifier/ice-field.ts";
+import { frostbiteRules } from "../src/verifier/frostbite.ts";
 
 const seed = 20_261_016;
 const safe = (board: number, mines = defaultMines) => {
@@ -41,17 +43,18 @@ describe("starting a run", () => {
     expect(session.nextGlacierCost()).toBe(glacierCosts[0]);
     expect(session.record()).toMatchObject({
       claims: [],
-      config: { mines: defaultMines },
+      config: { cabinet: "ice-field", mines: defaultMines },
       gameId: "frostbite",
       inputs: [],
       seed,
-      verifier: "ice-field",
-      verifierVersion: 1,
+      verifier: "frostbite",
+      verifierVersion: 2,
     });
   });
 
   it("takes another mine count, written into the record, and refuses one the rules do not allow", () => {
     expect(createIceFieldSession({ mines: 9, seed }).record().config).toEqual({
+      cabinet: "ice-field",
       mines: 9,
     });
     expect(
@@ -133,7 +136,13 @@ describe("recording what the player does", () => {
     clearBoard(session, 1);
     session.buildGlacier();
     const record = session.record();
-    const started = iceFieldRules.init(record.seed, record.config);
+    // Through the verifier the platform holds: the record is a legal run that earns what it claims.
+    expect(replayRecord(frostbiteRules, record)).toEqual({
+      earned: record.claims,
+      ok: true,
+    });
+    // And through the cabinet's rules alone it ends where the session is.
+    const started = iceFieldRules.init(record.seed, { mines: defaultMines });
     if (!started.ok) throw new Error(started.reason);
     let state = started.state;
     for (const input of record.inputs) {
@@ -142,7 +151,6 @@ describe("recording what the player does", () => {
       state = stepped.state;
     }
     expect(state).toEqual(session.state());
-    expect(iceFieldRules.earned(state)).toEqual(record.claims);
   });
 });
 

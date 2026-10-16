@@ -16,8 +16,15 @@ client-only: no network, no server of its own, nothing that touches a chain. The
   through the same rules the platform replays, recording its run as it goes. Signed in, it plays on a run the platform issued
   (`run.start`) and submits the record at "End run" (`run.submit`); otherwise it plays on a local seed and says its milestones
   are the game's own report.
-- `src/verifier/`: the deterministic rules (`ice-field.ts`), a seeded generator, and a sample run. `src/replay.ts` publishes
-  them: the SDK's build turns it into `verifier.js` and `verifier.json`, and the manifest pins the digest.
+- `src/snake/`: the **SAT SNAKE cabinet**, the real-time snake game ported to a fixed-step simulation (a timer calls the rules'
+  `moveOnce` each tick; only the player's turns and the tick of each are recorded). Same launcher/panel pattern as the ice
+  field; its mines are in plain view. The milestone is `snake-ten`.
+- `src/cabinet/`: what the cabinets share: the host type, the platform-run hook (`usePlatformRun`: begin a run, send the
+  record), the record view, the seed, and the mark naming.
+- `src/verifier/`: the deterministic rules (`ice-field.ts`, `snake.ts` with its geometry in `snake-board.ts`), a seeded
+  generator, and a sample run. `frostbite.ts` combines the cabinets behind one verifier (`combineCabinets`; a record names
+  its cabinet in `config.cabinet`). `src/replay.ts` publishes it: the SDK's build turns it into `verifier.js` and
+  `verifier.json`, and the manifest pins the digest.
 
 ## Public API
 
@@ -31,6 +38,8 @@ Package exports `./verifier` and `./verifier-sample` (the rules and the sample r
 - The cabinet uses classes only (the frame's policy forbids inline styles), writes only accepted inputs into the record, and
   never says a run is verified unless the platform replayed it.
 - `first-cashout` is a simulation event and is never replay-verified.
+- A change to any cabinet's rules raises `frostbiteVerifierVersion` and the manifest's version and digest.
+- The snake's rules use ticks, never a clock; the timer is in `src/snake/timing.ts` and only paces the screen.
 - The ice field hides its mines but the browser knows the seed, so "replay-checked" means the run followed the rules and nothing
   more (`docs/product/run-record.md`).
 

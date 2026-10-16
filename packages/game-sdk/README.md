@@ -30,6 +30,8 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./storage-shim`: `createPlatformStorage` gives a game written for `localStorage` a storage kept in memory,
   with the keys it names saved through `progress.save` (one save after a burst, a refused save retried with the
   next change). The page that owns the player's data stays the platform.
+- `./cabinets`: `combineCabinets` / `cabinet(rules)` build one verifier from the rules of several cabinets; a record names its
+  cabinet in `config.cabinet`, and an unknown or missing name is an `invalid-config` outcome.
 - `./frame-headers`: the response headers (CSP `sandbox allow-scripts`, `connect-src 'none'`, …) the platform
   serves game files with.
 - `./build`: `checkGameHtml`, `bundleGameScript`, `bundleGameStyles`, `buildGame(s)`: turns `/games/<id>` into

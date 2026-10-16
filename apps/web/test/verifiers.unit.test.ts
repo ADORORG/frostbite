@@ -10,6 +10,10 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { frostbite } from "../../../configs/games/frostbite.ts";
 import { createIceFieldSession } from "../../../games/frostbite/src/ice-field/session.ts";
+import {
+  playSession,
+  winnableSeed,
+} from "../../../games/frostbite/test/support/snake-solver.ts";
 import { iceFieldMines } from "../../../games/frostbite/src/verifier/ice-field.ts";
 import { iceFieldSampleRun } from "../../../games/frostbite/src/verifier/sample-run.ts";
 
@@ -169,5 +173,56 @@ describe("a run played through the ice-field cabinet", () => {
       detail: "the board is over: settle it",
       reason: "illegal-input",
     });
+  });
+});
+
+// SAT SNAKE: the same registered verifier, a second cabinet. A run played through the cabinet's session (timer ticks and
+// steering) leaves a record the platform replays to the same result.
+describe("a run played through the SAT SNAKE cabinet", () => {
+  const seed = winnableSeed(10);
+  const won = () => {
+    const session = playSession(seed, 10);
+    if (session === null) throw new Error("The test player could not win.");
+    return session.record();
+  };
+
+  it("is verified, and earns snake-ten, a milestone the manifest declares", () => {
+    const result = verifyRun(verifierRegistry, won());
+    expect(result).toMatchObject({ earned: ["snake-ten"], status: "verified" });
+    expect(frostbite.milestones.map(({ id }) => id)).toContain("snake-ten");
+  });
+
+  it("is refused when it claims a milestone the other cabinet decides", () => {
+    expect(
+      verifyRun(verifierRegistry, { ...won(), claims: ["first-win"] }),
+    ).toMatchObject({ reason: "claim-not-earned", status: "rejected" });
+  });
+
+  it("is refused for another seed, or with a turn added after the snake crashed", () => {
+    expect(
+      verifyRun(verifierRegistry, { ...won(), seed: seed + 1 }).status,
+    ).toBe("rejected");
+    const record = won();
+    expect(
+      verifyRun(verifierRegistry, {
+        ...record,
+        inputs: [
+          ...record.inputs,
+          { data: { dir: "up", tick: 9_000 }, type: "turn" },
+        ],
+      }),
+    ).toMatchObject({ reason: "illegal-input", status: "rejected" });
+  });
+
+  it("is refused without a cabinet named, or under rules of another version", () => {
+    expect(verifyRun(verifierRegistry, { ...won(), config: {} })).toMatchObject(
+      {
+        reason: "invalid-config",
+        status: "rejected",
+      },
+    );
+    expect(
+      verifyRun(verifierRegistry, { ...won(), verifierVersion: 1 }).status,
+    ).toBe("rejected");
   });
 });

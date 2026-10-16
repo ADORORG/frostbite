@@ -4,21 +4,15 @@ import { useEffect, useReducer, useRef, useState } from "react";
 
 import { IceBoard } from "./ice-board.tsx";
 import { IceControls } from "./ice-controls.tsx";
-import {
-  startNote,
-  type IceFieldRuns,
-  type SubmitState,
-} from "./platform-run.ts";
-import { markOf, neighbourMines } from "./neighbours.ts";
-import { RecordView } from "./record-view.tsx";
-import { randomSeed } from "./seed.ts";
+import type { CabinetHost } from "../cabinet/host.ts";
+import { markOf } from "../cabinet/marks.ts";
+import { RecordView } from "../cabinet/record-view.tsx";
+import { randomSeed } from "../cabinet/seed.ts";
+import { usePlatformRun } from "../cabinet/use-platform-run.ts";
+import { neighbourMines } from "./neighbours.ts";
 import { createIceFieldSession, type IceFieldSession } from "./session.ts";
 
-export interface IceFieldHost {
-  milestone(mark: string): void;
-  // The platform's runs, where it offers them: a run started there has the platform's seed and can be replay-checked.
-  readonly runs?: IceFieldRuns;
-}
+export type IceFieldHost = CabinetHost;
 
 type Phase = "ended" | "idle" | "playing";
 
@@ -37,9 +31,7 @@ export function IceField({
   const [message, setMessage] = useState("");
   const [session, setSession] = useState<IceFieldSession | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
-  // The platform's run this session was started on, if it was, and what became of its record.
-  const [runId, setRunId] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState<SubmitState | null>(null);
+  const platformRun = usePlatformRun(host.runs);
   // The session changes inside itself; the screen is drawn again after each input.
   const [, redraw] = useReducer((count: number) => count + 1, 0);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -54,18 +46,18 @@ export function IceField({
   };
   const start = async () => {
     // A run on the platform's seed when the platform gives one; otherwise the browser's own, reported as such.
-    const run = await host.runs?.start().catch(() => null);
-    const started = run?.status === "started" ? run : null;
+    const { note, seed } = await platformRun.begin(
+      newSeed,
+      "Pick a tile. A mine ends the board.",
+    );
     setSession(
       createIceFieldSession({
         onEarned: (milestone) => host.milestone(markOf(milestone)),
-        seed: started?.seed ?? newSeed(),
+        seed,
       }),
     );
-    setRunId(started?.runId ?? null);
-    setSubmitted(null);
     setPhase("playing");
-    setMessage(startNote(run ?? null));
+    setMessage(note);
   };
   const state = session?.state();
   const nextCost = session?.nextGlacierCost() ?? null;
@@ -114,12 +106,7 @@ export function IceField({
     setRecord(finished);
     setPhase("ended");
     setMessage("");
-    if (runId === null || host.runs === undefined) return;
-    setSubmitted({ kind: "pending" });
-    host.runs.submit(runId, finished).then(
-      (result) => setSubmitted({ kind: "settled", result }),
-      () => setSubmitted({ kind: "failed" }),
-    );
+    platformRun.send(finished);
   };
 
   return (
@@ -195,7 +182,7 @@ export function IceField({
             <RecordView
               onAgain={() => void start()}
               record={record}
-              submit={submitted}
+              submit={platformRun.submitted}
             />
           ) : null}
           {phase === "playing" ? null : (

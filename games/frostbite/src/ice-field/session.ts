@@ -5,10 +5,13 @@ import {
   glacierCosts,
   iceFieldGameId,
   iceFieldRules,
-  iceFieldVerifierId,
-  iceFieldVersion,
   type IceFieldState,
 } from "../verifier/ice-field.ts";
+import {
+  frostbiteVerifierId,
+  frostbiteVerifierVersion,
+  iceFieldCabinetName,
+} from "../verifier/frostbite.ts";
 
 export type SettleResult = "busted" | "skipped" | "won";
 
@@ -57,11 +60,11 @@ export function createIceFieldSession(
   let steps = 0;
   const announced = new Set<string>();
   const recorder = createRunRecorder({
-    config: { mines },
+    config: { cabinet: iceFieldCabinetName, mines },
     gameId: iceFieldGameId,
     seed: options.seed,
-    verifier: iceFieldVerifierId,
-    verifierVersion: iceFieldVersion,
+    verifier: frostbiteVerifierId,
+    verifierVersion: frostbiteVerifierVersion,
   });
 
   function apply(

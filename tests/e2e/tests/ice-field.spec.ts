@@ -1,9 +1,10 @@
 import { syncGameStateResponseSchema } from "@ador/shared/games";
-import { expect, test, type FrameLocator, type Page } from "@playwright/test";
+import { expect, test, type FrameLocator } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { signIn } from "../src/upload-helpers.ts";
 import { openDock } from "./support/dock.ts";
+import { watch } from "./support/frame-watch.ts";
 
 // The ice-field cabinet in FROST·BITE, played in the platform's isolated frame. Signed out, it plays on a seed of its own and
 // the milestone it earns is the game's own report. Signed in, the platform gives it a run and a seed, replays the record the
@@ -15,23 +16,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop only.");
   await page.emulateMedia({ reducedMotion: "reduce" });
 });
-
-function watch(page: Page) {
-  const violations: string[] = [];
-  const errors: string[] = [];
-  page.on("console", (message) => {
-    // The platform page reports one known thing, the wallet library's probe for script evaluation (see the hardening
-    // spec); anything else the policy reports, in the page or the game's frame, is a failure.
-    const text = message.text();
-    if (
-      /content security policy/iu.test(text) &&
-      !/Evaluating a string as JavaScript/u.test(text)
-    )
-      violations.push(text);
-  });
-  page.on("pageerror", (error) => errors.push(error.message));
-  return { errors, violations };
-}
 
 // Opens the cabinet and starts a run.
 async function startRun(game: FrameLocator) {
@@ -148,13 +132,13 @@ test("a run is played once: the record of a run already settled is refused", asy
     gameId: "frostbite",
     record: {
       claims: [],
-      config: { mines: 5 },
+      config: { cabinet: "ice-field", mines: 5 },
       gameId: "frostbite",
       inputs: [],
       schemaVersion: 1,
       seed: 1,
-      verifier: "ice-field",
-      verifierVersion: 1,
+      verifier: "frostbite",
+      verifierVersion: 2,
     },
     runId: run.runId,
   };

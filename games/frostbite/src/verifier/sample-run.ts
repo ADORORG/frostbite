@@ -7,9 +7,12 @@ import {
   firstWin,
   iceFieldGameId,
   iceFieldMines,
-  iceFieldVerifierId,
-  iceFieldVersion,
 } from "./ice-field.ts";
+import {
+  frostbiteVerifierId,
+  frostbiteVerifierVersion,
+  iceFieldCabinetName,
+} from "./frostbite.ts";
 
 // One legal run the verifier is shown with: clear every safe tile of the first board (the bonus pays well over the first
 // glacier tier's cost), settle it, and build the first glacier. It earns both milestones the rules can decide. It is a plain
@@ -25,12 +28,12 @@ export function iceFieldSampleRun(): RunRecord {
   inputs.push({ type: "settle" }, { data: 1, type: "build-glacier" });
   return {
     claims: [firstWin, firstGlacier],
-    config: { mines: defaultMines },
+    config: { cabinet: iceFieldCabinetName, mines: defaultMines },
     gameId: iceFieldGameId,
     inputs,
     schemaVersion: 1,
     seed,
-    verifier: iceFieldVerifierId,
-    verifierVersion: iceFieldVersion,
+    verifier: frostbiteVerifierId,
+    verifierVersion: frostbiteVerifierVersion,
   };
 }
