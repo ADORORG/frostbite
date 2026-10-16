@@ -14,6 +14,7 @@
     "./schema/collections": "./src/schema/collections.ts",
     "./schema/creator-admission": "./src/schema/creator-admission.ts",
     "./schema/derivatives": "./src/schema/derivatives.ts",
+    "./schema/game-admin": "./src/schema/game-admin.ts",
     "./schema/game-claims": "./src/schema/game-claims.ts",
     "./schema/game-runs": "./src/schema/game-runs.ts",
     "./schema/game-saves": "./src/schema/game-saves.ts",

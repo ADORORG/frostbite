@@ -1,4 +1,3 @@
-import { transactionStates } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -7,7 +6,11 @@ import {
   indexed,
   isObservable,
   walk,
-} from "../src/transitions.ts";
+  afterBroadcast,
+  moveTo,
+  signedOf,
+} from "../src/chain/progress.ts";
+import { transactionStates } from "../src/chain/transaction-state.ts";
 
 describe("what an observation does to a claim in the network's hands", () => {
   it.each([
@@ -93,12 +96,66 @@ describe("a walk through the lifecycle", () => {
       walk(["awaiting_signature", "signed", "broadcast_accepted"]),
     ).not.toThrow();
     expect(() => walk(["awaiting_signature", "broadcast_accepted"])).toThrow(
-      "Illegal claim transition awaiting_signature -> broadcast_accepted.",
+      "Illegal transaction transition awaiting_signature -> broadcast_accepted.",
     );
     expect(() => walk(["complete", "pending"])).toThrow(
-      /Illegal claim transition/u,
+      /Illegal transaction transition/u,
     );
     expect(() => walk([])).not.toThrow();
     expect(() => walk(["signed"])).not.toThrow();
+  });
+});
+
+describe("what a broadcast does to a signed transaction", () => {
+  const ref = { chain: "simnet:one" as never, id: "abc" };
+  it("records the id when the network has it, or may have it", () => {
+    expect(afterBroadcast({ kind: "accepted", ref })).toEqual({
+      state: "broadcast_accepted",
+      transactionId: "abc",
+    });
+    expect(afterBroadcast({ kind: "ambiguous", ref })).toEqual({
+      state: "broadcast_unknown",
+      transactionId: "abc",
+    });
+  });
+  it("records a refusal with its reason, and nothing when the network could not be asked", () => {
+    expect(afterBroadcast({ kind: "rejected", reason: "no" })).toEqual({
+      failureReason: "no",
+      state: "broadcast_rejected",
+    });
+    expect(afterBroadcast({ kind: "unavailable" })).toBeNull();
+  });
+});
+
+describe("moving a tracked transaction", () => {
+  const change = { state: "pending" } as const;
+  it("moves it only from the state it was decided in, and only where the lifecycle allows", () => {
+    expect(
+      moveTo("broadcast_accepted", change)({ state: "broadcast_accepted" }),
+    ).toBe(change);
+    expect(
+      moveTo("broadcast_accepted", change)({ state: "pending" }),
+    ).toBeNull();
+    expect(moveTo("signed", change)({ state: "signed" })).toBeNull();
+    expect(
+      moveTo("signed", { state: "expired" })({ state: "signed" }),
+    ).toBeNull();
+  });
+
+  it("reads a transaction as signed once it has a signed payload", () => {
+    const unsigned = {
+      chain: "simnet:one" as never,
+      family: "simulated" as never,
+      format: "f",
+      payload: "p",
+      summary: {} as never,
+    };
+    expect(signedOf({ signedPayload: null, unsigned })).toBeNull();
+    expect(signedOf({ signedPayload: "s", unsigned })).toEqual({
+      chain: unsigned.chain,
+      family: unsigned.family,
+      format: "f",
+      payload: "s",
+    });
   });
 });

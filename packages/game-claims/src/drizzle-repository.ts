@@ -1,22 +1,13 @@
 import type { DatabaseClient } from "@ador/database/connection";
 import { gameMilestoneClaims } from "@ador/database/schema/game-claims";
-import {
-  addressSchema,
-  chainFamilyIdSchema,
-  chainRefSchema,
-  contractRefSchema,
-  type TransactionSummary,
-  type UnsignedTransaction,
-} from "@ador/shared/chain";
+import { addressSchema, readTracked, trackedValues } from "@ador/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 
 import {
   settledStates,
-  type ClaimState,
   type GameClaimRepository,
   type StoredClaim,
 } from "./repository.ts";
-import { decodeSummary, encodeSummary } from "./summary-codec.ts";
 
 type Row = typeof gameMilestoneClaims.$inferSelect;
 
@@ -25,22 +16,9 @@ const unsigned = ["constructed", "simulated", "awaiting_signature"] as const;
 const settledList = [...settledStates];
 
 function toClaim(row: Row): StoredClaim {
-  const summary: TransactionSummary = decodeSummary(row.summary);
-  const chain = chainRefSchema.parse(row.chain);
-  const transaction: UnsignedTransaction = {
-    chain,
-    family: chainFamilyIdSchema.parse(row.unsignedFamily),
-    format: row.unsignedFormat,
-    payload: row.unsignedPayload,
-    summary,
-  };
+  const tracked = readTracked(row);
   return {
-    chain,
-    contract: contractRefSchema.parse({
-      chain,
-      family: row.contractFamily,
-      id: row.contractId,
-    }),
+    ...tracked,
     createdAt: row.createdAt,
     expiresAt: row.expiresAt,
     expectedClaims: row.expectedClaims,
@@ -49,13 +27,13 @@ function toClaim(row: Row): StoredClaim {
     id: row.id,
     milestoneId: row.milestoneId,
     signedPayload: row.signedPayload,
-    // The column's check constraint admits only the states of `ClaimState`.
-    state: row.state as ClaimState,
     transactionId: row.transactionId,
-    unsigned: transaction,
     updatedAt: row.updatedAt,
     userId: row.userId,
-    wallet: addressSchema.parse({ chain, value: row.walletAddress }),
+    wallet: addressSchema.parse({
+      chain: tracked.chain,
+      value: row.walletAddress,
+    }),
   };
 }
 
@@ -118,9 +96,7 @@ export function createDrizzleGameClaimRepository(
           updatedAt: now,
         };
         await transaction.insert(gameMilestoneClaims).values({
-          chain: claim.chain,
-          contractFamily: claim.contract.family,
-          contractId: claim.contract.id,
+          ...trackedValues(claim),
           createdAt: claim.createdAt,
           expectedClaims,
           expiresAt: claim.expiresAt,
@@ -128,10 +104,6 @@ export function createDrizzleGameClaimRepository(
           id: claim.id,
           milestoneId: claim.milestoneId,
           state: stored.state,
-          summary: encodeSummary(claim.unsigned.summary),
-          unsignedFamily: claim.unsigned.family,
-          unsignedFormat: claim.unsigned.format,
-          unsignedPayload: claim.unsigned.payload,
           updatedAt: now,
           userId: claim.userId,
           walletAddress: claim.wallet.value,

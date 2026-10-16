@@ -1,7 +1,7 @@
-import { transactionSummarySchema } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
-import { decodeSummary, encodeSummary } from "../src/summary-codec.ts";
+import { decodeSummary, encodeSummary } from "../src/chain/summary-codec.ts";
+import { transactionSummarySchema } from "../src/chain/transaction.ts";
 
 const chain = "simnet:one";
 const asset = { chain, id: "sim", kind: "native" } as const;

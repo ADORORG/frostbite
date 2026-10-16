@@ -1,13 +1,18 @@
 import { InvalidAddressError } from "@ador/chain/ports";
-import type {
-  Address,
-  SignedTransaction,
-  UnsignedTransaction,
+import {
+  afterBroadcast,
+  afterObservation,
+  indexed,
+  isObservable,
+  moveTo,
+  signedOf,
+  type Address,
+  type SignedTransaction,
+  type UnsignedTransaction,
 } from "@ador/shared/chain";
 
-import { moveTo, signedOf, toView } from "./claim-steps.ts";
+import { toView } from "./claim-steps.ts";
 import type { ClaimChange, StoredClaim } from "./repository.ts";
-import { afterObservation, indexed, isObservable } from "./transitions.ts";
 import type {
   ClaimChainPorts,
   ClaimView,
@@ -30,13 +35,8 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
     const signed = signedOf(claim);
     if (signed === null) return claim;
     const outcome = await chain.broadcaster.broadcast(signed);
-    if (outcome.kind === "unavailable") return claim;
-    const change: ClaimChange =
-      outcome.kind === "accepted"
-        ? { state: "broadcast_accepted", transactionId: outcome.ref.id }
-        : outcome.kind === "ambiguous"
-          ? { state: "broadcast_unknown", transactionId: outcome.ref.id }
-          : { failureReason: outcome.reason, state: "broadcast_rejected" };
+    const change: ClaimChange | null = afterBroadcast(outcome);
+    if (change === null) return claim;
     return repository.update(userId, claim.id, moveTo("signed", change));
   }
 

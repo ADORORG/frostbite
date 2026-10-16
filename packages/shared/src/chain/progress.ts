@@ -1,8 +1,6 @@
-import {
-  canTransition,
-  type Observation,
-  type TransactionState,
-} from "@ador/shared/chain";
+import type { BroadcastOutcome, Observation } from "./results.ts";
+import type { SignedTransaction, UnsignedTransaction } from "./transaction.ts";
+import { canTransition, type TransactionState } from "./transaction-state.ts";
 
 // Where a claim goes next. The neutral lifecycle allows no jumps, so each move is walked one legal step at a time and the claim
 // is written at the end of the walk; a mistake in a path fails loudly in a test, not quietly in a player's claim.
@@ -12,7 +10,7 @@ export function walk(path: readonly TransactionState[]): void {
     const to = path[index];
     if (from === undefined || to === undefined || !canTransition(from, to))
       throw new Error(
-        `Illegal claim transition ${String(from)} -> ${String(to)}.`,
+        `Illegal transaction transition ${String(from)} -> ${String(to)}.`,
       );
   }
 }
@@ -89,3 +87,58 @@ export function afterObservation(
 
 // What a confirmed claim becomes when the chain's indexed state shows it (the end of the walk checked above).
 export const indexed = "complete" as const satisfies TransactionState;
+
+export type BroadcastChange =
+  | {
+      readonly state: "broadcast_accepted" | "broadcast_unknown";
+      readonly transactionId: string;
+    }
+  | { readonly failureReason: string; readonly state: "broadcast_rejected" };
+
+// What a broadcast attempt does to a signed transaction; null when the network could not be asked at all, so nothing moves and
+// the same bytes are sent again later (the network gives the same id).
+export function afterBroadcast(
+  outcome: BroadcastOutcome,
+): BroadcastChange | null {
+  switch (outcome.kind) {
+    case "accepted":
+      return { state: "broadcast_accepted", transactionId: outcome.ref.id };
+    case "ambiguous":
+      return { state: "broadcast_unknown", transactionId: outcome.ref.id };
+    case "rejected":
+      return { failureReason: outcome.reason, state: "broadcast_rejected" };
+    case "unavailable":
+      return null;
+  }
+}
+
+// The state of a transaction the platform tracks: the neutral ones, and `expired` for one built and never signed in time.
+export type TrackedState = TransactionState | "expired";
+
+// The transaction a step was signed as, or null while it is unsigned.
+export const signedOf = (step: {
+  readonly signedPayload: string | null;
+  readonly unsigned: UnsignedTransaction;
+}): SignedTransaction | null =>
+  step.signedPayload === null
+    ? null
+    : {
+        chain: step.unsigned.chain,
+        family: step.unsigned.family,
+        format: step.unsigned.format,
+        payload: step.signedPayload,
+      };
+
+// A change is written only if the lifecycle allows the move from where the step is now; otherwise nothing is written, so a step
+// that arrives late (or twice) cannot move a transaction backwards or sideways.
+export const moveTo =
+  <Change extends { readonly state: TrackedState }>(
+    from: TransactionState,
+    change: Change,
+  ) =>
+  (step: { readonly state: TrackedState }): Change | null =>
+    step.state === from &&
+    change.state !== "expired" &&
+    canMove(from, change.state)
+      ? change
+      : null;

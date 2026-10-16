@@ -1,7 +1,7 @@
 import {
   transactionSummarySchema,
   type TransactionSummary,
-} from "@ador/shared/chain";
+} from "./transaction.ts";
 
 // A summary holds amounts as bigints, which JSON cannot carry. They are kept as decimal text under the same field names and
 // read back through the summary's own schema, so what is stored is checked on the way out as much as on the way in.
