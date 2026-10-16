@@ -81,6 +81,7 @@ const ports = () => {
   return { addressCodec, broadcaster, builder, contracts, observer, rewards };
 };
 const configured = (deployed: boolean) => ({
+  clock: () => now,
   chain: () => ({
     funding: { maxFee: { asset: nativeAsset(chain), baseUnits: 10n } },
     ports: ports(),

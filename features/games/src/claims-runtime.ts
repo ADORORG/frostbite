@@ -47,12 +47,13 @@ export function createGameClaimsResolver(
   config: GameClaimsConfig,
   environment: NodeJS.ProcessEnv = process.env,
 ) {
+  const clock = config.clock ?? (() => new Date());
   return memoizeUntilFailure(async () => {
     const database = createDatabaseClient(
       createDatabasePool(parseDatabaseEnvironment(environment)),
     );
     return createGameClaimsService({
-      clock: () => new Date(),
+      clock,
       earned: (userId, gameId, milestoneId) =>
         hasEarnedMilestone(database, { gameId, milestoneId, userId }),
       funding: (chain) => {
@@ -64,9 +65,7 @@ export function createGameClaimsResolver(
       game: claimableGameLookup(games, config),
       newId: randomUUID,
       ports: (chain) => config.chain(chain)?.ports ?? null,
-      repository: createDrizzleGameClaimRepository(database, {
-        clock: () => new Date(),
-      }),
+      repository: createDrizzleGameClaimRepository(database, { clock }),
     });
   });
 }

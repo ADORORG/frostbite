@@ -13,4 +13,7 @@ export interface GameClaimsConfig {
   } | null;
   // The rewards contract deployed for each game, by game id.
   readonly contracts: ReadonlyMap<string, ContractRef>;
+  // The time the claims service and its records use. Production leaves it out (the real clock); a test that drives a
+  // simulated chain on its own clock passes that clock, so a claim's expiry is judged on the clock that set it.
+  readonly clock?: () => Date;
 }
