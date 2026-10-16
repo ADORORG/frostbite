@@ -1,5 +1,8 @@
 # Plan: the claim path for run records (G6c, task #62)
 
+> **Superseded in part (2026-10-16):** the dealer (G6e) and the sandboxed runner described below were dropped (ADR-018 Amendment 2).
+> Replay verification stays, as an optional badge. Read the dealer sections as the road not taken.
+
 Status: **built on the documented defaults** (owner away, 2026-10-15; section 13 is what was decided and may be reviewed at
 merge). Branch `feat/claim-path`, stacked on `feat/ice-field-cabinet`; record `references/claim-path-task-record.md`. It
 turns the G6 spike (a run record and a replay verifier that nothing calls) into something a player's milestone can use,

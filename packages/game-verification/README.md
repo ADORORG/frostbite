@@ -14,7 +14,7 @@ specification is `docs/product/run-record.md`.
   runner for.
 - `@ador/game-verification/runner`: the `VerifierRunner` port and `createInProcessRunner`, which runs a first-party artifact
   in a `node:vm` context with a per-call time limit. **It is not a security boundary** and is used only for the platform's own
-  games; a sandboxed runner for anyone else's (task #65) is the same port.
+  games; a sandboxed runner for anyone else's is not planned (ADR-018 Amendment 2).
 
 - `@ador/game-verification/verifier`: re-exports `GameVerifier<State>` (a pure state machine: `init`, `step`, `earned`; defined in the SDK so a game needs nothing from the platform) and
   `defineVerifier`, which folds the state type away so different games share a registry.

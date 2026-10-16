@@ -18,7 +18,7 @@ only the SDK, publishes its own rules, and declares in its manifest which milest
   app's and the repository root's dependencies on a game are gone.
 - **First-party runner only.** `createInProcessRunner` runs the artifact in a `node:vm` context with a per-call time limit. It
   is **not a security boundary**; only `embedded` games (built from this repository) are loaded. Outside games stay
-  self-reported until a sandboxed runner exists (task #65, ADR needed).
+  self-reported until a sandboxed runner exists (a sandboxed runner was later dropped: ADR-018 Amendment 2).
 - **A verdict never grants a milestone the manifest does not declare replay-verifiable**, and a record for another seed or
   claiming such a milestone is rejected without a replay. Every submission that reaches a verdict spends the run.
 - **A browser can never set the verified level**: a sync request that names it is read as self-reported; only
@@ -84,9 +84,9 @@ only the SDK, publishes its own rules, and declares in its manifest which milest
 
 ## Not done (each is its own task)
 
-Retention of rejected records (the plan's 90-day prune); the sandboxed runner and its ADR (#65); the dealer for hidden
-information (#64); a real-time cabinet that can be replayed (#63); repeatable and target milestones; leaderboards (#54), which
-must not accept the FROST·BITE ice field until the dealer exists; the deployed path to the games' files (`configs/game-runs.ts`
+Retention of rejected records (the plan's 90-day prune); the sandboxed runner and the dealer for hidden
+information (both dropped, ADR-018 Amendment 2); a real-time cabinet that can be replayed (#63); repeatable and target milestones; leaderboards (#54), which
+should not treat the FROST·BITE ice field as proof of skill; the deployed path to the games' files (`configs/game-runs.ts`
 assumes the web app runs from its own folder).
 
 ## Full end-to-end run

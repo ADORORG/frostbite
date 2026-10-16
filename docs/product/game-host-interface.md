@@ -124,9 +124,9 @@ Answered in a second round:
 Settled by the G6 spike and the claim path (2026-10-15): the shape of a deterministic run record, the verifier contract,
 the replay pipeline and the claim path (`run.start`, `run.submit`, server-issued single-use runs, a verified level on the
 account) are in `docs/product/run-record.md`; FROST·BITE's ice-field and SAT SNAKE cabinets use them (a real-time cabinet
-ported to fixed steps, task #63, done for one cabinet). Still open: porting the other real-time cabinets, hidden information
-the player cannot read (the dealer, task #64), and running an outside game's rules on our server (a sandbox and an ADR,
-task #65).
+ported to fixed steps, task #63, done for one cabinet). Replay verification is optional and a game may skip it. Decided
+2026-10-16 (ADR-018 Amendment 2): no platform dealer for hidden information and no sandboxed runner for outside games' rules;
+a builder secures a game client side, and self-reported milestones may mint within limits.
 
 ## 8. What is built (2026-10-12) and where it differs
 

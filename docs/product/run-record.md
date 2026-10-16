@@ -57,8 +57,8 @@ reason is logged at startup). The game's browser bundle is never executed on the
 
 Who runs it matters: the artifact is the game's code, running on our server. Today only the platform's own games (`embedded`,
 built from this repository and reviewed) are loaded, replayed by an in-process runner with a per-call time limit (`node:vm`),
-**which is not a security boundary**. A game from anyone else would need a sandboxed runner with an ADR (task #65); until
-then outside games stay self-reported, and the loader says so rather than loading them.
+**which is not a security boundary**. A game from anyone else is not loaded and none is planned to be (ADR-018 Amendment 2): outside games stay
+self-reported, and the loader says so rather than loading them.
 
 ## What the platform does with a record (`verifyRun`)
 
@@ -158,10 +158,10 @@ is a cabinet beside the game, like the ice field, with its own launcher and its 
 **A limit replay cannot remove.** The seed is known to the player's browser and the rules are public, so the browser knows
 where the mines are, whoever chose the seed. Replay shows a record is _legal_, not that the player did not read the layout.
 Server-issued seeds stop a player choosing an easy board; they do not fix this for a hidden-information board, because the
-rules that place the mines are deterministic and public. A game whose result depends on hidden information needs a secret the
-player does not hold (the platform "dealer", task #64) or should be a game of skill rather than concealment. FROST·BITE's ice
+rules that place the mines are deterministic and public. A game whose result depends on hidden information is the builder's to secure
+client side, or should be a game of skill rather than concealment (a platform dealer was considered and dropped, ADR-018 Amendment 2). FROST·BITE's ice
 field is a hidden-information board, so its "Replay-checked" label means exactly "the run followed the rules", which the page
-says; nothing that carries value may depend on it, and a leaderboard must not accept it until the dealer exists.
+says; nothing that carries more than the self-reported class of reward may depend on it, and a leaderboard should not treat it as proof of skill.
 
 ## Limits (typed policy)
 

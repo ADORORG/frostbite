@@ -218,7 +218,7 @@ The platform replays the record on its server and holds the milestone on the acc
 it as "Replay-checked", and says what that shows (the run followed the game's rules) and what it does not (that a person
 played it; or, for a game with hidden information such as mine positions, that the player did not look). **Only games the
 platform plays itself are loaded today**; a game hosted elsewhere stays self-reported until the sandboxed runner exists
-(task #65). The explorer game (`games/sdk-explorer`) shows both calls answering.
+(ADR-018 Amendment 2: no sandboxed runner is planned, and replay is optional). The explorer game (`games/sdk-explorer`) shows both calls answering.
 
 ## Test and run it
 
