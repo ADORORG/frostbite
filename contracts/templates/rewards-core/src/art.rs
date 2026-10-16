@@ -50,6 +50,20 @@ mod tests {
     }
 
     #[test]
+    fn the_shared_drawing_vectors_agree() {
+        let file: serde_json::Value =
+            serde_json::from_str(include_str!("../../abi/drawing-vectors.json")).expect("JSON");
+        for good in file["canonical"].as_array().expect("canonical") {
+            let text = good.as_str().expect("text");
+            assert_eq!(validate(text.as_bytes(), 4096), Ok(Some(text)), "{text}");
+        }
+        for bad in file["contractRefuses"].as_array().expect("refused") {
+            let text = bad.as_str().expect("text");
+            assert!(validate(text.as_bytes(), 4096).is_err(), "{text}");
+        }
+    }
+
+    #[test]
     fn nothing_means_no_drawing() {
         assert_eq!(validate(b"", 4096), Ok(None));
     }
