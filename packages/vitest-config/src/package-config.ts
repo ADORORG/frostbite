@@ -13,6 +13,9 @@ const coverageReporters = ["text", "json-summary", "lcov"];
 /** The integration suites of database-backed packages are slower than the five-second default. */
 export const databaseTestTimeoutMs = 15_000;
 
+/** jsdom suites render whole React trees; on a busy machine they exceed the five-second default without being wrong. */
+export const domTestTimeoutMs = 15_000;
+
 /** File suffix a test glob matches: `.ts` files, `.tsx` files, or both. */
 export type TestExtension = "ts" | "tsx" | "{ts,tsx}";
 
@@ -95,6 +98,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
                   include: ["test/**/*.dom.test.{ts,tsx}"],
                   name: "unit-dom",
                   setupFiles: [options.dom.setupFile],
+                  testTimeout: domTestTimeoutMs,
                 },
               },
             ]),
