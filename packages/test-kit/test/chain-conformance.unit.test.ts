@@ -6,8 +6,14 @@ import { defineChainAdapterConformance } from "../src/chain-conformance.ts";
 import { simulated } from "./support/chains.ts";
 
 defineChainAdapterConformance("simulated", () => {
-  const { adapter, fixtures } = simulated();
-  return { adapter, fixtures };
+  const { adapter, fixtures, rewards } = simulated();
+  return { adapter, fixtures, rewards };
+});
+
+// The same adapter held to the same suite with a claim as the transaction it builds, signs and broadcasts.
+defineChainAdapterConformance("simulated (mint-milestone)", () => {
+  const { adapter, claimFixtures, rewards } = simulated();
+  return { adapter, fixtures: claimFixtures, rewards };
 });
 
 // Invented references: which CAIP-2 id is which network is configuration, not code.

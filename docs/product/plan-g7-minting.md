@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **plan for review**, nothing built. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a and G7b built** (the manifest declaration; the intent, claim records and claim service on the simulated chain); G7c to G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -66,6 +66,13 @@ chain-neutral port set:
   the level label, against the simulated chain; Playwright for success and each failure.
 - **G7e The contract** (GP-05): `contracts/templates/game-rewards` with runtime tests, pinned build and code hash; and the
   `bitcoin-alkanes` adapter's build, broadcast and observe. **This is the part that waits** for D19, D22 and wallet signing.
+
+**Built so far.** G7a: `rewards` and `milestone:claim` in the manifest (`@ador/shared/games`). G7b: the `mint-milestone`
+intent and summary in `@ador/shared/chain`; a `rewards` reader port (`RewardsReader.claimed`, capability `rewards:read`) in
+`@ador/chain`, which tells that a claim the platform watched confirm has also been indexed; the simulated chain executes claims
+(and can revert one); the `game_milestone_claims` table; and `@ador/game-claims` (start, submit signed, refresh, list). Notes: a
+claim is `complete` only once the reader shows the wallet's expected count; a failed claim stops at the state that saw the failure
+(no reconcile step for a claim that never happened); the platform's claim limit is per account while the chain's is per address.
 
 G7a to G7d are safe to build now and are real: when G7e lands they swap the simulated chain for the real one at the ports. They
 also let the owner see the whole experience before a contract exists. Each is its own branch and task.

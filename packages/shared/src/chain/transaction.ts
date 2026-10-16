@@ -10,6 +10,13 @@ import {
   extensionSchema,
 } from "./values.ts";
 
+// A milestone's id as a game declares it: lower-case words joined by hyphens (the same form as a game's own id).
+export const milestoneIdSchema = z
+  .string()
+  .min(2)
+  .max(64)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
+
 const semanticVersionPattern = /^\d+\.\d+\.\d+$/u;
 
 // Chain-neutral fields every intent shares. Anything family-specific (UTXO funding, gas settings)
@@ -38,6 +45,16 @@ export const transactionIntentSchema = z
         quantity: z.bigint().positive(),
       })
       .strict(),
+    // A player claims a milestone they earned from a game's rewards contract. The milestone is named by the id the game
+    // declared; the contract decides how many claims one address may make.
+    z
+      .object({
+        ...intentBase,
+        contract: contractRefSchema,
+        milestoneId: milestoneIdSchema,
+        operation: z.literal("mint-milestone"),
+      })
+      .strict(),
     z
       .object({
         ...intentBase,
@@ -50,7 +67,9 @@ export const transactionIntentSchema = z
   .superRefine((intent, context) => {
     const embedded = [
       intent.sender.chain,
-      ...(intent.operation === "mint" ? [intent.contract.chain] : []),
+      ...(intent.operation === "mint" || intent.operation === "mint-milestone"
+        ? [intent.contract.chain]
+        : []),
       ...(intent.operation === "transfer"
         ? [intent.recipient.chain, intent.amount.asset.chain]
         : []),
@@ -74,6 +93,11 @@ export const transactionSummarySchema = z
     chain: chainRefSchema,
     expiresAt: z.iso.datetime(),
     fee: amountSchema,
+    // Which milestone, from which contract, a `mint-milestone` transaction claims: what the person checks before signing.
+    milestone: z
+      .object({ contract: contractRefSchema, id: milestoneIdSchema })
+      .strict()
+      .optional(),
     operation: chainOperationSchema,
     recipient: addressSchema.optional(),
   })
@@ -84,6 +108,7 @@ export const transactionSummarySchema = z
       ...(summary.amount ? [summary.amount.asset.chain] : []),
       ...(summary.asset ? [summary.asset.chain] : []),
       ...(summary.recipient ? [summary.recipient.chain] : []),
+      ...(summary.milestone ? [summary.milestone.contract.chain] : []),
     ];
     if (embedded.some((chain) => chain !== summary.chain)) {
       context.addIssue({

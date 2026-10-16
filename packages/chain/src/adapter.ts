@@ -11,6 +11,7 @@ export const portCapabilities = {
   contracts: "contract:gateway",
   observer: "transaction:observe",
   reader: "chain:read",
+  rewards: "rewards:read",
 } as const satisfies Readonly<Record<keyof ChainPorts, string>>;
 
 export type PortName = keyof ChainPorts;
@@ -24,6 +25,7 @@ export const portNames = [
   "contracts",
   "observer",
   "reader",
+  "rewards",
 ] as const satisfies readonly PortName[];
 
 // Port capabilities are listed above; families add their own (for example `native-payment` or

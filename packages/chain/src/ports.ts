@@ -73,11 +73,23 @@ export interface ChainObserver {
   observe(ref: TransactionRef): Promise<Observation>;
 }
 
+// How many times an address has claimed a milestone from a game's rewards contract, as the chain's indexed state says. It is
+// how the platform tells that a claim it watched confirm has also been indexed (state `complete`, never earlier); it
+// reads only what the platform itself performs a claim for.
+export interface RewardsReader {
+  claimed(
+    contract: ContractRef,
+    holder: Address,
+    milestoneId: string,
+  ): Promise<number>;
+}
+
 export interface ChainPorts {
   readonly addressCodec: AddressCodec;
   readonly broadcaster: Broadcaster;
   readonly contracts: ContractGateway;
   readonly observer: ChainObserver;
   readonly reader: ChainReader;
+  readonly rewards: RewardsReader;
   readonly builder: TransactionBuilder;
 }

@@ -1,11 +1,15 @@
 import { chainRefSchema, type TransactionIntent } from "@ador/shared/chain";
 
-import type { ChainConformanceFixtures } from "../../src/chain-conformance.ts";
+import type {
+  ChainConformanceFixtures,
+  RewardsConformanceFixtures,
+} from "../../src/chain-conformance.ts";
 import { simulatedAddress } from "../../src/simulated-chain/address.ts";
 import { createSimulatedChain } from "../../src/simulated-chain/adapter.ts";
 import {
   nativeAsset,
   signSimulated,
+  simulatedFamily,
 } from "../../src/simulated-chain/transaction.ts";
 
 export const one = chainRefSchema.parse("simnet:one");
@@ -55,7 +59,41 @@ export function simulated() {
     },
     unservedChain: three,
   };
-  return { ...chain, fixtures, intent, recipient, sender };
+  // A claim from a rewards contract on the same chain, by the same wallet.
+  const contract = { chain: one, family: simulatedFamily, id: "rewards-1" };
+  const claimIntent: TransactionIntent = {
+    chain: one,
+    contract,
+    milestoneId: "first-win",
+    operation: "mint-milestone",
+    sender,
+  };
+  const claimFixtures: ChainConformanceFixtures = {
+    ...fixtures,
+    transaction: {
+      funding,
+      intent: claimIntent,
+      now: () => fixedNow,
+      sign: signSimulated,
+      tamper: (signed) => ({ ...signed, payload: `x${signed.payload}` }),
+    },
+  };
+  const rewards: RewardsConformanceFixtures = {
+    contract,
+    holder: simulatedAddress(one, "070809"),
+    milestoneId: "first-win",
+  };
+  return {
+    ...chain,
+    claimFixtures,
+    claimIntent,
+    contract,
+    fixtures,
+    intent,
+    recipient,
+    rewards,
+    sender,
+  };
 }
 
 // The simulated adapter with each port resolved, so a test fails loudly if one is missing.

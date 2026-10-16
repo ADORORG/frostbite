@@ -19,8 +19,13 @@ export const defaultFinalityDepth = 3;
 export class SimulatedLedger {
   private height = 100;
   private forced: ForcedBroadcast | undefined;
-  // Transaction id to the height at which the network first saw it.
-  private readonly entries = new Map<string, number>();
+  // Transaction id to the height at which the network first saw it, and what it carried.
+  private readonly entries = new Map<
+    string,
+    { readonly payload: string; readonly seenAt: number }
+  >();
+  // Transactions the network included and then reverted: seen, but without effect.
+  private readonly reverted = new Set<string>();
 
   constructor(
     private readonly chain: ChainRef,
@@ -30,6 +35,23 @@ export class SimulatedLedger {
 
   advance(blocks: number): void {
     this.height += blocks;
+  }
+
+  // The network included this transaction and its execution failed: observed as reverted from then on.
+  revert(ref: TransactionRef): void {
+    if (!this.entries.has(ref.id))
+      throw new Error("Only a transaction the network has seen can revert.");
+    this.reverted.add(ref.id);
+  }
+
+  // Payloads of the transactions that took effect: included, past the finality depth, and not reverted.
+  effective(): readonly string[] {
+    return [...this.entries.entries()]
+      .filter(
+        ([id, { seenAt }]) =>
+          !this.reverted.has(id) && this.height - seenAt >= this.finalityDepth,
+      )
+      .map(([, { payload }]) => payload);
   }
 
   failNext(outcome: ForcedBroadcast): void {
@@ -53,7 +75,8 @@ export class SimulatedLedger {
     if (outcome === "rejected")
       return { kind: "rejected", reason: "rejected by the simulated network" };
     // An ambiguous broadcast still reaches the network; the caller cannot tell and must look it up.
-    if (!this.entries.has(ref.id)) this.entries.set(ref.id, this.height);
+    if (!this.entries.has(ref.id))
+      this.entries.set(ref.id, { payload, seenAt: this.height });
     return outcome === "ambiguous"
       ? { kind: "ambiguous", ref }
       : { kind: "accepted", ref };
@@ -61,12 +84,14 @@ export class SimulatedLedger {
 
   observe(ref: TransactionRef): Observation {
     const observedAt = this.now().toISOString();
-    const seenAt = this.entries.get(ref.id);
+    const seen = this.entries.get(ref.id);
     const base = { observedAt, provider: "simulated", ref };
-    if (seenAt === undefined)
+    if (seen === undefined)
       return { ...base, confirmations: 0, status: "not-found" };
-    const confirmations = this.height - seenAt;
-    const block = this.block(seenAt);
+    const confirmations = this.height - seen.seenAt;
+    const block = this.block(seen.seenAt);
+    if (this.reverted.has(ref.id))
+      return { ...base, block, confirmations, status: "reverted" };
     return confirmations >= this.finalityDepth
       ? { ...base, block, confirmations, status: "confirmed" }
       : { ...base, block, confirmations, status: "pending" };

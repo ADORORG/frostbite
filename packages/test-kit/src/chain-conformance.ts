@@ -3,6 +3,10 @@ import { describe, it } from "vitest";
 import { portCapabilities, type ChainAdapter } from "@ador/chain/adapter";
 
 import {
+  checkRewardsReader,
+  type RewardsConformanceFixtures,
+} from "./chain-conformance-rewards.ts";
+import {
   checkAddressCodec,
   checkBroadcastAndObservation,
   checkCapabilityConsistency,
@@ -13,15 +17,20 @@ import {
 } from "./chain-conformance-checks.ts";
 
 export type { ChainConformanceFixtures } from "./chain-conformance-checks.ts";
+export type { RewardsConformanceFixtures } from "./chain-conformance-rewards.ts";
 
 // The suite every chain adapter must pass (ADR-017 section 8). Each group runs only for a port the
 // adapter declares, so an adapter is held to exactly the capabilities it claims.
 export function defineChainAdapterConformance(
   name: string,
-  create: () => { adapter: ChainAdapter; fixtures: ChainConformanceFixtures },
+  create: () => {
+    adapter: ChainAdapter;
+    fixtures: ChainConformanceFixtures;
+    rewards?: RewardsConformanceFixtures;
+  },
 ): void {
   describe(`chain adapter conformance: ${name}`, () => {
-    const { adapter, fixtures } = create();
+    const { adapter, fixtures, rewards } = create();
     const declares = (port: keyof typeof portCapabilities): boolean =>
       adapter.capabilities.has(portCapabilities[port]);
 
@@ -44,6 +53,14 @@ export function defineChainAdapterConformance(
       declares("broadcaster") && declares("observer") && declares("builder"),
     )("broadcasts idempotently and observes repeatably", () =>
       checkBroadcastAndObservation(adapter, fixtures),
+    );
+    it.runIf(declares("rewards"))(
+      "reads a holder's claims as a whole count that does not change by asking",
+      async () => {
+        if (rewards === undefined)
+          throw new Error("The fixtures must cover a declared rewards reader.");
+        await checkRewardsReader(adapter, rewards);
+      },
     );
     it.runIf(declares("reader") && declares("addressCodec"))(
       "reads head and balances on the requested chain",

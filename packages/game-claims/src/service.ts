@@ -1,0 +1,220 @@
+import type {
+  Address,
+  SignedTransaction,
+  UnsignedTransaction,
+} from "@ador/shared/chain";
+
+import { moveTo, signedOf, toView } from "./claim-steps.ts";
+import type { ClaimChange, StoredClaim } from "./repository.ts";
+import { afterObservation, indexed, isObservable } from "./transitions.ts";
+import type {
+  ClaimChainPorts,
+  ClaimView,
+  GameClaimsDependencies,
+  RefreshClaimResult,
+  StartClaimResult,
+  SubmitClaimResult,
+} from "./types.ts";
+
+export function createGameClaimsService(dependencies: GameClaimsDependencies) {
+  const { clock, earned, funding, game, newId, ports, repository } =
+    dependencies;
+
+  // Sends a signed claim to the network, once; asking again sends the same bytes and the network gives the same id.
+  async function broadcast(
+    userId: string,
+    claim: StoredClaim,
+    chain: ClaimChainPorts,
+  ): Promise<StoredClaim | null> {
+    const signed = signedOf(claim);
+    if (signed === null) return claim;
+    const outcome = await chain.broadcaster.broadcast(signed);
+    if (outcome.kind === "unavailable") return claim;
+    const change: ClaimChange =
+      outcome.kind === "accepted"
+        ? { state: "broadcast_accepted", transactionId: outcome.ref.id }
+        : outcome.kind === "ambiguous"
+          ? { state: "broadcast_unknown", transactionId: outcome.ref.id }
+          : { failureReason: outcome.reason, state: "broadcast_rejected" };
+    return repository.update(userId, claim.id, moveTo("signed", change));
+  }
+
+  return {
+    // A player asks to claim a milestone they earned, with the wallet they will sign with. The answer is the claim in progress
+    // if there is one (asking again changes nothing), or a new one with the transaction built and the summary to show.
+    async start(input: {
+      readonly gameId: string;
+      readonly milestoneId: string;
+      readonly userId: string;
+      readonly wallet: Address;
+    }): Promise<StartClaimResult> {
+      const { gameId, milestoneId, userId, wallet } = input;
+      const current = game(gameId);
+      const limit = current?.limits.get(milestoneId);
+      if (current === null || limit === undefined)
+        return { code: "not-claimable", ok: false };
+      if (current.contract === null) return { code: "unavailable", ok: false };
+      if (wallet.chain !== current.chain)
+        return { code: "wrong-chain", ok: false };
+      const chain = ports(current.chain);
+      if (chain === null) return { code: "unavailable", ok: false };
+      if (!(await earned(userId, gameId, milestoneId)))
+        return { code: "not-earned", ok: false };
+
+      const intent = {
+        chain: current.chain,
+        contract: current.contract,
+        milestoneId,
+        operation: "mint-milestone",
+        sender: wallet,
+      } as const;
+      let unsigned: UnsignedTransaction;
+      try {
+        const simulated = await chain.contracts.simulate(intent);
+        if (!simulated.ok)
+          return { code: "would-fail", ok: false, reason: simulated.reason };
+        unsigned = await chain.builder.build(intent, funding(current.chain));
+      } catch {
+        return { code: "chain-unavailable", ok: false };
+      }
+      const result = await repository.create(
+        {
+          chain: current.chain,
+          contract: current.contract,
+          createdAt: clock(),
+          expiresAt: new Date(unsigned.summary.expiresAt),
+          gameId,
+          id: newId(),
+          milestoneId,
+          unsigned,
+          userId,
+          wallet,
+        },
+        { limit },
+      );
+      if (result.kind === "limit-reached")
+        return { code: "limit-reached", ok: false };
+      return {
+        claim: toView(result.claim),
+        ok: true,
+        resumed: result.kind === "in-progress",
+      };
+    },
+
+    // The wallet signed what the player was shown. It is checked against what was built, kept, and sent to the network.
+    // Sending the same signed claim again returns the claim as it is; a different one is refused.
+    async submitSigned(input: {
+      readonly claimId: string;
+      readonly signed: SignedTransaction;
+      readonly userId: string;
+    }): Promise<SubmitClaimResult> {
+      const { claimId, signed, userId } = input;
+      const outcome: { refusal: SubmitClaimResult | null } = { refusal: null };
+      const accepted = await repository.update(userId, claimId, (claim) => {
+        if (claim.state !== "awaiting_signature") {
+          outcome.refusal =
+            claim.signedPayload === signed.payload
+              ? null
+              : { code: "not-awaiting-signature", ok: false };
+          return null;
+        }
+        if (clock() >= claim.expiresAt) {
+          outcome.refusal = { code: "expired", ok: false };
+          return { state: "expired" };
+        }
+        const chain = ports(claim.chain);
+        if (chain === null) {
+          outcome.refusal = { code: "chain-unavailable", ok: false };
+          return null;
+        }
+        const verified = chain.builder.verifySigned(claim.unsigned, signed);
+        if (!verified.ok) {
+          outcome.refusal = {
+            code: "invalid-signature",
+            ok: false,
+            reason: verified.reason,
+          };
+          return null;
+        }
+        return { signedPayload: signed.payload, state: "signed" };
+      });
+      if (accepted === null) return { code: "not-found", ok: false };
+      if (outcome.refusal !== null) return outcome.refusal;
+      const chain = ports(accepted.chain);
+      if (chain === null || accepted.state !== "signed")
+        return { claim: toView(accepted), ok: true };
+      try {
+        const sent = await broadcast(userId, accepted, chain);
+        return { claim: toView(sent ?? accepted), ok: true };
+      } catch {
+        return { code: "chain-unavailable", ok: false };
+      }
+    },
+
+    // Looks at the chain once and moves the claim as far as the evidence allows. It is safe to call as often as wanted.
+    async refresh(
+      userId: string,
+      claimId: string,
+    ): Promise<RefreshClaimResult> {
+      const claim = await repository.get(userId, claimId);
+      if (claim === null) return { code: "not-found", ok: false };
+      const chain = ports(claim.chain);
+      if (chain === null) return { code: "chain-unavailable", ok: false };
+      try {
+        if (claim.state === "signed")
+          return {
+            claim: toView((await broadcast(userId, claim, chain)) ?? claim),
+            ok: true,
+          };
+        if (claim.state === "awaiting_signature")
+          return {
+            claim: toView(
+              (await repository.update(userId, claimId, (held) =>
+                held.state === "awaiting_signature" && clock() >= held.expiresAt
+                  ? { state: "expired" }
+                  : null,
+              )) ?? claim,
+            ),
+            ok: true,
+          };
+        if (claim.transactionId === null)
+          return { claim: toView(claim), ok: true };
+        const ref = { chain: claim.chain, id: claim.transactionId };
+        if (claim.state === "confirmed") {
+          const count = await chain.rewards.claimed(
+            claim.contract,
+            claim.wallet,
+            claim.milestoneId,
+          );
+          const next = await repository.update(
+            userId,
+            claimId,
+            count >= claim.expectedClaims
+              ? moveTo("confirmed", { state: indexed })
+              : () => null,
+          );
+          return { claim: toView(next ?? claim), ok: true };
+        }
+        if (!isObservable(claim.state))
+          return { claim: toView(claim), ok: true };
+        const from = claim.state;
+        const next = afterObservation(from, await chain.observer.observe(ref));
+        if (next === null) return { claim: toView(claim), ok: true };
+        const moved = await repository.update(
+          userId,
+          claimId,
+          moveTo(from, next),
+        );
+        return { claim: toView(moved ?? claim), ok: true };
+      } catch {
+        return { code: "chain-unavailable", ok: false };
+      }
+    },
+
+    async list(userId: string, gameId: string): Promise<readonly ClaimView[]> {
+      return (await repository.list(userId, gameId)).map(toView);
+    },
+  };
+}
+
+export type GameClaimsService = ReturnType<typeof createGameClaimsService>;

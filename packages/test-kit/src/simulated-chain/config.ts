@@ -13,7 +13,12 @@ export function simulatedChainConfig(
 ): ChainConfig {
   return {
     chainId,
-    confirmations: { deploy: finalized, mint: finalized, transfer: finalized },
+    confirmations: {
+      deploy: finalized,
+      mint: finalized,
+      "mint-milestone": finalized,
+      transfer: finalized,
+    },
     displayName: `Simulated ${chainId}`,
     enabled: true,
     family: simulatedFamily,

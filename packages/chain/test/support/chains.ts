@@ -22,6 +22,7 @@ export const familyB = chainFamilyIdSchema.parse("family-b");
 const policy = {
   deploy: { kind: "confirmations", required: 3 },
   mint: { kind: "confirmations", required: 2 },
+  "mint-milestone": { kind: "confirmations", required: 2 },
   transfer: { kind: "finalized" },
 } as const;
 

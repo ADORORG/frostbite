@@ -4,12 +4,14 @@ import type {
   ChainObserver,
   ChainReader,
   ContractGateway,
+  RewardsReader,
 } from "@ador/chain/ports";
 import type {
   Amount,
   ChainRef,
   ChainTransaction,
   Observation,
+  TransactionRef,
 } from "@ador/shared/chain";
 
 import { simulatedAddressCodec } from "./address.ts";
@@ -20,6 +22,7 @@ import {
 } from "./ledger.ts";
 import {
   createSimulatedBuilder,
+  decodeSimulated,
   nativeAsset,
   simulatedFamily,
   simulatedAdapterVersion,
@@ -44,6 +47,8 @@ export interface SimulatedChainOptions {
 
 export interface SimulatedChainControls {
   advance(chain: ChainRef, blocks: number): void;
+  // The network included this transaction and its execution failed.
+  revert(ref: TransactionRef): void;
   failNext(chain: ChainRef, outcome: ForcedBroadcast): void;
   fund(chain: ChainRef, owner: string, baseUnits: bigint): void;
 }
@@ -129,6 +134,22 @@ export function createSimulatedChain(
   const observer: ChainObserver = {
     observe: (ref) => Promise.resolve(ledger(ref.chain).observe(ref)),
   };
+  // The simulated contract: a claim counts once its transaction is past the finality depth and has not reverted.
+  const rewards: RewardsReader = {
+    claimed: (contract, holder, milestoneId) =>
+      Promise.resolve(
+        ledger(contract.chain)
+          .effective()
+          .map(decodeSimulated)
+          .filter(
+            (body) =>
+              body?.operation === "mint-milestone" &&
+              body.contract === contract.id &&
+              body.sender === holder.value &&
+              body.milestoneId === milestoneId,
+          ).length,
+      ),
+  };
 
   return {
     adapter: {
@@ -141,6 +162,7 @@ export function createSimulatedChain(
         contracts,
         observer,
         reader,
+        rewards,
       },
       supports: (chain) => ledgers.has(chain),
       testOnly: true,
@@ -148,6 +170,7 @@ export function createSimulatedChain(
     },
     controls: {
       advance: (chain, blocks) => ledger(chain).advance(blocks),
+      revert: (ref) => ledger(ref.chain).revert(ref),
       failNext: (chain, outcome) => ledger(chain).failNext(outcome),
       fund: (chain, owner, baseUnits) =>
         balances.set(`${chain}|${owner}`, baseUnits),

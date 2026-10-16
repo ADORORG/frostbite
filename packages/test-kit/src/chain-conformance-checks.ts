@@ -143,6 +143,18 @@ export async function checkSummaryFidelity(
       "the amount shown is the amount built",
     );
   }
+  if (intent.operation === "mint-milestone") {
+    assert.deepEqual(
+      summary.milestone,
+      { contract: intent.contract, id: intent.milestoneId },
+      "the milestone and contract shown are the ones built",
+    );
+    assert.deepEqual(
+      summary.recipient,
+      intent.sender,
+      "a claim is shown as received by the one who makes it",
+    );
+  }
   assert.ok(
     Date.parse(summary.expiresAt) > now().getTime(),
     "a fresh summary has not expired",

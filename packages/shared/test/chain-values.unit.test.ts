@@ -189,6 +189,7 @@ describe("chainConfigListSchema", () => {
   const policy = {
     deploy: { kind: "confirmations", required: 3 },
     mint: { kind: "confirmations", required: 2 },
+    "mint-milestone": { kind: "confirmations", required: 2 },
     transfer: { kind: "finalized" },
   };
   const entry = {
@@ -205,7 +206,7 @@ describe("chainConfigListSchema", () => {
     expect(chainConfigListSchema.safeParse([entry]).success).toBe(true);
   });
 
-  it.each(["deploy", "mint", "transfer"] as const)(
+  it.each(["deploy", "mint", "mint-milestone", "transfer"] as const)(
     "refuses a chain with no confirmation policy for %s",
     (operation) => {
       const rest = Object.fromEntries(

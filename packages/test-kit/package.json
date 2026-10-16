@@ -22,7 +22,9 @@
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
     "./service-process": "./src/service-process.ts",
     "./simulated-chain": "./src/simulated-chain/adapter.ts",
+    "./simulated-chain-address": "./src/simulated-chain/address.ts",
     "./simulated-chain-config": "./src/simulated-chain/config.ts",
+    "./simulated-chain-transaction": "./src/simulated-chain/transaction.ts",
     "./simulated-game-host": "./src/simulated-game-host.ts",
     "./storage-registry": "./src/storage-registry.ts"
   },

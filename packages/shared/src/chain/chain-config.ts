@@ -7,7 +7,12 @@ export const chainRoles = ["test", "public-beta", "production"] as const;
 
 // Operations the platform performs on a chain. A confirmation policy is required for each one, so
 // a chain cannot be enabled with an operation whose finality nobody decided (D22).
-export const chainOperations = ["deploy", "mint", "transfer"] as const;
+export const chainOperations = [
+  "deploy",
+  "mint",
+  "mint-milestone",
+  "transfer",
+] as const;
 
 export const chainRoleSchema = z.enum(chainRoles);
 export const chainOperationSchema = z.enum(chainOperations);
