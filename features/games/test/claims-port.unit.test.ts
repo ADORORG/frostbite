@@ -2,6 +2,7 @@ import type { FetchLike } from "@ador/client-http";
 import { gameClaimSchema, type GameClaim } from "@ador/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
+import { createClaimsApi } from "../src/client/claims-api.ts";
 import { createClaimsService } from "../src/client/claims-port.ts";
 
 const claimId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
@@ -49,7 +50,7 @@ function setup(
   const fetchImpl = vi.fn<FetchLike>(async () => answer());
   const onStarted = vi.fn<(started: GameClaim) => void>();
   const service = createClaimsService({
-    fetch: fetchImpl,
+    api: createClaimsApi(fetchImpl),
     gameId: "arcade",
     onStarted,
     wallet: () => connected,
@@ -88,7 +89,7 @@ describe("asking for a claim from the page", () => {
   it("says claims are not supported when the page has nowhere to show a claim, without asking the platform", async () => {
     const fetchImpl = vi.fn<FetchLike>(async () => json({}));
     const service = createClaimsService({
-      fetch: fetchImpl,
+      api: createClaimsApi(fetchImpl),
       gameId: "arcade",
       wallet: () => wallet,
     });

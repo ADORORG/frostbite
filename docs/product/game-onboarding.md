@@ -134,7 +134,7 @@ The full list, with the status of what is still to come, is `docs/product/game-s
   `limit-reached`, `wrong-network`, `unavailable` or `not-supported` (this platform cannot take claims for this game, which
   is every game today: nothing is deployed to claim from). `claim.changed` carries the milestone id and one of
   `awaiting-signature`, `pending`, `claimed`, `complete`, `failed`, `expired`; **`complete` only once the chain's indexed state
-  agrees**, never on confirmation alone. At most six asks a minute.
+  agrees**, never on confirmation alone. At most six asks a minute. The player sees the claim in the platform's own review over the game (what it does, the network fee they pay, and where it stands); the game only learns how it goes.
 - **Events** arrive without a request, through `client.on(name, handler)`, which returns a function that stops
   listening: `wallet.changed` (only for a game that declared `wallet`), `claim.changed` (only for `milestone:claim`), `lifecycle.changed` (`paused` while the tab
   is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`.

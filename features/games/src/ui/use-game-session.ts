@@ -7,6 +7,7 @@ import {
   type RunsService,
 } from "@ador/game-sdk/host";
 import type { VerificationLevel, WalletInfo } from "@ador/game-sdk/protocol";
+import type { GameClaimState } from "@ador/shared/games";
 import {
   createLocalBackend,
   type KeyValueStorage,
@@ -17,6 +18,7 @@ import {
   type SyncStatus,
 } from "@ador/game-sdk/synced-backend";
 import {
+  useCallback,
   useEffect,
   useEffectEvent,
   useRef,
@@ -235,5 +237,11 @@ export function useGameSession(
 
   useHostEvents(host, frame, wallet);
 
-  return { connected, kept, progress, sync, toast, unlocked };
+  // Tells the game how a claim is going; dropped for a game that did not declare `milestone:claim`.
+  const emitClaim = useCallback(
+    (milestoneId: string, state: GameClaimState) =>
+      host.current?.emit("claim.changed", { id: milestoneId, state }),
+    [],
+  );
+  return { connected, emitClaim, kept, progress, sync, toast, unlocked };
 }

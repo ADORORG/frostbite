@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a to G7c built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes); G7d and G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -79,6 +79,15 @@ string) over `@ador/game-claims`; the page's claims port; `configs/game-claims.t
 deployed and no chain adapter takes claims, so every claim is answered `not-supported`, and the page's port answers the same
 until G7d gives it somewhere to show the claim to the player. The start route takes the wallet address as text and the platform
 parses it for the game's chain (an address from another chain is `wrong-network`).
+
+**G7d.** The player's side, for a game that declares `rewards`: a **Claim** button on each earned milestone, a **review** over the
+game (what the claim does, the contract, where it goes, the network fee, how long it is valid, and that the player pays the fee),
+a **Claims** section in the dock listing the player's claims, and a poll of every claim that is not over. States read: waiting for
+your wallet; sent; confirmed ("not complete until the network's records show it"); claimed (complete only once the chain's
+indexed state agrees); failed; expired. The game is told each change (`claim.changed`). The page uses the player's connected wallet
+for claiming without telling a game that did not declare `wallet`. **Signing**: the wallet signs through an injected signer, and
+none exists yet (signing is qualification-only), so the review says "your wallet cannot sign claims in this version yet" and
+offers no signature; the real signer is G7e. Everything is tested with a test signer against the routes.
 
 G7a to G7d are safe to build now and are real: when G7e lands they swap the simulated chain for the real one at the ports. They
 also let the owner see the whole experience before a contract exists. Each is its own branch and task.

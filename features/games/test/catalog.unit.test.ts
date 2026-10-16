@@ -8,6 +8,7 @@ import {
 import {
   bareGame,
   chains,
+  rewardsGame,
   coveredGame,
   embeddedGame,
   templateGame,
@@ -35,6 +36,7 @@ describe("the game catalog", () => {
           label: gameCapabilityLabels["run:submit"],
         },
       ],
+      claimable: false,
       cover: null,
       description: "A game written from the template.",
       embedSrc: null,
@@ -138,5 +140,19 @@ describe("the game catalog", () => {
     expect(catalog.isValidSlug("Missing")).toBe(false);
     expect(catalog.isValidSlug(undefined)).toBe(false);
     expect(catalog.isValidSlug("../admin")).toBe(false);
+  });
+});
+
+describe("whether a game's milestones can be claimed", () => {
+  it("is so for a game the platform plays itself that declares rewards, and for no other", () => {
+    const claimable = (game: Parameters<typeof createGameCatalog>[0][number]) =>
+      createGameCatalog([game], chains).list()[0]?.claimable;
+    expect(claimable(rewardsGame)).toBe(true);
+    expect(claimable(embeddedGame)).toBe(false);
+    expect(claimable(templateGame)).toBe(false);
+    // The same declaration on a game that runs elsewhere is never offered: the platform is not in its way.
+    expect(claimable({ ...rewardsGame, launch: templateGame.launch })).toBe(
+      false,
+    );
   });
 });

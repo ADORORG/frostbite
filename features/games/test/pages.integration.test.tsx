@@ -22,6 +22,7 @@ import {
   claimsConfig,
   runsConfig,
   walletConfig,
+  rewardsGame,
   walletGame,
 } from "./support/template-game.ts";
 
@@ -221,6 +222,23 @@ describe("a game's page", () => {
     expect(await render([templateGame], "/games/[slug]")).toContain(
       "Invalid route",
     );
+  });
+});
+
+describe("a game whose milestones can be claimed", () => {
+  it("is given a claims section, with the wallet connection behind it, and the player's wallet is not shown on the game's account", async () => {
+    const markup = await render([rewardsGame], "/games/[slug]", "rewards-game");
+    expect(markup).toContain("Claims");
+    expect(markup).not.toContain("Your wallet");
+  });
+
+  it("is given none when it declares no rewards", async () => {
+    const markup = await render(
+      [embeddedGame],
+      "/games/[slug]",
+      "embedded-game",
+    );
+    expect(markup).not.toContain("Claims");
   });
 });
 

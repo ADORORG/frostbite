@@ -17,9 +17,14 @@ import {
   StatusLamp,
   type DockSection,
 } from "@repo/ui/arcade";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import type { ClaimsApi } from "../client/claims-api.ts";
+import { ClaimReview } from "./claim-review.tsx";
+import { claimsDockSection } from "./claims-card.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
+import type { ClaimSigner } from "./use-claims.ts";
+import { usePlayerClaims } from "./use-player-claims.ts";
 import { useFullscreen } from "./use-fullscreen.ts";
 import { usePhoneLandscape } from "./use-phone-landscape.ts";
 import { useGameSession } from "./use-game-session.ts";
@@ -61,6 +66,7 @@ export function milestoneCopy(milestones: readonly GameMilestone[]): string {
 export function GamePlayer({
   accountFor,
   back,
+  claims,
   claimsFor,
   game,
   meta,
@@ -80,6 +86,14 @@ export function GamePlayer({
     gameId: string,
     wallet: () => WalletInfo | null,
   ) => ClaimsService;
+  // Present for a game whose milestones can be claimed on chain: how the page reaches the claim routes, the wallet the player
+  // has connected (the page's own use of it: the game is not told), and how that wallet signs a claim, if it can.
+  readonly claims?: {
+    readonly api?: ClaimsApi;
+    readonly pollMs?: number;
+    readonly sign?: ClaimSigner;
+    readonly wallet: WalletInfo | null;
+  };
   readonly game: HostedGame & { readonly milestones: readonly GameMilestone[] };
   // Small facts beside the title in the bar (version, network).
   readonly meta?: ReactNode;
@@ -99,15 +113,25 @@ export function GamePlayer({
   };
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const { connected, kept, progress, sync, toast, unlocked } = useGameSession(
-    game,
-    frame,
-    src,
-    accountFor,
-    { connectWallet: wallet?.connect, title, wallet: wallet?.current },
-    runsFor,
-    claimsFor,
-  );
+  const {
+    claimsFor: claimsOf,
+    bindTelling,
+    titles,
+    ui: claimUi,
+  } = usePlayerClaims(game.milestones, game.id, claims, claimsFor);
+  const { connected, emitClaim, kept, progress, sync, toast, unlocked } =
+    useGameSession(
+      game,
+      frame,
+      src,
+      accountFor,
+      { connectWallet: wallet?.connect, title, wallet: wallet?.current },
+      runsFor,
+      claimsOf,
+    );
+  useEffect(() => {
+    bindTelling(emitClaim);
+  }, [bindTelling, emitClaim]);
   const fullscreen = useFullscreen(frame);
   const phoneLandscape = usePhoneLandscape();
   const [promptDismissed, setPromptDismissed] = useState(false);
@@ -124,6 +148,15 @@ export function GamePlayer({
             content: (
               <ArcadeInfoCard title="Your milestones">
                 <MilestoneList
+                  claim={
+                    claims === undefined
+                      ? undefined
+                      : {
+                          message: claimUi.message,
+                          start: (id) => void claimUi.start(id),
+                          stateOf: claimUi.stateOf,
+                        }
+                  }
                   milestones={game.milestones}
                   progress={progress}
                   unlocked={unlocked}
@@ -135,6 +168,9 @@ export function GamePlayer({
             label: "Milestones",
           },
         ]),
+    ...(claims === undefined
+      ? []
+      : [claimsDockSection(claimUi.claims, claimUi.reopen, titles)]),
     ...(wallet === undefined
       ? []
       : [
@@ -201,6 +237,20 @@ export function GamePlayer({
             >
               {toast}
             </div>
+            {claimUi.active === null ? null : (
+              <ClaimReview
+                canSign={claimUi.canSign}
+                claim={claimUi.active}
+                message={claimUi.message}
+                onClose={claimUi.dismiss}
+                onSign={() => void claimUi.sign()}
+                title={
+                  titles[claimUi.active.milestoneId] ??
+                  claimUi.active.milestoneId
+                }
+                working={claimUi.working}
+              />
+            )}
             {prompt ? (
               <div className="arcade-prompt" data-testid="fullscreen-prompt">
                 <p>

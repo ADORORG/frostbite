@@ -1,0 +1,269 @@
+// @vitest-environment jsdom
+
+import { act } from "react";
+import { describe, expect, it, vi } from "vitest";
+
+import {
+  flush,
+  harness as h,
+  mount,
+  registerHarness,
+  send,
+} from "./support/player-harness.tsx";
+import {
+  claimAt,
+  claimGame,
+  fakeApi,
+  milestoneId,
+  until,
+  wallet,
+} from "./support/claims-ui.tsx";
+
+registerHarness();
+
+const text = () => h.container.textContent;
+const button = (name: string) =>
+  [...h.container.querySelectorAll("button")].find((candidate) =>
+    candidate.textContent.includes(name),
+  );
+const click = (name: string) =>
+  act(async () => {
+    button(name)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+const review = () => h.container.querySelector('[data-testid="claim-review"]');
+const changes = (reply: { mock: { calls: unknown[][] } }) =>
+  reply.mock.calls
+    .map(
+      ([message]) => message as { data?: { state?: string }; event?: string },
+    )
+    .filter(({ event }) => event === "claim.changed")
+    .map(({ data }) => data?.state);
+
+// A player whose game has earned the milestone, with the claim routes and wallet given.
+async function earned(
+  claims: Parameters<typeof mount>[1] extends infer P
+    ? P extends { claims?: infer C }
+      ? C
+      : never
+    : never,
+) {
+  const mounted = await mount(undefined, { claims, game: claimGame });
+  send(mounted.target, "ready", { sdkVersion: 1 }, "a");
+  send(mounted.target, "milestones.unlock", { id: milestoneId }, "b");
+  await flush();
+  return mounted;
+}
+
+describe("claiming from the milestone list", () => {
+  it("offers Claim only for a milestone that is earned, and not on a game with no claims", async () => {
+    const api = fakeApi();
+    const { target } = await mount(undefined, {
+      claims: { api, wallet },
+      game: claimGame,
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    await flush();
+    expect(button("Claim ")).toBeUndefined();
+    send(target, "milestones.unlock", { id: milestoneId }, "b");
+    await flush();
+    expect(button("Claim ")).toBeDefined();
+  });
+
+  it("starts the claim with the connected wallet's address and shows the review: what it does, the fee, and that the player pays it", async () => {
+    const api = fakeApi();
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    expect(api.start).toHaveBeenCalledExactlyOnceWith({
+      gameId: "embedded-game",
+      milestoneId,
+      wallet: wallet.address,
+    });
+    expect(review()?.getAttribute("data-state")).toBe("awaiting-signature");
+    expect(text()).toContain("rewards-1");
+    expect(text()).toContain("12 sim");
+    expect(text()).toContain("You pay the network fee");
+    expect(text()).toContain("Waiting for your wallet");
+  });
+
+  it("signs what was shown, sends it, and follows the claim to complete, saying confirmed is not complete and telling the game each step", async () => {
+    const answers = [claimAt("claimed"), claimAt("complete")];
+    let sent = false;
+    const api = fakeApi({
+      // Until the signed claim is sent, the platform still has it waiting for the wallet.
+      refresh: vi.fn(async () => ({
+        claim: sent
+          ? (answers.shift() ?? claimAt("complete"))
+          : claimAt("awaiting-signature"),
+        status: "ok" as const,
+      })),
+      submit: vi.fn(async () => {
+        sent = true;
+        return { claim: claimAt("pending"), status: "submitted" as const };
+      }),
+    });
+    const sign = vi.fn(
+      async (
+        t: Parameters<NonNullable<Parameters<typeof earned>[0]["sign"]>>[0],
+      ) => ({
+        ...t,
+        payload: `${t.payload}.sig`,
+      }),
+    );
+    const { reply } = await earned({ api, pollMs: 10, sign, wallet });
+    await click("Claim ");
+    await flush();
+    await click("Sign with your wallet");
+    expect(sign).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ payload: "{}" }),
+    );
+    expect(api.submit).toHaveBeenCalledWith({
+      claimId: claimAt("pending").id,
+      signed: expect.objectContaining({ payload: "{}.sig" }),
+    });
+    await until(() => text().includes("The network's records show it"));
+    expect(text()).toContain("Claim: Claimed");
+    expect(changes(reply)).toEqual([
+      "awaiting-signature",
+      "pending",
+      "claimed",
+      "complete",
+    ]);
+  });
+
+  it("stops looking at a claim once it is over", async () => {
+    const api = fakeApi({
+      refresh: vi.fn(async () => ({
+        claim: claimAt("failed", { failureReason: "reverted by the network" }),
+        status: "ok" as const,
+      })),
+    });
+    await earned({ api, pollMs: 10, sign: async (t) => t, wallet });
+    await click("Claim ");
+    await flush();
+    await click("Sign with your wallet");
+    await until(() => text().includes("Failed"));
+    expect(text()).toContain("reverted by the network");
+    const looks = vi.mocked(api.refresh).mock.calls.length;
+    await flush();
+    await flush();
+    expect(vi.mocked(api.refresh).mock.calls.length).toBe(looks);
+  });
+});
+
+describe("when a claim cannot go ahead", () => {
+  it.each([
+    ["limit-reached", "as often as it allows"],
+    ["not-earned", "Earn this milestone first"],
+    ["not-supported", "not available for this game yet"],
+    ["unavailable", "could not be reached"],
+    ["wrong-network", "another network"],
+  ] as const)("says why a start was refused: %s", async (reason, copy) => {
+    const api = fakeApi({
+      start: vi.fn(async () => ({ reason, status: "unavailable" as const })),
+    });
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    expect(text()).toContain(copy);
+    expect(review()).toBeNull();
+  });
+
+  it("asks for a wallet without asking the platform when none is connected", async () => {
+    const api = fakeApi();
+    await earned({ api, wallet: null });
+    await click("Claim ");
+    await flush();
+    expect(text()).toContain("Connect a wallet to claim.");
+    expect(api.start).not.toHaveBeenCalled();
+  });
+
+  it("says to sign in when there is no session, and that the platform could not be reached for any other failure", async () => {
+    const { ApiError } = await import("@ador/client-http");
+    const signedOut = fakeApi({
+      start: vi.fn(async () => {
+        throw new ApiError("unauthorized", 401, "no");
+      }),
+    });
+    await earned({ api: signedOut, wallet });
+    await click("Claim ");
+    await flush();
+    expect(text()).toContain("Sign in to claim.");
+  });
+
+  it("says the platform could not be reached when starting fails", async () => {
+    const api = fakeApi({
+      start: vi.fn(async () => {
+        throw new Error("offline");
+      }),
+    });
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    expect(text()).toContain(
+      "The platform could not be reached. Nothing was changed.",
+    );
+  });
+});
+
+describe("signing", () => {
+  it("says the wallet cannot sign claims yet, and does not offer a signature that cannot be made", async () => {
+    const api = fakeApi();
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    expect(text()).toContain("cannot sign claims in this version yet");
+    expect(button("Sign with your wallet")?.hasAttribute("disabled")).toBe(
+      true,
+    );
+    expect(api.submit).not.toHaveBeenCalled();
+  });
+
+  it("sends nothing when the wallet signs nothing", async () => {
+    const api = fakeApi();
+    await earned({ api, sign: async () => null, wallet });
+    await click("Claim ");
+    await flush();
+    await click("Sign with your wallet");
+    expect(text()).toContain("Nothing was signed.");
+    expect(api.submit).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["expired", "not signed in time"],
+    ["invalid-signature", "not what was shown"],
+    ["not-awaiting-signature", "can no longer be signed"],
+    ["not-found", "could not be found"],
+    ["chain-unavailable", "could not be reached"],
+  ] as const)(
+    "says what the platform refused a signature for: %s",
+    async (reason, copy) => {
+      const api = fakeApi({
+        submit: vi.fn(async () => ({ reason, status: "refused" as const })),
+      });
+      await earned({ api, sign: async (t) => t, wallet });
+      await click("Claim ");
+      await flush();
+      await click("Sign with your wallet");
+      expect(text()).toContain(copy);
+    },
+  );
+
+  it("says the platform could not be reached when sending fails, and lets the player try again", async () => {
+    const api = fakeApi({
+      submit: vi.fn(async () => {
+        throw new Error("offline");
+      }),
+    });
+    await earned({ api, sign: async (t) => t, wallet });
+    await click("Claim ");
+    await flush();
+    await click("Sign with your wallet");
+    expect(text()).toContain(
+      "The platform could not be reached. Nothing was changed.",
+    );
+    expect(button("Sign with your wallet")?.hasAttribute("disabled")).toBe(
+      false,
+    );
+  });
+});

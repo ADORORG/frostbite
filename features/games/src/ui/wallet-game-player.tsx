@@ -7,15 +7,23 @@ import { useMemo, type ComponentProps } from "react";
 
 import { GamePlayer } from "./game-player.tsx";
 
-type PlayerProps = Omit<ComponentProps<typeof GamePlayer>, "wallet">;
+type PlayerProps = Omit<ComponentProps<typeof GamePlayer>, "claims" | "wallet">;
 
 // The game's stage with the player's wallet behind it, for a game that declared the wallet capability. The wallet
 // connection and the chooser belong to the app (the header widget); this only reads the connection and asks for the
 // chooser, so a game that does not ask for a wallet is never told about one.
 export function WalletGamePlayer({
+  claimable = false,
+  exposeWallet = true,
   network,
   ...player
-}: PlayerProps & { readonly network: WalletNetwork }) {
+}: PlayerProps & {
+  // The game's milestones can be claimed: the page uses the connection to claim, without the game being told about it.
+  readonly claimable?: boolean;
+  // The game declared the wallet capability, so it is told what is connected.
+  readonly exposeWallet?: boolean;
+  readonly network: WalletNetwork;
+}) {
   const {
     address,
     connected,
@@ -35,7 +43,12 @@ export function WalletGamePlayer({
   return (
     <GamePlayer
       {...player}
-      wallet={{ connect: request, current, expectedNetwork: network }}
+      claims={claimable ? { wallet: current } : undefined}
+      wallet={
+        exposeWallet
+          ? { connect: request, current, expectedNetwork: network }
+          : undefined
+      }
     />
   );
 }

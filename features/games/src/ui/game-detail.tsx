@@ -95,9 +95,11 @@ export function GameDetail({
   );
   return (
     <GamesFrame navigation={navigation} variant="stage">
-      {game.embedSrc === null ? null : wantsWallet ? (
+      {game.embedSrc === null ? null : wantsWallet || game.claimable ? (
         <WalletGamePlayer
           {...player}
+          claimable={game.claimable}
+          exposeWallet={wantsWallet}
           network={wallet.network}
           src={game.embedSrc}
         />

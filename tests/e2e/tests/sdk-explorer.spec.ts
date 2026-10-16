@@ -37,10 +37,10 @@ test("every call is answered by the platform, in the real frame", async ({
   // No wallet is connected in a test browser, so the answer is none, not an error.
   await game.locator("#wallet").click();
   await expect(newest(page)).toHaveText('wallet.get → {"wallet":null}');
-  // Asking for a claim is answered, not refused: nothing is deployed to claim from, so the platform says it is not supported.
+  // Asking for a claim is answered, not refused: no wallet is connected in a test browser, so the page says there is none to claim with.
   await game.locator("#milestones-claim").click();
   await expect(newest(page)).toHaveText(
-    'milestones.claim → {"reason":"not-supported","status":"unavailable"}',
+    'milestones.claim → {"reason":"no-wallet","status":"unavailable"}',
   );
   await game.locator("#progress-save").click();
   await expect(newest(page)).toHaveText(
@@ -210,4 +210,27 @@ test("progress toward a target is held by the platform, shown on the page, and e
   // Reported again, the total stays at the target.
   await game.locator("#milestones-progress").click();
   await expect(newest(page)).toContainText('"current":10');
+});
+
+test("an earned milestone can be claimed from the dock, and the page says what is missing instead of pretending", async ({
+  page,
+}) => {
+  const game = page.frameLocator(frameSelector);
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
+  await game.locator("#milestones-unlock").click();
+  await expect(newest(page)).toContainText('"status":"unlocked"');
+  const dock = await openDock(page, "Milestones");
+  // Nothing to claim with: no wallet is connected in a test browser, and the platform is not asked.
+  await dock.getByRole("button", { name: "Claim First call" }).click();
+  await expect(dock.getByRole("alert")).toHaveText(
+    "Connect a wallet to claim.",
+  );
+  // The claims the player has, and what a claim costs, are said in their own section.
+  const claims = await openDock(page, "Claims");
+  await expect(claims).toContainText(
+    "You have not claimed anything from this game.",
+  );
+  await expect(claims).toContainText("You pay the network fee to claim.");
 });

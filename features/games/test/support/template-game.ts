@@ -97,6 +97,15 @@ export const walletGame = defineGame({
   title: "Wallet game",
 });
 
+// A game the platform plays itself whose milestones can be claimed on chain.
+export const rewardsGame = defineGame({
+  ...embeddedGame,
+  capabilities: ["milestone:claim"],
+  id: "rewards-game",
+  rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
+  title: "Rewards game",
+});
+
 export const walletConfig = {
   network: "signet",
 } as const;

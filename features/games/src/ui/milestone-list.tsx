@@ -1,7 +1,8 @@
-import type { GameMilestone } from "@ador/shared/games";
-import { ArcadeBadge } from "@repo/ui/arcade";
+import type { GameClaimState, GameMilestone } from "@ador/shared/games";
+import { ArcadeActionButton, ArcadeBadge } from "@repo/ui/arcade";
 
 import { gameMilestonePolicyLabels } from "../domain/catalog.ts";
+import { claimStateCopy } from "../domain/claim-copy.ts";
 import { presentMilestone, reachedSummary } from "../domain/milestone-state.ts";
 import type { MilestoneProgress } from "./use-game-session.ts";
 
@@ -14,10 +15,17 @@ export const replayCheckable =
 // a polite live region tells a screen reader when the game reports a new one; with none (`null`: the game cannot
 // be played here), they are only what the game declares. Either way each says how it is earned.
 export function MilestoneList({
+  claim,
   milestones,
   progress,
   unlocked,
 }: {
+  // Present for a game whose milestones can be claimed: how each claim stands, and how to start one.
+  readonly claim?: {
+    readonly message: string | null;
+    readonly start: (milestoneId: string) => void;
+    readonly stateOf: (milestoneId: string) => GameClaimState | null;
+  };
   readonly milestones: readonly GameMilestone[];
   // How often each was earned and the total toward each target, when the player's records say.
   readonly progress?: MilestoneProgress;
@@ -40,6 +48,7 @@ export function MilestoneList({
           {reachedSummary(views)}
         </p>
       )}
+      {claim?.message == null ? null : <p role="alert">{claim.message}</p>}
       <ul aria-label="Milestones of this game">
         {milestones.map((milestone, index) => {
           const view = views?.[index];
@@ -78,6 +87,28 @@ export function MilestoneList({
                 <>
                   <br />
                   <small>{view.detail}</small>
+                </>
+              ) : null}
+              {claim !== undefined && view?.state === "earned" ? (
+                <>
+                  <br />
+                  {(() => {
+                    const state = claim.stateOf(milestone.id);
+                    return state === null ||
+                      state === "failed" ||
+                      state === "expired" ? (
+                      <ArcadeActionButton
+                        onClick={() => claim.start(milestone.id)}
+                        tone="mint"
+                      >
+                        {`Claim ${milestone.title}`}
+                      </ArcadeActionButton>
+                    ) : (
+                      <small data-claim-state={state}>
+                        {`Claim: ${claimStateCopy[state].label}`}
+                      </small>
+                    );
+                  })()}
                 </>
               ) : null}
             </li>

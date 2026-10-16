@@ -50,6 +50,8 @@ export interface PublicCover {
 // One game as the public pages show it, taken from its manifest and nothing else.
 export interface PublicGame {
   readonly capabilities: readonly PublicCapability[];
+  // Whether the game declares a rewards contract, so its milestones can be claimed on chain (when the platform can take claims).
+  readonly claimable: boolean;
   // The preview the catalog shows, or null for a game that has none (the pages draw a stand-in).
   readonly cover: PublicCover | null;
   readonly description: string;
@@ -88,6 +90,7 @@ export function createGameCatalog(
       id: capability,
       label: gameCapabilityLabels[capability],
     })),
+    claimable: game.launch.mode === "embedded" && game.rewards !== undefined,
     cover:
       game.cover === undefined
         ? null
