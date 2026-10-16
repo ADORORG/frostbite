@@ -1,0 +1,29 @@
+[workspace]
+members = ["rewards-core", "responder-kit", "game-rewards", "milestone-collectible", "harness"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.86"
+license = "MIT"
+publish = false
+
+# Every dependency is pinned here once; the members inherit it. The alkanes-rs revision is the one
+# the allowlist spike pinned, and Cargo.lock is that revision's own lock (newer crates need Rust
+# above 1.86).
+[workspace.dependencies]
+alkanes-runtime = { git = "https://github.com/kungfuflex/alkanes-rs", rev = "62511e9371a3f9e448841140c51cfe428cfcb955" }
+alkanes-support = { git = "https://github.com/kungfuflex/alkanes-rs", rev = "62511e9371a3f9e448841140c51cfe428cfcb955" }
+metashrew-support = { git = "https://github.com/kungfuflex/metashrew", tag = "v9.0.5-rc.8" }
+anyhow = "1.0.90"
+sha2 = "0.10.9"
+serde_json = "1.0.128"
+rewards-core = { path = "rewards-core" }
+responder-kit = { path = "responder-kit" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

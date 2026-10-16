@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 (the contract templates) built; G7e-2 to G7e-4 not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -64,8 +64,16 @@ chain-neutral port set:
   capability check.
 - **G7d Player states** (GP-08): the dock and game page show earned, claim pending, claimed, complete, with the fee note and
   the level label, against the simulated chain; Playwright for success and each failure.
-- **G7e The contract** (GP-05): `contracts/templates/game-rewards` with runtime tests, pinned build and code hash; and the
-  `bitcoin-alkanes` adapter's build, broadcast and observe. **This is the part that waits** for D19, D22 and wallet signing.
+- **G7e The contract** (GP-05), in four pieces: **G7e-1** the `game-rewards@1` and `milestone-collectible@1` templates in
+  `contracts/templates` (built, below); **G7e-2** the `bitcoin-alkanes` adapter's reads (`rewards.claimed`, the collectible's
+  picture and content type, contract inspection); **G7e-3** its build, deploy, broadcast and observe; **G7e-4** the off-chain
+  SVG sanitiser for builder drawings. G7e-3 waits for wallet signing; G7e-2 and G7e-4 do not.
+
+**G7e-1 built.** `contracts/templates` holds one `game-rewards` instance per game and one shared `milestone-collectible` template
+(ADR-018 Amendment 3): a wallet claims a milestone up to a per-milestone limit and receives its own numbered collectible, whose picture is
+the builder's drawing in a generated frame, or a generated sprite when the milestone has none; the platform holds the auth token that
+defines milestones and pauses. See `contracts/templates/README.md` for the layout, the ABI, the known limits and the chain-neutral
+mapping the adapter implements.
 
 **Built so far.** G7a: `rewards` and `milestone:claim` in the manifest (`@ador/shared/games`). G7b: the `mint-milestone`
 intent and summary in `@ador/shared/chain`; a `rewards` reader port (`RewardsReader.claimed`, capability `rewards:read`) in

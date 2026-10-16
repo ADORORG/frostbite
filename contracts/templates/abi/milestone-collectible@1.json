@@ -1,0 +1,56 @@
+{
+  "template": "milestone-collectible",
+  "version": "1.0.0",
+  "family": "bitcoin-alkanes",
+  "operations": [
+    {
+      "name": "initialize",
+      "opcode": 0,
+      "authority": "once",
+      "inputs": ["milestone", "serial"],
+      "returns": "the collectible"
+    },
+    {
+      "name": "get_name",
+      "opcode": 99,
+      "view": true,
+      "inputs": [],
+      "returns": "string"
+    },
+    {
+      "name": "get_symbol",
+      "opcode": 100,
+      "view": true,
+      "inputs": [],
+      "returns": "string"
+    },
+    {
+      "name": "get_total_supply",
+      "opcode": 101,
+      "view": true,
+      "inputs": [],
+      "returns": "u128"
+    },
+    {
+      "name": "get_data",
+      "opcode": 1000,
+      "view": true,
+      "inputs": [],
+      "returns": "image/svg+xml bytes"
+    },
+    {
+      "name": "get_content_type",
+      "opcode": 1001,
+      "view": true,
+      "inputs": [],
+      "returns": "string"
+    },
+    {
+      "name": "get_attributes",
+      "opcode": 1002,
+      "view": true,
+      "inputs": [],
+      "returns": "json string"
+    }
+  ]
+}

@@ -1,2 +1,5 @@
 # Legacy game code copied unchanged from the pre-platform FROST·BITE (games/frostbite/src/legacy/README.md).
 games/frostbite/src/legacy/
+
+# Written by contracts/templates/build.sh (the template code hashes); never edited by hand.
+contracts/templates/release.json
