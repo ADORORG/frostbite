@@ -100,6 +100,26 @@ describe("the game catalog", () => {
     ]);
   });
 
+  it("lists the milestone:claim capability as declared but not granted, because the host cannot answer it yet", () => {
+    const claimable = createGameCatalog(
+      [
+        {
+          ...embeddedGame,
+          capabilities: ["milestone:claim"],
+          rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
+        },
+      ],
+      chains,
+    ).list()[0];
+    expect(claimable?.capabilities).toEqual([
+      {
+        available: false,
+        id: "milestone:claim",
+        label: "Start a claim for a milestone the player earned",
+      },
+    ]);
+  });
+
   it("has no play address for a game that is not configured, and names an unconfigured chain by its identifier", () => {
     expect(catalog.find("bare-game")).toMatchObject({
       networkLabel: "eip155:1",

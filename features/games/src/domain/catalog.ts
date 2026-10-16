@@ -16,6 +16,7 @@ import {
 // declarations, and the page says which is which.
 export const gameCapabilityLabels: Readonly<Record<GameCapability, string>> = {
   "balance:read": "Read the player's balance",
+  "milestone:claim": "Start a claim for a milestone the player earned",
   "run:submit": "Submit a finished run",
   "transaction:request": "Ask the player to sign a transaction",
   wallet: "See the address of the wallet the player connected",

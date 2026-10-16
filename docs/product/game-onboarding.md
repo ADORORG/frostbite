@@ -189,6 +189,17 @@ Allowed: full-screen (the game's page also has a Full screen button of the platf
 Sample game's "Run safety probe" button demonstrates this and is checked in a real browser by
 `tests/e2e/tests/game-host.spec.ts`.
 
+## Making milestones claimable on chain (declaration only so far)
+
+A game that wants its milestones minted declares one more field in its manifest, `rewards: { templateId, templateVersion }`, naming
+the contract template it wants (today `game-rewards` at `1.0.0`; the platform's own list says which exist). Every milestone the
+game declares is then enabled in that contract, and the most times one address can claim it is the milestone's own policy: once,
+or the `maxCount` of a repeatable one (`milestoneClaimLimit`, `rewardsInitialisation` in `@ador/shared/games`). The optional
+`milestone:claim` capability lets the game ask the platform to start a claim for a player; it needs `rewards`. The player's own
+wallet signs and the player pays the network fee. **Nothing mints yet**: the contract and the chain steps are task #73, and the
+page lists the capability as declared, not granted, until they exist. Holding a token will mean "claimed", never "earned"
+(`docs/product/plan-g7-minting.md`).
+
 ## Milestones are self-reported, unless the platform replays them
 
 The platform cannot see inside a game, so a milestone is the game's own report, recorded as `self-reported`

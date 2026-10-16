@@ -7,6 +7,7 @@ import {
   gameLaunchSchema,
 } from "./launch.ts";
 import { requestFingerprint } from "../http/fingerprint.ts";
+import { gameRewardsSchema } from "./rewards.ts";
 
 // The limits on what a game declares about itself. They bound what a public page must render.
 export const gameManifestLimits = Object.freeze({
@@ -33,6 +34,7 @@ export const gameIdSchema = z.string().min(2).max(64).regex(slugPattern);
 // host protocol that enforces them is a later task; until then they are declarations only.
 export const gameCapabilities = [
   "balance:read",
+  "milestone:claim",
   "run:submit",
   "transaction:request",
   "wallet",
@@ -49,9 +51,9 @@ export const gameMilestoneVerifications = [
   "replay-verified",
 ] as const;
 
-// A milestone a game says a player can earn, as data. Declaring one does not make it claimable: earning and
-// claiming on chain need the attestation service and contract (ADR-018), which do not exist yet. A change to
-// what a milestone means is a new manifest version, never an edit.
+// A milestone a game says a player can earn, as data. Declaring one does not make it claimable on chain: that
+// needs the game to declare a rewards contract too (`rewards`). A change to what a milestone means is a new
+// manifest version, never an edit.
 export const gameMilestoneSchema = z
   .object({
     claimPolicy: z.enum(gameMilestoneClaimPolicies),
@@ -130,6 +132,7 @@ export const gameReplayVerifierSchema = z
   .strict();
 
 export * from "./launch.ts";
+export * from "./rewards.ts";
 
 export const gameManifestSchemaVersion = 1;
 
@@ -158,6 +161,8 @@ export const gameManifestSchema = z
     schemaVersion: z.literal(gameManifestSchemaVersion),
     summary: z.string().trim().min(1).max(gameManifestLimits.summary),
     title: z.string().trim().min(1).max(gameManifestLimits.title),
+    // The contract the game's milestones are claimed from; left out, none can be claimed on chain.
+    rewards: gameRewardsSchema.optional(),
     // The game's own release version (any short text its team uses), separate from the manifest format.
     version: z.string().trim().min(1).max(gameManifestLimits.version),
     // How the game's milestones can be checked, beyond what the game says: left out, none can.
@@ -189,6 +194,23 @@ export const gameManifestSchema = z
     {
       message:
         "A game with a replay verifier must declare the run:submit capability, which is how it sends a run to be checked.",
+      path: ["capabilities"],
+    },
+  )
+  .refine(
+    ({ milestones, rewards }) => rewards === undefined || milestones.length > 0,
+    {
+      message:
+        "A game that declares a rewards contract needs at least one milestone to claim from it.",
+      path: ["rewards"],
+    },
+  )
+  .refine(
+    ({ capabilities, rewards }) =>
+      rewards !== undefined || !capabilities.includes("milestone:claim"),
+    {
+      message:
+        "A game can declare the milestone:claim capability only with a rewards contract to claim from.",
       path: ["capabilities"],
     },
   )
