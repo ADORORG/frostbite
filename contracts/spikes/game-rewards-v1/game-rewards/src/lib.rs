@@ -21,7 +21,19 @@ pub struct GameRewards(());
 #[derive(MessageDispatch)]
 enum GameRewardsMessage {
     #[opcode(0)]
-    Initialize { template: u128, limit: u128 },
+    Initialize {
+        template: u128,
+        limit: u128,
+        max_art_bytes: u128,
+    },
+
+    /// Spike only: the real contract restricts this to the platform admin.
+    #[opcode(2)]
+    SetArt { milestone: u128, svg: String },
+
+    #[opcode(101)]
+    #[returns(Vec<u8>)]
+    GetArt { milestone: u128 },
 
     #[opcode(1)]
     Claim { milestone: u128 },
@@ -65,7 +77,28 @@ impl GameRewards {
             .select(&milestone.to_le_bytes().to_vec())
     }
 
-    fn initialize(&self, template: u128, limit: u128) -> Result<CallResponse> {
+    fn art_pointer(&self, milestone: u128) -> StoragePointer {
+        self.config("/art")
+            .select(&milestone.to_le_bytes().to_vec())
+    }
+
+    fn set_art(&self, milestone: u128, svg: String) -> Result<CallResponse> {
+        if svg.len() as u128 > self.config("/max-art").get_value::<u128>() {
+            return Err(anyhow!("art too large"));
+        }
+        self.art_pointer(milestone)
+            .set(std::sync::Arc::new(svg.into_bytes()));
+        Ok(CallResponse::forward(&self.context()?.incoming_alkanes))
+    }
+
+    fn get_art(&self, milestone: u128) -> Result<CallResponse> {
+        let mut response = CallResponse::forward(&self.context()?.incoming_alkanes);
+        response.data = self.art_pointer(milestone).get().as_ref().clone();
+        Ok(response)
+    }
+
+    fn initialize(&self, template: u128, limit: u128, max_art_bytes: u128) -> Result<CallResponse> {
+        self.config("/max-art").set_value::<u128>(max_art_bytes);
         self.observe_initialization()?;
         self.config("/template").set_value::<u128>(template);
         self.config("/limit").set_value::<u128>(limit);

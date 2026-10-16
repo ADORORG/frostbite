@@ -3,8 +3,11 @@
 use alkanes_runtime::declare_alkane;
 use alkanes_runtime::message::MessageDispatch;
 use alkanes_runtime::{runtime::AlkaneResponder, storage::StoragePointer};
+use alkanes_support::{cellpack::Cellpack, id::AlkaneId, parcel::AlkaneTransferParcel};
 use alkanes_support::{parcel::AlkaneTransfer, response::CallResponse};
 use anyhow::Result;
+
+mod render;
 #[allow(unused_imports)]
 use metashrew_support::compat::{to_arraybuffer_layout, to_passback_ptr};
 use metashrew_support::index_pointer::KeyValuePointer;
@@ -35,17 +38,18 @@ enum CollectibleMessage {
 }
 
 impl Collectible {
-    fn payload_pointer(&self) -> StoragePointer {
-        StoragePointer::from_keyword("/payload")
+    fn config(&self, key: &str) -> StoragePointer {
+        StoragePointer::from_keyword(key)
     }
 
     fn initialize(&self, milestone: u128, serial: u128) -> Result<CallResponse> {
         self.observe_initialization()?;
         let context = self.context()?;
         let mut response = CallResponse::forward(&context.incoming_alkanes);
-        let payload = format!("{{\"milestone\":{milestone},\"serial\":{serial}}}");
-        self.payload_pointer()
-            .set(std::sync::Arc::new(payload.into_bytes()));
+        self.config("/game")
+            .set(std::sync::Arc::new(Vec::<u8>::from(context.caller)));
+        self.config("/milestone").set_value::<u128>(milestone);
+        self.config("/serial").set_value::<u128>(serial);
         response.alkanes.0.push(AlkaneTransfer {
             id: context.myself,
             value: 1,
@@ -73,9 +77,19 @@ impl Collectible {
         Ok(response)
     }
 
+    /// The builder's drawing lives once in the game's contract; each collectible stores only
+    /// the game, the milestone and its own serial, and asks for the drawing when it is read.
     fn get_data(&self) -> Result<CallResponse> {
         let mut response = CallResponse::forward(&self.context()?.incoming_alkanes);
-        response.data = self.payload_pointer().get().as_ref().clone();
+        let game: AlkaneId = self.config("/game").get().as_ref().clone().try_into()?;
+        let milestone = self.config("/milestone").get_value::<u128>();
+        let serial = self.config("/serial").get_value::<u128>();
+        let cellpack = Cellpack {
+            target: game,
+            inputs: vec![101, milestone],
+        };
+        let art = self.staticcall(&cellpack, &AlkaneTransferParcel::default(), self.fuel())?;
+        response.data = render::picture(&art.data, milestone, serial);
         Ok(response)
     }
 }

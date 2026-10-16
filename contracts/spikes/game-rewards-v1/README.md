@@ -8,7 +8,7 @@ audit, and it has not been mutation-tested.
 - `game-rewards/`: opcode 0 initialise (collectible template id, per-wallet limit), 1 claim
   (milestone), 99 name, 100 claimed count by holder and milestone.
 - `collectible/`: one collectible, supply one, opcodes 0, 99, 100, 101 and 1000 (`get-data`).
-- `harness/tests/claim.rs`: five tests through `index_block`, the mainnet code path.
+- `harness/tests/claim.rs`: eight tests through `index_block`, the mainnet code path.
 
 Run: `cargo build --release --target wasm32-unknown-unknown -p milestone-collectible -p game-rewards`
 then `cd harness && cargo test --test claim` (needs `wasm-bindgen-test-runner` 0.2.100). It is its own
@@ -26,6 +26,24 @@ workspace; `Cargo.lock` is the pinned `alkanes-rs` lock, because newer crates ne
 | Who is the claimant?                                  | Only the script output 0 pays to. The runtime does not expose the outputs a transaction spends (`AlkaneResponder::output` is commented out upstream), so a contract cannot tell who signed an input. Someone can therefore claim for another wallet: the victim gets a free collectible and uses a claim slot. |
 | Can tokens be transfer-locked?                        | No. A plain protostone edict moved the collectible to a new output without calling the contract (test 4).                                                                                                                                                                                                      |
 | Template size                                         | `game-rewards` 247 KB (133 KB gzip), `collectible` 219 KB (123 KB gzip) after `opt-level z`, LTO; `wasm-opt -Oz` saves about 15%. Paid once per template, not per game.                                                                                                                                        |
+
+## Collectible art (owner decision, ADR-018 Amendment 3)
+
+The builder's drawing is stored once in the game contract (`SetArt`, opcode 2; read by opcode 101). A
+collectible stores only its game, milestone and serial. `get-data` asks the game for the drawing
+(`staticcall`) and wraps it in a generated frame and serial plate; a milestone with no drawing gets a
+16 by 16 sprite. Measured in the harness:
+
+- the frame and plate add under 700 bytes to the builder's drawing;
+- reading a drawn collectible costs about 190,000 fuel; generating the sprite costs about 688,000, so
+  the sprite code should be made cheaper before use;
+- a drawing over the contract's limit (4096 bytes in the test, set at initialise) is refused.
+
+Not solved: `SetArt` carried the drawing as call inputs (16 bytes each). The call travels in the
+transaction's `OP_RETURN`, which standard relay limits to about 80 bytes, so a real drawing must travel
+in the witness (as `merkle-distributor` reads its proof) and be read from there. Also open: the
+builder's SVG is not sanitised here (that happens off chain, before submission); `SetArt` has no admin
+check; the drawing cannot contain a zero byte (strings end at one).
 
 ## What this means for the adapter (ports in `@ador/chain`)
 
