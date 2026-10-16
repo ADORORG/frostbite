@@ -1,0 +1,28 @@
+{
+  "name": "@repo/vitest-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/package-config.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts --project unit",
+    "test:integration": "vitest run --config vitest.config.ts --project integration",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.1.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "26.4.0",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

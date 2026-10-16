@@ -1,30 +1,7 @@
-import { defineConfig } from "vitest/config";
+import { packageVitestConfig } from "@repo/vitest-config";
 
-const coverage = {
-  provider: "v8" as const,
-  reporter: ["text", "json-summary", "lcov"],
-  thresholds: {
-    branches: 90.01,
-    functions: 90.01,
-    lines: 90.01,
-    statements: 90.01,
-  },
-  include: ["src/**/*.ts"],
-};
-
-export default defineConfig({
-  test: {
-    coverage,
-    // Integration files share one database and each applies the migrations first.
-    fileParallelism: false,
-    projects: [
-      { test: { name: "unit", include: ["test/**/*.unit.test.{ts,tsx}"] } },
-      {
-        test: {
-          name: "integration",
-          include: ["test/**/*.integration.test.ts"],
-        },
-      },
-    ],
-  },
+export default packageVitestConfig({
+  coverage: { include: ["src/**/*.ts"] },
+  fileParallelism: false,
+  tests: { unit: "{ts,tsx}" },
 });

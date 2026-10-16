@@ -28,6 +28,7 @@
     "@fontsource/vt323": "5.3.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
     "@types/jsdom": "30.0.0",
     "@types/node": "26.4.0",
     "@types/react": "^19",
