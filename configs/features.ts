@@ -4,6 +4,7 @@ import { createCollectionReviewFeature } from "@ador/feature-collection-review";
 import { createCollectionStudioFeature } from "@ador/feature-collection-studio";
 import { creatorAdmissionFeature } from "@ador/feature-creator-admission";
 import { platformShellFeature } from "@ador/feature-platform-shell";
+import { createGameAdminFeature } from "@ador/feature-game-admin";
 import { createGamesFeature } from "@ador/feature-games";
 import {
   creatorsFeature,
@@ -13,6 +14,7 @@ import { createFeatureRegistry } from "@ador/plugin-kit";
 import { createUploadsFeature } from "@ador/feature-uploads";
 import { authorizationPolicy } from "./authorization.ts";
 import { targetChains } from "./chains.ts";
+import { gameAdminConfig } from "./game-admin.ts";
 import { gameClaimsConfig } from "./game-claims.ts";
 import { gameRunsConfig } from "./game-runs.ts";
 import { games } from "./games.ts";
@@ -33,6 +35,7 @@ export const featureRegistry = createFeatureRegistry([
     gameRunsConfig,
     gameClaimsConfig,
   ),
+  createGameAdminFeature(games, gameAdminConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),
   createCollectionReviewFeature(authorizationPolicy, providerRegistry),

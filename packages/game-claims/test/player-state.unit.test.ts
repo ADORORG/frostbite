@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { lifecycleStates, playerClaimState } from "../src/player-state.ts";
+import { trackedStates as lifecycleStates } from "@ador/shared/chain";
+
+import { playerClaimState } from "../src/player-state.ts";
 
 describe("what a claim is called to the player", () => {
   it("names every state the lifecycle has, and only with one of six words", () => {

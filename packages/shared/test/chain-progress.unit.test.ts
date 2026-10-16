@@ -8,6 +8,8 @@ import {
   walk,
   afterBroadcast,
   moveTo,
+  stageOf,
+  trackedStates,
   signedOf,
 } from "../src/chain/progress.ts";
 import { transactionStates } from "../src/chain/transaction-state.ts";
@@ -157,5 +159,26 @@ describe("moving a tracked transaction", () => {
       format: "f",
       payload: "s",
     });
+  });
+});
+
+describe("where a tracked transaction stands for the person waiting", () => {
+  it("places every state in one of six stages", () => {
+    expect([...new Set(trackedStates.map(stageOf))].sort()).toEqual([
+      "awaiting-signature",
+      "complete",
+      "confirmed",
+      "expired",
+      "failed",
+      "pending",
+    ]);
+    expect(trackedStates).toHaveLength(14);
+  });
+
+  it("never calls a transaction complete before the indexed state agrees", () => {
+    expect(
+      trackedStates.filter((state) => stageOf(state) === "complete"),
+    ).toEqual(["complete"]);
+    expect(stageOf("confirmed")).toBe("confirmed");
   });
 });

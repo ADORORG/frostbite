@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 to G7e-5 built (the contract templates; the adapter's reads; its milestone-claim path; the drawing sanitiser; the staff's administration steps, signed by hand with a one-time key for witness data). The wallet-side signing of a bundle, and a staff page that drives it, are not built. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 to G7e-5 built (the contract templates; the adapter's reads; its milestone-claim path; the drawing sanitiser; the staff's administration steps, signed by hand with a one-time key for witness data). G7f adds the staff page (`/admin/games`, `@ador/feature-game-admin` over `@ador/game-admin`), run on the simulated chain; the wallet-side signing of a bundle is not built. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -97,6 +97,8 @@ indexed state agrees); failed; expired. The game is told each change (`claim.cha
 for claiming without telling a game that did not declare `wallet`. **Signing**: the wallet signs through an injected signer, and
 none exists yet (signing is qualification-only), so the review says "your wallet cannot sign claims in this version yet" and
 offers no signature; the real signer is G7e. Everything is tested with a test signer against the routes.
+
+**G7f.** Staff administration: the `game_admin_steps` log (who built and who sent each step), the `@ador/game-admin` service, and the pages and routes that drive it (`features/game-admin`), under the `game:administer` capability the `staff` role holds. Decisions: any staff member may pause and resume, logged; a complete step needs the network's records to show it (1 confirmation on signet); the decided "delayed" display (indexer more than 2 blocks behind, or 60 minutes unconfirmed, shown as delayed and never as failed) is **not built yet**, for players or staff; a milestone is defined once. No chain or contract is configured yet (`configs/game-rewards.ts`), so the pages say a step cannot be built. Staff paste a signed transaction until a wallet that signs steps is qualified.
 
 G7a to G7d are safe to build now and are real: when G7e lands they swap the simulated chain for the real one at the ports. They
 also let the owner see the whole experience before a contract exists. Each is its own branch and task.

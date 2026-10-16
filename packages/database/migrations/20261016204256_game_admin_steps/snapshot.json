@@ -2,9 +2,7 @@
   "version": "8",
   "dialect": "postgres",
   "id": "0045f351-7aa6-4351-aca0-4e6ac4d47741",
-  "prevIds": [
-    "5f39072c-1872-4628-95e0-df83f3b47e87"
-  ],
+  "prevIds": ["5f39072c-1872-4628-95e0-df83f3b47e87"],
   "ddl": [
     {
       "name": "ador",
@@ -21,40 +19,25 @@
       "schema": "ador"
     },
     {
-      "values": [
-        "active",
-        "suspended"
-      ],
+      "values": ["active", "suspended"],
       "name": "account_status",
       "entityType": "enums",
       "schema": "ador"
     },
     {
-      "values": [
-        "owner",
-        "admin",
-        "editor",
-        "analyst"
-      ],
+      "values": ["owner", "admin", "editor", "analyst"],
       "name": "organization_role",
       "entityType": "enums",
       "schema": "ador"
     },
     {
-      "values": [
-        "reviewer",
-        "staff"
-      ],
+      "values": ["reviewer", "staff"],
       "name": "platform_role",
       "entityType": "enums",
       "schema": "ador"
     },
     {
-      "values": [
-        "sign-in",
-        "link-wallet",
-        "step-up"
-      ],
+      "values": ["sign-in", "link-wallet", "step-up"],
       "name": "auth_challenge_action",
       "entityType": "enums",
       "schema": "ador"
@@ -132,21 +115,13 @@
       "schema": "ador"
     },
     {
-      "values": [
-        "thumbnail",
-        "preview"
-      ],
+      "values": ["thumbnail", "preview"],
       "name": "derivative_kind",
       "entityType": "enums",
       "schema": "ador"
     },
     {
-      "values": [
-        "pending",
-        "delivering",
-        "delivered",
-        "failed"
-      ],
+      "values": ["pending", "delivering", "delivered", "failed"],
       "name": "outbox_status",
       "entityType": "enums",
       "schema": "ador"
@@ -183,23 +158,13 @@
       "schema": "ador"
     },
     {
-      "values": [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-      ],
+      "values": ["image/jpeg", "image/png", "image/webp"],
       "name": "upload_content_type",
       "entityType": "enums",
       "schema": "ador"
     },
     {
-      "values": [
-        "reserved",
-        "completed",
-        "cancelled",
-        "failed",
-        "abandoned"
-      ],
+      "values": ["reserved", "completed", "cancelled", "failed", "abandoned"],
       "name": "upload_intent_state",
       "entityType": "enums",
       "schema": "ador"
@@ -5875,14 +5840,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "actor_user_id"
-      ],
+      "columns": ["actor_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "account_audit_events_actor_user_id_auth_users_id_fkey",
@@ -5892,14 +5853,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "organization_id"
-      ],
+      "columns": ["organization_id"],
       "schemaTo": "ador",
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "account_audit_events_organization_id_organizations_id_fkey",
@@ -5909,14 +5866,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "target_user_id"
-      ],
+      "columns": ["target_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "account_audit_events_target_user_id_auth_users_id_fkey",
@@ -5926,14 +5879,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "organization_id"
-      ],
+      "columns": ["organization_id"],
       "schemaTo": "ador",
       "tableTo": "organizations",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "organization_memberships_organization_id_organizations_id_fkey",
@@ -5943,14 +5892,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "organization_memberships_user_id_auth_users_id_fkey",
@@ -5960,14 +5905,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "platform_role_assignments_user_id_auth_users_id_fkey",
@@ -5977,14 +5918,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "actor_user_id"
-      ],
+      "columns": ["actor_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "auth_security_events_actor_user_id_auth_users_id_fkey",
@@ -5994,14 +5931,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "session_id"
-      ],
+      "columns": ["session_id"],
       "schemaTo": "ador",
       "tableTo": "auth_sessions",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "auth_security_events_session_id_auth_sessions_id_fkey",
@@ -6011,14 +5944,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "auth_sessions_user_id_auth_users_id_fkey",
@@ -6028,14 +5957,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "passkey_challenges_user_id_auth_users_id_fkey",
@@ -6045,14 +5970,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "session_id"
-      ],
+      "columns": ["session_id"],
       "schemaTo": "ador",
       "tableTo": "auth_sessions",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "passkey_challenges_session_id_auth_sessions_id_fkey",
@@ -6062,14 +5983,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "passkey_credentials_user_id_auth_users_id_fkey",
@@ -6079,14 +5996,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "expected_user_id"
-      ],
+      "columns": ["expected_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "wallet_challenges_expected_user_id_auth_users_id_fkey",
@@ -6096,14 +6009,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "wallet_identities_user_id_auth_users_id_fkey",
@@ -6113,14 +6022,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "submission_id"
-      ],
+      "columns": ["submission_id"],
       "schemaTo": "ador",
       "tableTo": "collection_submissions",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_review_events_45kKpDSi5ty7_fkey",
@@ -6130,14 +6035,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "actor_user_id"
-      ],
+      "columns": ["actor_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_review_events_actor_user_id_auth_users_id_fkey",
@@ -6147,14 +6048,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "collection_id"
-      ],
+      "columns": ["collection_id"],
       "schemaTo": "ador",
       "tableTo": "collections",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_submissions_collection_id_collections_id_fkey",
@@ -6164,14 +6061,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "owner_user_id"
-      ],
+      "columns": ["owner_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_submissions_owner_user_id_auth_users_id_fkey",
@@ -6181,14 +6074,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "collection_id"
-      ],
+      "columns": ["collection_id"],
       "schemaTo": "ador",
       "tableTo": "collections",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_items_collection_id_collections_id_fkey",
@@ -6198,14 +6087,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "image_asset_id"
-      ],
+      "columns": ["image_asset_id"],
       "schemaTo": "ador",
       "tableTo": "assets",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collection_items_image_asset_id_assets_id_fkey",
@@ -6215,14 +6100,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "owner_user_id"
-      ],
+      "columns": ["owner_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collections_owner_user_id_auth_users_id_fkey",
@@ -6232,14 +6113,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "cover_asset_id"
-      ],
+      "columns": ["cover_asset_id"],
       "schemaTo": "ador",
       "tableTo": "assets",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collections_cover_asset_id_assets_id_fkey",
@@ -6249,14 +6126,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "banner_asset_id"
-      ],
+      "columns": ["banner_asset_id"],
       "schemaTo": "ador",
       "tableTo": "assets",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "collections_banner_asset_id_assets_id_fkey",
@@ -6266,14 +6139,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "application_id"
-      ],
+      "columns": ["application_id"],
       "schemaTo": "ador",
       "tableTo": "creator_applications",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_admission_events_neS4CtPDyx1S_fkey",
@@ -6283,14 +6152,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "snapshot_id"
-      ],
+      "columns": ["snapshot_id"],
       "schemaTo": "ador",
       "tableTo": "creator_application_snapshots",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_admission_events_p67iLwn7UB3R_fkey",
@@ -6300,14 +6165,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "actor_user_id"
-      ],
+      "columns": ["actor_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_admission_events_actor_user_id_auth_users_id_fkey",
@@ -6317,14 +6178,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "application_id"
-      ],
+      "columns": ["application_id"],
       "schemaTo": "ador",
       "tableTo": "creator_applications",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_application_snapshots_81VSL4Ifl3B9_fkey",
@@ -6334,14 +6191,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "submitted_by_user_id"
-      ],
+      "columns": ["submitted_by_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_application_snapshots_7LdMOFcYpJxb_fkey",
@@ -6351,14 +6204,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "applicant_user_id"
-      ],
+      "columns": ["applicant_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "creator_applications_applicant_user_id_auth_users_id_fkey",
@@ -6368,14 +6217,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "asset_id"
-      ],
+      "columns": ["asset_id"],
       "schemaTo": "ador",
       "tableTo": "assets",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "asset_derivatives_asset_id_assets_id_fkey",
@@ -6385,14 +6230,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "created_by"
-      ],
+      "columns": ["created_by"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "game_admin_steps_created_by_auth_users_id_fkey",
@@ -6402,14 +6243,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "submitted_by"
-      ],
+      "columns": ["submitted_by"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "SET NULL",
       "name": "game_admin_steps_submitted_by_auth_users_id_fkey",
@@ -6419,14 +6256,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "game_milestone_claims_user_id_auth_users_id_fkey",
@@ -6436,14 +6269,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "game_runs_user_id_auth_users_id_fkey",
@@ -6453,14 +6282,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "game_milestone_counters_user_id_auth_users_id_fkey",
@@ -6470,14 +6295,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "game_milestone_unlocks_user_id_auth_users_id_fkey",
@@ -6487,14 +6308,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "game_saves_user_id_auth_users_id_fkey",
@@ -6504,14 +6321,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "upload_intent_id"
-      ],
+      "columns": ["upload_intent_id"],
       "schemaTo": "ador",
       "tableTo": "upload_intents",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "assets_upload_intent_id_upload_intents_id_fkey",
@@ -6521,14 +6334,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "assets_user_id_auth_users_id_fkey",
@@ -6538,14 +6347,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "upload_intents_user_id_auth_users_id_fkey",
@@ -6555,14 +6360,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "previous_user_id"
-      ],
+      "columns": ["previous_user_id"],
       "schemaTo": "ador",
       "tableTo": "auth_users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "released_wallets_previous_user_id_auth_users_id_fkey",
@@ -6571,11 +6372,7 @@
       "table": "released_wallets"
     },
     {
-      "columns": [
-        "user_id",
-        "game_id",
-        "milestone_id"
-      ],
+      "columns": ["user_id", "game_id", "milestone_id"],
       "nameExplicit": false,
       "name": "game_milestone_counters_pkey",
       "entityType": "pks",
@@ -6583,11 +6380,7 @@
       "table": "game_milestone_counters"
     },
     {
-      "columns": [
-        "user_id",
-        "game_id",
-        "milestone_id"
-      ],
+      "columns": ["user_id", "game_id", "milestone_id"],
       "nameExplicit": false,
       "name": "game_milestone_unlocks_pkey",
       "entityType": "pks",
@@ -6595,10 +6388,7 @@
       "table": "game_milestone_unlocks"
     },
     {
-      "columns": [
-        "user_id",
-        "game_id"
-      ],
+      "columns": ["user_id", "game_id"],
       "nameExplicit": false,
       "name": "game_saves_pkey",
       "entityType": "pks",
@@ -6606,11 +6396,7 @@
       "table": "game_saves"
     },
     {
-      "columns": [
-        "bucket",
-        "subject_hash",
-        "window_start"
-      ],
+      "columns": ["bucket", "subject_hash", "window_start"],
       "nameExplicit": false,
       "name": "rate_limit_windows_pkey",
       "entityType": "pks",
@@ -6618,9 +6404,7 @@
       "table": "rate_limit_windows"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "account_audit_events_pkey",
       "schema": "ador",
@@ -6628,9 +6412,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "organization_memberships_pkey",
       "schema": "ador",
@@ -6638,9 +6420,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "organizations_pkey",
       "schema": "ador",
@@ -6648,9 +6428,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "platform_role_assignments_pkey",
       "schema": "ador",
@@ -6658,9 +6436,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_security_events_pkey",
       "schema": "ador",
@@ -6668,9 +6444,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_sessions_pkey",
       "schema": "ador",
@@ -6678,9 +6452,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "auth_users_pkey",
       "schema": "ador",
@@ -6688,9 +6460,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "passkey_challenges_pkey",
       "schema": "ador",
@@ -6698,9 +6468,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "passkey_credentials_pkey",
       "schema": "ador",
@@ -6708,9 +6476,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "wallet_challenges_pkey",
       "schema": "ador",
@@ -6718,9 +6484,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "wallet_identities_pkey",
       "schema": "ador",
@@ -6728,9 +6492,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "collection_review_events_pkey",
       "schema": "ador",
@@ -6738,9 +6500,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "collection_submissions_pkey",
       "schema": "ador",
@@ -6748,9 +6508,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "collection_items_pkey",
       "schema": "ador",
@@ -6758,9 +6516,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "collections_pkey",
       "schema": "ador",
@@ -6768,9 +6524,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "creator_admission_events_pkey",
       "schema": "ador",
@@ -6778,9 +6532,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "creator_application_snapshots_pkey",
       "schema": "ador",
@@ -6788,9 +6540,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "creator_applications_pkey",
       "schema": "ador",
@@ -6798,9 +6548,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "asset_derivatives_pkey",
       "schema": "ador",
@@ -6808,9 +6556,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "game_admin_steps_pkey",
       "schema": "ador",
@@ -6818,9 +6564,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "game_milestone_claims_pkey",
       "schema": "ador",
@@ -6828,9 +6572,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "game_runs_pkey",
       "schema": "ador",
@@ -6838,9 +6580,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "event_id"
-      ],
+      "columns": ["event_id"],
       "nameExplicit": false,
       "name": "outbox_events_pkey",
       "schema": "ador",
@@ -6848,9 +6588,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "assets_pkey",
       "schema": "ador",
@@ -6858,9 +6596,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "upload_intents_pkey",
       "schema": "ador",
@@ -6868,9 +6604,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "released_wallets_pkey",
       "schema": "ador",
@@ -6879,9 +6613,7 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "player_id"
-      ],
+      "columns": ["player_id"],
       "nullsNotDistinct": false,
       "name": "game_saves_player_id_key",
       "entityType": "uniques",
@@ -6890,9 +6622,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nullsNotDistinct": false,
       "name": "auth_users_email_key",
       "schema": "ador",
@@ -6901,9 +6631,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "object_key"
-      ],
+      "columns": ["object_key"],
       "nullsNotDistinct": false,
       "name": "asset_derivatives_object_key_key",
       "schema": "ador",
@@ -6912,9 +6640,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "object_key"
-      ],
+      "columns": ["object_key"],
       "nullsNotDistinct": false,
       "name": "upload_intents_object_key_key",
       "schema": "ador",

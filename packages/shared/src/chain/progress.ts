@@ -1,6 +1,10 @@
 import type { BroadcastOutcome, Observation } from "./results.ts";
 import type { SignedTransaction, UnsignedTransaction } from "./transaction.ts";
-import { canTransition, type TransactionState } from "./transaction-state.ts";
+import {
+  canTransition,
+  transactionStates,
+  type TransactionState,
+} from "./transaction-state.ts";
 
 // Where a claim goes next. The neutral lifecycle allows no jumps, so each move is walked one legal step at a time and the claim
 // is written at the end of the walk; a mistake in a path fails loudly in a test, not quietly in a player's claim.
@@ -115,6 +119,12 @@ export function afterBroadcast(
 // The state of a transaction the platform tracks: the neutral ones, and `expired` for one built and never signed in time.
 export type TrackedState = TransactionState | "expired";
 
+// Every state a tracked transaction can be in, so a test can hold a table to them.
+export const trackedStates: readonly TrackedState[] = [
+  ...transactionStates,
+  "expired",
+];
+
 // The transaction a step was signed as, or null while it is unsigned.
 export const signedOf = (step: {
   readonly signedPayload: string | null;
@@ -142,3 +152,34 @@ export const moveTo =
     canMove(from, change.state)
       ? change
       : null;
+
+// Where a transaction stands for the person waiting on it, without saying it is done before the chain's indexed state agrees:
+// waiting for a signature; sent and not yet confirmed; confirmed but not yet seen by the indexer; complete; failed (rejected, or
+// included and reverted); or lapsed before it was signed.
+export type TransactionStage =
+  | "awaiting-signature"
+  | "complete"
+  | "confirmed"
+  | "expired"
+  | "failed"
+  | "pending";
+
+// Written out for every state of the lifecycle, so a state added there fails the type check here until it is placed.
+const stages: Readonly<Record<TrackedState, TransactionStage>> = {
+  awaiting_signature: "awaiting-signature",
+  broadcast_accepted: "pending",
+  broadcast_rejected: "failed",
+  broadcast_unknown: "pending",
+  complete: "complete",
+  confirmed: "confirmed",
+  constructed: "awaiting-signature",
+  expired: "expired",
+  indexed_failure: "failed",
+  indexed_success: "confirmed",
+  pending: "pending",
+  reconciled: "confirmed",
+  signed: "pending",
+  simulated: "awaiting-signature",
+};
+
+export const stageOf = (state: TrackedState): TransactionStage => stages[state];

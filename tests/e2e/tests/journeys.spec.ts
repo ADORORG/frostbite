@@ -176,7 +176,11 @@ test("staff without the reviewer role see their console and no review links", as
   await begin(page, baseURL, creatorE2EFixtures.staff.sessionToken);
   await bar(page).getByRole("link", { name: "Admin", exact: true }).click();
   await heading(page, "Admin console");
-  await expect(page.getByText("No staff areas yet")).toBeVisible();
+  // Staff have one area now: the rewards contracts of games.
+  await expect(page.getByText("No staff areas yet")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Game rewards" }).first(),
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Creator reviews" })).toHaveCount(
     0,
   );

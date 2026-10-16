@@ -1,5 +1,5 @@
 import { transactionStates } from "@ador/shared/chain";
-import { sql, type SQL } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   check,
   jsonb,

@@ -1,5 +1,6 @@
 import { authorizationPolicySchema } from "@ador/shared/accounts";
 import { collectionReviewCapability } from "@ador/shared/collections";
+import { gameAdminCapability } from "@ador/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { authorizationPolicy } from "../src/policy/authorization.ts";
@@ -19,6 +20,13 @@ describe("authorization policy", () => {
     );
     expect(authorizationPolicy.platform.staff).not.toContain(
       collectionReviewCapability,
+    );
+  });
+
+  it("lets staff, and only staff, administer a game's rewards contract", () => {
+    expect(authorizationPolicy.platform.staff).toContain(gameAdminCapability);
+    expect(authorizationPolicy.platform.reviewer).not.toContain(
+      gameAdminCapability,
     );
   });
 });

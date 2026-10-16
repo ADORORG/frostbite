@@ -217,6 +217,7 @@
   color: var(--arcade-text-muted);
   font-size: 0.9375rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 .arcade-info-card > * {
   margin: 0;

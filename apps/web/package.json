@@ -26,6 +26,7 @@
     "@ador/feature-collection-review": "workspace:*",
     "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
+    "@ador/feature-game-admin": "workspace:*",
     "@ador/feature-games": "workspace:*",
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-collections": "workspace:*",

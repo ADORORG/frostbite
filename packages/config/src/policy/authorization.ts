@@ -1,5 +1,6 @@
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
 import { collectionReviewCapability } from "@ador/shared/collections";
+import { gameAdminCapability } from "@ador/shared/games";
 
 export const authorizationPolicy = {
   organization: {
@@ -10,7 +11,8 @@ export const authorizationPolicy = {
   },
   platform: {
     reviewer: ["creator:review", collectionReviewCapability],
-    staff: ["platform:operate"],
+    // Any staff member may administer a game's rewards contract, including pausing it (ADR-018 Amendment 3); every step is logged.
+    staff: ["platform:operate", gameAdminCapability],
   },
   version: "beta-v1",
 } as const satisfies AuthorizationPolicy;
