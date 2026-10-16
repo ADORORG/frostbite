@@ -19,16 +19,21 @@ Neutral surface, safe for features, workers, and apps:
 Family-specific, allowed only where the repository boundary policy permits (this package, the wallet
 bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/` exception):
 
-- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter. It provides the
-  address codec, and, when given a node per chain (`BitcoinAlkanesReads`), the rewards reader: `claimed` (how many times a
-  holder claimed a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Simulation,
-  construction, broadcast, and observation arrive with the mint tasks; the adapter declares only what it provides.
-  Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode`, JSON-RPC transport, minimal
-  protobuf codec for the few indexer messages used, every answer validated); `abi.ts` holds the template opcodes (tested
-  against `contracts/templates/abi/*.json`); `milestone-key.ts` and `holder.ts` implement the rules shared with the contracts
-  (tested against the same vector files); `rewards.ts` and `inspect.ts` are the reads. Reads use the node directly, not
-  `@alkanes/ts-sdk`, whose read results are loosely typed (`any`), return raw hex for simulations and need its WASM runtime;
-  the SDK stays for the wallet and signing paths.
+- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter, and what a caller needs to
+  wire it to a node (`createRpcNode`, `createJsonRpc`, `AlkanesNode`, `TransactionOptions`). It always provides the address codec.
+  Given a node per chain (`BitcoinAlkanesNodes`) it also provides the **rewards reader**: `claimed` (how many times a holder claimed
+  a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Given transaction options as well
+  it provides the **milestone-claim path**: the builder (a PSBT the player's wallet signs, with a summary of what it does), the
+  signed-transaction check, the broadcaster, the observer (Bitcoin confirmation plus the indexer's trace), and the contract gateway
+  (inspection, and a simulation that tells a player before they sign whether a claim would be refused). Template deploy,
+  milestone definition and pause need the platform's own signer and are not here yet. The adapter declares only what it provides.
+  Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
+  codec for the few indexer messages used, every answer validated, the trace decoder); `tx/` builds a claim (the
+  protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,
+  `broadcaster.ts`, `observer.ts`, `contracts.ts`, `rewards.ts` and `inspect.ts` are the ports; `abi.ts` holds the template
+  opcodes, and `milestone-key.ts` and `holder.ts` the rules shared with the contracts, all tested against the vector files in
+  `contracts/templates/abi/`. Reads use the node directly, not `@alkanes/ts-sdk`, whose read results are loosely typed (`any`),
+  return raw hex for simulations and need its WASM runtime; the SDK stays for the wallet and signing paths.
 - `@ador/chain/bitcoin` — `validateBitcoinAddress` (P2WPKH and P2TR, mainnet or signet, `bitcoinjs-lib`
   7.0.2).
 - `@ador/chain/alkanes` — `loadAlkanesSdk`, the isolated entrypoint for the immutable

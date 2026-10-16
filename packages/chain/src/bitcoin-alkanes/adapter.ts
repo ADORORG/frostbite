@@ -4,7 +4,7 @@ import {
   type ChainRef,
 } from "@ador/shared/chain";
 
-import { portCapabilities, type ChainAdapter } from "../adapter.ts";
+import { portCapabilities, portNames, type ChainAdapter } from "../adapter.ts";
 import {
   validateBitcoinAddress,
   type BitcoinNetwork,
@@ -14,34 +14,52 @@ import {
   type AddressCodec,
   type ChainPorts,
 } from "../ports.ts";
+import { createBroadcaster } from "./broadcaster.ts";
+import { serveChains } from "./chains.ts";
+import { createClaimBuilder } from "./builder.ts";
+import { createContractGateway } from "./contracts.ts";
 import type { AlkanesNode } from "./node/node.ts";
-import { createRewardsReader, type RewardsChain } from "./rewards.ts";
+import { createObserver } from "./observer.ts";
+import type { TransactionOptions } from "./options.ts";
+import { createRewardsReader } from "./rewards.ts";
+
+// What a caller needs to wire the adapter to a node.
+export { createRpcNode, type AlkanesNode } from "./node/node.ts";
+export {
+  createJsonRpc,
+  type FetchLike,
+  type JsonRpcOptions,
+} from "./node/transport.ts";
+export type { TransactionOptions } from "./options.ts";
 
 // CAIP-2 namespace for Bitcoin chains (https://namespaces.chainagnostic.org/bip122/caip2).
 const bitcoinNamespace = "bip122";
 
 // Recorded on every chain record this adapter touches (ADR-017 section 7); bump on behavior change.
-export const bitcoinAlkanesAdapterVersion = "0.1.0";
+export const bitcoinAlkanesAdapterVersion = "0.2.0";
 
 export const bitcoinAlkanesFamily =
   chainFamilyIdSchema.parse("bitcoin-alkanes");
 
-// What turns reads on. Without it the adapter provides only the address codec.
-export interface BitcoinAlkanesReads {
+// What turns the node-backed ports on. Without it the adapter provides only the address codec.
+export interface BitcoinAlkanesNodes {
+  readonly maxPreviewBytes: number;
   // The node that serves each chain; the keys must be the chains the adapter serves.
   readonly nodes: ReadonlyMap<ChainRef, AlkanesNode>;
-  readonly maxPreviewBytes: number;
+  // When given, the adapter also builds, sends and watches milestone claims and simulates them; without it, reads only.
+  readonly transactions?: TransactionOptions;
 }
 
-// The `bitcoin-alkanes` adapter as it stands: the address codec, and the rewards reader when nodes are given. Simulation,
-// construction, broadcast, and observation arrive with the mint tasks; until then the adapter declares only what it provides,
-// so a feature that needs more fails at boot.
+// The `bitcoin-alkanes` adapter as it stands: the address codec; given nodes, the rewards reader; given transaction options too,
+// the claim builder, broadcaster, observer and contract gateway. Deploying templates and administering a game (defining
+// milestones, pausing) need the platform's own signer and arrive with it; the adapter declares only what it provides, so a
+// feature that needs more fails at boot.
 //
 // Which CAIP-2 chain is which Bitcoin network comes from validated configuration; no chain
 // identifier is hard-coded here.
 export function createBitcoinAlkanesAdapter(
   networks: ReadonlyMap<ChainRef, BitcoinNetwork>,
-  reads?: BitcoinAlkanesReads,
+  services?: BitcoinAlkanesNodes,
 ): ChainAdapter {
   if (networks.size === 0) {
     throw new Error("The bitcoin-alkanes adapter needs at least one chain.");
@@ -70,17 +88,16 @@ export function createBitcoinAlkanesAdapter(
     },
   };
 
-  const rewards =
-    reads === undefined ? undefined : rewardsReader(networks, reads);
   const ports: Partial<ChainPorts> = {
     addressCodec,
-    ...(rewards === undefined ? {} : { rewards }),
+    ...(services === undefined ? {} : nodePorts(networks, services)),
   };
   return {
-    capabilities: new Set([
-      portCapabilities.addressCodec,
-      ...(rewards === undefined ? [] : [portCapabilities.rewards]),
-    ]),
+    capabilities: new Set(
+      portNames
+        .filter((name) => ports[name] !== undefined)
+        .map((name) => portCapabilities[name]),
+    ),
     family: bitcoinAlkanesFamily,
     ports,
     supports: (chain) => networks.has(chain),
@@ -89,25 +106,22 @@ export function createBitcoinAlkanesAdapter(
   };
 }
 
-function rewardsReader(
+function nodePorts(
   networks: ReadonlyMap<ChainRef, BitcoinNetwork>,
-  reads: BitcoinAlkanesReads,
-) {
-  const served = [...networks.keys()].sort();
-  const nodes = [...reads.nodes.keys()].sort();
-  if (served.join() !== nodes.join()) {
-    throw new Error(
-      "The nodes must cover exactly the chains the adapter serves.",
-    );
-  }
-  const chains = new Map<ChainRef, RewardsChain>();
-  for (const [chain, network] of networks) {
-    const node = reads.nodes.get(chain);
-    if (node === undefined) continue;
-    chains.set(chain, { network, node });
-  }
-  return createRewardsReader({
+  services: BitcoinAlkanesNodes,
+): Partial<ChainPorts> {
+  const chains = serveChains(networks, services.nodes);
+  const rewards = createRewardsReader({
     chains,
-    maxPreviewBytes: reads.maxPreviewBytes,
+    maxPreviewBytes: services.maxPreviewBytes,
   });
+  const options = services.transactions;
+  if (options === undefined) return { rewards };
+  return {
+    broadcaster: createBroadcaster(chains),
+    builder: createClaimBuilder(chains, options, bitcoinAlkanesFamily),
+    contracts: createContractGateway(chains, options),
+    observer: createObserver(chains, options),
+    rewards,
+  };
 }

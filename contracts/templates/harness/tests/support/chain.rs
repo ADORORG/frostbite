@@ -177,6 +177,12 @@ impl Chain {
         self.push(input, Wallet::B, cellpack(super::GAME, inputs))
     }
 
+    /// A transaction built elsewhere (for example by the platform's TypeScript builder), added as it is.
+    pub fn push_transaction(&mut self, transaction: Transaction) -> Sent {
+        self.block.txdata.push(transaction);
+        self.sent(self.block.txdata.len() - 1)
+    }
+
     /// `wallet` claims `milestone`; the collectible is sent to that wallet's script.
     pub fn claim(&mut self, wallet: Wallet, milestone: u128) -> Sent {
         let input = self.made_up_input();

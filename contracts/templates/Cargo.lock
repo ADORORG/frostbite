@@ -855,6 +855,7 @@ dependencies = [
  "protorune",
  "protorune-support",
  "rewards-core",
+ "serde_json",
  "wasm-bindgen-test",
 ]
 

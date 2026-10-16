@@ -13,6 +13,7 @@ import {
 import { milestoneKey } from "../../src/bitcoin-alkanes/milestone-key.ts";
 import type { AlkaneId } from "../../src/bitcoin-alkanes/node/alkane-id.ts";
 import type { AlkanesNode } from "../../src/bitcoin-alkanes/node/node.ts";
+import { fakeNode } from "../support/nodes.ts";
 import type { ViewResult } from "../../src/bitcoin-alkanes/node/messages.ts";
 import {
   ContractAnswerError,
@@ -46,14 +47,12 @@ interface Seen {
 
 function nodeAnswering(answer: (call: Seen) => ViewResult) {
   const calls: Seen[] = [];
-  const node: AlkanesNode = {
-    bytecode: () => Promise.resolve(null),
-    height: () => Promise.resolve(1),
+  const node = fakeNode({
     view: (target, opcode, inputs) => {
       calls.push({ inputs, opcode, target });
       return Promise.resolve(answer({ inputs, opcode, target }));
     },
-  };
+  });
   return { calls, node };
 }
 

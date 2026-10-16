@@ -4,6 +4,8 @@ import type { JsonValue } from "@ador/shared/chain";
 import {
   NodeRejectedError,
   NodeUnavailableError,
+} from "../../src/bitcoin-alkanes/node/errors.ts";
+import {
   createJsonRpc,
   type FetchLike,
 } from "../../src/bitcoin-alkanes/node/transport.ts";

@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 (the contract templates) built; G7e-2 to G7e-4 not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 to G7e-4 built (the contract templates; the adapter's reads; its milestone-claim path; the drawing sanitiser); template deploy and game administration (G7e-5) need the platform signer. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -66,8 +66,8 @@ chain-neutral port set:
   the level label, against the simulated chain; Playwright for success and each failure.
 - **G7e The contract** (GP-05), in four pieces: **G7e-1** the `game-rewards@1` and `milestone-collectible@1` templates in
   `contracts/templates` (built, below); **G7e-2** the `bitcoin-alkanes` adapter's reads (`rewards.claimed`, the collectible's
-  picture and content type, contract inspection); **G7e-3** its build, deploy, broadcast and observe; **G7e-4** the off-chain
-  SVG sanitiser for builder drawings. G7e-3 waits for wallet signing; G7e-2 and G7e-4 do not.
+  picture and content type, contract inspection); **G7e-3** its claim build, broadcast and observe, and the claim simulation (template deploy and game administration are G7e-5, which needs the platform signer); **G7e-4** the off-chain
+  SVG sanitiser for builder drawings. G7e-1 to G7e-4 are built; the real signer that deploys and administers games is G7e-5.
 
 **G7e-1 built.** `contracts/templates` holds one `game-rewards` instance per game and one shared `milestone-collectible` template
 (ADR-018 Amendment 3): a wallet claims a milestone up to a per-milestone limit and receives its own numbered collectible, whose picture is

@@ -22,17 +22,38 @@ const diesel = { block: 2n, tx: 0n };
 
 describe("requests", () => {
   it("encode a call as the height and a varint calldata", () => {
-    expect(encodeSimulateRequest(971738, diesel, 99n, [])).toBe(
-      dieselNameRequest,
-    );
+    expect(
+      encodeSimulateRequest({
+        height: 971738,
+        inputs: [],
+        opcode: 99n,
+        target: diesel,
+      }),
+    ).toBe(dieselNameRequest);
   });
 
   it("carry the arguments after the opcode, including numbers wider than 64 bits", () => {
     const wide = (1n << 100n) + 5n;
     // Written out by an independent implementation: height 1, calldata 2 0 100 <wide> 7.
-    expect(encodeSimulateRequest(1, diesel, 100n, [wide, 7n])).toBe(
-      "0x20012a1302006485808080808080808080808080800407",
-    );
+    expect(
+      encodeSimulateRequest({
+        height: 1,
+        inputs: [wide, 7n],
+        opcode: 100n,
+        target: diesel,
+      }),
+    ).toBe("0x20012a1302006485808080808080808080808080800407");
+  });
+
+  it("carry the transaction a call is made in ahead of the height", () => {
+    const request = encodeSimulateRequest({
+      height: 1,
+      inputs: [],
+      opcode: 99n,
+      target: diesel,
+      transaction: Uint8Array.of(0xaa, 0xbb),
+    });
+    expect(request).toBe("0x1202aabb200 12a03020063".replace(" ", ""));
   });
 
   it("encode a bytecode request exactly as the Alkanes SDK does", () => {

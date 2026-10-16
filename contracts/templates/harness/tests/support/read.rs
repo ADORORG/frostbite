@@ -1,6 +1,7 @@
 use alkanes::view;
 use alkanes_support::cellpack::Cellpack;
 use alkanes_support::id::AlkaneId;
+use rewards_core::holder::Holder;
 use rewards_core::opcode::{collectible, game};
 
 use super::chain::Wallet;
@@ -45,7 +46,12 @@ pub fn fuel(target: (u128, u128), inputs: Vec<u128>) -> anyhow::Result<u64> {
 
 /// How many claims of `milestone` the game counts for `wallet`.
 pub fn claimed(wallet: Wallet, milestone: u128) -> anyhow::Result<u128> {
-    let (first, second) = wallet.holder().halves();
+    claimed_by(wallet.holder(), milestone)
+}
+
+/// The same, for any holder (for example the owner of a script a test did not make).
+pub fn claimed_by(holder: Holder, milestone: u128) -> anyhow::Result<u128> {
+    let (first, second) = holder.halves();
     number(
         super::GAME,
         vec![game::GET_CLAIMED, first, second, milestone],

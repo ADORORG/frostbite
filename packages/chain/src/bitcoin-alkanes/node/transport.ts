@@ -1,22 +1,7 @@
 import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
 
-// The node cannot be reached, answered too slowly, or answered something that is not JSON-RPC.
-export class NodeUnavailableError extends Error {
-  readonly code = "node-unavailable";
-  constructor(message: string) {
-    super(message);
-    this.name = "NodeUnavailableError";
-  }
-}
-
-// The node understood the request and refused it.
-export class NodeRejectedError extends Error {
-  readonly code = "node-rejected";
-  constructor(message: string) {
-    super(message);
-    this.name = "NodeRejectedError";
-  }
-}
+import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
+import { isRecord } from "./json.ts";
 
 export interface JsonRpc {
   call(method: string, params: readonly JsonValue[]): Promise<JsonValue>;
@@ -41,12 +26,6 @@ export interface JsonRpcOptions {
   readonly fetch: FetchLike;
   readonly timeoutMs: number;
   readonly url: string;
-}
-
-function isRecord(
-  value: JsonValue,
-): value is { readonly [key: string]: JsonValue } {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function createJsonRpc(options: JsonRpcOptions): JsonRpc {

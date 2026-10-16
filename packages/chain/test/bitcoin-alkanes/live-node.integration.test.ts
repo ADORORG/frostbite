@@ -19,7 +19,10 @@ describe.skipIf(url === undefined)(
     );
 
     it("reports a block height", async () => {
-      expect(await node.height()).toBeGreaterThan(900_000);
+      const tip = await node.tip();
+      expect(tip.height).toBeGreaterThan(900_000);
+      expect(tip.hash).toMatch(/^[0-9a-f]{64}$/u);
+      expect(await node.indexedHeight()).toBeGreaterThan(900_000);
     });
 
     it("answers a view of a deployed contract", async () => {
@@ -33,6 +36,28 @@ describe.skipIf(url === undefined)(
         false,
       );
       expect(await node.bytecode({ block: 2n, tx: 987654321n })).toBeNull();
+    });
+
+    it("describes transactions and the indexer's trace of one that called a contract", async () => {
+      // Transaction aa9833a5…0bc2 (block 971742) called a contract at output 3; recorded 2026-10-16.
+      const txid =
+        "aa9833a5bc390773b721d36947409d7077ea925034b5962c677fa8bec47f0bc2";
+      expect(await node.transaction(txid)).toMatchObject({
+        blockHeight: 971742,
+        confirmed: true,
+        outputs: 2,
+      });
+      expect(await node.trace(txid, 3)).toBe("success");
+      expect(await node.trace(txid, 0)).toBe("none");
+      expect(await node.transaction("00".repeat(31) + "01")).toBeNull();
+    });
+
+    it("lists unspent outputs and a fee estimate", async () => {
+      const outputs = await node.utxos(
+        "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+      );
+      expect(Array.isArray(outputs)).toBe(true);
+      expect(await node.feeRate(3)).toBeGreaterThan(0);
     });
 
     it("inspects the stored code", async () => {

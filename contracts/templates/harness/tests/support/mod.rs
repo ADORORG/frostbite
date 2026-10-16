@@ -8,7 +8,7 @@ pub mod chain;
 pub mod read;
 
 pub use chain::{Chain, Wallet};
-pub use read::{art, claimed, fuel, limit, number, paused, picture, text, view};
+pub use read::{art, claimed, claimed_by, fuel, limit, number, paused, picture, text, view};
 
 /// Built by `cargo build --release --target wasm32-unknown-unknown` (see the README).
 pub const COLLECTIBLE: &[u8] =

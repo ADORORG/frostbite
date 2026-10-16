@@ -3,15 +3,12 @@ import { describe, expect, it } from "vitest";
 import { chainFamilyIdSchema, chainRefSchema } from "@ador/shared/chain";
 
 import { inspectContract } from "../../src/bitcoin-alkanes/inspect.ts";
-import type { AlkanesNode } from "../../src/bitcoin-alkanes/node/node.ts";
+import { fakeNode } from "../support/nodes.ts";
 
 const chain = chainRefSchema.parse("bip122:000000000019d6689c085ae165831e93");
 const family = chainFamilyIdSchema.parse("bitcoin-alkanes");
-const nodeWith = (code: Uint8Array | null): AlkanesNode => ({
-  bytecode: () => Promise.resolve(code),
-  height: () => Promise.resolve(1),
-  view: () => Promise.reject(new Error("not used")),
-});
+const nodeWith = (code: Uint8Array | null) =>
+  fakeNode({ bytecode: () => Promise.resolve(code) });
 
 describe("inspecting a contract", () => {
   it("gives the SHA-256 of the stored code", async () => {

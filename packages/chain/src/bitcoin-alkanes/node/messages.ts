@@ -15,17 +15,23 @@ function calldata(target: AlkaneId, opcode: bigint, inputs: readonly bigint[]) {
   return [target.block, target.tx, opcode, ...inputs].flatMap(encodeVarint);
 }
 
-export function encodeSimulateRequest(
-  height: number,
-  target: AlkaneId,
-  opcode: bigint,
-  inputs: readonly bigint[],
-): string {
-  const parcel = new MessageWriter()
-    .varint(4, BigInt(height))
-    .bytesField(5, calldata(target, opcode, inputs))
-    .finish();
-  return `0x${toHex(parcel)}`;
+export interface SimulateRequest {
+  readonly height: number;
+  readonly inputs: readonly bigint[];
+  readonly opcode: bigint;
+  readonly target: AlkaneId;
+  // The transaction the call is made in (consensus-encoded), for a call that reads it, as a claim reads output 0.
+  readonly transaction?: Uint8Array;
+}
+
+export function encodeSimulateRequest(request: SimulateRequest): string {
+  const parcel = new MessageWriter();
+  if (request.transaction !== undefined)
+    parcel.bytesField(2, request.transaction);
+  parcel
+    .varint(4, BigInt(request.height))
+    .bytesField(5, calldata(request.target, request.opcode, request.inputs));
+  return `0x${toHex(parcel.finish())}`;
 }
 
 // A `uint128` message holds the low and high 64 bits; an unset field is zero.

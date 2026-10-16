@@ -3,15 +3,12 @@ import { chainRefSchema } from "@ador/shared/chain";
 
 import { portCapabilities } from "../../src/adapter.ts";
 import { createBitcoinAlkanesAdapter } from "../../src/bitcoin-alkanes/adapter.ts";
-import type { AlkanesNode } from "../../src/bitcoin-alkanes/node/node.ts";
+import { options } from "../support/claims.ts";
+import { fakeNode } from "../support/nodes.ts";
 
 const mainnet = chainRefSchema.parse("bip122:000000000019d6689c085ae165831e93");
 const signet = chainRefSchema.parse("bip122:00000008819873e925422c1ff0f99f7c");
-const node: AlkanesNode = {
-  bytecode: () => Promise.resolve(null),
-  height: () => Promise.resolve(1),
-  view: () => Promise.resolve({ error: "none", ok: false }),
-};
+const node = fakeNode();
 
 describe("the bitcoin-alkanes adapter with reads", () => {
   const networks = new Map([[mainnet, "mainnet" as const]]);
@@ -28,6 +25,42 @@ describe("the bitcoin-alkanes adapter with reads", () => {
       "addressCodec",
       "rewards",
     ]);
+  });
+
+  it("also builds, sends, watches and simulates claims when given transaction options", () => {
+    const adapter = createBitcoinAlkanesAdapter(networks, {
+      maxPreviewBytes: 8192,
+      nodes: new Map([[mainnet, node]]),
+      transactions: options,
+    });
+    expect(adapter.capabilities).toEqual(
+      new Set([
+        portCapabilities.addressCodec,
+        portCapabilities.broadcaster,
+        portCapabilities.builder,
+        portCapabilities.contracts,
+        portCapabilities.observer,
+        portCapabilities.rewards,
+      ]),
+    );
+    expect(Object.keys(adapter.ports).sort()).toEqual([
+      "addressCodec",
+      "broadcaster",
+      "builder",
+      "contracts",
+      "observer",
+      "rewards",
+    ]);
+  });
+
+  it("refuses transaction options that are not valid", () => {
+    expect(() =>
+      createBitcoinAlkanesAdapter(networks, {
+        maxPreviewBytes: 8192,
+        nodes: new Map([[mainnet, node]]),
+        transactions: { ...options, lifetimeMs: 0 },
+      }),
+    ).toThrow("lifetimeMs");
   });
 
   it("stays an address codec only without nodes", () => {

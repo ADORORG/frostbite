@@ -1,0 +1,9 @@
+{
+  "rule": "The signed transaction the platform would send to claim milestone \"first-frost\" from game 2:1: one input of 100,000 sats from a P2WPKH wallet at 2 sat/vB. Built by the TypeScript builder with a syntactically valid but not cryptographically valid signature; the indexer harness does not check signatures.",
+  "game": "2:1",
+  "milestone": "first-frost",
+  "key": "285129175851185728558316823437424749722",
+  "claimantScript": "0014751e76e8199196d454941c45d1b3a323f1433bd6",
+  "txHex": "0200000000010111111111111111111111111111111111111111111111111111111111111111110000000000fdffffff032202000000000000160014751e76e8199196d454941c45d1b3a323f1433bd60000000000000000336a5d301600ff7f8190ec82d08bc0a8828592849df3aef8c001ff7f92dbdbffecd5aff3c3bd8788a5baa4df8701ff7f9fe1ae0fec82010000000000160014751e76e8199196d454941c45d1b3a323f1433bd60209300602010102010101210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179800000000",
+  "txid": "497cfee8cb71ba7d6737b1176838f2f969b430823618869ae08ac55c0967c64c"
+}

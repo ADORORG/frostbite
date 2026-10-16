@@ -18,3 +18,5 @@ rewards-core = { workspace = true }
 anyhow = { workspace = true }
 bitcoin = { version = "0.32.4", features = ["rand"] }
 wasm-bindgen-test = "=0.3.50"
+serde_json = { workspace = true }
+
