@@ -579,12 +579,18 @@ importers:
 
   features/games:
     dependencies:
+      '@ador/chain':
+        specifier: workspace:*
+        version: link:../../packages/chain
       '@ador/client-http':
         specifier: workspace:*
         version: link:../../packages/client-http
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/game-claims':
+        specifier: workspace:*
+        version: link:../../packages/game-claims
       '@ador/game-runs':
         specifier: workspace:*
         version: link:../../packages/game-runs

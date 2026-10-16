@@ -2,6 +2,8 @@ import "./zod-config.ts";
 import { z } from "zod";
 
 import {
+  claimStates,
+  claimUnavailableReasons,
   errorCodeSchema,
   gameChannel,
   jsonValueSchema,
@@ -94,6 +96,22 @@ export const methods = {
         unlockedAt: timestamp.nullable(),
       })
       .strict(),
+  },
+  // Asks the platform to start a claim of a milestone the player earned: it builds the transaction and the player reviews and
+  // signs it with their own wallet in the platform's own page; the game never sees a wallet, a signature or a transaction.
+  // `requested` says the claim is open (asking again changes nothing); the game learns how it goes from `claim.changed`.
+  // Needs the `milestone:claim` capability.
+  "milestones.claim": {
+    params: z.object({ id: z.string().min(1).max(64) }).strict(),
+    result: z.discriminatedUnion("status", [
+      z.object({ status: z.literal("requested") }).strict(),
+      z
+        .object({
+          reason: z.enum(claimUnavailableReasons),
+          status: z.literal("unavailable"),
+        })
+        .strict(),
+    ]),
   },
   "milestones.unlock": {
     params: z.object({ id: z.string().min(1).max(64) }).strict(),
@@ -204,6 +222,7 @@ export const methodNames = Object.keys(methods) as MethodName[];
 // The manifest capability a method needs before the host answers it. A method not listed needs none.
 export const requiredCapability: Readonly<Partial<Record<MethodName, string>>> =
   {
+    "milestones.claim": "milestone:claim",
     "run.start": "run:submit",
     "run.submit": "run:submit",
     "wallet.connect": "wallet",
@@ -220,6 +239,9 @@ export type Result<Name extends MethodName> = z.infer<
 // (and, for the wallet, declared the capability). A message in this shape is not a response, so a game built
 // on an older SDK ignores it.
 export const events = {
+  "claim.changed": z
+    .object({ id: z.string().min(1).max(64), state: z.enum(claimStates) })
+    .strict(),
   "fullscreen.changed": z.object({ active: z.boolean() }).strict(),
   "player.changed": playerIdentitySchema,
   "lifecycle.changed": z
@@ -233,7 +255,7 @@ export type EventData<Name extends EventName> = z.infer<(typeof events)[Name]>;
 // The capability a game must have declared to be sent an event. An event not listed needs none.
 export const requiredEventCapability: Readonly<
   Partial<Record<EventName, string>>
-> = { "wallet.changed": "wallet" };
+> = { "claim.changed": "milestone:claim", "wallet.changed": "wallet" };
 
 const envelope = {
   channel: z.literal(gameChannel),

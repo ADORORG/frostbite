@@ -100,7 +100,7 @@ describe("the game catalog", () => {
     ]);
   });
 
-  it("lists the milestone:claim capability as declared but not granted, because the host cannot answer it yet", () => {
+  it("lists the milestone:claim capability as granted to a game the platform plays itself, because the host answers it", () => {
     const claimable = createGameCatalog(
       [
         {
@@ -113,7 +113,7 @@ describe("the game catalog", () => {
     ).list()[0];
     expect(claimable?.capabilities).toEqual([
       {
-        available: false,
+        available: true,
         id: "milestone:claim",
         label: "Start a claim for a milestone the player earned",
       },

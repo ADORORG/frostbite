@@ -107,6 +107,14 @@ export const probes: readonly Probe[] = [
     run: (client) => client.milestones.unlock(exploredMilestone),
   },
   {
+    id: "milestones-claim",
+    label: "milestones.claim",
+    // Asks the platform to start a claim of the milestone this game's explorer earns. The platform answers `unavailable`:
+    // `signed-out`, `not-earned` or, as today, `not-supported` (no contract is deployed for this game). A game that gets
+    // `requested` learns how the claim goes from the `claim.changed` event.
+    run: (client) => client.milestones.claim(exploredMilestone),
+  },
+  {
     id: "toast",
     label: "ui.toast",
     run: async (client) => ({

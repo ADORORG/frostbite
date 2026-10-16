@@ -103,3 +103,8 @@ export const walletConfig = {
 
 // Never read by a page; the runs routes read it only when a run is started.
 export const runsConfig = { playRoot: "/nonexistent/play" } as const;
+// No contract deployed and no chain that takes claims, as the platform is configured today.
+export const claimsConfig = {
+  chain: () => null,
+  contracts: new Map(),
+} as const;

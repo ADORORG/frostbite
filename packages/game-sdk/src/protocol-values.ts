@@ -87,5 +87,34 @@ export const walletInfoSchema = z
   .strict();
 export type WalletInfo = z.infer<typeof walletInfoSchema>;
 
+// Why a game's request to start a claim cannot go ahead right now. A claim needs a signed-in player, a connected wallet, a
+// milestone the player earned in a game that declared a rewards contract, and room under the claim limit; the answer says which
+// is missing so the game can say so. `not-supported` is a page or platform that cannot take claims for this game at all,
+// `unavailable` is a chain that cannot be reached or a claim the contract would refuse, and `wrong-network` is a wallet on
+// another chain than the game's.
+export const claimUnavailableReasons = [
+  "limit-reached",
+  "no-wallet",
+  "not-claimable",
+  "not-earned",
+  "not-supported",
+  "signed-out",
+  "unavailable",
+  "wrong-network",
+] as const;
+
+// Where a claim stands, as the player and the game are told (never "minted" before the chain's indexed state agrees):
+// waiting for the player's wallet to sign, sent and not yet confirmed, confirmed on chain, complete (indexed state agrees),
+// failed (rejected or reverted), or lapsed before it was signed.
+export const claimStates = [
+  "awaiting-signature",
+  "pending",
+  "claimed",
+  "complete",
+  "failed",
+  "expired",
+] as const;
+export type ClaimState = (typeof claimStates)[number];
+
 // A message a game may ask the platform to show the player. Plain text, kept short.
 export const toastMaxLength = 140;

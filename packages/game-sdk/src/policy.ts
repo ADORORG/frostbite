@@ -15,6 +15,8 @@ export const gameHostPolicySchema = z
     runRecordMaxBytes: z.number().int().min(1_024).max(1_048_576),
     // Runs a game may start and submit a minute together; a replay costs the platform real work.
     runCallsPerMinute: z.number().int().min(1).max(600),
+    // Claims a game may ask the platform to start a minute; each can open a review the player has to deal with.
+    claimCallsPerMinute: z.number().int().min(1).max(60),
     // Times a game may ask the page to open the wallet chooser a minute; a game must not keep a dialog in the way.
     connectCallsPerMinute: z.number().int().min(1).max(60),
     // Messages a game may ask the page to show a minute; the player is not to be spammed.
@@ -26,6 +28,7 @@ export const gameHostPolicySchema = z
 export type GameHostPolicy = z.infer<typeof gameHostPolicySchema>;
 
 export const defaultGameHostPolicy: GameHostPolicy = Object.freeze({
+  claimCallsPerMinute: 6,
   connectCallsPerMinute: 6,
   progressCallsPerMinute: 120,
   progressMaxBytes: 65_536,

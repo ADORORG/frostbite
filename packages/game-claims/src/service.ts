@@ -1,3 +1,4 @@
+import { InvalidAddressError } from "@ador/chain/ports";
 import type {
   Address,
   SignedTransaction,
@@ -46,7 +47,8 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       readonly gameId: string;
       readonly milestoneId: string;
       readonly userId: string;
-      readonly wallet: Address;
+      // The address of the wallet that will sign, as the page gives it: parsed for the game's chain here.
+      readonly wallet: string;
     }): Promise<StartClaimResult> {
       const { gameId, milestoneId, userId, wallet } = input;
       const current = game(gameId);
@@ -54,10 +56,16 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       if (current === null || limit === undefined)
         return { code: "not-claimable", ok: false };
       if (current.contract === null) return { code: "unavailable", ok: false };
-      if (wallet.chain !== current.chain)
-        return { code: "wrong-chain", ok: false };
       const chain = ports(current.chain);
       if (chain === null) return { code: "unavailable", ok: false };
+      let sender: Address;
+      try {
+        sender = chain.addressCodec.parse(current.chain, wallet);
+      } catch (error) {
+        if (error instanceof InvalidAddressError)
+          return { code: "wrong-chain", ok: false };
+        throw error;
+      }
       if (!(await earned(userId, gameId, milestoneId)))
         return { code: "not-earned", ok: false };
 
@@ -66,7 +74,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
         contract: current.contract,
         milestoneId,
         operation: "mint-milestone",
-        sender: wallet,
+        sender,
       } as const;
       let unsigned: UnsignedTransaction;
       try {
@@ -88,7 +96,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
           milestoneId,
           unsigned,
           userId,
-          wallet,
+          wallet: sender,
         },
         { limit },
       );

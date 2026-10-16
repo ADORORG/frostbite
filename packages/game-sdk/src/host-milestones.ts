@@ -32,6 +32,8 @@ export function createMilestoneHandlers(options: {
   }
 
   return {
+    // The manifest's milestone of this id, or a refusal: a game cannot ask about one it did not declare.
+    declared,
     counts: async (): Promise<Result<"milestones.counts">> => {
       const [records, totals] = await Promise.all([
         backend.milestones(),

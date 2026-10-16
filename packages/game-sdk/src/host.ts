@@ -22,6 +22,7 @@ export type {
   HostedGame,
   HostEvent,
   HostServices,
+  ClaimsService,
   RunsService,
 } from "./host-types.ts";
 import type {
@@ -55,6 +56,7 @@ export function createGameHost(options: {
   const policy = options.policy ?? defaultGameHostPolicy;
   let ready = false;
   const { within } = createRateLimiter(now, [
+    "claim",
     "connect",
     "progress",
     "run",
@@ -166,6 +168,18 @@ export function createGameHost(options: {
         await backend.saveProgress(state, savedAt);
         onEvent?.({ savedAt: savedAt.toISOString(), type: "progress-saved" });
         return { savedAt: savedAt.toISOString() };
+      }
+      case "milestones.claim": {
+        const { id } = methods["milestones.claim"].params.parse(params);
+        milestones.declared(id);
+        if (!within("claim", policy.claimCallsPerMinute))
+          throw new Refusal("rate_limited", "Claiming too often.");
+        return (
+          (await services?.claims?.claim(id)) ?? {
+            reason: "not-supported",
+            status: "unavailable",
+          }
+        );
       }
       case "milestones.counts":
         return milestones.counts();

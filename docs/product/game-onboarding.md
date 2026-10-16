@@ -127,8 +127,16 @@ The full list, with the status of what is still to come, is `docs/product/game-s
   `unavailable` (this page cannot offer a chooser). The game never handles the wallet: when the player connects it
   receives the `wallet.changed` event, and a player who closes the chooser changes nothing. At most six asks a
   minute.
+- **`milestones.claim(id)`** asks the platform to start a claim of a milestone the player earned, to be signed with their
+  own wallet in the platform's page; the game never sees a wallet, a signature or a transaction. It needs the
+  `milestone:claim` capability (which needs `rewards` in the manifest) and resolves to `requested` (asking again changes
+  nothing; watch `claim.changed`) or `unavailable` with why: `signed-out`, `no-wallet`, `not-earned`, `not-claimable`,
+  `limit-reached`, `wrong-network`, `unavailable` or `not-supported` (this platform cannot take claims for this game, which
+  is every game today: nothing is deployed to claim from). `claim.changed` carries the milestone id and one of
+  `awaiting-signature`, `pending`, `claimed`, `complete`, `failed`, `expired`; **`complete` only once the chain's indexed state
+  agrees**, never on confirmation alone. At most six asks a minute.
 - **Events** arrive without a request, through `client.on(name, handler)`, which returns a function that stops
-  listening: `wallet.changed` (only for a game that declared `wallet`), `lifecycle.changed` (`paused` while the tab
+  listening: `wallet.changed` (only for a game that declared `wallet`), `claim.changed` (only for `milestone:claim`), `lifecycle.changed` (`paused` while the tab
   is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`.
 - **`ui.toast(message)`** asks the page to show up to 140 characters of plain text; the page prefixes the game's
   name so it cannot pass for the platform's. It resolves to whether it was shown. At most six a minute.
@@ -197,7 +205,7 @@ game declares is then enabled in that contract, and the most times one address c
 or the `maxCount` of a repeatable one (`milestoneClaimLimit`, `rewardsInitialisation` in `@ador/shared/games`). The optional
 `milestone:claim` capability lets the game ask the platform to start a claim for a player; it needs `rewards`. The player's own
 wallet signs and the player pays the network fee. **Nothing mints yet**: the contract and the chain steps are task #73, and the
-page lists the capability as declared, not granted, until they exist. Holding a token will mean "claimed", never "earned"
+page lists the capability as granted (the host answers it) while every claim is answered `not-supported` until they exist. Holding a token will mean "claimed", never "earned"
 (`docs/product/plan-g7-minting.md`).
 
 ## Milestones are self-reported, unless the platform replays them

@@ -26,7 +26,9 @@ test("every call is answered by the platform, in the real frame", async ({
     "Connected. Call anything below.",
   );
   await game.locator("#capabilities").click();
-  await expect(newest(page)).toContainText('"granted":["run:submit","wallet"]');
+  await expect(newest(page)).toContainText(
+    '"granted":["milestone:claim","run:submit","wallet"]',
+  );
   await expect(newest(page)).toContainText('"events":[');
   await game.locator("#player").click();
   await expect(newest(page)).toContainText(
@@ -35,6 +37,11 @@ test("every call is answered by the platform, in the real frame", async ({
   // No wallet is connected in a test browser, so the answer is none, not an error.
   await game.locator("#wallet").click();
   await expect(newest(page)).toHaveText('wallet.get → {"wallet":null}');
+  // Asking for a claim is answered, not refused: nothing is deployed to claim from, so the platform says it is not supported.
+  await game.locator("#milestones-claim").click();
+  await expect(newest(page)).toHaveText(
+    'milestones.claim → {"reason":"not-supported","status":"unavailable"}',
+  );
   await game.locator("#progress-save").click();
   await expect(newest(page)).toHaveText(
     'progress.save → {"saved":{"calls":1}}',

@@ -75,6 +75,10 @@ export interface GameClient {
       id: string,
       current: number,
     ): Promise<Result<"milestones.progress">>;
+    // Asks the platform to start a claim of a milestone the player earned, to be signed with their own wallet in the
+    // platform's page. Resolves `requested` (the claim is open; watch `claim.changed`) or `unavailable` with why. Refused
+    // with `permission_denied` unless the game declared the `milestone:claim` capability, and rate limited.
+    claim(id: string): Promise<Result<"milestones.claim">>;
     // Reports a milestone earned. For a repeatable milestone each call is counted, up to the manifest's maximum;
     // read the count with `counts()`. A milestone with a target is earned through `progress` instead.
     unlock(id: string): Promise<Result<"milestones.unlock">>;
@@ -228,6 +232,7 @@ export function createGameClient(
       waiting.clear();
     },
     milestones: {
+      claim: (id) => call("milestones.claim", { id }),
       counts: async () => (await call("milestones.counts", {})).counts,
       list: async () => (await call("milestones.list", {})).milestones,
       progress: (id, current) => call("milestones.progress", { current, id }),

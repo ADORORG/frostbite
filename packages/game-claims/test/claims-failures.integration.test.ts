@@ -117,7 +117,7 @@ describe("signing", () => {
       gameId,
       milestoneId: "first-win",
       userId,
-      wallet,
+      wallet: wallet.value,
     });
     expect(next.ok && next.resumed).toBe(false);
     expect(next.ok && next.claim.id).not.toBe(claim.id);
@@ -134,7 +134,7 @@ describe("signing", () => {
       gameId,
       milestoneId: "first-win",
       userId,
-      wallet,
+      wallet: wallet.value,
     });
     expect(fresh.ok && fresh.claim.id).not.toBe(restarted.claim.id);
     expect((await stateOf(restarted.claim.id))?.state).toBe("expired");
@@ -190,7 +190,7 @@ describe("the network", () => {
       gameId,
       milestoneId: "first-win",
       userId,
-      wallet,
+      wallet: wallet.value,
     });
     expect(again.ok && again.resumed).toBe(false);
   });
@@ -244,7 +244,12 @@ describe("the network", () => {
       state: "indexed_failure",
     });
     expect(
-      await service.start({ gameId, milestoneId: "first-win", userId, wallet }),
+      await service.start({
+        gameId,
+        milestoneId: "first-win",
+        userId,
+        wallet: wallet.value,
+      }),
     ).toMatchObject({
       ok: true,
       resumed: false,

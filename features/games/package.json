@@ -5,6 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./claims-operations": "./src/application/claims-operations.ts",
+    "./claims-runtime": "./src/claims-runtime.ts",
     "./entrypoint": "./src/entrypoint.tsx",
     "./runs-operations": "./src/application/runs-operations.ts",
     "./runs-runtime": "./src/runs-runtime.ts"
@@ -19,8 +21,10 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/chain": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/game-claims": "workspace:*",
     "@ador/game-runs": "workspace:*",
     "@ador/game-saves": "workspace:*",
     "@ador/game-sdk": "workspace:*",

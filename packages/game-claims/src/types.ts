@@ -21,7 +21,12 @@ export interface ClaimableGame {
 // The chain ports a claim uses, and nothing else.
 export type ClaimChainPorts = Pick<
   ChainPorts,
-  "broadcaster" | "builder" | "contracts" | "observer" | "rewards"
+  | "addressCodec"
+  | "broadcaster"
+  | "builder"
+  | "contracts"
+  | "observer"
+  | "rewards"
 >;
 
 export interface GameClaimsDependencies {

@@ -3,6 +3,7 @@ import {
   createGameHost,
   type GameHost,
   type HostedGame,
+  type ClaimsService,
   type RunsService,
 } from "@ador/game-sdk/host";
 import type { VerificationLevel, WalletInfo } from "@ador/game-sdk/protocol";
@@ -24,6 +25,7 @@ import {
 } from "react";
 
 import { createAccountPort } from "../client/account-sync.ts";
+import { createClaimsService } from "../client/claims-port.ts";
 import { createRunsService } from "../client/runs-port.ts";
 import { useHostEvents } from "./use-host-events.ts";
 
@@ -83,6 +85,13 @@ export function useGameSession(
   } = { title: game.id },
   // How the game reaches the platform to start and settle replay-verified runs.
   runsFor: (gameId: string) => RunsService = createRunsService,
+  // How the game asks the platform to start a claim of a milestone. The default has nowhere to show the claim to the player yet,
+  // so a game is told claims are not supported rather than that one was requested.
+  claimsFor: (
+    gameId: string,
+    wallet: () => WalletInfo | null,
+  ) => ClaimsService = (gameId, walletOf) =>
+    createClaimsService({ gameId, wallet: walletOf }),
 ) {
   const [unlocked, setUnlocked] = useState<UnlockedMilestones>({});
   const [progress, setProgress] = useState<MilestoneProgress>(noProgress);
@@ -108,6 +117,9 @@ export function useGameSession(
   // session restarted by a re-render would reload the game and lose what the player was doing.
   const remoteFor = useEffectEvent((gameId: string) => accountFor(gameId));
   const runsOf = useEffectEvent((gameId: string) => runsFor(gameId));
+  const claimsOf = useEffectEvent((gameId: string) =>
+    claimsFor(gameId, () => walletNow.current ?? null),
+  );
 
   useEffect(() => {
     const element = frame.current;
@@ -196,6 +208,7 @@ export function useGameSession(
       reply: (message) => target.postMessage(message, "*"),
       // The game's words are shown as the game's: a message from it must not pass for the platform's.
       services: {
+        claims: claimsOf(id),
         runs: runsOf(id),
         toast: (message) => show(`${title}: ${message}`),
         wallet: () => walletNow.current ?? null,

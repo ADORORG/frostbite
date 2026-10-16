@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a and G7b built** (the manifest declaration; the intent, claim records and claim service on the simulated chain); G7c to G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7c built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes); G7d and G7e not started. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -73,6 +73,12 @@ intent and summary in `@ador/shared/chain`; a `rewards` reader port (`RewardsRea
 (and can revert one); the `game_milestone_claims` table; and `@ador/game-claims` (start, submit signed, refresh, list). Notes: a
 claim is `complete` only once the reader shows the wallet's expected count; a failed claim stops at the state that saw the failure
 (no reconcile step for a claim that never happened); the platform's claim limit is per account while the chain's is per address.
+**G7c.** `milestones.claim` and the `claim.changed` event in the SDK protocol (capability `milestone:claim`, rate limited, the
+milestone must be declared); four POST routes (`/api/v1/games/claims/start|submit|refresh|list`; this API's GET has no query
+string) over `@ador/game-claims`; the page's claims port; `configs/game-claims.ts`. **Nothing is configured**: no contract is
+deployed and no chain adapter takes claims, so every claim is answered `not-supported`, and the page's port answers the same
+until G7d gives it somewhere to show the claim to the player. The start route takes the wallet address as text and the platform
+parses it for the game's chain (an address from another chain is `wrong-network`).
 
 G7a to G7d are safe to build now and are real: when G7e lands they swap the simulated chain for the real one at the ports. They
 also let the owner see the whole experience before a contract exists. Each is its own branch and task.

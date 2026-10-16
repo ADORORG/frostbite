@@ -8,9 +8,11 @@ if (signet === undefined) throw new Error("No target chain is configured.");
 // The SDK explorer, in /games/sdk-explorer: it calls every method the platform offers a game and shows what
 // came back, so a builder can see each answer in the real isolated frame. It is registered only where the
 // platform is run for development or tests (see configs/games.ts), never in a deployment players use. It
-// declares the wallet capability so that the address call can be seen answering.
+// declares the wallet capability so that the address call can be seen answering, and a rewards contract with the
+// `milestone:claim` capability so that asking for a claim can be seen answering (today: not supported, since no contract is
+// deployed for it).
 export const sdkExplorerGame = defineGame({
-  capabilities: ["run:submit", "wallet"],
+  capabilities: ["milestone:claim", "run:submit", "wallet"],
   description:
     "Press a button to call the platform and see what comes back. Events the platform sends on its own appear in the same list.",
   id: "sdk-explorer",
@@ -34,6 +36,7 @@ export const sdkExplorerGame = defineGame({
     },
   ],
   network: signet.chainId,
+  rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "Calls every part of the game SDK and shows the answers.",
   title: "SDK Explorer",

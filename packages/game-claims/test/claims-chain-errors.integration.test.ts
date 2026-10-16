@@ -30,7 +30,12 @@ describe("starting when the chain is not behaving", () => {
     const userId = await player();
     chainFailure.simulate = true;
     expect(
-      await service.start({ gameId, milestoneId: "first-win", userId, wallet }),
+      await service.start({
+        gameId,
+        milestoneId: "first-win",
+        userId,
+        wallet: wallet.value,
+      }),
     ).toEqual({
       code: "would-fail",
       ok: false,
@@ -43,7 +48,12 @@ describe("starting when the chain is not behaving", () => {
     const userId = await player();
     chainFailure.build = true;
     expect(
-      await service.start({ gameId, milestoneId: "first-win", userId, wallet }),
+      await service.start({
+        gameId,
+        milestoneId: "first-win",
+        userId,
+        wallet: wallet.value,
+      }),
     ).toEqual({ code: "chain-unavailable", ok: false });
     expect(await service.list(userId, gameId)).toEqual([]);
   });

@@ -112,7 +112,15 @@ export interface RunsService {
   submit(runId: string, record: JsonValue): Promise<Result<"run.submit">>;
 }
 
+// Claims as the page reaches them. A claim is the player's own business with their wallet; the game only asks for one to
+// be started.
+export interface ClaimsService {
+  claim(milestoneId: string): Promise<Result<"milestones.claim">>;
+}
+
 export interface HostServices {
+  // Starts a claim of a milestone the player earned. A page that cannot offers none, and the game is told so.
+  claims?: ClaimsService;
   // Starts and settles replay-verified runs. A page that cannot offers none, and the game is told runs are unavailable.
   runs?: RunsService;
   // Opens the platform's wallet chooser for the player. A page that has none leaves it out, and the game is told so.

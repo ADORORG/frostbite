@@ -94,9 +94,10 @@ describe("requests and responses", () => {
 });
 
 describe("the methods", () => {
-  it("are exactly the fifteen the platform offers", () => {
+  it("are exactly the sixteen the platform offers", () => {
     expect(methodNames.sort()).toEqual([
       "capabilities.get",
+      "milestones.claim",
       "milestones.counts",
       "milestones.list",
       "milestones.progress",
@@ -217,8 +218,9 @@ describe("the wallet and the events", () => {
       expect(walletInfoSchema.safeParse(wallet).success).toBe(false);
   });
 
-  it("know four events, each with strict data", () => {
+  it("know five events, each with strict data", () => {
     expect(eventNames.sort()).toEqual([
+      "claim.changed",
       "fullscreen.changed",
       "lifecycle.changed",
       "player.changed",
@@ -262,13 +264,17 @@ describe("the wallet and the events", () => {
     ).toBe(false);
   });
 
-  it("need the wallet capability for the address, asking for a wallet and the wallet event, the run capability for runs, and nothing else", () => {
+  it("need the wallet capability for the address, asking for a wallet and the wallet event, the run capability for runs, the claim capability for claims, and nothing else", () => {
     expect(requiredCapability).toEqual({
+      "milestones.claim": "milestone:claim",
       "run.start": "run:submit",
       "run.submit": "run:submit",
       "wallet.connect": "wallet",
       "wallet.get": "wallet",
     });
-    expect(requiredEventCapability).toEqual({ "wallet.changed": "wallet" });
+    expect(requiredEventCapability).toEqual({
+      "claim.changed": "milestone:claim",
+      "wallet.changed": "wallet",
+    });
   });
 });

@@ -115,6 +115,7 @@ describe("the capabilities answer", () => {
     expect(result?.methods).toContain("wallet.get");
     expect(result?.methods).toContain("capabilities.get");
     expect(result?.events.sort()).toEqual([
+      "claim.changed",
       "fullscreen.changed",
       "lifecycle.changed",
       "player.changed",

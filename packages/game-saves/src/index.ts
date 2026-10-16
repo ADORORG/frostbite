@@ -7,3 +7,4 @@ export {
 } from "./service.ts";
 export type { MilestoneRule, MilestoneRules } from "./rules.ts";
 export { recordVerifiedMilestones } from "./verified-milestones.ts";
+export { hasEarnedMilestone } from "./earned.ts";

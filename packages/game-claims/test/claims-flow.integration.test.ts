@@ -12,7 +12,6 @@ import {
   gameId,
   indexerLag,
   network,
-  otherChain,
   player,
   registerDatabase,
   service,
@@ -38,7 +37,7 @@ describe("claiming a milestone from the start to complete", () => {
       gameId,
       milestoneId: "first-win",
       userId,
-      wallet,
+      wallet: wallet.value,
     });
     if (!started.ok) throw new Error("did not start");
     expect(started.resumed).toBe(false);
@@ -110,7 +109,7 @@ describe("claiming a milestone from the start to complete", () => {
       gameId,
       milestoneId: "first-win",
       userId,
-      wallet,
+      wallet: wallet.value,
     });
     expect(again.ok && again.resumed).toBe(true);
     expect(again.ok && again.claim.id).toBe(first.claim.id);
@@ -121,7 +120,12 @@ describe("claiming a milestone from the start to complete", () => {
     const userId = await player();
     const starts = await Promise.all(
       [1, 2, 3].map(() =>
-        service.start({ gameId, milestoneId: "first-win", userId, wallet }),
+        service.start({
+          gameId,
+          milestoneId: "first-win",
+          userId,
+          wallet: wallet.value,
+        }),
       ),
     );
     const ids = new Set(starts.map((s) => (s.ok ? s.claim.id : "failed")));
@@ -139,12 +143,23 @@ describe("claiming a milestone from the start to complete", () => {
     await service.refresh(userId, claim.id);
     await service.refresh(userId, claim.id);
     expect(
-      await service.start({ gameId, milestoneId: "first-win", userId, wallet }),
+      await service.start({
+        gameId,
+        milestoneId: "first-win",
+        userId,
+        wallet: wallet.value,
+      }),
     ).toEqual({ code: "limit-reached", ok: false });
     // Another milestone of the same game is a different claim, and one with room is open.
     expect(
-      (await service.start({ gameId, milestoneId: "streak", userId, wallet }))
-        .ok,
+      (
+        await service.start({
+          gameId,
+          milestoneId: "streak",
+          userId,
+          wallet: wallet.value,
+        })
+      ).ok,
     ).toBe(true);
   });
 
@@ -196,7 +211,7 @@ describe("claiming a milestone from the start to complete", () => {
         gameId,
         milestoneId: "first-win",
         userId,
-        wallet,
+        wallet: wallet.value,
         ...over,
       });
     expect(await ask({ gameId: "unknown-game" })).toEqual({
@@ -211,7 +226,7 @@ describe("claiming a milestone from the start to complete", () => {
       code: "not-earned",
       ok: false,
     });
-    expect(await ask({ wallet: { chain: otherChain, value: "x" } })).toEqual({
+    expect(await ask({ wallet: "not-an-address" })).toEqual({
       code: "wrong-chain",
       ok: false,
     });

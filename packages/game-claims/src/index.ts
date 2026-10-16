@@ -21,3 +21,4 @@ export type {
   StartClaimResult,
   SubmitClaimResult,
 } from "./types.ts";
+export { playerClaimState, type PlayerClaimState } from "./player-state.ts";

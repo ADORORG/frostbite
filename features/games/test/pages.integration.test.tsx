@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   gameSyncRoute,
+  listGameClaimsRoute,
+  refreshGameClaimRoute,
+  startGameClaimRoute,
   startGameRunRoute,
+  submitGameClaimRoute,
   submitGameRunRoute,
 } from "@ador/shared/games";
 import { createGamesEntrypoint } from "../src/entrypoint.tsx";
@@ -15,6 +19,7 @@ import {
   coveredGame,
   embeddedGame,
   templateGame,
+  claimsConfig,
   runsConfig,
   walletConfig,
   walletGame,
@@ -30,6 +35,7 @@ async function render(
     chains,
     walletConfig,
     runsConfig,
+    claimsConfig,
   ).pages?.find((candidate) => candidate.path === path);
   if (page === undefined) throw new Error(`No page ${path}`);
   // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
@@ -248,12 +254,21 @@ describe("the games feature registration", () => {
       chains,
       walletConfig,
       runsConfig,
+      claimsConfig,
     );
     expect(feature.manifest).toMatchObject({
       id: "games",
       navigation: [{ area: "main", href: "/games", label: "Games" }],
       requiredProviderCapabilities: [],
-      routes: [gameSyncRoute, startGameRunRoute, submitGameRunRoute],
+      routes: [
+        gameSyncRoute,
+        startGameRunRoute,
+        submitGameRunRoute,
+        startGameClaimRoute,
+        submitGameClaimRoute,
+        refreshGameClaimRoute,
+        listGameClaimsRoute,
+      ],
     });
     const entrypoint = await feature.load({
       registeredFeatureCount: 1,

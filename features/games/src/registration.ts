@@ -3,16 +3,22 @@ import type { ChainOption } from "@ador/shared/chain";
 import {
   gamePagePath,
   gameSyncRoute,
+  listGameClaimsRoute,
+  refreshGameClaimRoute,
+  startGameClaimRoute,
   startGameRunRoute,
+  submitGameClaimRoute,
   submitGameRunRoute,
   gamesNavigationLabel,
   gamesPath,
   type GameManifest,
 } from "@ador/shared/games";
 
+import type { GameClaimsConfig } from "./claims-config.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
 import type { GameWalletConfig } from "./wallet-config.ts";
 
+export type { GameClaimsConfig } from "./claims-config.ts";
 export type { GameRunsConfig } from "./runs-config.ts";
 export type { GameWalletConfig } from "./wallet-config.ts";
 
@@ -24,6 +30,7 @@ export function createGamesFeature(
   chains: readonly ChainOption[],
   wallet: GameWalletConfig,
   runs: GameRunsConfig,
+  claims: GameClaimsConfig,
 ) {
   return defineFeature({
     manifest: {
@@ -45,13 +52,21 @@ export function createGamesFeature(
       ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: [],
-      routes: [gameSyncRoute, startGameRunRoute, submitGameRunRoute],
+      routes: [
+        gameSyncRoute,
+        startGameRunRoute,
+        submitGameRunRoute,
+        startGameClaimRoute,
+        submitGameClaimRoute,
+        refreshGameClaimRoute,
+        listGameClaimsRoute,
+      ],
       version: "1.0.0",
     },
     load: async () =>
       import("@ador/feature-games/entrypoint").then(
         ({ createGamesEntrypoint }) =>
-          createGamesEntrypoint(games, chains, wallet, runs),
+          createGamesEntrypoint(games, chains, wallet, runs, claims),
       ),
   });
 }

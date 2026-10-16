@@ -1,6 +1,10 @@
 "use client";
 
-import type { HostedGame, RunsService } from "@ador/game-sdk/host";
+import type {
+  ClaimsService,
+  HostedGame,
+  RunsService,
+} from "@ador/game-sdk/host";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { GameMilestone } from "@ador/shared/games";
@@ -57,6 +61,7 @@ export function milestoneCopy(milestones: readonly GameMilestone[]): string {
 export function GamePlayer({
   accountFor,
   back,
+  claimsFor,
   game,
   meta,
   runsFor,
@@ -69,6 +74,12 @@ export function GamePlayer({
   readonly accountFor?: (gameId: string) => AccountPort;
   // A way back to the list, first in the bar.
   readonly back?: ReactNode;
+  // How the page asks the platform to start a claim, given a way to read the connected wallet; the real one unless a test
+  // supplies another.
+  readonly claimsFor?: (
+    gameId: string,
+    wallet: () => WalletInfo | null,
+  ) => ClaimsService;
   readonly game: HostedGame & { readonly milestones: readonly GameMilestone[] };
   // Small facts beside the title in the bar (version, network).
   readonly meta?: ReactNode;
@@ -95,6 +106,7 @@ export function GamePlayer({
     accountFor,
     { connectWallet: wallet?.connect, title, wallet: wallet?.current },
     runsFor,
+    claimsFor,
   );
   const fullscreen = useFullscreen(frame);
   const phoneLandscape = usePhoneLandscape();

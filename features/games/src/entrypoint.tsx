@@ -4,11 +4,19 @@ import type { ChainOption } from "@ador/shared/chain";
 import { gamePagePath, gamesPath, type GameManifest } from "@ador/shared/games";
 
 import {
+  createListGameClaimsOperation,
+  createRefreshGameClaimOperation,
+  createStartGameClaimOperation,
+  createSubmitGameClaimOperation,
+} from "./application/claims-operations.ts";
+import {
   createStartGameRunOperation,
   createSubmitGameRunOperation,
 } from "./application/runs-operations.ts";
 import { createSyncGameStateOperation } from "./application/sync-operation.ts";
 import { createGameCatalog } from "./domain/catalog.ts";
+import type { GameClaimsConfig } from "./claims-config.ts";
+import { createGameClaimsResolver } from "./claims-runtime.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
 import { createGameRunsResolver } from "./runs-runtime.ts";
 import { createGameSyncResolver } from "./runtime.ts";
@@ -22,9 +30,11 @@ export function createGamesEntrypoint(
   chains: readonly ChainOption[],
   wallet: GameWalletConfig,
   runs: GameRunsConfig,
+  claims: GameClaimsConfig,
 ): FeatureEntrypoint {
   const catalog = createGameCatalog(games, chains);
   const runsService = createGameRunsResolver(games, runs);
+  const claimsService = createGameClaimsResolver(games, claims);
   const access = { kind: "public" } as const;
   return {
     capabilities: ["api-routes", "navigation", "public-page"],
@@ -35,6 +45,10 @@ export function createGamesEntrypoint(
       ),
       registerHttpOperation(createStartGameRunOperation(runsService)),
       registerHttpOperation(createSubmitGameRunOperation(runsService)),
+      registerHttpOperation(createStartGameClaimOperation(claimsService)),
+      registerHttpOperation(createSubmitGameClaimOperation(claimsService)),
+      registerHttpOperation(createRefreshGameClaimOperation(claimsService)),
+      registerHttpOperation(createListGameClaimsOperation(claimsService)),
     ],
     pages: [
       {

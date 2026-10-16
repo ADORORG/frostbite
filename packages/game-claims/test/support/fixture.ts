@@ -76,11 +76,19 @@ export const chainFailure = {
 };
 
 function ports(): ClaimChainPorts {
-  const { broadcaster, builder, contracts, observer, rewards } =
+  const { addressCodec, broadcaster, builder, contracts, observer, rewards } =
     network.adapter.ports;
-  if (!broadcaster || !builder || !contracts || !observer || !rewards)
+  if (
+    !addressCodec ||
+    !broadcaster ||
+    !builder ||
+    !contracts ||
+    !observer ||
+    !rewards
+  )
     throw new Error("The simulated adapter lacks a port a claim needs.");
   return {
+    addressCodec,
     broadcaster: {
       broadcast: async (signed) => {
         if (chainFailure.broadcast) throw new Error("the node is down");
@@ -173,7 +181,7 @@ export async function startAndSign(userId: string, milestoneId = "first-win") {
     gameId,
     milestoneId,
     userId,
-    wallet,
+    wallet: wallet.value,
   });
   if (!started.ok || started.claim.toSign === null)
     throw new Error(`The claim did not start: ${JSON.stringify(started)}`);
