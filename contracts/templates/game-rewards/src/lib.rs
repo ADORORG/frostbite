@@ -73,6 +73,12 @@ enum GameRewardsMessage {
     #[opcode(103)]
     #[returns(u128)]
     GetPaused,
+
+    /// The Alkane id of the auth token, as two little-endian 128-bit numbers (block, then tx): the token whose holder administers
+    /// the game.
+    #[opcode(104)]
+    #[returns(Vec<u8>)]
+    GetAuthToken,
 }
 
 impl AlkaneResponder for GameRewards {}

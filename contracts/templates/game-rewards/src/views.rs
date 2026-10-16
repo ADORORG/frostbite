@@ -1,3 +1,4 @@
+use alkanes_runtime::auth::AuthenticatedResponder;
 use alkanes_support::response::CallResponse;
 use anyhow::Result;
 use responder_kit::Answers;
@@ -26,6 +27,13 @@ impl GameRewards {
 
     pub(crate) fn get_milestone_art(&self, milestone: u128) -> Result<CallResponse> {
         self.answer(self.art(milestone))
+    }
+
+    pub(crate) fn get_auth_token(&self) -> Result<CallResponse> {
+        let token = self.auth_token()?;
+        let mut data = token.block.to_le_bytes().to_vec();
+        data.extend(token.tx.to_le_bytes());
+        self.answer(data)
     }
 
     pub(crate) fn get_paused(&self) -> Result<CallResponse> {

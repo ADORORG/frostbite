@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { z } from "zod";
 
 import {
@@ -21,14 +23,20 @@ const lifetimeMilliseconds = 10 * 60 * 1000;
 const bodySchema = z
   .object({
     amount: z.string().optional(),
+    claimLimit: z.number().optional(),
     contract: z.string().optional(),
+    drawingBytes: z.number().optional(),
+    drawingSha: z.string().optional(),
     expiresAt: z.string(),
     fee: z.string(),
     milestoneId: z.string().optional(),
     nonce: z.number(),
     operation: z.string(),
+    paused: z.boolean().optional(),
     recipient: z.string().optional(),
     sender: z.string(),
+    templateId: z.string().optional(),
+    templateVersion: z.string().optional(),
   })
   .strict();
 export type SimulatedBody = z.infer<typeof bodySchema>;
@@ -64,19 +72,116 @@ export function decodeSimulated(payload: string): SimulatedBody | undefined {
   }
 }
 
+// The fields of the body that describe what a transaction does, derived from the summary a person was shown.
+function detailsOfSummary(summary: UnsignedTransaction["summary"]) {
+  return {
+    amount: summary.amount?.baseUnits.toString(),
+    claimLimit: summary.claimLimit,
+    contract: summary.milestone?.contract.id ?? summary.contract?.id,
+    drawingBytes: summary.drawing?.bytes,
+    drawingSha: summary.drawing?.sha256,
+    milestoneId: summary.milestone?.id,
+    paused: summary.paused,
+    recipient: summary.recipient?.value,
+    templateId: summary.template?.id,
+    templateVersion: summary.template?.version,
+  };
+}
+
 function summaryMatches(unsigned: UnsignedTransaction): boolean {
   const body = decodeSimulated(unsigned.payload);
   const { summary } = unsigned;
-  return (
-    body !== undefined &&
-    body.operation === summary.operation &&
-    body.recipient === summary.recipient?.value &&
-    body.contract === summary.milestone?.contract.id &&
-    body.milestoneId === summary.milestone?.id &&
-    body.amount === summary.amount?.baseUnits.toString() &&
-    body.fee === summary.fee.baseUnits.toString() &&
-    body.expiresAt === summary.expiresAt
+  if (
+    body === undefined ||
+    body.operation !== summary.operation ||
+    body.fee !== summary.fee.baseUnits.toString() ||
+    body.expiresAt !== summary.expiresAt
+  ) {
+    return false;
+  }
+  const expected = detailsOfSummary(summary);
+  return (Object.keys(expected) as (keyof typeof expected)[]).every(
+    (key) => body[key] === expected[key],
   );
+}
+
+// The simulated family has no code, so a template's "hash" is the hash of its name and version.
+function templateHash(id: string, version: string): string {
+  return createHash("sha256").update(`${id}@${version}`).digest("hex");
+}
+
+type Described = Pick<SimulatedBody, "contract" | "milestoneId"> &
+  Partial<SimulatedBody> & { summary: Partial<UnsignedTransaction["summary"]> };
+
+// What each operation puts in the payload and in the summary a person reads.
+function describe(intent: TransactionIntent): Described {
+  switch (intent.operation) {
+    case "transfer":
+      return {
+        amount: intent.amount.baseUnits.toString(),
+        contract: undefined,
+        milestoneId: undefined,
+        recipient: intent.recipient.value,
+        summary: { amount: intent.amount, recipient: intent.recipient },
+      };
+    case "mint-milestone":
+      return {
+        contract: intent.contract.id,
+        milestoneId: intent.milestoneId,
+        // A claim is received by the one who makes it.
+        recipient: intent.sender.value,
+        summary: {
+          milestone: { contract: intent.contract, id: intent.milestoneId },
+          recipient: intent.sender,
+        },
+      };
+    case "define-milestone": {
+      const drawing =
+        intent.drawing === undefined
+          ? undefined
+          : {
+              bytes: new TextEncoder().encode(intent.drawing).length,
+              sha256: createHash("sha256").update(intent.drawing).digest("hex"),
+            };
+      return {
+        claimLimit: intent.claimLimit,
+        contract: intent.contract.id,
+        drawingBytes: drawing?.bytes,
+        drawingSha: drawing?.sha256,
+        milestoneId: intent.milestoneId,
+        summary: {
+          claimLimit: intent.claimLimit,
+          contract: intent.contract,
+          drawing,
+          milestone: { contract: intent.contract, id: intent.milestoneId },
+        },
+      };
+    }
+    case "set-claims-paused":
+      return {
+        contract: intent.contract.id,
+        milestoneId: undefined,
+        paused: intent.paused,
+        summary: { contract: intent.contract, paused: intent.paused },
+      };
+    case "publish-template":
+    case "deploy":
+      return {
+        contract: undefined,
+        milestoneId: undefined,
+        summary: {
+          template: {
+            codeHash: templateHash(intent.templateId, intent.templateVersion),
+            id: intent.templateId,
+            version: intent.templateVersion,
+          },
+        },
+        templateId: intent.templateId,
+        templateVersion: intent.templateVersion,
+      };
+    case "mint":
+      return { contract: undefined, milestoneId: undefined, summary: {} };
+  }
 }
 
 export function createSimulatedBuilder(now: () => Date): TransactionBuilder {
@@ -92,19 +197,14 @@ export function createSimulatedBuilder(now: () => Date): TransactionBuilder {
         now().getTime() + lifetimeMilliseconds,
       ).toISOString();
       const fee = { asset: nativeAsset(intent.chain), baseUnits: simulatedFee };
-      const transfer = intent.operation === "transfer" ? intent : undefined;
-      const claim = intent.operation === "mint-milestone" ? intent : undefined;
+      const { summary, ...details } = describe(intent);
       nonce += 1;
       const payload = JSON.stringify({
-        amount: transfer?.amount.baseUnits.toString(),
-        contract: claim?.contract.id,
+        ...details,
         expiresAt,
         fee: fee.baseUnits.toString(),
-        milestoneId: claim?.milestoneId,
         nonce,
         operation: intent.operation,
-        // A claim is received by the one who makes it.
-        recipient: transfer?.recipient.value ?? claim?.sender.value,
         sender: intent.sender.value,
       });
       return Promise.resolve({
@@ -113,16 +213,11 @@ export function createSimulatedBuilder(now: () => Date): TransactionBuilder {
         format: simulatedFormat,
         payload,
         summary: {
-          amount: transfer?.amount,
+          ...summary,
           chain: intent.chain,
           expiresAt,
           fee,
-          milestone: claim && {
-            contract: claim.contract,
-            id: claim.milestoneId,
-          },
           operation: intent.operation,
-          recipient: transfer?.recipient ?? claim?.sender,
         },
       });
     },

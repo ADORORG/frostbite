@@ -190,6 +190,9 @@ describe("chainConfigListSchema", () => {
     deploy: { kind: "confirmations", required: 3 },
     mint: { kind: "confirmations", required: 2 },
     "mint-milestone": { kind: "confirmations", required: 2 },
+    "publish-template": { kind: "confirmations", required: 3 },
+    "define-milestone": { kind: "confirmations", required: 3 },
+    "set-claims-paused": { kind: "confirmations", required: 1 },
     transfer: { kind: "finalized" },
   };
   const entry = {

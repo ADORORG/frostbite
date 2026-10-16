@@ -24,8 +24,18 @@
       "inputs": ["milestone", "limit"],
       "witness": "optional svg drawing, uncompressed envelope"
     },
-    { "name": "pause", "opcode": 3, "authority": "auth token", "inputs": [] },
-    { "name": "resume", "opcode": 4, "authority": "auth token", "inputs": [] },
+    {
+      "name": "pause",
+      "opcode": 3,
+      "authority": "auth token",
+      "inputs": []
+    },
+    {
+      "name": "resume",
+      "opcode": 4,
+      "authority": "auth token",
+      "inputs": []
+    },
     {
       "name": "get_name",
       "opcode": 99,
@@ -60,6 +70,13 @@
       "view": true,
       "inputs": [],
       "returns": "u128"
+    },
+    {
+      "name": "get_auth_token",
+      "opcode": 104,
+      "view": true,
+      "inputs": [],
+      "returns": "bytes"
     }
   ]
 }

@@ -19,6 +19,9 @@ export const milestoneIdSchema = z
 
 const semanticVersionPattern = /^\d+\.\d+\.\d+$/u;
 
+// A sanity ceiling on a drawing carried in an intent; the real limit is the one set when the game's contract was made.
+const maxDrawingCharacters = 262_144;
+
 // Chain-neutral fields every intent shares. Anything family-specific (UTXO funding, gas settings)
 // goes in `extension`, which the owning adapter validates with its own schema.
 const intentBase = {
@@ -55,6 +58,37 @@ export const transactionIntentSchema = z
         operation: z.literal("mint-milestone"),
       })
       .strict(),
+    // Staff publish a template's code on the chain, once, so games can be made from it. (`deploy` makes a game from a published
+    // template.)
+    z
+      .object({
+        ...intentBase,
+        operation: z.literal("publish-template"),
+        templateId: z.string().trim().min(1).max(64),
+        templateVersion: z.string().regex(semanticVersionPattern),
+      })
+      .strict(),
+    // Staff define a milestone on a game's rewards contract: how many times one address may claim it and, optionally, its drawing
+    // (already cleaned). A milestone is defined once and never changed.
+    z
+      .object({
+        ...intentBase,
+        claimLimit: z.number().int().positive(),
+        contract: contractRefSchema,
+        drawing: z.string().min(1).max(maxDrawingCharacters).optional(),
+        milestoneId: milestoneIdSchema,
+        operation: z.literal("define-milestone"),
+      })
+      .strict(),
+    // Staff stop (or reopen) claims on a game's rewards contract.
+    z
+      .object({
+        ...intentBase,
+        contract: contractRefSchema,
+        operation: z.literal("set-claims-paused"),
+        paused: z.boolean(),
+      })
+      .strict(),
     z
       .object({
         ...intentBase,
@@ -67,9 +101,7 @@ export const transactionIntentSchema = z
   .superRefine((intent, context) => {
     const embedded = [
       intent.sender.chain,
-      ...(intent.operation === "mint" || intent.operation === "mint-milestone"
-        ? [intent.contract.chain]
-        : []),
+      ...("contract" in intent ? [intent.contract.chain] : []),
       ...(intent.operation === "transfer"
         ? [intent.recipient.chain, intent.amount.asset.chain]
         : []),
@@ -93,9 +125,31 @@ export const transactionSummarySchema = z
     chain: chainRefSchema,
     expiresAt: z.iso.datetime(),
     fee: amountSchema,
-    // Which milestone, from which contract, a `mint-milestone` transaction claims: what the person checks before signing.
+    // The game's rewards contract a milestone step acts on, and what the person checks before signing it.
+    claimLimit: z.number().int().positive().optional(),
+    contract: contractRefSchema.optional(),
+    // The drawing a milestone is defined with: its size and the SHA-256 of what goes on the chain, so staff can compare it with
+    // the picture they approved.
+    drawing: z
+      .object({
+        bytes: z.number().int().positive(),
+        sha256: z.string().regex(/^[0-9a-f]{64}$/u),
+      })
+      .strict()
+      .optional(),
+    // Which milestone, from which contract, a `mint-milestone` or `define-milestone` transaction acts on.
     milestone: z
       .object({ contract: contractRefSchema, id: milestoneIdSchema })
+      .strict()
+      .optional(),
+    paused: z.boolean().optional(),
+    // The template a `publish-template` or `deploy` transaction puts on the chain, with the hash of its code.
+    template: z
+      .object({
+        codeHash: z.string().regex(/^[0-9a-f]{64}$/u),
+        id: z.string().trim().min(1).max(64),
+        version: z.string().regex(semanticVersionPattern),
+      })
       .strict()
       .optional(),
     operation: chainOperationSchema,
@@ -109,6 +163,7 @@ export const transactionSummarySchema = z
       ...(summary.asset ? [summary.asset.chain] : []),
       ...(summary.recipient ? [summary.recipient.chain] : []),
       ...(summary.milestone ? [summary.milestone.contract.chain] : []),
+      ...(summary.contract ? [summary.contract.chain] : []),
     ];
     if (embedded.some((chain) => chain !== summary.chain)) {
       context.addIssue({

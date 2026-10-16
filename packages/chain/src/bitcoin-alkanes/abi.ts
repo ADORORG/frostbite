@@ -3,6 +3,7 @@
 export const gameRewardsOpcodes = {
   claim: 1n,
   defineMilestone: 2n,
+  getAuthToken: 104n,
   getClaimed: 100n,
   getLimit: 101n,
   getMilestoneArt: 102n,

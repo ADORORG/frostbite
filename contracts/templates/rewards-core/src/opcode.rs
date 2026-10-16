@@ -15,6 +15,7 @@ pub mod game {
     pub const GET_LIMIT: u128 = 101;
     pub const GET_MILESTONE_ART: u128 = 102;
     pub const GET_PAUSED: u128 = 103;
+    pub const GET_AUTH_TOKEN: u128 = 104;
 }
 
 /// `milestone-collectible@1`. 99 to 101 are the token views and 1000 to 1002 describe the

@@ -65,3 +65,16 @@ fn pausing_and_resuming_change_the_paused_view() -> anyhow::Result<()> {
     assert!(!paused()?);
     Ok(())
 }
+
+#[wasm_bindgen_test]
+fn the_game_names_its_auth_token() -> anyhow::Result<()> {
+    let chain = Chain::deploy();
+    chain.index();
+    let mut expected = AUTH_TOKEN.0.to_le_bytes().to_vec();
+    expected.extend(AUTH_TOKEN.1.to_le_bytes());
+    assert_eq!(
+        support::view(support::GAME, vec![game::GET_AUTH_TOKEN])?,
+        expected
+    );
+    Ok(())
+}

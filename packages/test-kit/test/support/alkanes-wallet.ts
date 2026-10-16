@@ -68,6 +68,8 @@ export function claimNode(): AlkanesNode {
     },
     bytecode: () => Promise.resolve(null),
     feeRate: () => Promise.resolve(2),
+    holdings: () =>
+      Promise.resolve({ alkanes: [], script: new Uint8Array(), value: 0n }),
     indexedHeight: () => Promise.resolve(100),
     tip: () => Promise.resolve({ hash: "cc".repeat(32), height: 100 }),
     trace: () => Promise.resolve("success"),

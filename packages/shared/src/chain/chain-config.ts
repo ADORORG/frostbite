@@ -11,6 +11,9 @@ export const chainOperations = [
   "deploy",
   "mint",
   "mint-milestone",
+  "publish-template",
+  "define-milestone",
+  "set-claims-paused",
   "transfer",
 ] as const;
 

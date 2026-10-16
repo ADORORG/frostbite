@@ -31,6 +31,7 @@ fn game_rewards_abi_matches_the_constants() {
         ("GET_LIMIT", game::GET_LIMIT),
         ("GET_MILESTONE_ART", game::GET_MILESTONE_ART),
         ("GET_PAUSED", game::GET_PAUSED),
+        ("GET_AUTH_TOKEN", game::GET_AUTH_TOKEN),
     ];
     let published = operations(include_str!("../../abi/game-rewards@1.json"));
     let expected: Vec<_> = expected
