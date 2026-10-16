@@ -46,6 +46,27 @@ mod tests {
     }
 
     #[test]
+    fn halves_match_the_shared_vectors() {
+        let file: serde_json::Value =
+            serde_json::from_str(include_str!("../../abi/holder-vectors.json")).expect("JSON");
+        for vector in file["vectors"].as_array().expect("vectors") {
+            let script: Vec<u8> = (0..vector["script"].as_str().expect("script").len())
+                .step_by(2)
+                .map(|at| {
+                    u8::from_str_radix(&vector["script"].as_str().expect("script")[at..at + 2], 16)
+                        .expect("hex")
+                })
+                .collect();
+            let (first, second) = Holder::from_script(&script).halves();
+            assert_eq!(first.to_string(), vector["first"].as_str().expect("first"));
+            assert_eq!(
+                second.to_string(),
+                vector["second"].as_str().expect("second")
+            );
+        }
+    }
+
+    #[test]
     fn the_digest_is_sha256() {
         // SHA-256 of the empty string.
         let expected = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";

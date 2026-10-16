@@ -78,7 +78,20 @@ export const observationSchema = z
   .strict()
   .readonly();
 
+// What a page shows for a collectible a claim produced: the picture the chain serves for it, who issued it and its edition
+// number. The issuer lets the platform check the item came from a game it lists, because anyone can create look-alike items.
+export const collectiblePreviewSchema = z
+  .object({
+    bytes: z.instanceof(Uint8Array),
+    contentType: z.string().trim().min(1).max(128),
+    edition: z.number().int().positive(),
+    issuer: contractRefSchema,
+  })
+  .strict()
+  .readonly();
+
 export type ChainTransaction = z.infer<typeof chainTransactionSchema>;
+export type CollectiblePreview = z.infer<typeof collectiblePreviewSchema>;
 export type ContractInspection = z.infer<typeof contractInspectionSchema>;
 export type SimulationResult = z.infer<typeof simulationResultSchema>;
 export type FundingPolicy = z.infer<typeof fundingPolicySchema>;

@@ -1,0 +1,13 @@
+{
+  "rule": "holder = SHA-256 of the output script; first and second halves are the first and last 16 bytes read as little-endian unsigned 128-bit integers",
+  "vectors": [
+    {
+      "address": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+      "network": "mainnet",
+      "script": "0014751e76e8199196d454941c45d1b3a323f1433bd6",
+      "sha256": "8838f796bf4970b148779c05b74b8c49515b322d04035f7faa5d9b2375df2396",
+      "first": "97762100933704329355157203268016748680",
+      "second": "199570462015842529564996467312406190929"
+    }
+  ]
+}

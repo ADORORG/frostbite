@@ -19,9 +19,16 @@ Neutral surface, safe for features, workers, and apps:
 Family-specific, allowed only where the repository boundary policy permits (this package, the wallet
 bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/` exception):
 
-- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter.
-  Today it provides the address codec only and declares only `address:codec`; reads, construction,
-  broadcast, and observation arrive with the contract and mint tasks (W6, W7).
+- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter. It provides the
+  address codec, and, when given a node per chain (`BitcoinAlkanesReads`), the rewards reader: `claimed` (how many times a
+  holder claimed a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Simulation,
+  construction, broadcast, and observation arrive with the mint tasks; the adapter declares only what it provides.
+  Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode`, JSON-RPC transport, minimal
+  protobuf codec for the few indexer messages used, every answer validated); `abi.ts` holds the template opcodes (tested
+  against `contracts/templates/abi/*.json`); `milestone-key.ts` and `holder.ts` implement the rules shared with the contracts
+  (tested against the same vector files); `rewards.ts` and `inspect.ts` are the reads. Reads use the node directly, not
+  `@alkanes/ts-sdk`, whose read results are loosely typed (`any`), return raw hex for simulations and need its WASM runtime;
+  the SDK stays for the wallet and signing paths.
 - `@ador/chain/bitcoin` — `validateBitcoinAddress` (P2WPKH and P2TR, mainnet or signet, `bitcoinjs-lib`
   7.0.2).
 - `@ador/chain/alkanes` — `loadAlkanesSdk`, the isolated entrypoint for the immutable
@@ -54,6 +61,9 @@ application's chain list is loaded into `createChainRegistry` by the first featu
 (`W4-01`). Platform engineering owns this package.
 
 ## Tests
+
+`ALKANES_LIVE_NODE_URL` (for example the public Subfrost mainnet endpoint) turns on `live-node.integration.test.ts`, which checks the
+decoders against a real node; without it the test is skipped and no suite needs the network.
 
 Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. The conformance suite and the
 simulated second family live in `@ador/test-kit` (`chain-conformance`, `simulated-chain`).

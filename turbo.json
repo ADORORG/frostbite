@@ -3,6 +3,7 @@
   "globalDependencies": ["configs/**"],
   "globalEnv": [
     "CI",
+    "ALKANES_LIVE_NODE_URL",
     "APP_ENV",
     "AUTH_SESSION_IDLE_TIMEOUT_MS",
     "DATABASE_ACQUIRE_TIMEOUT_MS",

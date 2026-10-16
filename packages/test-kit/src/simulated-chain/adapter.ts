@@ -135,7 +135,9 @@ export function createSimulatedChain(
     observe: (ref) => Promise.resolve(ledger(ref.chain).observe(ref)),
   };
   // The simulated contract: a claim counts once its transaction is past the finality depth and has not reverted.
+  // The simulated family mints no collectibles, so it truthfully has nothing to preview.
   const rewards: RewardsReader = {
+    preview: () => Promise.resolve(null),
     claimed: (contract, holder, milestoneId) =>
       Promise.resolve(
         ledger(contract.chain)

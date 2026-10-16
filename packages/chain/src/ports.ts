@@ -5,6 +5,7 @@ import type {
   BlockRef,
   BroadcastOutcome,
   ChainRef,
+  CollectiblePreview,
   ChainTransaction,
   ContractInspection,
   ContractRef,
@@ -82,6 +83,9 @@ export interface RewardsReader {
     holder: Address,
     milestoneId: string,
   ): Promise<number>;
+  // The picture and facts the chain serves for one collectible, or null when no such collectible exists. The caller checks the
+  // issuer against the games it lists.
+  preview(item: ContractRef): Promise<CollectiblePreview | null>;
 }
 
 export interface ChainPorts {

@@ -82,6 +82,7 @@ export function simulated() {
     contract,
     holder: simulatedAddress(one, "070809"),
     milestoneId: "first-win",
+    missingItem: { ...contract, id: "missing-item" },
   };
   return {
     ...chain,

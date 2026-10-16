@@ -128,6 +128,7 @@ function ports(): ClaimChainPorts {
           0,
           (await rewards.claimed(...asked)) - (indexerLag.on ? 1 : 0),
         ),
+      preview: rewards.preview,
     },
   };
 }

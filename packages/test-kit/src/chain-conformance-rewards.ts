@@ -4,11 +4,13 @@ import type { ChainAdapter } from "@ador/chain/adapter";
 import type { Address, ContractRef } from "@ador/shared/chain";
 
 // What an adapter that declares the rewards reader must show: a holder who has never claimed has claimed nothing, the answer is
-// a whole count, and asking again changes nothing. The fixture names a contract, a holder with no claims and a milestone.
+// a whole count, asking again changes nothing, and a collectible that does not exist has no preview. The fixture names a contract, a holder with no claims and a milestone.
 export interface RewardsConformanceFixtures {
   readonly contract: ContractRef;
   readonly holder: Address;
   readonly milestoneId: string;
+  // A collectible that does not exist.
+  readonly missingItem: ContractRef;
 }
 
 export async function checkRewardsReader(
@@ -20,7 +22,7 @@ export async function checkRewardsReader(
     reader,
     "the adapter declares rewards:read but does not provide it",
   );
-  const { contract, holder, milestoneId } = fixtures;
+  const { contract, holder, milestoneId, missingItem } = fixtures;
   const first = await reader.claimed(contract, holder, milestoneId);
   assert.ok(
     Number.isInteger(first) && first >= 0,
@@ -31,5 +33,10 @@ export async function checkRewardsReader(
     await reader.claimed(contract, holder, milestoneId),
     first,
     "asking again returns the same count",
+  );
+  assert.equal(
+    await reader.preview(missingItem),
+    null,
+    "a collectible that does not exist has no preview",
   );
 }
