@@ -2,10 +2,8 @@ import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
 import { chainRefSchema, type FundingPolicy } from "@ador/shared/chain";
 
-import {
-  BuildRefusedError,
-  createClaimBuilder,
-} from "../../src/bitcoin-alkanes/builder.ts";
+import { BuildRefusedError } from "../../src/bitcoin-alkanes/build-refused.ts";
+import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import {
   nativeAsset,
   type ServedChain,
@@ -49,7 +47,7 @@ function builderOn(utxos = [utxo(idA, 0, 100_000n)], rate = 2) {
   const chains = new Map<typeof chain, ServedChain>([
     [chain, { network: "mainnet", node }],
   ]);
-  return { asked, builder: createClaimBuilder(chains, options, family) };
+  return { asked, builder: createTransactionBuilder(chains, options, family) };
 }
 
 describe("building a milestone claim", () => {
@@ -180,7 +178,7 @@ describe("building a milestone claim", () => {
       { ...options, changeDustSats: 0n },
       { ...options, providerId: " " },
     ]) {
-      expect(() => createClaimBuilder(chains, bad, family)).toThrow();
+      expect(() => createTransactionBuilder(chains, bad, family)).toThrow();
     }
   });
 });

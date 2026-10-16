@@ -1,6 +1,6 @@
 import { type FundingPolicy } from "@ador/shared/chain";
 
-import { createClaimBuilder } from "../../src/bitcoin-alkanes/builder.ts";
+import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import {
   nativeAsset,
   type ServedChain,
@@ -23,5 +23,5 @@ export const chains = new Map<typeof chain, ServedChain>([
     },
   ],
 ]);
-export const builder = createClaimBuilder(chains, options, family);
+export const builder = createTransactionBuilder(chains, options, family);
 export const build = () => builder.build(claimIntent, funding);

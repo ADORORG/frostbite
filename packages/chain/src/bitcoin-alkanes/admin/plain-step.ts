@@ -39,6 +39,7 @@ export function planPlainStep(call: Call, funding: StepFunding): PlainStep {
   if (selection === null) {
     throw new StepRefusedError(
       "The wallet's confirmed balance cannot pay for the step.",
+      "insufficient-funds",
     );
   }
   const psbt = new Psbt();

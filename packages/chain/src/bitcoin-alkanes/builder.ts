@@ -5,6 +5,11 @@ import type {
 } from "@ador/shared/chain";
 
 import { validateBitcoinAddress } from "../bitcoin/address.ts";
+import { isAdminIntent, isAdminOperation } from "./admin/action.ts";
+import { buildAdmin } from "./admin/build.ts";
+import type { AdminOptions } from "./admin/templates.ts";
+import { verifySignedAdmin } from "./admin/verify.ts";
+import { BuildRefusedError } from "./build-refused.ts";
 import type { TransactionBuilder } from "../ports.ts";
 import { psbtFormat } from "./format.ts";
 import { milestoneKey } from "./milestone-key.ts";
@@ -20,33 +25,28 @@ import { claimScript } from "./tx/claim-call.ts";
 import { buildClaimPsbt } from "./tx/psbt.ts";
 import { verifySignedClaim } from "./verify.ts";
 
-// Why a transaction could not be built, as a code the caller can act on.
-export class BuildRefusedError extends Error {
-  constructor(
-    readonly code:
-      | "fee-above-limit"
-      | "insufficient-funds"
-      | "invalid-request"
-      | "unsupported-operation",
-    message: string,
-  ) {
-    super(message);
-    this.name = "BuildRefusedError";
-  }
-}
-
-export function createClaimBuilder(
+export function createTransactionBuilder(
   chains: ReadonlyMap<ChainRef, ServedChain>,
   options: TransactionOptions,
   family: UnsignedTransaction["family"],
+  admin?: AdminOptions,
 ): TransactionBuilder {
   assertTransactionOptions(options);
   return {
     build: async (intent: TransactionIntent, funding) => {
+      if (isAdminIntent(intent)) {
+        if (admin === undefined) {
+          throw new BuildRefusedError(
+            "unsupported-operation",
+            `This adapter is not set up to administer games, so it cannot build ${intent.operation}.`,
+          );
+        }
+        return buildAdmin(intent, { admin, chains, family, options }, funding);
+      }
       if (intent.operation !== "mint-milestone") {
         throw new BuildRefusedError(
           "unsupported-operation",
-          `The bitcoin-alkanes adapter builds milestone claims only, not ${intent.operation}.`,
+          `The bitcoin-alkanes adapter builds milestone claims and game administration only, not ${intent.operation}.`,
         );
       }
       const { network, node } = servedChain(chains, intent.chain);
@@ -105,6 +105,8 @@ export function createClaimBuilder(
       };
     },
     verifySigned: (unsigned, signed) =>
-      verifySignedClaim(chains, unsigned, signed),
+      admin !== undefined && isAdminOperation(unsigned.summary.operation)
+        ? verifySignedAdmin(admin, unsigned, signed)
+        : verifySignedClaim(chains, unsigned, signed),
   };
 }

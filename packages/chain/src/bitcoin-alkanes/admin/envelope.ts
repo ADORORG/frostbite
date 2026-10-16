@@ -1,7 +1,7 @@
 import { initEccLib, payments } from "bitcoinjs-lib";
 import * as ecc from "@bitcoinerlab/secp256k1";
 
-import { pushChunks, pushData } from "../tx/script.ts";
+import { pushChunks, pushData, readPushes } from "../tx/script.ts";
 
 // The data an Alkane reads from a transaction's witness (`alkanes-support`'s `RawEnvelope`): a tapscript that checks the key's
 // signature and then holds the data inside a never-run branch, `OP_FALSE OP_IF "BIN" <empty> <data pushes> OP_ENDIF`. The data
@@ -59,4 +59,37 @@ export function createEnvelope(
     throw new Error("The commit output could not be made.");
   }
   return { controlBlock, output: taproot.output, script };
+}
+
+// The data an envelope script holds, or null if the script is not one `envelopeScript` makes (the key, the data and the script as a
+// whole must match, byte for byte).
+export function envelopeData(script: Uint8Array): Uint8Array | null {
+  const keyLength = 32;
+  const pushedKey = readPushes(script, 0, opChecksig);
+  const key = pushedKey?.pushes[0];
+  if (
+    key === undefined ||
+    key.length !== keyLength ||
+    pushedKey?.pushes.length !== 1
+  ) {
+    return null;
+  }
+  const dataStart = 1 + keyLength + 1 + 1 + 1;
+  const read = readPushes(script, dataStart, opEndif);
+  const [protocol, body, ...chunks] = read?.pushes ?? [];
+  if (
+    read === null ||
+    protocol === undefined ||
+    body === undefined ||
+    protocol.join() !== protocolId.join() ||
+    body.length !== 0
+  ) {
+    return null;
+  }
+  const data = Uint8Array.from(chunks.flatMap((chunk) => [...chunk]));
+  const rebuilt = envelopeScript(key, data);
+  return rebuilt.length === script.length &&
+    rebuilt.every((byte, index) => byte === script[index])
+    ? data
+    : null;
 }

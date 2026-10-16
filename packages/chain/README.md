@@ -25,8 +25,12 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Given transaction options as well
   it provides the **milestone-claim path**: the builder (a PSBT the player's wallet signs, with a summary of what it does), the
   signed-transaction check, the broadcaster, the observer (Bitcoin confirmation plus the indexer's trace), and the contract gateway
-  (inspection, and a simulation that tells a player before they sign whether a claim would be refused). Template deploy,
-  milestone definition and pause need the platform's own signer and are not here yet. The adapter declares only what it provides.
+  (inspection, and a simulation that tells a player before they sign whether a claim would be refused). Given `administration` options too, the same builder also builds the
+  **staff's steps** (publish a template, create a game, define a milestone, pause or resume claims): one transaction, or for a step that carries
+  data in the witness (a drawing, a template's code) a commit-and-reveal pair sent as one `bitcoin-psbt-bundle` payload. No key is kept:
+  the reveal's own input is signed with a one-time key destroyed within the build; the staff wallet signs the rest after reading the summary,
+  and `verifySigned` proves the pair, the call, the data and the total fee are what the summary says. The auth token's output is named by
+  `extension.adminOutput` ("txid:vout") and checked against the indexer and the game's `get_auth_token`. The adapter declares only what it provides.
   Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
   codec for the few indexer messages used, every answer validated, the trace decoder); `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,

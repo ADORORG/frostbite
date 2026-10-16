@@ -1,7 +1,7 @@
 import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
 
-import { createClaimBuilder } from "../../src/bitcoin-alkanes/builder.ts";
+import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import type { ServedChain } from "../../src/bitcoin-alkanes/chains.ts";
 import { fakeNode } from "../support/nodes.ts";
 import {
@@ -27,7 +27,7 @@ describe("verifying that every input is signed", () => {
       ok: false,
       reason: "signature-invalid",
     });
-    const wide = await createClaimBuilder(
+    const wide = await createTransactionBuilder(
       new Map<typeof chain, ServedChain>([
         [
           chain,

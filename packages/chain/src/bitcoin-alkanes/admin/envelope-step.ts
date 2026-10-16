@@ -110,6 +110,7 @@ export function planEnvelopeStep(
     if (selection === null) {
       throw new StepRefusedError(
         "The wallet's confirmed balance cannot pay for the step.",
+        "insufficient-funds",
       );
     }
 

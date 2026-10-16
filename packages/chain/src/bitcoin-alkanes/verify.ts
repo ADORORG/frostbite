@@ -14,7 +14,7 @@ import { parseAlkaneId } from "./node/alkane-id.ts";
 import { fromHex } from "./node/hex.ts";
 import { claimScript } from "./tx/claim-call.ts";
 
-function parse(payload: string): Psbt | null {
+export function parse(payload: string): Psbt | null {
   try {
     return Psbt.fromBase64(payload);
   } catch {
@@ -22,12 +22,12 @@ function parse(payload: string): Psbt | null {
   }
 }
 
-function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
+export function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
   return a.length === b.length && a.every((byte, index) => byte === b[index]);
 }
 
 // The transaction two PSBTs describe is the same one: same version, lock time, inputs (outpoint and sequence) and outputs.
-function sameTransaction(a: Psbt, b: Psbt): boolean {
+export function sameTransaction(a: Psbt, b: Psbt): boolean {
   return (
     a.version === b.version &&
     a.locktime === b.locktime &&
@@ -90,7 +90,7 @@ function matchesSummary(
   );
 }
 
-function isSigned(psbt: Psbt): boolean {
+export function isSigned(psbt: Psbt): boolean {
   return psbt.data.inputs.every(
     (input) =>
       input.finalScriptWitness !== undefined ||

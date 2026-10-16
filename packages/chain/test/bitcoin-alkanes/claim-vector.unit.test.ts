@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { createClaimBuilder } from "../../src/bitcoin-alkanes/builder.ts";
+import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import {
   nativeAsset,
   type ServedChain,
@@ -50,7 +50,11 @@ describe("the claim transaction the indexer harness accepts", () => {
     const chains = new Map<typeof chain, ServedChain>([
       [chain, { network: "mainnet", node }],
     ]);
-    const unsigned = await createClaimBuilder(chains, options, family).build(
+    const unsigned = await createTransactionBuilder(
+      chains,
+      options,
+      family,
+    ).build(
       {
         ...claimIntent,
         contract: { ...claimIntent.contract, id: vector.game },

@@ -1,4 +1,4 @@
-import { Psbt } from "bitcoinjs-lib";
+import { Psbt, type Transaction } from "bitcoinjs-lib";
 import type {
   BroadcastOutcome,
   ChainRef,
@@ -7,6 +7,7 @@ import type {
 
 import type { Broadcaster } from "../ports.ts";
 import { servedChain, type ServedChain } from "./chains.ts";
+import { bundleFormat, decodeBundle } from "./admin/bundle.ts";
 import { psbtFormat } from "./format.ts";
 import { NodeRejectedError, NodeUnavailableError } from "./node/errors.ts";
 import { toHex } from "./node/hex.ts";
@@ -16,9 +17,8 @@ import { toHex } from "./node/hex.ts";
 const alreadyKnown =
   /already (?:in (?:block ?chain|the mempool)|known)|txn-already|AlreadyInMempool/iu;
 
-function finalTransaction(payload: string) {
+function finalTransaction(psbt: Psbt) {
   try {
-    const psbt = Psbt.fromBase64(payload);
     if (
       psbt.data.inputs.some(
         (input) =>
@@ -34,20 +34,44 @@ function finalTransaction(payload: string) {
   }
 }
 
+// The transactions a signed payload holds, in the order they must be sent (a commit before its reveal); null if any is not fully
+// signed. The last one is the transaction a caller follows.
+function transactionsOf(signed: SignedTransaction): Transaction[] | null {
+  const psbts =
+    signed.format === bundleFormat
+      ? decodeBundle(signed.payload)
+      : parsePsbt(signed.payload);
+  if (psbts === null) return null;
+  const list = psbts instanceof Psbt ? [psbts] : [psbts.commit, psbts.reveal];
+  const transactions = list.map(finalTransaction);
+  return transactions.every((transaction) => transaction !== null)
+    ? transactions
+    : null;
+}
+
+function parsePsbt(payload: string): Psbt | null {
+  try {
+    return Psbt.fromBase64(payload);
+  } catch {
+    return null;
+  }
+}
+
 export function createBroadcaster(
   chains: ReadonlyMap<ChainRef, ServedChain>,
 ): Broadcaster {
   return {
     broadcast: async (signed: SignedTransaction): Promise<BroadcastOutcome> => {
-      if (signed.format !== psbtFormat) {
+      if (signed.format !== psbtFormat && signed.format !== bundleFormat) {
         return {
           kind: "rejected",
           reason:
             "The signed transaction is not in a format this adapter sends.",
         };
       }
-      const transaction = finalTransaction(signed.payload);
-      if (transaction === null) {
+      const transactions = transactionsOf(signed);
+      const last = transactions?.[transactions.length - 1];
+      if (transactions === null || last === undefined) {
         return {
           kind: "rejected",
           reason: "The signed transaction is not fully signed.",
@@ -55,15 +79,25 @@ export function createBroadcaster(
       }
       const { node } = servedChain(chains, signed.chain);
       // The id is known before anything is sent, so a send that fails halfway can still be followed up by it.
-      const ref = { chain: signed.chain, id: transaction.getId() };
+      const ref = { chain: signed.chain, id: last.getId() };
       try {
-        await node.broadcast(toHex(transaction.toBuffer()));
+        for (const transaction of transactions) {
+          try {
+            await node.broadcast(toHex(transaction.toBuffer()));
+          } catch (error) {
+            // A transaction the node already has is sent: a repeat of this call, or of half of it, carries on to the next.
+            if (
+              !(error instanceof NodeRejectedError) ||
+              !alreadyKnown.test(error.message)
+            ) {
+              throw error;
+            }
+          }
+        }
         return { kind: "accepted", ref };
       } catch (error) {
         if (error instanceof NodeRejectedError) {
-          return alreadyKnown.test(error.message)
-            ? { kind: "accepted", ref }
-            : { kind: "rejected", reason: error.message };
+          return { kind: "rejected", reason: error.message };
         }
         if (error instanceof NodeUnavailableError)
           return { kind: "ambiguous", ref };

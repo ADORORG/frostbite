@@ -16,7 +16,8 @@ import {
 } from "../ports.ts";
 import { createBroadcaster } from "./broadcaster.ts";
 import { serveChains } from "./chains.ts";
-import { createClaimBuilder } from "./builder.ts";
+import type { AdminOptions } from "./admin/templates.ts";
+import { createTransactionBuilder } from "./builder.ts";
 import { createContractGateway } from "./contracts.ts";
 import type { AlkanesNode } from "./node/node.ts";
 import { createObserver } from "./observer.ts";
@@ -31,6 +32,11 @@ export {
   type JsonRpcOptions,
 } from "./node/transport.ts";
 export type { TransactionOptions } from "./options.ts";
+export {
+  templateKey,
+  type AdminOptions,
+  type TemplateEntry,
+} from "./admin/templates.ts";
 
 // CAIP-2 namespace for Bitcoin chains (https://namespaces.chainagnostic.org/bip122/caip2).
 const bitcoinNamespace = "bip122";
@@ -48,6 +54,9 @@ export interface BitcoinAlkanesNodes {
   readonly nodes: ReadonlyMap<ChainRef, AlkanesNode>;
   // When given, the adapter also builds, sends and watches milestone claims and simulates them; without it, reads only.
   readonly transactions?: TransactionOptions;
+  // When given (with `transactions`), the builder also builds the staff's steps: publishing templates, creating games, defining
+  // milestones and pausing. Without it the adapter refuses them.
+  readonly administration?: AdminOptions;
 }
 
 // The `bitcoin-alkanes` adapter as it stands: the address codec; given nodes, the rewards reader; given transaction options too,
@@ -119,7 +128,12 @@ function nodePorts(
   if (options === undefined) return { rewards };
   return {
     broadcaster: createBroadcaster(chains),
-    builder: createClaimBuilder(chains, options, bitcoinAlkanesFamily),
+    builder: createTransactionBuilder(
+      chains,
+      options,
+      bitcoinAlkanesFamily,
+      services.administration,
+    ),
     contracts: createContractGateway(chains, options),
     observer: createObserver(chains, options),
     rewards,

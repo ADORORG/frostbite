@@ -17,3 +17,32 @@ export function pushChunks(data: Uint8Array): number[] {
   }
   return pushes;
 }
+
+// The inverse of `pushData`: the data a run of pushes holds, from `start`, until the byte `stop` (not a push) or the end. Null if
+// a push is cut short or is of a form `pushData` does not make.
+export function readPushes(
+  script: Uint8Array,
+  start: number,
+  stop: number,
+): { readonly end: number; readonly pushes: Uint8Array[] } | null {
+  const pushes: Uint8Array[] = [];
+  let at = start;
+  while (at < script.length && script[at] !== stop) {
+    const opcode = script[at] ?? 0;
+    let length = opcode;
+    let header = 1;
+    if (opcode === 0x4c) {
+      length = script[at + 1] ?? -1;
+      header = 2;
+    } else if (opcode === 0x4d) {
+      length = (script[at + 1] ?? 0) | ((script[at + 2] ?? 0) << 8);
+      header = 3;
+    } else if (opcode > 75) {
+      return null;
+    }
+    if (length < 0 || at + header + length > script.length) return null;
+    pushes.push(script.subarray(at + header, at + header + length));
+    at += header + length;
+  }
+  return { end: at, pushes };
+}

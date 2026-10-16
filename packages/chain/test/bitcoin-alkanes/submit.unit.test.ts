@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Psbt } from "bitcoinjs-lib";
 import { chainRefSchema, type FundingPolicy } from "@ador/shared/chain";
 
-import { createClaimBuilder } from "../../src/bitcoin-alkanes/builder.ts";
+import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import { createBroadcaster } from "../../src/bitcoin-alkanes/broadcaster.ts";
 import { createObserver } from "../../src/bitcoin-alkanes/observer.ts";
 import {
@@ -37,7 +37,7 @@ const wallet = fakeNode({
 });
 const signedClaim = async () =>
   sign(
-    await createClaimBuilder(served(wallet), options, family).build(
+    await createTransactionBuilder(served(wallet), options, family).build(
       claimIntent,
       funding,
     ),
@@ -74,7 +74,7 @@ describe("sending a signed claim", () => {
     const open = Psbt.fromBase64(signed.payload);
     const psbt = Psbt.fromBase64(
       (
-        await createClaimBuilder(served(wallet), options, family).build(
+        await createTransactionBuilder(served(wallet), options, family).build(
           claimIntent,
           funding,
         )
@@ -105,7 +105,7 @@ describe("sending a signed claim", () => {
   it("refuses what is not a fully signed PSBT, without calling the node", async () => {
     const broadcaster = createBroadcaster(served(fakeNode()));
     const signed = await signedClaim();
-    const unsigned = await createClaimBuilder(
+    const unsigned = await createTransactionBuilder(
       served(wallet),
       options,
       family,

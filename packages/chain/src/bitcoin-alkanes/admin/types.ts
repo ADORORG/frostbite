@@ -28,7 +28,11 @@ export interface StepFunding {
 
 export class StepRefusedError extends Error {
   readonly code = "step-refused";
-  constructor(message: string) {
+  constructor(
+    message: string,
+    readonly reason:
+      "insufficient-funds" | "invalid-request" = "invalid-request",
+  ) {
     super(message);
     this.name = "StepRefusedError";
   }
