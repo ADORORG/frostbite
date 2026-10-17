@@ -6,10 +6,12 @@ import {
 import {
   gameAdminRoutes,
   listGameAdminStepsResponseSchema,
+  listGameAdminTemplatesResponseSchema,
   refreshGameAdminStepResponseSchema,
   startGameAdminStepResponseSchema,
   submitGameAdminStepResponseSchema,
   type ListGameAdminStepsResponse,
+  type ListGameAdminTemplatesResponse,
   type RefreshGameAdminStepResponse,
   type StartGameAdminStepInput,
   type StartGameAdminStepResponse,
@@ -29,6 +31,8 @@ export interface GameAdminApi {
   refresh(stepId: string): Promise<RefreshGameAdminStepResponse>;
   start(input: StartGameAdminStepInput): Promise<StartGameAdminStepResponse>;
   submit(input: SubmitGameAdminStepInput): Promise<SubmitGameAdminStepResponse>;
+  // The templates the platform may publish, which are published and where, and the log of the steps that publish them.
+  templates(): Promise<ListGameAdminTemplatesResponse>;
 }
 
 export function createGameAdminApi(
@@ -54,6 +58,11 @@ export function createGameAdminApi(
     submit: (input) =>
       request(gameAdminRoutes.submit, submitGameAdminStepResponseSchema, {
         body: input,
+        signal: AbortSignal.timeout(stepRequestTimeoutMs),
+      }),
+    templates: () =>
+      request(gameAdminRoutes.templates, listGameAdminTemplatesResponseSchema, {
+        body: {},
         signal: AbortSignal.timeout(stepRequestTimeoutMs),
       }),
   };

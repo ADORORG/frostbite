@@ -2,7 +2,10 @@
 
 How a deployment is pointed at the chain its games' rewards contracts live on, and how to turn it on and off. The settings are
 `REWARDS_*` in `.env.example`; the rules (dust, claim output, fee target, signing window, the templates and their released code
-hashes) are `configs/rewards-policy.ts`; the assembly is `configs/rewards-chain.ts`.
+hashes, the release gate) are `configs/rewards-policy.ts`; the assembly is `configs/rewards-chain.ts`.
+
+Where each template and each game's contract is on the chain is **not configuration**. Staff publish and create them from the
+Game rewards page, and the platform records them when each step completes (`ador.published_templates`, `ador.game_contracts`).
 
 ## Turn it on
 
@@ -10,17 +13,28 @@ hashes) are `configs/rewards-policy.ts`; the assembly is `configs/rewards-chain.
    the only chain wired today (`configs/chains.ts`). Blank means no rewards chain: claims and staff administration say
    "not available".
 2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it.
-3. `REWARDS_CHAIN_RELEASE_GATE=open`. Blank or `closed` configures the chain but offers nothing on it: no building, sending or
-   watching. Mainnet is not wired; opening a gate is the owner's decision after review.
-4. Templates (staff publishing templates and creating games): build them with `contracts/templates/build.sh`, then set
-   `REWARDS_TEMPLATES_DIR` to the directory holding `game-rewards.wasm` and `milestone-collectible.wasm`, and
-   `REWARDS_TEMPLATE_IDS` to the Alkane each is published at, for example
-   `{"game-rewards":"4:100","milestone-collectible":"4:101"}`. The ids are chosen by the owner and must be free on the chain.
-   A file whose SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
-5. A game's deployed contract: `REWARDS_CONTRACTS`, for example `{"my-game":{"id":"4:200","maxDrawingBytes":4096}}`. Add it
-   once staff have created the game's contract; the byte limit is the one it was created with.
+3. `REWARDS_CHAIN_RPC_TIMEOUT_MS` (optional): how long a call to the node may take. Blank means 15 seconds.
+4. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
+   `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
+   SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
 
 Restart the web process after changing any of these. A malformed value stops boot with the name of the setting.
+
+The release gate is `signetReleaseGate` in `configs/rewards-policy.ts` (signet: open). While a chain's gate is closed it is
+configured but not offered: nothing is built, sent or watched on it. Mainnet is not wired; opening its gate is the owner's decision
+after a review.
+
+## First use, from the staff page (`/admin/games`)
+
+1. Enter the wallet address you will sign with.
+2. Publish `game-rewards@1.0.0` and `milestone-collectible@1.0.0`: type the address each goes to (`4:n`, an id nothing else uses),
+   prepare the step, read the summary, sign, send. The template appears as published when the step completes.
+3. Open a game, enter the largest drawing its contract should keep (it cannot be changed), create the contract, sign, send. The
+   page shows the contract's address once the chain reports it.
+4. Define the game's milestones and pause or resume claims as before.
+
+A step is complete only after the indexer has run it. If a creation confirms but the chain does not report the new contract, the
+step fails to index and nothing is recorded; the contract may exist on chain, so check before creating another.
 
 ## Before the first step
 
@@ -30,5 +44,5 @@ indexer was about 1,000 blocks behind and not moving (finding S73).
 
 ## Turn it off
 
-Blank `REWARDS_CHAIN_RPC_URL`, or set `REWARDS_CHAIN_RELEASE_GATE=closed`, and restart. Steps and claims already sent stay on
-the chain and in the log; nothing new is built or sent, and the pages say it is not available.
+Blank `REWARDS_CHAIN_RPC_URL`, or close the chain's gate in the policy, and restart. Steps and claims already sent stay on the chain
+and in the log; nothing new is built or sent, and the pages say it is not available.

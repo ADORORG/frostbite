@@ -2,26 +2,31 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { gameAdminHref } from "@ador/shared/games";
 import { ArcadeEmptyState, ArcadeInfoCard } from "@repo/ui/arcade";
 
+import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { AdminFrame } from "./admin-frame.tsx";
 import { GameAdminPanel } from "./game-admin-panel.tsx";
+import { TemplatesPanel } from "./templates-panel.tsx";
 
 type Navigation = readonly NavigationItem[];
 
 // The staff page listing the games that declare rewards, and whether each has a contract to administer.
 export function GamesSurface({
+  api,
   games,
   navigation,
 }: {
+  readonly api?: GameAdminApi;
   readonly games: readonly AdminGameInfo[];
   readonly navigation: Navigation;
 }) {
   return (
     <AdminFrame
       heading="Game rewards"
-      intro="Games whose milestones can be claimed on chain. Defining a milestone and pausing claims are steps you sign yourself."
+      intro="Games whose milestones can be claimed on chain. Publishing a template, creating a game's contract, defining a milestone and pausing claims are steps you sign yourself."
       navigation={navigation}
     >
+      <TemplatesPanel {...(api === undefined ? {} : { api })} />
       {games.length === 0 ? (
         <ArcadeEmptyState title="Nothing to administer">
           No game declares rewards yet.
@@ -32,11 +37,6 @@ export function GamesSurface({
             <li key={game.id}>
               <ArcadeInfoCard title={game.title}>
                 <p>{`Network ${game.chain}. ${game.milestones.length} milestone${game.milestones.length === 1 ? "" : "s"}.`}</p>
-                <p>
-                  {game.contractId === null
-                    ? "No rewards contract is deployed for this game, so there is nothing to administer yet."
-                    : `Rewards contract ${game.contractId}.`}
-                </p>
                 <a
                   href={gameAdminHref(game.id)}
                 >{`Administer ${game.title}`}</a>
@@ -51,9 +51,11 @@ export function GamesSurface({
 
 // One game's administration page. A game that is unknown or declares no rewards is "not found", never an empty form.
 export function GameSurface({
+  api,
   game,
   navigation,
 }: {
+  readonly api?: GameAdminApi;
   readonly game: AdminGameInfo | undefined;
   readonly navigation: Navigation;
 }) {
@@ -70,14 +72,10 @@ export function GameSurface({
   return (
     <AdminFrame
       heading={game.title}
-      intro={
-        game.contractId === null
-          ? "No rewards contract is deployed for this game, so steps cannot be built yet."
-          : `Rewards contract ${game.contractId} on ${game.chain}.`
-      }
+      intro={`Rewards on ${game.chain}.`}
       navigation={navigation}
     >
-      <GameAdminPanel game={game} />
+      <GameAdminPanel {...(api === undefined ? {} : { api })} game={game} />
     </AdminFrame>
   );
 }

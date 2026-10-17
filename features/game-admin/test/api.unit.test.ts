@@ -17,12 +17,38 @@ const asked = (fetchImpl: ReturnType<typeof vi.fn>) =>
 
 describe("the administration routes as the page reaches them", () => {
   it("lists a game's steps, validating what comes back", async () => {
-    const fetchImpl = vi.fn<FetchLike>(async () => json({ steps: [step()] }));
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({
+        contract: { address: "2:7", maxDrawingBytes: 4096 },
+        steps: [step()],
+        templatesReady: true,
+      }),
+    );
     const result = await createGameAdminApi(fetchImpl).list("arcade");
     expect(result.steps).toHaveLength(1);
+    expect(result.contract?.address).toBe("2:7");
     expect(asked(fetchImpl)).toEqual([
       [gameAdminRoutes.list.path, { gameId: "arcade" }],
     ]);
+  });
+
+  it("lists the templates, which are published and where, and the steps that publish them", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({
+        publishable: [{ id: "game-rewards", version: "1.0.0" }],
+        published: [
+          {
+            address: "4:100",
+            publishedAt: "2026-10-16T12:00:00.000Z",
+            templateRef: "game-rewards@1.0.0",
+          },
+        ],
+        steps: [step()],
+      }),
+    );
+    const result = await createGameAdminApi(fetchImpl).templates();
+    expect(result.published[0]?.address).toBe("4:100");
+    expect(asked(fetchImpl)).toEqual([[gameAdminRoutes.templates.path, {}]]);
   });
 
   it("starts a step, sends it signed, and looks at it, each on its own route with its own body", async () => {

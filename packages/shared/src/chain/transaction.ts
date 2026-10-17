@@ -35,7 +35,12 @@ export const transactionIntentSchema = z
     z
       .object({
         ...intentBase,
+        // Where the template a game is made from, and the template its collectibles are made from, were published; how large a
+        // drawing the new contract will accept.
+        collectibleAt: contractRefSchema.optional(),
+        maxDrawingBytes: z.number().int().positive().optional(),
         operation: z.literal("deploy"),
+        templateAt: contractRefSchema.optional(),
         templateId: z.string().trim().min(1).max(64),
         templateVersion: z.string().regex(semanticVersionPattern),
       })
@@ -64,6 +69,8 @@ export const transactionIntentSchema = z
       .object({
         ...intentBase,
         operation: z.literal("publish-template"),
+        // Where on the chain the code is published, as staff chose.
+        templateAt: contractRefSchema.optional(),
         templateId: z.string().trim().min(1).max(64),
         templateVersion: z.string().regex(semanticVersionPattern),
       })
@@ -102,6 +109,12 @@ export const transactionIntentSchema = z
     const embedded = [
       intent.sender.chain,
       ...("contract" in intent ? [intent.contract.chain] : []),
+      ...("templateAt" in intent && intent.templateAt
+        ? [intent.templateAt.chain]
+        : []),
+      ...("collectibleAt" in intent && intent.collectibleAt
+        ? [intent.collectibleAt.chain]
+        : []),
       ...(intent.operation === "transfer"
         ? [intent.recipient.chain, intent.amount.asset.chain]
         : []),
@@ -142,10 +155,15 @@ export const transactionSummarySchema = z
       .object({ contract: contractRefSchema, id: milestoneIdSchema })
       .strict()
       .optional(),
+    // For a `deploy`: where the template its collectibles are made from is published, and the largest drawing the new contract accepts.
+    collectibleAt: contractRefSchema.optional(),
+    maxDrawingBytes: z.number().int().positive().optional(),
     paused: z.boolean().optional(),
     // The template a `publish-template` or `deploy` transaction puts on the chain, with the hash of its code.
     template: z
       .object({
+        // Where it is published, or will be.
+        at: contractRefSchema.optional(),
         codeHash: z.string().regex(/^[0-9a-f]{64}$/u),
         id: z.string().trim().min(1).max(64),
         version: z.string().regex(semanticVersionPattern),
@@ -164,6 +182,8 @@ export const transactionSummarySchema = z
       ...(summary.recipient ? [summary.recipient.chain] : []),
       ...(summary.milestone ? [summary.milestone.contract.chain] : []),
       ...(summary.contract ? [summary.contract.chain] : []),
+      ...(summary.template?.at ? [summary.template.at.chain] : []),
+      ...(summary.collectibleAt ? [summary.collectibleAt.chain] : []),
     ];
     if (embedded.some((chain) => chain !== summary.chain)) {
       context.addIssue({

@@ -9,6 +9,7 @@ import {
 
 import {
   createListStepsOperation,
+  createListTemplatesOperation,
   createRefreshStepOperation,
   createStartStepOperation,
   createSubmitStepOperation,
@@ -24,7 +25,7 @@ export function createGameAdminEntrypoint(
   games: readonly GameManifest[],
   config: GameAdminConfig,
 ): FeatureEntrypoint {
-  const known = adminGames(games, config);
+  const known = adminGames(games);
   const resolve = createGameAdminResolver(known, config);
   return {
     capabilities: [
@@ -39,6 +40,7 @@ export function createGameAdminEntrypoint(
       registerHttpOperation(createRefreshStepOperation(resolve)),
       registerHttpOperation(createStartStepOperation(resolve)),
       registerHttpOperation(createSubmitStepOperation(resolve)),
+      registerHttpOperation(createListTemplatesOperation(resolve)),
     ],
     pages: [
       {

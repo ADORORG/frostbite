@@ -67,3 +67,10 @@ pnpm --filter @ador/database test:unit
 pnpm --filter @ador/database test:integration
 pnpm --filter @ador/database test:coverage
 ```
+
+## Game contracts
+
+`ador.published_templates` and `ador.game_contracts` record where each template and each game's contract is on a chain, written in the
+transaction that completes the step that made it (`@ador/database/game-contracts`: `ContractStore` to read, `writeRecording` to write). A
+record is never updated: the tables refuse a second record for a template or game, and two at one address. `ador.game_admin_steps`
+is the evidence each points to, and may not be deleted while a record does.

@@ -32,6 +32,7 @@ const step = (state: TrackedState): StoredStep => ({
   contract: { chain, family: simulatedFamily, id: "rewards-1" },
   createdAt: new Date("2026-01-01T00:00:00.000Z"),
   createdBy: "staff-1",
+  createdContracts: null,
   expiresAt: new Date("2026-01-01T01:00:00.000Z"),
   failureReason: null,
   gameId: "arcade",
@@ -41,6 +42,7 @@ const step = (state: TrackedState): StoredStep => ({
   signedPayload: "never shown",
   state,
   submittedBy: "staff-2",
+  templateRef: null,
   transactionId: "tx-1",
   unsigned,
   updatedAt: new Date("2026-01-01T00:30:00.000Z"),
@@ -67,5 +69,21 @@ describe("the view of a stored step", () => {
     expect(view.transactionId).toBe("tx-1");
     expect(view).not.toHaveProperty("signedPayload");
     expect(Object.values(view)).not.toContain("never shown");
+  });
+
+  it("lists the contracts the step created, none when it created none, and names the template it published", () => {
+    expect(toView(step("complete")).createdContracts).toEqual([]);
+    expect(
+      toView({
+        ...step("complete"),
+        createdContracts: ["4:7"],
+        gameId: null,
+        templateRef: "game-rewards@1.0.0",
+      }),
+    ).toMatchObject({
+      createdContracts: ["4:7"],
+      gameId: null,
+      templateRef: "game-rewards@1.0.0",
+    });
   });
 });

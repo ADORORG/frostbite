@@ -60,15 +60,26 @@ export const plainGame = defineGame({
   version: "1",
 });
 
-export const config = (deployed = true): GameAdminConfig => ({
+export const gameTemplate = { id: "game-rewards", version: "1.0.0" };
+export const collectibleTemplate = {
+  id: "milestone-collectible",
+  version: "1.0.0",
+};
+
+export const config = (): GameAdminConfig => ({
   chain: () => null,
-  contracts: deployed ? new Map([[gameId, contract]]) : new Map(),
   drawingLimits: { maxAttributeLength: 4096, maxDepth: 8, maxElements: 200 },
-  maxDrawingBytes: new Map([[gameId, 4096n]]),
+  rewards: {
+    chain,
+    collectibleTemplate,
+    family: "simulated" as ContractRef["family"],
+    gameTemplate,
+    maxDrawingBytes: 8192n,
+    publishable: [gameTemplate, collectibleTemplate],
+  },
 });
 
-export const info = (deployed = true) =>
-  adminGames([game, plainGame], config(deployed));
+export const info = () => adminGames([game, plainGame]);
 
 const summary = (extra: object = {}) =>
   transactionSummarySchema.parse({
@@ -84,6 +95,7 @@ const summary = (extra: object = {}) =>
 export const view = (over: Partial<StepView> = {}): StepView => ({
   createdAt: "2026-10-16T12:00:00.000Z",
   createdBy: staffId,
+  createdContracts: [],
   expiresAt: "2026-10-16T12:10:00.000Z",
   failureReason: null,
   gameId,
@@ -93,6 +105,7 @@ export const view = (over: Partial<StepView> = {}): StepView => ({
   state: "awaiting_signature",
   submittedBy: null,
   summary: summary(),
+  templateRef: null,
   toSign: {
     chain,
     family: "simulated" as never,
@@ -111,4 +124,39 @@ export const defineSummary = () =>
     milestone: { contract, id: "first-win" },
     operation: "define-milestone",
     paused: undefined,
+  });
+
+const codeHash = "a".repeat(64);
+const at = (id: string) => ({ ...contract, id });
+
+// What staff are shown to publish a template at `at-1`.
+export const publishSummary = (over: { at?: ContractRef | undefined } = {}) =>
+  transactionSummarySchema.parse({
+    chain,
+    expiresAt: "2026-10-16T12:10:00.000Z",
+    fee: { asset: { chain, id: "sim", kind: "native" }, baseUnits: 1n },
+    operation: "publish-template",
+    template: {
+      at: "at" in over ? over.at : at("at-1"),
+      codeHash,
+      id: "game-rewards",
+      version: "1.0.0",
+    },
+  });
+
+// What staff are shown to create a game's contract from templates published at `at-1` and `at-2`.
+export const deploySummary = () =>
+  transactionSummarySchema.parse({
+    chain,
+    collectibleAt: at("at-2"),
+    expiresAt: "2026-10-16T12:10:00.000Z",
+    fee: { asset: { chain, id: "sim", kind: "native" }, baseUnits: 1n },
+    maxDrawingBytes: 4096,
+    operation: "deploy",
+    template: {
+      at: at("at-1"),
+      codeHash,
+      id: "game-rewards",
+      version: "1.0.0",
+    },
   });

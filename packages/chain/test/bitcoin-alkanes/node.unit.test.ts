@@ -92,7 +92,7 @@ describe("the indexed height", () => {
 describe("a trace", () => {
   it("is asked for by the transaction id as Bitcoin hashes it, and decoded", async () => {
     const { calls, rpc } = scriptedRpc({ metashrew_view: mainnetSuccessTrace });
-    expect(await createRpcNode(rpc).trace(txid, 3)).toBe("success");
+    expect((await createRpcNode(rpc).trace(txid, 3)).outcome).toBe("success");
     // The same request the live node answered with this trace: the id reversed, then the output index.
     expect(calls[0]?.params).toEqual([
       "trace",

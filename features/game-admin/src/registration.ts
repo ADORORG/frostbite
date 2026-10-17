@@ -51,6 +51,7 @@ export function createGameAdminFeature(
         gameAdminRoutes.refresh,
         gameAdminRoutes.start,
         gameAdminRoutes.submit,
+        gameAdminRoutes.templates,
       ],
       version: "1.0.0",
     },

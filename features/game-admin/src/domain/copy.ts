@@ -39,13 +39,19 @@ export const isSettledStep = (state: GameAdminStepState): boolean =>
   state === "complete" || state === "failed" || state === "expired";
 
 export const operationLabel = (
-  step: Pick<GameAdminStep, "operation" | "summary">,
-): string =>
-  step.operation === "define-milestone"
-    ? `Define milestone ${step.summary.milestoneId ?? ""}`.trim()
-    : step.summary.paused === true
-      ? "Pause claims"
-      : "Resume claims";
+  step: Pick<GameAdminStep, "operation" | "summary" | "templateRef">,
+): string => {
+  switch (step.operation) {
+    case "define-milestone":
+      return `Define milestone ${step.summary.milestoneId ?? ""}`.trim();
+    case "deploy":
+      return "Create the game's contract";
+    case "publish-template":
+      return `Publish template ${step.templateRef ?? ""}`.trim();
+    case "set-claims-paused":
+      return step.summary.paused === true ? "Pause claims" : "Resume claims";
+  }
+};
 
 export const startRefusalCopy: Readonly<
   Record<
@@ -53,14 +59,21 @@ export const startRefusalCopy: Readonly<
     string
   >
 > = {
+  "address-taken":
+    "That address already holds a template or a game's contract. Choose another.",
+  "already-created": "This game already has its contract.",
   "already-defined":
     "This milestone is already defined on the contract and cannot be defined again.",
+  "already-published": "This template is already published.",
   "bad-drawing": "The drawing was refused.",
   "could-not-build": "The step could not be built.",
   "not-administered":
     "This game or milestone is not one the platform can administer.",
+  "template-not-published":
+    "The templates a game's contract is made from are not both published yet. Publish them first.",
+  "unknown-template": "That is not a template the platform publishes.",
   unavailable:
-    "Administration is not available for this game yet: it has no contract, or the network is not set up.",
+    "Administration is not available yet: the network is not set up, or the game has no contract.",
   "wrong-network": "That address is not an address on this game's network.",
 };
 

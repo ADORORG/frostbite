@@ -70,6 +70,9 @@ export const observationSchema = z
   .object({
     block: blockRefSchema.optional(),
     confirmations: z.number().int().nonnegative(),
+    // The contracts the transaction created, in order, in the chain's own notation: how a game's contract is learned once the step
+    // that makes it has run.
+    created: z.array(z.string().trim().min(1).max(128)).readonly().optional(),
     observedAt: z.iso.datetime(),
     provider: z.string().trim().min(1).max(64),
     ref: transactionRefSchema,

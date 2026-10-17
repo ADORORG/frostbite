@@ -47,8 +47,8 @@ describe.skipIf(url === undefined)(
         confirmed: true,
         outputs: 2,
       });
-      expect(await node.trace(txid, 3)).toBe("success");
-      expect(await node.trace(txid, 0)).toBe("none");
+      expect((await node.trace(txid, 3)).outcome).toBe("success");
+      expect((await node.trace(txid, 0)).outcome).toBe("none");
       expect(await node.transaction("00".repeat(31) + "01")).toBeNull();
     });
 

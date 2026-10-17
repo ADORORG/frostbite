@@ -3,6 +3,8 @@ import type {
   GameAdminAction,
   GameAdminStep,
   GameAdminTransaction,
+  ListGameAdminStepsResponse,
+  ListGameAdminTemplatesResponse,
 } from "@ador/shared/games";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -28,11 +30,24 @@ export interface StartContext {
   readonly wallet: string;
 }
 
-// The log of one game's steps: loaded, started, reviewed and signed (or sent signed), and followed until each is over. The
-// platform decides what each state means; this only shows it.
+// What the page knows besides the log: for a game, whether it has its contract and whether the templates are ready; for the
+// templates, which are published and where.
+export type Overview =
+  | ({ readonly kind: "game" } & Pick<
+      ListGameAdminStepsResponse,
+      "contract" | "templatesReady"
+    >)
+  | ({ readonly kind: "templates" } & Pick<
+      ListGameAdminTemplatesResponse,
+      "publishable" | "published"
+    >);
+
+// The log of one game's steps (or, with no game, of the steps that publish templates): loaded, started, reviewed and signed (or
+// sent signed), and followed until each is over. The platform decides what each state means; this only shows it.
 export function useAdminSteps(options: {
   readonly api: GameAdminApi;
-  readonly gameId: string;
+  // The game the steps are about; null for the steps that publish templates.
+  readonly gameId: string | null;
   readonly pollMs?: number;
   readonly sign?: StepSigner;
 }) {
@@ -42,6 +57,7 @@ export function useAdminSteps(options: {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [overview, setOverview] = useState<Overview | null>(null);
 
   const upsert = useCallback((step: GameAdminStep) => {
     setSteps((held) =>
@@ -51,11 +67,41 @@ export function useAdminSteps(options: {
     );
   }, []);
 
+  // Asks for the log and the overview: run on arrival and whenever a step ends, since a step ending changes both.
+  const fetchState = useCallback(
+    (): Promise<{
+      readonly overview: Overview;
+      readonly steps: readonly GameAdminStep[];
+    }> =>
+      gameId === null
+        ? api.templates().then(({ publishable, published, steps: held }) => ({
+            overview: { kind: "templates", publishable, published },
+            steps: held,
+          }))
+        : api
+            .list(gameId)
+            .then(({ contract, steps: held, templatesReady }) => ({
+              overview: { contract, kind: "game", templatesReady },
+              steps: held,
+            })),
+    [api, gameId],
+  );
+  const apply = useCallback(
+    (state: {
+      readonly overview: Overview;
+      readonly steps: readonly GameAdminStep[];
+    }) => {
+      setOverview(state.overview);
+      state.steps.forEach(upsert);
+    },
+    [upsert],
+  );
+
   useEffect(() => {
     let current = true;
-    api.list(gameId).then(
-      ({ steps: held }) => {
-        if (current) held.forEach(upsert);
+    fetchState().then(
+      (state) => {
+        if (current) apply(state);
       },
       () => {
         if (current) setMessage(unreachableCopy);
@@ -64,7 +110,7 @@ export function useAdminSteps(options: {
     return () => {
       current = false;
     };
-  }, [api, gameId, upsert]);
+  }, [apply, fetchState]);
 
   const watching = useMemo(
     () =>
@@ -80,13 +126,16 @@ export function useAdminSteps(options: {
       for (const stepId of watching.split(","))
         api.refresh(stepId).then(
           (answer) => {
-            if (answer.status === "ok") upsert(answer.step);
+            if (answer.status !== "ok") return;
+            upsert(answer.step);
+            if (isSettledStep(answer.step.state))
+              fetchState().then(apply, () => undefined);
           },
           () => undefined,
         );
     }, pollMs);
     return () => clearInterval(timer);
-  }, [api, pollMs, upsert, watching]);
+  }, [api, apply, fetchState, pollMs, upsert, watching]);
 
   const start = useCallback(
     async (action: GameAdminAction, context: StartContext) => {
@@ -175,6 +224,7 @@ export function useAdminSteps(options: {
     canSign: sign !== undefined,
     dismiss: useCallback(() => setActiveId(null), []),
     message,
+    overview,
     reopen: useCallback((stepId: string) => setActiveId(stepId), []),
     sendPasted,
     sign: signWithWallet,

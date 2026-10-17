@@ -42,7 +42,6 @@ export const gameKey = templateKey("game-rewards", "1.0.0");
 export const collectibleKey = templateKey("milestone-collectible", "1.0.0");
 
 export const administration: AdminOptions = {
-  collectibleTemplate: collectibleKey,
   maxCodeBytes: 10_000,
   maxDrawingBytes: 4096n,
   random: (length) => new Uint8Array(length).fill(7),
@@ -50,7 +49,6 @@ export const administration: AdminOptions = {
     [
       gameKey,
       {
-        alkane: { block: 4n, tx: 2000n },
         codeHash: sha256Hex(gameCode),
         load: () => Promise.resolve(gameCode),
         readOnlyOpcode: 99n,
@@ -59,7 +57,6 @@ export const administration: AdminOptions = {
     [
       collectibleKey,
       {
-        alkane: { block: 4n, tx: 1000n },
         codeHash: sha256Hex(collectibleCode),
         load: () => Promise.resolve(collectibleCode),
         readOnlyOpcode: 99n,
@@ -114,6 +111,9 @@ const base = {
   sender: wallet,
 } as const;
 const contract = { chain, family, id: "2:5" };
+// Where staff published the game's template and the collectible template.
+export const gameTemplateAt = { chain, family, id: "4:2000" };
+export const collectibleTemplateAt = { chain, family, id: "4:1000" };
 export const intents = {
   define: {
     ...base,
@@ -132,7 +132,10 @@ export const intents = {
   },
   deploy: {
     ...base,
+    collectibleAt: collectibleTemplateAt,
+    maxDrawingBytes: 2048,
     operation: "deploy",
+    templateAt: gameTemplateAt,
     templateId: "game-rewards",
     templateVersion: "1.0.0",
   },
@@ -145,6 +148,7 @@ export const intents = {
   publish: {
     ...base,
     operation: "publish-template",
+    templateAt: gameTemplateAt,
     templateId: "game-rewards",
     templateVersion: "1.0.0",
   },

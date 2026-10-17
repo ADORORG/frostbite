@@ -46,8 +46,30 @@ export function StepReview({
       <dl>
         <dt>Network</dt>
         <dd>{summary.chain}</dd>
-        <dt>Rewards contract</dt>
-        <dd>{summary.contractId}</dd>
+        {summary.contractId === undefined ? null : (
+          <>
+            <dt>Rewards contract</dt>
+            <dd>{summary.contractId}</dd>
+          </>
+        )}
+        {summary.template === undefined ? null : (
+          <>
+            <dt>Template</dt>
+            <dd>{`${summary.template.id} ${summary.template.version}${summary.template.address === undefined ? "" : ` at ${summary.template.address}`}`}</dd>
+          </>
+        )}
+        {summary.collectibleAddress === undefined ? null : (
+          <>
+            <dt>Collectibles are made from the template at</dt>
+            <dd>{summary.collectibleAddress}</dd>
+          </>
+        )}
+        {summary.maxDrawingBytes === undefined ? null : (
+          <>
+            <dt>Largest drawing the contract will keep</dt>
+            <dd>{`${summary.maxDrawingBytes} bytes`}</dd>
+          </>
+        )}
         {summary.claimLimit === undefined ? null : (
           <>
             <dt>Claims allowed per wallet</dt>
@@ -75,6 +97,9 @@ export function StepReview({
         <strong>{copy.label}.</strong> {copy.detail}
         {step.failureReason === null ? null : ` (${step.failureReason})`}
       </p>
+      {step.createdContracts.length === 0 ? null : (
+        <p data-testid="created-contracts">{`The network reports it created: ${step.createdContracts.join(", ")}.`}</p>
+      )}
       {message === null ? null : <p role="alert">{message}</p>}
       {step.toSign === null ? null : canSign ? (
         <ArcadeActionButton disabled={working} onClick={onSign} tone="mint">

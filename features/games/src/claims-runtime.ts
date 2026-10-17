@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
 
 import {
+  createDrizzleContractStore,
+  type ContractStore,
+} from "@ador/database/game-contracts";
+import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
@@ -12,27 +16,36 @@ import {
 } from "@ador/game-claims";
 import { hasEarnedMilestone } from "@ador/game-saves";
 import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema, contractRefSchema } from "@ador/shared/chain";
 import { rewardsInitialisation, type GameManifest } from "@ador/shared/games";
 
 import type { GameClaimsConfig } from "./claims-config.ts";
 
-// What the claims service may know of a game, read from its manifest and the platform's configuration: the chain it is on,
-// the contract deployed for it, and each milestone's claim limit. A game that declares no rewards is unknown to it, so it can
-// neither start a claim nor be asked about one.
+// What the claims service may know of a game, read from its manifest and the record of its contract: the chain it is on, the
+// contract made for it (none until the step that makes it completes), and each milestone's claim limit. A game that declares no
+// rewards is unknown to it, so it can neither start a claim nor be asked about one.
 export function claimableGameLookup(
   games: readonly GameManifest[],
-  config: GameClaimsConfig,
-): (gameId: string) => ClaimableGame | null {
+  contracts: Pick<ContractStore, "gameContract">,
+): (gameId: string) => Promise<ClaimableGame | null> {
   const byId = new Map(games.map((game) => [game.id, game]));
-  return (gameId) => {
+  return async (gameId) => {
     const game = byId.get(gameId);
     const initialisation =
       game === undefined ? null : rewardsInitialisation(game);
     if (game === undefined || initialisation === null) return null;
+    const chain = chainRefSchema.parse(game.network);
+    const recorded = await contracts.gameContract(gameId, chain);
     return {
-      chain: chainRefSchema.parse(game.network),
-      contract: config.contracts.get(gameId) ?? null,
+      chain,
+      contract:
+        recorded === null
+          ? null
+          : contractRefSchema.parse({
+              chain,
+              family: recorded.family,
+              id: recorded.address,
+            }),
       limits: new Map(
         initialisation.milestones.map(({ claimLimit, id }) => [id, claimLimit]),
       ),
@@ -62,7 +75,7 @@ export function createGameClaimsResolver(
           throw new Error(`No chain is configured for claims on ${chain}.`);
         return offered.funding;
       },
-      game: claimableGameLookup(games, config),
+      game: claimableGameLookup(games, createDrizzleContractStore(database)),
       newId: randomUUID,
       ports: (chain) => config.chain(chain)?.ports ?? null,
       repository: createDrizzleGameClaimRepository(database, { clock }),

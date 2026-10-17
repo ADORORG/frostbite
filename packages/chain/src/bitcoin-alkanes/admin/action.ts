@@ -2,7 +2,7 @@ import type { TransactionIntent } from "@ador/shared/chain";
 
 import type { Call } from "../tx/call-script.ts";
 import { milestoneKey } from "../milestone-key.ts";
-import { parseAlkaneId } from "../node/alkane-id.ts";
+import { parseAlkaneId, type AlkaneId } from "../node/alkane-id.ts";
 import {
   createGameCall,
   defineMilestoneCall,
@@ -11,6 +11,16 @@ import {
   resumeCall,
 } from "./calls.ts";
 import { templateKey, type AdminOptions } from "./templates.ts";
+
+// Published code lives in block 4 (`{3, n}` publishes it at `{4, n}`).
+const codeBlock = 4n;
+
+function publishedCode(
+  at: { readonly id: string } | undefined,
+): AlkaneId | null {
+  const id = parseAlkaneId(at?.id ?? "");
+  return id !== null && id.block === codeBlock ? id : null;
+}
 
 export const adminOperations = [
   "define-milestone",
@@ -42,10 +52,13 @@ export function isAdminIntent(
 // sent.
 export interface AdminSource {
   readonly claimLimit?: number | undefined;
+  readonly collectibleAt?: { readonly id: string } | undefined;
   readonly contract?: { readonly id: string } | undefined;
+  readonly maxDrawingBytes?: number | undefined;
   readonly milestoneId?: string | undefined;
   readonly operation: AdminOperation;
   readonly paused?: boolean | undefined;
+  readonly templateAt?: { readonly id: string } | undefined;
   readonly templateId?: string | undefined;
   readonly templateVersion?: string | undefined;
 }
@@ -58,10 +71,7 @@ export function needsAuthToken(operation: AdminOperation): boolean {
 // The call an action makes, or null when its parts are missing, malformed or name a template that is not configured.
 export function adminCall(
   source: AdminSource,
-  options: Pick<
-    AdminOptions,
-    "collectibleTemplate" | "maxDrawingBytes" | "templates"
-  >,
+  options: Pick<AdminOptions, "maxDrawingBytes" | "templates">,
 ): Call | null {
   switch (source.operation) {
     case "define-milestone": {
@@ -87,22 +97,25 @@ export function adminCall(
       const entry = options.templates.get(
         templateKey(source.templateId ?? "", source.templateVersion ?? ""),
       );
-      return entry === undefined
+      const at = publishedCode(source.templateAt);
+      return entry === undefined || at === null
         ? null
-        : publishTemplateCall(entry.alkane.tx, entry.readOnlyOpcode);
+        : publishTemplateCall(at.tx, entry.readOnlyOpcode);
     }
     case "deploy": {
-      const game = options.templates.get(
+      const game = options.templates.has(
         templateKey(source.templateId ?? "", source.templateVersion ?? ""),
-      );
-      const collectible = options.templates.get(options.collectibleTemplate);
-      return game === undefined || collectible === undefined
+      )
+        ? publishedCode(source.templateAt)
+        : null;
+      const collectible = publishedCode(source.collectibleAt);
+      const size = source.maxDrawingBytes;
+      return game === null ||
+        collectible === null ||
+        size === undefined ||
+        BigInt(size) > options.maxDrawingBytes
         ? null
-        : createGameCall(
-            game.alkane.tx,
-            collectible.alkane.tx,
-            options.maxDrawingBytes,
-          );
+        : createGameCall(game.tx, collectible.tx, BigInt(size));
     }
   }
 }

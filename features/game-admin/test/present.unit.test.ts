@@ -5,9 +5,11 @@ import { peopleOf, toWireStep } from "../src/application/present.ts";
 import { adminGames } from "../src/game-info.ts";
 import { administeredGameLookup } from "../src/runtime.ts";
 import {
-  config,
+  chain,
   contract,
   defineSummary,
+  deploySummary,
+  publishSummary,
   game,
   otherStaffId,
   plainGame,
@@ -67,11 +69,82 @@ describe("a step as the page is told of it", () => {
     expect(wire.submittedBy).toBeNull();
   });
 
-  it("refuses a summary that names no contract", () => {
+  it("refuses a step on a contract whose summary names no contract", () => {
     const nameless = { ...view().summary, contract: undefined };
     expect(() => toWireStep(view({ summary: nameless }), names)).toThrow(
       /contract/u,
     );
+    expect(() =>
+      toWireStep(
+        view({
+          operation: "define-milestone",
+          summary: {
+            ...defineSummary(),
+            contract: undefined,
+            milestone: undefined,
+          },
+        }),
+        names,
+      ),
+    ).toThrow(/contract/u);
+  });
+
+  it("shows publishing a template by the template and where it goes, with no contract to name", () => {
+    const wire = toWireStep(
+      view({
+        gameId: null,
+        operation: "publish-template",
+        summary: publishSummary(),
+        templateRef: "game-rewards@1.0.0",
+      }),
+      names,
+    );
+    expect(gameAdminStepSchema.parse(wire)).toEqual(wire);
+    expect(wire).toMatchObject({
+      gameId: null,
+      templateRef: "game-rewards@1.0.0",
+      summary: { template: { address: "at-1", id: "game-rewards" } },
+    });
+    expect(wire.summary).not.toHaveProperty("contractId");
+  });
+
+  it("shows creating a game's contract by what it is made from and what it accepts, and what the network says it made", () => {
+    const wire = toWireStep(
+      view({
+        createdContracts: ["2:7"],
+        operation: "deploy",
+        state: "confirmed",
+        summary: deploySummary(),
+        toSign: null,
+      }),
+      names,
+    );
+    expect(gameAdminStepSchema.parse(wire)).toEqual(wire);
+    expect(wire).toMatchObject({
+      createdContracts: ["2:7"],
+      state: "confirmed",
+      summary: {
+        collectibleAddress: "at-2",
+        maxDrawingBytes: 4096,
+        template: { address: "at-1" },
+      },
+    });
+  });
+
+  it("shows a template without a known address as a template only", () => {
+    const wire = toWireStep(
+      view({
+        gameId: null,
+        operation: "publish-template",
+        summary: publishSummary({ at: undefined }),
+        templateRef: "game-rewards@1.0.0",
+      }),
+      names,
+    );
+    expect(wire.summary.template).toEqual({
+      id: "game-rewards",
+      version: "1.0.0",
+    });
   });
 
   it("lists each person once, and none for an account that is gone", () => {
@@ -86,50 +159,64 @@ describe("a step as the page is told of it", () => {
 });
 
 describe("the games administration knows", () => {
-  it("lists only games that declare rewards, with milestones, claim limits and the contract if there is one", () => {
-    const [arcade, ...others] = adminGames([game, plainGame], config());
+  it("lists only games that declare rewards, with milestones and claim limits", () => {
+    const [arcade, ...others] = adminGames([game, plainGame]);
     expect(others).toEqual([]);
-    expect(arcade).toMatchObject({
-      contractId: "rewards-1",
+    expect(arcade).toEqual({
+      chain,
       id: "arcade",
-      maxDrawingBytes: 4096n,
       milestones: [
         { claimLimit: 1, id: "first-win", title: "First win" },
         { claimLimit: 3, id: "streak", title: "Streak" },
       ],
+      title: "Arcade",
     });
-    expect(adminGames([game], config(false))[0]?.contractId).toBeNull();
   });
 
-  it("gives the service every game that declares rewards, with its contract if it has one", () => {
-    const known = adminGames([game, plainGame], config());
-    const lookup = administeredGameLookup(known, config());
-    expect(lookup("arcade")).toMatchObject({
+  const store = (
+    recorded: {
+      address: string;
+      family: string;
+      maxDrawingBytes: number;
+    } | null,
+  ) => {
+    const asked: [string, string][] = [];
+    return {
+      asked,
+      gameContract: (gameId: string, onChain: string) => {
+        asked.push([gameId, onChain]);
+        return Promise.resolve(recorded);
+      },
+    };
+  };
+
+  it("gives the service every game that declares rewards, with the contract on record and the size it accepts", async () => {
+    const contracts = store({
+      address: "rewards-1",
+      family: "simulated",
+      maxDrawingBytes: 4096,
+    });
+    const lookup = administeredGameLookup(
+      adminGames([game, plainGame]),
+      contracts,
+    );
+    const arcade = await lookup("arcade");
+    expect(arcade).toMatchObject({
+      chain,
       contract,
       maxDrawingBytes: 4096n,
     });
-    expect(lookup("arcade")?.milestones.get("streak")).toEqual({
-      claimLimit: 3,
-    });
-    expect(lookup("plain")).toBeNull();
-    const undeployed = config(false);
-    expect(
-      administeredGameLookup(
-        adminGames([game], undeployed),
-        undeployed,
-      )("arcade"),
-    ).toMatchObject({ contract: null });
+    expect(arcade?.milestones.get("streak")).toEqual({ claimLimit: 3 });
+    expect(contracts.asked).toEqual([["arcade", chain]]);
+    expect(await lookup("plain")).toBeNull();
+    expect(contracts.asked).toHaveLength(1);
   });
 
-  it("refuses to start when a game has a contract but no drawing limit is configured for it", () => {
-    const unlimited = {
-      ...config(),
-      maxDrawingBytes: new Map<string, bigint>(),
-    };
-    expect(() => adminGames([game], unlimited)).toThrow(/drawing limit/u);
-    // Without a contract there is nothing to bound, so nothing is missing.
-    expect(
-      adminGames([game], { ...unlimited, contracts: new Map() })[0],
-    ).toMatchObject({ contractId: null, maxDrawingBytes: null });
+  it("gives a game with no contract on record none, and no drawing size to keep", async () => {
+    const lookup = administeredGameLookup(adminGames([game]), store(null));
+    expect(await lookup("arcade")).toMatchObject({
+      contract: null,
+      maxDrawingBytes: 0n,
+    });
   });
 });

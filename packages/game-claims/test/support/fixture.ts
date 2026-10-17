@@ -142,7 +142,7 @@ export const service = createGameClaimsService({
   earned: (userId, id, milestoneId) =>
     Promise.resolve(earnedKeys.has(`${userId}|${id}|${milestoneId}`)),
   funding: () => funding,
-  game: (id) => (id === gameId ? game.current : null),
+  game: (id) => Promise.resolve(id === gameId ? game.current : null),
   newId: randomUUID,
   ports: (requested) =>
     chainAvailable.value && requested === chain ? ports() : null,

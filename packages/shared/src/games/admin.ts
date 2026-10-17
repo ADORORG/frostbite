@@ -1,10 +1,12 @@
 import { z } from "zod";
 
 import {
-  chainFamilyIdTextSchema,
-  chainRefTextSchema,
-} from "../chain/chain-ref.ts";
+  gameAdminStepSchema,
+  gameAdminTransactionSchema,
+} from "./admin-step.ts";
 import { gameIdSchema } from "./manifest.ts";
+
+export * from "./admin-step.ts";
 
 // Staff administration of a game's rewards contract: the capability, the pages, and the routes (ADR-018 Amendment 3). The
 // capability is granted by the authorization policy to the `staff` role, so "any admin may pause" is the policy and not a
@@ -15,8 +17,9 @@ export const gameAdminDetailPath = "/admin/games/[gameId]";
 export const gameAdminNavigationLabel = "Game rewards";
 export const gameAdminHref = (gameId: string) => `${gameAdminPath}/${gameId}`;
 
-// What staff may do to a game's contract. A milestone is defined once; its claim limit comes from the manifest, so staff supply
-// only its drawing.
+// What staff may do. On a game with a contract: define a milestone (once; its claim limit comes from the manifest, so staff supply
+// only its drawing), pause or resume claims. Before it has one: publish a template (once, for every game, at an address staff
+// choose) and create the game's contract from the published templates.
 export const gameAdminActionSchema = z.discriminatedUnion("operation", [
   z
     .object({
@@ -31,87 +34,50 @@ export const gameAdminActionSchema = z.discriminatedUnion("operation", [
       paused: z.boolean(),
     })
     .strict(),
+  z
+    .object({
+      maxDrawingBytes: z.number().int().positive().max(1_048_576),
+      operation: z.literal("deploy"),
+    })
+    .strict(),
+  z
+    .object({
+      // Where on the chain the code is published, in the chain's own notation.
+      address: z.string().trim().min(1).max(128),
+      operation: z.literal("publish-template"),
+      templateId: z.string().trim().min(1).max(64),
+      templateVersion: z.string().trim().min(1).max(64),
+    })
+    .strict(),
 ]);
-
-// Where a step stands (the lifecycle's stages; a test keeps the lists equal).
-export const gameAdminStepStates = [
-  "awaiting-signature",
-  "complete",
-  "confirmed",
-  "expired",
-  "failed",
-  "pending",
-] as const;
-
-// The transaction as it crosses the page: the one staff sign, and the same once signed. Plain text throughout.
-export const gameAdminTransactionSchema = z
-  .object({
-    chain: chainRefTextSchema,
-    family: chainFamilyIdTextSchema,
-    format: z.string().trim().min(1).max(64),
-    payload: z.string().min(1).max(262_144),
-  })
-  .strict();
-
-// What staff are shown before signing: what the step does, on which contract, for what fee, until when.
-export const gameAdminSummarySchema = z
-  .object({
-    chain: z.string().min(1).max(64),
-    claimLimit: z.number().int().positive().optional(),
-    contractId: z.string().min(1).max(128),
-    drawing: z
-      .object({
-        bytes: z.number().int().nonnegative(),
-        sha256: z.string().regex(/^[0-9a-f]{64}$/u),
-      })
-      .strict()
-      .optional(),
-    expiresAt: z.iso.datetime({ offset: true }),
-    fee: z
-      .object({
-        asset: z.string().min(1).max(128),
-        baseUnits: z.string().regex(/^\d{1,40}$/u),
-      })
-      .strict(),
-    milestoneId: gameIdSchema.optional(),
-    paused: z.boolean().optional(),
-  })
-  .strict();
-
-const person = z.string().min(1).max(200).nullable();
-
-export const gameAdminStepSchema = z
-  .object({
-    createdAt: z.iso.datetime({ offset: true }),
-    createdBy: person,
-    failureReason: z.string().min(1).max(256).nullable(),
-    gameId: gameIdSchema,
-    id: z.uuid(),
-    operation: z.enum(["define-milestone", "set-claims-paused"]),
-    state: z.enum(gameAdminStepStates),
-    submittedBy: person,
-    summary: gameAdminSummarySchema,
-    toSign: gameAdminTransactionSchema.nullable(),
-    transactionId: z.string().min(1).max(128).nullable(),
-  })
-  .strict();
 
 export const startGameAdminStepInputSchema = z
   .object({
     action: gameAdminActionSchema,
     // The output holding the game's auth token ("txid:vout"), for a chain whose steps must present it.
     authTokenOutput: z.string().trim().min(1).max(128).optional(),
-    gameId: gameIdSchema,
+    // The game the step is for; none when it publishes a template.
+    gameId: gameIdSchema.nullable(),
     // The address of the wallet staff will sign with; the platform parses it for the game's chain.
     wallet: z.string().trim().min(1).max(256),
   })
-  .strict();
+  .strict()
+  .refine(
+    ({ action, gameId }) =>
+      (action.operation === "publish-template") === (gameId === null),
+    "A template is published for no game; every other step is for one.",
+  );
 export const gameAdminStartRefusals = [
+  "address-taken",
+  "already-created",
   "already-defined",
+  "already-published",
   "bad-drawing",
   "could-not-build",
   "not-administered",
+  "template-not-published",
   "unavailable",
+  "unknown-template",
   "wrong-network",
 ] as const;
 export const startGameAdminStepResponseSchema = z.discriminatedUnion("status", [
@@ -177,7 +143,48 @@ export const listGameAdminStepsInputSchema = z
   .object({ gameId: gameIdSchema })
   .strict();
 export const listGameAdminStepsResponseSchema = z
-  .object({ steps: z.array(gameAdminStepSchema).max(500) })
+  .object({
+    // The game's contract once the step that created it completed; none until then.
+    contract: z
+      .object({
+        address: z.string().min(1).max(128),
+        maxDrawingBytes: z.number().int().positive(),
+      })
+      .strict()
+      .nullable(),
+    steps: z.array(gameAdminStepSchema).max(500),
+    // Whether both templates a game's contract is made from have been published.
+    templatesReady: z.boolean(),
+  })
+  .strict();
+
+// The templates the platform may publish, which are published and where, and the steps that publish them.
+export const listGameAdminTemplatesInputSchema = z.object({}).strict();
+export const listGameAdminTemplatesResponseSchema = z
+  .object({
+    published: z
+      .array(
+        z
+          .object({
+            address: z.string().min(1).max(128),
+            publishedAt: z.iso.datetime({ offset: true }),
+            templateRef: z.string().min(1).max(130),
+          })
+          .strict(),
+      )
+      .max(100),
+    publishable: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1).max(64),
+            version: z.string().min(1).max(64),
+          })
+          .strict(),
+      )
+      .max(100),
+    steps: z.array(gameAdminStepSchema).max(500),
+  })
   .strict();
 
 export const gameAdminRoutes = {
@@ -201,13 +208,20 @@ export const gameAdminRoutes = {
     operationId: "submitGameAdminStep",
     path: "/api/v1/game-admin/submit",
   },
+  templates: {
+    method: "POST",
+    operationId: "listGameAdminTemplates",
+    path: "/api/v1/game-admin/templates",
+  },
 } as const;
 
 export type GameAdminAction = z.infer<typeof gameAdminActionSchema>;
-export type GameAdminStep = z.infer<typeof gameAdminStepSchema>;
-export type GameAdminStepState = (typeof gameAdminStepStates)[number];
-export type GameAdminSummary = z.infer<typeof gameAdminSummarySchema>;
-export type GameAdminTransaction = z.infer<typeof gameAdminTransactionSchema>;
+export type ListGameAdminTemplatesInput = z.infer<
+  typeof listGameAdminTemplatesInputSchema
+>;
+export type ListGameAdminTemplatesResponse = z.infer<
+  typeof listGameAdminTemplatesResponseSchema
+>;
 export type ListGameAdminStepsInput = z.infer<
   typeof listGameAdminStepsInputSchema
 >;

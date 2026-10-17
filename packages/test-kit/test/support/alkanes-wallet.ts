@@ -72,7 +72,7 @@ export function claimNode(): AlkanesNode {
       Promise.resolve({ alkanes: [], script: new Uint8Array(), value: 0n }),
     indexedHeight: () => Promise.resolve(100),
     tip: () => Promise.resolve({ hash: "cc".repeat(32), height: 100 }),
-    trace: () => Promise.resolve("success"),
+    trace: () => Promise.resolve({ created: [], outcome: "success" }),
     transaction: () =>
       Promise.resolve(
         sent

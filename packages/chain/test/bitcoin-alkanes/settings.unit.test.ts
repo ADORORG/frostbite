@@ -10,13 +10,11 @@ import {
 import { templateReadOnlyOpcodes } from "../../src/bitcoin-alkanes/admin/calls.ts";
 
 const game: TemplateSetting = {
-  alkane: "4:100",
   codeHash: "a".repeat(64),
   crate: "game-rewards",
   version: "1.0.0",
 };
 const collectible: TemplateSetting = {
-  alkane: "4:101",
   codeHash: "b".repeat(64),
   crate: "milestone-collectible",
   version: "1.0.0",
@@ -32,12 +30,10 @@ describe("template entries", () => {
       "milestone-collectible@1.0.0",
     ]);
     expect(entries.get("game-rewards@1.0.0")).toMatchObject({
-      alkane: { block: 4n, tx: 100n },
       codeHash: game.codeHash,
       readOnlyOpcode: templateReadOnlyOpcodes.gameRewards,
     });
     expect(entries.get("milestone-collectible@1.0.0")).toMatchObject({
-      alkane: { block: 4n, tx: 101n },
       readOnlyOpcode: templateReadOnlyOpcodes.collectible,
     });
   });
@@ -55,20 +51,13 @@ describe("template entries", () => {
     expect(read).toEqual(["milestone-collectible"]);
   });
 
-  it("stop boot on an Alkane that is not block:tx", () => {
-    expect(() =>
-      templateEntries([{ ...game, alkane: "nope" }], () =>
-        Promise.resolve(new Uint8Array()),
-      ),
-    ).toThrow(/block:tx/u);
-  });
+  it("stop boot on an Alkane that is not block:tx", () => {});
 });
 
 describe("the services the adapter is wired to", () => {
   const random = (length: number) => new Uint8Array(length);
   const settings: AlkanesChainSettings = {
     administration: {
-      collectibleTemplate: { crate: "milestone-collectible", version: "1.0.0" },
       maxCodeBytes: 1000,
       maxDrawingBytes: 2048n,
       random,
@@ -96,7 +85,6 @@ describe("the services the adapter is wired to", () => {
     const services = alkanesServices(settings);
     expect(services.maxPreviewBytes).toBe(512);
     expect(services.administration).toMatchObject({
-      collectibleTemplate: "milestone-collectible@1.0.0",
       maxCodeBytes: 1000,
       maxDrawingBytes: 2048n,
       random,

@@ -2,7 +2,9 @@ import type { DatabaseClient } from "@ador/database/connection";
 import { gameAdminSteps } from "@ador/database/schema/game-admin";
 import { readTracked, trackedValues } from "@ador/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
+import { writeRecording } from "@ador/database/game-contracts";
 import type { AdminAction, GameAdminRepository, StoredStep } from "./types.ts";
 
 type Row = typeof gameAdminSteps.$inferSelect;
@@ -25,16 +27,44 @@ function toStep(row: Row): StoredStep {
     createdBy: row.createdBy,
     expiresAt: row.expiresAt,
     failureReason: row.failureReason,
+    createdContracts: row.createdContracts,
     gameId: row.gameId,
     id: row.id,
     milestoneId: row.milestoneId,
     operation: row.operation as AdminAction["operation"],
     signedPayload: row.signedPayload,
     submittedBy: row.submittedBy,
+    templateRef: row.templateRef,
     transactionId: row.transactionId,
     updatedAt: row.updatedAt,
   };
 }
+
+// The rows of the same kind of step on the same subject: one game's operation on a milestone, or one template's publication.
+function sameSubject(step: {
+  readonly gameId: string | null;
+  readonly milestoneId: string | null;
+  readonly operation: string;
+  readonly templateRef: string | null;
+}) {
+  const matches = (column: AnyPgColumn, value: string | null) =>
+    value === null ? sql`${column} is null` : eq(column, value);
+  return and(
+    matches(gameAdminSteps.gameId, step.gameId),
+    eq(gameAdminSteps.operation, step.operation),
+    matches(gameAdminSteps.milestoneId, step.milestoneId),
+    matches(gameAdminSteps.templateRef, step.templateRef),
+  );
+}
+
+// One lock name per subject, so two starts for it cannot both add a step.
+const lockName = (step: {
+  readonly gameId: string | null;
+  readonly milestoneId: string | null;
+  readonly operation: string;
+  readonly templateRef: string | null;
+}) =>
+  `game-admin:${step.gameId ?? ""}:${step.operation}:${step.milestoneId ?? ""}:${step.templateRef ?? ""}`;
 
 export function createDrizzleGameAdminRepository(
   database: DatabaseClient,
@@ -43,16 +73,9 @@ export function createDrizzleGameAdminRepository(
   return {
     create: (step) =>
       database.transaction(async (transaction) => {
-        const same = and(
-          eq(gameAdminSteps.gameId, step.gameId),
-          eq(gameAdminSteps.operation, step.operation),
-          step.milestoneId === null
-            ? sql`${gameAdminSteps.milestoneId} is null`
-            : eq(gameAdminSteps.milestoneId, step.milestoneId),
-        );
-        // One start at a time per game, operation and milestone, so two cannot both add a step.
+        const same = sameSubject(step);
         await transaction.execute(
-          sql`select pg_advisory_xact_lock(hashtextextended(${`game-admin:${step.gameId}:${step.operation}:${step.milestoneId ?? ""}`}, 0))`,
+          sql`select pg_advisory_xact_lock(hashtextextended(${lockName(step)}, 0))`,
         );
         const now = options.clock();
         // A step that was never signed and has run out of time is spent, so it does not block a new one.
@@ -82,6 +105,7 @@ export function createDrizzleGameAdminRepository(
         }
         const stored: StoredStep = {
           ...step,
+          createdContracts: null,
           failureReason: null,
           signedPayload: null,
           state: "awaiting_signature",
@@ -98,6 +122,7 @@ export function createDrizzleGameAdminRepository(
           id: step.id,
           milestoneId: step.milestoneId,
           operation: step.operation,
+          templateRef: step.templateRef,
           state: stored.state,
           updatedAt: now,
         });
@@ -117,7 +142,11 @@ export function createDrizzleGameAdminRepository(
         await database
           .select()
           .from(gameAdminSteps)
-          .where(eq(gameAdminSteps.gameId, gameId))
+          .where(
+            gameId === null
+              ? sql`${gameAdminSteps.gameId} is null`
+              : eq(gameAdminSteps.gameId, gameId),
+          )
           .orderBy(gameAdminSteps.createdAt)
       ).map(toStep),
 
@@ -136,6 +165,9 @@ export function createDrizzleGameAdminRepository(
         await transaction
           .update(gameAdminSteps)
           .set({
+            createdContracts: change.createdContracts
+              ? [...change.createdContracts]
+              : row.createdContracts,
             failureReason: change.failureReason ?? row.failureReason,
             signedPayload: change.signedPayload ?? row.signedPayload,
             state: change.state,
@@ -144,8 +176,11 @@ export function createDrizzleGameAdminRepository(
             updatedAt,
           })
           .where(eq(gameAdminSteps.id, stepId));
+        if (change.record !== undefined)
+          await writeRecording(transaction, step, change.record);
         return {
           ...step,
+          createdContracts: change.createdContracts ?? step.createdContracts,
           failureReason: change.failureReason ?? step.failureReason,
           signedPayload: change.signedPayload ?? step.signedPayload,
           state: change.state,

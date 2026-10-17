@@ -7,12 +7,18 @@ import {
 } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
-import { apiError, defining, fakeApi, step } from "./support/fake-api.ts";
+import {
+  apiError,
+  defining,
+  fakeApi,
+  listing,
+  step,
+} from "./support/fake-api.ts";
 import { panel } from "./support/panel.tsx";
 
 describe("the log, the milestones and following a step", () => {
   const loaded = (...steps: ReturnType<typeof step>[]) =>
-    fakeApi({ list: vi.fn(async () => ({ steps })) });
+    fakeApi({ list: vi.fn(async () => listing(steps)) });
 
   it("shows who built and who sent each step, newest first, and reopens one on request", async () => {
     const older = step({
@@ -28,9 +34,7 @@ describe("the log, the milestones and following a step", () => {
     const container = await panel(loaded(older, newer));
     await settle(() => expect(textOf(container)).toContain("Built by Ada"));
     const items = [
-      ...container.querySelectorAll(
-        'ul[aria-label="Steps taken on this game"] li',
-      ),
+      ...container.querySelectorAll('ul[aria-label="Steps taken"] li'),
     ];
     expect(items[0]?.textContent).toContain("Define milestone first-win");
     expect(items[0]?.textContent).toContain("an account that no longer exists");
@@ -102,7 +106,13 @@ describe("the log, the milestones and following a step", () => {
         step: { ...pending, state: "complete" },
       });
     const container = await panel(
-      fakeApi({ list: vi.fn(async () => ({ steps: [pending] })), refresh }),
+      fakeApi({
+        list: vi
+          .fn()
+          .mockResolvedValueOnce(listing([pending]))
+          .mockResolvedValue(listing([{ ...pending, state: "complete" }])),
+        refresh,
+      }),
       { pollMs: 10 },
     );
     await settle(() => expect(textOf(container)).toContain("Complete"));
@@ -122,7 +132,13 @@ describe("the log, the milestones and following a step", () => {
         step: { ...pending, state: "complete" },
       });
     const container = await panel(
-      fakeApi({ list: vi.fn(async () => ({ steps: [pending] })), refresh }),
+      fakeApi({
+        list: vi
+          .fn()
+          .mockResolvedValueOnce(listing([pending]))
+          .mockResolvedValue(listing([{ ...pending, state: "complete" }])),
+        refresh,
+      }),
       { pollMs: 10 },
     );
     await settle(() => expect(textOf(container)).toContain("Complete"));

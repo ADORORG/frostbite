@@ -5,19 +5,17 @@ import {
   feeCeiling,
   type ConfiguredChain,
   type FetchLike,
-  type TemplateSetting,
 } from "@ador/chain/configured";
 import {
   chainRefSchema,
   type ChainConfig,
   type ChainRef,
-  type ContractRef,
   type FundingPolicy,
 } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
 import { bitcoinSignetChainId, targetChains } from "./chains.ts";
-import { collectibleTemplate, rewardsPolicy } from "./rewards-policy.ts";
+import { rewardsPolicy } from "./rewards-policy.ts";
 
 // What the process provides, so a test can stand in for the network, the clock and the disk.
 export interface RewardsPlatform {
@@ -30,15 +28,12 @@ export interface RewardsPlatform {
 // The six things claims and staff administration use on a chain, each reached through the registry's neutral ports.
 type RewardsPorts = ReturnType<typeof portsOf>;
 
-// The rewards chain as the games' claims and staff administration see it: the ports they use on a chain, the contract deployed
-// for each game and the drawing size it accepts.
+// The rewards chain as the games' claims and staff administration see it: the ports they use on a chain, and the most a step may pay.
 export interface RewardsChain {
   chain(chain: ChainRef): {
     readonly funding: FundingPolicy;
     readonly ports: RewardsPorts;
   } | null;
-  readonly contracts: ReadonlyMap<string, ContractRef>;
-  readonly maxDrawingBytes: ReadonlyMap<string, bigint>;
 }
 
 const signet = chainRefSchema.parse(bitcoinSignetChainId);
@@ -50,8 +45,8 @@ function signetOption() {
   return option;
 }
 
-// The chain's record: every operation held to the confirmations decided for signet, and the gate as the deployment states it.
-export function chainConfig(environment: RewardsChainEnvironment): ChainConfig {
+// The chain's record: every operation held to the confirmations decided for signet, and the gate the policy states.
+export function chainConfig(): ChainConfig {
   const finality = {
     kind: "confirmations",
     required: rewardsPolicy.signetConfirmations,
@@ -71,43 +66,30 @@ export function chainConfig(environment: RewardsChainEnvironment): ChainConfig {
     displayName: option.displayName,
     enabled: true,
     family: option.family,
-    releaseGate: environment.releaseGate,
+    releaseGate: rewardsPolicy.signetReleaseGate,
     role: option.role,
   };
-}
-
-// The templates the platform may publish, each with the Alkane the deployment publishes it at.
-export function templateSettings(
-  ids: Readonly<
-    Record<(typeof rewardsPolicy.templates)[number]["crate"], string>
-  >,
-): TemplateSetting[] {
-  return rewardsPolicy.templates.map((template) => ({
-    ...template,
-    alkane: ids[template.crate],
-  }));
 }
 
 function configuredChain(
   environment: RewardsChainEnvironment,
   platform: RewardsPlatform,
 ): ConfiguredChain {
-  const { templates } = environment;
+  const directory = environment.templatesDirectory;
   return {
     adapter: {
       kind: "bitcoin-alkanes",
       settings: {
         administration:
-          templates === null
+          directory === null
             ? null
             : {
-                collectibleTemplate,
                 maxCodeBytes: rewardsPolicy.maxTemplateCodeBytes,
-                maxDrawingBytes: rewardsPolicy.defaultMaxDrawingBytes,
+                maxDrawingBytes: rewardsPolicy.maxDrawingBytes,
                 random: platform.random,
                 read: (crate) =>
-                  platform.readFile(join(templates.directory, `${crate}.wasm`)),
-                templates: templateSettings(templates.ids),
+                  platform.readFile(join(directory, `${crate}.wasm`)),
+                templates: rewardsPolicy.templates,
               },
         chain: signet,
         maxPreviewBytes: rewardsPolicy.maxPreviewBytes,
@@ -126,7 +108,7 @@ function configuredChain(
         },
       },
     },
-    config: chainConfig(environment),
+    config: chainConfig(),
   };
 }
 
@@ -141,8 +123,8 @@ function portsOf(registry: ReturnType<typeof createConfiguredRegistry>) {
   };
 }
 
-// The rewards chain for a deployment's settings, or null where none is set. While the release gate is closed the chain is not
-// offered at all, so nothing is built, sent or watched on it.
+// The rewards chain for a deployment's settings, or null where none is set. While the policy keeps the chain's release gate closed
+// it is not offered at all, so nothing is built, sent or watched on it.
 export function createRewardsChain(
   environment: RewardsChainEnvironment | null,
   platform: RewardsPlatform,
@@ -156,20 +138,5 @@ export function createRewardsChain(
         ports: portsOf(registry),
       }
     : null;
-  const { family } = signetOption();
-  return {
-    chain: (chain) => (chain === signet ? offered : null),
-    contracts: new Map(
-      [...environment.contracts].map(([game, { id }]) => [
-        game,
-        { chain: signet, family, id },
-      ]),
-    ),
-    maxDrawingBytes: new Map(
-      [...environment.contracts].map(([game, { maxDrawingBytes }]) => [
-        game,
-        maxDrawingBytes,
-      ]),
-    ),
-  };
+  return { chain: (chain) => (chain === signet ? offered : null) };
 }

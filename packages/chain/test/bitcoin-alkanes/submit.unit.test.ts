@@ -238,7 +238,7 @@ describe("watching a claim", () => {
       trace: (id, vout) => {
         asked.id = id;
         asked.vout = vout;
-        return Promise.resolve("success");
+        return Promise.resolve({ created: [], outcome: "success" });
       },
       transaction: () => Promise.resolve(confirmedAt(100, 3)),
     }).observe(ref);
@@ -250,7 +250,7 @@ describe("watching a claim", () => {
     const node = (outcome: "failure" | "none") => ({
       indexedHeight: () => Promise.resolve(100),
       tip: tipAt(100),
-      trace: () => Promise.resolve(outcome),
+      trace: () => Promise.resolve({ created: [], outcome }),
       transaction: () => Promise.resolve(confirmedAt(100, 2)),
     });
     expect(await observer(node("failure")).observe(ref)).toMatchObject({
@@ -265,7 +265,7 @@ describe("watching a claim", () => {
     const behind = await observer({
       indexedHeight: () => Promise.resolve(100),
       tip: tipAt(99),
-      trace: () => Promise.resolve("success"),
+      trace: () => Promise.resolve({ created: [], outcome: "success" }),
       transaction: () => Promise.resolve(confirmedAt(100)),
     }).observe(ref);
     expect(behind.confirmations).toBe(1);

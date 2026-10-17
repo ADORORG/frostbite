@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
 
+import { createDrizzleContractStore } from "@ador/database/game-contracts";
 import {
   gameAdminSteps,
+  gameContracts,
+  publishedTemplates,
   authUsers,
   createDatabaseClient,
   createDatabasePool,
@@ -23,6 +26,7 @@ import { createGameAdminService } from "../../src/service.ts";
 import type {
   AdminChainPorts,
   AdministeredGame,
+  RewardsPlan,
   StartStepInput,
 } from "../../src/types.ts";
 
@@ -55,8 +59,25 @@ export const network = {
 };
 
 export const game: { current: AdministeredGame | null } = { current: null };
+// The templates the platform may publish on the simulated chain, and which of them a game and its collectibles are made from.
+export const gameTemplate = { id: "game-rewards", version: "1.0.0" };
+export const collectibleTemplate = {
+  id: "milestone-collectible",
+  version: "1.0.0",
+};
+export const rewards: RewardsPlan = {
+  chain,
+  collectibleTemplate,
+  family: simulatedFamily,
+  gameTemplate,
+  maxDrawingBytes: 8192n,
+  publishable: [gameTemplate, collectibleTemplate],
+};
+export const contracts = createDrizzleContractStore(database);
 export const chainAvailable = { value: true };
 export const chainFailure = { build: false };
+// Makes the chain say nothing of what a step created.
+export const hideCreated = { value: false };
 // Held broadcasts, so two steps on one transaction can be made to overlap.
 export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
@@ -86,7 +107,15 @@ function ports(): AdminChainPorts {
           : builder.build(...asked),
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
-    observer,
+    observer: {
+      observe: async (ref) => {
+        const seen = await observer.observe(ref);
+        if (!hideCreated.value) return seen;
+        const { created, ...rest } = seen;
+        void created;
+        return rest;
+      },
+    },
   };
 }
 
@@ -96,12 +125,14 @@ export const repository = createDrizzleGameAdminRepository(database, {
 
 export const service = createGameAdminService({
   clock: () => clock.now,
+  contracts,
   funding: () => funding,
-  game: (id) => (id === gameId ? game.current : null),
+  game: (id) => Promise.resolve(id === gameId ? game.current : null),
   newId: randomUUID,
   ports: (requested) =>
     chainAvailable.value && requested === chain ? ports() : null,
   repository,
+  rewards,
   sanitise: (drawing) =>
     drawing.startsWith("<svg")
       ? { ok: true, svg: drawing }
@@ -141,6 +172,33 @@ export const defineInput = (
   ...over,
 });
 
+// Publishing a template is about no game; deploying one is about the game.
+export const publishInput = (
+  staffId: string,
+  template = gameTemplate,
+  address = "at-1",
+): StartStepInput => ({
+  action: {
+    address,
+    operation: "publish-template",
+    templateId: template.id,
+    templateVersion: template.version,
+  },
+  gameId: null,
+  staffId,
+  wallet: wallet.value,
+});
+
+export const deployInput = (
+  staffId: string,
+  maxDrawingBytes = 4096,
+): StartStepInput => ({
+  action: { maxDrawingBytes, operation: "deploy" },
+  gameId,
+  staffId,
+  wallet: wallet.value,
+});
+
 export const pauseInput = (staffId: string, paused = true): StartStepInput => ({
   action: { operation: "set-claims-paused", paused },
   gameId,
@@ -162,12 +220,15 @@ export function registerDatabase(): void {
   beforeAll(async () => runMigrations(environment));
   // Steps are kept by game, so each test starts from an empty log.
   beforeEach(async () => {
+    await database.delete(gameContracts);
+    await database.delete(publishedTemplates);
     await database.delete(gameAdminSteps);
     clock.now = start;
     current = makeNetwork();
     game.current = administeredGame();
     chainAvailable.value = true;
     chainFailure.build = false;
+    hideCreated.value = false;
     broadcastGate.enabled = false;
     broadcastGate.held = [];
     network.controls.fund(chain, wallet.value, 100n);

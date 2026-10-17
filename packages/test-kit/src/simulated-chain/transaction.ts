@@ -24,17 +24,20 @@ const bodySchema = z
   .object({
     amount: z.string().optional(),
     claimLimit: z.number().optional(),
+    collectibleAt: z.string().optional(),
     contract: z.string().optional(),
     drawingBytes: z.number().optional(),
     drawingSha: z.string().optional(),
     expiresAt: z.string(),
     fee: z.string(),
+    maxDrawingBytes: z.number().optional(),
     milestoneId: z.string().optional(),
     nonce: z.number(),
     operation: z.string(),
     paused: z.boolean().optional(),
     recipient: z.string().optional(),
     sender: z.string(),
+    templateAt: z.string().optional(),
     templateId: z.string().optional(),
     templateVersion: z.string().optional(),
   })
@@ -77,12 +80,15 @@ function detailsOfSummary(summary: UnsignedTransaction["summary"]) {
   return {
     amount: summary.amount?.baseUnits.toString(),
     claimLimit: summary.claimLimit,
+    collectibleAt: summary.collectibleAt?.id,
     contract: summary.milestone?.contract.id ?? summary.contract?.id,
     drawingBytes: summary.drawing?.bytes,
     drawingSha: summary.drawing?.sha256,
+    maxDrawingBytes: summary.maxDrawingBytes,
     milestoneId: summary.milestone?.id,
     paused: summary.paused,
     recipient: summary.recipient?.value,
+    templateAt: summary.template?.at?.id,
     templateId: summary.template?.id,
     templateVersion: summary.template?.version,
   };
@@ -165,20 +171,33 @@ function describe(intent: TransactionIntent): Described {
         summary: { contract: intent.contract, paused: intent.paused },
       };
     case "publish-template":
-    case "deploy":
+    case "deploy": {
+      const deployed =
+        intent.operation === "deploy"
+          ? {
+              collectibleAt: intent.collectibleAt,
+              maxDrawingBytes: intent.maxDrawingBytes,
+            }
+          : {};
       return {
+        collectibleAt: deployed.collectibleAt?.id,
         contract: undefined,
+        maxDrawingBytes: deployed.maxDrawingBytes,
         milestoneId: undefined,
         summary: {
+          ...deployed,
           template: {
+            at: intent.templateAt,
             codeHash: templateHash(intent.templateId, intent.templateVersion),
             id: intent.templateId,
             version: intent.templateVersion,
           },
         },
+        templateAt: intent.templateAt?.id,
         templateId: intent.templateId,
         templateVersion: intent.templateVersion,
       };
+    }
     case "mint":
       return { contract: undefined, milestoneId: undefined, summary: {} };
   }

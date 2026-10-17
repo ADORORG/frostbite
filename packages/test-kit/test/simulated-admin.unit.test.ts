@@ -60,12 +60,16 @@ describe("administration on the simulated chain", () => {
       (ports) => ({
         ...base(ports),
         operation: "publish-template",
+        templateAt: { ...ports.contract, id: "at-1" },
         templateId: "game-rewards",
         templateVersion: "1.0.0",
       }),
       (ports) => ({
         ...base(ports),
+        collectibleAt: { ...ports.contract, id: "at-2" },
+        maxDrawingBytes: 2048,
         operation: "deploy",
+        templateAt: { ...ports.contract, id: "at-1" },
         templateId: "game-rewards",
         templateVersion: "1.0.0",
       }),
@@ -93,5 +97,73 @@ describe("administration on the simulated chain", () => {
       ok: false,
       reason: "summary-mismatch",
     });
+  });
+
+  it("shows where a template is published and what the new contract is created with, and refuses a summary that changes either", async () => {
+    const { need, unsigned } = await built((ports) => ({
+      ...base(ports),
+      collectibleAt: { ...ports.contract, id: "at-2" },
+      maxDrawingBytes: 2048,
+      operation: "deploy",
+      templateAt: { ...ports.contract, id: "at-1" },
+      templateId: "game-rewards",
+      templateVersion: "1.0.0",
+    }));
+    expect(unsigned.summary.template?.at?.id).toBe("at-1");
+    expect(unsigned.summary.collectibleAt?.id).toBe("at-2");
+    expect(unsigned.summary.maxDrawingBytes).toBe(2048);
+    const { collectibleAt, template } = unsigned.summary;
+    if (collectibleAt === undefined || template?.at === undefined)
+      throw new Error("the summary names no addresses");
+    const lies = (change: Partial<typeof unsigned.summary>) => {
+      const lying = {
+        ...unsigned,
+        summary: { ...unsigned.summary, ...change },
+      };
+      return need("builder").verifySigned(lying, signSimulated(lying));
+    };
+    const mismatch = { ok: false, reason: "summary-mismatch" };
+    expect(lies({ maxDrawingBytes: 1 })).toEqual(mismatch);
+    expect(lies({ collectibleAt: { ...collectibleAt, id: "x" } })).toEqual(
+      mismatch,
+    );
+    expect(
+      lies({ template: { ...template, at: { ...template.at, id: "x" } } }),
+    ).toEqual(mismatch);
+  });
+
+  it("names the contract a deployment created once it is confirmed, and no other step does", async () => {
+    const ports = simulatedPorts();
+    const send = async (intent: TransactionIntent) => {
+      const unsigned = await ports.need("builder").build(intent, funding);
+      const outcome = await ports
+        .need("broadcaster")
+        .broadcast(signSimulated(unsigned));
+      if (outcome.kind !== "accepted") throw new Error("not accepted");
+      return outcome.ref;
+    };
+    const deploy = await send({
+      ...base(ports),
+      collectibleAt: { ...ports.contract, id: "at-2" },
+      maxDrawingBytes: 2048,
+      operation: "deploy",
+      templateAt: { ...ports.contract, id: "at-1" },
+      templateId: "game-rewards",
+      templateVersion: "1.0.0",
+    });
+    const pause = await send({
+      ...base(ports),
+      contract: ports.contract,
+      operation: "set-claims-paused",
+      paused: true,
+    });
+    const observer = ports.need("observer");
+    expect((await observer.observe(deploy)).created).toBeUndefined();
+    ports.controls.advance(deploy.chain, 10);
+    const made = await observer.observe(deploy);
+    expect(made.status).toBe("confirmed");
+    expect(made.created).toHaveLength(1);
+    expect(made.created?.[0]).toMatch(/^sim-game-\d+$/u);
+    expect((await observer.observe(pause)).created).toBeUndefined();
   });
 });

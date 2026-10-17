@@ -5,6 +5,10 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
 } from "@ador/database/connection";
+import {
+  createDrizzleContractStore,
+  type ContractStore,
+} from "@ador/database/game-contracts";
 import { authUsers } from "@ador/database/schema/auth";
 import {
   createDrizzleGameAdminRepository,
@@ -13,26 +17,35 @@ import {
 } from "@ador/game-admin";
 import { sanitizeDrawing } from "@ador/milestone-art";
 import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
+import { chainFamilyIdSchema, contractRefSchema } from "@ador/shared/chain";
 import { inArray } from "drizzle-orm";
 
 import type { GameAdminConfig } from "./config.ts";
 import type { AdminGameInfo } from "./game-info.ts";
 
-// What the service may know of a game, from its manifest and the platform's configuration.
+// What the service may know of a game, from its manifest and the record of its contract: the chain, the contract once the step that
+// created it completed, the drawing size it accepts, and the claim limits.
 export function administeredGameLookup(
   games: readonly AdminGameInfo[],
-  config: Pick<GameAdminConfig, "contracts">,
-): (gameId: string) => AdministeredGame | null {
+  contracts: Pick<ContractStore, "gameContract">,
+): (gameId: string) => Promise<AdministeredGame | null> {
   const byId = new Map(games.map((game) => [game.id, game]));
-  return (gameId) => {
+  return async (gameId) => {
     const game = byId.get(gameId);
     if (game === undefined) return null;
+    const recorded = await contracts.gameContract(gameId, game.chain);
     return {
       chain: game.chain,
-      contract: config.contracts.get(gameId) ?? null,
-      // A game with a contract always has its limit (`adminGames` refuses otherwise); one without has no use for it, since
-      // nothing can be built for it.
-      maxDrawingBytes: game.maxDrawingBytes ?? 0n,
+      contract:
+        recorded === null
+          ? null
+          : contractRefSchema.parse({
+              chain: game.chain,
+              family: chainFamilyIdSchema.parse(recorded.family),
+              id: recorded.address,
+            }),
+      // A game without a contract has no use for it: nothing can be built for it.
+      maxDrawingBytes: BigInt(recorded?.maxDrawingBytes ?? 0),
       milestones: new Map(
         game.milestones.map(({ claimLimit, id }) => [id, { claimLimit }]),
       ),
@@ -52,18 +65,21 @@ export function createGameAdminResolver(
     const database = createDatabaseClient(
       createDatabasePool(parseDatabaseEnvironment(environment)),
     );
+    const contracts = createDrizzleContractStore(database);
     const service = createGameAdminService({
       clock,
+      contracts,
       funding: (chain) => {
         const offered = config.chain(chain);
         if (offered === null)
           throw new Error(`No chain is configured for steps on ${chain}.`);
         return offered.funding;
       },
-      game: administeredGameLookup(games, config),
+      game: administeredGameLookup(games, contracts),
       newId: randomUUID,
       ports: (chain) => config.chain(chain)?.ports ?? null,
       repository: createDrizzleGameAdminRepository(database, { clock }),
+      rewards: config.rewards,
       sanitise: (drawing, maxBytes) => {
         const result = sanitizeDrawing(drawing, {
           ...config.drawingLimits,
@@ -82,7 +98,7 @@ export function createGameAdminResolver(
         .where(inArray(authUsers.id, [...ids]));
       return new Map(rows.map(({ id, name }) => [id, name]));
     };
-    return { names, service };
+    return { names, rewards: config.rewards, service };
   });
 }
 

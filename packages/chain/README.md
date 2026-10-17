@@ -84,3 +84,12 @@ adapter settings (`AdapterSettings`, a union with one member today: `bitcoin-alk
 adapters and the registry; `feeCeiling` states the fee limit in the chain's own currency. A new family adds its settings to the
 union and its cases to `configured.ts`; callers reach it through the same neutral ports. The Alkanes assembly (node, transaction
 options, administration templates) is `bitcoin-alkanes/settings.ts`; nothing in it has a default, the caller states every value.
+
+## Where templates and contracts are
+
+The adapter does not know where anything is published. A `publish-template` step names the address (`templateAt`), and a `deploy` step the
+addresses of the game and collectible templates and how large a drawing the new contract accepts (`templateAt`, `collectibleAt`,
+`maxDrawingBytes`); all appear in the summary staff sign, and the verifier rebuilds the call from the summary. Published code lives in block
+4 (`{3, n}` publishes at `{4, n}`), so any other address is refused. A confirmed step's observation lists the contracts its trace created
+(`created`, `decodeTraceCreated`): for a game made from its template, the game first and then its auth token. The fixture is the
+indexer's own recording of a creation (`contracts/templates/abi/trace-vectors.json`, `creation`).

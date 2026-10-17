@@ -1,32 +1,27 @@
 import { chainRefSchema, type TransactionIntent } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { bitcoinSignetChainId } from "../../../configs/chains.ts";
 import {
   chainConfig,
   createRewardsChain,
-  templateSettings,
   type RewardsPlatform,
 } from "../../../configs/rewards-chain.ts";
+import { rewardsPlan } from "../../../configs/rewards-plan.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 const signet = chainRefSchema.parse(bitcoinSignetChainId);
 const url = "https://node.example.invalid/v1/rpc";
 const environment: RewardsChainEnvironment = {
-  contracts: new Map([["arcade", { id: "4:200", maxDrawingBytes: 2048n }]]),
   maxFeeSats: 25_000n,
-  releaseGate: "open",
   rpcTimeoutMs: 400,
   rpcUrl: url,
-  templates: null,
+  templatesDirectory: null,
 };
 const withTemplates: RewardsChainEnvironment = {
   ...environment,
-  templates: {
-    directory: "/srv/templates",
-    ids: { "game-rewards": "4:100", "milestone-collectible": "4:101" },
-  },
+  templatesDirectory: "/srv/templates",
 };
 
 function platform() {
@@ -64,13 +59,28 @@ describe("the rewards chain", () => {
     expect(createRewardsChain(null, platform().platform)).toBeNull();
   });
 
-  it("is configured but not offered while the release gate is closed", () => {
-    const rewards = createRewardsChain(
-      { ...environment, releaseGate: "closed" },
-      platform().platform,
-    );
-    expect(rewards?.chain(signet)).toBeNull();
-    expect(rewards?.contracts.size).toBe(1);
+  it("is configured but not offered while the policy keeps the release gate closed", async () => {
+    vi.resetModules();
+    vi.doMock("../../../configs/rewards-policy.ts", async (original) => ({
+      rewardsPolicy: {
+        ...(
+          await original<typeof import("../../../configs/rewards-policy.ts")>()
+        ).rewardsPolicy,
+        signetReleaseGate: "closed",
+      },
+    }));
+    try {
+      const closed = await import("../../../configs/rewards-chain.ts");
+      expect(closed.chainConfig().releaseGate).toBe("closed");
+      expect(
+        closed
+          .createRewardsChain(environment, platform().platform)
+          ?.chain(signet),
+      ).toBeNull();
+    } finally {
+      vi.doUnmock("../../../configs/rewards-policy.ts");
+      vi.resetModules();
+    }
   });
 
   it("offers signet with the fee ceiling and the six ports once the gate is open", () => {
@@ -89,16 +99,6 @@ describe("the rewards chain", () => {
       "rewards",
     ]);
     expect(rewards?.chain(chainRefSchema.parse("simnet:one"))).toBeNull();
-  });
-
-  it("lists each game's contract on signet and the drawing size it accepts", () => {
-    const rewards = createRewardsChain(environment, platform().platform);
-    expect(rewards?.contracts.get("arcade")).toEqual({
-      chain: signet,
-      family: "bitcoin-alkanes",
-      id: "4:200",
-    });
-    expect(rewards?.maxDrawingBytes.get("arcade")).toBe(2048n);
   });
 
   it("asks the configured node, naming it as the source of what it observes", async () => {
@@ -125,20 +125,8 @@ describe("the rewards chain", () => {
     ).rejects.toThrow();
   });
 
-  it("gives each template the Alkane the deployment publishes it at", () => {
-    expect(
-      templateSettings({
-        "game-rewards": "4:100",
-        "milestone-collectible": "4:101",
-      }).map(({ alkane, crate }) => [crate, alkane]),
-    ).toEqual([
-      ["game-rewards", "4:100"],
-      ["milestone-collectible", "4:101"],
-    ]);
-  });
-
-  it("holds every operation to the decided confirmations, and keeps the gate as configured", () => {
-    const config = chainConfig(environment);
+  it("holds every operation to the decided confirmations, with the gate the policy states", () => {
+    const config = chainConfig();
     expect(Object.keys(config.confirmations).sort()).toEqual([
       "define-milestone",
       "deploy",
@@ -151,10 +139,8 @@ describe("the rewards chain", () => {
     for (const finality of Object.values(config.confirmations)) {
       expect(finality).toEqual({ kind: "confirmations", required: 1 });
     }
+    expect(config.releaseGate).toBe(rewardsPolicy.signetReleaseGate);
     expect(config.releaseGate).toBe("open");
-    expect(
-      chainConfig({ ...environment, releaseGate: "closed" }).releaseGate,
-    ).toBe("closed");
   });
 
   describe("administration", () => {
@@ -162,6 +148,7 @@ describe("the rewards chain", () => {
       chain: signet,
       operation: "publish-template",
       sender: { chain: signet, value: sender },
+      templateAt: { chain: signet, family: rewardsPlan.family, id: "4:100" },
       templateId: "game-rewards",
       templateVersion: rewardsPolicy.templates[0].version,
     });

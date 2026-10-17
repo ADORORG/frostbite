@@ -16,8 +16,11 @@ export const rewardsPolicy = {
   maxPreviewBytes: 8192,
   // What a template's code may weigh uncompressed, checked before it is unpacked; the released templates are well below it.
   maxTemplateCodeBytes: 512 * 1024,
-  // The largest drawing a new game's contract is created to accept, unless its own setting says otherwise.
-  defaultMaxDrawingBytes: 4096n,
+  // The most a new game's contract may be created to accept; staff choose within it when they create the contract.
+  maxDrawingBytes: 4096n,
+  // Whether the platform may build, send and watch transactions on signet. Signet is open (ADR-018: signet first); a mainnet record
+  // is added closed and opened by the owner after review, as an edit to this file.
+  signetReleaseGate: "open",
   // The confirmations after which a step is done on signet (ADR-018, D22); the indexer must also have run it.
   signetConfirmations: 1,
   // The templates the platform may publish. Their code hashes are the released ones, so a rebuilt template that differs is
@@ -35,6 +38,3 @@ export const rewardsPolicy = {
     },
   ],
 } as const;
-
-// The template every game's collectibles are created from.
-export const collectibleTemplate = rewardsPolicy.templates[1];

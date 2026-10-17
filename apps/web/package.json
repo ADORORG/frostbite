@@ -32,6 +32,7 @@
     "@ador/feature-platform-shell": "workspace:*",
     "@ador/feature-public-collections": "workspace:*",
     "@ador/feature-public-products": "workspace:*",
+    "@ador/game-admin": "workspace:*",
     "@ador/game-sdk": "workspace:*",
     "@ador/game-verification": "workspace:*",
     "@ador/http": "workspace:*",

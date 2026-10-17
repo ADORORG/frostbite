@@ -1,4 +1,7 @@
-import { packageVitestConfig } from "@repo/vitest-config";
+import {
+  databaseTestTimeoutMs,
+  packageVitestConfig,
+} from "@repo/vitest-config";
 
 export default packageVitestConfig({
   coverage: {
@@ -6,5 +9,8 @@ export default packageVitestConfig({
     include: ["src/**/*.{ts,tsx}"],
   },
   dom: { setupFile: "test/ui-setup.ts" },
+  // The integration files share one database.
+  fileParallelism: false,
+  integrationTimeoutMs: databaseTestTimeoutMs,
   react: true,
 });

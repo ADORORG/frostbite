@@ -2,10 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import {
-  collectibleTemplate,
-  rewardsPolicy,
-} from "../../../configs/rewards-policy.ts";
+import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 const abi = (name: string): { version: string } =>
   JSON.parse(
@@ -29,10 +26,6 @@ describe("the rewards policy", () => {
     expect(
       new Set(rewardsPolicy.templates.map(({ codeHash }) => codeHash)).size,
     ).toBe(rewardsPolicy.templates.length);
-  });
-
-  it("makes games' collectibles from the milestone collectible template", () => {
-    expect(collectibleTemplate.crate).toBe("milestone-collectible");
   });
 
   it("keeps the change output at or above the relay dust limit and the claim output above the change", () => {

@@ -51,7 +51,14 @@ function summaryOf(
       return entry === undefined
         ? {}
         : {
+            ...(intent.operation === "deploy"
+              ? {
+                  collectibleAt: intent.collectibleAt,
+                  maxDrawingBytes: intent.maxDrawingBytes,
+                }
+              : {}),
             template: {
+              at: intent.templateAt,
               codeHash: entry.codeHash,
               id: intent.templateId,
               version: intent.templateVersion,

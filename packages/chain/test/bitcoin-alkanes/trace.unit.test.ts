@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import { MessageWriter } from "../../src/bitcoin-alkanes/node/protobuf.ts";
 import { toHex } from "../../src/bitcoin-alkanes/node/hex.ts";
-import { decodeTraceOutcome } from "../../src/bitcoin-alkanes/node/trace.ts";
+import {
+  decodeTrace,
+  decodeTraceCreated,
+  decodeTraceOutcome,
+} from "../../src/bitcoin-alkanes/node/trace.ts";
 import { mainnetSuccessTrace } from "../support/recorded.ts";
 
 // Traces the Alkanes indexer itself recorded for a claim that succeeded and one that reverted (`contracts/templates/harness`).
@@ -18,7 +22,11 @@ const vectors = JSON.parse(
     ),
     "utf8",
   ),
-) as { readonly failure: string; readonly success: string };
+) as {
+  readonly creation: string;
+  readonly failure: string;
+  readonly success: string;
+};
 
 describe("a trace the indexer recorded", () => {
   it("reads as a success when the outer call exited with the success flag", () => {
@@ -68,5 +76,59 @@ describe("a trace the indexer recorded", () => {
       new MessageWriter().varint(3, 1n).bytesField(2, [1, 2]).finish(),
     );
     expect(decodeTraceOutcome(other)).toBe("none");
+  });
+});
+
+describe("what a call created", () => {
+  it("lists a game and then its auth token, as the indexer recorded the creation of a game", () => {
+    expect(decodeTraceCreated(vectors.creation)).toEqual([
+      { block: 2n, tx: 1n },
+      { block: 2n, tx: 2n },
+    ]);
+    expect(decodeTrace(vectors.creation).outcome).toBe("success");
+  });
+
+  it("lists the collectible a claim made, and nothing for a claim that reverted", () => {
+    expect(decodeTraceCreated(vectors.success)).toEqual([
+      { block: 2n, tx: 3n },
+    ]);
+    expect(decodeTraceCreated(vectors.failure)).toEqual([]);
+  });
+
+  it("is empty when there is no trace", () => {
+    expect(decodeTraceCreated("")).toEqual([]);
+    expect(decodeTraceCreated("0x")).toEqual([]);
+  });
+
+  it("reads both halves of a 128-bit number and skips events that create nothing", () => {
+    const half = (lo: bigint, hi: bigint) =>
+      new MessageWriter().varint(1, lo).varint(2, hi).finish();
+    const created = (block: Uint8Array, tx: Uint8Array) =>
+      new MessageWriter()
+        .bytesField(
+          3,
+          new MessageWriter()
+            .bytesField(
+              1,
+              new MessageWriter()
+                .bytesField(1, block)
+                .bytesField(2, tx)
+                .finish(),
+            )
+            .finish(),
+        )
+        .finish();
+    const trace = toHex(
+      new MessageWriter()
+        .bytesField(1, new MessageWriter().varint(9, 1n).finish())
+        .bytesField(1, created(half(5n, 1n), half(7n, 0n)))
+        .bytesField(1, new MessageWriter().bytesField(3, []).finish())
+        .varint(2, 1n)
+        .bytesField(2, created(half(9n, 0n), half(9n, 0n)))
+        .finish(),
+    );
+    expect(decodeTraceCreated(trace)).toEqual([
+      { block: (1n << 64n) | 5n, tx: 7n },
+    ]);
   });
 });

@@ -8,12 +8,14 @@ export const stepId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 export const step = (over: Partial<GameAdminStep> = {}): GameAdminStep => ({
   createdAt: "2026-10-16T12:00:00.000Z",
   createdBy: "Ada",
+  createdContracts: [],
   failureReason: null,
   gameId: "arcade",
   id: stepId,
   operation: "set-claims-paused",
   state: "awaiting-signature",
   submittedBy: null,
+  templateRef: null,
   summary: {
     chain: "simnet:one",
     contractId: "rewards-1",
@@ -46,10 +48,50 @@ export const defining = (over: Partial<GameAdminStep> = {}) =>
     ...over,
   });
 
+export const publishing = (over: Partial<GameAdminStep> = {}) =>
+  step({
+    gameId: null,
+    operation: "publish-template",
+    summary: {
+      chain: "simnet:one",
+      expiresAt: "2026-10-16T12:10:00.000Z",
+      fee: { asset: "sim", baseUnits: "1" },
+      template: { address: "at-1", id: "game-rewards", version: "1.0.0" },
+    },
+    templateRef: "game-rewards@1.0.0",
+    ...over,
+  });
+
+export const creating = (over: Partial<GameAdminStep> = {}) =>
+  step({
+    operation: "deploy",
+    summary: {
+      chain: "simnet:one",
+      collectibleAddress: "at-2",
+      expiresAt: "2026-10-16T12:10:00.000Z",
+      fee: { asset: "sim", baseUnits: "1" },
+      maxDrawingBytes: 4096,
+      template: { address: "at-1", id: "game-rewards", version: "1.0.0" },
+    },
+    ...over,
+  });
+
+export const publishable = [
+  { id: "game-rewards", version: "1.0.0" },
+  { id: "milestone-collectible", version: "1.0.0" },
+];
+
+// What the list route answers for a game that has its contract.
+export const listing = (steps: GameAdminStep[]) => ({
+  contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+  steps,
+  templatesReady: true,
+});
+
 // An API that answers from what a test gives it, and remembers what it was asked.
 export function fakeApi(overrides: Partial<GameAdminApi> = {}) {
   const api: GameAdminApi = {
-    list: vi.fn(async () => ({ steps: [] })),
+    list: vi.fn(async () => listing([])),
     refresh: vi.fn(async () => ({ status: "ok" as const, step: step() })),
     start: vi.fn(async () => ({
       resumed: false,
@@ -60,6 +102,7 @@ export function fakeApi(overrides: Partial<GameAdminApi> = {}) {
       status: "submitted" as const,
       step: step({ state: "pending", toSign: null, transactionId: "abc" }),
     })),
+    templates: vi.fn(async () => ({ publishable, published: [], steps: [] })),
     ...overrides,
   };
   return api;

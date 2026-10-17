@@ -10,13 +10,18 @@ export function toWireStep(
 ): GameAdminStep {
   const { summary } = view;
   const contract = summary.milestone?.contract ?? summary.contract;
-  if (contract === undefined)
+  // A step on a contract names it; publishing a template and creating a contract act on none yet.
+  const actsOnContract =
+    view.operation === "define-milestone" ||
+    view.operation === "set-claims-paused";
+  if (actsOnContract && contract === undefined)
     throw new Error("A step's summary names the contract it acts on.");
   const named = (id: string | null) =>
     id === null ? null : (names.get(id) ?? null);
   return {
     createdAt: view.createdAt,
     createdBy: named(view.createdBy),
+    createdContracts: [...view.createdContracts],
     failureReason: view.failureReason,
     gameId: view.gameId,
     id: view.id,
@@ -28,7 +33,10 @@ export function toWireStep(
       ...(summary.claimLimit === undefined
         ? {}
         : { claimLimit: summary.claimLimit }),
-      contractId: contract.id,
+      ...(summary.collectibleAt === undefined
+        ? {}
+        : { collectibleAddress: summary.collectibleAt.id }),
+      ...(contract === undefined ? {} : { contractId: contract.id }),
       ...(summary.drawing === undefined ? {} : { drawing: summary.drawing }),
       expiresAt: summary.expiresAt,
       fee: {
@@ -38,8 +46,23 @@ export function toWireStep(
       ...(summary.milestone === undefined
         ? {}
         : { milestoneId: summary.milestone.id }),
+      ...(summary.maxDrawingBytes === undefined
+        ? {}
+        : { maxDrawingBytes: summary.maxDrawingBytes }),
       ...(summary.paused === undefined ? {} : { paused: summary.paused }),
+      ...(summary.template === undefined
+        ? {}
+        : {
+            template: {
+              ...(summary.template.at === undefined
+                ? {}
+                : { address: summary.template.at.id }),
+              id: summary.template.id,
+              version: summary.template.version,
+            },
+          }),
     },
+    templateRef: view.templateRef,
     toSign:
       view.toSign === null
         ? null

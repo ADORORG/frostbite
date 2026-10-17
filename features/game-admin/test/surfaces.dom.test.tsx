@@ -1,47 +1,43 @@
-import { mount, textOf } from "@ador/test-kit/dom";
+import { mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { GameSurface, GamesSurface } from "../src/ui/surfaces.tsx";
+import { fakeApi } from "./support/fake-api.ts";
 import { info } from "./support/fixtures.ts";
 
 const navigation = [] as const;
 
 describe("the staff pages", () => {
-  it("list the games that declare rewards, with whether each has a contract, and a way in", async () => {
-    const withContract = await mount(
-      <GamesSurface games={info()} navigation={navigation} />,
+  it("list the games that declare rewards with a way in, above the templates", async () => {
+    const container = await mount(
+      <GamesSurface api={fakeApi()} games={info()} navigation={navigation} />,
     );
-    expect(textOf(withContract)).toContain("Rewards contract rewards-1.");
+    await settle(() =>
+      expect(textOf(container)).toContain("game-rewards@1.0.0"),
+    );
     expect(
-      withContract.querySelector("a[href='/admin/games/arcade']")?.textContent,
+      container.querySelector("a[href='/admin/games/arcade']")?.textContent,
     ).toBe("Administer Arcade");
-    const without = await mount(
-      <GamesSurface games={info(false)} navigation={navigation} />,
-    );
-    expect(textOf(without)).toContain(
-      "No rewards contract is deployed for this game",
-    );
+    // Whether a game has its contract is on record, so the list does not claim to know it.
+    expect(textOf(container)).not.toContain("Rewards contract");
   });
 
   it("say so when no game declares rewards", async () => {
     const container = await mount(
-      <GamesSurface games={[]} navigation={navigation} />,
+      <GamesSurface api={fakeApi()} games={[]} navigation={navigation} />,
     );
     expect(textOf(container)).toContain("Nothing to administer");
   });
 
-  it("show a game's page, with its contract or why it has none, and 'not found' for a game that declares no rewards", async () => {
+  it("show a game's page with its contract loaded from the record, and 'not found' for a game that declares no rewards", async () => {
     const [arcade] = info();
     const page = await mount(
-      <GameSurface game={arcade} navigation={navigation} />,
+      <GameSurface api={fakeApi()} game={arcade} navigation={navigation} />,
     );
-    expect(textOf(page)).toContain("Rewards contract rewards-1 on simnet:one.");
-    const none = await mount(
-      <GameSurface game={info(false)[0]} navigation={navigation} />,
-    );
-    expect(textOf(none)).toContain("steps cannot be built yet");
+    expect(textOf(page)).toContain("Rewards on simnet:one.");
+    await settle(() => expect(textOf(page)).toContain("Contract rewards-1."));
     const missing = await mount(
-      <GameSurface game={undefined} navigation={navigation} />,
+      <GameSurface api={fakeApi()} game={undefined} navigation={navigation} />,
     );
     expect(textOf(missing)).toContain("Game not found");
     expect(missing.querySelector("a[href='/admin/games']")).not.toBeNull();

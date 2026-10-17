@@ -11,7 +11,7 @@ import {
   type ViewResult,
 } from "./messages.ts";
 import { MessageWriter } from "./protobuf.ts";
-import { decodeTraceOutcome, type TraceOutcome } from "./trace.ts";
+import { decodeTrace, type TraceReport } from "./trace.ts";
 import type { JsonRpc } from "./transport.ts";
 
 // The Alkanes side of a node, over `metashrew_view`.
@@ -21,8 +21,8 @@ export interface IndexerClient {
   holdings(txid: string, vout: number): Promise<OutputHoldings>;
   // The height the indexer has processed; behind the chain tip while it catches up.
   indexedHeight(): Promise<number>;
-  // How the call a transaction made at `vout` ended. `txid` is the usual (display) transaction id.
-  trace(txid: string, vout: number): Promise<TraceOutcome>;
+  // How the call a transaction made at `vout` ended, and what it created. `txid` is the usual (display) transaction id.
+  trace(txid: string, vout: number): Promise<TraceReport>;
   view(request: SimulateRequest): Promise<ViewResult>;
 }
 
@@ -88,7 +88,7 @@ export function createIndexerClient(rpc: JsonRpc): IndexerClient {
       return height;
     },
     trace: async (txid, vout) =>
-      decodeTraceOutcome(
+      decodeTrace(
         textOf(
           await rpc.call("metashrew_view", [
             "trace",

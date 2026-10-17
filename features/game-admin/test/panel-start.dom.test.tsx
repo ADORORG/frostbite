@@ -87,7 +87,7 @@ describe("starting a step", () => {
       { reason: "wrong-network" as const },
       "not an address on this game's network",
     ],
-    [{ reason: "unavailable" as const }, "not available for this game yet"],
+    [{ reason: "unavailable" as const }, "not available yet"],
     [
       { reason: "not-administered" as const },
       "not one the platform can administer",

@@ -115,5 +115,4 @@ export const runsConfig = { playRoot: "/nonexistent/play" } as const;
 // No contract deployed and no chain that takes claims, as the platform is configured today.
 export const claimsConfig = {
   chain: () => null,
-  contracts: new Map(),
 } as const;

@@ -58,4 +58,24 @@ describe("a tracked transaction as a row", () => {
       readTracked({ ...row, summary: { operation: "x" } }),
     ).toThrow();
   });
+
+  it("keeps a step that acts on no contract yet without one, and refuses half a contract", () => {
+    const values = trackedValues({ chain, contract: null, unsigned });
+    expect(values).toMatchObject({ contractFamily: null, contractId: null });
+    const row = {
+      ...values,
+      expiresAt: new Date(),
+      failureReason: null,
+      signedPayload: null,
+      state: "awaiting_signature",
+      transactionId: null,
+    };
+    expect(readTracked(row).contract).toBeNull();
+    expect(() => readTracked({ ...row, contractFamily: "simulated" })).toThrow(
+      /family and id/u,
+    );
+    expect(() => readTracked({ ...row, contractId: "x" })).toThrow(
+      /family and id/u,
+    );
+  });
 });

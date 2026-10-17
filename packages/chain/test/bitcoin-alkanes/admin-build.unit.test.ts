@@ -24,6 +24,8 @@ import {
   gameCode,
   intents,
   tokenId,
+  collectibleTemplateAt,
+  gameTemplateAt,
 } from "../support/administration.ts";
 
 const refusal = async (promise: Promise<unknown>) =>
@@ -73,6 +75,7 @@ describe("building the staff's steps", () => {
     const unsigned = await adminBuilder().build(intents.publish, funding);
     expect(unsigned.format).toBe(bundleFormat);
     expect(unsigned.summary.template).toEqual({
+      at: gameTemplateAt,
       codeHash: sha256Hex(gameCode),
       id: "game-rewards",
       version: "1.0.0",
@@ -86,6 +89,22 @@ describe("building the staff's steps", () => {
     expect(unsigned.format).toBe(psbtFormat);
     expect(Psbt.fromBase64(unsigned.payload).txInputs).toHaveLength(1);
     expect(unsigned.summary.template?.id).toBe("game-rewards");
+    expect(unsigned.summary.template?.at).toEqual(gameTemplateAt);
+    expect(unsigned.summary.collectibleAt).toEqual(collectibleTemplateAt);
+    expect(unsigned.summary.maxDrawingBytes).toBe(2048);
+  });
+
+  it("makes the call from the address the step names, not from configuration", async () => {
+    const callOf = async (id: string) => {
+      const unsigned = await adminBuilder().build(
+        { ...intents.publish, templateAt: { ...gameTemplateAt, id } },
+        funding,
+      );
+      return decodeBundle(unsigned.payload)?.reveal.txOutputs[1]?.script;
+    };
+    const first = await callOf("4:2000");
+    expect(first).toBeDefined();
+    expect(first).not.toEqual(await callOf("4:2001"));
   });
 
   it("refuses what it cannot do, with a code the caller can act on", async () => {
@@ -116,6 +135,36 @@ describe("building the staff's steps", () => {
     expect(await build({ ...intents.publish, templateVersion: "9.9.9" })).toBe(
       "invalid-request",
     );
+    const missing = (key: "collectibleAt" | "maxDrawingBytes" | "templateAt") =>
+      build({ ...intents.deploy, [key]: undefined });
+    for (const key of [
+      "collectibleAt",
+      "maxDrawingBytes",
+      "templateAt",
+    ] as const)
+      expect(await missing(key), key).toBe("invalid-request");
+    expect(await build({ ...intents.publish, templateAt: undefined })).toBe(
+      "invalid-request",
+    );
+    // Published code lives in block 4; a contract's own id is not where code can be published.
+    expect(
+      await build({
+        ...intents.publish,
+        templateAt: { ...gameTemplateAt, id: "2:5" },
+      }),
+    ).toBe("invalid-request");
+    expect(
+      await build({
+        ...intents.publish,
+        templateAt: { ...gameTemplateAt, id: "x" },
+      }),
+    ).toBe("invalid-request");
+    expect(await build({ ...intents.deploy, maxDrawingBytes: 4097 })).toBe(
+      "invalid-request",
+    );
+    expect(
+      await build({ ...intents.deploy, maxDrawingBytes: 4096 }),
+    ).toBeNull();
     expect(await build({ ...intents.define, drawing: "x".repeat(5000) })).toBe(
       "invalid-request",
     );

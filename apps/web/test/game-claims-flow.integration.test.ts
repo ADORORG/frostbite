@@ -3,12 +3,16 @@ import { randomUUID } from "node:crypto";
 import {
   authUsers,
   createDatabaseClient,
+  gameAdminSteps,
+  gameContracts,
+  publishedTemplates,
   createDatabasePool,
   gameMilestoneClaims,
   gameMilestoneUnlocks,
   parseDatabaseEnvironment,
   runMigrations,
 } from "@ador/database";
+import { writeRecording } from "@ador/database/game-contracts";
 import {
   createListGameClaimsOperation,
   createRefreshGameClaimOperation,
@@ -36,7 +40,6 @@ const database = createDatabaseClient(pool);
 const chain = chainRefSchema.parse("simnet:one");
 const gameId = "claim-game";
 const wallet = "sim:one:a1b2c3fe";
-const contract = { chain, family: simulatedFamily, id: "rewards-1" };
 const game = defineGame({
   capabilities: ["milestone:claim"],
   description: "",
@@ -80,16 +83,43 @@ const ports = () => {
     throw new Error("The simulated adapter lacks a port.");
   return { addressCodec, broadcaster, builder, contracts, observer, rewards };
 };
-const configured = (deployed: boolean) => ({
+const configured = () => ({
   clock: () => now,
   chain: () => ({
     funding: { maxFee: { asset: nativeAsset(chain), baseUnits: 10n } },
     ports: ports(),
   }),
-  contracts: deployed ? new Map([[gameId, contract]]) : new Map(),
 });
-const operations = (deployed = true) => {
-  const resolver = createGameClaimsResolver([game], configured(deployed));
+// The game's contract on record, as the step that created it left it: nothing is configured, so a game has a contract only once
+// that step completed.
+async function recordContract() {
+  const id = randomUUID();
+  await database.insert(gameAdminSteps).values({
+    chain,
+    expiresAt: now,
+    gameId,
+    id,
+    operation: "deploy",
+    state: "awaiting_signature",
+    summary: {},
+    unsignedFamily: simulatedFamily,
+    unsignedFormat: "f",
+    unsignedPayload: "p",
+  });
+  await writeRecording(
+    database,
+    { chain, id },
+    {
+      address: "rewards-1",
+      family: simulatedFamily,
+      gameId,
+      kind: "game",
+      maxDrawingBytes: 4096,
+    },
+  );
+}
+const operations = () => {
+  const resolver = createGameClaimsResolver([game], configured());
   return {
     list: createListGameClaimsOperation(resolver),
     refresh: createRefreshGameClaimOperation(resolver),
@@ -123,9 +153,13 @@ const sign = (toSign: NonNullable<GameClaim["toSign"]>) => ({
 });
 
 beforeAll(async () => runMigrations(environment));
-beforeEach(() => {
+beforeEach(async () => {
   now = new Date("2026-10-16T12:00:00.000Z");
   network = createSimulatedChain({ chains: [chain], now: () => now });
+  await database.delete(gameContracts);
+  await database.delete(publishedTemplates);
+  await database.delete(gameAdminSteps);
+  await recordContract();
 });
 afterAll(async () => pool.end());
 
@@ -193,14 +227,15 @@ describe("claiming a milestone through the operations", () => {
     ).toEqual([]);
   });
 
-  it("answers that claims are not supported for a game with no contract deployed, however well earned", async () => {
+  it("answers that claims are not supported for a game with no contract on record, however well earned", async () => {
     const userId = await seedPlayer();
-    expect(
-      await operations(false).start.execute(input, sessionFor(userId)),
-    ).toEqual({
-      ok: true,
-      value: { reason: "not-supported", status: "unavailable" },
-    });
+    await database.delete(gameContracts);
+    expect(await operations().start.execute(input, sessionFor(userId))).toEqual(
+      {
+        ok: true,
+        value: { reason: "not-supported", status: "unavailable" },
+      },
+    );
   });
 
   it("answers wrong network for a wallet address that is not on the game's chain", async () => {

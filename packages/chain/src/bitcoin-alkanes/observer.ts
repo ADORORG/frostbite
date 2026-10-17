@@ -1,6 +1,7 @@
 import type { ChainRef, Observation, TransactionRef } from "@ador/shared/chain";
 
 import type { ChainObserver } from "../ports.ts";
+import { formatAlkaneId } from "./node/alkane-id.ts";
 import { servedChain, type ServedChain } from "./chains.ts";
 import type { TransactionOptions } from "./options.ts";
 
@@ -37,7 +38,7 @@ export function createObserver(
       const confirmations = Math.max(1, tip.height - blockHeight + 1);
       if (indexed < blockHeight)
         return { ...base, block, confirmations, status: "pending" };
-      const outcome = await node.trace(
+      const { created, outcome } = await node.trace(
         ref.id,
         protostoneOutput(transaction.outputs),
       );
@@ -45,6 +46,9 @@ export function createObserver(
         ...base,
         block,
         confirmations,
+        ...(outcome === "success" && created.length > 0
+          ? { created: created.map(formatAlkaneId) }
+          : {}),
         status: outcome === "success" ? "confirmed" : "reverted",
       };
     },

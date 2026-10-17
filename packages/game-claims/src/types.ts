@@ -34,7 +34,7 @@ export interface GameClaimsDependencies {
   // Whether the milestone is on the player's account as earned, at any level.
   earned(userId: string, gameId: string, milestoneId: string): Promise<boolean>;
   funding(chain: ChainRef): FundingPolicy;
-  game(gameId: string): ClaimableGame | null;
+  game(gameId: string): Promise<ClaimableGame | null>;
   newId(): string;
   ports(chain: ChainRef): ClaimChainPorts | null;
   readonly repository: GameClaimRepository;

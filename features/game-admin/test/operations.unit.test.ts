@@ -9,12 +9,19 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   createListStepsOperation,
+  createListTemplatesOperation,
   createRefreshStepOperation,
   createStartStepOperation,
   createSubmitStepOperation,
 } from "../src/application/operations.ts";
 import type { GameAdminRuntime } from "../src/runtime.ts";
-import { chain, staffId, view } from "./support/fixtures.ts";
+import {
+  chain,
+  config,
+  publishSummary,
+  staffId,
+  view,
+} from "./support/fixtures.ts";
 
 const context = {
   actorSession: null,
@@ -26,6 +33,18 @@ const anonymous = { ...context, actorUserId: null };
 function stub(overrides: Partial<GameAdminService> = {}) {
   const service: GameAdminService = {
     list: vi.fn(async () => [view()]),
+    status: vi.fn(async () => ({
+      contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+      templatesReady: true,
+    })),
+    templates: vi.fn(async () => [
+      {
+        address: "at-1",
+        codeHash: "a".repeat(64),
+        publishedAt: new Date("2026-10-16T12:00:00.000Z"),
+        templateRef: "game-rewards@1.0.0",
+      },
+    ]),
     refresh: vi.fn(async () => ({ ok: true as const, step: view() })),
     start: vi.fn(async () => ({
       ok: true as const,
@@ -37,6 +56,7 @@ function stub(overrides: Partial<GameAdminService> = {}) {
   };
   const resolve = async (): Promise<GameAdminRuntime> => ({
     names: async () => new Map([[staffId, "Ada"]]),
+    rewards: config().rewards,
     service,
   });
   return {
@@ -44,6 +64,7 @@ function stub(overrides: Partial<GameAdminService> = {}) {
     refresh: createRefreshStepOperation(resolve),
     service,
     start: createStartStepOperation(resolve),
+    templates: createListTemplatesOperation(resolve),
     submit: createSubmitStepOperation(resolve),
   };
 }
@@ -67,6 +88,7 @@ describe("every administration operation", () => {
       [s.submit, gameAdminRoutes.submit],
       [s.refresh, gameAdminRoutes.refresh],
       [s.list, gameAdminRoutes.list],
+      [s.templates, gameAdminRoutes.templates],
     ] as const)
       expect(operation).toMatchObject({
         access: { capability: gameAdminCapability, kind: "platform" },
@@ -83,10 +105,12 @@ describe("every administration operation", () => {
       await s.submit.execute({ signed, stepId: view().id }, anonymous),
       await s.refresh.execute({ stepId: view().id }, anonymous),
       await s.list.execute({ gameId: "arcade" }, anonymous),
+      await s.templates.execute({}, anonymous),
     ])
       expect(result).toMatchObject({ ok: false });
     expect(s.service.start).not.toHaveBeenCalled();
     expect(s.service.list).not.toHaveBeenCalled();
+    expect(s.service.templates).not.toHaveBeenCalled();
   });
 });
 
@@ -111,6 +135,11 @@ describe("starting a step", () => {
   });
 
   it.each([
+    ["address-taken", "address-taken"],
+    ["already-created", "already-created"],
+    ["already-published", "already-published"],
+    ["template-not-published", "template-not-published"],
+    ["unknown-template", "unknown-template"],
     ["already-defined", "already-defined"],
     ["chain-unavailable", "unavailable"],
     ["not-administered", "not-administered"],
@@ -187,8 +216,61 @@ describe("sending, looking at and listing steps", () => {
     });
     expect(await s.list.execute({ gameId: "arcade" }, context)).toMatchObject({
       ok: true,
-      value: { steps: [{ createdBy: "Ada" }] },
+      value: {
+        contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+        steps: [{ createdBy: "Ada" }],
+        templatesReady: true,
+      },
     });
     expect(s.service.list).toHaveBeenCalledWith("arcade");
+  });
+
+  it("lists a game the platform does not administer as having no contract, no templates ready and no steps", async () => {
+    const s = stub({
+      list: vi.fn(async () => []),
+      status: vi.fn(async () => null),
+    });
+    expect(await s.list.execute({ gameId: "nope" }, context)).toEqual({
+      ok: true,
+      value: { contract: null, steps: [], templatesReady: false },
+    });
+  });
+
+  it("lists the templates that may be published, which are and where, and the steps that published them", async () => {
+    const s = stub({
+      list: vi.fn(async () => [
+        view({
+          gameId: null,
+          operation: "publish-template",
+          templateRef: "game-rewards@1.0.0",
+          summary: publishSummary(),
+        }),
+      ]),
+    });
+    expect(await s.templates.execute({}, context)).toEqual({
+      ok: true,
+      value: {
+        publishable: [
+          { id: "game-rewards", version: "1.0.0" },
+          { id: "milestone-collectible", version: "1.0.0" },
+        ],
+        published: [
+          {
+            address: "at-1",
+            publishedAt: "2026-10-16T12:00:00.000Z",
+            templateRef: "game-rewards@1.0.0",
+          },
+        ],
+        steps: [
+          expect.objectContaining({
+            createdBy: "Ada",
+            gameId: null,
+            operation: "publish-template",
+          }),
+        ],
+      },
+    });
+    // The steps that publish templates are the ones that belong to no game.
+    expect(s.service.list).toHaveBeenCalledWith(null);
   });
 });

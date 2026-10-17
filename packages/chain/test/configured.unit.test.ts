@@ -70,16 +70,11 @@ const settings = (
 
 const code = Uint8Array.from({ length: 11 }, (_v, index) => index);
 const template = (crate: "game-rewards" | "milestone-collectible") => ({
-  alkane: crate === "game-rewards" ? "4:100" : "4:101",
   codeHash: createHash("sha256").update(code).digest("hex"),
   crate,
   version: "1.0.0",
 });
 const administration = (maxCodeBytes: number) => ({
-  collectibleTemplate: {
-    crate: "milestone-collectible",
-    version: "1.0.0",
-  } as const,
   maxCodeBytes,
   maxDrawingBytes: 4096n,
   random: (length: number) => new Uint8Array(length),
@@ -89,6 +84,7 @@ const administration = (maxCodeBytes: number) => ({
 const publish = {
   chain,
   operation: "publish-template",
+  templateAt: { chain, family: bitcoinAlkanesFamily, id: "4:100" },
   sender: { chain, value: "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx" },
   templateId: "game-rewards",
   templateVersion: "1.0.0",
@@ -132,6 +128,7 @@ describe("the configured registry", () => {
     const intent = {
       chain,
       operation: "publish-template",
+      templateAt: { chain, family: bitcoinAlkanesFamily, id: "4:100" },
       sender: { chain, value: "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx" },
       templateId: "game-rewards",
       templateVersion: "1.0.0",
@@ -147,10 +144,6 @@ describe("the configured registry", () => {
     const loaded: string[] = [];
     const withAdministration = createConfiguredRegistry([
       configured({
-        collectibleTemplate: {
-          crate: "milestone-collectible",
-          version: "1.0.0",
-        },
         maxCodeBytes: 1000,
         maxDrawingBytes: 4096n,
         random: (length) => new Uint8Array(length),
@@ -160,13 +153,11 @@ describe("the configured registry", () => {
         },
         templates: [
           {
-            alkane: "4:100",
             codeHash: "a".repeat(64),
             crate: "game-rewards",
             version: "1.0.0",
           },
           {
-            alkane: "4:101",
             codeHash: "b".repeat(64),
             crate: "milestone-collectible",
             version: "1.0.0",

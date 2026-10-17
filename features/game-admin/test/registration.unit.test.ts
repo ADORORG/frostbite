@@ -53,6 +53,7 @@ describe("game administration registration", () => {
       "POST refreshGameAdminStep",
       "POST startGameAdminStep",
       "POST submitGameAdminStep",
+      "POST listGameAdminTemplates",
     ]);
   });
 

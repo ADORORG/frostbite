@@ -1,3 +1,4 @@
+import { sha256Hex } from "../../src/bitcoin-alkanes/admin/data.ts";
 import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
 import type { UnsignedTransaction } from "@ador/shared/chain";
@@ -12,6 +13,9 @@ import {
   funding,
   intents,
   signAdmin,
+  collectibleTemplateAt,
+  gameCode,
+  gameTemplateAt,
 } from "../support/administration.ts";
 
 const builder = adminBuilder();
@@ -136,6 +140,20 @@ describe("verifying a signed step", () => {
         },
       }),
       lies(publish, { template: undefined }),
+      lies(publish, {
+        template: {
+          at: { ...gameTemplateAt, id: "4:2001" },
+          codeHash: sha256Hex(gameCode),
+          id: "game-rewards",
+          version: "1.0.0",
+        },
+      }),
+      lies(deploy, {
+        collectibleAt: { ...collectibleTemplateAt, id: "4:1001" },
+      }),
+      lies(deploy, { collectibleAt: undefined }),
+      lies(deploy, { maxDrawingBytes: 1024 }),
+      lies(deploy, { maxDrawingBytes: undefined }),
       lies(deploy, {
         template: {
           codeHash: "0".repeat(64),

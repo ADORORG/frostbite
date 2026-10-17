@@ -8,7 +8,6 @@ import {
   createBitcoinAlkanesAdapter,
   type BitcoinAlkanesNodes,
 } from "./adapter.ts";
-import { parseAlkaneId } from "./node/alkane-id.ts";
 import { createRpcNode } from "./node/node.ts";
 import { createJsonRpc, type FetchLike } from "./node/transport.ts";
 import type { TransactionOptions } from "./options.ts";
@@ -16,7 +15,6 @@ import type { TransactionOptions } from "./options.ts";
 // A template the platform may publish, as configuration states it. Its file is `<crate>.wasm` in the templates directory, and
 // `codeHash` is the SHA-256 of that file as released (`contracts/templates/release.json`), checked before anything is built.
 export interface TemplateSetting {
-  readonly alkane: string;
   readonly codeHash: string;
   readonly crate: "game-rewards" | "milestone-collectible";
   readonly version: string;
@@ -35,16 +33,9 @@ export function templateEntries(
 ): ReadonlyMap<string, TemplateEntry> {
   return new Map(
     settings.map((setting) => {
-      const alkane = parseAlkaneId(setting.alkane);
-      if (alkane === null) {
-        throw new Error(
-          `The Alkane of ${setting.crate} is not block:tx: ${setting.alkane}.`,
-        );
-      }
       return [
         templateKey(setting.crate, setting.version),
         {
-          alkane,
           codeHash: setting.codeHash,
           load: () => read(setting.crate),
           readOnlyOpcode: readOnlyOpcode[setting.crate],
@@ -56,8 +47,6 @@ export function templateEntries(
 
 // What the platform stands behind staff administration with: the templates it may publish, where to load them, and the limits.
 export interface AlkanesAdministrationSettings {
-  // The template every game's collectibles are created from.
-  readonly collectibleTemplate: Pick<TemplateSetting, "crate" | "version">;
   readonly maxCodeBytes: number;
   readonly maxDrawingBytes: bigint;
   readonly random: (length: number) => Uint8Array;
@@ -93,10 +82,6 @@ export function alkanesServices(
       ? {}
       : {
           administration: {
-            collectibleTemplate: templateKey(
-              administration.collectibleTemplate.crate,
-              administration.collectibleTemplate.version,
-            ),
             maxCodeBytes: administration.maxCodeBytes,
             maxDrawingBytes: administration.maxDrawingBytes,
             random: administration.random,

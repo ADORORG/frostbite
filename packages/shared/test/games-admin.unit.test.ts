@@ -7,6 +7,8 @@ import {
   gameAdminRoutes,
   gameAdminStepSchema,
   gameAdminStepStates,
+  listGameAdminTemplatesInputSchema,
+  listGameAdminTemplatesResponseSchema,
   listGameAdminStepsResponseSchema,
   refreshGameAdminStepResponseSchema,
   startGameAdminStepInputSchema,
@@ -18,12 +20,14 @@ const id = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 const step = {
   createdAt: "2026-10-16T12:00:00.000Z",
   createdBy: "Ada",
+  createdContracts: [],
   failureReason: null,
   gameId: "arcade",
   id,
   operation: "set-claims-paused",
   state: "awaiting-signature",
   submittedBy: null,
+  templateRef: null,
   summary: {
     chain: "simnet:one",
     contractId: "rewards-1",
@@ -54,11 +58,11 @@ describe("the staff administration contract", () => {
       gameAdminStepSchema.parse({ ...step, state: "minted" }),
     ).toThrow();
     expect(() =>
-      gameAdminStepSchema.parse({ ...step, operation: "deploy" }),
+      gameAdminStepSchema.parse({ ...step, operation: "reboot" }),
     ).toThrow();
   });
 
-  it("takes the two actions staff have, each with only its own fields", () => {
+  it("takes the four actions staff have, each with only its own fields", () => {
     expect(
       gameAdminActionSchema.parse({
         milestoneId: "first-win",
@@ -87,6 +91,104 @@ describe("the staff administration contract", () => {
         milestoneId: "first-win",
         operation: "define-milestone",
       }),
+    ).toThrow();
+  });
+
+  it("takes publishing a template and creating a game's contract, with only their own fields", () => {
+    const publish = {
+      address: "4:100",
+      operation: "publish-template",
+      templateId: "game-rewards",
+      templateVersion: "1.0.0",
+    };
+    expect(gameAdminActionSchema.parse(publish)).toEqual(publish);
+    expect(
+      gameAdminActionSchema.parse({
+        maxDrawingBytes: 4096,
+        operation: "deploy",
+      }),
+    ).toBeDefined();
+    for (const bad of [
+      { ...publish, address: " " },
+      { ...publish, templateVersion: undefined },
+      { ...publish, paused: true },
+      { maxDrawingBytes: 0, operation: "deploy" },
+      { maxDrawingBytes: 1.5, operation: "deploy" },
+      { maxDrawingBytes: 2_000_000, operation: "deploy" },
+      { operation: "deploy" },
+    ]) {
+      expect(() => gameAdminActionSchema.parse(bad)).toThrow();
+    }
+  });
+
+  it("publishes a template for no game, and every other step for one", () => {
+    const wallet = "tb1qwallet";
+    const publish = {
+      address: "4:100",
+      operation: "publish-template",
+      templateId: "game-rewards",
+      templateVersion: "1.0.0",
+    };
+    expect(
+      startGameAdminStepInputSchema.parse({
+        action: publish,
+        gameId: null,
+        wallet,
+      }).gameId,
+    ).toBeNull();
+    expect(() =>
+      startGameAdminStepInputSchema.parse({
+        action: publish,
+        gameId: "arcade",
+        wallet,
+      }),
+    ).toThrow(/for no game/u);
+    for (const action of [
+      { operation: "set-claims-paused", paused: true },
+      { maxDrawingBytes: 4096, operation: "deploy" },
+    ]) {
+      expect(() =>
+        startGameAdminStepInputSchema.parse({ action, gameId: null, wallet }),
+      ).toThrow(/for no game/u);
+    }
+  });
+
+  it("shows a step that publishes a template or creates a contract by what it makes, not by a contract it acts on", () => {
+    const published = {
+      ...step,
+      createdContracts: ["2:7"],
+      gameId: null,
+      operation: "publish-template",
+      templateRef: "game-rewards@1.0.0",
+      summary: {
+        chain: "simnet:one",
+        expiresAt: "2026-10-16T12:10:00.000Z",
+        fee: { asset: "sim", baseUnits: "1" },
+        template: { address: "4:100", id: "game-rewards", version: "1.0.0" },
+      },
+    };
+    expect(gameAdminStepSchema.parse(published)).toEqual(published);
+    const created = {
+      ...step,
+      operation: "deploy",
+      summary: {
+        chain: "simnet:one",
+        collectibleAddress: "4:101",
+        expiresAt: "2026-10-16T12:10:00.000Z",
+        fee: { asset: "sim", baseUnits: "1" },
+        maxDrawingBytes: 4096,
+        template: { address: "4:100", id: "game-rewards", version: "1.0.0" },
+      },
+    };
+    expect(gameAdminStepSchema.parse(created)).toEqual(created);
+    expect(() =>
+      gameAdminStepSchema.parse({
+        ...created,
+        summary: { ...created.summary, maxDrawingBytes: 0 },
+      }),
+    ).toThrow();
+    expect(() =>
+      gameAdminStepSchema.parse({ ...step, createdContracts: "2:7" }),
     ).toThrow();
   });
 
@@ -123,24 +225,59 @@ describe("the staff administration contract", () => {
     expect(
       refreshGameAdminStepResponseSchema.parse({ status: "ok", step }),
     ).toBeDefined();
+    const empty = { contract: null, steps: [step], templatesReady: false };
+    expect(listGameAdminStepsResponseSchema.parse(empty).steps).toHaveLength(1);
     expect(
-      listGameAdminStepsResponseSchema.parse({ steps: [step] }).steps,
+      listGameAdminStepsResponseSchema.parse({
+        ...empty,
+        contract: { address: "2:7", maxDrawingBytes: 4096 },
+        templatesReady: true,
+      }).contract?.address,
+    ).toBe("2:7");
+    expect(() =>
+      listGameAdminStepsResponseSchema.parse({ steps: [step] }),
+    ).toThrow();
+    expect(
+      listGameAdminTemplatesResponseSchema.parse({
+        publishable: [{ id: "game-rewards", version: "1.0.0" }],
+        published: [
+          {
+            address: "4:100",
+            publishedAt: "2026-10-16T12:00:00.000Z",
+            templateRef: "game-rewards@1.0.0",
+          },
+        ],
+        steps: [step],
+      }).published,
     ).toHaveLength(1);
+    expect(listGameAdminTemplatesInputSchema.parse({})).toEqual({});
+    expect(() => listGameAdminTemplatesInputSchema.parse({ x: 1 })).toThrow();
     expect(() =>
       startGameAdminStepInputSchema.parse({
         action: { operation: "set-claims-paused", paused: true },
         gameId: "arcade",
       }),
     ).toThrow();
+    for (const reason of [
+      "address-taken",
+      "already-created",
+      "already-published",
+      "template-not-published",
+      "unknown-template",
+    ]) {
+      expect(
+        startGameAdminStepResponseSchema.parse({ reason, status: "refused" }),
+      ).toBeDefined();
+    }
   });
 
-  it("has four POST routes under one prefix, and a page address per game", () => {
+  it("has five POST routes under one prefix, and a page address per game", () => {
     expect(Object.values(gameAdminRoutes).map((route) => route.method)).toEqual(
-      ["POST", "POST", "POST", "POST"],
+      ["POST", "POST", "POST", "POST", "POST"],
     );
     expect(
       new Set(Object.values(gameAdminRoutes).map((route) => route.path)).size,
-    ).toBe(4);
+    ).toBe(5);
     expect(gameAdminHref("arcade")).toBe("/admin/games/arcade");
   });
 });

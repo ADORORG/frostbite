@@ -51,7 +51,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       readonly wallet: string;
     }): Promise<StartClaimResult> {
       const { gameId, milestoneId, userId, wallet } = input;
-      const current = game(gameId);
+      const current = await game(gameId);
       const limit = current?.limits.get(milestoneId);
       if (current === null || limit === undefined)
         return { code: "not-claimable", ok: false };

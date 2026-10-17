@@ -53,6 +53,9 @@ importers:
       '@ador/feature-uploads':
         specifier: workspace:*
         version: link:features/uploads
+      '@ador/game-admin':
+        specifier: workspace:*
+        version: link:packages/game-admin
       '@ador/http':
         specifier: workspace:*
         version: link:packages/http
@@ -141,6 +144,9 @@ importers:
       '@ador/feature-public-products':
         specifier: workspace:*
         version: link:../../features/public-products
+      '@ador/game-admin':
+        specifier: workspace:*
+        version: link:../../packages/game-admin
       '@ador/game-sdk':
         specifier: workspace:*
         version: link:../../packages/game-sdk

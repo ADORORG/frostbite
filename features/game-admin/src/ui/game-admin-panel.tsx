@@ -1,19 +1,21 @@
 "use client";
 
-import { ArcadeInfoCard, ArcadeTextField } from "@repo/ui/arcade";
-import { useMemo, useState } from "react";
+import { ArcadeInfoCard } from "@repo/ui/arcade";
+import { useMemo } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
+import { ContractCard } from "./contract-card.tsx";
 import { MilestoneTable } from "./milestone-table.tsx";
 import { PauseCard } from "./pause-card.tsx";
+import { SignerCard, useSigner } from "./signer-card.tsx";
 import { StepLog } from "./step-log.tsx";
 import { StepReview } from "./step-review.tsx";
 import { useAdminSteps, type StepSigner } from "./use-admin-steps.ts";
 
-// One game's rewards contract, for staff: pause and resume claims, define milestones, review and sign each step, and the log of
-// what has been done. The wallet address is whichever staff will sign with; the auth-token output is for networks whose steps
-// must present the game's token.
+// One game's rewards contract, for staff: create it once the templates are published, then pause and resume claims, define
+// milestones, review and sign each step, and the log of what has been done. The wallet address is whichever staff will sign with;
+// the auth-token output is for networks whose steps must present the game's token.
 export function GameAdminPanel({
   api: injected,
   game,
@@ -32,48 +34,53 @@ export function GameAdminPanel({
     ...(pollMs === undefined ? {} : { pollMs }),
     ...(sign === undefined ? {} : { sign }),
   });
-  const [wallet, setWallet] = useState("");
-  const [authToken, setAuthToken] = useState("");
-  const context = { authTokenOutput: authToken.trim(), wallet: wallet.trim() };
-  const ready = context.wallet !== "";
+  const signer = useSigner();
   const ask = (action: Parameters<typeof admin.start>[0]) =>
-    ready ? admin.start(action, context) : Promise.resolve();
+    signer.ready ? admin.start(action, signer.context) : Promise.resolve();
+  const { overview } = admin;
+  if (overview === null || overview.kind !== "game")
+    return (
+      <ArcadeInfoCard title="Rewards contract">
+        <p role="status">{admin.message ?? "Loading this game's contract…"}</p>
+      </ArcadeInfoCard>
+    );
+  const hasContract = overview.contract !== null;
   return (
     <>
-      <ArcadeInfoCard title="Who signs">
-        <ArcadeTextField
-          hint="The address of the wallet you will sign with."
-          label="Wallet address"
-          onChange={setWallet}
-          required
-          value={wallet}
-        />
-        <ArcadeTextField
-          hint="Where the game's auth token is held, as txid:vout. Needed to define milestones and pause on Bitcoin."
-          label="Auth token output"
-          onChange={setAuthToken}
-          value={authToken}
-        />
-        {ready ? null : <p>Enter your wallet address to start a step.</p>}
-      </ArcadeInfoCard>
+      <SignerCard signer={signer} withAuthToken={hasContract} />
       {admin.message !== null && admin.active === null ? (
         <p role="alert">{admin.message}</p>
       ) : null}
-      <PauseCard
-        busy={!ready}
-        onChange={(paused) =>
-          void ask({ operation: "set-claims-paused", paused })
-        }
-        steps={admin.steps}
-      />
-      <MilestoneTable
-        busy={!ready}
-        milestones={game.milestones}
-        onDefine={(milestoneId, drawing) =>
-          void ask({ drawing, milestoneId, operation: "define-milestone" })
-        }
-        steps={admin.steps}
-      />
+      {overview.contract === null ? (
+        <ContractCard
+          busy={!signer.ready}
+          onCreate={(maxDrawingBytes) =>
+            void ask({ maxDrawingBytes, operation: "deploy" })
+          }
+          templatesReady={overview.templatesReady}
+        />
+      ) : (
+        <>
+          <ArcadeInfoCard title="Rewards contract">
+            <p data-testid="contract-address">{`Contract ${overview.contract.address}. It keeps drawings up to ${overview.contract.maxDrawingBytes} bytes.`}</p>
+          </ArcadeInfoCard>
+          <PauseCard
+            busy={!signer.ready}
+            onChange={(paused) =>
+              void ask({ operation: "set-claims-paused", paused })
+            }
+            steps={admin.steps}
+          />
+          <MilestoneTable
+            busy={!signer.ready}
+            milestones={game.milestones}
+            onDefine={(milestoneId, drawing) =>
+              void ask({ drawing, milestoneId, operation: "define-milestone" })
+            }
+            steps={admin.steps}
+          />
+        </>
+      )}
       {admin.active === null ? null : (
         <StepReview
           canSign={admin.canSign}

@@ -8,6 +8,8 @@ import {
   gameAdminStartRefusals,
   listGameAdminStepsInputSchema,
   listGameAdminStepsResponseSchema,
+  listGameAdminTemplatesInputSchema,
+  listGameAdminTemplatesResponseSchema,
   refreshGameAdminStepInputSchema,
   refreshGameAdminStepResponseSchema,
   startGameAdminStepInputSchema,
@@ -16,6 +18,8 @@ import {
   submitGameAdminStepResponseSchema,
   type ListGameAdminStepsInput,
   type ListGameAdminStepsResponse,
+  type ListGameAdminTemplatesInput,
+  type ListGameAdminTemplatesResponse,
   type RefreshGameAdminStepInput,
   type RefreshGameAdminStepResponse,
   type StartGameAdminStepInput,
@@ -38,11 +42,16 @@ const base = {
 } as const;
 
 const startRefusal = {
+  "address-taken": "address-taken",
+  "already-created": "already-created",
   "already-defined": "already-defined",
+  "already-published": "already-published",
   "bad-drawing": "bad-drawing",
   "chain-unavailable": "unavailable",
   "could-not-build": "could-not-build",
   "not-administered": "not-administered",
+  "template-not-published": "template-not-published",
+  "unknown-template": "unknown-template",
   unavailable: "unavailable",
   "wrong-chain": "wrong-network",
 } as const satisfies Record<
@@ -156,18 +165,28 @@ export function createRefreshStepOperation(resolve: Resolve) {
   >;
 }
 
-// The log of a game's steps, oldest first: who took each and when.
+// The log of a game's steps, oldest first: who took each and when; and where the game stands (its contract, and whether the
+// templates it is made from are published).
 export function createListStepsOperation(resolve: Resolve) {
   return {
     ...base,
     execute: async (input, context) => {
       if (context.actorUserId === null) return unauthenticated;
       const { names, service } = await resolve();
+      // A game the platform does not administer has no contract, no templates ready and no steps.
+      const status = (await service.status(input.gameId)) ?? {
+        contract: null,
+        templatesReady: false,
+      };
       const steps = await service.list(input.gameId);
       const known = await names(peopleOf(steps));
       return {
         ok: true,
-        value: { steps: steps.map((step) => toWireStep(step, known)) },
+        value: {
+          contract: status.contract,
+          steps: steps.map((step) => toWireStep(step, known)),
+          templatesReady: status.templatesReady,
+        },
       } as const;
     },
     inputSchema: listGameAdminStepsInputSchema,
@@ -176,5 +195,42 @@ export function createListStepsOperation(resolve: Resolve) {
   } satisfies HttpOperation<
     ListGameAdminStepsInput,
     ListGameAdminStepsResponse
+  >;
+}
+
+// The templates the platform may publish, which are published and where, and the log of the steps that publish them.
+export function createListTemplatesOperation(resolve: Resolve) {
+  return {
+    ...base,
+    execute: async (_input, context) => {
+      if (context.actorUserId === null) return unauthenticated;
+      const { names, rewards, service } = await resolve();
+      const [published, steps] = await Promise.all([
+        service.templates(),
+        service.list(null),
+      ]);
+      const known = await names(peopleOf(steps));
+      return {
+        ok: true,
+        value: {
+          publishable: rewards.publishable.map(({ id, version }) => ({
+            id,
+            version,
+          })),
+          published: published.map(({ address, publishedAt, templateRef }) => ({
+            address,
+            publishedAt: publishedAt.toISOString(),
+            templateRef,
+          })),
+          steps: steps.map((step) => toWireStep(step, known)),
+        },
+      } as const;
+    },
+    inputSchema: listGameAdminTemplatesInputSchema,
+    outputSchema: listGameAdminTemplatesResponseSchema,
+    ...gameAdminRoutes.templates,
+  } satisfies HttpOperation<
+    ListGameAdminTemplatesInput,
+    ListGameAdminTemplatesResponse
   >;
 }

@@ -1,18 +1,20 @@
 import {
   afterBroadcast,
   afterObservation,
-  indexed,
   isObservable,
   moveTo,
   signedOf,
   type SignedTransaction,
 } from "@ador/shared/chain";
 
+import { completing } from "./completion.ts";
+import { refOf } from "./plan.ts";
 import { startStep } from "./start.ts";
 import { toView } from "./steps.ts";
 import type {
   AdminChainPorts,
   GameAdminDependencies,
+  GameStatus,
   RefreshStepResult,
   StepChange,
   StoredStep,
@@ -121,33 +123,62 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
             ),
           );
         if (step.state === "confirmed")
-          return view(
-            await repository.update(
-              stepId,
-              moveTo("confirmed", { state: indexed }),
-            ),
-          );
+          return view(await repository.update(stepId, completing));
         if (step.transactionId === null || !isObservable(step.state))
           return view(step);
         const from = step.state;
-        const next = afterObservation(
-          from,
-          await chain.observer.observe({
-            chain: step.chain,
-            id: step.transactionId,
+        const observation = await chain.observer.observe({
+          chain: step.chain,
+          id: step.transactionId,
+        });
+        const next = afterObservation(from, observation);
+        if (next === null) return view(step);
+        const move = moveTo(from, next);
+        // What the chain says the step created is kept with it, to be recorded when the step completes.
+        return view(
+          await repository.update(stepId, (held) => {
+            const change = move(held);
+            return change !== null && observation.created !== undefined
+              ? { ...change, createdContracts: observation.created }
+              : change;
           }),
         );
-        return next === null
-          ? view(step)
-          : view(await repository.update(stepId, moveTo(from, next)));
       } catch {
         return { code: "chain-unavailable", ok: false };
       }
     },
 
-    async list(gameId: string) {
+    // A game's steps, or (with null) the steps that published templates, oldest first.
+    async list(gameId: string | null) {
       return (await repository.list(gameId)).map(toView);
     },
+
+    // Whether a game has its contract yet (and how large a drawing it accepts), and whether the two templates it is made from are
+    // published, which is all that is needed to create it. Null for a game the service does not administer.
+    async status(gameId: string): Promise<GameStatus | null> {
+      const game = await dependencies.game(gameId);
+      if (game === null) return null;
+      const { gameTemplate, collectibleTemplate } = dependencies.rewards;
+      const published = await Promise.all(
+        [gameTemplate, collectibleTemplate].map((template) =>
+          dependencies.contracts.publishedTemplate(game.chain, refOf(template)),
+        ),
+      );
+      return {
+        contract:
+          game.contract === null
+            ? null
+            : {
+                address: game.contract.id,
+                maxDrawingBytes: Number(game.maxDrawingBytes),
+              },
+        templatesReady: published.every((template) => template !== null),
+      };
+    },
+
+    // The templates published on the rewards chain.
+    templates: () =>
+      dependencies.contracts.publishedTemplates(dependencies.rewards.chain),
   };
 }
 

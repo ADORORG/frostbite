@@ -28,10 +28,13 @@ function sourceOf(summary: UnsignedTransaction["summary"]): AdminSource | null {
   if (!isAdminOperation(summary.operation)) return null;
   return {
     claimLimit: summary.claimLimit,
+    collectibleAt: summary.collectibleAt,
     contract: summary.milestone?.contract ?? summary.contract,
+    maxDrawingBytes: summary.maxDrawingBytes,
     milestoneId: summary.milestone?.id,
     operation: summary.operation,
     paused: summary.paused,
+    templateAt: summary.template?.at,
     templateId: summary.template?.id,
     templateVersion: summary.template?.version,
   };

@@ -8,9 +8,14 @@ import type {
   TransactionRef,
 } from "@ador/shared/chain";
 
+import { decodeSimulated } from "./transaction.ts";
+
 export type ForcedBroadcast = "rejected" | "unavailable" | "ambiguous";
 
 export const defaultFinalityDepth = 3;
+
+// What a simulated deployment's contract id starts with, followed by the transaction's nonce.
+export const createdContractPrefix = "sim-game-";
 
 // Deterministic in-memory chain state: heights advance only when a test says so, and a broadcast
 // outcome can be forced, which is how the simulated family exercises the paths a real network only
@@ -93,8 +98,22 @@ export class SimulatedLedger {
     if (this.reverted.has(ref.id))
       return { ...base, block, confirmations, status: "reverted" };
     return confirmations >= this.finalityDepth
-      ? { ...base, block, confirmations, status: "confirmed" }
+      ? {
+          ...base,
+          block,
+          confirmations,
+          ...this.created(seen.payload),
+          status: "confirmed",
+        }
       : { ...base, block, confirmations, status: "pending" };
+  }
+
+  // A deployment creates the game's contract, named after the transaction that made it.
+  private created(payload: string): { readonly created?: readonly string[] } {
+    const body = decodeSimulated(payload);
+    return body?.operation === "deploy"
+      ? { created: [`${createdContractPrefix}${body.nonce}`] }
+      : {};
   }
 
   private block(height: number): BlockRef {

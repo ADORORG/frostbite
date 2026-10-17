@@ -28,3 +28,16 @@ fn the_indexer_records_a_success_and_a_failure() -> anyhow::Result<()> {
     assert_eq!(recorded["failure"], hex(&failure).as_str(), "failure");
     Ok(())
 }
+
+#[wasm_bindgen_test]
+fn the_indexer_records_the_creation_of_a_game() -> anyhow::Result<()> {
+    let chain = Chain::deploy_from_templates();
+    let creation = chain.initialisation();
+    chain.index();
+    let trace = view::trace(&creation.trace)?;
+    assert!(!trace.is_empty());
+    let recorded: serde_json::Value =
+        serde_json::from_str(include_str!("../../abi/trace-vectors.json"))?;
+    assert_eq!(recorded["creation"], hex(&trace).as_str(), "creation");
+    Ok(())
+}

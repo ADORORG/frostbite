@@ -98,6 +98,7 @@ export {
   gameSaves,
 } from "./schema/game-saves.ts";
 export { gameAdminSteps } from "./schema/game-admin.ts";
+export { gameContracts, publishedTemplates } from "./schema/game-contracts.ts";
 export { gameMilestoneClaims } from "./schema/game-claims.ts";
 export { gameRuns } from "./schema/game-runs.ts";
 export {
