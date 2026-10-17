@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   defaultCoverageThreshold,
   packageVitestConfig,
+  domTestTimeoutMs,
 } from "../src/package-config.ts";
 
 const include = ["src/**/*.ts"];
@@ -139,6 +140,9 @@ describe("packageVitestConfig", () => {
       include: ["test/**/*.dom.test.{ts,tsx}"],
       name: "unit-dom",
       setupFiles: ["test/ui-setup.ts"],
+      // A busy machine renders a page slowly; the node tests keep the default.
+      testTimeout: domTestTimeoutMs,
     });
+    expect(projects[0]).not.toHaveProperty("testTimeout");
   });
 });
