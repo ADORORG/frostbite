@@ -102,6 +102,8 @@ export const view = (over: Partial<StepView> = {}): StepView => ({
   id: "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60",
   milestoneId: null,
   operation: "set-claims-paused",
+  recordable: false,
+  recordedBy: null,
   state: "awaiting_signature",
   submittedBy: null,
   summary: summary(),

@@ -6,6 +6,7 @@ import {
 } from "./admin-step.ts";
 import { gameIdSchema } from "./manifest.ts";
 
+export * from "./admin-record.ts";
 export * from "./admin-step.ts";
 
 // Staff administration of a game's rewards contract: the capability, the pages, and the routes (ADR-018 Amendment 3). The
@@ -194,6 +195,11 @@ export const gameAdminRoutes = {
     method: "POST",
     operationId: "listGameAdminSteps",
     path: "/api/v1/game-admin/list",
+  },
+  record: {
+    method: "POST",
+    operationId: "recordGameAdminContract",
+    path: "/api/v1/game-admin/record",
   },
   refresh: {
     method: "POST",

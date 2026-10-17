@@ -10,6 +10,8 @@ import {
   listGameAdminStepsResponseSchema,
   listGameAdminTemplatesInputSchema,
   listGameAdminTemplatesResponseSchema,
+  recordGameAdminContractInputSchema,
+  recordGameAdminContractResponseSchema,
   refreshGameAdminStepInputSchema,
   refreshGameAdminStepResponseSchema,
   startGameAdminStepInputSchema,
@@ -20,6 +22,8 @@ import {
   type ListGameAdminStepsResponse,
   type ListGameAdminTemplatesInput,
   type ListGameAdminTemplatesResponse,
+  type RecordGameAdminContractInput,
+  type RecordGameAdminContractResponse,
   type RefreshGameAdminStepInput,
   type RefreshGameAdminStepResponse,
   type StartGameAdminStepInput,
@@ -132,6 +136,41 @@ export function createSubmitStepOperation(resolve: Resolve) {
   } satisfies HttpOperation<
     SubmitGameAdminStepInput,
     SubmitGameAdminStepResponse
+  >;
+}
+
+// Takes the address staff enter for a contract the platform could not read. The platform checks it before it records it; a refusal
+// says why.
+export function createRecordContractOperation(resolve: Resolve) {
+  return {
+    ...base,
+    execute: async (input, context) => {
+      if (context.actorUserId === null) return unauthenticated;
+      const { names, service } = await resolve();
+      const outcome = await service.recordCreated({
+        address: input.address,
+        staffId: context.actorUserId,
+        stepId: input.stepId,
+      });
+      return {
+        ok: true,
+        value: outcome.ok
+          ? {
+              status: "recorded",
+              step: toWireStep(
+                outcome.step,
+                await names(peopleOf([outcome.step])),
+              ),
+            }
+          : { reason: outcome.code, status: "refused" },
+      } as const;
+    },
+    inputSchema: recordGameAdminContractInputSchema,
+    outputSchema: recordGameAdminContractResponseSchema,
+    ...gameAdminRoutes.record,
+  } satisfies HttpOperation<
+    RecordGameAdminContractInput,
+    RecordGameAdminContractResponse
   >;
 }
 

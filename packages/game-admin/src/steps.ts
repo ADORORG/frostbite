@@ -1,3 +1,4 @@
+import { isUnreadableCreation } from "./completion.ts";
 import type { StoredStep, StepView } from "./types.ts";
 
 export const toView = (step: StoredStep): StepView => ({
@@ -10,6 +11,8 @@ export const toView = (step: StoredStep): StepView => ({
   id: step.id,
   milestoneId: step.milestoneId,
   operation: step.operation,
+  recordable: isUnreadableCreation(step),
+  recordedBy: step.recordedBy,
   state: step.state,
   submittedBy: step.submittedBy,
   summary: step.unsigned.summary,

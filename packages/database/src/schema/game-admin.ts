@@ -31,6 +31,10 @@ export const gameAdminSteps = platformSchema.table(
     submittedBy: uuid("submitted_by").references(() => authUsers.id, {
       onDelete: "set null",
     }),
+    // Who entered the address of a contract the chain did not report, when staff had to; none when the chain reported it.
+    recordedBy: uuid("recorded_by").references(() => authUsers.id, {
+      onDelete: "set null",
+    }),
     ...trackedTransactionColumns,
     // The contract the step acts on. Publishing a template and creating a game act on none yet.
     contractFamily: text("contract_family"),

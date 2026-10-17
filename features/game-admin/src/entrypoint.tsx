@@ -10,6 +10,7 @@ import {
 import {
   createListStepsOperation,
   createListTemplatesOperation,
+  createRecordContractOperation,
   createRefreshStepOperation,
   createStartStepOperation,
   createSubmitStepOperation,
@@ -37,6 +38,7 @@ export function createGameAdminEntrypoint(
     id: "game-admin",
     operations: [
       registerHttpOperation(createListStepsOperation(resolve)),
+      registerHttpOperation(createRecordContractOperation(resolve)),
       registerHttpOperation(createRefreshStepOperation(resolve)),
       registerHttpOperation(createStartStepOperation(resolve)),
       registerHttpOperation(createSubmitStepOperation(resolve)),

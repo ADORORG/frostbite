@@ -9,6 +9,7 @@ import {
 } from "@ador/test-kit/simulated-chain-transaction";
 import { describe, expect, it } from "vitest";
 
+import { unreadableCreation } from "../src/completion.ts";
 import { toView } from "../src/steps.ts";
 import type { StoredStep } from "../src/types.ts";
 
@@ -39,6 +40,7 @@ const step = (state: TrackedState): StoredStep => ({
   id: "step-1",
   milestoneId: null,
   operation: "set-claims-paused",
+  recordedBy: null,
   signedPayload: "never shown",
   state,
   submittedBy: "staff-2",
@@ -60,6 +62,19 @@ describe("the view of a stored step", () => {
     expect(view.createdAt).toBe("2026-01-01T00:00:00.000Z");
     expect(view.expiresAt).toBe("2026-01-01T01:00:00.000Z");
     expect(view.summary).toBe(unsigned.summary);
+  });
+
+  it("says a step can have its contract's address entered only when the platform could not read it", () => {
+    const unreadable = {
+      ...step("indexed_failure"),
+      failureReason: unreadableCreation,
+      operation: "deploy" as const,
+    };
+    expect(toView(unreadable).recordable).toBe(true);
+    expect(toView(step("indexed_failure")).recordable).toBe(false);
+    expect(toView({ ...unreadable, recordedBy: "staff-3" }).recordedBy).toBe(
+      "staff-3",
+    );
   });
 
   it("carries who made and who sent the step, and never the signed payload", () => {

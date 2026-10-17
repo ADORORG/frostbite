@@ -1,0 +1,2 @@
+ALTER TABLE "ador"."game_admin_steps" ADD COLUMN "recorded_by" uuid;--> statement-breakpoint
+ALTER TABLE "ador"."game_admin_steps" ADD CONSTRAINT "game_admin_steps_recorded_by_auth_users_id_fkey" FOREIGN KEY ("recorded_by") REFERENCES "ador"."auth_users"("id") ON DELETE SET NULL;

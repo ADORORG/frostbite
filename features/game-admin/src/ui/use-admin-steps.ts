@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { GameAdminApi } from "../client/api.ts";
 import {
   isSettledStep,
+  recordRefusalCopy,
   startRefusalCopy,
   submitRefusalCopy,
   unreachableCopy,
@@ -194,6 +195,28 @@ export function useAdminSteps(options: {
     [active, api, upsert],
   );
 
+  // Staff enter where the contract this step made is. The platform checks it; what it accepts is the step, now complete, and the
+  // game's record is read again, since it now has its contract.
+  const record = useCallback(
+    async (address: string) => {
+      if (active === null) return;
+      setWorking(true);
+      setMessage(null);
+      try {
+        const answer = await api.record({ address, stepId: active.id });
+        if (answer.status === "recorded") {
+          upsert(answer.step);
+          apply(await fetchState());
+        } else setMessage(recordRefusalCopy[answer.reason]);
+      } catch {
+        setMessage(unreachableCopy);
+      } finally {
+        setWorking(false);
+      }
+    },
+    [active, api, apply, fetchState, upsert],
+  );
+
   const signWithWallet = useCallback(async () => {
     const transaction = active?.toSign ?? null;
     if (transaction === null || sign === undefined) return;
@@ -232,6 +255,7 @@ export function useAdminSteps(options: {
     dismiss: useCallback(() => setActiveId(null), []),
     message,
     overview,
+    record,
     reopen: useCallback((stepId: string) => setActiveId(stepId), []),
     sendPasted,
     sign: signWithWallet,

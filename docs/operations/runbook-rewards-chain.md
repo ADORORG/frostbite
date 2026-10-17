@@ -34,7 +34,12 @@ after a review.
 4. Define the game's milestones and pause or resume claims as before.
 
 A step is complete only after the indexer has run it. If a creation confirms but the chain does not report the new contract, the
-step fails to index and nothing is recorded; the contract may exist on chain, so check before creating another.
+step fails to index and nothing is recorded; the contract may exist on chain, so check before creating another. In that case the
+step's details show "Contract address": find the contract on a block explorer and enter its address. The platform checks that a
+contract is there and is made from the game template (same code hash) and that the address is not already a template or another
+game's contract; only then does it record the address and complete the step, and the log says who entered it. A refusal says why
+and records nothing. (That an instance reports its template's code hash is the assumption to confirm on the first live creation; if
+the check refuses a real contract, nothing is recorded wrongly, and the finding is logged.)
 
 ## Before the first step
 

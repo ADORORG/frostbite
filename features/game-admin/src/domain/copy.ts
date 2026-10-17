@@ -77,6 +77,18 @@ export const startRefusalCopy: Readonly<
   "wrong-network": "That address is not an address on this game's network.",
 };
 
+export const recordRefusalCopy = {
+  "address-taken":
+    "That address already holds a template or a game's contract.",
+  "already-created": "This game already has its contract.",
+  "chain-unavailable": "The network could not be reached. Try again.",
+  "different-code":
+    "A contract is there, but it is not made from this game's template.",
+  "not-found": "This step could not be found.",
+  "not-on-chain": "No contract is at that address.",
+  "not-recordable": "This step's contract address cannot be entered.",
+} as const;
+
 export const submitRefusalCopy = {
   "chain-unavailable": "The network could not be reached. Try sending again.",
   expired: "It was not signed in time. Start the step again.",

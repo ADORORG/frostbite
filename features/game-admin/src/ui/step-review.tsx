@@ -9,6 +9,7 @@ import {
   shortHash,
   stateCopy,
 } from "../domain/copy.ts";
+import { RecordAddress } from "./record-address.tsx";
 
 // The review staff sign from: what the step does, on which contract, for what fee, until when, and where it stands. It shows exactly
 // what the platform built (the wallet signs that, and the platform refuses anything else), and it never says a step is done before
@@ -18,6 +19,7 @@ export function StepReview({
   canSign,
   message,
   onClose,
+  onRecord,
   onSign,
   onSendPasted,
   step,
@@ -26,6 +28,7 @@ export function StepReview({
   readonly canSign: boolean;
   readonly message: string | null;
   readonly onClose: () => void;
+  readonly onRecord: (address: string) => void;
   readonly onSendPasted: (payload: string) => void;
   readonly onSign: () => void;
   readonly step: GameAdminStep;
@@ -100,6 +103,12 @@ export function StepReview({
       {step.createdContracts.length === 0 ? null : (
         <p data-testid="created-contracts">{`The network reports it created: ${step.createdContracts.join(", ")}.`}</p>
       )}
+      {step.recordedBy === null ? null : (
+        <p data-testid="recorded-by">{`The contract's address was entered by ${step.recordedBy}.`}</p>
+      )}
+      {step.recordable ? (
+        <RecordAddress onRecord={onRecord} working={working} />
+      ) : null}
       {message === null ? null : <p role="alert">{message}</p>}
       {step.toSign === null ? null : canSign ? (
         <ArcadeActionButton disabled={working} onClick={onSign} tone="mint">

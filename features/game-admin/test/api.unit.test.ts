@@ -80,6 +80,20 @@ describe("the administration routes as the page reaches them", () => {
     ]);
   });
 
+  it("sends the address staff enter for a step, and validates the answer", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({ status: "recorded", step: step({ state: "complete" }) }),
+    );
+    const answer = await createGameAdminApi(fetchImpl).record({
+      address: "2:7",
+      stepId,
+    });
+    expect(answer.status).toBe("recorded");
+    expect(asked(fetchImpl)).toEqual([
+      [gameAdminRoutes.record.path, { address: "2:7", stepId }],
+    ]);
+  });
+
   it("refuses an answer that is not in the documented shape", async () => {
     const fetchImpl = vi.fn<FetchLike>(async () =>
       json({ steps: [{ id: "x" }] }),

@@ -78,6 +78,12 @@ export const chainAvailable = { value: true };
 export const chainFailure = { build: false };
 // Makes the chain say nothing of what a step created.
 export const hideCreated = { value: false };
+// What the chain says of a contract staff enter by hand: whether code is there, its hash, or that the node cannot be asked.
+export const inspected: {
+  codeHash: string | null;
+  down: boolean;
+  exists: boolean;
+} = { codeHash: null, down: false, exists: false };
 // Held broadcasts, so two steps on one transaction can be made to overlap.
 export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
@@ -85,9 +91,9 @@ export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
 };
 
 function ports(): AdminChainPorts {
-  const { addressCodec, broadcaster, builder, observer } =
+  const { addressCodec, broadcaster, builder, contracts, observer } =
     network.adapter.ports;
-  if (!addressCodec || !broadcaster || !builder || !observer)
+  if (!addressCodec || !broadcaster || !builder || !contracts || !observer)
     throw new Error("The simulated adapter lacks a port a step needs.");
   return {
     addressCodec,
@@ -106,6 +112,13 @@ function ports(): AdminChainPorts {
           ? Promise.reject(new Error("the node is down"))
           : builder.build(...asked),
       verifySigned: (...asked) => builder.verifySigned(...asked),
+    },
+    contracts: {
+      inspect: async (ref) => {
+        if (inspected.down) throw new Error("the node is down");
+        return { ...inspected, ref };
+      },
+      simulate: (...asked) => contracts.simulate(...asked),
     },
     observer: {
       observe: async (ref) => {
@@ -229,6 +242,7 @@ export function registerDatabase(): void {
     chainAvailable.value = true;
     chainFailure.build = false;
     hideCreated.value = false;
+    Object.assign(inspected, { codeHash: null, down: false, exists: false });
     broadcastGate.enabled = false;
     broadcastGate.held = [];
     network.controls.fund(chain, wallet.value, 100n);

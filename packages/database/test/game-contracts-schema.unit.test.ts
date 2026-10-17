@@ -3,6 +3,7 @@ import { getTableConfig } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 
 import {
+  authUsers,
   gameAdminSteps,
   gameContracts,
   publishedTemplates,
@@ -42,7 +43,12 @@ describe("the administration log", () => {
     expect(config.foreignKeys.map((key) => key.onDelete)).toEqual([
       "set null",
       "set null",
+      "set null",
     ]);
+    // Each of the three people columns (created, sent, address entered by hand) points at the accounts table.
+    expect(
+      config.foreignKeys.map((key) => key.reference().foreignTable),
+    ).toEqual([authUsers, authUsers, authUsers]);
   });
 });
 

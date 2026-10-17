@@ -147,12 +147,22 @@ describe("a step as the page is told of it", () => {
     });
   });
 
+  it("says whether the address of its contract can be entered, and by whom it was", () => {
+    expect(toWireStep(view(), names)).toMatchObject({
+      recordable: false,
+      recordedBy: null,
+    });
+    expect(
+      toWireStep(view({ recordable: true, recordedBy: staffId }), names),
+    ).toMatchObject({ recordable: true, recordedBy: "Ada" });
+  });
+
   it("lists each person once, and none for an account that is gone", () => {
     expect(
       peopleOf([
         view(),
-        view({ submittedBy: otherStaffId }),
         view({ createdBy: null }),
+        view({ recordedBy: otherStaffId }),
       ]).sort(),
     ).toEqual([otherStaffId, staffId].sort());
   });

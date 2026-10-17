@@ -13,6 +13,8 @@ export const step = (over: Partial<GameAdminStep> = {}): GameAdminStep => ({
   gameId: "arcade",
   id: stepId,
   operation: "set-claims-paused",
+  recordable: false,
+  recordedBy: null,
   state: "awaiting-signature",
   submittedBy: null,
   templateRef: null,
@@ -93,6 +95,10 @@ export const listing = (steps: GameAdminStep[]) => ({
 export function fakeApi(overrides: Partial<GameAdminApi> = {}) {
   const api: GameAdminApi = {
     list: vi.fn(async () => listing([])),
+    record: vi.fn(async () => ({
+      status: "recorded" as const,
+      step: step({ createdContracts: ["2:7"], state: "complete" }),
+    })),
     refresh: vi.fn(async () => ({ status: "ok" as const, step: step() })),
     start: vi.fn(async () => ({
       resumed: false,

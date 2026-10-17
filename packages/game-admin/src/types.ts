@@ -66,6 +66,8 @@ export interface StoredStep {
   readonly id: string;
   readonly milestoneId: string | null;
   readonly operation: AdminAction["operation"];
+  // Who entered the address of the contract the step created, where the chain did not report it.
+  readonly recordedBy: string | null;
   readonly signedPayload: string | null;
   readonly state: TrackedState;
   readonly submittedBy: string | null;
@@ -94,7 +96,9 @@ export type NewStep = Pick<
 export interface StepChange {
   // The contracts the chain reported the step created, kept with the step when it is confirmed.
   readonly createdContracts?: readonly string[];
-  readonly failureReason?: string;
+  // `null` clears the reason, for a step that was failed and is made right.
+  readonly failureReason?: string | null;
+  readonly recordedBy?: string;
   // What completing the step adds to the record of the chain; written in the same moment.
   readonly record?: Recording;
   readonly signedPayload?: string;
@@ -146,7 +150,7 @@ export interface GameStatus {
 
 export type AdminChainPorts = Pick<
   ChainPorts,
-  "addressCodec" | "broadcaster" | "builder" | "observer"
+  "addressCodec" | "broadcaster" | "builder" | "contracts" | "observer"
 >;
 
 export type DrawingCheck =
@@ -177,6 +181,9 @@ export interface StepView {
   readonly id: string;
   readonly milestoneId: string | null;
   readonly operation: AdminAction["operation"];
+  // Whether staff can enter the address of the contract this step made, which the platform could not read.
+  readonly recordable: boolean;
+  readonly recordedBy: string | null;
   readonly state: StoredStep["state"];
   readonly submittedBy: string | null;
   readonly summary: TransactionSummary;
@@ -232,6 +239,20 @@ export type SubmitStepResult =
       readonly code: "invalid-signature";
       readonly ok: false;
       readonly reason: string;
+    };
+
+export type RecordCreatedResult =
+  | { readonly ok: true; readonly step: StepView }
+  | {
+      readonly code:
+        | "address-taken"
+        | "already-created"
+        | "chain-unavailable"
+        | "different-code"
+        | "not-found"
+        | "not-on-chain"
+        | "not-recordable";
+      readonly ok: false;
     };
 
 export type RefreshStepResult =

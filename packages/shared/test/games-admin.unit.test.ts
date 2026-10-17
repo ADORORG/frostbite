@@ -15,34 +15,9 @@ import {
   startGameAdminStepResponseSchema,
   submitGameAdminStepResponseSchema,
 } from "../src/games/index.ts";
+import { adminStep } from "./support/admin-step.ts";
 
-const id = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
-const step = {
-  createdAt: "2026-10-16T12:00:00.000Z",
-  createdBy: "Ada",
-  createdContracts: [],
-  failureReason: null,
-  gameId: "arcade",
-  id,
-  operation: "set-claims-paused",
-  state: "awaiting-signature",
-  submittedBy: null,
-  templateRef: null,
-  summary: {
-    chain: "simnet:one",
-    contractId: "rewards-1",
-    expiresAt: "2026-10-16T12:10:00.000Z",
-    fee: { asset: "sim", baseUnits: "1" },
-    paused: true,
-  },
-  toSign: {
-    chain: "simnet:one",
-    family: "simulated",
-    format: "f",
-    payload: "{}",
-  },
-  transactionId: null,
-};
+const step = adminStep;
 
 describe("the staff administration contract", () => {
   it("names the stages the lifecycle has, no more and no fewer", () => {
@@ -279,13 +254,16 @@ describe("the staff administration contract", () => {
     }
   });
 
-  it("has five POST routes under one prefix, and a page address per game", () => {
-    expect(Object.values(gameAdminRoutes).map((route) => route.method)).toEqual(
-      ["POST", "POST", "POST", "POST", "POST"],
+  it("has six POST routes under one prefix, and a page address per game", () => {
+    const routes = Object.values(gameAdminRoutes);
+    expect(routes.map((route) => route.method)).toEqual(
+      routes.map(() => "POST"),
     );
+    expect(routes).toHaveLength(6);
+    expect(new Set(routes.map((route) => route.path)).size).toBe(6);
     expect(
-      new Set(Object.values(gameAdminRoutes).map((route) => route.path)).size,
-    ).toBe(5);
+      routes.every((route) => route.path.startsWith("/api/v1/game-admin/")),
+    ).toBe(true);
     expect(gameAdminHref("arcade")).toBe("/admin/games/arcade");
   });
 });

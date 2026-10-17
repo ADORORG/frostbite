@@ -38,7 +38,9 @@ repository writes to in the same transaction that completes the step.
 - A step is complete when the network confirms it; the observer says confirmed only once the indexer has run the call.
 - **What a step made is recorded with it or not at all.** Completing a publication records the template at the address staff chose;
   completing a creation records the contract the chain reported (the first contract its trace created), in the same transaction. A
-  creation the chain says nothing about fails to index and records nothing. Addresses are never configuration, and a recorded
+  creation the chain says nothing about fails to index and records nothing, until staff enter the address (`recordCreated`): it is
+  accepted only if a contract is there with the game template's code hash and the address is free, then recorded and the step
+  completed in one transaction, with who entered it (`recorded_by`). Addresses are never configuration, and a recorded
   address never changes (the tables refuse a second record for a game, a template, or an address).
 - A step is about one game, or (publishing a template) about none; the table's checks keep each operation's subject and contract
   coherent (`subject_coherent`, `contract_coherent`).

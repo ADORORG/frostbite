@@ -50,6 +50,7 @@ describe("game administration registration", () => {
       ),
     ).toEqual([
       "POST listGameAdminSteps",
+      "POST recordGameAdminContract",
       "POST refreshGameAdminStep",
       "POST startGameAdminStep",
       "POST submitGameAdminStep",

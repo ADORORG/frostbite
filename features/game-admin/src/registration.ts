@@ -48,6 +48,7 @@ export function createGameAdminFeature(
       requiredProviderCapabilities: [],
       routes: [
         gameAdminRoutes.list,
+        gameAdminRoutes.record,
         gameAdminRoutes.refresh,
         gameAdminRoutes.start,
         gameAdminRoutes.submit,

@@ -6,16 +6,17 @@ pause and resume; every step logged). Service and table: `@ador/game-admin`. Pla
 
 ## Public API
 
-`createGameAdminFeature(games, config)` returns the feature registration: five API routes and two admin pages. Register it once in
+`createGameAdminFeature(games, config)` returns the feature registration: six API routes and two admin pages. Register it once in
 the feature registry (`configs/features.ts`); removing that line removes every route, page and navigation entry.
 
-| Operation                | Route                               | Notes                                                                   |
-| ------------------------ | ----------------------------------- | ----------------------------------------------------------------------- |
-| `startGameAdminStep`     | `POST /api/v1/game-admin/start`     | Builds the step; an answer (with why) when it cannot be taken           |
-| `submitGameAdminStep`    | `POST /api/v1/game-admin/submit`    | Takes what was signed; checked against what was built                   |
-| `refreshGameAdminStep`   | `POST /api/v1/game-admin/refresh`   | Looks at the chain once; the page asks until the step is over           |
-| `listGameAdminSteps`     | `POST /api/v1/game-admin/list`      | A game's log, its contract (once made), whether the templates are ready |
-| `listGameAdminTemplates` | `POST /api/v1/game-admin/templates` | The templates that may be published, which are and where, and their log |
+| Operation                 | Route                               | Notes                                                                   |
+| ------------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
+| `startGameAdminStep`      | `POST /api/v1/game-admin/start`     | Builds the step; an answer (with why) when it cannot be taken           |
+| `submitGameAdminStep`     | `POST /api/v1/game-admin/submit`    | Takes what was signed; checked against what was built                   |
+| `refreshGameAdminStep`    | `POST /api/v1/game-admin/refresh`   | Looks at the chain once; the page asks until the step is over           |
+| `recordGameAdminContract` | `POST /api/v1/game-admin/record`    | Staff enter a contract's address the platform could not read; checked   |
+| `listGameAdminSteps`      | `POST /api/v1/game-admin/list`      | A game's log, its contract (once made), whether the templates are ready |
+| `listGameAdminTemplates`  | `POST /api/v1/game-admin/templates` | The templates that may be published, which are and where, and their log |
 
 | Page         | Path                    | Notes                                                                                        |
 | ------------ | ----------------------- | -------------------------------------------------------------------------------------------- |

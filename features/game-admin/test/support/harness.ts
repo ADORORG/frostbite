@@ -20,6 +20,7 @@ import { afterAll, beforeAll, beforeEach } from "vitest";
 import {
   createListStepsOperation,
   createListTemplatesOperation,
+  createRecordContractOperation,
   createRefreshStepOperation,
   createStartStepOperation,
   createSubmitStepOperation,
@@ -48,11 +49,11 @@ export const advance = (blocks: number) =>
   network.controls.advance(chain, blocks);
 
 const ports = () => {
-  const { addressCodec, broadcaster, builder, observer } =
+  const { addressCodec, broadcaster, builder, contracts, observer } =
     network.adapter.ports;
-  if (!addressCodec || !broadcaster || !builder || !observer)
+  if (!addressCodec || !broadcaster || !builder || !contracts || !observer)
     throw new Error("The simulated adapter lacks a port.");
-  return { addressCodec, broadcaster, builder, observer };
+  return { addressCodec, broadcaster, builder, contracts, observer };
 };
 
 const configured = (): GameAdminConfig => ({
@@ -70,6 +71,7 @@ export function operations() {
   const resolver = createGameAdminResolver(adminGames([game]), settings);
   return {
     list: createListStepsOperation(resolver),
+    record: createRecordContractOperation(resolver),
     refresh: createRefreshStepOperation(resolver),
     start: createStartStepOperation(resolver),
     submit: createSubmitStepOperation(resolver),

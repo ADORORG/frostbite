@@ -7,11 +7,14 @@ import {
   gameAdminRoutes,
   listGameAdminStepsResponseSchema,
   listGameAdminTemplatesResponseSchema,
+  recordGameAdminContractResponseSchema,
   refreshGameAdminStepResponseSchema,
   startGameAdminStepResponseSchema,
   submitGameAdminStepResponseSchema,
   type ListGameAdminStepsResponse,
   type ListGameAdminTemplatesResponse,
+  type RecordGameAdminContractInput,
+  type RecordGameAdminContractResponse,
   type RefreshGameAdminStepResponse,
   type StartGameAdminStepInput,
   type StartGameAdminStepResponse,
@@ -28,6 +31,10 @@ export const stepRequestTimeoutMs = 5_000;
 // (including no session) is thrown as the requester throws it, for the caller to say.
 export interface GameAdminApi {
   list(gameId: string): Promise<ListGameAdminStepsResponse>;
+  // Enters where a game's contract is, when the platform could not read it from the confirmed transaction.
+  record(
+    input: RecordGameAdminContractInput,
+  ): Promise<RecordGameAdminContractResponse>;
   refresh(stepId: string): Promise<RefreshGameAdminStepResponse>;
   start(input: StartGameAdminStepInput): Promise<StartGameAdminStepResponse>;
   submit(input: SubmitGameAdminStepInput): Promise<SubmitGameAdminStepResponse>;
@@ -43,6 +50,11 @@ export function createGameAdminApi(
     list: (gameId) =>
       request(gameAdminRoutes.list, listGameAdminStepsResponseSchema, {
         body: { gameId },
+        signal: AbortSignal.timeout(stepRequestTimeoutMs),
+      }),
+    record: (input) =>
+      request(gameAdminRoutes.record, recordGameAdminContractResponseSchema, {
+        body: input,
         signal: AbortSignal.timeout(stepRequestTimeoutMs),
       }),
     refresh: (stepId) =>

@@ -26,6 +26,8 @@ export function toWireStep(
     gameId: view.gameId,
     id: view.id,
     operation: view.operation,
+    recordable: view.recordable,
+    recordedBy: named(view.recordedBy),
     state: stageOf(view.state),
     submittedBy: named(view.submittedBy),
     summary: {
@@ -79,8 +81,10 @@ export function toWireStep(
 // The people a set of steps names, to look up once.
 export const peopleOf = (views: readonly StepView[]): string[] => [
   ...new Set(
-    views.flatMap(({ createdBy, submittedBy }) =>
-      [createdBy, submittedBy].filter((id): id is string => id !== null),
+    views.flatMap(({ createdBy, recordedBy, submittedBy }) =>
+      [createdBy, recordedBy, submittedBy].filter(
+        (id): id is string => id !== null,
+      ),
     ),
   ),
 ];

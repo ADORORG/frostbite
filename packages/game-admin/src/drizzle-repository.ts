@@ -32,6 +32,7 @@ function toStep(row: Row): StoredStep {
     id: row.id,
     milestoneId: row.milestoneId,
     operation: row.operation as AdminAction["operation"],
+    recordedBy: row.recordedBy,
     signedPayload: row.signedPayload,
     submittedBy: row.submittedBy,
     templateRef: row.templateRef,
@@ -107,6 +108,7 @@ export function createDrizzleGameAdminRepository(
           ...step,
           createdContracts: null,
           failureReason: null,
+          recordedBy: null,
           signedPayload: null,
           state: "awaiting_signature",
           submittedBy: null,
@@ -168,7 +170,11 @@ export function createDrizzleGameAdminRepository(
             createdContracts: change.createdContracts
               ? [...change.createdContracts]
               : row.createdContracts,
-            failureReason: change.failureReason ?? row.failureReason,
+            failureReason:
+              change.failureReason === undefined
+                ? row.failureReason
+                : change.failureReason,
+            recordedBy: change.recordedBy ?? row.recordedBy,
             signedPayload: change.signedPayload ?? row.signedPayload,
             state: change.state,
             submittedBy: change.submittedBy ?? row.submittedBy,
@@ -181,7 +187,11 @@ export function createDrizzleGameAdminRepository(
         return {
           ...step,
           createdContracts: change.createdContracts ?? step.createdContracts,
-          failureReason: change.failureReason ?? step.failureReason,
+          failureReason:
+            change.failureReason === undefined
+              ? step.failureReason
+              : change.failureReason,
+          recordedBy: change.recordedBy ?? step.recordedBy,
           signedPayload: change.signedPayload ?? step.signedPayload,
           state: change.state,
           submittedBy: change.submittedBy ?? step.submittedBy,

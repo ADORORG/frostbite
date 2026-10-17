@@ -9,6 +9,7 @@ import {
 
 import { completing } from "./completion.ts";
 import { refOf } from "./plan.ts";
+import { recordCreated } from "./record.ts";
 import { startStep } from "./start.ts";
 import { toView } from "./steps.ts";
 import type {
@@ -100,6 +101,10 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
         return { code: "chain-unavailable", ok: false };
       }
     },
+
+    // Staff enter where a game's contract was made, when the platform could not read it. See `record.ts`.
+    recordCreated: (input: Parameters<typeof recordCreated>[1]) =>
+      recordCreated(dependencies, input),
 
     // Looks at the chain once and moves the step as far as the evidence allows. It is safe to call as often as wanted. A step is
     // complete when the network confirms it: the observer reports confirmed only once the indexer has run the call.

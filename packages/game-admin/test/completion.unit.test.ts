@@ -9,7 +9,11 @@ import {
 } from "@ador/test-kit/simulated-chain-transaction";
 import { describe, expect, it } from "vitest";
 
-import { completing } from "../src/completion.ts";
+import {
+  completing,
+  isUnreadableCreation,
+  unreadableCreation,
+} from "../src/completion.ts";
 import type { StoredStep } from "../src/types.ts";
 
 const chain = chainRefSchema.parse("simnet:one");
@@ -43,6 +47,7 @@ const step = (
   gameId: "arcade",
   id: "step-1",
   milestoneId: null,
+  recordedBy: null,
   signedPayload: "signed",
   state,
   submittedBy: "staff-1",
@@ -159,5 +164,40 @@ describe("completing a confirmed step", () => {
     for (const state of ["pending", "complete", "indexed_failure"] as const) {
       expect(completing(creation({ state }))).toBeNull();
     }
+  });
+});
+
+describe("telling a creation the platform could not read from one that failed", () => {
+  const failed = (over: Partial<StoredStep> = {}) =>
+    creation({
+      createdContracts: null,
+      failureReason: unreadableCreation,
+      state: "indexed_failure",
+      ...over,
+    });
+
+  it("is only a creation that confirmed and failed to say what it made", () => {
+    expect(isUnreadableCreation(failed())).toBe(true);
+    // Whatever completing does with a creation that said nothing is what makes it recordable by hand.
+    const outcome = completing(creation({ createdContracts: [] }));
+    expect(
+      isUnreadableCreation(
+        failed({ failureReason: outcome?.failureReason ?? null }),
+      ),
+    ).toBe(true);
+  });
+
+  it("is not a creation that reverted, one still in progress, one complete, or another operation", () => {
+    expect(
+      isUnreadableCreation(
+        failed({ failureReason: "reverted by the network" }),
+      ),
+    ).toBe(false);
+    expect(isUnreadableCreation(failed({ failureReason: null }))).toBe(false);
+    expect(isUnreadableCreation(failed({ state: "confirmed" }))).toBe(false);
+    expect(isUnreadableCreation(failed({ state: "complete" }))).toBe(false);
+    expect(
+      isUnreadableCreation(failed({ operation: "publish-template" })),
+    ).toBe(false);
   });
 });

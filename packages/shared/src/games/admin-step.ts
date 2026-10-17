@@ -83,6 +83,10 @@ export const gameAdminStepSchema = z
       "publish-template",
       "set-claims-paused",
     ]),
+    // Whether staff can enter where the contract this step made is, which the platform could not read from the confirmed transaction.
+    recordable: z.boolean(),
+    // Who entered the contract's address, when the chain did not report it and staff had to.
+    recordedBy: person,
     state: z.enum(gameAdminStepStates),
     submittedBy: person,
     summary: gameAdminSummarySchema,

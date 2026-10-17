@@ -1,4 +1,3 @@
-import type { GameAdminService } from "@ador/game-admin";
 import { signedTransactionSchema } from "@ador/shared/chain";
 import {
   gameAdminCapability,
@@ -7,79 +6,14 @@ import {
 } from "@ador/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
+import { publishSummary, staffId, view } from "./support/fixtures.ts";
 import {
-  createListStepsOperation,
-  createListTemplatesOperation,
-  createRefreshStepOperation,
-  createStartStepOperation,
-  createSubmitStepOperation,
-} from "../src/application/operations.ts";
-import type { GameAdminRuntime } from "../src/runtime.ts";
-import {
-  chain,
-  config,
-  publishSummary,
-  staffId,
-  view,
-} from "./support/fixtures.ts";
-
-const context = {
-  actorSession: null,
-  actorUserId: staffId as never,
-  correlationId: "c0ffee00-0000-4000-8000-000000000000" as never,
-};
-const anonymous = { ...context, actorUserId: null };
-
-function stub(overrides: Partial<GameAdminService> = {}) {
-  const service: GameAdminService = {
-    list: vi.fn(async () => [view()]),
-    status: vi.fn(async () => ({
-      contract: { address: "rewards-1", maxDrawingBytes: 4096 },
-      drawingCeiling: 8192,
-      templatesReady: true,
-    })),
-    templates: vi.fn(async () => [
-      {
-        address: "at-1",
-        codeHash: "a".repeat(64),
-        publishedAt: new Date("2026-10-16T12:00:00.000Z"),
-        templateRef: "game-rewards@1.0.0",
-      },
-    ]),
-    refresh: vi.fn(async () => ({ ok: true as const, step: view() })),
-    start: vi.fn(async () => ({
-      ok: true as const,
-      resumed: false,
-      step: view(),
-    })),
-    submitSigned: vi.fn(async () => ({ ok: true as const, step: view() })),
-    ...overrides,
-  };
-  const resolve = async (): Promise<GameAdminRuntime> => ({
-    names: async () => new Map([[staffId, "Ada"]]),
-    rewards: config().rewards,
-    service,
-  });
-  return {
-    list: createListStepsOperation(resolve),
-    refresh: createRefreshStepOperation(resolve),
-    service,
-    start: createStartStepOperation(resolve),
-    templates: createListTemplatesOperation(resolve),
-    submit: createSubmitStepOperation(resolve),
-  };
-}
-const startInput = {
-  action: { operation: "set-claims-paused", paused: true },
-  gameId: "arcade",
-  wallet: "sim:one:a1b2c3fe",
-} as const;
-const signed = {
-  chain,
-  family: "simulated",
-  format: "sim-json/1",
-  payload: "{}.sig",
-};
+  anonymous,
+  context,
+  signed,
+  startInput,
+  stub,
+} from "./support/operations-stub.ts";
 
 describe("every administration operation", () => {
   it("is a keyless POST on its contract route that needs the administration capability", () => {
@@ -88,6 +22,7 @@ describe("every administration operation", () => {
       [s.start, gameAdminRoutes.start],
       [s.submit, gameAdminRoutes.submit],
       [s.refresh, gameAdminRoutes.refresh],
+      [s.record, gameAdminRoutes.record],
       [s.list, gameAdminRoutes.list],
       [s.templates, gameAdminRoutes.templates],
     ] as const)
@@ -105,11 +40,13 @@ describe("every administration operation", () => {
       await s.start.execute(startInput, anonymous),
       await s.submit.execute({ signed, stepId: view().id }, anonymous),
       await s.refresh.execute({ stepId: view().id }, anonymous),
+      await s.record.execute({ address: "2:7", stepId: view().id }, anonymous),
       await s.list.execute({ gameId: "arcade" }, anonymous),
       await s.templates.execute({}, anonymous),
     ])
       expect(result).toMatchObject({ ok: false });
     expect(s.service.start).not.toHaveBeenCalled();
+    expect(s.service.recordCreated).not.toHaveBeenCalled();
     expect(s.service.list).not.toHaveBeenCalled();
     expect(s.service.templates).not.toHaveBeenCalled();
   });

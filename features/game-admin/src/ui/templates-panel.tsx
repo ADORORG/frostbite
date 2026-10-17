@@ -111,6 +111,7 @@ export function TemplatesPanel({
           canSign={admin.canSign}
           message={admin.message}
           onClose={admin.dismiss}
+          onRecord={(address) => void admin.record(address)}
           onSendPasted={(payload) => void admin.sendPasted(payload)}
           onSign={() => void admin.sign()}
           step={admin.active}
