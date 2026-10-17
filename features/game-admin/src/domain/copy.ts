@@ -98,6 +98,11 @@ export const submitRefusalCopy = {
   "not-found": "This step could not be found.",
 } as const;
 
+export const walletUnavailableCopy =
+  "No wallet that signs steps is connected. Connect one from the wallet button in the header, or sign elsewhere and paste the result.";
+export const walletRefusedCopy =
+  "Your wallet did not sign, so nothing was sent.";
+
 export const unreachableCopy =
   "The platform could not be reached. Nothing was changed.";
 export const noSignerCopy =

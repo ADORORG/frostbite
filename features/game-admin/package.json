@@ -23,6 +23,7 @@
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/game-admin": "workspace:*",
+    "@ador/wallet": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/milestone-art": "workspace:*",
     "@ador/plugin-kit": "workspace:*",

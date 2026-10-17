@@ -75,7 +75,7 @@ describe("reviewing and sending a step", () => {
     );
   });
 
-  it("says nothing was signed when the wallet gave nothing back, and that the platform could not be reached when it failed", async () => {
+  it("says nothing was signed when the wallet gave nothing back, that the wallet did not sign when it refused, and that the platform could not be reached when the send failed", async () => {
     const nothing = await review(fakeApi(), { sign: vi.fn(async () => null) });
     await click(button(nothing, "Sign with your wallet"));
     expect(textOf(nothing)).toContain("Nothing was signed.");
@@ -85,7 +85,18 @@ describe("reviewing and sending a step", () => {
       }),
     });
     await click(button(broken, "Sign with your wallet"));
-    expect(textOf(broken)).toContain("could not be reached");
+    expect(textOf(broken)).toContain("Your wallet did not sign");
+    expect(button(broken, "Sign with your wallet")?.disabled).toBe(false);
+    const unreachable = await review(
+      fakeApi({
+        submit: vi.fn(async () => {
+          throw apiError("network");
+        }),
+      }),
+      { sign: vi.fn(async (transaction) => transaction) },
+    );
+    await click(button(unreachable, "Sign with your wallet"));
+    expect(textOf(unreachable)).toContain("could not be reached");
   });
 
   it.each([

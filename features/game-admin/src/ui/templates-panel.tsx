@@ -23,10 +23,13 @@ export function TemplatesPanel({
   api: injected,
   pollMs,
   sign,
+  connectedAddress,
 }: {
   readonly api?: GameAdminApi;
   readonly pollMs?: number;
   readonly sign?: StepSigner;
+  // The connected wallet's address, offered as the one to sign with.
+  readonly connectedAddress?: string;
 }) {
   const api = useMemo(() => injected ?? createGameAdminApi(), [injected]);
   const admin = useAdminSteps({
@@ -35,7 +38,7 @@ export function TemplatesPanel({
     ...(pollMs === undefined ? {} : { pollMs }),
     ...(sign === undefined ? {} : { sign }),
   });
-  const signer = useSigner();
+  const signer = useSigner(connectedAddress);
   const [addresses, setAddresses] = useState<Readonly<Record<string, string>>>(
     {},
   );
@@ -54,7 +57,11 @@ export function TemplatesPanel({
   );
   return (
     <>
-      <SignerCard signer={signer} withAuthToken={false} />
+      <SignerCard
+        canSign={sign !== undefined}
+        signer={signer}
+        withAuthToken={false}
+      />
       <ArcadeInfoCard title="Templates">
         <ul aria-label="Templates">
           {overview.publishable.map((template) => {

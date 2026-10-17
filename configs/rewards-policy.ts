@@ -22,6 +22,9 @@ export const rewardsPolicy = {
   // Whether the platform may build, send and watch transactions on signet. Signet is open (ADR-018: signet first); a mainnet record
   // is added closed and opened by the owner after review, as an edit to this file.
   signetReleaseGate: "open",
+  // The wallets (LaserEyes provider ids) staff may sign administration steps with from the page. Chosen by the owner; each still
+  // needs qualification evidence (packages/wallet README) before it is relied on for real funds.
+  signingWallets: ["xverse", "unisat", "oyl"],
   // The confirmations after which a step is done on signet (ADR-018, D22); the indexer must also have run it.
   signetConfirmations: 1,
   // The templates the platform may publish. Their code hashes are the released ones, so a rebuilt template that differs is

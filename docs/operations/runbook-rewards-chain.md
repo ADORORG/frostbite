@@ -26,7 +26,11 @@ after a review.
 
 ## First use, from the staff page (`/admin/games`)
 
-1. Enter the wallet address you will sign with.
+1. Connect Xverse, UniSat or OYL from the wallet button in the header (the policy list `signingWallets` in
+   `configs/rewards-policy.ts`). The page then offers that wallet's address and signs with it: each step opens a review, and the
+   wallet asks you to approve it. Without a connected wallet from that list, enter the address you will sign with, sign elsewhere
+   and paste the result. The wallets are not yet qualified with evidence (finding S77): try a template publish first, and treat a
+   refusal by the wallet or by the platform's check as information, not as a fault to bypass.
 2. Publish `game-rewards@1.0.0` and `milestone-collectible@1.0.0`: type the address each goes to (`4:n`, an id nothing else uses),
    prepare the step, read the summary, sign, send. The template appears as published when the step completes.
 3. Open a game, enter the largest drawing its contract should keep (it cannot be changed), create the contract, sign, send. The

@@ -14,6 +14,11 @@ The single platform boundary around the exact-pinned LaserEyes React/Core pair.
   (up to 3 seconds), then connects. A test in a real browser fails if the library is fetched on page load.
 - `useWalletConnection().signMessage` requires a connected account and explicitly requests BIP-322
   for its address. This diagnostic primitive does not establish a session or qualify wallet support.
+- `useStepWallet(allowedProviders)` (client) is the connected wallet as a signer of the platform's own transactions: `sign` is present
+  only while a wallet on the deployment's list is connected. `signWithWallet` (bridge) asks the wallet, one PSBT at a time, to sign
+  only the inputs nobody has signed (`@ador/chain/wallet-signing`: `walletRequests`, `withWalletSignatures`), finalised and never
+  sent, and puts the answers back; the platform then checks the result against what it built. Today the `bitcoin-alkanes` family;
+  another family adds its own mapping beside it.
 - `@ador/wallet/registration` contributes LaserEyes through one explicit provider-registry entry.
 - `createLaserEyesSigner` adapts one connected LaserEyes client to the narrow signer contract used
   by Alkanes application services.

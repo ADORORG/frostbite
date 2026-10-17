@@ -11,6 +11,7 @@ const familySpecificImports = [
   "@ador/chain/alkanes",
   "@ador/chain/bitcoin",
   "@ador/chain/bitcoin-alkanes",
+  "@ador/chain/wallet-signing",
   "bitcoinjs-lib",
 ];
 const familySpecificPrefixes = ["@alkanes/", "@omnisat/"];

@@ -11,6 +11,9 @@ export interface WalletConnectionClient {
   connect(provider: LaserEyesProviderId): Promise<void>;
   disconnect(): void;
   signMessage(message: string): Promise<string>;
+  // Asks the connected wallet to sign the given inputs of a PSBT (base64) with the wallet's own address, finalised and not sent;
+  // answers the signed PSBT (base64). Rejects if the wallet refuses or answers anything incomplete.
+  signPsbt(psbt: string, inputs: readonly number[]): Promise<string>;
   isInstalled(provider: LaserEyesProviderId): boolean;
   installationUrl(provider: LaserEyesProviderId): string;
 }
@@ -34,6 +37,8 @@ export function idleConnection(
     network,
     provider: null,
     signMessage: () =>
+      Promise.reject(new Error("A connected wallet account is required.")),
+    signPsbt: () =>
       Promise.reject(new Error("A connected wallet account is required.")),
   };
 }

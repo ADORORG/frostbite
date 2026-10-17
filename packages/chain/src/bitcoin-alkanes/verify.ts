@@ -90,15 +90,18 @@ function matchesSummary(
   );
 }
 
-export function isSigned(psbt: Psbt): boolean {
-  return psbt.data.inputs.every(
-    (input) =>
-      input.finalScriptWitness !== undefined ||
-      input.finalScriptSig !== undefined ||
-      input.tapKeySig !== undefined ||
-      (input.partialSig?.length ?? 0) > 0 ||
-      (input.tapScriptSig?.length ?? 0) > 0,
+export function inputIsSigned(input: Psbt["data"]["inputs"][number]): boolean {
+  return (
+    input.finalScriptWitness !== undefined ||
+    input.finalScriptSig !== undefined ||
+    input.tapKeySig !== undefined ||
+    (input.partialSig?.length ?? 0) > 0 ||
+    (input.tapScriptSig?.length ?? 0) > 0
   );
+}
+
+export function isSigned(psbt: Psbt): boolean {
+  return psbt.data.inputs.every(inputIsSigned);
 }
 
 // Checks that what the wallet signed is what was built and shown. That each signature is valid is Bitcoin's to decide when the

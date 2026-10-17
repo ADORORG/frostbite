@@ -77,6 +77,7 @@ export const config = (): GameAdminConfig => ({
     maxDrawingBytes: 8192n,
     publishable: [gameTemplate, collectibleTemplate],
   },
+  signingWallets: ["xverse"],
 });
 
 export const info = () => adminGames([game, plainGame]);

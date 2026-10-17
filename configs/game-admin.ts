@@ -1,6 +1,7 @@
 import type { GameAdminConfig } from "@ador/feature-game-admin";
 
 import { rewardsChain } from "./game-rewards.ts";
+import { rewardsPolicy } from "./rewards-policy.ts";
 import { rewardsPlan } from "./rewards-plan.ts";
 
 // What the platform needs to let staff administer games' rewards contracts (see `game-rewards.ts`), and the limits a milestone's
@@ -14,4 +15,5 @@ export const gameAdminConfig = {
     maxElements: 200,
   },
   rewards: rewardsPlan,
+  signingWallets: rewardsPolicy.signingWallets,
 } satisfies GameAdminConfig;

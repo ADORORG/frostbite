@@ -33,6 +33,7 @@ const state = {
   connected: false,
   disconnect,
   signMessage: vi.fn(async () => "signature"),
+  signPsbt: vi.fn(),
   hasBinance: false,
   hasKeplr: false,
   hasLeather: false,
@@ -123,6 +124,47 @@ describe("normalized wallet connection client", () => {
       toSignAddress: "tb1qcandidate",
       protocol: "bip322",
     });
+    Reflect.set(state, "connected", false);
+  });
+
+  it("asks the connected wallet to sign the given inputs with its own address, finalised and not sent", async () => {
+    renderToStaticMarkup(<Probe />);
+    if (captured === null) throw new Error("Expected captured wallet client");
+    await expect(captured.signPsbt("psbt", [0])).rejects.toThrow(
+      "connected wallet",
+    );
+    Reflect.set(state, "connected", true);
+    Reflect.set(state, "provider", "xverse");
+    Reflect.set(state, "address", "");
+    await expect(captured.signPsbt("psbt", [0])).rejects.toThrow(
+      "connected wallet",
+    );
+    Reflect.set(state, "address", "tb1qcandidate");
+    state.signPsbt.mockResolvedValueOnce({
+      signedPsbtBase64: "signed-base64",
+      signedPsbtHex: "signed-hex",
+    });
+    await expect(captured.signPsbt("psbt", [0, 2])).resolves.toBe(
+      "signed-base64",
+    );
+    expect(state.signPsbt).toHaveBeenCalledWith({
+      broadcast: false,
+      finalize: true,
+      inputsToSign: [
+        { address: "tb1qcandidate", index: 0 },
+        { address: "tb1qcandidate", index: 2 },
+      ],
+      tx: "psbt",
+    });
+    // A wallet that sent the transaction, or answered nothing, is not trusted.
+    state.signPsbt.mockResolvedValueOnce({
+      signedPsbtBase64: "a",
+      signedPsbtHex: "b",
+      txId: "sent",
+    });
+    await expect(captured.signPsbt("psbt", [0])).rejects.toThrow("broadcast");
+    state.signPsbt.mockResolvedValueOnce(undefined);
+    await expect(captured.signPsbt("psbt", [0])).rejects.toThrow("incomplete");
     Reflect.set(state, "connected", false);
   });
 });

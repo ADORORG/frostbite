@@ -17,6 +17,9 @@ export interface GameAdminConfig {
   // The chain templates are published on, the templates that may be, which a game and its collectibles are made from, and the most
   // a game's contract may be created to accept.
   readonly rewards: RewardsPlan;
+  // The connected wallets that may sign steps from the page (LaserEyes provider ids). A wallet is on this list because the
+  // deployment has decided to trust it with this, not because it happens to be installed.
+  readonly signingWallets: readonly string[];
   // The rest of the sanitiser's limits; the byte limit is each contract's own (what it was created to accept).
   readonly drawingLimits: Omit<DrawingPolicy, "maxBytes">;
 }

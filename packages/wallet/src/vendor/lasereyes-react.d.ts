@@ -36,6 +36,21 @@ declare module "@omnisat/lasereyes-react" {
     readonly hasXverse: boolean;
     connect(provider: LaserEyesProviderId): Promise<void>;
     disconnect(): void;
+    signPsbt(options: {
+      readonly broadcast: false;
+      readonly finalize: boolean;
+      readonly inputsToSign:
+        | readonly { readonly address: string; readonly index: number }[]
+        | undefined;
+      readonly tx: string;
+    }): Promise<
+      | {
+          readonly signedPsbtBase64: string | undefined;
+          readonly signedPsbtHex: string | undefined;
+          readonly txId?: string | undefined;
+        }
+      | undefined
+    >;
     signMessage(
       message: string,
       options: { readonly toSignAddress: string; readonly protocol: "bip322" },

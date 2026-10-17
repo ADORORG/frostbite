@@ -5,8 +5,7 @@ import { ArcadeEmptyState, ArcadeInfoCard } from "@repo/ui/arcade";
 import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { AdminFrame } from "./admin-frame.tsx";
-import { GameAdminPanel } from "./game-admin-panel.tsx";
-import { TemplatesPanel } from "./templates-panel.tsx";
+import { WalletGamePanel, WalletTemplatesPanel } from "./wallet-panels.tsx";
 
 type Navigation = readonly NavigationItem[];
 
@@ -15,10 +14,12 @@ export function GamesSurface({
   api,
   games,
   navigation,
+  signingWallets,
 }: {
   readonly api?: GameAdminApi;
   readonly games: readonly AdminGameInfo[];
   readonly navigation: Navigation;
+  readonly signingWallets: readonly string[];
 }) {
   return (
     <AdminFrame
@@ -26,7 +27,10 @@ export function GamesSurface({
       intro="Games whose milestones can be claimed on chain. Publishing a template, creating a game's contract, defining a milestone and pausing claims are steps you sign yourself."
       navigation={navigation}
     >
-      <TemplatesPanel {...(api === undefined ? {} : { api })} />
+      <WalletTemplatesPanel
+        {...(api === undefined ? {} : { api })}
+        signingWallets={signingWallets}
+      />
       {games.length === 0 ? (
         <ArcadeEmptyState title="Nothing to administer">
           No game declares rewards yet.
@@ -54,10 +58,12 @@ export function GameSurface({
   api,
   game,
   navigation,
+  signingWallets,
 }: {
   readonly api?: GameAdminApi;
   readonly game: AdminGameInfo | undefined;
   readonly navigation: Navigation;
+  readonly signingWallets: readonly string[];
 }) {
   if (game === undefined)
     return (
@@ -75,7 +81,11 @@ export function GameSurface({
       intro={`Rewards on ${game.chain}.`}
       navigation={navigation}
     >
-      <GameAdminPanel {...(api === undefined ? {} : { api })} game={game} />
+      <WalletGamePanel
+        {...(api === undefined ? {} : { api })}
+        game={game}
+        signingWallets={signingWallets}
+      />
     </AdminFrame>
   );
 }

@@ -41,6 +41,7 @@ const walletOf = (
   network: "signet",
   provider: null,
   signMessage: async () => "",
+  signPsbt: async () => "",
   ...overrides,
 });
 const unisat = {

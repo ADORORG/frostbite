@@ -1,4 +1,5 @@
 import { mount, settle, textOf } from "@ador/test-kit/dom";
+import { WalletProvider } from "@ador/wallet/client";
 import { describe, expect, it } from "vitest";
 
 import { GameSurface, GamesSurface } from "../src/ui/surfaces.tsx";
@@ -6,11 +7,23 @@ import { fakeApi } from "./support/fake-api.ts";
 import { info } from "./support/fixtures.ts";
 
 const navigation = [] as const;
+const signingWallets = ["xverse"] as const;
+// The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
+const inApp = (page: React.ReactNode) => (
+  <WalletProvider network="signet">{page}</WalletProvider>
+);
 
 describe("the staff pages", () => {
   it("list the games that declare rewards with a way in, above the templates", async () => {
     const container = await mount(
-      <GamesSurface api={fakeApi()} games={info()} navigation={navigation} />,
+      inApp(
+        <GamesSurface
+          api={fakeApi()}
+          games={info()}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
     );
     await settle(() =>
       expect(textOf(container)).toContain("game-rewards@1.0.0"),
@@ -24,7 +37,14 @@ describe("the staff pages", () => {
 
   it("say so when no game declares rewards", async () => {
     const container = await mount(
-      <GamesSurface api={fakeApi()} games={[]} navigation={navigation} />,
+      inApp(
+        <GamesSurface
+          api={fakeApi()}
+          games={[]}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
     );
     expect(textOf(container)).toContain("Nothing to administer");
   });
@@ -32,12 +52,26 @@ describe("the staff pages", () => {
   it("show a game's page with its contract loaded from the record, and 'not found' for a game that declares no rewards", async () => {
     const [arcade] = info();
     const page = await mount(
-      <GameSurface api={fakeApi()} game={arcade} navigation={navigation} />,
+      inApp(
+        <GameSurface
+          api={fakeApi()}
+          game={arcade}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
     );
     expect(textOf(page)).toContain("Rewards on simnet:one.");
     await settle(() => expect(textOf(page)).toContain("Contract rewards-1."));
     const missing = await mount(
-      <GameSurface api={fakeApi()} game={undefined} navigation={navigation} />,
+      inApp(
+        <GameSurface
+          api={fakeApi()}
+          game={undefined}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
     );
     expect(textOf(missing)).toContain("Game not found");
     expect(missing.querySelector("a[href='/admin/games']")).not.toBeNull();

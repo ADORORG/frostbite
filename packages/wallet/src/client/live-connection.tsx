@@ -9,6 +9,7 @@ import {
 } from "@omnisat/lasereyes-react";
 import { useEffect } from "react";
 
+import { requireSignedPsbt } from "../bridge/laser-eyes-signer.ts";
 import type { WalletNetwork } from "../contracts.ts";
 import type { WalletConnectionClient } from "./connection-client.ts";
 import type { ConnectionStore } from "./connection-store.ts";
@@ -69,6 +70,27 @@ export function useLiveWalletConnection(): WalletConnectionClient {
         toSignAddress: state.address,
         protocol: laserEyesBip322Protocol,
       });
+    },
+    signPsbt: async (psbt, inputs) => {
+      if (
+        !state.connected ||
+        state.provider === undefined ||
+        state.address.length === 0
+      ) {
+        throw new Error("A connected wallet account is required.");
+      }
+      const signed = requireSignedPsbt(
+        await state.signPsbt({
+          broadcast: false,
+          finalize: true,
+          inputsToSign: inputs.map((index) => ({
+            address: state.address,
+            index,
+          })),
+          tx: psbt,
+        }),
+      );
+      return signed.psbtBase64;
     },
     isInstalled: (provider) => providerAvailability(state, provider),
     installationUrl,

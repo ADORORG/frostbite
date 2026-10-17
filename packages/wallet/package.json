@@ -19,6 +19,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/chain": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@omnisat/lasereyes-core": "0.0.85",
     "@omnisat/lasereyes-react": "0.0.80",

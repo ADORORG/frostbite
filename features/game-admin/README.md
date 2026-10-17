@@ -35,9 +35,11 @@ which a game and its collectibles are made from, the most a contract may be crea
 
 ## Behaviour worth knowing
 
-- **Signing.** No wallet in this version signs administration steps, so the review shows the transaction to sign and a box for the
-  signed result (a wallet that can sign is injected as `sign` when one is qualified). The platform checks what comes back is exactly
-  what it built and showed; nothing else is sent.
+- **Signing.** When a wallet on the deployment's `signingWallets` list (config; Xverse, UniSat and OYL today) is connected in the
+  app's header, its address is offered as the one to sign with and the review has a Sign button: the wallet is asked to approve
+  only the inputs nobody has signed. Otherwise the review shows the transaction to sign and a box for the signed result. Either
+  way the platform checks what comes back is exactly what it built and showed; nothing else is sent. A wallet that declines
+  leaves the step signable again.
 - **Nothing is called done early.** A step is "complete" only when the network's records show it; "Confirmed, not yet indexed" and
   "Sent, waiting" are separate.
 - **A milestone is defined once.** The page shows the log's standing and hides the form once a definition completed; the contract

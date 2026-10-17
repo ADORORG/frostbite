@@ -60,7 +60,7 @@ function requireState(
   return state;
 }
 
-function requireSignedPsbt(
+export function requireSignedPsbt(
   result: Awaited<ReturnType<LaserEyesSigningClient["signPsbt"]>>,
 ): SignedPsbt {
   if (

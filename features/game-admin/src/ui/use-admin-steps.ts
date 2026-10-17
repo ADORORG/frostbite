@@ -15,6 +15,7 @@ import {
   startRefusalCopy,
   submitRefusalCopy,
   unreachableCopy,
+  walletRefusedCopy,
 } from "../domain/copy.ts";
 
 // What staff's wallet is asked to sign, and what it gives back. Where no wallet can sign steps there is none, and the page lets
@@ -222,8 +223,16 @@ export function useAdminSteps(options: {
     if (transaction === null || sign === undefined) return;
     setWorking(true);
     setMessage(null);
+    let signed: GameAdminTransaction | null;
     try {
-      await send(await sign(transaction));
+      signed = await sign(transaction);
+    } catch {
+      // The wallet was closed, declined, or could not sign: nothing was sent, and the step can be signed again.
+      setWorking(false);
+      return setMessage(walletRefusedCopy);
+    }
+    try {
+      await send(signed);
     } catch {
       setMessage(unreachableCopy);
     } finally {

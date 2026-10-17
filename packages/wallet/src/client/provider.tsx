@@ -4,6 +4,9 @@ export { walletNetworkUnavailableReason } from "./network-availability.ts";
 export { classifyWalletConnectionError } from "./connection-error.ts";
 export { useWalletChooser } from "./chooser.tsx";
 export { hasRememberedWallet } from "./remembered.ts";
+export { useStepWallet } from "./step-signer.ts";
+export type { StepWallet } from "./step-signer.ts";
+export { WalletRefusedError } from "../bridge/step-signer.ts";
 export type { WalletConnectionFailure } from "./connection-error.ts";
 export type { WalletConnectionClient } from "./connection-client.ts";
 

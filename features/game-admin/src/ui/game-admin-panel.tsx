@@ -21,11 +21,14 @@ export function GameAdminPanel({
   game,
   sign,
   pollMs,
+  connectedAddress,
 }: {
   readonly api?: GameAdminApi;
   readonly game: AdminGameInfo;
   readonly pollMs?: number;
   readonly sign?: StepSigner;
+  // The connected wallet's address, offered as the one to sign with.
+  readonly connectedAddress?: string;
 }) {
   const api = useMemo(() => injected ?? createGameAdminApi(), [injected]);
   const admin = useAdminSteps({
@@ -34,7 +37,7 @@ export function GameAdminPanel({
     ...(pollMs === undefined ? {} : { pollMs }),
     ...(sign === undefined ? {} : { sign }),
   });
-  const signer = useSigner();
+  const signer = useSigner(connectedAddress);
   const ask = (action: Parameters<typeof admin.start>[0]) =>
     signer.ready ? admin.start(action, signer.context) : Promise.resolve();
   const { overview } = admin;
@@ -47,7 +50,11 @@ export function GameAdminPanel({
   const hasContract = overview.contract !== null;
   return (
     <>
-      <SignerCard signer={signer} withAuthToken={hasContract} />
+      <SignerCard
+        canSign={sign !== undefined}
+        signer={signer}
+        withAuthToken={hasContract}
+      />
       {admin.message !== null && admin.active === null ? (
         <p role="alert">{admin.message}</p>
       ) : null}
