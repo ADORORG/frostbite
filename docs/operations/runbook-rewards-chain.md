@@ -51,6 +51,18 @@ Check the node's indexer is keeping up: `metashrew_height` against `esplora_bloc
 after the indexer ran it (ADR-018), so a lagging indexer holds every step at "sent". On 2026-10-16 the public signet endpoint's
 indexer was about 1,000 blocks behind and not moving (finding S73).
 
+## Reading the lamp and "delayed"
+
+Every page has a small lamp in its header (nothing shows where no rewards chain is configured). **Chain in sync**: the indexer has read every
+block. **n blocks behind**: normal catching up (up to 2 blocks). **Delayed, n blocks behind**: more than 2 blocks behind; hover or focus the lamp for
+the heights. **Chain status unknown** (grey): the platform could not ask the node, which is not the same as the indexer being behind.
+
+A step or claim that is sent and waiting turns "Sent, delayed" or "Confirmed, delayed" when the indexer is more than 2 blocks behind or it was
+sent more than 60 minutes ago (`delay` in `configs/rewards-policy.ts`). Delayed is never failed: nothing is cancelled or retried, and it
+completes when the indexer catches up and the chain's records agree. The wait is counted from when the network first answered with the transaction's id
+(`broadcast_at`). If the node cannot be asked, only the 60 minutes can mark a wait delayed. The lamp refreshes every 30 seconds
+(`indexingRefreshMs`), and the platform asks the node at most once per 15 seconds (`indexingReadingMs`) however many pages are open.
+
 ## Turn it off
 
 Blank `REWARDS_CHAIN_RPC_URL`, or close the chain's gate in the policy, and restart. Steps and claims already sent stay on the chain

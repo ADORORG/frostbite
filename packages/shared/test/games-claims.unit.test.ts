@@ -24,10 +24,12 @@ const transaction = {
   payload: "{}",
 };
 const claim = {
+  delayed: false,
   failureReason: null,
   gameId: "arcade",
   id,
   milestoneId: "first-win",
+  sentAt: null,
   state: "awaiting-signature",
   summary: {
     chain: "simnet:one",
@@ -56,6 +58,25 @@ describe("a claim as the page is told of it", () => {
         transactionId: "abc",
       }),
     ).toBe(true);
+  });
+
+  it("says whether a claim is delayed and when it was sent, as a flag and a time, and refuses anything else", () => {
+    const sent = {
+      ...claim,
+      delayed: true,
+      sentAt: "2026-10-16T11:00:00.000Z",
+      state: "pending",
+      toSign: null,
+      transactionId: "abc",
+    };
+    expect(accepts(gameClaimSchema, sent)).toBe(true);
+    expect(accepts(gameClaimSchema, { ...sent, delayed: "yes" })).toBe(false);
+    expect(accepts(gameClaimSchema, { ...sent, sentAt: "yesterday" })).toBe(
+      false,
+    );
+    expect(accepts(gameClaimSchema, { ...sent, delayed: undefined })).toBe(
+      false,
+    );
   });
 
   it.each([

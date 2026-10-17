@@ -24,10 +24,12 @@ export const claimAt = (
   over: Partial<GameClaim> = {},
 ): GameClaim =>
   gameClaimSchema.parse({
+    delayed: false,
     failureReason: null,
     gameId: "embedded-game",
     id: claimId,
     milestoneId,
+    sentAt: null,
     state,
     summary: {
       chain: "simnet:one",

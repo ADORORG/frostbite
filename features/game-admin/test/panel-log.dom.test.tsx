@@ -93,6 +93,50 @@ describe("the log, the milestones and following a step", () => {
     expect(textOf(container)).toContain("claims resumed by Grace");
   });
 
+  it("says a step that has waited longer than expected is delayed, and that it has not failed, in the log and in its details", async () => {
+    const container = await panel(
+      loaded(
+        defining({
+          delayed: true,
+          sentAt: "2026-10-16T11:00:00.000Z",
+          state: "pending",
+          toSign: null,
+        }),
+      ),
+    );
+    await settle(() => expect(textOf(container)).toContain("Sent, delayed"));
+    expect(textOf(container)).not.toContain("Sent, waiting");
+    expect(
+      container.querySelector("[data-delayed='true']")?.textContent,
+    ).toContain("Sent, delayed");
+    await click(button(container, "Details"));
+    const review = container.querySelector('[data-testid="step-review"]');
+    expect(review?.textContent).toContain("It has not failed");
+    expect(review?.textContent).not.toContain("Failed");
+  });
+
+  it("says a confirmed step is delayed too, and shows a settled or ordinary step as it is, whatever the flag", async () => {
+    const container = await panel(
+      loaded(
+        defining({ delayed: true, state: "confirmed", toSign: null }),
+        step({
+          id: "44444444-4444-4444-8444-444444444444",
+          delayed: true,
+          state: "complete",
+          toSign: null,
+        }),
+      ),
+    );
+    await settle(() =>
+      expect(textOf(container)).toContain("Confirmed, delayed"),
+    );
+    expect(textOf(container)).toContain("Complete");
+    expect(textOf(container)).not.toContain("Complete, delayed");
+    expect(
+      container.querySelector("[data-delayed='true']")?.textContent,
+    ).toContain("Confirmed, delayed");
+  });
+
   it("looks again at a step that is not over until it is, and then stops", async () => {
     const pending = step({ state: "pending", toSign: null });
     const refresh = vi

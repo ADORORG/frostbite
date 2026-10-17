@@ -19,6 +19,8 @@ const skipped = new Set([
 const ownConfig: Record<string, string> = {
   "packages/client-react/vitest.config.ts":
     "attaches the React plugin and a setup file to each project, which the shared options do not express",
+  "packages/chain/vitest.regtest.config.ts":
+    "runs one live-stack suite against a local chain on demand: no projects, no coverage, a long timeout, and it fails when the stack is down",
   "packages/eslint-config/vitest.config.js":
     "plain JavaScript package that cannot import a TypeScript config",
   "packages/typescript-config/vitest.config.ts":

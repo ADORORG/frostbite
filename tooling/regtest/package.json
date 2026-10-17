@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./config": "./src/config.ts",
     "./gateway": "./src/gateway.ts",
     "./bitcoind": "./src/bitcoind.ts",
     "./json": "./src/json.ts"

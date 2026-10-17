@@ -54,6 +54,7 @@ export const silentBroadcaster: Broadcaster = {
 };
 
 export const silentObserver: ChainObserver = {
+  indexing: () => Promise.reject(new Error("not used")),
   observe: () => Promise.reject(new Error("not used")),
 };
 

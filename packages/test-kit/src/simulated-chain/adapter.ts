@@ -131,7 +131,17 @@ export function createSimulatedChain(
           : { kind: "rejected" as const, reason: "unknown simulated chain" },
       ),
   };
+  // The simulated indexer is the ledger itself: it has read every block there is.
   const observer: ChainObserver = {
+    indexing: (chain) => {
+      const { height } = ledger(chain).head();
+      return Promise.resolve({
+        chain,
+        indexedHeight: height,
+        observedAt: new Date().toISOString(),
+        tipHeight: height,
+      });
+    },
     observe: (ref) => Promise.resolve(ledger(ref.chain).observe(ref)),
   };
   // The simulated contract: a claim counts once its transaction is past the finality depth and has not reverted.

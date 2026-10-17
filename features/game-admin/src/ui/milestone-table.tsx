@@ -7,7 +7,7 @@ import {
 import { useState } from "react";
 
 import type { AdminGameInfo } from "../game-info.ts";
-import { stateCopy } from "../domain/copy.ts";
+import { stepCopy } from "../domain/copy.ts";
 
 type Milestone = AdminGameInfo["milestones"][number];
 
@@ -31,7 +31,7 @@ function standing(
   const step = latestDefinition(steps, milestoneId);
   if (step === undefined) return "Not defined";
   if (step.state === "complete") return "Defined";
-  return stateCopy[step.state].label;
+  return stepCopy(step).label;
 }
 
 // The game's milestones with their claim limits (from the manifest) and a way to define each on the contract with its drawing. A

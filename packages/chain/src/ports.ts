@@ -10,6 +10,7 @@ import type {
   ContractInspection,
   ContractRef,
   FundingPolicy,
+  IndexingStatus,
   Observation,
   SignedTransaction,
   SimulationResult,
@@ -72,6 +73,8 @@ export interface Broadcaster {
 export interface ChainObserver {
   // Read-only and repeatable: asking again for the same state returns equivalent evidence.
   observe(ref: TransactionRef): Promise<Observation>;
+  // How far the chain's indexer has read against the chain's tip. Throws when the chain cannot be asked.
+  indexing(chain: ChainRef): Promise<IndexingStatus>;
 }
 
 // How many times an address has claimed a milestone from a game's rewards contract, as the chain's indexed state says. It is

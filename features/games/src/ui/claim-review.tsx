@@ -1,7 +1,7 @@
 import type { GameClaim } from "@ador/shared/games";
 import { ArcadeActionButton } from "@repo/ui/arcade";
 
-import { claimStateCopy, feeText } from "../domain/claim-copy.ts";
+import { claimCopy, feeText } from "../domain/claim-copy.ts";
 import { noSignerCopy } from "./use-claims.ts";
 import { shortAddress } from "./wallet-card.tsx";
 
@@ -25,7 +25,7 @@ export function ClaimReview({
   readonly title: string;
   readonly working: boolean;
 }) {
-  const copy = claimStateCopy[claim.state];
+  const copy = claimCopy(claim);
   const { summary } = claim;
   return (
     <section

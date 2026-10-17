@@ -35,6 +35,35 @@ export const stateCopy: Readonly<
   },
 };
 
+// What a step in a waiting state says when it has waited longer than expected: more than an hour since it was sent, or the network's
+// records are far behind. It says so and says it has not failed, because it has not.
+const delayedCopy: Readonly<
+  Partial<Record<GameAdminStepState, { detail: string; label: string }>>
+> = {
+  confirmed: {
+    detail:
+      "In a block, but the network's records have not caught up, or it has been over an hour. It has not failed; it shows as complete once they agree.",
+    label: "Confirmed, delayed",
+  },
+  pending: {
+    detail:
+      "Sent, and taking longer than expected: over an hour, or the network's records are far behind. It has not failed and nothing is lost. Keep checking.",
+    label: "Sent, delayed",
+  },
+};
+
+// Whether to say a step is delayed: only while it is in a waiting state, whatever else the flag says.
+export const showsDelayed = (
+  step: Pick<GameAdminStep, "delayed" | "state">,
+): boolean => step.delayed && delayedCopy[step.state] !== undefined;
+
+// The words for a step as it stands now: its state's, or the delayed ones while it is waiting longer than expected.
+export const stepCopy = (
+  step: Pick<GameAdminStep, "delayed" | "state">,
+): { detail: string; label: string } =>
+  (showsDelayed(step) ? delayedCopy[step.state] : undefined) ??
+  stateCopy[step.state];
+
 export const isSettledStep = (state: GameAdminStepState): boolean =>
   state === "complete" || state === "failed" || state === "expired";
 

@@ -37,6 +37,37 @@ export const claimStateCopy: Readonly<
   },
 };
 
+// What a claim in a waiting state says when it has waited longer than expected (over an hour since it was sent, or the network's
+// records are far behind). It says so and says nothing has failed, because it has not.
+const delayedCopy: Readonly<
+  Partial<
+    Record<GameClaimState, { readonly detail: string; readonly label: string }>
+  >
+> = {
+  claimed: {
+    detail:
+      "Confirmed on the network, but its records have not caught up, or it has been over an hour. It has not failed; it shows as claimed once they agree.",
+    label: "Confirmed, delayed",
+  },
+  pending: {
+    detail:
+      "Sent, and taking longer than expected: over an hour, or the network's records are far behind. It has not failed and you have lost nothing. Keep this page open or check back later.",
+    label: "Sent, delayed",
+  },
+};
+
+// Whether to say a claim is delayed: only while it is in a waiting state, whatever else the flag says.
+export const showsDelayed = (
+  claim: Pick<GameClaim, "delayed" | "state">,
+): boolean => claim.delayed && delayedCopy[claim.state] !== undefined;
+
+// The words for a claim as it stands now: its state's, or the delayed ones while it waits longer than expected.
+export const claimCopy = (
+  claim: Pick<GameClaim, "delayed" | "state">,
+): { readonly detail: string; readonly label: string } =>
+  (showsDelayed(claim) ? delayedCopy[claim.state] : undefined) ??
+  claimStateCopy[claim.state];
+
 // Why a claim could not start, as the page says it.
 export const claimUnavailableCopy: Readonly<
   Record<GameClaimUnavailableReason | "signed-out", string>

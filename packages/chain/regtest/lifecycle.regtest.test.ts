@@ -14,8 +14,6 @@ import {
   runStep,
 } from "./stack.ts";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 // The whole life of a game's rewards contract on a real chain: the adapter builds each step, a wallet signs it, Bitcoin Core accepts
 // it, a block holds it, and the real Alkanes indexer runs it. Nothing here is simulated.
 describe("the rewards lifecycle on regtest", () => {

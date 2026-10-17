@@ -17,3 +17,6 @@ const rewards = createRewardsChain(parseRewardsChainEnvironment(process.env), {
 });
 
 export const rewardsChain = rewards?.chain ?? (() => null);
+
+// The same chain as anyone may see how far its indexer has read (the lamp in every page's header); none where no chain is configured.
+export const followedRewardsChain = rewards?.followed ?? null;

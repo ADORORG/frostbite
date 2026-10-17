@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "@ador/database/connection";
 import { gameAdminSteps } from "@ador/database/schema/game-admin";
-import { readTracked, trackedValues } from "@ador/shared/chain";
+import { readTracked, sentAtAfter, trackedValues } from "@ador/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
@@ -22,6 +22,7 @@ const settled = [
 function toStep(row: Row): StoredStep {
   return {
     ...readTracked(row),
+    broadcastAt: row.broadcastAt,
     createdAt: row.createdAt,
     // The column's check constraint admits only the operations of `AdminAction`.
     createdBy: row.createdBy,
@@ -106,6 +107,7 @@ export function createDrizzleGameAdminRepository(
         }
         const stored: StoredStep = {
           ...step,
+          broadcastAt: null,
           createdContracts: null,
           failureReason: null,
           recordedBy: null,
@@ -164,9 +166,11 @@ export function createDrizzleGameAdminRepository(
         const change = decide(step);
         if (change === null) return step;
         const updatedAt = options.clock();
+        const broadcastAt = sentAtAfter(step.broadcastAt, change, updatedAt);
         await transaction
           .update(gameAdminSteps)
           .set({
+            broadcastAt,
             createdContracts: change.createdContracts
               ? [...change.createdContracts]
               : row.createdContracts,
@@ -186,6 +190,7 @@ export function createDrizzleGameAdminRepository(
           await writeRecording(transaction, step, change.record);
         return {
           ...step,
+          broadcastAt,
           createdContracts: change.createdContracts ?? step.createdContracts,
           failureReason:
             change.failureReason === undefined

@@ -84,6 +84,8 @@ export const inspected: {
   down: boolean;
   exists: boolean;
 } = { codeHash: null, down: false, exists: false };
+// How far behind the tip the chain's indexer is, or that the node cannot be asked.
+export const indexer = { behind: 0, down: false };
 // Held broadcasts, so two steps on one transaction can be made to overlap.
 export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
@@ -121,6 +123,14 @@ function ports(): AdminChainPorts {
       simulate: (...asked) => contracts.simulate(...asked),
     },
     observer: {
+      indexing: async (asked) => {
+        if (indexer.down) throw new Error("the node is down");
+        const reading = await observer.indexing(asked);
+        return {
+          ...reading,
+          tipHeight: reading.indexedHeight + indexer.behind,
+        };
+      },
       observe: async (ref) => {
         const seen = await observer.observe(ref);
         if (!hideCreated.value) return seen;
@@ -136,9 +146,12 @@ export const repository = createDrizzleGameAdminRepository(database, {
   clock: () => clock.now,
 });
 
+export const delay = { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 };
+
 export const service = createGameAdminService({
   clock: () => clock.now,
   contracts,
+  delay,
   funding: () => funding,
   game: (id) => Promise.resolve(id === gameId ? game.current : null),
   newId: randomUUID,
@@ -243,6 +256,7 @@ export function registerDatabase(): void {
     chainFailure.build = false;
     hideCreated.value = false;
     Object.assign(inspected, { codeHash: null, down: false, exists: false });
+    Object.assign(indexer, { behind: 0, down: false });
     broadcastGate.enabled = false;
     broadcastGate.held = [];
     network.controls.fund(chain, wallet.value, 100n);

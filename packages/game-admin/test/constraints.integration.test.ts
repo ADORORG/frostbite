@@ -102,4 +102,34 @@ describe("the log of administration", () => {
     await database.insert(gameAdminSteps).values(publication);
     await database.insert(gameAdminSteps).values(creation);
   });
+
+  it("keeps the time a step was sent exactly as long as it has the network's id for it", async () => {
+    const staff = await seedStaff();
+    const started = await service.start(defineInput(staff));
+    if (!started.ok) throw new Error("not started");
+    const [row] = await database.select().from(gameAdminSteps);
+    if (row === undefined) throw new Error("no row");
+    const sent = {
+      ...row,
+      gameId: "other",
+      id: crypto.randomUUID(),
+      signedPayload: "signed",
+      state: "broadcast_accepted",
+      transactionId: "tx-1",
+    };
+    const at = new Date("2026-10-17T12:00:00.000Z");
+    // Sent without a time, and a time without being sent.
+    await expect(
+      database.insert(gameAdminSteps).values({ ...sent, broadcastAt: null }),
+    ).rejects.toThrow();
+    await expect(
+      database.insert(gameAdminSteps).values({
+        ...row,
+        broadcastAt: at,
+        id: crypto.randomUUID(),
+        gameId: "other",
+      }),
+    ).rejects.toThrow();
+    await database.insert(gameAdminSteps).values({ ...sent, broadcastAt: at });
+  });
 });

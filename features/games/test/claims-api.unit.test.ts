@@ -7,10 +7,12 @@ const claimId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 const json = (body: object, status = 200) =>
   new Response(JSON.stringify(body), { status });
 const wire = {
+  delayed: false,
   failureReason: null,
   gameId: "arcade",
   id: claimId,
   milestoneId: "first-win",
+  sentAt: null,
   state: "pending",
   summary: {
     chain: "simnet:one",

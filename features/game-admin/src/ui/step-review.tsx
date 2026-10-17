@@ -7,7 +7,7 @@ import {
   noSignerCopy,
   operationLabel,
   shortHash,
-  stateCopy,
+  stepCopy,
 } from "../domain/copy.ts";
 import { RecordAddress } from "./record-address.tsx";
 
@@ -35,7 +35,7 @@ export function StepReview({
   readonly working: boolean;
 }) {
   const [pasted, setPasted] = useState("");
-  const copy = stateCopy[step.state];
+  const copy = stepCopy(step);
   const { summary } = step;
   return (
     <section

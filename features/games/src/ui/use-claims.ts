@@ -168,9 +168,10 @@ export function useClaims(options: {
     sign: signActive,
     start,
     // The newest claim for a milestone, if any.
-    stateOf: (milestoneId: string): GameClaimState | null =>
-      [...claims].reverse().find((claim) => claim.milestoneId === milestoneId)
-        ?.state ?? null,
+    latestOf: (milestoneId: string): GameClaim | null =>
+      [...claims]
+        .reverse()
+        .find((claim) => claim.milestoneId === milestoneId) ?? null,
     working,
   };
 }

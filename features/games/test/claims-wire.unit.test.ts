@@ -31,6 +31,24 @@ describe("a claim as the page is told of it", () => {
     ]);
   });
 
+  it("carries when the claim was sent and whether its wait is delayed", () => {
+    expect(toWireClaim(view())).toMatchObject({ delayed: false, sentAt: null });
+    const wire = toWireClaim(
+      view({
+        delayed: true,
+        sentAt: "2026-10-16T11:00:00.000Z",
+        state: "broadcast_accepted",
+        toSign: null,
+      }),
+    );
+    expect(wire).toMatchObject({
+      delayed: true,
+      sentAt: "2026-10-16T11:00:00.000Z",
+      state: "pending",
+    });
+    expect(gameClaimSchema.safeParse(wire).success).toBe(true);
+  });
+
   it("names the state the player understands, and has nothing to sign once it is signed", () => {
     expect(
       toWireClaim(view({ state: "broadcast_accepted", toSign: null })),

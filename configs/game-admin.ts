@@ -9,6 +9,7 @@ import { rewardsPlan } from "./rewards-plan.ts";
 // work a drawing can cost the page that shows it.
 export const gameAdminConfig = {
   chain: rewardsChain,
+  delay: rewardsPolicy.delay,
   drawingLimits: {
     maxAttributeLength: 4096,
     maxDepth: 8,

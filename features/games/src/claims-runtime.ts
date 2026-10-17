@@ -67,6 +67,7 @@ export function createGameClaimsResolver(
     );
     return createGameClaimsService({
       clock,
+      delay: config.delay,
       earned: (userId, gameId, milestoneId) =>
         hasEarnedMilestone(database, { gameId, milestoneId, userId }),
       funding: (chain) => {

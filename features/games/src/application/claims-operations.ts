@@ -40,10 +40,12 @@ export function toWireClaim(view: ClaimView): GameClaim {
   if (milestone === undefined)
     throw new Error("A claim's summary names the milestone it claims.");
   return {
+    delayed: view.delayed,
     failureReason: view.failureReason,
     gameId: view.gameId,
     id: view.id,
     milestoneId: view.milestoneId,
+    sentAt: view.sentAt,
     state: playerClaimState(view.state),
     summary: {
       chain: view.summary.chain,

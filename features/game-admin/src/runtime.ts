@@ -69,6 +69,7 @@ export function createGameAdminResolver(
     const service = createGameAdminService({
       clock,
       contracts,
+      delay: config.delay,
       funding: (chain) => {
         const offered = config.chain(chain);
         if (offered === null)

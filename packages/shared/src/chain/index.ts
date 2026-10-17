@@ -1,5 +1,7 @@
 export * from "./chain-config.ts";
 export * from "./chain-ref.ts";
+export * from "./indexing.ts";
+export * from "./indexing-route.ts";
 export * from "./progress.ts";
 export * from "./results.ts";
 export * from "./summary-codec.ts";

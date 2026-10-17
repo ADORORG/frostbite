@@ -62,6 +62,8 @@ export const chainAvailable = { value: true };
 
 // While `on`, the indexer is behind: it shows one claim fewer than the network has confirmed.
 export const indexerLag = { on: false };
+// How far behind the chain's tip its indexer reads, or that the node cannot be asked.
+export const indexer = { behind: 0, down: false };
 // What the chain does wrong on purpose.
 // Held broadcasts, released by a test one at a time, so two steps on one claim can be made to overlap.
 export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
@@ -117,6 +119,14 @@ function ports(): ClaimChainPorts {
           : contracts.simulate(intent),
     },
     observer: {
+      indexing: async (asked) => {
+        if (indexer.down) throw new Error("the node is down");
+        const reading = await observer.indexing(asked);
+        return {
+          ...reading,
+          tipHeight: reading.indexedHeight + indexer.behind,
+        };
+      },
       observe: (ref) =>
         chainFailure.observe
           ? Promise.reject(new Error("the node is down"))
@@ -137,8 +147,11 @@ export const repository = createDrizzleGameClaimRepository(database, {
   clock: () => clock.now,
 });
 
+export const delay = { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 };
+
 export const service = createGameClaimsService({
   clock: () => clock.now,
+  delay,
   earned: (userId, id, milestoneId) =>
     Promise.resolve(earnedKeys.has(`${userId}|${id}|${milestoneId}`)),
   funding: () => funding,
@@ -199,6 +212,7 @@ export function registerDatabase(): void {
     game.current = claimableGame();
     chainAvailable.value = true;
     indexerLag.on = false;
+    Object.assign(indexer, { behind: 0, down: false });
     broadcastGate.enabled = false;
     broadcastGate.held = [];
     chainFailure.broadcast = false;

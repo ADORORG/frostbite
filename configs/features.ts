@@ -1,4 +1,5 @@
 import { createAccountsFeature } from "@ador/feature-accounts";
+import { createChainStatusFeature } from "@ador/feature-chain-status";
 import { createPublicCollectionsFeature } from "@ador/feature-public-collections";
 import { createCollectionReviewFeature } from "@ador/feature-collection-review";
 import { createCollectionStudioFeature } from "@ador/feature-collection-studio";
@@ -13,6 +14,7 @@ import {
 import { createFeatureRegistry } from "@ador/plugin-kit";
 import { createUploadsFeature } from "@ador/feature-uploads";
 import { authorizationPolicy } from "./authorization.ts";
+import { chainStatusConfig } from "./chain-status.ts";
 import { targetChains } from "./chains.ts";
 import { gameAdminConfig } from "./game-admin.ts";
 import { gameClaimsConfig } from "./game-claims.ts";
@@ -23,6 +25,7 @@ import { gameWalletConfig, walletAuthConfig } from "./wallet.ts";
 
 export const featureRegistry = createFeatureRegistry([
   platformShellFeature,
+  createChainStatusFeature(chainStatusConfig),
   createAccountsFeature(walletAuthConfig, null),
   creatorAdmissionFeature,
   launchesFeature,

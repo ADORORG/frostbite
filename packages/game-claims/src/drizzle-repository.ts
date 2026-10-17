@@ -1,6 +1,11 @@
 import type { DatabaseClient } from "@ador/database/connection";
 import { gameMilestoneClaims } from "@ador/database/schema/game-claims";
-import { addressSchema, readTracked, trackedValues } from "@ador/shared/chain";
+import {
+  addressSchema,
+  readTracked,
+  sentAtAfter,
+  trackedValues,
+} from "@ador/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 
 import {
@@ -19,6 +24,7 @@ function toClaim(row: Row): StoredClaim {
   const tracked = readTracked(row);
   return {
     ...tracked,
+    broadcastAt: row.broadcastAt,
     createdAt: row.createdAt,
     expiresAt: row.expiresAt,
     expectedClaims: row.expectedClaims,
@@ -88,6 +94,7 @@ export function createDrizzleGameClaimRepository(
           ).length + 1;
         const stored: StoredClaim = {
           ...claim,
+          broadcastAt: null,
           expectedClaims,
           failureReason: null,
           signedPayload: null,
@@ -156,9 +163,11 @@ export function createDrizzleGameClaimRepository(
         const change = decide(claim);
         if (change === null) return claim;
         const updatedAt = options.clock();
+        const broadcastAt = sentAtAfter(claim.broadcastAt, change, updatedAt);
         await transaction
           .update(gameMilestoneClaims)
           .set({
+            broadcastAt,
             failureReason: change.failureReason ?? row.failureReason,
             signedPayload: change.signedPayload ?? row.signedPayload,
             state: change.state,
@@ -168,6 +177,7 @@ export function createDrizzleGameClaimRepository(
           .where(eq(gameMilestoneClaims.id, claimId));
         return {
           ...claim,
+          broadcastAt,
           failureReason: change.failureReason ?? claim.failureReason,
           signedPayload: change.signedPayload ?? claim.signedPayload,
           state: change.state,

@@ -74,6 +74,8 @@ export const gameAdminStepSchema = z
     failureReason: z.string().min(1).max(256).nullable(),
     // The contracts the chain reported the step created, once it ran: where a new game's contract is.
     createdContracts: z.array(z.string().min(1).max(128)).max(8),
+    // Sent and waiting longer than expected, or waiting on an indexer that is far behind. Never a statement that the step failed.
+    delayed: z.boolean(),
     // The game the step is about; none when it publishes a template.
     gameId: gameIdSchema.nullable(),
     id: z.uuid(),
@@ -87,6 +89,8 @@ export const gameAdminStepSchema = z
     recordable: z.boolean(),
     // Who entered the contract's address, when the chain did not report it and staff had to.
     recordedBy: person,
+    // When the step was sent to the network; none before.
+    sentAt: z.iso.datetime({ offset: true }).nullable(),
     state: z.enum(gameAdminStepStates),
     submittedBy: person,
     summary: gameAdminSummarySchema,

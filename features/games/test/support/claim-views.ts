@@ -40,11 +40,13 @@ export const toSign = unsignedTransactionSchema.parse({
   summary,
 });
 export const view = (over: Partial<ClaimView> = {}): ClaimView => ({
+  delayed: false,
   expiresAt: summary.expiresAt,
   failureReason: null,
   gameId: "arcade",
   id: claimId,
   milestoneId: "first-win",
+  sentAt: null,
   state: "awaiting_signature",
   summary,
   toSign,

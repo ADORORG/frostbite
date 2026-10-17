@@ -2,7 +2,10 @@ export { ArcadePanel } from "./arcade/arcade-panel.tsx";
 export { ArcadeModal } from "./components/arcade-modal.tsx";
 export { ArcadeDialog } from "./components/arcade-dialog.tsx";
 export { Avatar } from "./components/avatar.tsx";
-export { ShellSlotsProvider } from "./patterns/shell-slots.tsx";
+export {
+  ShellSlotsProvider,
+  ShellStatusProvider,
+} from "./patterns/shell-slots.tsx";
 export { StatusLamp } from "./arcade/status-lamp.tsx";
 export { AccessState } from "./feedback/access-state.tsx";
 export type { StatusTone } from "./arcade/status-lamp.tsx";

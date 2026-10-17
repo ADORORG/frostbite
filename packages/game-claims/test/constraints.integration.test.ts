@@ -16,6 +16,7 @@ import {
 
 registerDatabase();
 
+const sentAt = new Date("2026-10-16T12:30:00.000Z");
 const base = (userId: string) => ({
   chain,
   contractFamily: contract.family,
@@ -54,7 +55,12 @@ describe("what the claims table refuses by itself", () => {
   it.each([
     [
       "a state that is not one",
-      { signedPayload: "x.sig", state: "minted", transactionId: "t" },
+      {
+        broadcastAt: sentAt,
+        signedPayload: "x.sig",
+        state: "minted",
+        transactionId: "t",
+      },
       "game_milestone_claims_state_known",
     ],
     [
@@ -84,8 +90,22 @@ describe("what the claims table refuses by itself", () => {
     ],
     [
       "a transaction id before the network answered",
-      { transactionId: "abc" },
+      { broadcastAt: sentAt, transactionId: "abc" },
       "game_milestone_claims_transaction_coherent",
+    ],
+    [
+      "a claim sent with no time recorded",
+      {
+        signedPayload: "x.sig",
+        state: "broadcast_accepted",
+        transactionId: "t",
+      },
+      "game_milestone_claims_broadcast_coherent",
+    ],
+    [
+      "a time of sending on a claim the network never answered",
+      { broadcastAt: sentAt },
+      "game_milestone_claims_broadcast_coherent",
     ],
     [
       "a rejection with no reason",
@@ -125,6 +145,7 @@ describe("what the claims table refuses by itself", () => {
           ...signed,
           state: "indexed_failure",
           failureReason: "no",
+          broadcastAt: sentAt,
           transactionId: "t",
         }),
       ),
@@ -136,6 +157,7 @@ describe("what the claims table refuses by itself", () => {
           milestoneId: "a3",
           ...signed,
           state: "complete",
+          broadcastAt: sentAt,
           transactionId: "t",
         }),
       ),
@@ -160,6 +182,7 @@ describe("what the claims table refuses by itself", () => {
       ...base(userId),
       signedPayload: "x.sig",
       state: "complete",
+      broadcastAt: sentAt,
       transactionId: "t",
     };
     expect(await refusal(insert(done))).toBeNull();

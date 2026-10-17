@@ -23,6 +23,9 @@ export const settledStatesSql = quote([
 ]);
 
 export const trackedTransactionColumns = {
+  // When the transaction was first sent to the network (the moment the network gave its id for it): how long it has been waiting is
+  // counted from here. Never moved by later observations, which only change the state.
+  broadcastAt: timestamp("broadcast_at", { mode: "date", withTimezone: true }),
   chain: text("chain").notNull(),
   contractFamily: text("contract_family").notNull(),
   contractId: text("contract_id").notNull(),
@@ -49,6 +52,7 @@ export const trackedTransactionColumns = {
 };
 
 interface TrackedTable {
+  readonly broadcastAt: AnyPgColumn;
   readonly failureReason: AnyPgColumn;
   readonly signedPayload: AnyPgColumn;
   readonly state: AnyPgColumn;
@@ -60,6 +64,7 @@ interface TrackedTable {
 // network's id for it from the moment the network answered; a transaction that failed says why, and no other has a reason.
 export function trackedTransactionChecks(name: string, table: TrackedTable) {
   const {
+    broadcastAt,
     failureReason,
     signedPayload,
     state,
@@ -79,6 +84,10 @@ export function trackedTransactionChecks(name: string, table: TrackedTable) {
     check(
       `${name}_transaction_coherent`,
       sql`(${state} in ('constructed', 'simulated', 'awaiting_signature', 'signed', 'expired', 'broadcast_rejected')) = (${transactionId} is null)`,
+    ),
+    check(
+      `${name}_broadcast_coherent`,
+      sql`(${transactionId} is null) = (${broadcastAt} is null)`,
     ),
     check(
       `${name}_failure_coherent`,

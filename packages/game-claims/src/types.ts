@@ -3,6 +3,7 @@ import type {
   Address,
   ChainRef,
   ContractRef,
+  DelayPolicy,
   FundingPolicy,
   TransactionSummary,
   UnsignedTransaction,
@@ -31,6 +32,8 @@ export type ClaimChainPorts = Pick<
 
 export interface GameClaimsDependencies {
   readonly clock: () => Date;
+  // When a claim's wait is called delayed.
+  readonly delay: DelayPolicy;
   // Whether the milestone is on the player's account as earned, at any level.
   earned(userId: string, gameId: string, milestoneId: string): Promise<boolean>;
   funding(chain: ChainRef): FundingPolicy;
@@ -42,11 +45,15 @@ export interface GameClaimsDependencies {
 
 // A claim as a person or a page is told of it. The transaction to sign is given only while the wallet is still to be asked.
 export interface ClaimView {
+  // Sent and waiting longer than expected, or waiting on an indexer that is far behind. Never a statement that the claim failed.
+  readonly delayed: boolean;
   readonly expiresAt: string;
   readonly failureReason: string | null;
   readonly gameId: string;
   readonly id: string;
   readonly milestoneId: string;
+  // When the claim was sent to the network; none before.
+  readonly sentAt: string | null;
   readonly state: StoredClaim["state"];
   readonly summary: TransactionSummary;
   readonly toSign: UnsignedTransaction | null;

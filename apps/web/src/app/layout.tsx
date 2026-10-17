@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
+import { IndexingBadge } from "@ador/feature-chain-status/badge";
+import { ShellStatusProvider } from "@repo/ui/arcade";
 import "@repo/ui/styles.css";
 import "./globals.css";
+import { chainStatusConfig } from "../../../../configs/chain-status";
 import { walletAuthConfig } from "../../../../configs/wallet";
 import { ClientNavigation } from "./client-navigation";
 import { WalletShell } from "./wallet-shell";
@@ -49,14 +52,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <ClientNavigation />
-        <WalletShell
-          balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
-          candidates={walletAuthConfig.candidates}
-          network={walletAuthConfig.network}
-          reconnectWaitMs={walletAuthConfig.reconnectWaitMs}
+        <ShellStatusProvider
+          status={<IndexingBadge refreshMs={chainStatusConfig.refreshMs} />}
         >
-          {children}
-        </WalletShell>
+          <WalletShell
+            balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
+            candidates={walletAuthConfig.candidates}
+            network={walletAuthConfig.network}
+            reconnectWaitMs={walletAuthConfig.reconnectWaitMs}
+          >
+            {children}
+          </WalletShell>
+        </ShellStatusProvider>
       </body>
     </html>
   );

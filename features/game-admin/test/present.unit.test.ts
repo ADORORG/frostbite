@@ -147,6 +147,19 @@ describe("a step as the page is told of it", () => {
     });
   });
 
+  it("carries when the step was sent and whether its wait is delayed", () => {
+    expect(toWireStep(view(), names)).toMatchObject({
+      delayed: false,
+      sentAt: null,
+    });
+    expect(
+      toWireStep(
+        view({ delayed: true, sentAt: "2026-10-16T11:00:00.000Z" }),
+        names,
+      ),
+    ).toMatchObject({ delayed: true, sentAt: "2026-10-16T11:00:00.000Z" });
+  });
+
   it("says whether the address of its contract can be entered, and by whom it was", () => {
     expect(toWireStep(view(), names)).toMatchObject({
       recordable: false,

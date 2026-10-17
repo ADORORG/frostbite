@@ -37,6 +37,7 @@ const step = (
   over: Partial<StoredStep> & Pick<StoredStep, "operation" | "unsigned">,
   state: TrackedState = "confirmed",
 ): StoredStep => ({
+  broadcastAt: null,
   chain,
   contract: null,
   createdAt: new Date("2026-01-01T00:00:00.000Z"),

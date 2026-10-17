@@ -11,7 +11,7 @@ import { completing } from "./completion.ts";
 import { refOf } from "./plan.ts";
 import { recordCreated } from "./record.ts";
 import { startStep } from "./start.ts";
-import { toView } from "./steps.ts";
+import { createStepViewer } from "./steps.ts";
 import type {
   AdminChainPorts,
   GameAdminDependencies,
@@ -24,6 +24,7 @@ import type {
 
 export function createGameAdminService(dependencies: GameAdminDependencies) {
   const { clock, ports, repository } = dependencies;
+  const viewer = createStepViewer(dependencies);
 
   // Sends a signed step to the network, once; asking again sends the same bytes and the network gives the same id.
   async function broadcast(
@@ -91,11 +92,13 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
       if (outcome.refusal !== null) return outcome.refusal;
       const chain = ports(accepted.chain);
       if (chain === null || accepted.state !== "signed")
-        return { ok: true, step: toView(accepted) };
+        return { ok: true, step: await viewer.one(accepted) };
       try {
         return {
           ok: true,
-          step: toView((await broadcast(accepted, chain)) ?? accepted),
+          step: await viewer.one(
+            (await broadcast(accepted, chain)) ?? accepted,
+          ),
         };
       } catch {
         return { code: "chain-unavailable", ok: false };
@@ -113,9 +116,11 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
       if (step === null) return { code: "not-found", ok: false };
       const chain = ports(step.chain);
       if (chain === null) return { code: "chain-unavailable", ok: false };
-      const view = (held: StoredStep | null): RefreshStepResult => ({
+      const view = async (
+        held: StoredStep | null,
+      ): Promise<RefreshStepResult> => ({
         ok: true,
-        step: toView(held ?? step),
+        step: await viewer.one(held ?? step),
       });
       try {
         if (step.state === "signed") return view(await broadcast(step, chain));
@@ -155,7 +160,7 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
 
     // A game's steps, or (with null) the steps that published templates, oldest first.
     async list(gameId: string | null) {
-      return (await repository.list(gameId)).map(toView);
+      return viewer.many(await repository.list(gameId));
     },
 
     // Whether a game has its contract yet (and how large a drawing it accepts), and whether the two templates it is made from are

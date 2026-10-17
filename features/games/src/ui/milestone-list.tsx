@@ -1,8 +1,8 @@
-import type { GameClaimState, GameMilestone } from "@ador/shared/games";
+import type { GameClaim, GameMilestone } from "@ador/shared/games";
 import { ArcadeActionButton, ArcadeBadge } from "@repo/ui/arcade";
 
 import { gameMilestonePolicyLabels } from "../domain/catalog.ts";
-import { claimStateCopy } from "../domain/claim-copy.ts";
+import { claimCopy, showsDelayed } from "../domain/claim-copy.ts";
 import { presentMilestone, reachedSummary } from "../domain/milestone-state.ts";
 import type { MilestoneProgress } from "./use-game-session.ts";
 
@@ -24,7 +24,7 @@ export function MilestoneList({
   readonly claim?: {
     readonly message: string | null;
     readonly start: (milestoneId: string) => void;
-    readonly stateOf: (milestoneId: string) => GameClaimState | null;
+    readonly latestOf: (milestoneId: string) => GameClaim | null;
   };
   readonly milestones: readonly GameMilestone[];
   // How often each was earned and the total toward each target, when the player's records say.
@@ -93,10 +93,10 @@ export function MilestoneList({
                 <>
                   <br />
                   {(() => {
-                    const state = claim.stateOf(milestone.id);
-                    return state === null ||
-                      state === "failed" ||
-                      state === "expired" ? (
+                    const latest = claim.latestOf(milestone.id);
+                    return latest === null ||
+                      latest.state === "failed" ||
+                      latest.state === "expired" ? (
                       <ArcadeActionButton
                         onClick={() => claim.start(milestone.id)}
                         tone="mint"
@@ -104,8 +104,11 @@ export function MilestoneList({
                         {`Claim ${milestone.title}`}
                       </ArcadeActionButton>
                     ) : (
-                      <small data-claim-state={state}>
-                        {`Claim: ${claimStateCopy[state].label}`}
+                      <small
+                        data-claim-state={latest.state}
+                        data-delayed={showsDelayed(latest) ? "true" : undefined}
+                      >
+                        {`Claim: ${claimCopy(latest).label}`}
                       </small>
                     );
                   })()}

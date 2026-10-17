@@ -3,6 +3,7 @@ import type {
   ChainFamilyId,
   ChainRef,
   ContractRef,
+  DelayPolicy,
   FundingPolicy,
   TrackedState,
   TransactionSummary,
@@ -52,6 +53,8 @@ export interface RewardsPlan {
 }
 
 export interface StoredStep {
+  // When the network first gave an id for the step's transaction; none before it was sent.
+  readonly broadcastAt: Date | null;
   readonly chain: ChainRef;
   // The contract the step acts on; none for publishing a template or creating a game's contract.
   readonly contract: ContractRef | null;
@@ -159,6 +162,8 @@ export type DrawingCheck =
 
 export interface GameAdminDependencies {
   readonly clock: () => Date;
+  // When a step's wait is called delayed.
+  readonly delay: DelayPolicy;
   funding(chain: ChainRef): FundingPolicy;
   game(gameId: string): Promise<AdministeredGame | null>;
   newId(): string;
@@ -177,6 +182,8 @@ export interface StepView {
   readonly expiresAt: string;
   readonly failureReason: string | null;
   readonly createdContracts: readonly string[];
+  // Sent and waiting longer than expected, or waiting on an indexer that is far behind. Never a statement that the step failed.
+  readonly delayed: boolean;
   readonly gameId: string | null;
   readonly id: string;
   readonly milestoneId: string | null;
@@ -184,6 +191,8 @@ export interface StepView {
   // Whether staff can enter the address of the contract this step made, which the platform could not read.
   readonly recordable: boolean;
   readonly recordedBy: string | null;
+  // When the step was sent to the network; none before.
+  readonly sentAt: string | null;
   readonly state: StoredStep["state"];
   readonly submittedBy: string | null;
   readonly summary: TransactionSummary;

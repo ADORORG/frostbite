@@ -1,7 +1,7 @@
 import type { GameAdminStep } from "@ador/shared/games";
 import { ArcadeActionButton, ArcadeInfoCard } from "@repo/ui/arcade";
 
-import { operationLabel, stateCopy } from "../domain/copy.ts";
+import { operationLabel, showsDelayed, stepCopy } from "../domain/copy.ts";
 
 const who = (name: string | null): string =>
   name ?? "an account that no longer exists";
@@ -28,9 +28,13 @@ export function StepLog({
       ) : (
         <ul aria-label="Steps taken">
           {newestFirst.map((step) => (
-            <li data-step-state={step.state} key={step.id}>
+            <li
+              data-delayed={showsDelayed(step) ? "true" : undefined}
+              data-step-state={step.state}
+              key={step.id}
+            >
               <strong>{operationLabel(step)}</strong> —{" "}
-              <span>{stateCopy[step.state].label}</span>
+              <span>{stepCopy(step).label}</span>
               <br />
               <small>
                 {`Built by ${who(step.createdBy)} at ${step.createdAt}`}

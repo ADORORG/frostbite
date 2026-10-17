@@ -26,6 +26,33 @@ describe("arcade controls", () => {
   });
 
   it.each([
+    ["ready", "status-lamp--ready"],
+    ["attention", "status-lamp--attention"],
+    ["unavailable", "status-lamp--unavailable"],
+    ["neutral", "status-lamp--neutral"],
+  ] as const)("shows the %s tone as %s", (tone, className) => {
+    expect(
+      renderToStaticMarkup(<StatusLamp label="Chain" tone={tone} />),
+    ).toContain(className);
+  });
+
+  it("is a plain lamp unless asked to be compact, and can be reached by keyboard only when it has a detail to give", () => {
+    const plain = renderToStaticMarkup(<StatusLamp label="Chain" />);
+    expect(plain).not.toContain("data-compact");
+    expect(plain).not.toContain("tabindex");
+    expect(plain).not.toContain("status-lamp__detail");
+    const compact = renderToStaticMarkup(
+      <StatusLamp compact detail="Block 5 of 9." label="Chain" tone="ready" />,
+    );
+    expect(compact).toContain('data-compact="true"');
+    expect(compact).toContain('tabindex="0"');
+    // The detail is in the markup, so it is read out with the label.
+    expect(compact).toMatch(
+      /<span class="status-lamp__detail">Block 5 of 9\.<\/span>/u,
+    );
+  });
+
+  it.each([
     ["unauthenticated", "Authentication required"],
     ["forbidden", "Access denied"],
     ["unavailable", "Verification unavailable"],

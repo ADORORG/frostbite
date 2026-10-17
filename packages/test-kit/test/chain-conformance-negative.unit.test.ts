@@ -215,6 +215,7 @@ describe("the conformance suite refuses a broken adapter", () => {
     let reads = 0;
     const drifting = broken(adapter, {
       observer: {
+        indexing: observer.indexing,
         observe: async (ref): Promise<Observation> => {
           reads += 1;
           return { ...(await observer.observe(ref)), confirmations: reads };

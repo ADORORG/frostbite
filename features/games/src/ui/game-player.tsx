@@ -154,7 +154,7 @@ export function GamePlayer({
                       : {
                           message: claimUi.message,
                           start: (id) => void claimUi.start(id),
-                          stateOf: claimUi.stateOf,
+                          latestOf: claimUi.latestOf,
                         }
                   }
                   milestones={game.milestones}

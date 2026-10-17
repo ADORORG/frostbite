@@ -181,7 +181,8 @@
     justify-content: flex-start;
   }
 }
-.app-header__end {
+.app-header__end,
+.app-header__status {
   display: flex;
   align-items: center;
 }

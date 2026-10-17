@@ -85,6 +85,7 @@ const ports = () => {
 };
 const configured = () => ({
   clock: () => now,
+  delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 },
   chain: () => ({
     funding: { maxFee: { asset: nativeAsset(chain), baseUnits: 10n } },
     ports: ports(),

@@ -53,11 +53,52 @@
   background: currentcolor;
   box-shadow: 0 0 1rem currentcolor;
 }
+.status-lamp[data-compact] {
+  position: relative;
+  gap: 0.5rem;
+  font-size: 0.5625rem;
+  white-space: nowrap;
+}
+.status-lamp[data-compact] .status-lamp__light {
+  width: 0.5rem;
+  height: 0.5rem;
+  box-shadow: 0 0 0.5rem currentcolor;
+}
+/* The detail is read out with the label at all times; it is drawn only while the lamp is hovered or focused. */
+.status-lamp__detail {
+  position: absolute;
+  z-index: 10;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: normal;
+}
+.status-lamp[data-compact]:hover .status-lamp__detail,
+.status-lamp[data-compact]:focus-visible .status-lamp__detail {
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 18rem;
+  max-width: calc(100vw - 2rem);
+  height: auto;
+  padding: 0.75rem;
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  background: var(--arcade-surface);
+  clip-path: none;
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-body);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-transform: none;
+}
 .status-lamp--attention {
   color: var(--arcade-yellow);
 }
 .status-lamp--ready {
   color: var(--arcade-mint);
+}
+.status-lamp--neutral {
+  color: var(--arcade-text-muted);
 }
 .status-lamp--unavailable {
   color: var(--arcade-red);

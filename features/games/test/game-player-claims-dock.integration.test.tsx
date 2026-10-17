@@ -180,3 +180,30 @@ describe("a milestone claimed before", () => {
     expect(button("Claim ")).toBeUndefined();
   });
 });
+
+describe("a claim that is taking long", () => {
+  it("is called delayed beside its milestone and in the list of claims, never failed, and offers no second claim", async () => {
+    const api = fakeApi({
+      list: vi.fn(async () => ({
+        claims: [
+          claimAt("pending", {
+            delayed: true,
+            sentAt: "2026-10-16T11:00:00.000Z",
+          }),
+        ],
+      })),
+    });
+    const { target } = await mount(undefined, {
+      claims: { api, pollMs: 100_000, wallet },
+      game: claimGame,
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    send(target, "milestones.unlock", { id: milestoneId }, "b");
+    await flush();
+    expect(text()).toContain("Claim: Sent, delayed");
+    expect(text()).not.toContain("Claim: Sent,\u0020waiting");
+    expect(text()).not.toContain("Failed");
+    expect(button("Claim ")).toBeUndefined();
+    expect(document.querySelector("[data-delayed='true']")).not.toBeNull();
+  });
+});

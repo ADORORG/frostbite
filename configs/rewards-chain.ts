@@ -1,5 +1,6 @@
 import { join } from "node:path";
 
+import { cacheIndexing } from "@ador/chain/indexing";
 import {
   createConfiguredRegistry,
   feeCeiling,
@@ -11,6 +12,7 @@ import {
   type ChainConfig,
   type ChainRef,
   type FundingPolicy,
+  type IndexingStatus,
 } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
@@ -34,6 +36,11 @@ export interface RewardsChain {
     readonly funding: FundingPolicy;
     readonly ports: RewardsPorts;
   } | null;
+  // The chain as anyone may see how far its indexer has read: its name, and the reading (which rejects where the node cannot be asked).
+  readonly followed: {
+    readonly displayName: string;
+    indexing(): Promise<IndexingStatus>;
+  };
 }
 
 const signet = chainRefSchema.parse(bitcoinSignetChainId);
@@ -112,13 +119,20 @@ function configuredChain(
   };
 }
 
-function portsOf(registry: ReturnType<typeof createConfiguredRegistry>) {
+function portsOf(
+  registry: ReturnType<typeof createConfiguredRegistry>,
+  platform: RewardsPlatform,
+) {
   return {
     addressCodec: registry.port(signet, "addressCodec"),
     broadcaster: registry.port(signet, "broadcaster"),
     builder: registry.port(signet, "builder"),
     contracts: registry.port(signet, "contracts"),
-    observer: registry.port(signet, "observer"),
+    // Every page of the site shows how far the indexer has read, so the node is asked once in a while and not once a visitor.
+    observer: cacheIndexing(registry.port(signet, "observer"), {
+      now: platform.now,
+      ttlMs: rewardsPolicy.indexingReadingMs,
+    }),
     rewards: registry.port(signet, "rewards"),
   };
 }
@@ -132,11 +146,16 @@ export function createRewardsChain(
   if (environment === null) return null;
   const configured = configuredChain(environment, platform);
   const registry = createConfiguredRegistry([configured]);
+  const ports = portsOf(registry, platform);
   const offered = registry.broadcastAllowed(signet)
-    ? {
-        funding: feeCeiling(configured, environment.maxFeeSats),
-        ports: portsOf(registry),
-      }
+    ? { funding: feeCeiling(configured, environment.maxFeeSats), ports }
     : null;
-  return { chain: (chain) => (chain === signet ? offered : null) };
+  return {
+    chain: (chain) => (chain === signet ? offered : null),
+    // Reading how far the indexer has come moves nothing, so it does not wait on the release gate that guards sending.
+    followed: {
+      displayName: configured.config.displayName,
+      indexing: () => ports.observer.indexing(signet),
+    },
+  };
 }

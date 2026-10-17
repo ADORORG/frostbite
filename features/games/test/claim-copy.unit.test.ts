@@ -5,10 +5,12 @@ import {
 import { describe, expect, it } from "vitest";
 
 import {
+  claimCopy,
   claimStateCopy,
   claimUnavailableCopy,
   feeText,
   isSettledClaim,
+  showsDelayed,
 } from "../src/domain/claim-copy.ts";
 
 describe("what a claim is called", () => {
@@ -39,6 +41,39 @@ describe("what a claim is called", () => {
     for (const reason of gameClaimUnavailableReasons)
       expect(claimUnavailableCopy[reason].length).toBeGreaterThan(0);
     expect(claimUnavailableCopy["signed-out"]).toBe("Sign in to claim.");
+  });
+});
+
+describe("a claim that is taking long", () => {
+  it("says so for the two states that wait on the network, and says it has not failed", () => {
+    expect(claimCopy({ delayed: true, state: "pending" })).toMatchObject({
+      label: "Sent, delayed",
+    });
+    expect(claimCopy({ delayed: true, state: "claimed" })).toMatchObject({
+      label: "Confirmed, delayed",
+    });
+    for (const state of ["pending", "claimed"] as const) {
+      const said = claimCopy({ delayed: true, state }).detail;
+      expect(said).toContain("not failed");
+      expect(said).not.toContain("Failed");
+    }
+  });
+
+  it("keeps the ordinary words unless it is delayed, and never calls a claim that is not waiting delayed", () => {
+    for (const state of gameClaimStates) {
+      expect(claimCopy({ delayed: false, state })).toBe(claimStateCopy[state]);
+      expect(showsDelayed({ delayed: true, state })).toBe(
+        state === "pending" || state === "claimed",
+      );
+      if (state !== "pending" && state !== "claimed")
+        expect(claimCopy({ delayed: true, state })).toBe(claimStateCopy[state]);
+    }
+  });
+
+  it("never says minted", () => {
+    expect(
+      Object.values(claimCopy({ delayed: true, state: "pending" })).join(" "),
+    ).not.toMatch(/mint/iu);
   });
 });
 

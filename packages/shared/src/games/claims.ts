@@ -62,10 +62,14 @@ export const gameClaimSummarySchema = z
 
 export const gameClaimSchema = z
   .object({
+    // Sent and waiting longer than expected, or waiting on an indexer that is far behind. Never a statement that the claim failed.
+    delayed: z.boolean(),
     failureReason: z.string().min(1).max(256).nullable(),
     gameId: gameIdSchema,
     id: z.uuid(),
     milestoneId: gameIdSchema,
+    // When the claim was sent to the network; none before.
+    sentAt: z.iso.datetime({ offset: true }).nullable(),
     state: gameClaimStateSchema,
     summary: gameClaimSummarySchema,
     // The transaction for the wallet to sign, while the wallet is still to be asked; otherwise nothing.

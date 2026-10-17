@@ -18,6 +18,19 @@ export function createObserver(
   options: Pick<TransactionOptions, "now" | "providerId">,
 ): ChainObserver {
   return {
+    indexing: async (chain) => {
+      const { node } = servedChain(chains, chain);
+      const [tip, indexedHeight] = await Promise.all([
+        node.tip(),
+        node.indexedHeight(),
+      ]);
+      return {
+        chain,
+        indexedHeight,
+        observedAt: options.now().toISOString(),
+        tipHeight: tip.height,
+      };
+    },
     observe: async (ref: TransactionRef): Promise<Observation> => {
       const { node } = servedChain(chains, ref.chain);
       const observedAt = options.now().toISOString();

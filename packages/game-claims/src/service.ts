@@ -11,7 +11,7 @@ import {
   type UnsignedTransaction,
 } from "@ador/shared/chain";
 
-import { toView } from "./claim-steps.ts";
+import { createClaimViewer } from "./claim-steps.ts";
 import type { ClaimChange, StoredClaim } from "./repository.ts";
 import type {
   ClaimChainPorts,
@@ -25,6 +25,7 @@ import type {
 export function createGameClaimsService(dependencies: GameClaimsDependencies) {
   const { clock, earned, funding, game, newId, ports, repository } =
     dependencies;
+  const viewer = createClaimViewer(dependencies);
 
   // Sends a signed claim to the network, once; asking again sends the same bytes and the network gives the same id.
   async function broadcast(
@@ -103,7 +104,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       if (result.kind === "limit-reached")
         return { code: "limit-reached", ok: false };
       return {
-        claim: toView(result.claim),
+        claim: await viewer.one(result.claim),
         ok: true,
         resumed: result.kind === "in-progress",
       };
@@ -150,10 +151,10 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       if (outcome.refusal !== null) return outcome.refusal;
       const chain = ports(accepted.chain);
       if (chain === null || accepted.state !== "signed")
-        return { claim: toView(accepted), ok: true };
+        return { claim: await viewer.one(accepted), ok: true };
       try {
         const sent = await broadcast(userId, accepted, chain);
-        return { claim: toView(sent ?? accepted), ok: true };
+        return { claim: await viewer.one(sent ?? accepted), ok: true };
       } catch {
         return { code: "chain-unavailable", ok: false };
       }
@@ -168,25 +169,22 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       if (claim === null) return { code: "not-found", ok: false };
       const chain = ports(claim.chain);
       if (chain === null) return { code: "chain-unavailable", ok: false };
+      const done = async (held: StoredClaim): Promise<RefreshClaimResult> => ({
+        claim: await viewer.one(held),
+        ok: true,
+      });
       try {
         if (claim.state === "signed")
-          return {
-            claim: toView((await broadcast(userId, claim, chain)) ?? claim),
-            ok: true,
-          };
+          return done((await broadcast(userId, claim, chain)) ?? claim);
         if (claim.state === "awaiting_signature")
-          return {
-            claim: toView(
-              (await repository.update(userId, claimId, (held) =>
-                held.state === "awaiting_signature" && clock() >= held.expiresAt
-                  ? { state: "expired" }
-                  : null,
-              )) ?? claim,
-            ),
-            ok: true,
-          };
-        if (claim.transactionId === null)
-          return { claim: toView(claim), ok: true };
+          return done(
+            (await repository.update(userId, claimId, (held) =>
+              held.state === "awaiting_signature" && clock() >= held.expiresAt
+                ? { state: "expired" }
+                : null,
+            )) ?? claim,
+          );
+        if (claim.transactionId === null) return done(claim);
         const ref = { chain: claim.chain, id: claim.transactionId };
         if (claim.state === "confirmed") {
           const count = await chain.rewards.claimed(
@@ -201,26 +199,25 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
               ? moveTo("confirmed", { state: indexed })
               : () => null,
           );
-          return { claim: toView(next ?? claim), ok: true };
+          return done(next ?? claim);
         }
-        if (!isObservable(claim.state))
-          return { claim: toView(claim), ok: true };
+        if (!isObservable(claim.state)) return done(claim);
         const from = claim.state;
         const next = afterObservation(from, await chain.observer.observe(ref));
-        if (next === null) return { claim: toView(claim), ok: true };
+        if (next === null) return done(claim);
         const moved = await repository.update(
           userId,
           claimId,
           moveTo(from, next),
         );
-        return { claim: toView(moved ?? claim), ok: true };
+        return done(moved ?? claim);
       } catch {
         return { code: "chain-unavailable", ok: false };
       }
     },
 
     async list(userId: string, gameId: string): Promise<readonly ClaimView[]> {
-      return (await repository.list(userId, gameId)).map(toView);
+      return viewer.many(await repository.list(userId, gameId));
     },
   };
 }

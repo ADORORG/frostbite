@@ -20,10 +20,12 @@ const denied = (code: string, status: number) =>
     status,
   );
 const claim: GameClaim = gameClaimSchema.parse({
+  delayed: false,
   failureReason: null,
   gameId: "arcade",
   id: claimId,
   milestoneId: "first-win",
+  sentAt: null,
   state: "awaiting-signature",
   summary: {
     chain: "simnet:one",

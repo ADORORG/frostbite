@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
 import { createBitcoind, type Bitcoind } from "@repo/regtest/bitcoind";
+import { defaultFlags } from "@repo/regtest/config";
 import { objectOf } from "@repo/regtest/json";
 import {
   chainFamilyIdSchema,
@@ -30,11 +31,10 @@ import {
   withWalletSignatures,
 } from "../src/bitcoin-alkanes/wallet-signing.ts";
 
-// The local regtest stack (`pnpm --filter @repo/regtest regtest up`) as a test reaches it. Its address and Bitcoin Core's credentials
+// The local regtest stack (`pnpm --filter @repo/regtest regtest up`) as a test reaches it. Its addresses and Bitcoin Core's credentials
 // are the stack's own defaults (tooling/regtest/src/config.ts): a regtest chain guards nothing.
-const gateway = process.env["REGTEST_GATEWAY_URL"] ?? "http://127.0.0.1:18081";
-const bitcoindUrl =
-  process.env["REGTEST_BITCOIND_URL"] ?? "http://127.0.0.1:18443";
+const gateway = `http://127.0.0.1:${defaultFlags["gateway-port"]}`;
+const bitcoindUrl = `http://127.0.0.1:${defaultFlags["bitcoind-port"]}`;
 const templates = join(
   dirname(createRequire(import.meta.url).resolve("../package.json")),
   "../../contracts/templates",
@@ -47,10 +47,10 @@ export const regtestChain = chainRefSchema.parse(
 export const family = chainFamilyIdSchema.parse("bitcoin-alkanes");
 
 export const core: Bitcoind = createBitcoind({
-  password: "ador-regtest-only",
+  password: defaultFlags["bitcoind-password"],
   url: bitcoindUrl,
-  user: "ador",
-  wallet: "ador",
+  user: defaultFlags["bitcoind-user"],
+  wallet: defaultFlags.wallet,
 });
 export const node = createRpcNode(
   createJsonRpc({ fetch, timeoutMs: 60_000, url: gateway }),

@@ -68,6 +68,7 @@ export const collectibleTemplate = {
 
 export const config = (): GameAdminConfig => ({
   chain: () => null,
+  delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 },
   drawingLimits: { maxAttributeLength: 4096, maxDepth: 8, maxElements: 200 },
   rewards: {
     chain,
@@ -97,6 +98,7 @@ export const view = (over: Partial<StepView> = {}): StepView => ({
   createdAt: "2026-10-16T12:00:00.000Z",
   createdBy: staffId,
   createdContracts: [],
+  delayed: false,
   expiresAt: "2026-10-16T12:10:00.000Z",
   failureReason: null,
   gameId,
@@ -105,6 +107,7 @@ export const view = (over: Partial<StepView> = {}): StepView => ({
   operation: "set-claims-paused",
   recordable: false,
   recordedBy: null,
+  sentAt: null,
   state: "awaiting_signature",
   submittedBy: null,
   summary: summary(),

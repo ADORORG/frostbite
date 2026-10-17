@@ -8,8 +8,16 @@ export const rewardsPolicy = {
   changeDustSats: 294n,
   // What a claim's collectible output carries: above the dust limit of a P2TR output so the collectible has somewhere to land.
   claimOutputSats: 546n,
+  // When a wait is called delayed rather than ordinary (ADR-018): the indexer is more than this many blocks behind the chain's tip, or a
+  // sent step or claim has gone this long without finishing. Delayed is shown, never as failed, and nothing is retried or cancelled.
+  delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60 * 1000 },
   // The fee rate is taken for confirmation within this many blocks.
   feeTargetBlocks: 3,
+  // How long one reading of the indexer is reused. Every page of the site shows it, so the node is asked at most once in this time
+  // however many people are looking; a reading is never older than this.
+  indexingReadingMs: 15_000,
+  // How often a page asks again how far the indexer has read. Longer than a reading is reused, so most asks cost the node nothing.
+  indexingRefreshMs: 30_000,
   // How long a built transaction may be signed for. Staff sign each step by hand after reading its summary, so it is generous.
   lifetimeMs: 30 * 60 * 1000,
   // The largest collectible picture the platform will read back from a chain for display; not below the largest drawing a contract

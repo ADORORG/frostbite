@@ -19,6 +19,8 @@ export const settledStates: ReadonlySet<ClaimState> = new Set([
 ]);
 
 export interface StoredClaim {
+  // When the network first gave an id for the claim's transaction; none before it was sent.
+  readonly broadcastAt: Date | null;
   readonly chain: ChainRef;
   readonly contract: ContractRef;
   readonly createdAt: Date;

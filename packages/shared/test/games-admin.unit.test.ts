@@ -37,6 +37,24 @@ describe("the staff administration contract", () => {
     ).toThrow();
   });
 
+  it("says whether a step is delayed and when it was sent, as a flag and a time, and refuses anything else", () => {
+    const sent = {
+      ...step,
+      delayed: true,
+      sentAt: "2026-10-16T11:00:00.000Z",
+    };
+    expect(gameAdminStepSchema.parse(sent)).toEqual(sent);
+    expect(() =>
+      gameAdminStepSchema.parse({ ...sent, delayed: "yes" }),
+    ).toThrow();
+    expect(() =>
+      gameAdminStepSchema.parse({ ...sent, sentAt: "yesterday" }),
+    ).toThrow();
+    expect(() =>
+      gameAdminStepSchema.parse({ ...sent, delayed: undefined }),
+    ).toThrow();
+  });
+
   it("takes the four actions staff have, each with only its own fields", () => {
     expect(
       gameAdminActionSchema.parse({

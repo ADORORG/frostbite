@@ -5,6 +5,7 @@
   "dependencies": {
     "@ador/chain": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
+    "@ador/feature-chain-status": "workspace:*",
     "@ador/feature-collection-review": "workspace:*",
     "@ador/feature-collection-studio": "workspace:*",
     "@ador/feature-creator-admission": "workspace:*",
