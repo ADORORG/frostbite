@@ -6,12 +6,16 @@ const mainnetP2wpkh = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
 const mainnetP2tr =
   "bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0";
 const signetP2wpkh = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
+// An address Bitcoin Core's regtest wallet made, and a legacy testnet one (regtest and signet share testnet's version bytes).
+const regtestP2wpkh = "bcrt1qn42y974s76dhr4jsswtqer8sl2h8aracmelqvs";
+const testnetLegacy = "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn";
 
 describe("validateBitcoinAddress", () => {
   it.each([
     [mainnetP2wpkh, "mainnet", "p2wpkh", 44],
     [mainnetP2tr, "mainnet", "p2tr", 68],
     [signetP2wpkh, "signet", "p2wpkh", 44],
+    [regtestP2wpkh, "regtest", "p2wpkh", 44],
   ] as const)("validates %s", (candidate, network, type, scriptLength) => {
     const result = validateBitcoinAddress(candidate, network);
 
@@ -24,6 +28,11 @@ describe("validateBitcoinAddress", () => {
 
   it.each([
     ["", "mainnet", "invalid-address"],
+    [regtestP2wpkh, "signet", "invalid-address"],
+    [regtestP2wpkh, "mainnet", "invalid-address"],
+    [signetP2wpkh, "regtest", "invalid-address"],
+    [testnetLegacy, "regtest", "unsupported-address-type"],
+    [testnetLegacy, "mainnet", "invalid-address"],
     [mainnetP2wpkh, "signet", "invalid-address"],
     [signetP2wpkh, "mainnet", "invalid-address"],
     [` ${mainnetP2wpkh}`, "mainnet", "invalid-address"],

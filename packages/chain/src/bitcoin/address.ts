@@ -1,7 +1,18 @@
 import { address, networks, opcodes, script } from "bitcoinjs-lib";
 
-export const bitcoinNetworks = ["mainnet", "signet"] as const;
+export const bitcoinNetworks = ["mainnet", "signet", "regtest"] as const;
 export type BitcoinNetwork = (typeof bitcoinNetworks)[number];
+
+// What tells one network's addresses from another's: the bech32 prefix (BIP-173) and the legacy version bytes. Signet shares
+// testnet's.
+const addressRules = {
+  mainnet: { legacy: networks.bitcoin, prefix: "bc" },
+  regtest: { legacy: networks.regtest, prefix: "bcrt" },
+  signet: { legacy: networks.testnet, prefix: "tb" },
+} as const satisfies Record<
+  BitcoinNetwork,
+  { readonly legacy: typeof networks.bitcoin; readonly prefix: string }
+>;
 export type SupportedAddressType = "p2tr" | "p2wpkh";
 
 declare const validatedAddressBrand: unique symbol;
@@ -52,7 +63,7 @@ export function validateBitcoinAddress(
   }
 
   try {
-    const expectedPrefix = network === "mainnet" ? "bc" : "tb";
+    const expectedPrefix = addressRules[network].prefix;
     const decoded = address.fromBech32(candidate);
     if (decoded.prefix !== expectedPrefix) {
       return { code: "invalid-address", ok: false };
@@ -90,8 +101,7 @@ export function validateBitcoinAddress(
   } catch {
     try {
       const decoded = address.fromBase58Check(candidate);
-      const expectedNetwork =
-        network === "mainnet" ? networks.bitcoin : networks.testnet;
+      const expectedNetwork = addressRules[network].legacy;
       const isKnownLegacyVersion =
         decoded.version === expectedNetwork.pubKeyHash ||
         decoded.version === expectedNetwork.scriptHash;
