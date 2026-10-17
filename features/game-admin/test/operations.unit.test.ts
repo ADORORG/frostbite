@@ -35,6 +35,7 @@ function stub(overrides: Partial<GameAdminService> = {}) {
     list: vi.fn(async () => [view()]),
     status: vi.fn(async () => ({
       contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+      drawingCeiling: 8192,
       templatesReady: true,
     })),
     templates: vi.fn(async () => [
@@ -218,6 +219,7 @@ describe("sending, looking at and listing steps", () => {
       ok: true,
       value: {
         contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+        drawingCeiling: 8192,
         steps: [{ createdBy: "Ada" }],
         templatesReady: true,
       },
@@ -232,7 +234,12 @@ describe("sending, looking at and listing steps", () => {
     });
     expect(await s.list.execute({ gameId: "nope" }, context)).toEqual({
       ok: true,
-      value: { contract: null, steps: [], templatesReady: false },
+      value: {
+        contract: null,
+        drawingCeiling: 1,
+        steps: [],
+        templatesReady: false,
+      },
     });
   });
 

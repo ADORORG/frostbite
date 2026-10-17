@@ -35,7 +35,7 @@ export interface StartContext {
 export type Overview =
   | ({ readonly kind: "game" } & Pick<
       ListGameAdminStepsResponse,
-      "contract" | "templatesReady"
+      "contract" | "drawingCeiling" | "templatesReady"
     >)
   | ({ readonly kind: "templates" } & Pick<
       ListGameAdminTemplatesResponse,
@@ -80,10 +80,17 @@ export function useAdminSteps(options: {
           }))
         : api
             .list(gameId)
-            .then(({ contract, steps: held, templatesReady }) => ({
-              overview: { contract, kind: "game", templatesReady },
-              steps: held,
-            })),
+            .then(
+              ({ contract, drawingCeiling, steps: held, templatesReady }) => ({
+                overview: {
+                  contract,
+                  drawingCeiling,
+                  kind: "game",
+                  templatesReady,
+                },
+                steps: held,
+              }),
+            ),
     [api, gameId],
   );
   const apply = useCallback(

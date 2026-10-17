@@ -12,7 +12,7 @@ Game rewards page, and the platform records them when each step completes (`ador
 1. `REWARDS_CHAIN_RPC_URL`: one JSON-RPC address serving the Bitcoin (`esplora_*`) and Alkanes (`metashrew_*`) methods. Signet is
    the only chain wired today (`configs/chains.ts`). Blank means no rewards chain: claims and staff administration say
    "not available".
-2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it.
+2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it. On signet 50000 is generous; tighten it before any real network.
 3. `REWARDS_CHAIN_RPC_TIMEOUT_MS` (optional): how long a call to the node may take. Blank means 15 seconds.
 4. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose

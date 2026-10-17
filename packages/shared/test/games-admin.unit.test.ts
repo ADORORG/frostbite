@@ -225,7 +225,12 @@ describe("the staff administration contract", () => {
     expect(
       refreshGameAdminStepResponseSchema.parse({ status: "ok", step }),
     ).toBeDefined();
-    const empty = { contract: null, steps: [step], templatesReady: false };
+    const empty = {
+      contract: null,
+      drawingCeiling: 16_384,
+      steps: [step],
+      templatesReady: false,
+    };
     expect(listGameAdminStepsResponseSchema.parse(empty).steps).toHaveLength(1);
     expect(
       listGameAdminStepsResponseSchema.parse({
@@ -236,6 +241,9 @@ describe("the staff administration contract", () => {
     ).toBe("2:7");
     expect(() =>
       listGameAdminStepsResponseSchema.parse({ steps: [step] }),
+    ).toThrow();
+    expect(() =>
+      listGameAdminStepsResponseSchema.parse({ ...empty, drawingCeiling: 0 }),
     ).toThrow();
     expect(
       listGameAdminTemplatesResponseSchema.parse({

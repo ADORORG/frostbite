@@ -176,6 +176,7 @@ export function createListStepsOperation(resolve: Resolve) {
       // A game the platform does not administer has no contract, no templates ready and no steps.
       const status = (await service.status(input.gameId)) ?? {
         contract: null,
+        drawingCeiling: 1,
         templatesReady: false,
       };
       const steps = await service.list(input.gameId);
@@ -184,6 +185,7 @@ export function createListStepsOperation(resolve: Resolve) {
         ok: true,
         value: {
           contract: status.contract,
+          drawingCeiling: status.drawingCeiling,
           steps: steps.map((step) => toWireStep(step, known)),
           templatesReady: status.templatesReady,
         },

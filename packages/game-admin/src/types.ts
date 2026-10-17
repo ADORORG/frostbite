@@ -139,6 +139,8 @@ export interface GameStatus {
     readonly address: string;
     readonly maxDrawingBytes: number;
   } | null;
+  // The most a new contract may be created to accept.
+  readonly drawingCeiling: number;
   readonly templatesReady: boolean;
 }
 

@@ -193,6 +193,7 @@ describe("where a game stands before any step", () => {
     const staff = await seedStaff();
     expect(await service.status(gameId)).toEqual({
       contract: null,
+      drawingCeiling: 8192,
       templatesReady: false,
     });
     await runToEnd(publishInput(staff, gameTemplate, "at-1"));

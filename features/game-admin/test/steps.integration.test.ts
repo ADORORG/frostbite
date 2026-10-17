@@ -76,6 +76,7 @@ describe("administering a game through the operations", () => {
       ok: true,
       value: {
         contract: { address: expect.any(String), maxDrawingBytes: 4096 },
+        drawingCeiling: 8192,
         templatesReady: true,
       },
     });

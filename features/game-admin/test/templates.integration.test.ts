@@ -51,7 +51,12 @@ describe("publishing templates and creating a game's contract through the operat
     const ops = operations();
     const before = await ops.list.execute({ gameId }, sessionFor(ada));
     expect(before).toMatchObject({
-      value: { contract: null, steps: [], templatesReady: false },
+      value: {
+        contract: null,
+        drawingCeiling: 8192,
+        steps: [],
+        templatesReady: false,
+      },
     });
     const made = await createContract(ops, ada);
     expect(made).toMatchObject({
@@ -65,6 +70,7 @@ describe("publishing templates and creating a game's contract through the operat
     expect(after).toMatchObject({
       value: {
         contract: { address: made.createdContracts[0], maxDrawingBytes: 4096 },
+        drawingCeiling: 8192,
         templatesReady: true,
       },
     });

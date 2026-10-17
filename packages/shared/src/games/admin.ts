@@ -152,6 +152,8 @@ export const listGameAdminStepsResponseSchema = z
       })
       .strict()
       .nullable(),
+    // The most a new contract may be created to accept, in bytes.
+    drawingCeiling: z.number().int().positive(),
     steps: z.array(gameAdminStepSchema).max(500),
     // Whether both templates a game's contract is made from have been published.
     templatesReady: z.boolean(),

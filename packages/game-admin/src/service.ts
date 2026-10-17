@@ -172,6 +172,7 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
                 address: game.contract.id,
                 maxDrawingBytes: Number(game.maxDrawingBytes),
               },
+        drawingCeiling: Number(dependencies.rewards.maxDrawingBytes),
         templatesReady: published.every((template) => template !== null),
       };
     },

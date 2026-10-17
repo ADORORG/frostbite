@@ -28,6 +28,12 @@ describe("the rewards policy", () => {
     ).toBe(rewardsPolicy.templates.length);
   });
 
+  it("reads back at least as much picture as a contract may be created to keep", () => {
+    expect(BigInt(rewardsPolicy.maxPreviewBytes)).toBeGreaterThanOrEqual(
+      rewardsPolicy.maxDrawingBytes,
+    );
+  });
+
   it("keeps the change output at or above the relay dust limit and the claim output above the change", () => {
     expect(rewardsPolicy.changeDustSats).toBeGreaterThanOrEqual(294n);
     expect(rewardsPolicy.claimOutputSats).toBeGreaterThan(

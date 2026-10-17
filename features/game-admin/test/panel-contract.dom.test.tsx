@@ -15,6 +15,7 @@ const noContract = (templatesReady: boolean) =>
   fakeApi({
     list: vi.fn(async () => ({
       contract: null,
+      drawingCeiling: 8192,
       steps: [],
       templatesReady,
     })),
@@ -64,7 +65,7 @@ describe("a game with no contract yet", () => {
     expect(button(container, "Create the contract")?.disabled).toBe(false);
     await click(button(container, "Create the contract"));
     expect(api.start).toHaveBeenLastCalledWith({
-      action: { maxDrawingBytes: 4096, operation: "deploy" },
+      action: { maxDrawingBytes: 8192, operation: "deploy" },
       gameId: "arcade",
       wallet: "sim:one:a1b2c3fe",
     });
@@ -77,13 +78,13 @@ describe("a game with no contract yet", () => {
     });
   });
 
-  it("does not offer a size that is not a positive whole number", async () => {
+  it("does not offer a size that is not a positive whole number within what a contract may accept", async () => {
     const container = await panel(noContract(true));
     await settle(() =>
       expect(button(container, "Create the contract")).not.toBeNull(),
     );
     await enterWallet(container);
-    for (const size of ["", "0", "-5", "1.5", "lots"]) {
+    for (const size of ["", "0", "-5", "1.5", "lots", "8193"]) {
       await typeInto(fieldByLabel(container, "Largest drawing (bytes)"), size);
       expect(button(container, "Create the contract")?.disabled).toBe(true);
     }
@@ -122,6 +123,7 @@ describe("a game with no contract yet", () => {
     const api = fakeApi({
       list: vi.fn(async () => ({
         contract: null,
+        drawingCeiling: 8192,
         steps: [made],
         templatesReady: true,
       })),
@@ -153,6 +155,7 @@ describe("a game with no contract yet", () => {
       .fn()
       .mockResolvedValueOnce({
         contract: null,
+        drawingCeiling: 8192,
         steps: [pending],
         templatesReady: true,
       })

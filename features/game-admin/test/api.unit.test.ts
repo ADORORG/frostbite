@@ -20,6 +20,7 @@ describe("the administration routes as the page reaches them", () => {
     const fetchImpl = vi.fn<FetchLike>(async () =>
       json({
         contract: { address: "2:7", maxDrawingBytes: 4096 },
+        drawingCeiling: 8192,
         steps: [step()],
         templatesReady: true,
       }),

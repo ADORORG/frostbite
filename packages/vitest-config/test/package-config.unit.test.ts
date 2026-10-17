@@ -4,6 +4,7 @@ import {
   defaultCoverageThreshold,
   packageVitestConfig,
   domTestTimeoutMs,
+  unitTestTimeoutMs,
 } from "../src/package-config.ts";
 
 const include = ["src/**/*.ts"];
@@ -101,13 +102,13 @@ describe("packageVitestConfig", () => {
     ).toBe(false);
   });
 
-  it("gives only the integration project a longer timeout", () => {
+  it("gives the integration project a longer timeout than the unit project's", () => {
     const { projects } = build({
       coverage: { include },
       integrationTimeoutMs: 30_000,
     });
     expect(projects.map(({ testTimeout }) => testTimeout)).toEqual([
-      undefined,
+      unitTestTimeoutMs,
       30_000,
     ]);
   });
@@ -140,9 +141,12 @@ describe("packageVitestConfig", () => {
       include: ["test/**/*.dom.test.{ts,tsx}"],
       name: "unit-dom",
       setupFiles: ["test/ui-setup.ts"],
-      // A busy machine renders a page slowly; the node tests keep the default.
+      // A busy machine renders a page slowly.
       testTimeout: domTestTimeoutMs,
     });
-    expect(projects[0]).not.toHaveProperty("testTimeout");
+    expect(projects[0]).toMatchObject({
+      name: "unit",
+      testTimeout: unitTestTimeoutMs,
+    });
   });
 });

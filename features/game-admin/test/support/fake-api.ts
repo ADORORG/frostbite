@@ -84,6 +84,7 @@ export const publishable = [
 // What the list route answers for a game that has its contract.
 export const listing = (steps: GameAdminStep[]) => ({
   contract: { address: "rewards-1", maxDrawingBytes: 4096 },
+  drawingCeiling: 8192,
   steps,
   templatesReady: true,
 });

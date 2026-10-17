@@ -54,6 +54,7 @@ export function GameAdminPanel({
       {overview.contract === null ? (
         <ContractCard
           busy={!signer.ready}
+          drawingCeiling={overview.drawingCeiling}
           onCreate={(maxDrawingBytes) =>
             void ask({ maxDrawingBytes, operation: "deploy" })
           }

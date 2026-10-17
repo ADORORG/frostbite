@@ -16,6 +16,9 @@ export const databaseTestTimeoutMs = 15_000;
 /** jsdom suites render whole React trees; on a busy machine they exceed the five-second default without being wrong. */
 export const domTestTimeoutMs = 15_000;
 
+/** Unit suites in node are fast alone, but a busy machine running many workspaces at once pushes some past the five-second default. */
+export const unitTestTimeoutMs = 15_000;
+
 /** File suffix a test glob matches: `.ts` files, `.tsx` files, or both. */
 export type TestExtension = "ts" | "tsx" | "{ts,tsx}";
 
@@ -86,6 +89,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
           test: {
             include: [`test/**/*.unit.test.${unit}`],
             name: "unit",
+            testTimeout: unitTestTimeoutMs,
             ...withEnvironment,
           },
         },
