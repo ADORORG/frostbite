@@ -63,6 +63,14 @@ completes when the indexer catches up and the chain's records agree. The wait is
 (`broadcast_at`). If the node cannot be asked, only the 60 minutes can mark a wait delayed. The lamp refreshes every 30 seconds
 (`indexingRefreshMs`), and the platform asks the node at most once per 15 seconds (`indexingReadingMs`) however many pages are open.
 
+## Checking the setup before the first signet run
+
+`pnpm signet:preflight` (optionally `--env <file>`, default `apps/web/.env.local`) reads the settings and checks, without signing or sending anything:
+the `REWARDS_*` settings parse as the platform parses them; each template in `REWARDS_TEMPLATES_DIR` has the released hash; the indexer is within
+the allowed lag of the tip; the auth-token factory (`4:65517`) has code; and the estimated cost of publishing each template at the quoted fee rate is
+within `REWARDS_MAX_FEE_SATS`. `UNVERIFIED` means the node could not be asked (for example a stalled indexer), not that the check passed. Exit code 0
+means all passed, 1 something is wrong, 2 only unverified. It does not cover broadcast acceptance, wallet signing or the staff account and manifest.
+
 ## Turn it off
 
 Blank `REWARDS_CHAIN_RPC_URL`, or close the chain's gate in the policy, and restart. Steps and claims already sent stay on the chain

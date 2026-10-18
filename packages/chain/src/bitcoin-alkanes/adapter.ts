@@ -31,6 +31,7 @@ export {
   type FetchLike,
   type JsonRpcOptions,
 } from "./node/transport.ts";
+export { packCode, sha256Hex } from "./admin/data.ts";
 export type { TransactionOptions } from "./options.ts";
 export { templateEntries, type TemplateSetting } from "./settings.ts";
 export {

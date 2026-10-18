@@ -50,7 +50,8 @@
     "repository:check": "pnpm --filter @repo/repository-policy check",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
     "game:dev": "pnpm --filter @repo/game-tools dev",
-    "game:new": "pnpm --filter @repo/game-tools new"
+    "game:new": "pnpm --filter @repo/game-tools new",
+    "signet:preflight": "pnpm --filter @repo/signet-preflight preflight"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
