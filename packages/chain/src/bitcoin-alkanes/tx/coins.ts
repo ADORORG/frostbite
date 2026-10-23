@@ -24,6 +24,17 @@ export interface CoinRequest {
   readonly utxos: readonly NodeUtxo[];
 }
 
+// What to add to a refusal for want of funds when outputs wait for their first confirmation: they are not spent, and the person
+// who sees "no balance" while their wallet shows one should be told why.
+export function unconfirmedNote(utxos: readonly NodeUtxo[]): string {
+  const waiting = utxos
+    .filter((utxo) => !utxo.confirmed)
+    .reduce((sum, utxo) => sum + utxo.value, 0n);
+  return waiting === 0n
+    ? ""
+    : ` ${waiting} sats in the wallet are still waiting for their first confirmation, and a step does not spend them; try again once they confirm.`;
+}
+
 // Picks the fewest, largest confirmed outputs that pay for the fixed outputs and the fee. Unconfirmed outputs are never spent: a
 // claim built on one would fail if that transaction were replaced.
 export function selectCoins(request: CoinRequest): CoinSelection | null {

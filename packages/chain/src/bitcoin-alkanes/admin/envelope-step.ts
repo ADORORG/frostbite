@@ -2,7 +2,7 @@ import { Psbt, Transaction } from "bitcoinjs-lib";
 
 import { fromHex } from "../node/hex.ts";
 import { callScript, type Call } from "../tx/call-script.ts";
-import { selectCoins } from "../tx/coins.ts";
+import { selectCoins, unconfirmedNote } from "../tx/coins.ts";
 import { feeFor } from "../tx/fees.ts";
 import { createEnvelope, tapscriptLeafVersion } from "./envelope.ts";
 import type { OneTimeKey } from "./one-time-key.ts";
@@ -109,7 +109,7 @@ export function planEnvelopeStep(
     });
     if (selection === null) {
       throw new StepRefusedError(
-        "The wallet's confirmed balance cannot pay for the step.",
+        `The wallet's confirmed balance cannot pay for the step.${unconfirmedNote(funder.utxos)}`,
         "insufficient-funds",
       );
     }

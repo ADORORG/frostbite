@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { selectCoins } from "../../src/bitcoin-alkanes/tx/coins.ts";
+import {
+  selectCoins,
+  unconfirmedNote,
+} from "../../src/bitcoin-alkanes/tx/coins.ts";
 import { estimateVsize, feeFor } from "../../src/bitcoin-alkanes/tx/fees.ts";
 import { idA, idB, idC, utxo } from "../support/claims.ts";
 
 const base = {
   changeDustSats: 294n,
-  templateSequence: { attempts: 200, first: 1000n },
   fixedOutputs: ["p2wpkh"] as const,
   fixedSats: 546n,
   feeRate: 2,
@@ -113,5 +115,19 @@ describe("picking coins", () => {
       utxos: [utxo(idA, 0, 2_000n), utxo(idB, 0, 2_000n)],
     });
     expect(selection?.chosen).toHaveLength(1);
+  });
+});
+
+describe("saying why a balance is not spent", () => {
+  it("names the sats still waiting for their first confirmation, and nothing when none wait", () => {
+    const waiting = { ...utxo(idA, 0, 5_000_000n), confirmed: false };
+    expect(unconfirmedNote([waiting, utxo(idB, 0, 1_000n)])).toContain(
+      "5000000 sats",
+    );
+    expect(
+      unconfirmedNote([waiting, { ...waiting, vout: 1, value: 7n }]),
+    ).toContain("5000007 sats");
+    expect(unconfirmedNote([utxo(idB, 0, 1_000n)])).toBe("");
+    expect(unconfirmedNote([])).toBe("");
   });
 });
