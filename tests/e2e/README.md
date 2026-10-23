@@ -28,8 +28,13 @@ after reading the diff: `pnpm test:e2e -- --update-snapshots changed <spec>`.
 
 `pnpm stack` runs the whole product locally for a person to drive by hand: the same disposable
 PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the same users, kept running
-until Ctrl+C. It builds the web app first if there is no build, then prints the address and the pages
-worth visiting.
+until Ctrl+C. It builds the web app first (every start; Next reuses its cache, `--no-build` skips it), then
+prints the address, the pages worth visiting, and which rewards chain it is on.
+
+- **Rewards chain:** the stack takes `BETA_NETWORK` and the `REWARDS_*` settings from `apps/web/.env.local` (and
+  nothing else from that file; a variable already in your shell wins). With them set it talks to that node, so staff
+  steps sent from the stack are real transactions on that network; with none, claims and game administration say
+  "not available". The line it prints names the network and the node's host, never the key.
 
 - **Signing in:** open `http://localhost:4174/dev/sign-in` and click a person (creator, second creator,
   applicant, reviewer, staff). It sets the session and lands on that person's page. Real sign-in is by
@@ -40,8 +45,8 @@ worth visiting.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
 - Everything is disposable and local: the server binds the loopback address, the session tokens are fixed
-  fixtures of a throwaway database, storage is MinIO (never real R2), and nothing touches a chain. Never
-  run it on a shared host.
+  fixtures of a throwaway database and storage is MinIO (never real R2). The only real thing is the rewards
+  chain above, when one is set. Never run it on a shared host.
 - Docker is required (as for the integration tests).
 
 ## Verification

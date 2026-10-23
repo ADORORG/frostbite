@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from "node:child_process";
-import { access } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import { resolve } from "node:path";
 
@@ -10,6 +10,10 @@ import {
   resolveStackServer,
   stackActors,
 } from "../src/manual-stack.ts";
+import {
+  chainSettingsFrom,
+  describeChain,
+} from "../src/stack-chain-environment.ts";
 import { createStackProxy } from "../src/stack-proxy.ts";
 import { withUploadServices } from "../src/services.ts";
 import { applicationEnvironment, seed } from "./stack-setup.ts";
@@ -19,10 +23,8 @@ import { applicationEnvironment, seed } from "./stack-setup.ts";
 // Stops everything when interrupted. Start it with `pnpm stack` from the repository root.
 
 const repositoryRoot = resolve(import.meta.dirname, "../../..");
-const builtServer = resolve(
-  repositoryRoot,
-  "apps/web/.next/standalone/apps/web/server.js",
-);
+// The app's own settings file, where a developer keeps the rewards chain; only its chain settings are used (see the module).
+const settingsFile = resolve(repositoryRoot, "apps/web/.env.local");
 const readyTimeoutMilliseconds = 90_000;
 
 function run(
@@ -46,15 +48,13 @@ function finished(child: ChildProcess): Promise<number | null> {
   });
 }
 
-async function ensureBuild(): Promise<void> {
-  try {
-    await access(builtServer);
-    return;
-  } catch {
-    console.log("No web build found; building it first (this takes a minute).");
-  }
+// Always built, so what runs is the code in this checkout and the network it is set to (the network can be fixed into pages at build
+// time). Next reuses its cache, so an unchanged tree builds quickly. `--no-build` skips it for someone who knows nothing changed.
+async function build(environment: NodeJS.ProcessEnv): Promise<void> {
+  if (process.argv.includes("--no-build")) return;
+  console.log("Building the web app (reuses the cache when nothing changed).");
   const code = await finished(
-    run(["pnpm", "--filter", "web", "build"], process.env),
+    run(["pnpm", "--filter", "web", "build"], environment),
   );
   if (code !== 0)
     throw new Error(`The web build failed (exit ${String(code)}).`);
@@ -117,7 +117,12 @@ function untilInterrupted(): Promise<void> {
   });
 }
 
-await ensureBuild();
+const chainSettings = chainSettingsFrom(
+  await readFile(settingsFile, "utf8").catch(() => null),
+  process.env,
+);
+const stackEnvironment = { ...process.env, ...chainSettings };
+await build(stackEnvironment);
 const { baseURL, port } = resolveStackServer();
 await withDisposablePostgres(async (databaseUrl) => {
   await seed(databaseUrl);
@@ -131,7 +136,7 @@ await withDisposablePostgres(async (databaseUrl) => {
       const server = run(
         ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
         {
-          ...process.env,
+          ...stackEnvironment,
           ...baseEnvironment,
           ...serviceEnvironment,
           HOSTNAME: "127.0.0.1",
@@ -149,6 +154,7 @@ await withDisposablePostgres(async (databaseUrl) => {
         });
         await listen(frontDoor, Number(port));
         console.log(formatStackGuide({ baseURL }));
+        console.log(`${describeChain(stackEnvironment)}\n`);
         try {
           await untilInterrupted();
         } finally {

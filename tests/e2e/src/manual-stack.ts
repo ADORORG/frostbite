@@ -108,7 +108,7 @@ export function formatStackGuide(input: {
   lines.push(
     "",
     "Everything here is disposable: the database, the storage, and the users disappear when you stop",
-    "the stack (Ctrl+C). Nothing is on a chain; storage is local MinIO, not R2.",
+    "the stack (Ctrl+C). Storage is local MinIO, not R2. The rewards chain, if the line below names one, is the only real thing here.",
     "",
   );
   return lines.join("\n");

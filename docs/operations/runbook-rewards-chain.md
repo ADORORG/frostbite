@@ -28,7 +28,7 @@ wallet set to the same network. Games, collections and records made on the other
 
 Restart the web process after changing any of these. A malformed value stops boot with the name of the setting.
 
-The release gate is `signetReleaseGate` in `configs/rewards-policy.ts` (signet: open). While a chain's gate is closed it is
+The release gate is `testChainReleaseGate` in `configs/rewards-policy.ts` (the beta's test network: open). While a chain's gate is closed it is
 configured but not offered: nothing is built, sent or watched on it. Mainnet is not wired; opening its gate is the owner's decision
 after a review.
 
@@ -71,7 +71,7 @@ completes when the indexer catches up and the chain's records agree. The wait is
 (`broadcast_at`). If the node cannot be asked, only the 60 minutes can mark a wait delayed. The lamp refreshes every 30 seconds
 (`indexingRefreshMs`), and the platform asks the node at most once per 15 seconds (`indexingReadingMs`) however many pages are open.
 
-## Checking the setup before the first signet run
+## Checking the setup before the first run
 
 `pnpm testnet:preflight` (optionally `--env <file>`, default `apps/web/.env.local`) reads the settings and checks, without signing or sending anything:
 the `REWARDS_*` settings parse as the platform parses them; each template in `REWARDS_TEMPLATES_DIR` has the released hash; the indexer is within

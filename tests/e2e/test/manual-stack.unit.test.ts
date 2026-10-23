@@ -63,7 +63,7 @@ describe("the guide", () => {
     for (const [path] of stackPages)
       expect(guide).toContain(`http://localhost:4174${path}`);
     expect(guide).toContain("Ctrl+C");
-    expect(guide).toContain("Nothing is on a chain");
+    expect(guide).toContain("the only real thing here");
   });
 
   it("uses the actors it is given", () => {
