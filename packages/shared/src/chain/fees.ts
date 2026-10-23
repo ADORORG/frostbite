@@ -92,6 +92,18 @@ export const chainFeesSchema = z.discriminatedUnion("state", [
     .strict(),
 ]);
 
+// How a built transaction's fee came about, told with it: the rate the chain quoted when it was priced, the speed asked for and the
+// wait that speed stands for. Optional because an adapter that does not price by rate (or a transaction built before) has none.
+export const feeDetailSchema = z
+  .object({
+    approxMinutes: z.number().positive().finite().optional(),
+    satPerVb: z.number().positive().finite(),
+    speed: feeSpeedSchema.optional(),
+  })
+  .strict()
+  .readonly();
+export type FeeDetail = z.infer<typeof feeDetailSchema>;
+
 export const chainFeesInputSchema = z.object({}).strict();
 
 export const chainFeesRoute = {

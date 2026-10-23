@@ -1,6 +1,8 @@
 import {
   assertFeeSpeedPolicy,
+  feeSpeeds,
   targetBlocksOf,
+  type FeeDetail,
   type FeeSpeed,
   type FeeSpeedPolicy,
 } from "@ador/shared/chain";
@@ -34,6 +36,30 @@ export function feeTargetFor(
   return speed === undefined
     ? options.feeTargetBlocks
     : targetBlocksOf(options.feeSpeeds, speed);
+}
+
+// How a fee came about, for the person who is shown it: the rate the node quoted and, when it is known, the speed and its wait. The speed
+// is the one chosen, or the one the usual block target stands for; none when the usual target is not one of the speeds.
+export function feeDetailFor(
+  options: Pick<TransactionOptions, "feeSpeeds" | "feeTargetBlocks">,
+  speed: FeeSpeed | undefined,
+  satPerVb: number,
+): FeeDetail {
+  const named =
+    speed ??
+    feeSpeeds.find(
+      (candidate) =>
+        options.feeSpeeds[candidate].targetBlocks === options.feeTargetBlocks,
+    );
+  return {
+    ...(named === undefined
+      ? {}
+      : {
+          approxMinutes: options.feeSpeeds[named].approxMinutes,
+          speed: named,
+        }),
+    satPerVb,
+  };
 }
 
 export function assertTransactionOptions(options: TransactionOptions): void {

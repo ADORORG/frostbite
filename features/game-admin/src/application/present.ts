@@ -47,6 +47,9 @@ export function toWireStep(
         asset: summary.fee.asset.id,
         baseUnits: summary.fee.baseUnits.toString(),
       },
+      ...(summary.feeDetail === undefined
+        ? {}
+        : { feeDetail: summary.feeDetail }),
       ...(summary.milestone === undefined
         ? {}
         : { milestoneId: summary.milestone.id }),

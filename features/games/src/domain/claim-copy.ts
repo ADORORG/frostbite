@@ -88,7 +88,3 @@ export const unreachableCopy =
 // A claim is over when it took effect or never will; the page stops asking after it.
 export const isSettledClaim = (state: GameClaimState): boolean =>
   state === "complete" || state === "failed" || state === "expired";
-
-// The fee the player pays, as the review shows it: the amount in the network's smallest unit and the asset it is paid in.
-export const feeText = (summary: GameClaim["summary"]): string =>
-  `${summary.fee.baseUnits} ${summary.fee.asset}`;

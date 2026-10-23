@@ -117,3 +117,14 @@
 .fee-picker__hint {
   grid-column: 2 / -1;
 }
+
+/* The cost of a transaction, wherever a person is about to act on the chain: the total, then what it was priced at. */
+.cost-overview__total {
+  display: block;
+}
+.cost-overview__details {
+  color: var(--arcade-text-muted);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

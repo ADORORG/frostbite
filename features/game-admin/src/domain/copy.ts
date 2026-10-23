@@ -1,7 +1,6 @@
 import type {
   GameAdminStep,
   GameAdminStepState,
-  GameAdminSummary,
   StartGameAdminStepResponse,
 } from "@ador/shared/games";
 
@@ -136,8 +135,5 @@ export const unreachableCopy =
   "The platform could not be reached. Nothing was changed.";
 export const noSignerCopy =
   "This version has no wallet connection that signs administration steps. Sign the transaction below with a wallet you trust, and paste the signed result.";
-
-export const feeText = (summary: Pick<GameAdminSummary, "fee">): string =>
-  `${summary.fee.baseUnits} ${summary.fee.asset}`;
 
 export const shortHash = (hash: string): string => `${hash.slice(0, 12)}…`;

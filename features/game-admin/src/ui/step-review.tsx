@@ -1,9 +1,9 @@
+import { CostOverview } from "@ador/feature-chain-status/fee-picker";
 import type { GameAdminStep } from "@ador/shared/games";
 import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import {
-  feeText,
   noSignerCopy,
   operationLabel,
   shortHash,
@@ -92,7 +92,13 @@ export function StepReview({
           </>
         )}
         <dt>Network fee</dt>
-        <dd>{feeText(summary)}</dd>
+        <dd>
+          <CostOverview
+            asset={summary.fee.asset}
+            baseUnits={summary.fee.baseUnits}
+            detail={summary.feeDetail}
+          />
+        </dd>
         <dt>Valid until</dt>
         <dd>{summary.expiresAt}</dd>
       </dl>

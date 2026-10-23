@@ -9,7 +9,7 @@ import { BuildRefusedError } from "../build-refused.ts";
 import { nativeAsset, servedChain, type ServedChain } from "../chains.ts";
 import { psbtFormat } from "../format.ts";
 import { parseAlkaneId } from "../node/alkane-id.ts";
-import type { TransactionOptions } from "../options.ts";
+import { feeDetailFor, type TransactionOptions } from "../options.ts";
 import { adminCall, type AdminIntent } from "./action.ts";
 import { bundleFormat, encodeBundle } from "./bundle.ts";
 import { configuredTemplate, sha256Hex, stepData } from "./data.ts";
@@ -144,6 +144,11 @@ export async function buildAdmin(
           context.options.now().getTime() + context.options.lifetimeMs,
         ).toISOString(),
         fee: { asset: nativeAsset(intent.chain), baseUnits: fee },
+        feeDetail: feeDetailFor(
+          context.options,
+          intent.feeSpeed,
+          stepFunds.feeRate,
+        ),
         operation: intent.operation,
       },
     };

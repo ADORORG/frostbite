@@ -23,6 +23,7 @@ step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/s
   wait and rate, an optional cost for a transaction of `vbytes`, refuses a speed above `maxFeeSats` with the reason, and says plainly
   when the market is unknown. The choice is the speed, never the rate: the speed travels on the intent (`feeSpeed`) and the adapter
   quotes the rate for its block target when it builds the transaction. Other features import only this subpath.
+- `<CostOverview asset baseUnits detail?>` (same entry): the cost of a built transaction, told wherever a person is about to act on the chain. A fee in satoshis (`btc`) is shown as sats, then the rate it was priced at, the speed with its wait and about how large the transaction is (fee ÷ rate); any other asset is its amount and name. `detail` is the `feeDetail` the builder put on the summary.
 - The lamp itself is the shared `StatusLamp` (`@repo/ui/arcade`) in its compact form, so another status (a queue, a provider) reuses it.
 
 ## Answers

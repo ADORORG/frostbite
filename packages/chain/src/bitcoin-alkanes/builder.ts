@@ -17,6 +17,7 @@ import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
 import { fromHex } from "./node/hex.ts";
 import {
+  feeDetailFor,
   feeTargetFor,
   assertTransactionOptions,
   type TransactionOptions,
@@ -60,9 +61,12 @@ export function createTransactionBuilder(
         );
       }
       const call = claimScript(game, milestoneKey(intent.milestoneId));
+      const feeRate = await node.feeRate(
+        feeTargetFor(options, intent.feeSpeed),
+      );
       const selection = selectCoins({
         changeDustSats: options.changeDustSats,
-        feeRate: await node.feeRate(feeTargetFor(options, intent.feeSpeed)),
+        feeRate,
         fixedOutputs: [sender.value.type],
         fixedSats: options.claimOutputSats,
         kind: sender.value.type,
@@ -99,6 +103,7 @@ export function createTransactionBuilder(
             options.now().getTime() + options.lifetimeMs,
           ).toISOString(),
           fee: { asset: nativeAsset(intent.chain), baseUnits: selection.fee },
+          feeDetail: feeDetailFor(options, intent.feeSpeed, feeRate),
           milestone: { contract: intent.contract, id: intent.milestoneId },
           operation: "mint-milestone",
           recipient: intent.sender,

@@ -78,6 +78,19 @@ describe("a claim as the page is told of it", () => {
     });
   });
 
+  it("passes on how the fee came about when the builder said, and says nothing of it when it did not", () => {
+    const detail = {
+      approxMinutes: 60,
+      satPerVb: 2.5,
+      speed: "medium",
+    } as const;
+    const told = toWireClaim(
+      view({ summary: { ...summary, feeDetail: detail } }),
+    );
+    expect(gameClaimSchema.parse(told).summary.feeDetail).toEqual(detail);
+    expect(toWireClaim(view()).summary).not.toHaveProperty("feeDetail");
+  });
+
   it("refuses a summary that does not name its milestone, which is not a claim", () => {
     const bare = transactionSummarySchema.parse({
       chain,

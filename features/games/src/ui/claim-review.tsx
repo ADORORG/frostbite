@@ -1,7 +1,8 @@
+import { CostOverview } from "@ador/feature-chain-status/fee-picker";
 import type { GameClaim } from "@ador/shared/games";
 import { ArcadeActionButton } from "@repo/ui/arcade";
 
-import { claimCopy, feeText } from "../domain/claim-copy.ts";
+import { claimCopy } from "../domain/claim-copy.ts";
 import { noSignerCopy } from "./use-claims.ts";
 import { shortAddress } from "./wallet-card.tsx";
 
@@ -44,7 +45,13 @@ export function ClaimReview({
         <dt>Goes to</dt>
         <dd title={summary.recipient}>{shortAddress(summary.recipient)}</dd>
         <dt>Network fee</dt>
-        <dd>{feeText(summary)}</dd>
+        <dd>
+          <CostOverview
+            asset={summary.fee.asset}
+            baseUnits={summary.fee.baseUnits}
+            detail={summary.feeDetail}
+          />
+        </dd>
         <dt>Valid until</dt>
         <dd>{summary.expiresAt}</dd>
       </dl>

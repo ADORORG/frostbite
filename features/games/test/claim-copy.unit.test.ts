@@ -8,7 +8,6 @@ import {
   claimCopy,
   claimStateCopy,
   claimUnavailableCopy,
-  feeText,
   isSettledClaim,
   showsDelayed,
 } from "../src/domain/claim-copy.ts";
@@ -84,20 +83,5 @@ describe("when a claim is over", () => {
       "expired",
       "failed",
     ]);
-  });
-});
-
-describe("the fee as the review shows it", () => {
-  it("is the amount in the smallest unit and the asset it is paid in", () => {
-    expect(
-      feeText({
-        chain: "simnet:one",
-        contractId: "rewards-1",
-        expiresAt: "2026-10-16T12:10:00.000Z",
-        fee: { asset: "sim", baseUnits: "12" },
-        milestoneId: "first-win",
-        recipient: "x",
-      }),
-    ).toBe("12 sim");
   });
 });

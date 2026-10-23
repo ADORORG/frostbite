@@ -4,7 +4,7 @@ import {
   chainFamilyIdTextSchema,
   chainRefTextSchema,
 } from "../chain/chain-ref.ts";
-import { feeSpeedSchema } from "../chain/fees.ts";
+import { feeDetailSchema, feeSpeedSchema } from "../chain/fees.ts";
 import { gameIdSchema } from "./manifest.ts";
 
 // A player's claim of a milestone on chain, as the page is told of it. Nothing here is chain-specific beyond the opaque
@@ -56,6 +56,8 @@ export const gameClaimSummarySchema = z
         baseUnits: z.string().regex(/^\d{1,40}$/u),
       })
       .strict(),
+    // The rate and speed the fee was priced at, when the adapter priced it by rate.
+    feeDetail: feeDetailSchema.optional(),
     milestoneId: gameIdSchema,
     recipient: z.string().min(1).max(256),
   })

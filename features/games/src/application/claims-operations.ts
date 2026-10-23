@@ -55,6 +55,9 @@ export function toWireClaim(view: ClaimView): GameClaim {
         asset: view.summary.fee.asset.id,
         baseUnits: view.summary.fee.baseUnits.toString(),
       },
+      ...(view.summary.feeDetail === undefined
+        ? {}
+        : { feeDetail: view.summary.feeDetail }),
       milestoneId: view.milestoneId,
       recipient: view.wallet.value,
     },

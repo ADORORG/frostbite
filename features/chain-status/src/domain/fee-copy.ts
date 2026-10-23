@@ -1,4 +1,4 @@
-import type { FeeQuoteView, FeeSpeed } from "@ador/shared/chain";
+import type { FeeDetail, FeeQuoteView, FeeSpeed } from "@ador/shared/chain";
 import { feeAtRate } from "@ador/shared/chain";
 
 // How the fee speeds are named and told, in the platform's words. Waits are estimates and are always said as "about"; a rate is the
@@ -45,4 +45,41 @@ export function spreadText(quotes: readonly FeeQuoteView[]): string {
   return low === high
     ? rateText(low)
     : `${rateText(low).replace(" sat/vB", "")} to ${rateText(high)}`;
+}
+
+// The id the chain adapters give the network's own coin, whose fee is paid in satoshis.
+const satoshiAsset = "btc";
+
+export interface CostLines {
+  readonly details: readonly string[];
+  readonly total: string;
+}
+
+// The lines of a cost overview. Only a fee paid in satoshis (asset "btc") has a rate and a size to tell; the size is the fee divided by
+// the rate it was priced at, so it is the transaction's own, not a guess. Any other asset is the amount and its name.
+export function costBreakdown({
+  asset,
+  baseUnits,
+  detail,
+}: {
+  readonly asset: string;
+  readonly baseUnits: string;
+  readonly detail?: FeeDetail | undefined;
+}): CostLines {
+  if (asset !== satoshiAsset)
+    return { details: [], total: `${baseUnits} ${asset}` };
+  const sats = Number(baseUnits);
+  const total = `${sats.toLocaleString("en-US")} sats`;
+  if (detail === undefined) return { details: [], total };
+  const details = [`Priced at ${rateText(detail.satPerVb)}`];
+  if (detail.speed !== undefined)
+    details.push(
+      detail.approxMinutes === undefined
+        ? speedNames[detail.speed]
+        : `${speedNames[detail.speed]}, ${waitText(detail.approxMinutes)}`,
+    );
+  details.push(
+    `About ${Math.round(sats / detail.satPerVb).toLocaleString("en-US")} vB`,
+  );
+  return { details, total };
 }

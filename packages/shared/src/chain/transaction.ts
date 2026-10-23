@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { chainFamilyIdSchema, chainRefSchema } from "./chain-ref.ts";
-import { feeSpeedSchema } from "./fees.ts";
+import { feeDetailSchema, feeSpeedSchema } from "./fees.ts";
 import { chainOperationSchema, type ChainOperation } from "./chain-config.ts";
 import {
   addressSchema,
@@ -142,6 +142,8 @@ export const transactionSummarySchema = z
     chain: chainRefSchema,
     expiresAt: z.iso.datetime(),
     fee: amountSchema,
+    // The rate and speed the fee was priced at, so the person is shown what they are paying and why.
+    feeDetail: feeDetailSchema.optional(),
     // The game's rewards contract a milestone step acts on, and what the person checks before signing it.
     claimLimit: z.number().int().positive().optional(),
     contract: contractRefSchema.optional(),

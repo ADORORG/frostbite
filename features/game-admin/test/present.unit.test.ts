@@ -37,6 +37,20 @@ describe("a step as the page is told of it", () => {
     expect(wire.toSign).not.toHaveProperty("summary");
   });
 
+  it("passes on how the fee came about when the builder said, and says nothing of it when it did not", () => {
+    const detail = {
+      approxMinutes: 15,
+      satPerVb: 9,
+      speed: "lightning",
+    } as const;
+    const told = toWireStep(
+      view({ summary: { ...view().summary, feeDetail: detail } }),
+      names,
+    );
+    expect(gameAdminStepSchema.parse(told).summary.feeDetail).toEqual(detail);
+    expect(toWireStep(view(), names).summary).not.toHaveProperty("feeDetail");
+  });
+
   it("shows a definition's milestone, limit and drawing, and no transaction once it is signed", () => {
     const wire = toWireStep(
       view({

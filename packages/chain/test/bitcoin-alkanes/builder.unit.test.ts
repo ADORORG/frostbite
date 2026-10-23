@@ -86,6 +86,7 @@ describe("building a milestone claim", () => {
         fixedNow.getTime() + options.lifetimeMs,
       ).toISOString(),
       fee: { asset: nativeAsset(chain), baseUnits: 402n },
+      feeDetail: { approxMinutes: 30, satPerVb: 2, speed: "fast" },
       milestone: { contract: game, id: "first-frost" },
       operation: "mint-milestone",
       recipient: wallet,

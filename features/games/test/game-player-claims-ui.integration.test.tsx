@@ -72,6 +72,39 @@ describe("claiming from the milestone list", () => {
     expect(text()).toContain("Waiting for your wallet");
   });
 
+  it("shows the cost clearly: the satoshis, the rate, the speed with its wait, and the size", async () => {
+    const base = claimAt("awaiting-signature");
+    const api = fakeApi({
+      start: vi.fn(async () => ({
+        claim: {
+          ...base,
+          summary: {
+            ...base.summary,
+            fee: { asset: "btc", baseUnits: "5050" },
+            feeDetail: {
+              approxMinutes: 250,
+              satPerVb: 25.25,
+              speed: "slow" as const,
+            },
+          },
+        },
+        resumed: false,
+        status: "started" as const,
+      })),
+    });
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    expect(review()?.querySelector(".cost-overview__total")?.textContent).toBe(
+      "5,050 sats",
+    );
+    expect(
+      [...(review()?.querySelectorAll(".cost-overview li") ?? [])].map(
+        (item) => item.textContent,
+      ),
+    ).toEqual(["Priced at 25 sat/vB", "Slow, about 4 h", "About 200 vB"]);
+  });
+
   it("signs what was shown, sends it, and follows the claim to complete, saying confirmed is not complete and telling the game each step", async () => {
     const answers = [claimAt("claimed"), claimAt("complete")];
     let sent = false;

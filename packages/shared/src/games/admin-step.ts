@@ -4,6 +4,7 @@ import {
   chainFamilyIdTextSchema,
   chainRefTextSchema,
 } from "../chain/chain-ref.ts";
+import { feeDetailSchema } from "../chain/fees.ts";
 import { gameIdSchema } from "./manifest.ts";
 
 // Where a step stands (the lifecycle's stages; a test keeps the lists equal).
@@ -49,6 +50,8 @@ export const gameAdminSummarySchema = z
         baseUnits: z.string().regex(/^\d{1,40}$/u),
       })
       .strict(),
+    // The rate and speed the fee was priced at, when the adapter priced it by rate.
+    feeDetail: feeDetailSchema.optional(),
     // The most drawing the contract being created will accept.
     maxDrawingBytes: z.number().int().positive().optional(),
     milestoneId: gameIdSchema.optional(),
