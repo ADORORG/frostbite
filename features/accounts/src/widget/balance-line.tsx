@@ -10,20 +10,28 @@ const reasons = {
 // the reason there is none. Never a zero standing in for "unknown".
 export function BalanceLine({
   balance,
+  network,
   onRefresh,
 }: {
   readonly balance: BalanceSnapshot;
+  // The network the wallet is on, which decides the coin's name.
+  readonly network: string;
   readonly onRefresh: () => void;
 }) {
   const { reading, reason, state } = balance;
   const busy = state === "loading" || state === "refreshing";
   return (
     <div className="wallet-menu__balance">
-      <span className="wallet-menu__label">Balance</span>
+      <span className="wallet-menu__label">Spendable balance</span>
       <p role="status">
         {reading !== null ? (
           <>
-            {formatBalance(reading.satoshis)}
+            {formatBalance(reading.satoshis, network)}
+            {reading.pendingSats > 0 ? (
+              <small data-testid="pending-balance">
+                {` Plus ${formatBalance(reading.pendingSats, network)} still waiting for its first confirmation; a step cannot spend it yet.`}
+              </small>
+            ) : null}
             <small>
               {state === "stale"
                 ? ` Last read ${updatedAt(reading.asOf)}; could not update.`

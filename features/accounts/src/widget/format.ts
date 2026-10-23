@@ -7,11 +7,17 @@ export const abbreviated = (address: string) =>
 
 const SATOSHIS_PER_BTC = 100_000_000;
 
-// "0.00123456 BTC (123,456 sats)": the figure in both units, exact (a balance never exceeds 2.1e15 satoshis, which
-// a number holds without rounding).
-export function formatBalance(satoshis: number): string {
-  const btc = (satoshis / SATOSHIS_PER_BTC).toFixed(8);
-  return `${btc} BTC (${satoshis.toLocaleString("en-US")} sats)`;
+// The coin's name on a network. Test networks' coins are worth nothing, so they are written tBTC and never passed off as bitcoin.
+export const unitOf = (network: string) =>
+  network === "mainnet" ? "BTC" : "tBTC";
+
+// "0.00123456": bitcoin to the satoshi, exact (a balance never exceeds 2.1e15 satoshis, which a number holds without rounding).
+export const formatBtc = (satoshis: number) =>
+  (satoshis / SATOSHIS_PER_BTC).toFixed(8);
+
+// "0.00123456 tBTC (123,456 sats)": the figure in both units.
+export function formatBalance(satoshis: number, network: string): string {
+  return `${formatBtc(satoshis)} ${unitOf(network)} (${satoshis.toLocaleString("en-US")} sats)`;
 }
 
 // The time of an ISO timestamp, in UTC, so the same reading reads the same everywhere.

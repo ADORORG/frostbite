@@ -10,10 +10,16 @@ import { address, anonymous } from "./support/wallet-operations.ts";
 const now = new Date("2026-10-15T12:00:00.000Z");
 const clock = () => now;
 // A source that accepts every address on signet only, as a real one that reads one network would.
-const reads = (satoshis: () => Promise<number>) => ({
-  accepts: (candidate: string, network: "mainnet" | "signet") =>
+const reads = (
+  balance: () => Promise<{ confirmedSats: number; pendingSats: number }>,
+) => ({
+  accepts: (candidate: string, network: "mainnet" | "signet" | "testnet4") =>
     network === "signet" && candidate.startsWith("tb1q"),
-  satoshis,
+  balance,
+});
+const confirmed = (confirmedSats: number) => async () => ({
+  confirmedSats,
+  pendingSats: 0,
 });
 const ask = (
   source: Parameters<typeof createBalanceOperation>[0]["source"],
@@ -47,14 +53,18 @@ describe("the wallet balance", () => {
     });
   });
 
-  it("asks the source for the canonical address on the named network and answers with the time it was asked", async () => {
-    const satoshis = vi.fn(async () => 123_456);
-    const result = await ask(reads(satoshis));
-    expect(satoshis).toHaveBeenCalledWith(address, "signet");
+  it("asks the source for the canonical address on the named network and answers with the time it was asked, spendable and pending apart", async () => {
+    const balance = vi.fn(async () => ({
+      confirmedSats: 123_456,
+      pendingSats: 5_000_000,
+    }));
+    const result = await ask(reads(balance));
+    expect(balance).toHaveBeenCalledWith(address, "signet");
     expect(result).toEqual({
       ok: true,
       value: {
         asOf: "2026-10-15T12:00:00.000Z",
+        pendingSats: 5_000_000,
         satoshis: 123_456,
         status: "ready",
       },
@@ -66,36 +76,44 @@ describe("the wallet balance", () => {
   });
 
   it("answers a real zero as a zero", async () => {
-    expect(await ask(reads(async () => 0))).toMatchObject({
+    expect(await ask(reads(confirmed(0)))).toMatchObject({
       ok: true,
-      value: { satoshis: 0, status: "ready" },
+      value: { pendingSats: 0, satoshis: 0, status: "ready" },
     });
   });
 
   it("refuses an address the source does not accept for the network, without looking it up", async () => {
-    const satoshis = vi.fn(async () => 1);
+    const balance = vi.fn(confirmed(1));
     for (const input of [
       { address: "bc1pnotforthissource0000000", network: "signet" as const },
       // A signet address is not a mainnet address.
       { address, network: "mainnet" as const },
     ])
-      expect(await ask(reads(satoshis), input)).toMatchObject({
+      expect(await ask(reads(balance), input)).toMatchObject({
         error: "invalid_request",
         ok: false,
       });
-    expect(satoshis).not.toHaveBeenCalled();
+    expect(balance).not.toHaveBeenCalled();
   });
 
   it.each([
     ["a failing source", () => Promise.reject(new Error("indexer down"))],
-    ["a negative balance", async () => -1],
-    ["a fraction", async () => 1.5],
-    ["not a number", async () => Number.NaN],
-    ["more than can exist", async () => maxSatoshis + 1],
+    ["a negative balance", confirmed(-1)],
+    ["a fraction", confirmed(1.5)],
+    ["not a number", confirmed(Number.NaN)],
+    ["more than can exist", confirmed(maxSatoshis + 1)],
+    [
+      "an impossible pending figure",
+      async () => ({ confirmedSats: 1, pendingSats: -1 }),
+    ],
+    [
+      "a pending figure that is more than can exist",
+      async () => ({ confirmedSats: 1, pendingSats: maxSatoshis + 1 }),
+    ],
   ])(
     "says the source failed for %s, never showing a number",
-    async (_name, satoshis) => {
-      expect(await ask(reads(satoshis))).toEqual({
+    async (_name, balance) => {
+      expect(await ask(reads(balance))).toEqual({
         ok: true,
         value: { reason: "source-failed", status: "unavailable" },
       });
@@ -103,7 +121,7 @@ describe("the wallet balance", () => {
   );
 
   it("accepts the largest balance that can exist", async () => {
-    expect(await ask(reads(async () => maxSatoshis))).toMatchObject({
+    expect(await ask(reads(confirmed(maxSatoshis)))).toMatchObject({
       value: { satoshis: maxSatoshis, status: "ready" },
     });
   });

@@ -35,18 +35,25 @@ export function createBalanceOperation(dependencies: {
             ok: false,
           };
         try {
-          const satoshis = await source.satoshis(input.address, input.network);
-          if (
-            !Number.isSafeInteger(satoshis) ||
-            satoshis < 0 ||
-            satoshis > maxSatoshis
-          )
-            throw new RangeError("The source answered an impossible balance.");
+          const { confirmedSats, pendingSats } = await source.balance(
+            input.address,
+            input.network,
+          );
+          for (const figure of [confirmedSats, pendingSats])
+            if (
+              !Number.isSafeInteger(figure) ||
+              figure < 0 ||
+              figure > maxSatoshis
+            )
+              throw new RangeError(
+                "The source answered an impossible balance.",
+              );
           return {
             ok: true,
             value: {
               asOf: clock().toISOString(),
-              satoshis,
+              pendingSats,
+              satoshis: confirmedSats,
               status: "ready",
             },
           };

@@ -19,6 +19,7 @@ import { useWalletSession } from "../client/use-wallet-session.ts";
 import type { WalletCandidate } from "../wallet-config.ts";
 import { WalletChooserDialog } from "./chooser-dialog.tsx";
 import { abbreviated } from "./format.ts";
+import { HeaderBalance } from "./header-balance.tsx";
 import { useBalance } from "./use-balance.ts";
 import { WalletMenu } from "./wallet-menu.tsx";
 
@@ -26,8 +27,9 @@ const subscribeToNothing = () => () => {};
 const nothingRemembered = () => false;
 
 // The wallet in the header of every page. With no wallet and nobody signed in it is one button that opens the
-// wallet chooser; otherwise it shows the connected wallet's picture and short address and opens a menu. The menu is
-// where the balance is read (only while it is open), the account is signed in to, wallets are linked and removed.
+// wallet chooser; otherwise it shows the connected wallet's picture, short address and balance, and opens a menu. The
+// balance is read while a wallet is connected and the tab is showing; the menu is where the account is signed in to,
+// wallets are linked and removed.
 export function WalletWidget({
   balanceRefreshMs,
   candidates,
@@ -65,11 +67,7 @@ export function WalletWidget({
     session.view.kind === "disconnected" && session.view.signedIn;
   const hasMenu = wallet.connected || signedIn || session.methods !== null;
   const menuOpen = menuRequested && hasMenu;
-  const balance = useBalance({
-    intervalMs: balanceRefreshMs,
-    open: menuOpen,
-    wallet,
-  });
+  const balance = useBalance({ intervalMs: balanceRefreshMs, wallet });
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const menuId = useId();
@@ -114,6 +112,7 @@ export function WalletWidget({
           <>
             <Avatar seed={wallet.address} size={24} />
             <span title={wallet.address}>{abbreviated(wallet.address)}</span>
+            <HeaderBalance balance={balance} network={wallet.network} />
             {mismatch ? <span aria-label="Wrong network">⚠</span> : null}
           </>
         ) : waiting ? (

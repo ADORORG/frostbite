@@ -13,6 +13,9 @@ export interface BalanceTarget {
 
 export interface BalanceReading {
   readonly asOf: string;
+  // Waiting for its first confirmation; not spendable yet.
+  readonly pendingSats: number;
+  // Confirmed, so spendable.
   readonly satoshis: number;
 }
 
@@ -75,7 +78,11 @@ export function createBalanceStore(dependencies: {
       );
       if (mine !== latest) return;
       if (answer.status === "ready") {
-        reading = { asOf: answer.asOf, satoshis: answer.satoshis };
+        reading = {
+          asOf: answer.asOf,
+          pendingSats: answer.pendingSats,
+          satoshis: answer.satoshis,
+        };
         reason = null;
         state = "ready";
       } else {

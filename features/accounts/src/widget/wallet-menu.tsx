@@ -109,7 +109,11 @@ export function WalletMenu({
         ) : null}
       </div>
       {wallet.connected ? (
-        <BalanceLine balance={balance} onRefresh={onRefreshBalance} />
+        <BalanceLine
+          balance={balance}
+          network={wallet.network}
+          onRefresh={onRefreshBalance}
+        />
       ) : null}
       {methods === null ? null : (
         <MenuWallets

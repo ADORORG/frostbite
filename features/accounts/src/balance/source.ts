@@ -7,6 +7,11 @@ import type { WalletNetwork } from "@ador/wallet/contracts";
 export interface BalanceSource {
   // Whether this is an address the source can read on that network. Nothing is looked up for one it refuses.
   accepts(address: string, network: WalletNetwork): boolean;
-  // The confirmed bitcoin balance of an accepted address, in satoshis.
-  satoshis(address: string, network: WalletNetwork): Promise<number>;
+  // What the address holds, in satoshis: `confirmedSats` is spendable, `pendingSats` is still waiting for its first confirmation.
+  balance(address: string, network: WalletNetwork): Promise<AddressHoldings>;
+}
+
+export interface AddressHoldings {
+  readonly confirmedSats: number;
+  readonly pendingSats: number;
 }

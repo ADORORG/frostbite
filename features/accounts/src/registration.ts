@@ -3,6 +3,8 @@ import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 
 import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
+
+export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import { createWalletServicesResolver } from "./runtime.ts";
 import {
   validateWalletAuthConfig,
@@ -11,8 +13,8 @@ import {
 
 export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
 
-// `balanceSource` is where the widget's balance comes from. The platform has not chosen an indexer, so the beta passes
-// `null` and the widget says no balance is available.
+// `balanceSource` is where the widget's balance comes from (confirmed and pending apart); `null` means the platform has no chain to ask
+// and the widget says no balance is available.
 export function createAccountsFeature(
   input: WalletAuthConfig,
   balanceSource: BalanceSource | null,

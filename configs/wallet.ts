@@ -21,7 +21,8 @@ export const walletAuthConfig = {
     { id: "binance", label: "Binance" },
     { id: "op_net", label: "OP_NET" },
   ],
-  // The owner's choice: refresh the balance every minute, and only while the wallet menu is open.
+  // The owner's choice (2026-10-23, replacing "only while the menu is open"): the balance is in the header, so it is refreshed every
+  // minute while a wallet is connected and the tab is showing.
   balanceRefreshMs: 60_000,
   // A challenge can be signed for five minutes.
   challengeLifetimeMs: 300_000,

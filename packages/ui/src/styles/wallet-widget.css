@@ -21,6 +21,25 @@
 .wallet-widget__trigger[aria-expanded="true"] {
   background: color-mix(in srgb, var(--arcade-cyan) 14%, transparent);
 }
+.wallet-widget__balance,
+.wallet-widget__pending {
+  font-family: var(--arcade-font-body, inherit);
+  font-size: 0.6875rem;
+  text-transform: none;
+  white-space: nowrap;
+}
+.wallet-widget__balance {
+  padding-left: 0.5rem;
+  border-left: 0.125rem solid
+    color-mix(in srgb, var(--arcade-cyan) 40%, transparent);
+  color: var(--arcade-text);
+}
+.wallet-widget__pending {
+  color: var(--arcade-yellow);
+}
+.wallet-widget__balance[data-stale="true"] {
+  color: var(--arcade-text-muted);
+}
 .wallet-widget__trigger[data-mismatch="true"] {
   border-color: var(--arcade-yellow);
   color: var(--arcade-yellow);

@@ -24,6 +24,9 @@ export const walletBalanceRequestSchema = z.strictObject({
 export const walletBalanceResponseSchema = z.discriminatedUnion("status", [
   z.strictObject({
     asOf: z.iso.datetime(),
+    // Waiting for its first confirmation: counted apart, because a step does not spend it and it could still be replaced.
+    pendingSats: z.int().min(0).max(maxSatoshis),
+    // Confirmed, so spendable.
     satoshis: z.int().min(0).max(maxSatoshis),
     status: z.literal("ready"),
   }),
