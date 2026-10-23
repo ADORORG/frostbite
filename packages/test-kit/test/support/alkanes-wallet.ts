@@ -69,6 +69,10 @@ export function claimNode(): AlkanesNode {
     },
     bytecode: () => Promise.resolve(null),
     feeRate: () => Promise.resolve(2),
+    feeRates: (targets) =>
+      Promise.resolve(
+        targets.map((target) => ({ satPerVb: 2, targetBlocks: target })),
+      ),
     holdings: () =>
       Promise.resolve({ alkanes: [], script: new Uint8Array(), value: 0n }),
     indexedHeight: () => Promise.resolve(100),

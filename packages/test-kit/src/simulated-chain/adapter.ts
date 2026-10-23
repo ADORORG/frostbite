@@ -141,6 +141,20 @@ export function createSimulatedChain(
   };
   // The simulated indexer is the ledger itself: it has read every block there is.
   const observer: ChainObserver = {
+    // What an owner holds is all confirmed: the simulated ledger has no mempool to wait in.
+    balance: (chain, address) =>
+      Promise.resolve({
+        confirmed: balances.get(`${chain}|${address}`) ?? 0n,
+        pending: 0n,
+      }),
+    // A made-up market in which waiting less costs more: sixty satoshis per virtual byte for one block, falling as the target grows.
+    feeRates: (_chain, targets) =>
+      Promise.resolve(
+        targets.map((target) => ({
+          satPerVb: 60 / target,
+          targetBlocks: target,
+        })),
+      ),
     indexing: (chain) => {
       const { height } = ledger(chain).head();
       return Promise.resolve({

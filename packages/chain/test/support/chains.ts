@@ -54,6 +54,8 @@ export const silentBroadcaster: Broadcaster = {
 };
 
 export const silentObserver: ChainObserver = {
+  balance: () => Promise.reject(new Error("not used")),
+  feeRates: () => Promise.reject(new Error("not used")),
   indexing: () => Promise.reject(new Error("not used")),
   observe: () => Promise.reject(new Error("not used")),
 };

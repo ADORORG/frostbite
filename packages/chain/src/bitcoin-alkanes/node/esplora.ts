@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { FeeRate, JsonValue } from "@ador/shared/chain";
 
 import { NodeUnavailableError } from "./errors.ts";
 import { isRecord, listOf, recordOf, textOf, wholeNumberOf } from "./json.ts";
@@ -33,6 +33,8 @@ export interface EsploraClient {
   broadcast(hex: string): Promise<string>;
   // Fee rate in satoshis per virtual byte for confirmation within `target` blocks (the nearest estimate at or above it).
   feeRate(target: number): Promise<number>;
+  // The same for several targets from one look at the fee market.
+  feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
   // The transaction as the node sees it, or null when it has never heard of it.
   transaction(txid: string): Promise<NodeTransaction | null>;
   tip(): Promise<ChainTip>;
@@ -51,6 +53,35 @@ function utxoOf(value: JsonValue): NodeUtxo {
     value: BigInt(wholeNumberOf(entry["value"], "unspent output value")),
     vout: wholeNumberOf(entry["vout"], "unspent output index"),
   };
+}
+
+// One look at the node's fee estimates, answered for each target with the nearest estimate at or above it. A target the node has no
+// estimate for stops the whole answer: a rate is never guessed.
+async function feeRatesFor(
+  rpc: JsonRpc,
+  targets: readonly number[],
+): Promise<readonly FeeRate[]> {
+  const estimates = recordOf(
+    await rpc.call("esplora_fee-estimates", []),
+    "fee estimates",
+  );
+  const known = Object.entries(estimates)
+    .map(([blocks, rate]) => [Number(blocks), rate] as const)
+    .filter(
+      ([blocks, rate]) =>
+        Number.isInteger(blocks) && typeof rate === "number" && rate > 0,
+    )
+    .sort((a, b) => a[0] - b[0]);
+  return targets.map((target) => {
+    const choice = known.find(([blocks]) => blocks >= target);
+    const rate = choice?.[1];
+    if (typeof rate !== "number") {
+      throw new NodeUnavailableError(
+        "The node has no fee estimate for the target.",
+      );
+    }
+    return { satPerVb: rate, targetBlocks: target };
+  });
 }
 
 export function createEsploraClient(rpc: JsonRpc): EsploraClient {
@@ -80,25 +111,15 @@ export function createEsploraClient(rpc: JsonRpc): EsploraClient {
       return txid;
     },
     feeRate: async (target) => {
-      const estimates = recordOf(
-        await rpc.call("esplora_fee-estimates", []),
-        "fee estimates",
-      );
-      const choice = Object.entries(estimates)
-        .map(([blocks, rate]) => [Number(blocks), rate] as const)
-        .filter(
-          ([blocks, rate]) =>
-            blocks >= target && typeof rate === "number" && rate > 0,
-        )
-        .sort((a, b) => a[0] - b[0])[0];
-      const rate = choice?.[1];
-      if (typeof rate !== "number") {
+      const [only] = await feeRatesFor(rpc, [target]);
+      if (only === undefined) {
         throw new NodeUnavailableError(
           "The node has no fee estimate for the target.",
         );
       }
-      return rate;
+      return only.satPerVb;
     },
+    feeRates: (targets) => feeRatesFor(rpc, targets),
     // A transaction the node does not know is answered with plain text, not an error.
     transaction: async (txid) => {
       const answer = await rpc.call("esplora_tx", [txid]);

@@ -4,6 +4,7 @@ import {
   stageOf,
   type ChainRef,
   type DelayPolicy,
+  type FeeRate,
   type IndexingStatus,
   type TrackedState,
 } from "@ador/shared/chain";
@@ -24,9 +25,9 @@ export async function readIndexing(
   }
 }
 
-// An observer that asks the chain how far its indexer has read at most once in `ttlMs`, however many ask: every page shows the
-// reading, so uncached it would be a request to the node per visitor. Callers that arrive while a reading is on its way share it,
-// and a failed reading is never kept, so the next caller asks again.
+// An observer that asks the chain how far its indexer has read, and what its fee market quotes, at most once in `ttlMs`, however many ask:
+// every page shows both, so uncached each would be a request to the node per visitor. Callers that arrive while a reading is on its way
+// share it, and a failed reading is never kept, so the next caller asks again.
 export function cacheIndexing(
   observer: ChainObserver,
   options: { readonly now: () => Date; readonly ttlMs: number },
@@ -35,7 +36,25 @@ export function cacheIndexing(
     ChainRef,
     { readonly at: number; readonly reading: Promise<IndexingStatus> }
   >();
+  const quotes = new Map<
+    string,
+    { readonly at: number; readonly quote: Promise<readonly FeeRate[]> }
+  >();
   return {
+    balance: (chain, address) => observer.balance(chain, address),
+    feeRates: (chain, targets) => {
+      const key = `${chain}|${targets.join(",")}`;
+      const now = options.now().getTime();
+      const held = quotes.get(key);
+      if (held !== undefined && now - held.at < options.ttlMs)
+        return held.quote;
+      const quote = observer.feeRates(chain, targets);
+      quotes.set(key, { at: now, quote });
+      quote.catch(() => {
+        if (quotes.get(key)?.quote === quote) quotes.delete(key);
+      });
+      return quote;
+    },
     indexing: (chain) => {
       const now = options.now().getTime();
       const held = readings.get(chain);

@@ -67,14 +67,17 @@ describe("the rewards chain", () => {
 
   it("is configured but not offered while the policy keeps the release gate closed", async () => {
     vi.resetModules();
-    vi.doMock("../../../configs/rewards-policy.ts", async (original) => ({
-      rewardsPolicy: {
-        ...(
-          await original<typeof import("../../../configs/rewards-policy.ts")>()
-        ).rewardsPolicy,
-        testChainReleaseGate: "closed",
-      },
-    }));
+    vi.doMock("../../../configs/rewards-policy.ts", async (original) => {
+      const real =
+        await original<typeof import("../../../configs/rewards-policy.ts")>();
+      return {
+        ...real,
+        rewardsPolicy: {
+          ...real.rewardsPolicy,
+          testChainReleaseGate: "closed",
+        },
+      };
+    });
     try {
       const closed = await import("../../../configs/rewards-chain.ts");
       expect(closed.chainConfig().releaseGate).toBe("closed");

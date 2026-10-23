@@ -1,4 +1,8 @@
-import { chainRefSchema, type IndexingStatus } from "@ador/shared/chain";
+import {
+  chainRefSchema,
+  type ChainRef,
+  type IndexingStatus,
+} from "@ador/shared/chain";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -18,7 +22,12 @@ const reading = (height: number): IndexingStatus => ({
 });
 
 function observerOf(indexing: ChainObserver["indexing"]): ChainObserver {
-  return { indexing, observe: () => Promise.reject(new Error("not used")) };
+  return {
+    balance: () => Promise.reject(new Error("not used")),
+    feeRates: () => Promise.reject(new Error("not used")),
+    indexing,
+    observe: () => Promise.reject(new Error("not used")),
+  };
 }
 
 describe("reading the indexer", () => {
@@ -111,10 +120,49 @@ describe("caching the reading", () => {
     expect(indexing).toHaveBeenCalledTimes(2);
   });
 
+  it("asks for the fee rates at most once in the time to live for the same targets, and again for other targets or after it", async () => {
+    const feeRates = vi.fn(
+      async (_chain: ChainRef, targets: readonly number[]) =>
+        targets.map((target) => ({ satPerVb: 2, targetBlocks: target })),
+    );
+    const observer = cacheIndexing(
+      { ...observerOf(async () => reading(1)), feeRates },
+      { now: () => clock.now, ttlMs: 1_000 },
+    );
+    await observer.feeRates(chain, [1, 3]);
+    await observer.feeRates(chain, [1, 3]);
+    expect(feeRates).toHaveBeenCalledTimes(1);
+    await observer.feeRates(chain, [6]);
+    expect(feeRates).toHaveBeenCalledTimes(2);
+    clock.now = new Date(clock.now.getTime() + 1_000);
+    await observer.feeRates(chain, [1, 3]);
+    expect(feeRates).toHaveBeenCalledTimes(3);
+  });
+
+  it("never keeps a fee quote that failed", async () => {
+    const feeRates = vi
+      .fn<ChainObserver["feeRates"]>()
+      .mockRejectedValueOnce(new Error("the node is down"))
+      .mockResolvedValueOnce([{ satPerVb: 2, targetBlocks: 1 }]);
+    const observer = cacheIndexing(
+      { ...observerOf(async () => reading(1)), feeRates },
+      { now: () => clock.now, ttlMs: 1_000 },
+    );
+    await expect(observer.feeRates(chain, [1])).rejects.toThrow("down");
+    expect(await observer.feeRates(chain, [1])).toEqual([
+      { satPerVb: 2, targetBlocks: 1 },
+    ]);
+  });
+
   it("passes observations straight through", async () => {
     const observe = vi.fn(() => Promise.reject(new Error("seen")));
     const observer = cacheIndexing(
-      { indexing: async () => reading(1), observe },
+      {
+        balance: () => Promise.reject(new Error("not used")),
+        feeRates: () => Promise.reject(new Error("not used")),
+        indexing: async () => reading(1),
+        observe,
+      },
       { now: () => clock.now, ttlMs: 1 },
     );
     await expect(observer.observe({ chain, id: "abc" })).rejects.toThrow(
@@ -129,6 +177,8 @@ describe("judging which waits are delayed", () => {
   const now = new Date("2026-10-17T12:00:00.000Z");
   const sent = (minutes: number) => new Date(now.getTime() - minutes * 60_000);
   const behind = (lag: number): ChainObserver => ({
+    balance: () => Promise.reject(new Error("not used")),
+    feeRates: () => Promise.reject(new Error("not used")),
     indexing: async (asked) => ({
       chain: asked,
       indexedHeight: 100,
@@ -163,9 +213,7 @@ describe("judging which waits are delayed", () => {
 
   it("does not delay a wait the indexer is keeping up with, and asks it once for each chain with something waiting", async () => {
     const indexing = vi.fn(behind(1).indexing);
-    const judge = judgeWith(
-      new Map([[chain, { indexing, observe: behind(1).observe }]]),
-    );
+    const judge = judgeWith(new Map([[chain, { ...behind(1), indexing }]]));
     expect(
       await judge([
         { broadcastAt: sent(5), chain, state: "pending" },
@@ -181,8 +229,8 @@ describe("judging which waits are delayed", () => {
 
   it("falls back to the time when the chain cannot be asked", async () => {
     const down: ChainObserver = {
+      ...behind(0),
       indexing: () => Promise.reject(new Error("the node is down")),
-      observe: behind(0).observe,
     };
     const judge = judgeWith(new Map([[chain, down]]));
     expect(

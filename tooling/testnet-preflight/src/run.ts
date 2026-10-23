@@ -7,7 +7,10 @@ import {
 import type { DelayPolicy } from "@ador/shared/chain";
 
 import { betaChains } from "../../../configs/beta-chains.ts";
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+import {
+  defaultFeeTargetBlocks,
+  rewardsPolicy,
+} from "../../../configs/rewards-policy.ts";
 import { chainName, checkChain } from "./checks/chain.ts";
 import { checkConfiguration } from "./checks/configuration.ts";
 import { checkFee, feeName } from "./checks/fee.ts";
@@ -44,7 +47,10 @@ const skipped = (name: string): CheckResult => ({
 export async function runPreflight(
   source: NodeJS.ProcessEnv,
   platform: PreflightPlatform,
-  policy: PreflightPolicy = rewardsPolicy,
+  policy: PreflightPolicy = {
+    ...rewardsPolicy,
+    feeTargetBlocks: defaultFeeTargetBlocks,
+  },
 ): Promise<readonly CheckResult[]> {
   const { betaNetwork, environment, result } = checkConfiguration(source);
   const templates = await checkTemplates(

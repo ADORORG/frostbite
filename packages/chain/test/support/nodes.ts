@@ -9,6 +9,7 @@ export function fakeNode(overrides: Partial<AlkanesNode> = {}): AlkanesNode {
     broadcast: unexpected("broadcast"),
     bytecode: unexpected("bytecode"),
     feeRate: unexpected("feeRate"),
+    feeRates: unexpected("feeRates"),
     holdings: unexpected("holdings"),
     indexedHeight: unexpected("indexedHeight"),
     tip: unexpected("tip"),

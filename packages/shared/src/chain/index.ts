@@ -1,5 +1,6 @@
 export * from "./chain-config.ts";
 export * from "./chain-ref.ts";
+export * from "./fees.ts";
 export * from "./indexing.ts";
 export * from "./indexing-route.ts";
 export * from "./networks.ts";

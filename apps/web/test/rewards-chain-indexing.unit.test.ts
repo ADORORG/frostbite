@@ -106,14 +106,17 @@ describe("how far the rewards chain's indexer has read", () => {
 
   it("is readable while the policy keeps the release gate closed, because reading moves nothing", async () => {
     vi.resetModules();
-    vi.doMock("../../../configs/rewards-policy.ts", async (original) => ({
-      rewardsPolicy: {
-        ...(
-          await original<typeof import("../../../configs/rewards-policy.ts")>()
-        ).rewardsPolicy,
-        testChainReleaseGate: "closed",
-      },
-    }));
+    vi.doMock("../../../configs/rewards-policy.ts", async (original) => {
+      const real =
+        await original<typeof import("../../../configs/rewards-policy.ts")>();
+      return {
+        ...real,
+        rewardsPolicy: {
+          ...real.rewardsPolicy,
+          testChainReleaseGate: "closed",
+        },
+      };
+    });
     try {
       const closed = await import("../../../configs/rewards-chain.ts");
       const rewards = closed.createRewardsChain(

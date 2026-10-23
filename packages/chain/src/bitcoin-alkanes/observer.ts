@@ -18,6 +18,18 @@ export function createObserver(
   options: Pick<TransactionOptions, "now" | "providerId">,
 ): ChainObserver {
   return {
+    balance: async (chain, address) => {
+      const { node } = servedChain(chains, chain);
+      let confirmed = 0n;
+      let pending = 0n;
+      for (const utxo of await node.utxos(address)) {
+        if (utxo.confirmed) confirmed += utxo.value;
+        else pending += utxo.value;
+      }
+      return { confirmed, pending };
+    },
+    feeRates: (chain, targets) =>
+      servedChain(chains, chain).node.feeRates(targets),
     indexing: async (chain) => {
       const { node } = servedChain(chains, chain);
       const [tip, indexedHeight] = await Promise.all([

@@ -1,17 +1,23 @@
 import { createFeatureRegistry } from "@ador/plugin-kit";
-import { chainIndexingRoute } from "@ador/shared/chain";
+import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createChainStatusFeature } from "../src/registration.ts";
 
 const config = {
   delay: { maxLagBlocks: 2 },
+  feeSpeeds: {
+    fast: { approxMinutes: 30, targetBlocks: 3 },
+    lightning: { approxMinutes: 15, targetBlocks: 1 },
+    medium: { approxMinutes: 60, targetBlocks: 6 },
+    slow: { approxMinutes: 250, targetBlocks: 25 },
+  },
   followed: null,
   refreshMs: 30_000,
 };
 
 describe("the chain status registration", () => {
-  it("declares the one public route it implements, and no page", () => {
+  it("declares the two public routes it implements, and no page", () => {
     expect(createChainStatusFeature(config).manifest).toEqual({
       capabilities: ["api-routes"],
       dependencies: [],
@@ -20,7 +26,7 @@ describe("the chain status registration", () => {
       pages: [],
       requiredDecisionGates: [],
       requiredProviderCapabilities: [],
-      routes: [chainIndexingRoute],
+      routes: [chainIndexingRoute, chainFeesRoute],
       version: "1.0.0",
     });
   });
@@ -32,6 +38,6 @@ describe("the chain status registration", () => {
       capabilities: ["api-routes"],
       id: "chain-status",
     });
-    expect(loaded.operations).toHaveLength(1);
+    expect(loaded.operations).toHaveLength(2);
   });
 });

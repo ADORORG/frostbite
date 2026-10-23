@@ -129,6 +129,8 @@ function ports(): AdminChainPorts {
       simulate: (...asked) => contracts.simulate(...asked),
     },
     observer: {
+      balance: (...asked) => observer.balance(...asked),
+      feeRates: (...asked) => observer.feeRates(...asked),
       indexing: async (asked) => {
         if (indexer.down) throw new Error("the node is down");
         const reading = await observer.indexing(asked);

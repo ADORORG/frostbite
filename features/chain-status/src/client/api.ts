@@ -4,8 +4,11 @@ import {
   type FetchLike,
 } from "@ador/client-http";
 import {
+  chainFeesRoute,
+  chainFeesSchema,
   chainIndexingRoute,
   chainIndexingSchema,
+  type ChainFees,
   type ChainIndexing,
 } from "@ador/shared/chain";
 
@@ -13,6 +16,7 @@ import {
 export const indexingTimeoutMs = 5_000;
 
 export interface ChainStatusApi {
+  fees(signal: AbortSignal): Promise<ChainFees>;
   indexing(signal: AbortSignal): Promise<ChainIndexing>;
 }
 
@@ -21,6 +25,13 @@ export function createChainStatusApi(
 ): ChainStatusApi {
   const request = createRequester(fetchImpl);
   return {
+    fees: (signal) =>
+      request(chainFeesRoute, chainFeesSchema, {
+        signal: AbortSignal.any([
+          signal,
+          AbortSignal.timeout(indexingTimeoutMs),
+        ]),
+      }),
     indexing: (signal) =>
       request(chainIndexingRoute, chainIndexingSchema, {
         signal: AbortSignal.any([

@@ -13,7 +13,12 @@ import type { ChainStatusConfig } from "../config.ts";
 // How far the followed chain's indexer has read, with the platform's verdict on it. Public, because it says nothing about anyone. A chain
 // that cannot be asked is reported as such (`unavailable`), never as in sync and never as behind.
 export function createIndexingOperation(
-  config: Pick<ChainStatusConfig, "delay" | "followed">,
+  config: Pick<ChainStatusConfig, "delay"> & {
+    readonly followed: Pick<
+      NonNullable<ChainStatusConfig["followed"]>,
+      "displayName" | "indexing"
+    > | null;
+  },
 ): HttpOperation<Record<string, never>, ChainIndexing> {
   return {
     access: { kind: "public" },

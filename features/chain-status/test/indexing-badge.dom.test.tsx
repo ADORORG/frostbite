@@ -21,6 +21,7 @@ const hidden = (value: boolean) =>
 afterEach(() => hidden(false));
 
 const apiOf = (indexing: ChainStatusApi["indexing"]): ChainStatusApi => ({
+  fees: () => Promise.reject(new Error("not used")),
   indexing,
 });
 

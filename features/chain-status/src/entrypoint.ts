@@ -1,6 +1,7 @@
 import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
 
+import { createFeesOperation } from "./application/fees.ts";
 import { createIndexingOperation } from "./application/indexing.ts";
 import type { ChainStatusConfig } from "./config.ts";
 
@@ -10,7 +11,10 @@ export function createChainStatusEntrypoint(
   return {
     capabilities: ["api-routes"],
     id: "chain-status",
-    operations: [registerHttpOperation(createIndexingOperation(config))],
+    operations: [
+      registerHttpOperation(createIndexingOperation(config)),
+      registerHttpOperation(createFeesOperation(config)),
+    ],
     version: "1.0.0",
   };
 }

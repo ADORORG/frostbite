@@ -9,6 +9,7 @@ import type {
   ChainTransaction,
   ContractInspection,
   ContractRef,
+  FeeRate,
   FundingPolicy,
   IndexingStatus,
   Observation,
@@ -82,6 +83,20 @@ export interface ChainObserver {
   observe(ref: TransactionRef): Promise<Observation>;
   // How far the chain's indexer has read against the chain's tip. Throws when the chain cannot be asked.
   indexing(chain: ChainRef): Promise<IndexingStatus>;
+  // What the chain's fee market quotes, in satoshis per virtual byte, for confirming within each of `targets` blocks. Throws when the
+  // chain cannot be asked or has no quote for a target: a rate is never guessed.
+  feeRates(
+    chain: ChainRef,
+    targets: readonly number[],
+  ): Promise<readonly FeeRate[]>;
+  // What an address holds on the chain, in its smallest unit: `confirmed` can be spent by a step, `pending` is still waiting for its
+  // first confirmation. Throws when the chain cannot be asked.
+  balance(chain: ChainRef, address: string): Promise<AddressBalance>;
+}
+
+export interface AddressBalance {
+  readonly confirmed: bigint;
+  readonly pending: bigint;
 }
 
 // How many times an address has claimed a milestone from a game's rewards contract, as the chain's indexed state says. It is

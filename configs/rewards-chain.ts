@@ -1,6 +1,7 @@
 import { join } from "node:path";
 
 import { cacheIndexing } from "@ador/chain/indexing";
+import type { AddressBalance } from "@ador/chain/ports";
 import {
   createConfiguredRegistry,
   feeCeiling,
@@ -11,13 +12,14 @@ import {
   chainRefSchema,
   type ChainConfig,
   type ChainRef,
+  type FeeRate,
   type FundingPolicy,
   type IndexingStatus,
 } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
 import { betaChain, type BetaChain } from "./chains.ts";
-import { rewardsPolicy } from "./rewards-policy.ts";
+import { defaultFeeTargetBlocks, rewardsPolicy } from "./rewards-policy.ts";
 
 // What the process provides, so a test can stand in for the network, the clock and the disk.
 export interface RewardsPlatform {
@@ -38,7 +40,11 @@ export interface RewardsChain {
   } | null;
   // The chain as anyone may see how far its indexer has read: its name, and the reading (which rejects where the node cannot be asked).
   readonly followed: {
+    // What an address holds on the chain (see `ChainObserver.balance`).
+    balance(address: string): Promise<AddressBalance>;
     readonly displayName: string;
+    // What the chain's fee market quotes for each block target.
+    feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
     indexing(): Promise<IndexingStatus>;
   };
 }
@@ -104,7 +110,7 @@ function configuredChain(
         transactions: {
           changeDustSats: rewardsPolicy.changeDustSats,
           claimOutputSats: rewardsPolicy.claimOutputSats,
-          feeTargetBlocks: rewardsPolicy.feeTargetBlocks,
+          feeTargetBlocks: defaultFeeTargetBlocks,
           lifetimeMs: rewardsPolicy.lifetimeMs,
           templateSequence: rewardsPolicy.templateSequence,
         },
@@ -152,7 +158,9 @@ export function createRewardsChain(
     chain: (chain) => (chain === served ? offered : null),
     // Reading how far the indexer has come moves nothing, so it does not wait on the release gate that guards sending.
     followed: {
+      balance: (address) => ports.observer.balance(served, address),
       displayName: configured.config.displayName,
+      feeRates: (targets) => ports.observer.feeRates(served, targets),
       indexing: () => ports.observer.indexing(served),
     },
   };
