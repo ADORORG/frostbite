@@ -29,6 +29,15 @@ describe("settings", () => {
     expect(environment?.maxFeeSats).toBe(500_000n);
   });
 
+  it("names the node by its host only, since the address may carry a key", () => {
+    const { result } = checkConfiguration({
+      ...base,
+      REWARDS_CHAIN_RPC_URL: "https://node.example/v4/s3cret-key",
+    });
+    expect(result.detail).toContain("Node node.example,");
+    expect(result.detail).not.toContain("s3cret-key");
+  });
+
   it("fails with no node address, and says what that means", () => {
     const { environment, result } = checkConfiguration({});
     expect(environment).toBeNull();

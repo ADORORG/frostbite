@@ -15,6 +15,7 @@ const signet = chainRefSchema.parse(bitcoinSignetChainId);
 const url = "https://node.example.invalid/v1/rpc";
 const environment: RewardsChainEnvironment = {
   maxFeeSats: 25_000n,
+  rpcHeaders: {},
   rpcTimeoutMs: 400,
   rpcUrl: url,
   templatesDirectory: null,
@@ -25,11 +26,15 @@ const withTemplates: RewardsChainEnvironment = {
 };
 
 function platform() {
-  const requests: { body: string; url: string }[] = [];
+  const requests: {
+    body: string;
+    headers: Readonly<Record<string, string>>;
+    url: string;
+  }[] = [];
   const reads: string[] = [];
   const platform: RewardsPlatform = {
     fetch: async (address, init) => {
-      requests.push({ body: init.body, url: address });
+      requests.push({ body: init.body, headers: init.headers, url: address });
       await new Promise((resolve) => setTimeout(resolve, 20));
       if (init.signal.aborted) throw new Error("timed out");
       const known = init.body.includes("esplora_tx");
@@ -113,6 +118,23 @@ describe("the rewards chain", () => {
     });
     expect(requests.map((request) => request.url)).toEqual([url]);
     expect(requests[0]?.body).toContain("esplora_tx");
+  });
+
+  it("sends the node's key header with its calls, and only that header otherwise", async () => {
+    const ref = { chain: signet, id: "a".repeat(64) };
+    for (const [rpcHeaders, sent] of [
+      [{ "x-gateway-key": "k3y" }, { "x-gateway-key": "k3y" }],
+      [{}, {}],
+    ] as const) {
+      const { platform: stand, requests } = platform();
+      await createRewardsChain({ ...environment, rpcHeaders }, stand)
+        ?.chain(signet)
+        ?.ports.observer.observe(ref);
+      expect(requests[0]?.headers).toEqual({
+        ...sent,
+        "content-type": "application/json",
+      });
+    }
   });
 
   it("gives up on a node that stays silent past the configured time", async () => {

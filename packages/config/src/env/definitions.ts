@@ -231,6 +231,22 @@ export const environmentDefinitions = [
     secret: true,
   },
   {
+    key: "REWARDS_CHAIN_RPC_API_KEY",
+    description:
+      "The key a gateway node asks for, sent in the header named by REWARDS_CHAIN_RPC_API_KEY_HEADER; blank when the node needs none. Set both or neither.",
+    exposure: "server",
+    required: false,
+    secret: true,
+  },
+  {
+    key: "REWARDS_CHAIN_RPC_API_KEY_HEADER",
+    description:
+      "Name of the HTTP header that carries REWARDS_CHAIN_RPC_API_KEY (the node's documentation says which); blank when the node needs none.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
     key: "REWARDS_CHAIN_RPC_TIMEOUT_MS",
     description:
       "Milliseconds before a call to the rewards chain node gives up; blank means 15000.",

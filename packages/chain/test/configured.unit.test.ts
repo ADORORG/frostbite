@@ -41,6 +41,7 @@ const settings = (
   network: "signet",
   now: () => new Date("2026-01-01T00:00:00.000Z"),
   rpc: {
+    headers: {},
     fetch: async (url, init) => {
       requests.push(url);
       await new Promise((resolve) => setTimeout(resolve, 20));

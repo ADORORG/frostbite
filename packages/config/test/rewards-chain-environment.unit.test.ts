@@ -21,6 +21,7 @@ describe("the rewards chain environment", () => {
   it("reads a node with the safe defaults: the standard timeout and no templates directory", () => {
     expect(parseRewardsChainEnvironment(node)).toEqual({
       maxFeeSats: 20_000n,
+      rpcHeaders: {},
       rpcTimeoutMs: 15_000,
       rpcUrl: "https://node.example.invalid/rpc",
       templatesDirectory: null,
@@ -36,6 +37,7 @@ describe("the rewards chain environment", () => {
       }),
     ).toEqual({
       maxFeeSats: 20_000n,
+      rpcHeaders: {},
       rpcTimeoutMs: 5000,
       rpcUrl: "https://node.example.invalid/rpc",
       templatesDirectory: "/srv/templates",
@@ -61,5 +63,56 @@ describe("the rewards chain environment", () => {
     ]) {
       expect(() => parseRewardsChainEnvironment({ ...node, ...bad })).toThrow();
     }
+  });
+
+  it("turns a key and its header name into the header the node is called with", () => {
+    expect(
+      parseRewardsChainEnvironment({
+        ...node,
+        REWARDS_CHAIN_RPC_API_KEY: " k3y-VALUE ",
+        REWARDS_CHAIN_RPC_API_KEY_HEADER: " x-gateway-key ",
+      })?.rpcHeaders,
+    ).toEqual({ "x-gateway-key": "k3y-VALUE" });
+  });
+
+  it("treats blank key settings as none, and refuses a key without its header or the reverse", () => {
+    expect(
+      parseRewardsChainEnvironment({
+        ...node,
+        REWARDS_CHAIN_RPC_API_KEY: " ",
+        REWARDS_CHAIN_RPC_API_KEY_HEADER: "",
+      })?.rpcHeaders,
+    ).toEqual({});
+    for (const half of [
+      { REWARDS_CHAIN_RPC_API_KEY: "k3y" },
+      { REWARDS_CHAIN_RPC_API_KEY_HEADER: "x-gateway-key" },
+    ]) {
+      expect(() => parseRewardsChainEnvironment({ ...node, ...half })).toThrow(
+        /together or not at all/u,
+      );
+    }
+  });
+
+  it("refuses a header name or key that could not be sent as an HTTP header", () => {
+    const pair = {
+      REWARDS_CHAIN_RPC_API_KEY: "k3y",
+      REWARDS_CHAIN_RPC_API_KEY_HEADER: "x-gateway-key",
+    };
+    for (const bad of [
+      { REWARDS_CHAIN_RPC_API_KEY_HEADER: "x gateway" },
+      { REWARDS_CHAIN_RPC_API_KEY_HEADER: "x-key:" },
+      { REWARDS_CHAIN_RPC_API_KEY: "two words" },
+      { REWARDS_CHAIN_RPC_API_KEY: "line\nbreak" },
+    ]) {
+      expect(() =>
+        parseRewardsChainEnvironment({ ...node, ...pair, ...bad }),
+      ).toThrow();
+    }
+  });
+
+  it("does not read the key while no node address is set", () => {
+    expect(
+      parseRewardsChainEnvironment({ REWARDS_CHAIN_RPC_API_KEY: "k3y" }),
+    ).toBeNull();
   });
 });

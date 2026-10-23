@@ -62,6 +62,7 @@ export async function runPreflight(
   const node = createRpcNode(
     createJsonRpc({
       fetch: platform.fetch,
+      headers: environment.rpcHeaders,
       timeoutMs: environment.rpcTimeoutMs,
       url: environment.rpcUrl,
     }),

@@ -13,8 +13,11 @@ Game rewards page, and the platform records them when each step completes (`ador
    the only chain wired today (`configs/chains.ts`). Blank means no rewards chain: claims and staff administration say
    "not available".
 2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it. The `game-rewards` template is 294 KB, which costs about 150,000 sats to publish at 2 sat/vB, so the ceiling must be above that (finding S78): 500000 suits signet. Tighten it before any real network.
-3. `REWARDS_CHAIN_RPC_TIMEOUT_MS` (optional): how long a call to the node may take. Blank means 15 seconds.
-4. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
+3. `REWARDS_CHAIN_RPC_API_KEY` and `REWARDS_CHAIN_RPC_API_KEY_HEADER` (optional, together): for a gateway that wants a key, the key
+   and the name of the HTTP header that carries it (its documentation says which). They are sent with every call, from the server only.
+   One without the other stops boot. Keep the key out of `REWARDS_CHAIN_RPC_URL`, which is logged by host only but is easier to leak.
+4. `REWARDS_CHAIN_RPC_TIMEOUT_MS` (optional): how long a call to the node may take. Blank means 15 seconds.
+5. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
    SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
 

@@ -105,4 +105,35 @@ describe("the JSON-RPC transport", () => {
       ).toThrow("timeout");
     }
   });
+
+  it("sends the configured headers with every call, and keeps content-type its own", async () => {
+    const seen: Readonly<Record<string, string>>[] = [];
+    const client = createJsonRpc({
+      fetch: (url, init) => {
+        seen.push(init.headers);
+        return answering({ id: seen.length, jsonrpc: "2.0", result: "1" })(
+          url,
+          init,
+        );
+      },
+      headers: { "content-type": "text/plain", "x-gateway-key": "k3y" },
+      timeoutMs: 1000,
+      url: "https://node.example/rpc",
+    });
+    await client.call("m", []);
+    await client.call("m", []);
+    expect(seen).toEqual([
+      { "content-type": "application/json", "x-gateway-key": "k3y" },
+      { "content-type": "application/json", "x-gateway-key": "k3y" },
+    ]);
+  });
+
+  it("sends only content-type when no headers are configured", async () => {
+    const seen: Readonly<Record<string, string>>[] = [];
+    await rpc((url, init) => {
+      seen.push(init.headers);
+      return answering({ id: 1, jsonrpc: "2.0", result: "1" })(url, init);
+    }).call("m", []);
+    expect(seen).toEqual([{ "content-type": "application/json" }]);
+  });
 });

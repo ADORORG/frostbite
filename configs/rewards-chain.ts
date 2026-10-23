@@ -104,6 +104,7 @@ function configuredChain(
         now: platform.now,
         rpc: {
           fetch: platform.fetch,
+          headers: environment.rpcHeaders,
           timeoutMs: environment.rpcTimeoutMs,
           url: environment.rpcUrl,
         },

@@ -25,6 +25,8 @@ export type FetchLike = (
 
 export interface JsonRpcOptions {
   readonly fetch: FetchLike;
+  // Sent with every call, for a gateway that wants a key in a header. `content-type` is always the transport's own.
+  readonly headers?: Readonly<Record<string, string>>;
   readonly timeoutMs: number;
   readonly url: string;
 }
@@ -44,7 +46,7 @@ export function createJsonRpc(options: JsonRpcOptions): JsonRpc {
       try {
         const response = await options.fetch(options.url, {
           body: JSON.stringify({ id, jsonrpc: "2.0", method, params }),
-          headers: { "content-type": "application/json" },
+          headers: { ...options.headers, "content-type": "application/json" },
           method: "POST",
           signal: AbortSignal.timeout(options.timeoutMs),
         });

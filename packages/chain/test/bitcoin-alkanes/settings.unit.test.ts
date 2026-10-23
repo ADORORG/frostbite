@@ -70,6 +70,7 @@ describe("the services the adapter is wired to", () => {
     now: () => new Date("2026-01-01T00:00:00.000Z"),
     rpc: {
       fetch: () => Promise.reject(new Error("offline")),
+      headers: {},
       timeoutMs: 400,
       url: "https://user:key@node.example.invalid/rpc",
     },

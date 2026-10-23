@@ -29,7 +29,7 @@ export function checkConfiguration(source: NodeJS.ProcessEnv): {
     return {
       environment,
       result: {
-        detail: `Node ${environment.rpcUrl}, fee ceiling ${environment.maxFeeSats} sats, timeout ${environment.rpcTimeoutMs} ms.`,
+        detail: `Node ${new URL(environment.rpcUrl).host}, fee ceiling ${environment.maxFeeSats} sats, timeout ${environment.rpcTimeoutMs} ms.`,
         name: configurationName,
         verdict: "pass",
       },

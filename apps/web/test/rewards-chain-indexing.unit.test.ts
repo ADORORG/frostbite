@@ -12,6 +12,7 @@ import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 const signet = chainRefSchema.parse(bitcoinSignetChainId);
 const environment: RewardsChainEnvironment = {
   maxFeeSats: 25_000n,
+  rpcHeaders: {},
   rpcTimeoutMs: 400,
   rpcUrl: "https://node.example.invalid/v1/rpc",
   templatesDirectory: null,

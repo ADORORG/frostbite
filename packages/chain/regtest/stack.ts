@@ -124,7 +124,7 @@ export async function regtest() {
         maxPreviewBytes: 16_384,
         network: "regtest",
         now: () => new Date(),
-        rpc: { fetch, timeoutMs: 60_000, url: gateway },
+        rpc: { fetch, headers: {}, timeoutMs: 60_000, url: gateway },
         transactions: {
           changeDustSats: 294n,
           claimOutputSats: 546n,

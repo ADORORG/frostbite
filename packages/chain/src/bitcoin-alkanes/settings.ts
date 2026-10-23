@@ -65,6 +65,8 @@ export interface AlkanesChainSettings {
   readonly now: () => Date;
   readonly rpc: {
     readonly fetch: FetchLike;
+    // The node's key header, when it asks for one; empty otherwise. Secret: never log it.
+    readonly headers: Readonly<Record<string, string>>;
     readonly timeoutMs: number;
     readonly url: string;
   };
@@ -98,6 +100,7 @@ export function alkanesServices(
         createRpcNode(
           createJsonRpc({
             fetch: settings.rpc.fetch,
+            headers: settings.rpc.headers,
             timeoutMs: settings.rpc.timeoutMs,
             url: settings.rpc.url,
           }),
