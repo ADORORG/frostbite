@@ -10,6 +10,10 @@ import { rewardsPlan } from "./rewards-plan.ts";
 export const gameAdminConfig = {
   chain: rewardsChain,
   delay: rewardsPolicy.delay,
+  fees: {
+    defaultSpeed: rewardsPolicy.defaultFeeSpeed,
+    refreshMs: rewardsPolicy.indexingRefreshMs,
+  },
   drawingLimits: {
     maxAttributeLength: 4096,
     maxDepth: 8,

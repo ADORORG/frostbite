@@ -92,6 +92,7 @@ export function createStartGameClaimOperation(getService: Service) {
       const outcome = await (
         await getService()
       ).start({
+        feeSpeed: input.feeSpeed,
         gameId: input.gameId,
         milestoneId: input.milestoneId,
         userId: context.actorUserId,

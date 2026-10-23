@@ -1,3 +1,10 @@
+import {
+  assertFeeSpeedPolicy,
+  targetBlocksOf,
+  type FeeSpeed,
+  type FeeSpeedPolicy,
+} from "@ador/shared/chain";
+
 import type { TemplateSequence } from "./admin/free-address.ts";
 
 // What sending and watching a transaction needs beyond the node: the policy values, all from configuration.
@@ -6,8 +13,10 @@ export interface TransactionOptions {
   readonly changeDustSats: bigint;
   // What the claim output (output 0) carries: above the dust limit, so the collectible has somewhere to land.
   readonly claimOutputSats: bigint;
-  // Confirmation target, in blocks, the fee rate is taken for.
+  // Confirmation target, in blocks, the fee rate is taken for when no speed was chosen.
   readonly feeTargetBlocks: number;
+  // The speeds a person may choose, each a block target; a transaction built for a speed takes the rate for its target.
+  readonly feeSpeeds: FeeSpeedPolicy;
   // How long a built transaction may be signed for.
   readonly lifetimeMs: number;
   readonly now: () => Date;
@@ -17,7 +26,18 @@ export interface TransactionOptions {
   readonly templateSequence: TemplateSequence;
 }
 
+// The block target a transaction is priced for: the speed the person chose, or the usual one when none was.
+export function feeTargetFor(
+  options: Pick<TransactionOptions, "feeSpeeds" | "feeTargetBlocks">,
+  speed: FeeSpeed | undefined,
+): number {
+  return speed === undefined
+    ? options.feeTargetBlocks
+    : targetBlocksOf(options.feeSpeeds, speed);
+}
+
 export function assertTransactionOptions(options: TransactionOptions): void {
+  assertFeeSpeedPolicy(options.feeSpeeds);
   for (const [name, value] of [
     ["feeTargetBlocks", options.feeTargetBlocks],
     ["lifetimeMs", options.lifetimeMs],

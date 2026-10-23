@@ -25,6 +25,7 @@ import {
   type ConfiguredChain,
 } from "../src/configured.ts";
 import { createRpcNode } from "../src/bitcoin-alkanes/node/node.ts";
+import { feeSpeeds } from "./fee-speeds.ts";
 import { createJsonRpc } from "../src/bitcoin-alkanes/node/transport.ts";
 import {
   walletRequests,
@@ -130,6 +131,7 @@ export async function regtest() {
           templateSequence: { attempts: 200, first: 1000n },
           claimOutputSats: 546n,
           feeTargetBlocks: 3,
+          feeSpeeds,
           lifetimeMs: 30 * 60_000,
         },
       },
@@ -249,6 +251,12 @@ export async function ensureAuthTokenFactory(
       templateSequence: { attempts: 200, first: 1000n },
       claimOutputSats: 546n,
       feeTargetBlocks: 3,
+      feeSpeeds: {
+        fast: { approxMinutes: 30, targetBlocks: 3 },
+        lightning: { approxMinutes: 15, targetBlocks: 1 },
+        medium: { approxMinutes: 60, targetBlocks: 6 },
+        slow: { approxMinutes: 250, targetBlocks: 25 },
+      },
       lifetimeMs: 30 * 60_000,
       now: () => new Date(),
       providerId: "regtest",

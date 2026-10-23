@@ -74,6 +74,7 @@ export function createStartStepOperation(resolve: Resolve) {
       const outcome = await service.start({
         action: input.action,
         authTokenOutput: input.authTokenOutput,
+        feeSpeed: input.feeSpeed,
         gameId: input.gameId,
         staffId: context.actorUserId,
         wallet: input.wallet,

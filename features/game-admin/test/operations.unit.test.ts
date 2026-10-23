@@ -66,6 +66,10 @@ describe("starting a step", () => {
       staffId,
       wallet: startInput.wallet,
     });
+    await s.start.execute({ ...startInput, feeSpeed: "fast" }, context);
+    expect(s.service.start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ feeSpeed: "fast" }),
+    );
     expect(result).toMatchObject({
       ok: true,
       value: { resumed: false, status: "started", step: { createdBy: "Ada" } },

@@ -1,6 +1,6 @@
 # `@ador/feature-chain-status`
 
-How far the rewards chain's indexer has read, as one public route and a lamp any page can show.
+How far the rewards chain's indexer has read, and what it costs to be confirmed on it, as two public routes, a lamp and a panel any page can show, and the one fee speed picker any step can use.
 
 ## Purpose
 
@@ -10,11 +10,19 @@ step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/s
 
 ## Public API
 
-- `createChainStatusFeature(config)` (package root): the registration for `configs/features.ts`. Declares the route
-  `GET /api/v1/chain/indexing` (public, no input) and no page.
+- `createChainStatusFeature(config)` (package root): the registration for `configs/features.ts`. Declares the routes
+  `GET /api/v1/chain/indexing` and `GET /api/v1/chain/fees` (public, no input) and no page.
 - `@ador/feature-chain-status/badge`: `<IndexingBadge refreshMs />`, a client component. It draws nothing until the platform answers,
   asks again every `refreshMs` (not while the tab is hidden), draws nothing where the platform follows no chain, and says
   "Chain status unknown" when the platform cannot be reached. The app places it in the header through `ShellStatusProvider` in the layout.
+- The badge also opens a panel one click beside the lamp: the latest block and, for each fee speed (slow, medium, fast, lightning),
+  the chain's rate, the approximate wait and what an example transaction (`exampleVbytes`) would pay. Where the chain or the
+  platform cannot be asked it says "Fees unknown" and draws no rate.
+- `@ador/feature-chain-status/fee-picker`: `<FeeSpeedPicker market value onChange vbytes? maxFeeSats?>` and `useFeeQuotes({ refreshMs })`,
+  the one control any step that pays a fee uses (staff steps and a player's claim today; minting next). It shows the four speeds with their
+  wait and rate, an optional cost for a transaction of `vbytes`, refuses a speed above `maxFeeSats` with the reason, and says plainly
+  when the market is unknown. The choice is the speed, never the rate: the speed travels on the intent (`feeSpeed`) and the adapter
+  quotes the rate for its block target when it builds the transaction. Other features import only this subpath.
 - The lamp itself is the shared `StatusLamp` (`@repo/ui/arcade`) in its compact form, so another status (a queue, a provider) reuses it.
 
 ## Answers

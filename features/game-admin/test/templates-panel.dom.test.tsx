@@ -10,6 +10,7 @@ import {
 import type { ListGameAdminTemplatesResponse } from "@ador/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
+import { FeeSettingsBoundary } from "../src/ui/fee-settings.tsx";
 import { TemplatesPanel } from "../src/ui/templates-panel.tsx";
 import { fakeApi, publishable, publishing } from "./support/fake-api.ts";
 
@@ -133,5 +134,76 @@ describe("the templates staff publish", () => {
     await enterWallet(container);
     await click(button(container, "Publish milestone-collectible@1.0.0"));
     expect(textOf(container)).toContain("This template is already published.");
+  });
+});
+
+describe("choosing how fast a template is published", () => {
+  const quotes = [
+    { approxMinutes: 250, satPerVb: 1.009, speed: "slow", targetBlocks: 25 },
+    { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
+    { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
+    { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
+  ] as const;
+  const feesApi = {
+    fees: async () => ({
+      chain: "Bitcoin testnet4",
+      observedAt: "2026-10-23T12:00:00.000Z",
+      quotes: [...quotes],
+      state: "ok" as const,
+      tipHeight: 157_401,
+    }),
+    indexing: () => Promise.reject(new Error("not used")),
+  };
+
+  it("offers the speeds with the chain's rates, starts on the usual one, and sends the one chosen with the step", async () => {
+    const fake = api();
+    fake.start = vi.fn(async () => ({
+      resumed: false,
+      status: "started" as const,
+      step: publishing(),
+    }));
+    const container = await mount(
+      <FeeSettingsBoundary
+        settings={{ api: feesApi, defaultSpeed: "slow", refreshMs: 60_000 }}
+      >
+        <TemplatesPanel api={fake} />
+      </FeeSettingsBoundary>,
+    );
+    await settle(() =>
+      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
+    );
+    await settle(() => expect(textOf(container)).toContain("9.00 sat/vB"));
+    const radios = [
+      ...container.querySelectorAll<HTMLInputElement>("input[type=radio]"),
+    ];
+    expect(radios.map((radio) => [radio.value, radio.checked])).toEqual([
+      ["slow", true],
+      ["medium", false],
+      ["fast", false],
+      ["lightning", false],
+    ]);
+    await enterWallet(container);
+    await click(button(container, "Publish game-rewards@1.0.0"));
+    expect(fake.start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ feeSpeed: "slow" }),
+    );
+    await click(radios[2] ?? null);
+    await click(button(container, "Publish game-rewards@1.0.0"));
+    expect(fake.start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ feeSpeed: "fast" }),
+    );
+  });
+
+  it("sends no speed, and offers no picker, where the page was given no fee settings", async () => {
+    const fake = api();
+    const container = await mount(<TemplatesPanel api={fake} />);
+    await settle(() =>
+      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
+    );
+    expect(container.querySelector("input[type=radio]")).toBeNull();
+    await enterWallet(container);
+    await click(button(container, "Publish game-rewards@1.0.0"));
+    const asked = vi.mocked(fake.start).mock.calls.at(-1)?.[0];
+    expect(asked).not.toHaveProperty("feeSpeed");
   });
 });

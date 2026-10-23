@@ -679,6 +679,9 @@ importers:
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/feature-chain-status':
+        specifier: workspace:*
+        version: link:../chain-status
       '@ador/game-admin':
         specifier: workspace:*
         version: link:../../packages/game-admin
@@ -761,6 +764,9 @@ importers:
       '@ador/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@ador/feature-chain-status':
+        specifier: workspace:*
+        version: link:../chain-status
       '@ador/game-claims':
         specifier: workspace:*
         version: link:../../packages/game-claims

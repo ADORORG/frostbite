@@ -11,7 +11,11 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
 } from "@ador/database";
-import { chainRefSchema, type Address } from "@ador/shared/chain";
+import {
+  chainRefSchema,
+  type Address,
+  type TransactionIntent,
+} from "@ador/shared/chain";
 import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
 import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
 import {
@@ -76,6 +80,8 @@ export const rewards: RewardsPlan = {
 export const contracts = createDrizzleContractStore(database);
 export const chainAvailable = { value: true };
 export const chainFailure = { build: false };
+// The intents the chain was asked to build, oldest first.
+export const builtIntents: TransactionIntent[] = [];
 // Makes the chain find no free address for a template.
 export const placement = { exhausted: false };
 // Makes the chain say nothing of what a step created.
@@ -111,10 +117,12 @@ function ports(): AdminChainPorts {
       },
     },
     builder: {
-      build: (...asked) =>
-        chainFailure.build
+      build: (...asked) => {
+        builtIntents.push(asked[0]);
+        return chainFailure.build
           ? Promise.reject(new Error("the node is down"))
-          : builder.build(...asked),
+          : builder.build(...asked);
+      },
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {
@@ -260,6 +268,7 @@ export function registerDatabase(): void {
     game.current = administeredGame();
     chainAvailable.value = true;
     chainFailure.build = false;
+    builtIntents.length = 0;
     placement.exhausted = false;
     hideCreated.value = false;
     Object.assign(inspected, { codeHash: null, down: false, exists: false });

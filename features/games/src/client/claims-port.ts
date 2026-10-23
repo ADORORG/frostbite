@@ -1,6 +1,7 @@
 import { ApiError } from "@ador/client-http";
 import type { ClaimsService } from "@ador/game-sdk/host";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
+import type { FeeSpeed } from "@ador/shared/chain";
 import type { GameClaim } from "@ador/shared/games";
 
 import { createClaimsApi, type ClaimsApi } from "./claims-api.ts";
@@ -12,6 +13,8 @@ import { createClaimsApi, type ClaimsApi } from "./claims-api.ts";
 // unavailable, without the reason.
 export function createClaimsService(options: {
   readonly api?: ClaimsApi;
+  // The speed the player chose for their claims, read when a claim is asked for; none, the platform's usual speed.
+  readonly feeSpeed?: () => FeeSpeed | undefined;
   readonly gameId: string;
   // Shows the player the claim that was started, to review and sign.
   readonly onStarted?: (claim: GameClaim) => void;
@@ -27,7 +30,9 @@ export function createClaimsService(options: {
       if (connected === null)
         return { reason: "no-wallet", status: "unavailable" };
       try {
+        const feeSpeed = options.feeSpeed?.();
         const answer = await api.start({
+          ...(feeSpeed === undefined ? {} : { feeSpeed }),
           gameId,
           milestoneId,
           wallet: connected.address,

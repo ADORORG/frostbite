@@ -17,6 +17,7 @@ import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
 import { fromHex } from "./node/hex.ts";
 import {
+  feeTargetFor,
   assertTransactionOptions,
   type TransactionOptions,
 } from "./options.ts";
@@ -61,7 +62,7 @@ export function createTransactionBuilder(
       const call = claimScript(game, milestoneKey(intent.milestoneId));
       const selection = selectCoins({
         changeDustSats: options.changeDustSats,
-        feeRate: await node.feeRate(options.feeTargetBlocks),
+        feeRate: await node.feeRate(feeTargetFor(options, intent.feeSpeed)),
         fixedOutputs: [sender.value.type],
         fixedSats: options.claimOutputSats,
         kind: sender.value.type,

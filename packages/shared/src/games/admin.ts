@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { feeSpeedSchema } from "../chain/fees.ts";
 import {
   gameAdminStepSchema,
   gameAdminTransactionSchema,
@@ -55,6 +56,8 @@ export const startGameAdminStepInputSchema = z
     action: gameAdminActionSchema,
     // The output holding the game's auth token ("txid:vout"), for a chain whose steps must present it.
     authTokenOutput: z.string().trim().min(1).max(128).optional(),
+    // How fast staff want the step confirmed; absent, the platform's usual speed.
+    feeSpeed: feeSpeedSchema.optional(),
     // The game the step is for; none when it publishes a template.
     gameId: gameIdSchema.nullable(),
     // The address of the wallet staff will sign with; the platform parses it for the game's chain.

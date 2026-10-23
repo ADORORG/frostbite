@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  builtIntents,
   collectibleTemplate,
   contracts,
   chain,
@@ -79,6 +80,16 @@ describe("publishing a template", () => {
     // The first is not on the chain yet, but its address is spoken for: the second is not given the same one.
     expect(first.step.summary.template?.at?.id).toBe("template-1");
     expect(second.step.summary.template?.at?.id).toBe("template-2");
+  });
+
+  it("builds the step at the speed staff chose, and at the chain's usual speed when they chose none", async () => {
+    const staff = await seedStaff();
+    await service.start({ ...publishInput(staff), feeSpeed: "lightning" });
+    await service.start(publishInput(staff, collectibleTemplate));
+    expect(builtIntents.map((intent) => intent.feeSpeed)).toEqual([
+      "lightning",
+      undefined,
+    ]);
   });
 
   it("says so, and builds nothing, when the chain finds no free address", async () => {

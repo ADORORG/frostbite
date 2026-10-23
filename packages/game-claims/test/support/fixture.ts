@@ -7,7 +7,11 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
 } from "@ador/database";
-import { chainRefSchema, type Address } from "@ador/shared/chain";
+import {
+  chainRefSchema,
+  type Address,
+  type TransactionIntent,
+} from "@ador/shared/chain";
 import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
 import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
 import {
@@ -70,6 +74,8 @@ export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
   held: [],
 };
+// The intents the chain was asked to build, oldest first.
+export const builtIntents: TransactionIntent[] = [];
 export const chainFailure = {
   broadcast: false,
   build: false,
@@ -102,10 +108,12 @@ function ports(): ClaimChainPorts {
       },
     },
     builder: {
-      build: (...asked) =>
-        chainFailure.build
+      build: (...asked) => {
+        builtIntents.push(asked[0]);
+        return chainFailure.build
           ? Promise.reject(new Error("the node is down"))
-          : builder.build(...asked),
+          : builder.build(...asked);
+      },
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {
@@ -221,6 +229,7 @@ export function registerDatabase(): void {
     broadcastGate.held = [];
     chainFailure.broadcast = false;
     chainFailure.build = false;
+    builtIntents.length = 0;
     chainFailure.observe = false;
     chainFailure.simulate = false;
   });

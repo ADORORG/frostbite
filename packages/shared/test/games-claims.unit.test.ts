@@ -132,6 +132,18 @@ describe("starting a claim", () => {
     wallet: " sim:one:a1b2c3 ",
   };
 
+  it("takes the speed the player chose, one of the four, and not any other", () => {
+    for (const feeSpeed of ["slow", "medium", "fast", "lightning"])
+      expect(
+        startGameClaimInputSchema.parse({ ...input, feeSpeed }).feeSpeed,
+      ).toBe(feeSpeed);
+    expect(startGameClaimInputSchema.parse(input).feeSpeed).toBeUndefined();
+    for (const feeSpeed of ["turbo", "", 3, null])
+      expect(accepts(startGameClaimInputSchema, { ...input, feeSpeed })).toBe(
+        false,
+      );
+  });
+
   it("takes the game, the milestone and the wallet's address, trimmed, and nothing else", () => {
     expect(startGameClaimInputSchema.parse(input).wallet).toBe(
       "sim:one:a1b2c3",

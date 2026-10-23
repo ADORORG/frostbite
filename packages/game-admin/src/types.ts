@@ -4,6 +4,7 @@ import type {
   ChainRef,
   ContractRef,
   DelayPolicy,
+  FeeSpeed,
   FundingPolicy,
   TrackedState,
   TransactionSummary,
@@ -203,6 +204,8 @@ export interface StartStepInput {
   readonly action: AdminAction;
   // The output that holds the game's auth token ("txid:vout"), for the chains whose steps must present it.
   readonly authTokenOutput?: string | undefined;
+  // How fast staff want the step confirmed; absent, the chain's usual speed.
+  readonly feeSpeed?: FeeSpeed | undefined;
   // The game the step is for; null when publishing a template.
   readonly gameId: string | null;
   readonly staffId: string;

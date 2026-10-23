@@ -4,6 +4,7 @@ import {
   chainFamilyIdTextSchema,
   chainRefTextSchema,
 } from "../chain/chain-ref.ts";
+import { feeSpeedSchema } from "../chain/fees.ts";
 import { gameIdSchema } from "./manifest.ts";
 
 // A player's claim of a milestone on chain, as the page is told of it. Nothing here is chain-specific beyond the opaque
@@ -81,6 +82,8 @@ export const gameClaimSchema = z
 export const startGameClaimInputSchema = z
   .object({
     gameId: gameIdSchema,
+    // How fast the player wants the claim confirmed; absent, the platform's usual speed.
+    feeSpeed: feeSpeedSchema.optional(),
     milestoneId: gameIdSchema,
     // The address of the wallet that will sign, as the page's connected wallet gives it. The platform parses it for the game's
     // chain and refuses what is not an address there.

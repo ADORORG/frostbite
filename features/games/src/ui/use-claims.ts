@@ -1,5 +1,6 @@
 import { ApiError } from "@ador/client-http";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
+import type { FeeSpeed } from "@ador/shared/chain";
 import type { GameClaim, GameClaimState } from "@ador/shared/games";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -40,11 +41,16 @@ export function useClaims(options: {
   readonly gameId: string;
   // Told when a claim's state changes, for the game (`claim.changed`).
   readonly onChange?: (milestoneId: string, state: GameClaimState) => void;
+  // The speed claims are started at until the player picks another; none, the platform's usual speed.
+  readonly feeSpeed?: FeeSpeed | undefined;
   readonly pollMs?: number;
   readonly sign?: ClaimSigner;
   readonly wallet: WalletInfo | null;
 }) {
   const { api, enabled, gameId, onChange, sign, wallet } = options;
+  const [feeSpeed, setFeeSpeed] = useState<FeeSpeed | null>(
+    options.feeSpeed ?? null,
+  );
   const pollMs = options.pollMs ?? defaultClaimPollMs;
   const [claims, setClaims] = useState<readonly GameClaim[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -119,6 +125,7 @@ export function useClaims(options: {
       setMessage(null);
       try {
         const answer = await api.start({
+          ...(feeSpeed === null ? {} : { feeSpeed }),
           gameId,
           milestoneId,
           wallet: wallet.address,
@@ -133,7 +140,7 @@ export function useClaims(options: {
         );
       }
     },
-    [api, begin, gameId, wallet],
+    [api, begin, feeSpeed, gameId, wallet],
   );
 
   const active = claims.find(({ id }) => id === activeId) ?? null;
@@ -163,6 +170,8 @@ export function useClaims(options: {
     canSign: sign !== undefined,
     claims,
     dismiss: useCallback(() => setActiveId(null), []),
+    feeSpeed,
+    setFeeSpeed,
     message,
     reopen: useCallback((claimId: string) => setActiveId(claimId), []),
     sign: signActive,

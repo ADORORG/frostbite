@@ -100,6 +100,7 @@ export function GameDetail({
           {...player}
           claimable={game.claimable}
           exposeWallet={wantsWallet}
+          {...(wallet.fees === undefined ? {} : { fees: wallet.fees })}
           network={wallet.network}
           src={game.embedSrc}
         />

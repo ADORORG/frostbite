@@ -21,6 +21,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";
 import { ClaimReview } from "./claim-review.tsx";
+import type { ClaimFeeSettings } from "../wallet-config.ts";
+import { ClaimFeesBeside } from "./claim-fees.tsx";
 import { claimsDockSection } from "./claims-card.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
 import type { ClaimSigner } from "./use-claims.ts";
@@ -90,6 +92,8 @@ export function GamePlayer({
   // has connected (the page's own use of it: the game is not told), and how that wallet signs a claim, if it can.
   readonly claims?: {
     readonly api?: ClaimsApi;
+    // How a claim's fee speed is offered; absent, no choice is made and claims use the platform's usual speed.
+    readonly fees?: ClaimFeeSettings;
     readonly pollMs?: number;
     readonly sign?: ClaimSigner;
     readonly wallet: WalletInfo | null;
@@ -161,6 +165,7 @@ export function GamePlayer({
                   progress={progress}
                   unlocked={unlocked}
                 />
+                <ClaimFeesBeside fees={claims?.fees} ui={claimUi} />
                 <p>{milestoneCopy(game.milestones)}</p>
               </ArcadeInfoCard>
             ),

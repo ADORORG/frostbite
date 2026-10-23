@@ -5,6 +5,7 @@ import { ArcadeEmptyState, ArcadeInfoCard } from "@repo/ui/arcade";
 import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { AdminFrame } from "./admin-frame.tsx";
+import { FeeSettingsBoundary, type FeeSettings } from "./fee-settings.tsx";
 import { WalletGamePanel, WalletTemplatesPanel } from "./wallet-panels.tsx";
 
 type Navigation = readonly NavigationItem[];
@@ -12,11 +13,13 @@ type Navigation = readonly NavigationItem[];
 // The staff page listing the games that declare rewards, and whether each has a contract to administer.
 export function GamesSurface({
   api,
+  fees,
   games,
   navigation,
   signingWallets,
 }: {
   readonly api?: GameAdminApi;
+  readonly fees: FeeSettings;
   readonly games: readonly AdminGameInfo[];
   readonly navigation: Navigation;
   readonly signingWallets: readonly string[];
@@ -27,10 +30,12 @@ export function GamesSurface({
       intro="Games whose milestones can be claimed on chain. Publishing a template, creating a game's contract, defining a milestone and pausing claims are steps you sign yourself."
       navigation={navigation}
     >
-      <WalletTemplatesPanel
-        {...(api === undefined ? {} : { api })}
-        signingWallets={signingWallets}
-      />
+      <FeeSettingsBoundary settings={fees}>
+        <WalletTemplatesPanel
+          {...(api === undefined ? {} : { api })}
+          signingWallets={signingWallets}
+        />
+      </FeeSettingsBoundary>
       {games.length === 0 ? (
         <ArcadeEmptyState title="Nothing to administer">
           No game declares rewards yet.
@@ -56,11 +61,13 @@ export function GamesSurface({
 // One game's administration page. A game that is unknown or declares no rewards is "not found", never an empty form.
 export function GameSurface({
   api,
+  fees,
   game,
   navigation,
   signingWallets,
 }: {
   readonly api?: GameAdminApi;
+  readonly fees: FeeSettings;
   readonly game: AdminGameInfo | undefined;
   readonly navigation: Navigation;
   readonly signingWallets: readonly string[];
@@ -81,11 +88,13 @@ export function GameSurface({
       intro={`Rewards on ${game.chain}.`}
       navigation={navigation}
     >
-      <WalletGamePanel
-        {...(api === undefined ? {} : { api })}
-        game={game}
-        signingWallets={signingWallets}
-      />
+      <FeeSettingsBoundary settings={fees}>
+        <WalletGamePanel
+          {...(api === undefined ? {} : { api })}
+          game={game}
+          signingWallets={signingWallets}
+        />
+      </FeeSettingsBoundary>
     </AdminFrame>
   );
 }

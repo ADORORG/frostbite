@@ -102,6 +102,10 @@ describe("starting a claim", () => {
       userId,
       wallet: "sim:one:a1b2c3fe",
     });
+    await s.start.execute({ ...startInput, feeSpeed: "fast" }, context);
+    expect(s.service.start).toHaveBeenLastCalledWith(
+      expect.objectContaining({ feeSpeed: "fast" }),
+    );
   });
 
   it("says a claim already open was resumed", async () => {

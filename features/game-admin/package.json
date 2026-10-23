@@ -22,6 +22,7 @@
     "@ador/chain": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/feature-chain-status": "workspace:*",
     "@ador/game-admin": "workspace:*",
     "@ador/wallet": "workspace:*",
     "@ador/http": "workspace:*",

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { chainFamilyIdSchema, chainRefSchema } from "./chain-ref.ts";
+import { feeSpeedSchema } from "./fees.ts";
 import { chainOperationSchema, type ChainOperation } from "./chain-config.ts";
 import {
   addressSchema,
@@ -27,6 +28,9 @@ const maxDrawingCharacters = 262_144;
 const intentBase = {
   chain: chainRefSchema,
   extension: extensionSchema.optional(),
+  // How fast the person wants it confirmed. Absent: the platform's usual speed. The adapter prices the transaction at the rate the
+  // chain quotes for the speed's block target when it builds it.
+  feeSpeed: feeSpeedSchema.optional(),
   sender: addressSchema,
 };
 

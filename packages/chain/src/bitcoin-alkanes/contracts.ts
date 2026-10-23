@@ -10,7 +10,7 @@ import { inspectContract } from "./inspect.ts";
 import { milestoneKey } from "./milestone-key.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
 import { fromHex } from "./node/hex.ts";
-import type { TransactionOptions } from "./options.ts";
+import { feeTargetFor, type TransactionOptions } from "./options.ts";
 import { claimScript } from "./tx/claim-call.ts";
 import { estimateVsize, feeFor } from "./tx/fees.ts";
 
@@ -66,7 +66,7 @@ export function createContractGateway(
         [sender.value.type, sender.value.type],
         call.length,
       ),
-      await node.feeRate(options.feeTargetBlocks),
+      await node.feeRate(feeTargetFor(options, intent.feeSpeed)),
     );
     return {
       fee: { asset: nativeAsset(intent.chain), baseUnits: fee },

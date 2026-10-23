@@ -2,7 +2,7 @@ import { gameClaimSchema, type GameClaim } from "@ador/shared/games";
 import { vi } from "vitest";
 
 import type { ClaimsApi } from "../../src/client/claims-api.ts";
-import { flush, game } from "./player-harness.tsx";
+import { flush, game, mount, send } from "./player-harness.tsx";
 
 // What the claim UI tests share: a claim as the routes answer, a fake of the routes, and a wallet.
 export const claimId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
@@ -69,4 +69,61 @@ export function fakeApi(over: Partial<ClaimsApi> = {}) {
 export async function until(condition: () => boolean, tries = 40) {
   for (let attempt = 0; attempt < tries && !condition(); attempt += 1)
     await flush();
+}
+
+// The chain's quotes for the four fee speeds, as the platform answers them.
+export const fees = {
+  api: {
+    fees: async () => ({
+      chain: "Bitcoin signet",
+      observedAt: "2026-10-23T12:00:00.000Z",
+      quotes: [
+        {
+          approxMinutes: 250,
+          satPerVb: 1.009,
+          speed: "slow" as const,
+          targetBlocks: 25,
+        },
+        {
+          approxMinutes: 60,
+          satPerVb: 3,
+          speed: "medium" as const,
+          targetBlocks: 6,
+        },
+        {
+          approxMinutes: 30,
+          satPerVb: 5,
+          speed: "fast" as const,
+          targetBlocks: 3,
+        },
+        {
+          approxMinutes: 15,
+          satPerVb: 9,
+          speed: "lightning" as const,
+          targetBlocks: 1,
+        },
+      ],
+      state: "ok" as const,
+      tipHeight: 157_401,
+    }),
+    indexing: () => Promise.reject(new Error("not used")),
+  },
+  defaultSpeed: "slow" as const,
+  exampleVbytes: 200,
+  refreshMs: 60_000,
+};
+
+// A player whose game has earned the milestone, with the claim routes and wallet given.
+export async function earned(
+  claims: Parameters<typeof mount>[1] extends infer P
+    ? P extends { claims?: infer C }
+      ? C
+      : never
+    : never,
+) {
+  const mounted = await mount(undefined, { claims, game: claimGame });
+  send(mounted.target, "ready", { sdkVersion: 1 }, "a");
+  send(mounted.target, "milestones.unlock", { id: milestoneId }, "b");
+  await flush();
+  return mounted;
 }

@@ -2,6 +2,7 @@ import type { GameWalletConfig } from "@ador/feature-games";
 import type { WalletAuthConfig } from "@ador/feature-accounts";
 
 import { betaChain } from "./chains.ts";
+import { rewardsPolicy } from "./rewards-policy.ts";
 
 // How wallet sign-in behaves and which wallets a player can choose, as the business decided them. A change is a
 // reviewed change to this record.
@@ -40,5 +41,10 @@ export const walletAuthConfig = {
 // How the games pages relate to the wallet: the network a game's wallet is expected to be on. Connecting is done
 // from the header widget on any page.
 export const gameWalletConfig = {
+  fees: {
+    defaultSpeed: rewardsPolicy.defaultFeeSpeed,
+    exampleVbytes: rewardsPolicy.exampleTransactionVbytes,
+    refreshMs: rewardsPolicy.indexingRefreshMs,
+  },
   network: walletAuthConfig.network,
 } as const satisfies GameWalletConfig;

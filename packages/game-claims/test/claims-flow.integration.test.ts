@@ -3,6 +3,7 @@ import { gameMilestoneClaims } from "@ador/database";
 import { describe, expect, it } from "vitest";
 
 import {
+  builtIntents,
   chain,
   chainAvailable,
   claimableGame,
@@ -29,6 +30,34 @@ const rowOf = async (id: string) =>
       .from(gameMilestoneClaims)
       .where(eq(gameMilestoneClaims.id, id))
   )[0];
+
+describe("the speed a claim is asked to confirm at", () => {
+  it("is built into the claim as the player chose it, and left out when they chose none", async () => {
+    const userId = await player();
+    const input = {
+      gameId,
+      milestoneId: "first-win",
+      userId,
+      wallet: wallet.value,
+    };
+    const first = await service.start({ ...input, feeSpeed: "lightning" });
+    expect(first.ok).toBe(true);
+    expect(builtIntents.map((intent) => intent.feeSpeed)).toEqual([
+      "lightning",
+    ]);
+  });
+
+  it("is the chain's usual one when the player chose none", async () => {
+    const userId = await player();
+    await service.start({
+      gameId,
+      milestoneId: "first-win",
+      userId,
+      wallet: wallet.value,
+    });
+    expect(builtIntents.map((intent) => intent.feeSpeed)).toEqual([undefined]);
+  });
+});
 
 describe("claiming a milestone from the start to complete", () => {
   it("builds the transaction, shows what it does, and keeps it awaiting the wallet", async () => {

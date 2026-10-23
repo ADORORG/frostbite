@@ -7,6 +7,7 @@ import {
   moveTo,
   signedOf,
   type Address,
+  type FeeSpeed,
   type SignedTransaction,
   type UnsignedTransaction,
 } from "@ador/shared/chain";
@@ -45,13 +46,15 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
     // A player asks to claim a milestone they earned, with the wallet they will sign with. The answer is the claim in progress
     // if there is one (asking again changes nothing), or a new one with the transaction built and the summary to show.
     async start(input: {
+      // How fast the player wants the claim confirmed; absent, the chain's usual speed.
+      readonly feeSpeed?: FeeSpeed | undefined;
       readonly gameId: string;
       readonly milestoneId: string;
       readonly userId: string;
       // The address of the wallet that will sign, as the page gives it: parsed for the game's chain here.
       readonly wallet: string;
     }): Promise<StartClaimResult> {
-      const { gameId, milestoneId, userId, wallet } = input;
+      const { feeSpeed, gameId, milestoneId, userId, wallet } = input;
       const current = await game(gameId);
       const limit = current?.limits.get(milestoneId);
       if (current === null || limit === undefined)
@@ -73,6 +76,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       const intent = {
         chain: current.chain,
         contract: current.contract,
+        ...(feeSpeed === undefined ? {} : { feeSpeed }),
         milestoneId,
         operation: "mint-milestone",
         sender,

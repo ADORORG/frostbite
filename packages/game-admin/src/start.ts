@@ -41,7 +41,9 @@ export async function startStep(
   let unsigned: UnsignedTransaction;
   try {
     unsigned = await planned.ports.builder.build(
-      planned.intent,
+      input.feeSpeed === undefined
+        ? planned.intent
+        : { ...planned.intent, feeSpeed: input.feeSpeed },
       dependencies.funding(planned.chain),
     );
   } catch (error) {

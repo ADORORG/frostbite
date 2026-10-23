@@ -1,4 +1,5 @@
 import { ApiError } from "@ador/client-http";
+import type { FeeSpeed } from "@ador/shared/chain";
 import type {
   GameAdminAction,
   GameAdminStep,
@@ -29,6 +30,7 @@ export const defaultStepPollMs = 4_000;
 
 export interface StartContext {
   readonly authTokenOutput?: string | undefined;
+  readonly feeSpeed?: FeeSpeed | undefined;
   readonly wallet: string;
 }
 
@@ -156,6 +158,9 @@ export function useAdminSteps(options: {
           context.authTokenOutput === ""
             ? {}
             : { authTokenOutput: context.authTokenOutput }),
+          ...(context.feeSpeed === undefined
+            ? {}
+            : { feeSpeed: context.feeSpeed }),
           gameId,
           wallet: context.wallet,
         });

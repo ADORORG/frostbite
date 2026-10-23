@@ -50,6 +50,7 @@ export function createGameAdminEntrypoint(
         path: gameAdminPath,
         render: ({ navigation }) => (
           <GamesSurface
+            fees={config.fees}
             games={known}
             navigation={navigation}
             signingWallets={config.signingWallets}
@@ -61,6 +62,7 @@ export function createGameAdminEntrypoint(
         path: gameAdminDetailPath,
         render: ({ navigation, params }) => (
           <GameSurface
+            fees={config.fees}
             game={known.find(({ id }) => id === params.gameId)}
             navigation={navigation}
             signingWallets={config.signingWallets}

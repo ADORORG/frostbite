@@ -112,6 +112,7 @@ function configuredChain(
         transactions: {
           changeDustSats: rewardsPolicy.changeDustSats,
           claimOutputSats: rewardsPolicy.claimOutputSats,
+          feeSpeeds: rewardsPolicy.feeSpeeds,
           feeTargetBlocks: defaultFeeTargetBlocks,
           lifetimeMs: rewardsPolicy.lifetimeMs,
           templateSequence: rewardsPolicy.templateSequence,

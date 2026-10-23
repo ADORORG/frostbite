@@ -8,6 +8,7 @@ import { info } from "./support/fixtures.ts";
 
 const navigation = [] as const;
 const signingWallets = ["xverse"] as const;
+const fees = { defaultSpeed: "slow", refreshMs: 60_000 } as const;
 // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
 const inApp = (page: React.ReactNode) => (
   <WalletProvider network="signet">{page}</WalletProvider>
@@ -19,6 +20,7 @@ describe("the staff pages", () => {
       inApp(
         <GamesSurface
           api={fakeApi()}
+          fees={fees}
           games={info()}
           navigation={navigation}
           signingWallets={signingWallets}
@@ -40,6 +42,7 @@ describe("the staff pages", () => {
       inApp(
         <GamesSurface
           api={fakeApi()}
+          fees={fees}
           games={[]}
           navigation={navigation}
           signingWallets={signingWallets}
@@ -55,6 +58,7 @@ describe("the staff pages", () => {
       inApp(
         <GameSurface
           api={fakeApi()}
+          fees={fees}
           game={arcade}
           navigation={navigation}
           signingWallets={signingWallets}
@@ -67,6 +71,7 @@ describe("the staff pages", () => {
       inApp(
         <GameSurface
           api={fakeApi()}
+          fees={fees}
           game={undefined}
           navigation={navigation}
           signingWallets={signingWallets}

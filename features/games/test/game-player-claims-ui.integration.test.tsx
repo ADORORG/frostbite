@@ -13,6 +13,7 @@ import {
 import {
   claimAt,
   claimGame,
+  earned,
   fakeApi,
   milestoneId,
   until,
@@ -38,21 +39,6 @@ const changes = (reply: { mock: { calls: unknown[][] } }) =>
     )
     .filter(({ event }) => event === "claim.changed")
     .map(({ data }) => data?.state);
-
-// A player whose game has earned the milestone, with the claim routes and wallet given.
-async function earned(
-  claims: Parameters<typeof mount>[1] extends infer P
-    ? P extends { claims?: infer C }
-      ? C
-      : never
-    : never,
-) {
-  const mounted = await mount(undefined, { claims, game: claimGame });
-  send(mounted.target, "ready", { sdkVersion: 1 }, "a");
-  send(mounted.target, "milestones.unlock", { id: milestoneId }, "b");
-  await flush();
-  return mounted;
-}
 
 describe("claiming from the milestone list", () => {
   it("offers Claim only for a milestone that is earned, and not on a game with no claims", async () => {

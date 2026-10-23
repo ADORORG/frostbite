@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@ador/chain": "workspace:*",
+    "@ador/feature-chain-status": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/game-claims": "workspace:*",

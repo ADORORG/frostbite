@@ -1,4 +1,5 @@
 import type { FetchLike } from "@ador/client-http";
+import type { FeeSpeed } from "@ador/shared/chain";
 import { gameClaimSchema, type GameClaim } from "@ador/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
@@ -48,11 +49,13 @@ const wallet = { address: "sim1one1a1b2c3fe1111", network: "signet" };
 function setup(
   answer: () => Response | Promise<Response>,
   connected = wallet as typeof wallet | null,
+  feeSpeed?: () => FeeSpeed | undefined,
 ) {
   const fetchImpl = vi.fn<FetchLike>(async () => answer());
   const onStarted = vi.fn<(started: GameClaim) => void>();
   const service = createClaimsService({
     api: createClaimsApi(fetchImpl),
+    ...(feeSpeed === undefined ? {} : { feeSpeed }),
     gameId: "arcade",
     onStarted,
     wallet: () => connected,
@@ -76,6 +79,23 @@ describe("asking for a claim from the page", () => {
     });
     expect(init?.signal).toBeInstanceOf(AbortSignal);
     expect(onStarted).toHaveBeenCalledExactlyOnceWith(claim);
+  });
+
+  it("sends the speed the player has picked at the moment the claim is asked for, and none when they picked none", async () => {
+    let picked: FeeSpeed | undefined = "fast";
+    const { fetchImpl, service } = setup(
+      () => json({ claim, resumed: false, status: "started" }),
+      wallet,
+      () => picked,
+    );
+    await service.claim("first-win");
+    picked = undefined;
+    await service.claim("first-win");
+    const bodies = fetchImpl.mock.calls.map(([, init]) =>
+      JSON.parse(init?.body ?? ""),
+    );
+    expect(bodies[0]).toHaveProperty("feeSpeed", "fast");
+    expect(bodies[1]).not.toHaveProperty("feeSpeed");
   });
 
   it("says there is no wallet without asking the platform", async () => {

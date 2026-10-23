@@ -5,6 +5,7 @@ import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import { useMemo, type ComponentProps } from "react";
 
+import type { ClaimFeeSettings } from "../wallet-config.ts";
 import { GamePlayer } from "./game-player.tsx";
 
 type PlayerProps = Omit<ComponentProps<typeof GamePlayer>, "claims" | "wallet">;
@@ -15,6 +16,7 @@ type PlayerProps = Omit<ComponentProps<typeof GamePlayer>, "claims" | "wallet">;
 export function WalletGamePlayer({
   claimable = false,
   exposeWallet = true,
+  fees,
   network,
   ...player
 }: PlayerProps & {
@@ -22,6 +24,8 @@ export function WalletGamePlayer({
   readonly claimable?: boolean;
   // The game declared the wallet capability, so it is told what is connected.
   readonly exposeWallet?: boolean;
+  // How a claim's fee speed is offered, where it is.
+  readonly fees?: ClaimFeeSettings;
   readonly network: WalletNetwork;
 }) {
   const {
@@ -43,7 +47,11 @@ export function WalletGamePlayer({
   return (
     <GamePlayer
       {...player}
-      claims={claimable ? { wallet: current } : undefined}
+      claims={
+        claimable
+          ? { ...(fees === undefined ? {} : { fees }), wallet: current }
+          : undefined
+      }
       wallet={
         exposeWallet
           ? { connect: request, current, expectedNetwork: network }

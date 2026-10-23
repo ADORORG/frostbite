@@ -47,6 +47,12 @@ export const options: TransactionOptions = {
   templateSequence: { attempts: 200, first: 1000n },
   claimOutputSats: 546n,
   feeTargetBlocks: 3,
+  feeSpeeds: {
+    fast: { approxMinutes: 30, targetBlocks: 3 },
+    lightning: { approxMinutes: 15, targetBlocks: 1 },
+    medium: { approxMinutes: 60, targetBlocks: 6 },
+    slow: { approxMinutes: 250, targetBlocks: 25 },
+  },
   lifetimeMs: 600_000,
   now: () => fixedNow,
   providerId: "test-node",

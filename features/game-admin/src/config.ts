@@ -1,6 +1,11 @@
 import type { AdminChainPorts, RewardsPlan } from "@ador/game-admin";
 import type { DrawingPolicy } from "@ador/milestone-art";
-import type { ChainRef, DelayPolicy, FundingPolicy } from "@ador/shared/chain";
+import type {
+  ChainRef,
+  DelayPolicy,
+  FeeSpeed,
+  FundingPolicy,
+} from "@ador/shared/chain";
 
 // What the platform needs, beyond a game's manifest, to administer its rewards contract: a chain it can build, send and watch
 // transactions on, what it has decided about publishing templates and creating contracts, and the limits a milestone's drawing is
@@ -16,6 +21,11 @@ export interface GameAdminConfig {
   readonly clock?: () => Date;
   // When a step's wait is called delayed (see `rewardsPolicy.delay`).
   readonly delay: DelayPolicy;
+  // The speed a step is offered at first, and how often the page asks the chain what each speed costs (milliseconds).
+  readonly fees: {
+    readonly defaultSpeed: FeeSpeed;
+    readonly refreshMs: number;
+  };
   // The chain templates are published on, the templates that may be, which a game and its collectibles are made from, and the most
   // a game's contract may be created to accept.
   readonly rewards: RewardsPlan;

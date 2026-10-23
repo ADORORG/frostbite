@@ -5,7 +5,7 @@ import { gameRewardsOpcodes } from "../abi.ts";
 import { fromHex } from "../node/hex.ts";
 import { formatAlkaneId, type AlkaneId } from "../node/alkane-id.ts";
 import type { AlkanesNode } from "../node/node.ts";
-import type { TransactionOptions } from "../options.ts";
+import { feeTargetFor, type TransactionOptions } from "../options.ts";
 import { needsAuthToken, type AdminOperation } from "./action.ts";
 import { StepRefusedError, type StepFunding } from "./types.ts";
 
@@ -44,14 +44,14 @@ export async function stepFunding(
   sender: BitcoinAddress,
   options: Pick<
     TransactionOptions,
-    "changeDustSats" | "claimOutputSats" | "feeTargetBlocks"
+    "changeDustSats" | "claimOutputSats" | "feeSpeeds" | "feeTargetBlocks"
   >,
 ): Promise<StepFunding> {
   const script = fromHex(sender.scriptHex);
   const owned = await node.utxos(sender.address);
   const base = {
     changeDustSats: options.changeDustSats,
-    feeRate: await node.feeRate(options.feeTargetBlocks),
+    feeRate: await node.feeRate(feeTargetFor(options, intent.feeSpeed)),
     outputDustSats: options.claimOutputSats,
   };
   const funder = (utxos: typeof owned) => ({
