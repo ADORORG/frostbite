@@ -20,6 +20,8 @@ const rates = [
   { satPerVb: 5, targetBlocks: 3 },
   { satPerVb: 9, targetBlocks: 1 },
 ];
+// An everyday step of 200 vB may pay up to 1,000 sats: the usual rates are within that, the 9 sat/vB one is not.
+const limit = { exampleVbytes: 200, maxFeeSats: 1_000 };
 const status = {
   chain: "bip122:00000000da84f2bafbbc53dee25a72ae",
   indexedHeight: 157_400,
@@ -34,14 +36,23 @@ const followed = (
   displayName: "Bitcoin testnet4",
   feeRates: async () => rates,
   indexing: async () => status,
+  maxFeeSats: limit.maxFeeSats,
   ...over,
 });
 const answer = (value: Parameters<typeof createFeesOperation>[0]["followed"]) =>
-  createFeesOperation({ feeSpeeds, followed: value }).execute({}, context);
+  createFeesOperation({
+    exampleVbytes: limit.exampleVbytes,
+    feeSpeeds,
+    followed: value,
+  }).execute({}, context);
 
 describe("the chain fees route", () => {
   it("is public, takes no input, and answers in the shared contract", () => {
-    const operation = createFeesOperation({ feeSpeeds, followed: null });
+    const operation = createFeesOperation({
+      exampleVbytes: limit.exampleVbytes,
+      feeSpeeds,
+      followed: null,
+    });
     expect(operation).toMatchObject({
       access: { kind: "public" },
       method: "GET",
@@ -62,6 +73,7 @@ describe("the chain fees route", () => {
       ok: true,
       value: {
         chain: "Bitcoin testnet4",
+        maxFeeSats: 1_000,
         observedAt: status.observedAt,
         quotes: [
           {
@@ -69,20 +81,54 @@ describe("the chain fees route", () => {
             satPerVb: 1.009,
             speed: "slow",
             targetBlocks: 25,
+            withinLimit: true,
           },
-          { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
-          { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
+          {
+            approxMinutes: 60,
+            satPerVb: 3,
+            speed: "medium",
+            targetBlocks: 6,
+            withinLimit: true,
+          },
+          {
+            approxMinutes: 30,
+            satPerVb: 5,
+            speed: "fast",
+            targetBlocks: 3,
+            withinLimit: true,
+          },
           {
             approxMinutes: 15,
             satPerVb: 9,
             speed: "lightning",
             targetBlocks: 1,
+            withinLimit: false,
           },
         ],
         state: "ok",
         tipHeight: 157_401,
       },
     });
+  });
+
+  it("marks the speeds a distorted market prices beyond any step, as testnet4 did at 588,235 sat/vB, while the slow one stays offered", async () => {
+    const distorted = [
+      { satPerVb: 1.009, targetBlocks: 25 },
+      { satPerVb: 588_235.294, targetBlocks: 6 },
+      { satPerVb: 588_235.294, targetBlocks: 3 },
+      { satPerVb: 588_235.294, targetBlocks: 1 },
+    ];
+    const result = await answer(followed({ feeRates: async () => distorted }));
+    const quotes =
+      result.ok && result.value.state === "ok" ? result.value.quotes : [];
+    expect(
+      quotes.map(({ speed, withinLimit }) => [speed, withinLimit]),
+    ).toEqual([
+      ["slow", true],
+      ["medium", false],
+      ["fast", false],
+      ["lightning", false],
+    ]);
   });
 
   it("reports the chain as unavailable, never a guessed rate, when it cannot be asked or quotes too little", async () => {

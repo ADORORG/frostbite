@@ -101,6 +101,14 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.fee-picker__alert {
+  margin: 0;
+  color: var(--arcade-pink);
+  font-weight: bold;
+}
+.chain-status tr[data-over="true"] {
+  opacity: 0.6;
+}
 .fee-picker__name {
   font-weight: bold;
 }

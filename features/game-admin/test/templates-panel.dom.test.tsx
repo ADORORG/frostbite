@@ -146,14 +146,39 @@ describe("the templates staff publish", () => {
 
 describe("choosing how fast a template is published", () => {
   const quotes = [
-    { approxMinutes: 250, satPerVb: 1.009, speed: "slow", targetBlocks: 25 },
-    { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
-    { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
-    { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
+    {
+      approxMinutes: 250,
+      satPerVb: 1.009,
+      speed: "slow",
+      targetBlocks: 25,
+      withinLimit: true,
+    },
+    {
+      approxMinutes: 60,
+      satPerVb: 3,
+      speed: "medium",
+      targetBlocks: 6,
+      withinLimit: true,
+    },
+    {
+      approxMinutes: 30,
+      satPerVb: 5,
+      speed: "fast",
+      targetBlocks: 3,
+      withinLimit: true,
+    },
+    {
+      approxMinutes: 15,
+      satPerVb: 9,
+      speed: "lightning",
+      targetBlocks: 1,
+      withinLimit: true,
+    },
   ] as const;
   const feesApi = {
     fees: async () => ({
       chain: "Bitcoin testnet4",
+      maxFeeSats: 500_000,
       observedAt: "2026-10-23T12:00:00.000Z",
       quotes: [...quotes],
       state: "ok" as const,

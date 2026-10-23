@@ -47,6 +47,20 @@ export function spreadText(quotes: readonly FeeQuoteView[]): string {
     : `${rateText(low).replace(" sat/vB", "")} to ${rateText(high)}`;
 }
 
+// Why a speed cannot be chosen when its rate is beyond what even a small step could pay: the market is quoting more than the platform
+// lets any step spend, so the platform would refuse every step at that speed.
+export const overLimitText = (maxFeeSats: number): string =>
+  `The chain is quoting more for this speed than the ${maxFeeSats.toLocaleString("en-US")} sats a step may pay, even a small one, so it cannot be chosen now.`;
+
+// What the header's summary says of the rates: the spread across the speeds that can be chosen, and that some cannot.
+export function usableSpreadText(quotes: readonly FeeQuoteView[]): string {
+  const usable = quotes.filter(({ withinLimit }) => withinLimit);
+  if (usable.length === 0) return "no speed is within the fee limit";
+  return usable.length === quotes.length
+    ? spreadText(usable)
+    : `${spreadText(usable)} · faster speeds over the limit`;
+}
+
 // The id the chain adapters give the network's own coin, whose fee is paid in satoshis.
 const satoshiAsset = "btc";
 

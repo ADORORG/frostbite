@@ -6,7 +6,7 @@ import {
   costText,
   rateText,
   speedNames,
-  spreadText,
+  usableSpreadText,
   waitText,
 } from "../domain/fee-copy.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
@@ -59,7 +59,7 @@ export function ChainStatusPanel({
   return (
     <details className="chain-status">
       <summary>
-        {`Block ${fees.tipHeight.toLocaleString("en-US")} · ${spreadText(fees.quotes)}`}
+        {`Block ${fees.tipHeight.toLocaleString("en-US")} · ${usableSpreadText(fees.quotes)}`}
       </summary>
       <div
         className="chain-status__panel"
@@ -86,11 +86,19 @@ export function ChainStatusPanel({
             {feeSpeeds.map((speed) => {
               const quote = fees.quotes.find((q) => q.speed === speed);
               return quote === undefined ? null : (
-                <tr key={speed}>
+                <tr
+                  data-over={quote.withinLimit ? undefined : "true"}
+                  key={speed}
+                >
                   <th scope="row">{speedNames[speed]}</th>
                   <td>{waitText(quote.approxMinutes)}</td>
                   <td>{rateText(quote.satPerVb)}</td>
-                  <td>{costText(quote.satPerVb, exampleVbytes)}</td>
+                  <td>
+                    {costText(quote.satPerVb, exampleVbytes)}
+                    {quote.withinLimit ? null : (
+                      <small>{` · over the ${fees.maxFeeSats.toLocaleString("en-US")} sat limit`}</small>
+                    )}
+                  </td>
                 </tr>
               );
             })}

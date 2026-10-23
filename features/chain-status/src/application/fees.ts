@@ -15,13 +15,13 @@ import type { ChainStatusConfig } from "../config.ts";
 // anyone. A chain that cannot be asked, or that quotes nothing for a speed, is reported as unavailable: a rate is never guessed, and a
 // stale one is never passed off as current.
 export function createFeesOperation(
-  config: Pick<ChainStatusConfig, "feeSpeeds" | "followed">,
+  config: Pick<ChainStatusConfig, "exampleVbytes" | "feeSpeeds" | "followed">,
 ): HttpOperation<Record<string, never>, ChainFees> {
   return {
     access: { kind: "public" },
     applicationErrors: [],
     execute: async () => {
-      const { feeSpeeds: policy, followed } = config;
+      const { exampleVbytes, feeSpeeds: policy, followed } = config;
       if (followed === null) return { ok: true, value: { state: "none" } };
       try {
         const [status, rates] = await Promise.all([
@@ -30,7 +30,10 @@ export function createFeesOperation(
             feeSpeeds.map((speed) => targetBlocksOf(policy, speed)),
           ),
         ]);
-        const quotes = quotesFor(policy, rates);
+        const quotes = quotesFor(policy, rates, {
+          exampleVbytes,
+          maxFeeSats: followed.maxFeeSats,
+        });
         if (quotes === null)
           return {
             ok: true,
@@ -40,6 +43,7 @@ export function createFeesOperation(
           ok: true,
           value: {
             chain: followed.displayName,
+            maxFeeSats: followed.maxFeeSats,
             observedAt: status.observedAt,
             quotes,
             state: "ok",

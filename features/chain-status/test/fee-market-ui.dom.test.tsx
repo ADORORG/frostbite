@@ -1,4 +1,4 @@
-import type { ChainFees, FeeSpeed } from "@ador/shared/chain";
+import type { ChainFees, FeeQuoteView, FeeSpeed } from "@ador/shared/chain";
 import { click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
@@ -8,19 +8,30 @@ import { FeeSpeedPicker } from "../src/ui/fee-speed-picker.tsx";
 import { useFeeQuotes } from "../src/ui/use-fee-quotes.ts";
 import type { FeeMarket } from "../src/ui/use-fee-quotes.ts";
 
+const rates: Omit<FeeQuoteView, "withinLimit">[] = [
+  { approxMinutes: 250, satPerVb: 1.009, speed: "slow", targetBlocks: 25 },
+  { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
+  { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
+  { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
+];
 const ok: Extract<ChainFees, { state: "ok" }> = {
   chain: "Bitcoin testnet4",
+  maxFeeSats: 500_000,
   observedAt: "2026-10-23T12:00:00.000Z",
-  quotes: [
-    { approxMinutes: 250, satPerVb: 1.009, speed: "slow", targetBlocks: 25 },
-    { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
-    { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
-    { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
-  ],
+  quotes: rates.map((quote) => ({ ...quote, withinLimit: true })),
   state: "ok",
   tipHeight: 157_401,
 };
 const answered = (fees: ChainFees): FeeMarket => ({ fees, status: "answered" });
+// The market testnet4 had on 2026-10-23: every target under 13 blocks quoted at 588,235 sat/vB, which no step can pay.
+const distorted: Extract<ChainFees, { state: "ok" }> = {
+  ...ok,
+  quotes: ok.quotes.map((quote) =>
+    quote.speed === "slow"
+      ? quote
+      : { ...quote, satPerVb: 588_235.294, withinLimit: false },
+  ),
+};
 
 describe("the chain panel in the header", () => {
   it("summarises the block and the spread of rates, and tells each speed with its wait, rate and example cost", async () => {
@@ -44,6 +55,38 @@ describe("the chain panel in the header", () => {
     expect(textOf(container)).toContain("A 200 vB transaction");
     expect(textOf(container)).toContain(
       "You see the exact fee before you sign",
+    );
+  });
+
+  it("marks the speeds no step can afford, and leaves the summary to the ones that can be chosen", async () => {
+    const container = await mount(
+      <ChainStatusPanel exampleVbytes={200} market={answered(distorted)} />,
+    );
+    expect(container.querySelector("summary")?.textContent).toBe(
+      "Block 157,401 · 1.01 sat/vB · faster speeds over the limit",
+    );
+    const rows = [...container.querySelectorAll("tbody tr")];
+    expect(rows.map((row) => row.getAttribute("data-over"))).toEqual([
+      null,
+      "true",
+      "true",
+      "true",
+    ]);
+    expect(rows[1]?.textContent).toContain("588,235 sat/vB");
+    expect(rows[1]?.textContent).toContain("over the 500,000 sat limit");
+    expect(rows[0]?.textContent).not.toContain("limit");
+  });
+
+  it("says no speed is within the limit when none is", async () => {
+    const none = {
+      ...ok,
+      quotes: ok.quotes.map((quote) => ({ ...quote, withinLimit: false })),
+    };
+    const container = await mount(
+      <ChainStatusPanel exampleVbytes={200} market={answered(none)} />,
+    );
+    expect(container.querySelector("summary")?.textContent).toBe(
+      "Block 157,401 · no speed is within the fee limit",
     );
   });
 
@@ -131,6 +174,34 @@ describe("the fee speed picker", () => {
     ]);
     expect(textOf(container)).toContain(
       "More than the 1,000 sats this step may pay, so it cannot be chosen.",
+    );
+  });
+
+  it("does not offer a speed the chain prices beyond any step, says why, and keeps the cheap one", async () => {
+    const onChange = vi.fn<(speed: FeeSpeed) => void>();
+    const container = await mount(
+      picker({ market: answered(distorted), onChange }),
+    );
+    expect(options(container).map((input) => input.disabled)).toEqual([
+      false,
+      true,
+      true,
+      true,
+    ]);
+    expect(textOf(container)).toContain(
+      "The chain is quoting more for this speed than the 500,000 sats a step may pay, even a small one, so it cannot be chosen now.",
+    );
+    await click(options(container)[1] ?? null);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it("warns when the speed already chosen has become one no step can afford", async () => {
+    const container = await mount(
+      picker({ market: answered(distorted), value: "lightning" }),
+    );
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+      "Lightning cannot be sent now. Choose another speed.",
     );
   });
 

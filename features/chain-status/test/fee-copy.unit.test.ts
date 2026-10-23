@@ -44,6 +44,7 @@ describe("telling the spread across the speeds", () => {
     satPerVb,
     speed: "slow" as const,
     targetBlocks: 1,
+    withinLimit: true,
   });
 
   it("is the lowest to the highest rate, and one rate when they are alike", () => {

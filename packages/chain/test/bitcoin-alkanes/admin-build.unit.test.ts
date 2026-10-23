@@ -210,7 +210,12 @@ describe("building the staff's steps", () => {
       adminBuilder().build(intents.pause, {
         maxFee: { ...funding.maxFee, baseUnits: 1n },
       }),
-    ).rejects.toMatchObject({ code: "fee-above-limit" });
+    ).rejects.toMatchObject({
+      code: "fee-above-limit",
+      message: expect.stringMatching(
+        /^The fee would be \d+ sats, above the 1 the platform allows for one step\. Choose a slower speed\.$/u,
+      ) as string,
+    });
   });
 
   it("refuses to publish code that is not the code its configuration names", async () => {

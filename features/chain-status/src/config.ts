@@ -19,6 +19,9 @@ export interface ChainStatusConfig {
     readonly displayName: string;
     feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
     indexing(): Promise<IndexingStatus>;
+    // The most one step may pay in fees, in satoshis: what the platform refuses above, told so no speed is offered that no step could
+    // afford.
+    readonly maxFeeSats: number;
   } | null;
   // How often a page's lamp asks again, in milliseconds.
   readonly refreshMs: number;

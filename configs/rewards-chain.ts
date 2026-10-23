@@ -48,6 +48,8 @@ export interface RewardsChain {
     // What the chain's fee market quotes for each block target.
     feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
     indexing(): Promise<IndexingStatus>;
+    // The most one step may pay in fees, in satoshis.
+    readonly maxFeeSats: number;
   };
 }
 
@@ -142,6 +144,14 @@ function portsOf(
   };
 }
 
+// The fee ceiling as a page is told it, a plain number of satoshis. One too large to be a plain number is a mistake in the
+// settings, refused when the chain is made rather than told wrongly.
+function ceilingSats(maxFeeSats: bigint): number {
+  if (maxFeeSats > BigInt(Number.MAX_SAFE_INTEGER))
+    throw new Error("REWARDS_MAX_FEE_SATS is larger than a page can be told.");
+  return Number(maxFeeSats);
+}
+
 // The rewards chain for a deployment's settings, or null where none is set. While the policy keeps the chain's release gate closed
 // it is not offered at all, so nothing is built, sent or watched on it.
 export function createRewardsChain(
@@ -174,6 +184,7 @@ export function createRewardsChain(
       displayName: configured.config.displayName,
       feeRates: (targets) => ports.observer.feeRates(served, targets),
       indexing: () => ports.observer.indexing(served),
+      maxFeeSats: ceilingSats(environment.maxFeeSats),
     },
   };
 }

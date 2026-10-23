@@ -69,17 +69,58 @@ describe("the quotes for the speeds", () => {
     { satPerVb: 9, targetBlocks: 1 },
   ];
 
-  it("pair each speed with the rate for its target and the wait the policy tells", () => {
-    expect(quotesFor(policy, rates)).toEqual([
-      { approxMinutes: 250, satPerVb: 1.5, speed: "slow", targetBlocks: 25 },
-      { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
-      { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
-      { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
+  // An everyday step of 200 vB may pay 1,000 sats: 5 sat/vB is exactly that, 9 is over.
+  const limit = { exampleVbytes: 200, maxFeeSats: 1_000 };
+
+  it("pair each speed with the rate for its target and the wait the policy tells, and say whether any step could afford it", () => {
+    expect(quotesFor(policy, rates, limit)).toEqual([
+      {
+        approxMinutes: 250,
+        satPerVb: 1.5,
+        speed: "slow",
+        targetBlocks: 25,
+        withinLimit: true,
+      },
+      {
+        approxMinutes: 60,
+        satPerVb: 3,
+        speed: "medium",
+        targetBlocks: 6,
+        withinLimit: true,
+      },
+      {
+        approxMinutes: 30,
+        satPerVb: 5,
+        speed: "fast",
+        targetBlocks: 3,
+        withinLimit: true,
+      },
+      {
+        approxMinutes: 15,
+        satPerVb: 9,
+        speed: "lightning",
+        targetBlocks: 1,
+        withinLimit: false,
+      },
+    ]);
+  });
+
+  it("count a rate that costs one satoshi more than the limit as over it", () => {
+    const over = quotesFor(
+      policy,
+      [{ satPerVb: 5.005, targetBlocks: 25 }, ...rates.slice(1)],
+      limit,
+    );
+    expect(over?.map((quote) => quote.withinLimit)).toEqual([
+      false,
+      true,
+      true,
+      false,
     ]);
   });
 
   it("are none, rather than a guess, when the node quoted no rate for a speed's target", () => {
-    expect(quotesFor(policy, rates.slice(1))).toBeNull();
+    expect(quotesFor(policy, rates.slice(1), limit)).toBeNull();
   });
 
   it("have a cost that never rounds below what is needed", () => {
@@ -95,9 +136,10 @@ describe("the public fees answer", () => {
     { approxMinutes: 60, satPerVb: 2, speed: "medium", targetBlocks: 6 },
     { approxMinutes: 30, satPerVb: 3, speed: "fast", targetBlocks: 3 },
     { approxMinutes: 15, satPerVb: 4, speed: "lightning", targetBlocks: 1 },
-  ];
+  ].map((quote) => ({ ...quote, withinLimit: true }));
   const ok = {
     chain: "Bitcoin testnet4",
+    maxFeeSats: 500_000,
     observedAt: "2026-10-23T12:00:00.000Z",
     quotes,
     state: "ok",
@@ -120,6 +162,11 @@ describe("the public fees answer", () => {
       { ...ok, quotes: quotes.slice(1) },
       { ...ok, quotes: [{ ...quotes[0], satPerVb: 0 }, ...quotes.slice(1)] },
       { ...ok, extra: 1 },
+      { ...ok, maxFeeSats: 0 },
+      {
+        ...ok,
+        quotes: [{ ...quotes[0], withinLimit: undefined }, ...quotes.slice(1)],
+      },
     ]) {
       expect(() => chainFeesSchema.parse(bad)).toThrow();
     }

@@ -129,7 +129,7 @@ export async function buildAdmin(
     if (fee > funding.maxFee.baseUnits) {
       throw new BuildRefusedError(
         "fee-above-limit",
-        "The fee is above the maximum the platform allows.",
+        `The fee would be ${fee} sats, above the ${funding.maxFee.baseUnits} the platform allows for one step. Choose a slower speed.`,
       );
     }
     return {

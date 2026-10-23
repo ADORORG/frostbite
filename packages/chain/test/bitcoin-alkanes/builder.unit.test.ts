@@ -162,6 +162,8 @@ describe("building a milestone claim", () => {
     const { builder } = builderOn();
     await expect(builder.build(intent, funding(401n))).rejects.toMatchObject({
       code: "fee-above-limit",
+      message:
+        "The fee would be 402 sats, above the 401 the platform allows for one step. Choose a slower speed.",
     });
     await expect(builder.build(intent, funding(402n))).resolves.toBeDefined();
   });

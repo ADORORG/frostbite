@@ -76,6 +76,7 @@ export const fees = {
   api: {
     fees: async () => ({
       chain: "Bitcoin signet",
+      maxFeeSats: 500_000,
       observedAt: "2026-10-23T12:00:00.000Z",
       quotes: [
         {
@@ -83,24 +84,28 @@ export const fees = {
           satPerVb: 1.009,
           speed: "slow" as const,
           targetBlocks: 25,
+          withinLimit: true,
         },
         {
           approxMinutes: 60,
           satPerVb: 3,
           speed: "medium" as const,
           targetBlocks: 6,
+          withinLimit: true,
         },
         {
           approxMinutes: 30,
           satPerVb: 5,
           speed: "fast" as const,
           targetBlocks: 3,
+          withinLimit: true,
         },
         {
           approxMinutes: 15,
           satPerVb: 9,
           speed: "lightning" as const,
           targetBlocks: 1,
+          withinLimit: true,
         },
       ],
       state: "ok" as const,

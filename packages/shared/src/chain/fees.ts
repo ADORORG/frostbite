@@ -82,10 +82,15 @@ export const chainFeesSchema = z.discriminatedUnion("state", [
               satPerVb: z.number().positive().finite(),
               speed: feeSpeedSchema,
               targetBlocks: z.number().int().positive(),
+              // Whether even an everyday-sized step could be sent at this rate without passing `maxFeeSats`. Where it is false no
+              // step can be, however small, and the speed is not offered.
+              withinLimit: z.boolean(),
             })
             .strict(),
         )
         .length(feeSpeeds.length),
+      // The most any one step may pay in fees, in satoshis; the platform refuses a step above it.
+      maxFeeSats: z.number().int().positive(),
       state: z.literal("ok"),
       tipHeight: z.number().int().nonnegative(),
     })
@@ -118,11 +123,18 @@ export type FeeQuoteView = Extract<
   { state: "ok" }
 >["quotes"][number];
 
+// What a speed is measured against to tell whether it can be offered: the most a step may pay, and about how large an everyday step is.
+export interface FeeLimit {
+  readonly exampleVbytes: number;
+  readonly maxFeeSats: number;
+}
+
 // The quotes for every speed, in the order of `feeSpeeds`, from what the node quoted per block target. A speed the node had no quote
 // for is a reason to say the market is unavailable, never a guessed rate.
 export function quotesFor(
   policy: FeeSpeedPolicy,
   rates: readonly FeeRate[],
+  limit: FeeLimit,
 ): FeeQuoteView[] | null {
   const quotes: FeeQuoteView[] = [];
   for (const speed of feeSpeeds) {
@@ -136,6 +148,8 @@ export function quotesFor(
       satPerVb: rate.satPerVb,
       speed,
       targetBlocks,
+      withinLimit:
+        feeAtRate(rate.satPerVb, limit.exampleVbytes) <= limit.maxFeeSats,
     });
   }
   return quotes;

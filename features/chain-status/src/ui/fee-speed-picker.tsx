@@ -9,6 +9,7 @@ import { useId } from "react";
 
 import {
   costText,
+  overLimitText,
   rateText,
   speedHints,
   speedNames,
@@ -71,8 +72,10 @@ export function FeeSpeedPicker({
           vbytes === undefined
             ? null
             : { sats: Math.ceil(quote.satPerVb * vbytes) };
+        const unaffordable = !quote.withinLimit;
         const over =
-          cost !== null && maxFeeSats !== undefined && cost.sats > maxFeeSats;
+          unaffordable ||
+          (cost !== null && maxFeeSats !== undefined && cost.sats > maxFeeSats);
         return (
           <label
             className="fee-picker__option"
@@ -83,7 +86,10 @@ export function FeeSpeedPicker({
               checked={value === speed}
               disabled={over}
               name={group}
-              onChange={() => onChange(speed)}
+              onChange={() => {
+                // A speed that cannot be chosen is switched off, and refused here too.
+                if (!over) onChange(speed);
+              }}
               type="radio"
               value={speed}
             />
@@ -98,13 +104,20 @@ export function FeeSpeedPicker({
               </span>
             )}
             <small className="fee-picker__hint">
-              {over
-                ? `More than the ${maxFeeSats?.toLocaleString("en-US")} sats this step may pay, so it cannot be chosen.`
-                : speedHints[speed]}
+              {unaffordable
+                ? overLimitText(fees.maxFeeSats)
+                : over
+                  ? `More than the ${maxFeeSats?.toLocaleString("en-US")} sats this step may pay, so it cannot be chosen.`
+                  : speedHints[speed]}
             </small>
           </label>
         );
       })}
+      {byspeed.get(value)?.withinLimit === false ? (
+        <p className="fee-picker__alert" role="alert">
+          {`${speedNames[value]} cannot be sent now. Choose another speed.`}
+        </p>
+      ) : null}
       <small className="fee-picker__note">
         Rates are the chain&apos;s quotes at block{" "}
         {fees.tipHeight.toLocaleString("en-US")} and change with demand; waits
