@@ -9,6 +9,8 @@ import type {
 // and then nothing is shown), what counts as far behind, and how often a page asks again.
 export interface ChainStatusConfig {
   readonly delay: Pick<DelayPolicy, "maxLagBlocks">;
+  // About how large an everyday transaction is, in virtual bytes, for the example cost the fee panel tells.
+  readonly exampleVbytes: number;
   // The speeds a fee can be paid at, each a block target and a wait, told next to the rate the chain quotes for it.
   readonly feeSpeeds: FeeSpeedPolicy;
   // The chain followed: its name, a reading of its indexer and a quote of its fee market, both of which reject where the chain cannot be

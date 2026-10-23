@@ -1,0 +1,119 @@
+/* The chain in the header: the lamp, and the block and fees one click beside it. */
+.chain-status-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.chain-status {
+  position: relative;
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+}
+.chain-status > summary {
+  cursor: pointer;
+  color: var(--arcade-text-muted);
+  white-space: nowrap;
+  list-style: none;
+}
+.chain-status > summary::-webkit-details-marker {
+  display: none;
+}
+.chain-status > summary:hover,
+.chain-status[open] > summary {
+  color: var(--arcade-cyan);
+}
+.chain-status__panel {
+  position: absolute;
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 0.5rem;
+  width: min(26rem, calc(100vw - 2.5rem));
+  margin-top: 0.5rem;
+  padding: 1rem;
+  border: var(--arcade-border-width) solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 50%);
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-body);
+  font-size: 0.8125rem;
+  text-transform: none;
+}
+.chain-status__panel p {
+  margin: 0;
+}
+.chain-status__title small,
+.chain-status__panel small {
+  color: var(--arcade-text-muted);
+}
+.chain-status__caption {
+  margin-bottom: 0.25rem;
+  color: var(--arcade-text-muted);
+  text-align: left;
+}
+.chain-status__panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.chain-status__panel th,
+.chain-status__panel td {
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  text-align: left;
+  font-weight: normal;
+}
+.chain-status__panel thead th {
+  color: var(--arcade-text-muted);
+  font-size: 0.6875rem;
+}
+.chain-status__panel tbody th {
+  color: var(--arcade-cyan);
+}
+
+/* Choosing how fast a transaction confirms: one row per speed, in the order they are told. */
+.fee-picker {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.fee-picker legend {
+  padding: 0;
+  font-weight: bold;
+}
+.fee-picker__option {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  gap: 0.25rem 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  cursor: pointer;
+}
+.fee-picker__option:has(input:checked) {
+  border-color: var(--arcade-cyan);
+  background: color-mix(in srgb, var(--arcade-cyan) 10%, transparent);
+}
+.fee-picker__option[data-over="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.fee-picker__name {
+  font-weight: bold;
+}
+.fee-picker__wait,
+.fee-picker__rate,
+.fee-picker__cost {
+  white-space: nowrap;
+}
+.fee-picker__wait,
+.fee-picker__hint,
+.fee-picker__note {
+  color: var(--arcade-text-muted);
+}
+.fee-picker__hint {
+  grid-column: 2 / -1;
+}

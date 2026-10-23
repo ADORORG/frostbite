@@ -21,7 +21,7 @@ const hidden = (value: boolean) =>
 afterEach(() => hidden(false));
 
 const apiOf = (indexing: ChainStatusApi["indexing"]): ChainStatusApi => ({
-  fees: () => Promise.reject(new Error("not used")),
+  fees: async () => ({ state: "none" as const }),
   indexing,
 });
 
@@ -30,7 +30,7 @@ describe("the header badge", () => {
     let answer: (value: ChainIndexing) => void = () => undefined;
     const api = apiOf(() => new Promise((resolve) => (answer = resolve)));
     const container = await mount(
-      <IndexingBadge api={api} refreshMs={60_000} />,
+      <IndexingBadge api={api} exampleVbytes={200} refreshMs={60_000} />,
     );
     expect(textOf(container)).toBe("");
     answer(ok("delayed", 7));
@@ -45,7 +45,11 @@ describe("the header badge", () => {
       .mockResolvedValueOnce(ok("delayed", 5))
       .mockResolvedValue(ok("current", 0));
     const container = await mount(
-      <IndexingBadge api={apiOf(indexing)} refreshMs={20} />,
+      <IndexingBadge
+        api={apiOf(indexing)}
+        exampleVbytes={200}
+        refreshMs={20}
+      />,
     );
     await settle(() => expect(textOf(container)).toContain("Chain in sync"));
     expect(indexing.mock.calls.length).toBeGreaterThanOrEqual(2);
@@ -56,7 +60,13 @@ describe("the header badge", () => {
     const indexing = vi.fn<ChainStatusApi["indexing"]>(async () =>
       ok("current", 0),
     );
-    await mount(<IndexingBadge api={apiOf(indexing)} refreshMs={10} />);
+    await mount(
+      <IndexingBadge
+        api={apiOf(indexing)}
+        exampleVbytes={200}
+        refreshMs={10}
+      />,
+    );
     await settle(() => expect(indexing).toHaveBeenCalledTimes(1));
     await new Promise((resolve) => setTimeout(resolve, 80));
     expect(indexing).toHaveBeenCalledTimes(1);
@@ -70,6 +80,7 @@ describe("the header badge", () => {
         api={apiOf(async () => {
           throw new ApiError("network", null, "unreachable");
         })}
+        exampleVbytes={200}
         refreshMs={60_000}
       />,
     );
@@ -83,7 +94,11 @@ describe("the header badge", () => {
       state: "none",
     }));
     const container = await mount(
-      <IndexingBadge api={apiOf(indexing)} refreshMs={60_000} />,
+      <IndexingBadge
+        api={apiOf(indexing)}
+        exampleVbytes={200}
+        refreshMs={60_000}
+      />,
     );
     await settle(() => expect(indexing).toHaveBeenCalled());
     expect(container.querySelector('[role="status"]')).toBeNull();
