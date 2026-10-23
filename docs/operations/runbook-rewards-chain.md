@@ -10,7 +10,7 @@ Game rewards page, and the platform records them when each step completes (`ador
 ## Turn it on
 
 1. `REWARDS_CHAIN_RPC_URL`: one JSON-RPC address serving the Bitcoin (`esplora_*`) and Alkanes (`metashrew_*`) methods. The node must serve the
-   beta's test network, `betaNetwork` in `configs/chains.ts` (`signet`, shipped; or `testnet4`, ADR-019); `pnpm signet:preflight`
+   beta's test network, `BETA_NETWORK` (`signet`, the blank default; or `testnet4`, ADR-019); `pnpm testnet:preflight`
    reads the node's genesis block and fails if it is the other chain, which the addresses alone would not show. Blank means no rewards chain: claims and staff administration say
    "not available".
 2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it. The `game-rewards` template is 294 KB, which costs about 150,000 sats to publish at 2 sat/vB, so the ceiling must be above that (finding S78): 500000 suits signet. Tighten it before any real network.
@@ -22,7 +22,7 @@ Game rewards page, and the platform records them when each step completes (`ador
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
    SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
 
-To move a deployment between test networks, change `betaNetwork`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
+To move a deployment between test networks, set `BETA_NETWORK`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
 network, apply migrations (`wallet_network_testnet4` widens the wallet network checks), run the preflight, restart, and connect a
 wallet set to the same network. Games, collections and records made on the other network stay on it (their chain ids differ).
 
@@ -73,7 +73,7 @@ completes when the indexer catches up and the chain's records agree. The wait is
 
 ## Checking the setup before the first signet run
 
-`pnpm signet:preflight` (optionally `--env <file>`, default `apps/web/.env.local`) reads the settings and checks, without signing or sending anything:
+`pnpm testnet:preflight` (optionally `--env <file>`, default `apps/web/.env.local`) reads the settings and checks, without signing or sending anything:
 the `REWARDS_*` settings parse as the platform parses them; each template in `REWARDS_TEMPLATES_DIR` has the released hash; the indexer is within
 the allowed lag of the tip; the auth-token factory (`4:65517`) has code; and the estimated cost of publishing each template at the quoted fee rate is
 within `REWARDS_MAX_FEE_SATS`. `UNVERIFIED` means the node could not be asked (for example a stalled indexer), not that the check passed. Exit code 0

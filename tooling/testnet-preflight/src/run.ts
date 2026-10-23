@@ -6,7 +6,7 @@ import {
 
 import type { DelayPolicy } from "@ador/shared/chain";
 
-import { betaChain } from "../../../configs/chains.ts";
+import { betaChains } from "../../../configs/beta-chains.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 import { chainName, checkChain } from "./checks/chain.ts";
 import { checkConfiguration } from "./checks/configuration.ts";
@@ -23,8 +23,6 @@ import type { CheckResult } from "./result.ts";
 
 // The decisions the checks hold the setup to; the platform's own policy unless a test supplies another.
 export interface PreflightPolicy {
-  // The chain the platform is set to use (CAIP-2), which the node must serve.
-  readonly chainId: string;
   readonly delay: DelayPolicy;
   readonly feeTargetBlocks: number;
   readonly templates: readonly TemplateSpec[];
@@ -46,18 +44,15 @@ const skipped = (name: string): CheckResult => ({
 export async function runPreflight(
   source: NodeJS.ProcessEnv,
   platform: PreflightPlatform,
-  policy: PreflightPolicy = {
-    ...rewardsPolicy,
-    chainId: betaChain.chain.chainId,
-  },
+  policy: PreflightPolicy = rewardsPolicy,
 ): Promise<readonly CheckResult[]> {
-  const { environment, result } = checkConfiguration(source);
+  const { betaNetwork, environment, result } = checkConfiguration(source);
   const templates = await checkTemplates(
     environment?.templatesDirectory ?? null,
     policy.templates,
     platform.readFile,
   );
-  if (environment === null) {
+  if (environment === null || betaNetwork === null) {
     return [
       result,
       templates.result,
@@ -78,7 +73,7 @@ export async function runPreflight(
   return [
     result,
     templates.result,
-    await checkChain(node, policy.chainId),
+    await checkChain(node, betaChains[betaNetwork].chain.chainId),
     await checkIndexer(node, policy.delay),
     await checkFactory(node, authTokenFactory),
     await checkFee(

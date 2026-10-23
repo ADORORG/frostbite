@@ -223,6 +223,14 @@ export const environmentDefinitions = [
     secret: false,
   },
   {
+    key: "BETA_NETWORK",
+    description:
+      "The test network the beta runs on: signet or testnet4; blank means signet. The wallet network, games' chain, collections' target chain and the rewards chain follow it, and the node address must serve it (ADR-019).",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
     key: "REWARDS_CHAIN_RPC_URL",
     description:
       "Address of the JSON-RPC node (Bitcoin and Alkanes methods) the games' rewards contracts are reached through; blank means no rewards chain, and claims and staff administration answer not available. It may carry a key, so it is secret.",

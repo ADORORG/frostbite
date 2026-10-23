@@ -21,7 +21,7 @@ const familySpecificPrefixes = ["@alkanes/", "@omnisat/"];
 // `packages/auth/` is a recorded exception: wallet-first sign-in still validates Bitcoin addresses
 // directly and moves to the neutral address codec with the network-to-chain migration, which waits
 // for the W2-10B wallet evidence (ADR-017 section 7). Remove it then.
-// `tooling/signet-preflight/` checks one family's setup (the Alkanes factory, its indexer, its fee market) before a first signet
+// `tooling/testnet-preflight/` checks one family's setup (the Alkanes factory, its indexer, its fee market) before a first signet
 // run, so it speaks that family by purpose; it is developer tooling that nothing in the platform imports.
 const familyImportOwners = [
   "packages/auth/",
@@ -29,7 +29,7 @@ const familyImportOwners = [
   "packages/test-kit/test/",
   "packages/wallet/",
   "providers/chain/",
-  "tooling/signet-preflight/",
+  "tooling/testnet-preflight/",
 ];
 
 function isFamilySpecific(imported: string): boolean {

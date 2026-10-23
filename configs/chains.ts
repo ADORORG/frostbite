@@ -1,53 +1,22 @@
-import {
-  chainOptionSchema,
-  type ChainOption,
-  type WalletNetwork,
-} from "@ador/shared/chain";
+import type { BetaNetwork, ChainOption } from "@ador/shared/chain";
+import { parseBetaNetworkEnvironment } from "@repo/config/beta-network";
 
-// CAIP-2 identifies a Bitcoin chain as `bip122:` plus the first 16 bytes (32 hex characters) of its
-// genesis block hash (https://namespaces.chainagnostic.org/bip122/caip2). Signet's genesis hash is
-// 00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6, asserted in Bitcoin Core's
-// chain parameters (src/kernel/chainparams.cpp, default signet).
-export const bitcoinSignetChainId = "bip122:00000008819873e925422c1ff0f99f7c";
+import { betaChains, type BetaChain } from "./beta-chains.ts";
 
-// Testnet4's genesis hash is 00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043 (BIP-94;
-// chainparams.cpp, CTestNet4Params), the same block the Subfrost gateway answers for height 0.
-export const bitcoinTestnet4ChainId = "bip122:00000000da84f2bafbbc53dee25a72ae";
+// The ids stay importable from here, where the rest of the platform has always found them.
+export {
+  betaChains,
+  bitcoinSignetChainId,
+  bitcoinTestnet4ChainId,
+  type BetaChain,
+} from "./beta-chains.ts";
 
-// The test networks the beta can run on. Each is a chain record and the wallet network a person's wallet
-// must be on to use it.
-export const betaChains = {
-  signet: {
-    chain: chainOptionSchema.parse({
-      chainId: bitcoinSignetChainId,
-      displayName: "Bitcoin signet",
-      enabled: true,
-      family: "bitcoin-alkanes",
-      role: "public-beta",
-    }),
-    network: "signet",
-  },
-  testnet4: {
-    chain: chainOptionSchema.parse({
-      chainId: bitcoinTestnet4ChainId,
-      displayName: "Bitcoin testnet4",
-      enabled: true,
-      family: "bitcoin-alkanes",
-      role: "public-beta",
-    }),
-    network: "testnet4",
-  },
-} as const satisfies Record<
-  string,
-  { readonly chain: ChainOption; readonly network: WalletNetwork }
->;
-
-export type BetaChain = (typeof betaChains)[keyof typeof betaChains];
-
-// The one test network this deployment runs on (ADR-008 keeps mainnet behind its own readiness gate).
-// Changing it is a reviewed edit to this file: the wallet network, the games' chain, collections' target
-// chain and the rewards chain all follow it. Games and data made on the other network stay on it.
-export const betaNetwork: keyof typeof betaChains = "signet";
+// The one test network this deployment runs on, from `BETA_NETWORK` (blank: signet; ADR-008 keeps mainnet behind its own readiness
+// gate). The wallet network, the games' chain, collections' target chain and the rewards chain all follow it. Games and data made
+// on the other network stay on it.
+export const betaNetwork: BetaNetwork = parseBetaNetworkEnvironment(
+  process.env,
+);
 export const betaChain: BetaChain = betaChains[betaNetwork];
 
 // The chains a collection draft may target in the beta. This is the projection of `ChainConfig` that

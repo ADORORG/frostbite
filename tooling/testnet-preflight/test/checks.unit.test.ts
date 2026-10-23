@@ -34,7 +34,7 @@ describe("settings", () => {
       ...base,
       REWARDS_CHAIN_RPC_URL: "https://node.example/v4/s3cret-key",
     });
-    expect(result.detail).toContain("Node node.example,");
+    expect(result.detail).toContain("node node.example,");
     expect(result.detail).not.toContain("s3cret-key");
   });
 

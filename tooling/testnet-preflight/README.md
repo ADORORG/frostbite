@@ -1,18 +1,18 @@
-# `@repo/signet-preflight`
+# `@repo/testnet-preflight`
 
 Developer tooling. Not shipped, and nothing in the platform imports it.
 
-Checks, before any coin is spent, what a first run of the rewards chain needs on the beta's test network (signet or testnet4, `betaNetwork` in `configs/chains.ts`; the package keeps the name it was made with). It reads, and never signs, broadcasts or writes.
+Checks, before any coin is spent, what a first run of the rewards chain needs on the beta's test network (signet or testnet4, `BETA_NETWORK`). It reads, and never signs, broadcasts or writes.
 
 ## Public API
 
-`pnpm signet:preflight [--env <file>]` reads the app's settings (default `apps/web/.env.local`, with the process environment over it)
+`pnpm testnet:preflight [--env <file>]` reads the app's settings (default `apps/web/.env.local`, with the process environment over it)
 and prints one verdict per check, then exits `0` (all passed), `1` (something is wrong or was skipped), or `2` (nothing wrong, but
 something could not be checked).
 
 | Check              | Passes when                                                                                           |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| Settings           | The platform's own parser (`parseRewardsChainEnvironment`) accepts `REWARDS_*`.                       |
+| Settings           | The platform's own parsers accept `BETA_NETWORK` and `REWARDS_*`.                                     |
 | Template code      | Each template in `rewardsPolicy.templates` is in `REWARDS_TEMPLATES_DIR` and has the released hash.   |
 | Chain              | The node's genesis block is the configured chain's (signet and testnet4 addresses look alike).        |
 | Indexer            | The indexer is no more than `rewardsPolicy.delay.maxLagBlocks` behind the tip (the site lamp's rule). |
@@ -37,7 +37,7 @@ signing with Xverse, UniSat or OYL, and the staff account and game manifest.
 
 ## Test commands
 
-`pnpm --filter @repo/signet-preflight test:unit`, `test:integration` (runs the real command against a node on a local port),
+`pnpm --filter @repo/testnet-preflight test:unit`, `test:integration` (runs the real command against a node on a local port),
 `test:coverage`.
 
 ## Ownership

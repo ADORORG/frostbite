@@ -16,6 +16,11 @@ export const walletNetworks = ["mainnet", "signet", "testnet4"] as const;
 export const walletNetworkSchema = z.enum(walletNetworks);
 export type WalletNetwork = z.infer<typeof walletNetworkSchema>;
 
+// The test networks a deployment can run the beta on (`BETA_NETWORK`); `configs/chains.ts` has a chain record for each.
+export const betaNetworks = ["signet", "testnet4"] as const;
+export const betaNetworkSchema = z.enum(betaNetworks);
+export type BetaNetwork = z.infer<typeof betaNetworkSchema>;
+
 export function isWalletNetwork(value: string): value is WalletNetwork {
   return walletNetworkSchema.safeParse(value).success;
 }

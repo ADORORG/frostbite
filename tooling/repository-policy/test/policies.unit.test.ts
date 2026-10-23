@@ -186,7 +186,7 @@ describe("source policies", () => {
     "packages/auth/src/domain/contracts.ts",
     "packages/test-kit/test/chain-conformance.unit.test.ts",
     "providers/chain/bitcoin-alkanes/src/index.ts",
-    "tooling/signet-preflight/src/run.ts",
+    "tooling/testnet-preflight/src/run.ts",
   ])("allows chain-family imports in %s", async (path) => {
     const [root, file] = await temporaryFile(
       path,

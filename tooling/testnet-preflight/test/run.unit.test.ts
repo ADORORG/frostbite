@@ -8,7 +8,6 @@ const code = new Uint8Array([0, 97, 115, 109]);
 const genesis =
   "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043";
 const policy = {
-  chainId: "bip122:00000000da84f2bafbbc53dee25a72ae",
   delay: { maxLagBlocks: 2, maxUnsettledMs: 3_600_000 },
   feeTargetBlocks: 3,
   templates: [
@@ -16,6 +15,7 @@ const policy = {
   ],
 } as const;
 const env = {
+  BETA_NETWORK: "testnet4",
   REWARDS_CHAIN_RPC_URL: "https://node.example/v4/jsonrpc",
   REWARDS_MAX_FEE_SATS: "500000",
   REWARDS_TEMPLATES_DIR: "/templates",
@@ -84,21 +84,22 @@ describe("the whole preflight", () => {
   });
 
   it("fails, naming both chains, when the node serves another chain than the platform is set to use", async () => {
-    const signetGenesis =
-      "00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6";
     const results = await runPreflight(
-      env,
-      platform({ ...healthy, "esplora_block-height": signetGenesis }),
+      { ...env, BETA_NETWORK: "signet" },
+      platform({ ...healthy, "esplora_block-height": genesis }),
       policy,
     );
     expect(results[2]).toMatchObject({
       name: "The node serves the configured chain",
       verdict: "fail",
     });
+    // What the node serves, and what the platform is set to use.
+    expect(results[2]?.detail).toContain(
+      "bip122:00000000da84f2bafbbc53dee25a72ae",
+    );
     expect(results[2]?.detail).toContain(
       "bip122:00000008819873e925422c1ff0f99f7c",
     );
-    expect(results[2]?.detail).toContain(policy.chainId);
     expect(exitCodeOf(results)).toBe(1);
   });
 
@@ -172,5 +173,20 @@ describe("the report", () => {
   it("shows a thrown value as text", () => {
     expect(messageOf(new Error("x"))).toBe("x");
     expect(messageOf("y")).toBe("y");
+  });
+});
+
+describe("the beta network setting", () => {
+  it("is named in the settings verdict, and a network the platform has no chain for fails it", async () => {
+    const named = await runPreflight(env, platform(healthy), policy);
+    expect(named[0]?.detail).toContain("Network testnet4");
+    const unknown = await runPreflight(
+      { ...env, BETA_NETWORK: "testnet3" },
+      platform(healthy),
+      policy,
+    );
+    expect(unknown[0]).toMatchObject({ verdict: "fail" });
+    expect(unknown[0]?.detail).toContain("BETA_NETWORK");
+    expect(unknown[2]?.verdict).toBe("skipped");
   });
 });

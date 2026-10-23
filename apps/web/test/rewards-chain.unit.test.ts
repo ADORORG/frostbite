@@ -2,7 +2,7 @@ import { chainRefSchema, type TransactionIntent } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it, vi } from "vitest";
 
-import { bitcoinSignetChainId } from "../../../configs/chains.ts";
+import { betaChain } from "../../../configs/chains.ts";
 import {
   chainConfig,
   createRewardsChain,
@@ -11,7 +11,8 @@ import {
 import { rewardsPlan } from "../../../configs/rewards-plan.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
-const signet = chainRefSchema.parse(bitcoinSignetChainId);
+// The chain this deployment runs on (configs/chains.ts), whichever test network that is.
+const beta = chainRefSchema.parse(betaChain.chain.chainId);
 const url = "https://node.example.invalid/v1/rpc";
 const environment: RewardsChainEnvironment = {
   maxFeeSats: 25_000n,
@@ -80,7 +81,7 @@ describe("the rewards chain", () => {
       expect(
         closed
           .createRewardsChain(environment, platform().platform)
-          ?.chain(signet),
+          ?.chain(beta),
       ).toBeNull();
     } finally {
       vi.doUnmock("../../../configs/rewards-policy.ts");
@@ -88,11 +89,11 @@ describe("the rewards chain", () => {
     }
   });
 
-  it("offers signet with the fee ceiling and the six ports once the gate is open", () => {
+  it("offers beta with the fee ceiling and the six ports once the gate is open", () => {
     const rewards = createRewardsChain(environment, platform().platform);
-    const offered = rewards?.chain(signet);
+    const offered = rewards?.chain(beta);
     expect(offered?.funding.maxFee).toEqual({
-      asset: { chain: signet, id: "btc", kind: "native" },
+      asset: { chain: beta, id: "btc", kind: "native" },
       baseUnits: 25_000n,
     });
     expect(Object.keys(offered?.ports ?? {}).sort()).toEqual([
@@ -108,9 +109,9 @@ describe("the rewards chain", () => {
 
   it("asks the configured node, naming it as the source of what it observes", async () => {
     const { platform: stand, requests } = platform();
-    const ref = { chain: signet, id: "a".repeat(64) };
+    const ref = { chain: beta, id: "a".repeat(64) };
     const observation = await createRewardsChain(environment, stand)
-      ?.chain(signet)
+      ?.chain(beta)
       ?.ports.observer.observe(ref);
     expect(observation).toMatchObject({
       provider: "node.example.invalid",
@@ -121,14 +122,14 @@ describe("the rewards chain", () => {
   });
 
   it("sends the node's key header with its calls, and only that header otherwise", async () => {
-    const ref = { chain: signet, id: "a".repeat(64) };
+    const ref = { chain: beta, id: "a".repeat(64) };
     for (const [rpcHeaders, sent] of [
       [{ "x-gateway-key": "k3y" }, { "x-gateway-key": "k3y" }],
       [{}, {}],
     ] as const) {
       const { platform: stand, requests } = platform();
       await createRewardsChain({ ...environment, rpcHeaders }, stand)
-        ?.chain(signet)
+        ?.chain(beta)
         ?.ports.observer.observe(ref);
       expect(requests[0]?.headers).toEqual({
         ...sent,
@@ -141,9 +142,9 @@ describe("the rewards chain", () => {
     const observer = createRewardsChain(
       { ...environment, rpcTimeoutMs: 1 },
       platform().platform,
-    )?.chain(signet)?.ports.observer;
+    )?.chain(beta)?.ports.observer;
     await expect(
-      observer?.observe({ chain: signet, id: "a".repeat(64) }),
+      observer?.observe({ chain: beta, id: "a".repeat(64) }),
     ).rejects.toThrow();
   });
 
@@ -167,10 +168,10 @@ describe("the rewards chain", () => {
 
   describe("administration", () => {
     const intent = (sender: string): TransactionIntent => ({
-      chain: signet,
+      chain: beta,
       operation: "publish-template",
-      sender: { chain: signet, value: sender },
-      templateAt: { chain: signet, family: rewardsPlan.family, id: "4:100" },
+      sender: { chain: beta, value: sender },
+      templateAt: { chain: beta, family: rewardsPlan.family, id: "4:100" },
       templateId: "game-rewards",
       templateVersion: rewardsPolicy.templates[0].version,
     });
@@ -180,11 +181,11 @@ describe("the rewards chain", () => {
       const builder = createRewardsChain(
         environment,
         platform().platform,
-      )?.chain(signet)?.ports.builder;
+      )?.chain(beta)?.ports.builder;
       const refusal = await builder
         ?.build(intent(sender), {
           maxFee: {
-            asset: { chain: signet, id: "btc", kind: "native" },
+            asset: { chain: beta, id: "btc", kind: "native" },
             baseUnits: 1n,
           },
         })
@@ -197,12 +198,12 @@ describe("the rewards chain", () => {
 
     it("loads the template from the configured directory once templates are configured", async () => {
       const { platform: stand, reads } = platform();
-      const builder = createRewardsChain(withTemplates, stand)?.chain(signet)
+      const builder = createRewardsChain(withTemplates, stand)?.chain(beta)
         ?.ports.builder;
       const outcome = await builder
         ?.build(intent(sender), {
           maxFee: {
-            asset: { chain: signet, id: "btc", kind: "native" },
+            asset: { chain: beta, id: "btc", kind: "native" },
             baseUnits: 1n,
           },
         })

@@ -46,7 +46,12 @@ beforeEach(async () => {
   await mkdir(join(workspace, "games/sample-game/coverage"));
   await writeFile(join(workspace, "games/sample-game/coverage/x.json"), "{}");
   await mkdir(join(workspace, "configs/games"), { recursive: true });
-  for (const file of ["games.ts", "chains.ts", "games/sample.ts"])
+  for (const file of [
+    "games.ts",
+    "chains.ts",
+    "beta-chains.ts",
+    "games/sample.ts",
+  ])
     await cp(
       join(repository, "configs", file),
       join(workspace, "configs", file),

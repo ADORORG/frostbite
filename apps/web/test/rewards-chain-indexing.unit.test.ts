@@ -2,14 +2,15 @@ import { chainRefSchema } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it, vi } from "vitest";
 
-import { bitcoinSignetChainId } from "../../../configs/chains.ts";
+import { betaChain } from "../../../configs/chains.ts";
 import {
   createRewardsChain,
   type RewardsPlatform,
 } from "../../../configs/rewards-chain.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
-const signet = chainRefSchema.parse(bitcoinSignetChainId);
+// The chain this deployment runs on (configs/chains.ts), whichever test network that is.
+const beta = chainRefSchema.parse(betaChain.chain.chainId);
 const environment: RewardsChainEnvironment = {
   maxFeeSats: 25_000n,
   rpcHeaders: {},
@@ -55,9 +56,9 @@ describe("how far the rewards chain's indexer has read", () => {
   it("names the chain and reports the tip and the indexer's height as the node gave them", async () => {
     const { platform } = node({ indexed: 325_681, tip: 326_770 });
     const followed = createRewardsChain(environment, platform)?.followed;
-    expect(followed?.displayName).toBe("Bitcoin signet");
+    expect(followed?.displayName).toBe(betaChain.chain.displayName);
     expect(await followed?.indexing()).toEqual({
-      chain: signet,
+      chain: beta,
       indexedHeight: 325_681,
       observedAt: "2026-10-17T12:00:00.000Z",
       tipHeight: 326_770,
@@ -88,7 +89,7 @@ describe("how far the rewards chain's indexer has read", () => {
     const { asked, platform } = node({ indexed: 10, tip: 12 });
     const rewards = createRewardsChain(environment, platform);
     await rewards?.followed.indexing();
-    await rewards?.chain(signet)?.ports.observer.indexing(signet);
+    await rewards?.chain(beta)?.ports.observer.indexing(beta);
     expect(
       asked.filter((method) => method === "metashrew_height"),
     ).toHaveLength(1);
@@ -119,7 +120,7 @@ describe("how far the rewards chain's indexer has read", () => {
         environment,
         node({ indexed: 1, tip: 2 }).platform,
       );
-      expect(rewards?.chain(signet)).toBeNull();
+      expect(rewards?.chain(beta)).toBeNull();
       expect((await rewards?.followed.indexing())?.tipHeight).toBe(2);
     } finally {
       vi.doUnmock("../../../configs/rewards-policy.ts");

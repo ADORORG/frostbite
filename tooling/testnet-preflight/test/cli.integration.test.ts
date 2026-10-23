@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { betaChain } from "../../../configs/chains.ts";
+import { betaChains } from "../../../configs/beta-chains.ts";
 
 const run = promisify(execFile);
 const servers: Server[] = [];
@@ -15,8 +15,8 @@ afterEach(() => {
 });
 
 const answers: Readonly<Record<string, string | number | object>> = {
-  // The genesis block of the chain the platform is set to use: its id's thirty-two digits, padded to a block hash.
-  "esplora_block-height": betaChain.chain.chainId
+  // The genesis block of signet, which the platform uses while BETA_NETWORK is blank: its id's thirty-two digits, padded to a block hash.
+  "esplora_block-height": betaChains.signet.chain.chainId
     .slice("bip122:".length)
     .padEnd(64, "0"),
   "esplora_blocks:tip:hash": "00",

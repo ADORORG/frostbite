@@ -6,7 +6,7 @@ import { parseArgs, parseEnv } from "node:util";
 import { exitCodeOf, formatReport } from "./result.ts";
 import { runPreflight } from "./run.ts";
 
-// `pnpm signet:preflight [--env <file>]`: checks, without sending anything, what a first run on the beta's test network (signet or testnet4) needs.
+// `pnpm testnet:preflight [--env <file>]`: checks, without sending anything, what a first run on the beta's test network (signet or testnet4) needs.
 const root = resolve(import.meta.dirname, "../../..");
 const { values } = parseArgs({ options: { env: { type: "string" } } });
 const file = resolve(root, values.env ?? "apps/web/.env.local");

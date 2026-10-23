@@ -1,5 +1,5 @@
 {
-  "name": "@repo/signet-preflight",
+  "name": "@repo/testnet-preflight",
   "version": "0.0.0",
   "private": true,
   "type": "module",

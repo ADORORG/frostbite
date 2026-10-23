@@ -1,6 +1,6 @@
 import { chainRefSchema, walletNetworks } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   betaChain,
@@ -84,5 +84,44 @@ describe("the rewards chain on testnet4", () => {
     expect(rewards?.chain(testnet4)).not.toBeNull();
     expect(rewards?.chain(signet)).toBeNull();
     expect(rewards?.followed.displayName).toBe("Bitcoin testnet4");
+  });
+});
+
+describe("BETA_NETWORK", () => {
+  const followed = async (value: string | undefined) => {
+    vi.resetModules();
+    if (value === undefined) vi.unstubAllEnvs();
+    else vi.stubEnv("BETA_NETWORK", value);
+    try {
+      const chains = await import("../../../configs/chains.ts");
+      const wallet = await import("../../../configs/wallet.ts");
+      const plan = await import("../../../configs/rewards-plan.ts");
+      return { chains, plan, wallet };
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  };
+
+  it("chooses the chain, the wallet network, the target chains and the rewards plan, signet while blank", async () => {
+    const blank = await followed(undefined);
+    expect(blank.chains.betaNetwork).toBe("signet");
+    for (const [value, network, id] of [
+      ["", "signet", bitcoinSignetChainId],
+      ["signet", "signet", bitcoinSignetChainId],
+      ["testnet4", "testnet4", bitcoinTestnet4ChainId],
+    ] as const) {
+      const set = await followed(value);
+      expect(set.chains.betaNetwork).toBe(network);
+      expect(set.chains.betaChain.chain.chainId).toBe(id);
+      expect(set.chains.targetChains.map(({ chainId }) => chainId)).toEqual([
+        id,
+      ]);
+      expect(set.wallet.walletAuthConfig.network).toBe(network);
+      expect(set.plan.rewardsPlan.chain).toBe(id);
+    }
+  });
+
+  it("stops boot on a network the platform has no chain for", async () => {
+    await expect(followed("testnet3")).rejects.toThrow("BETA_NETWORK");
   });
 });

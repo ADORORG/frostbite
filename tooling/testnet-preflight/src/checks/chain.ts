@@ -27,7 +27,7 @@ export async function checkChain(
         verdict: "pass",
       }
     : {
-        detail: `The node's genesis block is ${genesis} (${served}); the platform is set to use ${expectedChainId}. Point the node address at that chain, or change betaNetwork in configs/chains.ts.`,
+        detail: `The node's genesis block is ${genesis} (${served}); the platform is set to use ${expectedChainId}. Point the node address at that chain, or change BETA_NETWORK.`,
         name: chainName,
         verdict: "fail",
       };
