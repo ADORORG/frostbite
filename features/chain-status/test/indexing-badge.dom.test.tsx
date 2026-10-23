@@ -25,6 +25,10 @@ const apiOf = (indexing: ChainStatusApi["indexing"]): ChainStatusApi => ({
   indexing,
 });
 
+// What the pill says about the chain is its button's name (the words are in the panel it opens).
+const named = (container: HTMLElement) =>
+  container.querySelector("button")?.getAttribute("aria-label") ?? "";
+
 describe("the header badge", () => {
   it("draws nothing until the platform has answered, then shows the answer", async () => {
     let answer: (value: ChainIndexing) => void = () => undefined;
@@ -35,7 +39,7 @@ describe("the header badge", () => {
     expect(textOf(container)).toBe("");
     answer(ok("delayed", 7));
     await settle(() =>
-      expect(textOf(container)).toContain("Delayed, 7 blocks behind"),
+      expect(named(container)).toContain("Delayed, 7 blocks behind"),
     );
   });
 
@@ -51,7 +55,7 @@ describe("the header badge", () => {
         refreshMs={20}
       />,
     );
-    await settle(() => expect(textOf(container)).toContain("Chain in sync"));
+    await settle(() => expect(named(container)).toContain("Chain in sync"));
     expect(indexing.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -85,7 +89,7 @@ describe("the header badge", () => {
       />,
     );
     await settle(() =>
-      expect(textOf(container)).toContain("Chain status unknown"),
+      expect(named(container)).toContain("Chain status unknown"),
     );
   });
 
@@ -101,6 +105,6 @@ describe("the header badge", () => {
       />,
     );
     await settle(() => expect(indexing).toHaveBeenCalled());
-    expect(container.querySelector('[role="status"]')).toBeNull();
+    expect(container.innerHTML).toBe("");
   });
 });

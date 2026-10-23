@@ -1,0 +1,72 @@
+/* A button that opens a panel under it (the wallet, the network, the menu). One look and one behaviour for every such control. */
+.popover {
+  position: relative;
+  display: inline-flex;
+}
+.popover__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--arcade-space-2);
+  min-height: 2.25rem;
+  padding: 0 var(--arcade-space-3);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: transparent;
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--arcade-transition-fast),
+    border-color var(--arcade-transition-fast);
+}
+.popover__trigger:hover,
+.popover[data-open="true"] > .popover__trigger {
+  border-color: var(--arcade-cyan);
+  background: color-mix(in srgb, var(--arcade-cyan) 12%, transparent);
+}
+.popover__panel {
+  position: absolute;
+  top: calc(100% + var(--arcade-space-2));
+  z-index: 40;
+  display: grid;
+  gap: var(--arcade-space-3);
+  width: max-content;
+  min-width: 15rem;
+  max-width: min(24rem, calc(100vw - 1.5rem));
+  padding: var(--arcade-space-4);
+  border: var(--arcade-border-width) solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 50%);
+  color: var(--arcade-text);
+  font-size: var(--arcade-text-sm);
+}
+.popover[data-align="end"] > .popover__panel {
+  right: 0;
+}
+.popover[data-align="start"] > .popover__panel {
+  left: 0;
+}
+.popover__panel p {
+  margin: 0;
+}
+.popover__panel--wide {
+  width: min(32rem, calc(100vw - 1.5rem));
+  max-width: none;
+}
+/* On a narrow screen the panel is a sheet the width of the screen, hung from the bar it belongs to. */
+@media (max-width: 48rem) {
+  .popover {
+    position: static;
+  }
+  .popover__panel {
+    right: var(--arcade-space-3);
+    left: var(--arcade-space-3);
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - var(--arcade-header-height) - 1rem);
+    overflow-y: auto;
+  }
+}

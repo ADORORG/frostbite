@@ -39,9 +39,10 @@
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1rem max(1.25rem, calc((100vw - var(--arcade-content-width)) / 2));
+  gap: var(--arcade-space-4);
+  min-height: var(--arcade-header-height);
+  padding: var(--arcade-space-2)
+    max(var(--arcade-space-4), calc((100vw - var(--arcade-content-width)) / 2));
   border-bottom: var(--arcade-border-width) solid var(--arcade-border);
   background: color-mix(in srgb, var(--arcade-surface) 94%, transparent);
   backdrop-filter: blur(0.75rem);
@@ -54,14 +55,14 @@
 .app-brand {
   gap: 0.75rem;
   font-family: var(--arcade-font-display);
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;
 }
 .app-brand__orbit {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   border: 0.25rem solid var(--arcade-ink);
   border-radius: 50%;
   background: linear-gradient(
@@ -97,9 +98,8 @@
   .arcade-marquee__track span:not(:first-child) {
     display: none;
   }
-  .app-header {
-    align-items: stretch;
-    flex-direction: column;
+  .app-brand > span:not(.app-brand__orbit) {
+    display: none;
   }
   .app-footer {
     align-items: flex-start;

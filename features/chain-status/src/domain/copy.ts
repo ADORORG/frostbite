@@ -49,3 +49,7 @@ export function lampFor(
       };
   }
 }
+
+// "testnet4" from "Bitcoin testnet4": the network's own name, for a place with little room. A name without the word is kept whole.
+export const shortChain = (displayName: string): string =>
+  displayName.replace(/^Bitcoin\s+/u, "");

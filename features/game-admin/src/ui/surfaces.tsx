@@ -1,6 +1,12 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { gameAdminHref } from "@ador/shared/games";
-import { ArcadeEmptyState, ArcadeInfoCard } from "@repo/ui/arcade";
+import {
+  ArcadeBadge,
+  ArcadeEmptyState,
+  SectionBlock,
+  Tile,
+  shortenMiddle,
+} from "@repo/ui/arcade";
 
 import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
@@ -36,24 +42,37 @@ export function GamesSurface({
           signingWallets={signingWallets}
         />
       </FeeSettingsBoundary>
-      {games.length === 0 ? (
-        <ArcadeEmptyState title="Nothing to administer">
-          No game declares rewards yet.
-        </ArcadeEmptyState>
-      ) : (
-        <ul aria-label="Games with rewards">
-          {games.map((game) => (
-            <li key={game.id}>
-              <ArcadeInfoCard title={game.title}>
-                <p>{`Network ${game.chain}. ${game.milestones.length} milestone${game.milestones.length === 1 ? "" : "s"}.`}</p>
-                <a
-                  href={gameAdminHref(game.id)}
-                >{`Administer ${game.title}`}</a>
-              </ArcadeInfoCard>
-            </li>
-          ))}
-        </ul>
-      )}
+      <SectionBlock title="Games">
+        {games.length === 0 ? (
+          <ArcadeEmptyState title="Nothing to administer">
+            No game declares rewards yet.
+          </ArcadeEmptyState>
+        ) : (
+          <ul aria-label="Games with rewards" className="tile-grid">
+            {games.map((game) => (
+              <li key={game.id}>
+                <Tile
+                  badge={
+                    <span title={game.chain}>
+                      <ArcadeBadge tone="cyan">
+                        {shortenMiddle(game.chain, { head: 10, tail: 4 })}
+                      </ArcadeBadge>
+                    </span>
+                  }
+                  footer={
+                    <a
+                      href={gameAdminHref(game.id)}
+                    >{`Administer ${game.title}`}</a>
+                  }
+                  title={game.title}
+                >
+                  <p>{`${game.milestones.length} milestone${game.milestones.length === 1 ? "" : "s"}`}</p>
+                </Tile>
+              </li>
+            ))}
+          </ul>
+        )}
+      </SectionBlock>
     </AdminFrame>
   );
 }

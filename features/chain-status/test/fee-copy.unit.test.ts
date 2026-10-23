@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  costText,
-  rateText,
-  spreadText,
-  waitText,
-} from "../src/domain/fee-copy.ts";
+import { costText, rateText, waitText } from "../src/domain/fee-copy.ts";
 
 describe("telling a wait", () => {
   it("is minutes below an hour, and hours in halves from there, always 'about'", () => {
@@ -35,22 +30,5 @@ describe("telling a cost", () => {
     expect(costText(1.009, 200)).toBe("202 sats");
     expect(costText(588_235.294, 200)).toBe("117,647,059 sats");
     expect(costText(2, 100.5)).toBe("201 sats");
-  });
-});
-
-describe("telling the spread across the speeds", () => {
-  const quote = (satPerVb: number) => ({
-    approxMinutes: 15,
-    satPerVb,
-    speed: "slow" as const,
-    targetBlocks: 1,
-    withinLimit: true,
-  });
-
-  it("is the lowest to the highest rate, and one rate when they are alike", () => {
-    expect(spreadText([quote(9), quote(1.009), quote(3)])).toBe(
-      "1.01 to 9.00 sat/vB",
-    );
-    expect(spreadText([quote(2), quote(2)])).toBe("2.00 sat/vB");
   });
 });

@@ -81,7 +81,7 @@ describe("entering the address of a contract the platform could not read", () =>
       expect(
         container.querySelector('[data-testid="contract-address"]')
           ?.textContent,
-      ).toContain("Contract 2:77"),
+      ).toBe("2:77"),
     );
     expect(
       container.querySelector('[data-testid="recorded-by"]')?.textContent,

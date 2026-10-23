@@ -29,16 +29,23 @@ const click = (name: string) =>
     button(name)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
 
+const chip = () => document.querySelector<HTMLButtonElement>(".fee-chip");
+// The speed is one small control; its tiles open under it.
+const openedRadios = async () => {
+  await vi.waitFor(() => expect(chip()?.textContent).toContain("1.01"));
+  await act(async () =>
+    chip()?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+  );
+  return [...document.querySelectorAll<HTMLInputElement>("input[type=radio]")];
+};
+
 describe("choosing how fast a claim confirms", () => {
   it("offers the fee speeds beside the milestones, starts on the usual one, and starts the claim at the one chosen", async () => {
     const api = fakeApi();
     await earned({ api, fees, wallet });
-    await vi.waitFor(() =>
-      expect(document.querySelectorAll("input[type=radio]")).toHaveLength(4),
-    );
-    const radios = [
-      ...document.querySelectorAll<HTMLInputElement>("input[type=radio]"),
-    ];
+    expect(document.querySelector("input[type=radio]")).toBeNull();
+    const radios = await openedRadios();
+    expect(radios).toHaveLength(4);
     expect(radios.map((radio) => [radio.value, radio.checked])).toEqual([
       ["slow", true],
       ["medium", false],
@@ -60,12 +67,7 @@ describe("choosing how fast a claim confirms", () => {
   it("starts a claim the game asks for at the speed the player chose, which the game can neither see nor change", async () => {
     const api = fakeApi();
     const { target } = await earned({ api, fees, wallet });
-    await vi.waitFor(() =>
-      expect(document.querySelectorAll("input[type=radio]")).toHaveLength(4),
-    );
-    const radios = [
-      ...document.querySelectorAll<HTMLInputElement>("input[type=radio]"),
-    ];
+    const radios = await openedRadios();
     await act(async () => radios[2]?.click());
     send(target, "milestones.claim", { id: milestoneId }, "c");
     await flush();

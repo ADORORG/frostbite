@@ -1,24 +1,23 @@
-/* The bar: a few quiet links, the work areas, and one account menu. */
+/* The bar: a few quiet links and the work areas; the account, the network and the wallet sit at the end. Under 60rem the links fold
+   into one menu, so the header stays on one line at any width. */
 .app-navigation {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.25rem 0.5rem;
+  gap: var(--arcade-space-1);
+  margin-right: auto;
 }
 .app-nav-link {
   display: inline-flex;
   align-items: center;
-  padding: 0.625rem 0.875rem;
-  border-bottom: var(--arcade-border-width) solid transparent;
+  min-height: 2.25rem;
+  padding: 0 var(--arcade-space-3);
+  border-bottom: 0.125rem solid transparent;
   color: var(--arcade-text-muted);
-  font-family: var(--arcade-font-pixel);
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  line-height: 1.4;
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  text-transform: uppercase;
-  cursor: pointer;
   transition: color var(--arcade-transition-fast);
 }
 .app-nav-link:hover,
@@ -29,46 +28,96 @@
   border-bottom-color: var(--arcade-yellow);
 }
 .app-nav-link--account {
-  margin-left: 0.5rem;
-  border: 0.125rem solid var(--arcade-cyan);
+  border: 0.125rem solid var(--arcade-border-strong);
   border-radius: var(--arcade-radius-small);
-  color: var(--arcade-cyan);
 }
-.account-menu {
-  position: relative;
+.app-header__tools,
+.app-header__end,
+.app-header__status {
+  display: flex;
+  align-items: center;
+  gap: var(--arcade-space-2);
 }
-.account-menu > summary {
+.app-header__tools {
+  margin-left: auto;
+}
+.details-menu,
+.popover > summary,
+.account-menu > summary,
+.nav-menu > summary {
   list-style: none;
 }
-.account-menu > summary::-webkit-details-marker {
+.popover > summary::-webkit-details-marker {
   display: none;
 }
 .account-menu > summary::after {
   content: "▾";
-  margin-left: 0.5rem;
+  color: var(--arcade-text-subtle);
 }
-.account-menu__list {
-  position: absolute;
-  right: 0;
-  z-index: 30;
-  min-width: 13rem;
-  margin: 0.5rem 0 0;
-  padding: 0.375rem;
-  border: var(--arcade-border-width) solid var(--arcade-border-strong);
-  border-radius: var(--arcade-radius-medium);
-  background: var(--arcade-surface);
-  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 50%);
+.popover[open] > .popover__trigger {
+  border-color: var(--arcade-cyan);
+  background: color-mix(in srgb, var(--arcade-cyan) 12%, transparent);
+}
+.popover > .popover__trigger[data-current="true"] {
+  border-color: var(--arcade-yellow);
+}
+/* Links in a menu: full-width rows with room to press. */
+.popover__panel .menu-group,
+.menu-group {
+  margin: var(--arcade-space-3) 0 var(--arcade-space-1);
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.menu-list {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 12rem;
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
-.account-menu__list a {
-  display: block;
-  padding: 0.75rem 0.875rem;
+.menu-link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--arcade-space-3);
+  border-left: 0.1875rem solid transparent;
   border-radius: var(--arcade-radius-small);
+  color: var(--arcade-text);
   text-decoration: none;
 }
-.account-menu__list a:hover,
-.account-menu__list a[aria-current="page"] {
+.menu-link:hover {
   background: var(--arcade-surface-raised);
+}
+.menu-link[data-current="true"] {
+  border-left-color: var(--arcade-yellow);
+  background: var(--arcade-surface-raised);
+}
+.popover.nav-menu {
+  display: none;
+}
+.nav-menu__icon {
+  width: 1rem;
+  height: 0.75rem;
+  background: linear-gradient(
+    currentcolor 0 0.125rem,
+    transparent 0.125rem 0.3125rem,
+    currentcolor 0.3125rem 0.4375rem,
+    transparent 0.4375rem 0.625rem,
+    currentcolor 0.625rem
+  );
+}
+@media (max-width: 60rem) {
+  .app-navigation,
+  .popover.account-menu,
+  .app-header__tools > .app-nav-link--account {
+    display: none;
+  }
+  .popover.nav-menu {
+    display: inline-flex;
+  }
 }
 
 /* The body: an area's sidebar beside the page, or the page alone. */
@@ -91,7 +140,7 @@
 .area-sidebar {
   align-self: start;
   position: sticky;
-  top: 6rem;
+  top: calc(var(--arcade-header-height) + var(--arcade-space-5));
 }
 .area-sidebar__title {
   margin: 0 0 0.75rem;
@@ -171,20 +220,6 @@
   .app-body[data-sidebar="true"] .arcade-section {
     padding: 1.25rem;
   }
-  .account-menu__list {
-    right: auto;
-    left: 0;
-  }
-}
-@media (max-width: 40rem) {
-  .app-navigation {
-    justify-content: flex-start;
-  }
-}
-.app-header__end,
-.app-header__status {
-  display: flex;
-  align-items: center;
 }
 .avatar {
   display: block;

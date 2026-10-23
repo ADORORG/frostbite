@@ -13,3 +13,8 @@
 @import "./styles/dock.css";
 @import "./styles/wallet-widget.css";
 @import "./styles/chain-status.css";
+@import "./styles/popover.css";
+@import "./styles/choice.css";
+@import "./styles/summary.css";
+@import "./styles/section.css";
+@import "./styles/staff.css";

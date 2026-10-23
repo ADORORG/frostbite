@@ -47,9 +47,11 @@ describe("the panels over the connected wallet", () => {
         container.querySelector('[data-testid="wallet-signs"]'),
       ).not.toBeNull(),
     );
+    // The connected wallet is the one signing: shown short, with the whole address in its title, and no field asking for one.
     expect(
-      (fieldByLabel(container, "Wallet address") as HTMLInputElement).value,
+      container.querySelector(".signer-bar code")?.getAttribute("title"),
     ).toBe("sim:one:a1b2c3fe");
+    expect(container.querySelector("input")).toBeNull();
     expect(wallet.allowed.at(-1)).toEqual(["xverse", "oyl"]);
   });
 
@@ -59,7 +61,9 @@ describe("the panels over the connected wallet", () => {
       <WalletTemplatesPanel api={fakeApi()} signingWallets={["xverse"]} />,
     );
     await settle(() =>
-      expect(textOf(container)).toContain("game-rewards@1.0.0"),
+      expect(
+        container.querySelector('[data-template="game-rewards@1.0.0"]'),
+      ).not.toBeNull(),
     );
     expect(
       container.querySelector('[data-testid="wallet-does-not-sign"]')

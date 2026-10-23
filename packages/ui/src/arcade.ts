@@ -38,3 +38,19 @@ export {
 } from "./patterns/catalog.tsx";
 export { ArcadeDock } from "./patterns/dock.tsx";
 export type { DockSection } from "./patterns/dock.tsx";
+export { Popover } from "./components/popover.tsx";
+export {
+  ChoiceTiles,
+  SegmentedChoice,
+} from "./components/segmented-choice.tsx";
+export type { ChoiceOption } from "./components/segmented-choice.tsx";
+export { KeyValueList } from "./components/key-value-list.tsx";
+export type { KeyValue } from "./components/key-value-list.tsx";
+export { ActionProgress, Spinner } from "./components/action-progress.tsx";
+export type {
+  ProgressState,
+  ProgressStep,
+} from "./components/action-progress.tsx";
+export { StatusDot } from "./primitives/status-dot.tsx";
+export { SectionBlock, Tile, TileGrid } from "./components/section-block.tsx";
+export { shortenMiddle } from "./components/shorten-middle.ts";

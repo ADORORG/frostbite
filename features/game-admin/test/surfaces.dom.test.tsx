@@ -28,7 +28,9 @@ describe("the staff pages", () => {
       ),
     );
     await settle(() =>
-      expect(textOf(container)).toContain("game-rewards@1.0.0"),
+      expect(
+        container.querySelector('[data-template="game-rewards@1.0.0"]'),
+      ).not.toBeNull(),
     );
     expect(
       container.querySelector("a[href='/admin/games/arcade']")?.textContent,
@@ -66,7 +68,11 @@ describe("the staff pages", () => {
       ),
     );
     expect(textOf(page)).toContain("Rewards on simnet:one.");
-    await settle(() => expect(textOf(page)).toContain("Contract rewards-1."));
+    await settle(() =>
+      expect(
+        page.querySelector('[data-testid="contract-address"]')?.textContent,
+      ).toBe("rewards-1"),
+    );
     const missing = await mount(
       inApp(
         <GameSurface

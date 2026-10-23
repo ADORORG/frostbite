@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { GameAdminApi } from "../client/api.ts";
 import {
+  actionLabel,
   isSettledStep,
   recordRefusalCopy,
   startRefusalCopy,
@@ -17,6 +18,7 @@ import {
   walletRefusedCopy,
 } from "../domain/copy.ts";
 import { failureCopy } from "../domain/failure-copy.ts";
+import type { Starting } from "./starting.ts";
 
 // What staff's wallet is asked to sign, and what it gives back. Where no wallet can sign steps there is none, and the page lets
 // staff sign elsewhere and paste the result.
@@ -60,6 +62,8 @@ export function useAdminSteps(options: {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  // An action that was asked for and has not yet become a step to review: what it is, and why it did not, if it did not.
+  const [starting, setStarting] = useState<Starting | null>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
 
   const upsert = useCallback((step: GameAdminStep) => {
@@ -149,7 +153,9 @@ export function useAdminSteps(options: {
 
   const start = useCallback(
     async (action: GameAdminAction, context: StartContext) => {
+      const label = actionLabel(action);
       setMessage(null);
+      setStarting({ failure: null, label });
       try {
         const answer = await api.start({
           action,
@@ -166,15 +172,17 @@ export function useAdminSteps(options: {
         if (answer.status === "started") {
           upsert(answer.step);
           setActiveId(answer.step.id);
+          setStarting(null);
         } else {
-          setMessage(
-            [startRefusalCopy[answer.reason], answer.detail]
+          setStarting({
+            failure: [startRefusalCopy[answer.reason], answer.detail]
               .filter((part) => part !== undefined)
               .join(" "),
-          );
+            label,
+          });
         }
       } catch (error) {
-        setMessage(failureCopy(error, "start"));
+        setStarting({ failure: failureCopy(error, "start"), label });
       }
     },
     [api, gameId, upsert],
@@ -259,7 +267,10 @@ export function useAdminSteps(options: {
   return {
     active,
     canSign: sign !== undefined,
-    dismiss: useCallback(() => setActiveId(null), []),
+    dismiss: useCallback(() => {
+      setActiveId(null);
+      setStarting(null);
+    }, []),
     message,
     overview,
     record,
@@ -267,6 +278,7 @@ export function useAdminSteps(options: {
     sendPasted,
     sign: signWithWallet,
     start,
+    starting,
     steps,
     working,
   };

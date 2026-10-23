@@ -1,13 +1,14 @@
 import type { BalanceSnapshot } from "../client/balance-store.ts";
-import { formatBalance, updatedAt } from "./format.ts";
+import { formatBtc, unitOf, updatedAt } from "./format.ts";
 
 const reasons = {
   "not-configured": "Balance unavailable: no data source is configured.",
   "source-failed": "Balance unavailable: the data source did not answer.",
 } as const;
 
-// The balance exactly as far as it is known: a figure with the time it was read, an older figure marked as older, or
-// the reason there is none. Never a zero standing in for "unknown".
+// The balance exactly as far as it is known: the figure large, then what it is in satoshis and when it was read, an older figure
+// marked as older, or the reason there is none. Never a zero standing in for "unknown". What is still waiting for its first
+// confirmation is told apart from what can be spent.
 export function BalanceLine({
   balance,
   network,
@@ -20,42 +21,57 @@ export function BalanceLine({
 }) {
   const { reading, reason, state } = balance;
   const busy = state === "loading" || state === "refreshing";
+  const unit = unitOf(network);
   return (
-    <div className="wallet-menu__balance">
-      <span className="wallet-menu__label">Spendable balance</span>
-      <p role="status">
-        {reading !== null ? (
-          <>
-            {formatBalance(reading.satoshis, network)}
-            {reading.pendingSats > 0 ? (
-              <small data-testid="pending-balance">
-                {` Plus ${formatBalance(reading.pendingSats, network)} still waiting for its first confirmation; a step cannot spend it yet.`}
-              </small>
-            ) : null}
-            <small>
-              {state === "stale"
-                ? ` Last read ${updatedAt(reading.asOf)}; could not update.`
-                : ` Updated ${updatedAt(reading.asOf)}.`}
+    <section aria-label="Balance" className="wallet-balance">
+      <div className="wallet-balance__head">
+        <span className="wallet-menu__label">Spendable balance</span>
+        <button
+          aria-label="Refresh balance"
+          className="wallet-balance__refresh"
+          disabled={busy}
+          onClick={onRefresh}
+          title={busy ? "Refreshing…" : "Refresh balance"}
+          type="button"
+        >
+          <span aria-hidden="true" data-busy={busy ? "true" : undefined}>
+            ↻
+          </span>
+        </button>
+      </div>
+      {reading !== null ? (
+        <div role="status">
+          <p className="wallet-balance__amount">
+            <strong>{formatBtc(reading.satoshis)}</strong>
+            <span>{unit}</span>
+          </p>
+          <small className="wallet-balance__detail">
+            {`${reading.satoshis.toLocaleString("en-US")} sats · ${
+              state === "stale"
+                ? `last read ${updatedAt(reading.asOf)}; could not update`
+                : `updated ${updatedAt(reading.asOf)}`
+            }`}
+          </small>
+          {reading.pendingSats > 0 ? (
+            <small
+              className="wallet-balance__pending"
+              data-testid="pending-balance"
+            >
+              {`+ ${formatBtc(reading.pendingSats)} ${unit} (${reading.pendingSats.toLocaleString("en-US")} sats) still waiting for its first confirmation; a step cannot spend it yet.`}
             </small>
-          </>
-        ) : state === "loading" ? (
-          "Loading balance…"
-        ) : state === "unavailable" && reason !== null ? (
-          reasons[reason]
-        ) : state === "failed" ? (
-          "Balance could not be loaded."
-        ) : (
-          "Balance appears while this menu is open."
-        )}
-      </p>
-      <button
-        className="wallet-menu__action"
-        disabled={busy}
-        onClick={onRefresh}
-        type="button"
-      >
-        {busy ? "Refreshing…" : "Refresh balance"}
-      </button>
-    </div>
+          ) : null}
+        </div>
+      ) : (
+        <p role="status">
+          {state === "loading"
+            ? "Loading balance…"
+            : state === "unavailable" && reason !== null
+              ? reasons[reason]
+              : state === "failed"
+                ? "Balance could not be loaded."
+                : "Balance appears once the wallet has been read."}
+        </p>
+      )}
+    </section>
   );
 }

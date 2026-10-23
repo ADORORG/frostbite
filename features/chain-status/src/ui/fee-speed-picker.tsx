@@ -1,26 +1,16 @@
 "use client";
 
-import {
-  feeSpeeds,
-  type FeeQuoteView,
-  type FeeSpeed,
-} from "@ador/shared/chain";
-import { useId } from "react";
+import { type FeeSpeed } from "@ador/shared/chain";
+import { SegmentedChoice } from "@repo/ui/arcade";
 
-import {
-  costText,
-  overLimitText,
-  rateText,
-  speedHints,
-  speedNames,
-  waitText,
-} from "../domain/fee-copy.ts";
+import { speedNames } from "../domain/fee-copy.ts";
+import { feeChoices } from "../domain/fee-choices.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
 
-// Where a person chooses how fast a transaction should confirm, for any step that pays a fee (a claim, a staff step). It shows what
-// each speed costs and how long it is about to take, from the chain's own quotes, and says so plainly when there are none. With the
-// size of the transaction it also says what the speed would cost in satoshis, and with a ceiling it refuses a speed that would pass
-// it. The choice is the speed, not the rate: the platform quotes the rate again when it builds the transaction.
+// Where a person chooses how fast a transaction should confirm, for any step that pays a fee (a claim, a staff step): the four speeds
+// as tiles, each with its rate and wait from the chain's own quotes, and says so plainly when there are none. With the size of the
+// transaction it also tells what each would cost, and with a ceiling it refuses a speed that would pass it. A speed no step could
+// afford is never offered. The choice is the speed, not the rate: the platform quotes the rate again when it builds the transaction.
 export function FeeSpeedPicker({
   disabled = false,
   market,
@@ -39,7 +29,6 @@ export function FeeSpeedPicker({
   // About how large the transaction is, in virtual bytes, so a cost can be told.
   readonly vbytes?: number;
 }) {
-  const group = useId();
   if (market.status === "loading")
     return <p role="status">Loading what each speed costs…</p>;
   if (market.status === "unreachable")
@@ -59,70 +48,37 @@ export function FeeSpeedPicker({
           : `${fees.chain} could not be asked what a fee costs right now. The step is built at the platform's usual speed, and you see its fee before you sign.`}
       </p>
     );
-  const byspeed = new Map<FeeSpeed, FeeQuoteView>(
-    fees.quotes.map((quote) => [quote.speed, quote]),
-  );
+  const { notes, options } = feeChoices({
+    maxFeeSats,
+    platformMaxFeeSats: fees.maxFeeSats,
+    quotes: fees.quotes,
+    vbytes,
+  });
+  const chosen = options.find((option) => option.value === value);
   return (
-    <fieldset className="fee-picker" disabled={disabled}>
-      <legend>How fast should it confirm?</legend>
-      {feeSpeeds.map((speed) => {
-        const quote = byspeed.get(speed);
-        if (quote === undefined) return null;
-        const cost =
-          vbytes === undefined
-            ? null
-            : { sats: Math.ceil(quote.satPerVb * vbytes) };
-        const unaffordable = !quote.withinLimit;
-        const over =
-          unaffordable ||
-          (cost !== null && maxFeeSats !== undefined && cost.sats > maxFeeSats);
-        return (
-          <label
-            className="fee-picker__option"
-            data-over={over ? "true" : undefined}
-            key={speed}
-          >
-            <input
-              checked={value === speed}
-              disabled={over}
-              name={group}
-              onChange={() => {
-                // A speed that cannot be chosen is switched off, and refused here too.
-                if (!over) onChange(speed);
-              }}
-              type="radio"
-              value={speed}
-            />
-            <span className="fee-picker__name">{speedNames[speed]}</span>
-            <span className="fee-picker__wait">
-              {waitText(quote.approxMinutes)}
-            </span>
-            <span className="fee-picker__rate">{rateText(quote.satPerVb)}</span>
-            {vbytes === undefined ? null : (
-              <span className="fee-picker__cost">
-                {`≈ ${costText(quote.satPerVb, vbytes)}`}
-              </span>
-            )}
-            <small className="fee-picker__hint">
-              {unaffordable
-                ? overLimitText(fees.maxFeeSats)
-                : over
-                  ? `More than the ${maxFeeSats?.toLocaleString("en-US")} sats this step may pay, so it cannot be chosen.`
-                  : speedHints[speed]}
-            </small>
-          </label>
-        );
-      })}
-      {byspeed.get(value)?.withinLimit === false ? (
+    <div className="fee-picker">
+      <SegmentedChoice
+        disabled={disabled}
+        legend="How fast should it confirm?"
+        onChange={onChange}
+        options={options}
+        value={value}
+      />
+      {chosen?.disabled === true ? (
         <p className="fee-picker__alert" role="alert">
           {`${speedNames[value]} cannot be sent now. Choose another speed.`}
         </p>
       ) : null}
+      {notes.map((note) => (
+        <small className="fee-picker__note" key={note}>
+          {note}
+        </small>
+      ))}
       <small className="fee-picker__note">
         Rates are the chain&apos;s quotes at block{" "}
         {fees.tipHeight.toLocaleString("en-US")} and change with demand; waits
         are estimates, not promises.
       </small>
-    </fieldset>
+    </div>
   );
 }

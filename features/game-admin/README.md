@@ -62,3 +62,7 @@ keyboard, reduced-motion, responsive and visual behavior: `tests/e2e/tests/game-
 ## Ownership
 
 The games platform owner.
+
+## The page and the sheet
+
+Each page is a signer line (who signs, and the fee speed as a chip), then sections (templates as tiles; the contract, claims and milestones; the activity log). Any action opens `StepSheet` the moment it is pressed: "preparing", then the step's review (lifecycle stages from the platform's record, the facts, the fee as its own card, and the sign button); a refusal or failure is shown in the sheet. `isStarting` marks only the button that was pressed as busy.

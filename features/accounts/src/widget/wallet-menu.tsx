@@ -9,7 +9,7 @@ import type { useWalletSession } from "../client/use-wallet-session.ts";
 import { BalanceLine } from "./balance-line.tsx";
 import { CopyAddress } from "./copy-address.tsx";
 import { failureCopy } from "./failure-copy.ts";
-import { networkName } from "./format.ts";
+import { networkName, shortAddress } from "./format.ts";
 import { MenuWallets } from "./menu-wallets.tsx";
 
 type Session = ReturnType<typeof useWalletSession>;
@@ -27,7 +27,6 @@ const statusText = {
 export function WalletMenu({
   balance,
   expectedNetwork,
-  id,
   onChoose,
   onRefreshBalance,
   onSessionChange,
@@ -36,7 +35,6 @@ export function WalletMenu({
 }: {
   readonly balance: BalanceSnapshot;
   readonly expectedNetwork: WalletNetwork;
-  readonly id: string;
   readonly onChoose: () => void;
   readonly onRefreshBalance: () => void;
   // Called after signing in or out succeeded, so the page can show what the new session may see.
@@ -48,12 +46,12 @@ export function WalletMenu({
   const working = busy !== null;
   const waiting = "Waiting for your wallet…";
   return (
-    <div aria-label="Wallet" className="wallet-menu" id={id} role="group">
+    <div className="wallet-menu">
       {wallet.connected ? (
-        <div className="wallet-menu__identity">
-          <Avatar label="Wallet picture" seed={wallet.address} size={40} />
-          <div>
-            <code title={wallet.address}>{wallet.address}</code>
+        <div className="wallet-identity">
+          <Avatar label="Wallet picture" seed={wallet.address} size={36} />
+          <div className="wallet-identity__text">
+            <code title={wallet.address}>{shortAddress(wallet.address)}</code>
             <small>
               {wallet.provider ?? "Wallet"} · {networkName(wallet.network)}
             </small>
@@ -122,42 +120,46 @@ export function WalletMenu({
           onRemove={(walletId) => void actions.unlink(walletId)}
         />
       )}
-      <div className="wallet-menu__actions">
-        <button
-          className="wallet-menu__action"
-          onClick={onChoose}
-          type="button"
-        >
-          {wallet.connected ? "Switch wallet" : "Connect wallet"}
-        </button>
-        {wallet.connected ? (
-          <button
-            className="wallet-menu__action"
-            disabled={working}
-            onClick={wallet.disconnect}
-            type="button"
-          >
-            Disconnect wallet
+      <ul className="menu-list wallet-menu__rows">
+        <li>
+          <button className="menu-link" onClick={onChoose} type="button">
+            {wallet.connected ? "Switch wallet" : "Connect wallet"}
           </button>
+        </li>
+        {wallet.connected ? (
+          <li>
+            <button
+              className="menu-link"
+              disabled={working}
+              onClick={wallet.disconnect}
+              type="button"
+            >
+              Disconnect wallet
+            </button>
+          </li>
         ) : null}
         {view.kind === "linked" ||
         view.kind === "not-linked" ||
         (view.kind === "disconnected" && view.signedIn) ? (
-          <button
-            className="wallet-menu__action"
-            disabled={working}
-            onClick={() =>
-              void actions.signOut().then((ok) => ok && onSessionChange())
-            }
-            type="button"
-          >
-            Sign out
-          </button>
+          <li>
+            <button
+              className="menu-link"
+              disabled={working}
+              onClick={() =>
+                void actions.signOut().then((ok) => ok && onSessionChange())
+              }
+              type="button"
+            >
+              Sign out
+            </button>
+          </li>
         ) : null}
-        <a className="wallet-menu__action" href="/account">
-          Account and passkeys
-        </a>
-      </div>
+        <li>
+          <a className="menu-link" href="/account">
+            Account and passkeys
+          </a>
+        </li>
+      </ul>
     </div>
   );
 }

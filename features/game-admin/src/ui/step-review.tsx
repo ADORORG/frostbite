@@ -1,111 +1,56 @@
 import { CostOverview } from "@ador/feature-chain-status/fee-picker";
 import type { GameAdminStep } from "@ador/shared/games";
-import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
-import { useState } from "react";
+import { ActionProgress, ArcadeTextField, KeyValueList } from "@repo/ui/arcade";
 
-import {
-  noSignerCopy,
-  operationLabel,
-  shortHash,
-  stepCopy,
-} from "../domain/copy.ts";
+import { noSignerCopy, stepCopy } from "../domain/copy.ts";
+import { stepFacts } from "../domain/facts.ts";
+import { lifecycleSteps } from "../domain/lifecycle.ts";
 import { RecordAddress } from "./record-address.tsx";
 
-// The review staff sign from: what the step does, on which contract, for what fee, until when, and where it stands. It shows exactly
-// what the platform built (the wallet signs that, and the platform refuses anything else), and it never says a step is done before
-// the network's records show it. With a wallet that signs, one button; without, the transaction to sign elsewhere and a box for the
-// signed result.
+// What a step is, for the review staff sign from: where it stands (its stages, from the platform's own record), what it does and on
+// which contract or template, and what it costs, apart from the rest because it is what is being agreed to. It shows exactly what the
+// platform built (the wallet signs that, and the platform refuses anything else), and it never says a step is done before the
+// network's records show it. Without a wallet that signs, the transaction to sign elsewhere and a box for the signed result.
 export function StepReview({
   canSign,
   message,
-  onClose,
+  onPaste,
   onRecord,
-  onSign,
-  onSendPasted,
+  pasted,
   step,
   working,
 }: {
   readonly canSign: boolean;
   readonly message: string | null;
-  readonly onClose: () => void;
+  readonly onPaste: (payload: string) => void;
   readonly onRecord: (address: string) => void;
-  readonly onSendPasted: (payload: string) => void;
-  readonly onSign: () => void;
+  readonly pasted: string;
   readonly step: GameAdminStep;
   readonly working: boolean;
 }) {
-  const [pasted, setPasted] = useState("");
   const copy = stepCopy(step);
   const { summary } = step;
   return (
-    <section
-      aria-label={`Step ${operationLabel(step)}`}
-      className="arcade-claim"
+    <div
+      className="step-review"
       data-state={step.state}
       data-testid="step-review"
-      role="dialog"
     >
-      <h3>{operationLabel(step)}</h3>
-      <dl>
-        <dt>Network</dt>
-        <dd>{summary.chain}</dd>
-        {summary.contractId === undefined ? null : (
-          <>
-            <dt>Rewards contract</dt>
-            <dd>{summary.contractId}</dd>
-          </>
-        )}
-        {summary.template === undefined ? null : (
-          <>
-            <dt>Template</dt>
-            <dd>{`${summary.template.id} ${summary.template.version}${summary.template.address === undefined ? "" : ` at ${summary.template.address}`}`}</dd>
-          </>
-        )}
-        {summary.collectibleAddress === undefined ? null : (
-          <>
-            <dt>Collectibles are made from the template at</dt>
-            <dd>{summary.collectibleAddress}</dd>
-          </>
-        )}
-        {summary.maxDrawingBytes === undefined ? null : (
-          <>
-            <dt>Largest drawing the contract will keep</dt>
-            <dd>{`${summary.maxDrawingBytes} bytes`}</dd>
-          </>
-        )}
-        {summary.claimLimit === undefined ? null : (
-          <>
-            <dt>Claims allowed per wallet</dt>
-            <dd>{summary.claimLimit}</dd>
-          </>
-        )}
-        {summary.drawing === undefined ? null : (
-          <>
-            <dt>Drawing</dt>
-            <dd>{`${summary.drawing.bytes} bytes, ${shortHash(summary.drawing.sha256)}`}</dd>
-          </>
-        )}
-        {summary.paused === undefined ? null : (
-          <>
-            <dt>Claims will be</dt>
-            <dd>{summary.paused ? "paused" : "open"}</dd>
-          </>
-        )}
-        <dt>Network fee</dt>
-        <dd>
-          <CostOverview
-            asset={summary.fee.asset}
-            baseUnits={summary.fee.baseUnits}
-            detail={summary.feeDetail}
-          />
-        </dd>
-        <dt>Valid until</dt>
-        <dd>{summary.expiresAt}</dd>
-      </dl>
-      <p aria-live="polite" role="status">
-        <strong>{copy.label}.</strong> {copy.detail}
-        {step.failureReason === null ? null : ` (${step.failureReason})`}
-      </p>
+      <ActionProgress
+        detail={`${copy.detail}${step.failureReason === null ? "" : ` (${step.failureReason})`}`}
+        steps={lifecycleSteps(step)}
+        title={copy.label}
+        working={step.state === "pending" || step.state === "confirmed"}
+      />
+      <KeyValueList items={stepFacts(step)} label="What this step does" />
+      <div className="step-cost">
+        <span className="step-cost__label">Network fee</span>
+        <CostOverview
+          asset={summary.fee.asset}
+          baseUnits={summary.fee.baseUnits}
+          detail={summary.feeDetail}
+        />
+      </div>
       {step.createdContracts.length === 0 ? null : (
         <p data-testid="created-contracts">{`The network reports it created: ${step.createdContracts.join(", ")}.`}</p>
       )}
@@ -116,35 +61,21 @@ export function StepReview({
         <RecordAddress onRecord={onRecord} working={working} />
       ) : null}
       {message === null ? null : <p role="alert">{message}</p>}
-      {step.toSign === null ? null : canSign ? (
-        <ArcadeActionButton disabled={working} onClick={onSign} tone="mint">
-          {working ? "Waiting for your wallet…" : "Sign with your wallet"}
-        </ArcadeActionButton>
-      ) : (
-        <>
+      {step.toSign === null || canSign ? null : (
+        <div className="step-review__elsewhere">
           <p>{noSignerCopy}</p>
           <label className="arcade-field">
             <span>Transaction to sign</span>
-            <textarea readOnly rows={5} value={step.toSign.payload} />
+            <textarea readOnly rows={4} value={step.toSign.payload} />
           </label>
           <ArcadeTextField
             label="Signed transaction"
             multiline
-            onChange={setPasted}
+            onChange={onPaste}
             value={pasted}
           />
-          <ArcadeActionButton
-            disabled={working}
-            onClick={() => onSendPasted(pasted)}
-            tone="mint"
-          >
-            {working ? "Sending…" : "Send signed transaction"}
-          </ArcadeActionButton>
-        </>
+        </div>
       )}
-      <ArcadeActionButton onClick={onClose} tone="pink">
-        Close
-      </ArcadeActionButton>
-    </section>
+    </div>
   );
 }

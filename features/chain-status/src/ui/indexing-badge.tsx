@@ -4,8 +4,7 @@ import { useResource } from "@ador/client-react";
 import { useEffect, useMemo } from "react";
 
 import { createChainStatusApi, type ChainStatusApi } from "../client/api.ts";
-import { ChainStatusPanel } from "./chain-status-panel.tsx";
-import { IndexingLamp } from "./indexing-lamp.tsx";
+import { NetworkPill } from "./network-pill.tsx";
 import { useFeeQuotes } from "./use-fee-quotes.ts";
 
 // The lamp in the header: asks the platform how far the chain's indexer has read when the page opens and then every `refreshMs`
@@ -37,9 +36,10 @@ export function IndexingBadge({
   const market = useFeeQuotes({ api, refreshMs });
   if (state.status === "loading") return null;
   return (
-    <div className="chain-status-bar">
-      <IndexingLamp indexing={state.status === "ready" ? state.data : null} />
-      <ChainStatusPanel exampleVbytes={exampleVbytes} market={market} />
-    </div>
+    <NetworkPill
+      exampleVbytes={exampleVbytes}
+      indexing={state.status === "ready" ? state.data : null}
+      market={market}
+    />
   );
 }

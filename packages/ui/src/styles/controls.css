@@ -22,6 +22,27 @@
   box-shadow: 0.125rem 0.125rem 0 var(--arcade-ink);
   transform: translate(0.25rem, 0.25rem);
 }
+.arcade-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: var(--arcade-shadow-depth) var(--arcade-shadow-depth) 0
+    var(--arcade-ink);
+  transform: none;
+}
+.arcade-button[aria-busy="true"] {
+  cursor: progress;
+}
+.arcade-button .spinner {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: var(--arcade-space-2);
+  border-width: 0.125rem;
+}
+.arcade-button[data-size="small"] {
+  min-height: 2.25rem;
+  padding: 0.375rem 0.75rem;
+  box-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+}
 .arcade-button--cyan {
   color: var(--arcade-cyan);
 }

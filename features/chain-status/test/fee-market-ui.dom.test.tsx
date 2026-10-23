@@ -1,122 +1,11 @@
-import type { ChainFees, FeeQuoteView, FeeSpeed } from "@ador/shared/chain";
+import type { FeeSpeed } from "@ador/shared/chain";
 import { click, mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
-import { ChainStatusPanel } from "../src/ui/chain-status-panel.tsx";
 import type { ChainStatusApi } from "../src/client/api.ts";
 import { FeeSpeedPicker } from "../src/ui/fee-speed-picker.tsx";
 import { useFeeQuotes } from "../src/ui/use-fee-quotes.ts";
-import type { FeeMarket } from "../src/ui/use-fee-quotes.ts";
-
-const rates: Omit<FeeQuoteView, "withinLimit">[] = [
-  { approxMinutes: 250, satPerVb: 1.009, speed: "slow", targetBlocks: 25 },
-  { approxMinutes: 60, satPerVb: 3, speed: "medium", targetBlocks: 6 },
-  { approxMinutes: 30, satPerVb: 5, speed: "fast", targetBlocks: 3 },
-  { approxMinutes: 15, satPerVb: 9, speed: "lightning", targetBlocks: 1 },
-];
-const ok: Extract<ChainFees, { state: "ok" }> = {
-  chain: "Bitcoin testnet4",
-  maxFeeSats: 500_000,
-  observedAt: "2026-10-23T12:00:00.000Z",
-  quotes: rates.map((quote) => ({ ...quote, withinLimit: true })),
-  state: "ok",
-  tipHeight: 157_401,
-};
-const answered = (fees: ChainFees): FeeMarket => ({ fees, status: "answered" });
-// The market testnet4 had on 2026-10-23: every target under 13 blocks quoted at 588,235 sat/vB, which no step can pay.
-const distorted: Extract<ChainFees, { state: "ok" }> = {
-  ...ok,
-  quotes: ok.quotes.map((quote) =>
-    quote.speed === "slow"
-      ? quote
-      : { ...quote, satPerVb: 588_235.294, withinLimit: false },
-  ),
-};
-
-describe("the chain panel in the header", () => {
-  it("summarises the block and the spread of rates, and tells each speed with its wait, rate and example cost", async () => {
-    const container = await mount(
-      <ChainStatusPanel exampleVbytes={200} market={answered(ok)} />,
-    );
-    expect(container.querySelector("summary")?.textContent).toBe(
-      "Block 157,401 · 1.01 to 9.00 sat/vB",
-    );
-    const rows = [...container.querySelectorAll("tbody tr")].map((row) =>
-      [...row.children].map((cell) => cell.textContent),
-    );
-    expect(rows).toEqual([
-      ["Slow", "about 4 h", "1.01 sat/vB", "202 sats"],
-      ["Medium", "about 1 h", "3.00 sat/vB", "600 sats"],
-      ["Fast", "about 30 min", "5.00 sat/vB", "1,000 sats"],
-      ["Lightning", "about 15 min", "9.00 sat/vB", "1,800 sats"],
-    ]);
-    expect(textOf(container)).toContain("Bitcoin testnet4 · block 157,401");
-    expect(textOf(container)).toContain("read 12:00:00 UTC");
-    expect(textOf(container)).toContain("A 200 vB transaction");
-    expect(textOf(container)).toContain(
-      "You see the exact fee before you sign",
-    );
-  });
-
-  it("marks the speeds no step can afford, and leaves the summary to the ones that can be chosen", async () => {
-    const container = await mount(
-      <ChainStatusPanel exampleVbytes={200} market={answered(distorted)} />,
-    );
-    expect(container.querySelector("summary")?.textContent).toBe(
-      "Block 157,401 · 1.01 sat/vB · faster speeds over the limit",
-    );
-    const rows = [...container.querySelectorAll("tbody tr")];
-    expect(rows.map((row) => row.getAttribute("data-over"))).toEqual([
-      null,
-      "true",
-      "true",
-      "true",
-    ]);
-    expect(rows[1]?.textContent).toContain("588,235 sat/vB");
-    expect(rows[1]?.textContent).toContain("over the 500,000 sat limit");
-    expect(rows[0]?.textContent).not.toContain("limit");
-  });
-
-  it("says no speed is within the limit when none is", async () => {
-    const none = {
-      ...ok,
-      quotes: ok.quotes.map((quote) => ({ ...quote, withinLimit: false })),
-    };
-    const container = await mount(
-      <ChainStatusPanel exampleVbytes={200} market={answered(none)} />,
-    );
-    expect(container.querySelector("summary")?.textContent).toBe(
-      "Block 157,401 · no speed is within the fee limit",
-    );
-  });
-
-  it("draws nothing while loading or where no chain is followed", async () => {
-    for (const market of [
-      { status: "loading" } as const,
-      answered({ state: "none" }),
-    ]) {
-      const container = await mount(
-        <ChainStatusPanel exampleVbytes={200} market={market} />,
-      );
-      expect(container.innerHTML).toBe("");
-    }
-  });
-
-  it("says the fees are unknown, and draws no rate, when the chain or the platform cannot be asked", async () => {
-    for (const market of [
-      answered({ chain: "Bitcoin testnet4", state: "unavailable" }),
-      { status: "unreachable" } as const,
-    ]) {
-      const container = await mount(
-        <ChainStatusPanel exampleVbytes={200} market={market} />,
-      );
-      expect(container.querySelector("summary")?.textContent).toBe(
-        "Fees unknown",
-      );
-      expect(textOf(container)).not.toMatch(/sat\/vB/u);
-    }
-  });
-});
+import { answered, distorted, ok } from "./support/fee-fixtures.ts";
 
 describe("the fee speed picker", () => {
   const picker = (
@@ -194,6 +83,24 @@ describe("the fee speed picker", () => {
     await click(options(container)[1] ?? null);
     expect(onChange).not.toHaveBeenCalled();
     expect(container.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it("gives only one reason for a speed that is both priced out and too large for the step", async () => {
+    const container = await mount(
+      picker({
+        market: answered(distorted),
+        maxFeeSats: 1_000,
+        vbytes: 200,
+      }),
+    );
+    expect(options(container).map((input) => input.disabled)).toEqual([
+      false,
+      true,
+      true,
+      true,
+    ]);
+    expect(textOf(container)).toContain("more for this speed than the 500,000");
+    expect(textOf(container)).not.toContain("More than the 1,000 sats");
   });
 
   it("warns when the speed already chosen has become one no step can afford", async () => {

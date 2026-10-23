@@ -6,6 +6,8 @@ import {
   address,
   answers,
   asks,
+  balanceCard,
+  chip,
   click,
   connection,
   container,
@@ -23,11 +25,9 @@ const ready = (satoshis: number, pendingSats = 0) =>
     satoshis,
     status: "ready",
   });
-const headerBalance = () =>
-  container.querySelector(".wallet-widget__balance")?.textContent ?? "";
 
 describe("the wallet widget: the balance", () => {
-  it("asks for the balance of the connected wallet as soon as it is connected, and shows it in the header with the time it was read", async () => {
+  it("asks for the balance of the connected wallet as soon as it is connected, keeps it out of the chip, and shows it in the menu with the time it was read", async () => {
     Object.assign(connection, { address, connected: true });
     answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(123_456);
@@ -35,33 +35,61 @@ describe("the wallet widget: the balance", () => {
     await settle();
     expect(asks(balancePath)).toHaveLength(1);
     expect(asks(balancePath)[0]?.body).toEqual({ address, network: "signet" });
-    expect(headerBalance()).toBe("0.00123456 tBTC");
-    expect(
-      container.querySelector(".wallet-widget__balance")?.getAttribute("title"),
-    ).toBe("Spendable now. Read 12:34:56 UTC.");
-    expect(container.querySelector(".wallet-widget__pending")).toBeNull();
+    // The chip is the wallet's short address and nothing longer.
+    expect(chip()).toBe("tb1q9v…d45v");
     await openMenu();
-    expect(
-      container.querySelector(".wallet-menu__balance")?.textContent,
-    ).toContain("0.00123456 tBTC (123,456 sats) Updated 12:34:56 UTC.");
+    expect(balanceCard()).toContain("0.00123456");
+    expect(balanceCard()).toContain("tBTC");
+    expect(balanceCard()).toContain("123,456 sats · updated 12:34:56 UTC");
     // Opening the menu does not ask again.
     expect(asks(balancePath)).toHaveLength(1);
   });
 
-  it("shows what is still waiting for its first confirmation apart from what can be spent, in the header and the menu", async () => {
+  it("shows what is still waiting for its first confirmation apart from what can be spent", async () => {
     Object.assign(connection, { address, connected: true });
     answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(0, 5_000_000);
     await show();
     await settle();
-    expect(headerBalance()).toBe("0.00000000 tBTC");
-    const pending = container.querySelector(".wallet-widget__pending");
-    expect(pending?.textContent).toBe("+0.05000000 pending");
-    expect(pending?.getAttribute("title")).toContain("5,000,000 sats");
     await openMenu();
+    expect(balanceCard()).toContain("0.00000000");
     expect(
       container.querySelector('[data-testid="pending-balance"]')?.textContent,
-    ).toContain("0.05000000 tBTC (5,000,000 sats) still waiting");
+    ).toBe(
+      "+ 0.05000000 tBTC (5,000,000 sats) still waiting for its first confirmation; a step cannot spend it yet.",
+    );
+  });
+
+  it("will not start another read while one is under way, and says it is refreshing", async () => {
+    Object.assign(connection, { address, connected: true });
+    answers["/api/v1/auth/methods"] = () => json({}, 401);
+    let answer: (response: Response) => void = () => undefined;
+    answers[balancePath] = () =>
+      new Promise<Response>((resolve) => (answer = resolve));
+    await show();
+    await settle();
+    await openMenu();
+    const refresh = () =>
+      container.querySelector<HTMLButtonElement>(".wallet-balance__refresh");
+    expect(refresh()?.disabled).toBe(true);
+    expect(refresh()?.title).toBe("Refreshing…");
+    expect(balanceCard()).toContain("Loading balance…");
+    await act(async () => answer(ready(7)));
+    await settle();
+    expect(refresh()?.disabled).toBe(false);
+    expect(refresh()?.title).toBe("Refresh balance");
+  });
+
+  it("says nothing of what is waiting when nothing is", async () => {
+    Object.assign(connection, { address, connected: true });
+    answers["/api/v1/auth/methods"] = () => json({}, 401);
+    answers[balancePath] = () => ready(42, 0);
+    await show();
+    await settle();
+    await openMenu();
+    expect(
+      container.querySelector('[data-testid="pending-balance"]'),
+    ).toBeNull();
   });
 
   it("names the coin by the network: bitcoin on mainnet, tBTC on a test network", async () => {
@@ -70,7 +98,10 @@ describe("the wallet widget: the balance", () => {
     answers[balancePath] = () => ready(100_000_000);
     await show();
     await settle();
-    expect(headerBalance()).toBe("1.00000000 BTC");
+    await openMenu();
+    const amount = container.querySelector(".wallet-balance__amount");
+    expect(amount?.querySelector("strong")?.textContent).toBe("1.00000000");
+    expect(amount?.querySelector("span")?.textContent).toBe("BTC");
     Object.assign(connection, { network: "signet" });
   });
 
@@ -95,7 +126,8 @@ describe("the wallet widget: the balance", () => {
       });
       await settle();
       expect(asks(balancePath)).toHaveLength(1);
-      expect(headerBalance()).toBe("0.00000042 tBTC");
+      await openMenu();
+      expect(balanceCard()).toContain("0.00000042");
     } finally {
       Object.defineProperty(document, "hidden", {
         configurable: true,
@@ -109,7 +141,8 @@ describe("the wallet widget: the balance", () => {
     await show();
     await settle();
     expect(asks(balancePath)).toHaveLength(0);
-    expect(container.querySelector(".wallet-widget__balance")).toBeNull();
+    expect(chip()).toBe("Connect wallet");
+    expect(container.querySelector(".wallet-balance")).toBeNull();
   });
 
   it("says why there is no balance instead of showing a zero, and refreshes when asked", async () => {
@@ -117,11 +150,10 @@ describe("the wallet widget: the balance", () => {
     answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
-    // The header says only that there is none; the menu says why.
-    expect(headerBalance()).toBe("balance unavailable");
+    // The chip says nothing of a balance; the menu says why there is none.
+    expect(chip()).toBe("tb1q9v…d45v");
     await openMenu();
-    const line = () =>
-      container.querySelector(".wallet-menu__balance")?.textContent ?? "";
+    const line = balanceCard;
     expect(line()).toContain(
       "Balance unavailable: no data source is configured.",
     );
@@ -137,9 +169,10 @@ describe("the wallet widget: the balance", () => {
     await click("Refresh balance");
     answers[balancePath] = () => json({}, 500);
     await click("Refresh balance");
-    expect(line()).toContain("0.00000005 tBTC (5 sats)");
-    expect(line()).toContain("Last read 12:34:56 UTC; could not update.");
-    expect(headerBalance()).toContain("(old)");
+    expect(line()).toContain("0.00000005");
+    expect(line()).toContain(
+      "5 sats · last read 12:34:56 UTC; could not update",
+    );
     expect(asks(balancePath)).toHaveLength(5);
   });
 });

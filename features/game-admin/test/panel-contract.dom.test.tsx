@@ -103,9 +103,12 @@ describe("a game with no contract yet", () => {
     );
     await enterWallet(container);
     await click(button(container, "Create the contract"));
+    expect(container.querySelector("dialog h2")?.textContent).toBe(
+      "Create the game's contract",
+    );
     const review = container.querySelector('[data-testid="step-review"]');
-    expect(review?.textContent).toContain("Create the game's contract");
-    expect(review?.textContent).toContain("game-rewards 1.0.0 at at-1");
+    expect(review?.textContent).toContain("game-rewards 1.0.0");
+    expect(review?.textContent).toContain("at-1");
     expect(review?.textContent).toContain("at-2");
     expect(review?.textContent).toContain("4096 bytes");
     expect(review?.textContent).not.toContain("Rewards contract");
@@ -142,8 +145,10 @@ describe("a game with no contract yet", () => {
       expect(
         container.querySelector('[data-testid="contract-address"]')
           ?.textContent,
-      ).toBe("Contract rewards-1. It keeps drawings up to 4096 bytes."),
+      ).toBe("rewards-1"),
     );
+    expect(textOf(container)).toContain("Keeps drawings up to");
+    expect(textOf(container)).toContain("4096 bytes");
     expect(textOf(container)).toContain("Auth token output");
     expect(button(container, "Create the contract")).toBeNull();
     expect(step().operation).toBe("set-claims-paused");

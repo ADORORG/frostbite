@@ -28,6 +28,18 @@ export function installReactTestEnvironment() {
   afterEach(unmountAll);
 }
 
+// jsdom has no modal dialog. This stands in for the browser's, which sets `open` and fires `close` when it closes, so a page that
+// opens a dialog can be tested as it is used. Call once from a project's setup file.
+export function installDialogShim() {
+  HTMLDialogElement.prototype.showModal = function showModal() {
+    this.setAttribute("open", "");
+  };
+  HTMLDialogElement.prototype.close = function close() {
+    this.removeAttribute("open");
+    this.dispatchEvent(new Event("close"));
+  };
+}
+
 export const click = (element: Element | null) => {
   if (element === null) throw new Error("element to click is missing");
   return act(() => {

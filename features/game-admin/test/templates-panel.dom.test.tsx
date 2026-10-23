@@ -1,5 +1,4 @@
 import {
-  button,
   click,
   fieldByLabel,
   mount,
@@ -12,6 +11,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { FeeSettingsBoundary } from "../src/ui/fee-settings.tsx";
 import { TemplatesPanel } from "../src/ui/templates-panel.tsx";
+import { byName } from "./support/find.ts";
 import {
   apiError,
   fakeApi,
@@ -46,7 +46,7 @@ describe("the templates staff publish", () => {
       />,
     );
     expect(textOf(container)).toContain("Loading the templates");
-    expect(button(container, "Publish game-rewards@1.0.0")).toBeNull();
+    expect(byName(container, "Publish game-rewards@1.0.0")).toBeNull();
     release();
     await settle(() =>
       expect(textOf(container)).toContain("Published at at-1"),
@@ -59,9 +59,9 @@ describe("the templates staff publish", () => {
     expect(items[0]?.textContent).not.toContain("Not published");
     expect(items[1]?.textContent).toContain("Not published");
     // A published template has nothing left to publish; the other has a field and a button.
-    expect(button(container, "Publish game-rewards@1.0.0")).toBeNull();
+    expect(byName(container, "Publish game-rewards@1.0.0")).toBeNull();
     expect(
-      button(container, "Publish milestone-collectible@1.0.0"),
+      byName(container, "Publish milestone-collectible@1.0.0"),
     ).not.toBeNull();
     expect(textOf(container)).not.toContain("Auth token output");
     expect(textOf(container)).toContain("No template has been published yet.");
@@ -88,9 +88,9 @@ describe("the templates staff publish", () => {
     const fake = api();
     const container = await mount(<TemplatesPanel api={fake} />);
     await settle(() =>
-      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
+      expect(byName(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
     );
-    const publish = () => button(container, "Publish game-rewards@1.0.0");
+    const publish = () => byName(container, "Publish game-rewards@1.0.0");
     // The platform finds the address; there is nothing to type for it.
     expect(container.textContent).not.toContain("Address for");
     expect(container.querySelectorAll("input")).toHaveLength(1);
@@ -112,11 +112,13 @@ describe("the templates staff publish", () => {
       gameId: null,
       wallet: "sim:one:a1b2c3fe",
     });
-    const review = container.querySelector('[data-testid="step-review"]');
-    expect(review?.textContent).toContain(
+    const sheet = container.querySelector("dialog");
+    expect(sheet?.querySelector("h2")?.textContent).toBe(
       "Publish template game-rewards@1.0.0",
     );
-    expect(review?.textContent).toContain("game-rewards 1.0.0 at at-1");
+    const review = container.querySelector('[data-testid="step-review"]');
+    expect(review?.textContent).toContain("game-rewards 1.0.0");
+    expect(review?.textContent).toContain("Published atat-1");
     expect(review?.textContent).not.toContain("Rewards contract");
   });
 
@@ -139,7 +141,7 @@ describe("the templates staff publish", () => {
     expect(textOf(container)).toContain("Publish template game-rewards@1.0.0");
     expect(textOf(container)).toContain("sent by Grace");
     await enterWallet(container);
-    await click(button(container, "Publish milestone-collectible@1.0.0"));
+    await click(byName(container, "Publish milestone-collectible@1.0.0"));
     expect(textOf(container)).toContain("This template is already published.");
   });
 });
@@ -202,9 +204,16 @@ describe("choosing how fast a template is published", () => {
       </FeeSettingsBoundary>,
     );
     await settle(() =>
-      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
+      expect(byName(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
     );
-    await settle(() => expect(textOf(container)).toContain("9.00 sat/vB"));
+    // The speed chosen is one small control; its tiles open under it.
+    const chip = () => container.querySelector<HTMLButtonElement>(".fee-chip");
+    await settle(() => expect(textOf(chip() ?? container)).toContain("1.01"));
+    expect(chip()?.getAttribute("aria-label")).toBe(
+      "Fee speed: Slow, 1.01 sat/vB, about 4 h",
+    );
+    expect(container.querySelector("input[type=radio]")).toBeNull();
+    await click(chip());
     const radios = [
       ...container.querySelectorAll<HTMLInputElement>("input[type=radio]"),
     ];
@@ -215,12 +224,20 @@ describe("choosing how fast a template is published", () => {
       ["lightning", false],
     ]);
     await enterWallet(container);
-    await click(button(container, "Publish game-rewards@1.0.0"));
+    await click(byName(container, "Publish game-rewards@1.0.0"));
     expect(fake.start).toHaveBeenLastCalledWith(
       expect.objectContaining({ feeSpeed: "slow" }),
     );
     await click(radios[2] ?? null);
-    await click(button(container, "Publish game-rewards@1.0.0"));
+    // Choosing closes the tiles and the chip says what was chosen.
+    expect(container.querySelector("input[type=radio]")).toBeNull();
+    expect(chip()?.textContent).toContain("Fast");
+    // The first template now has a step in progress, so it offers that step and not a second publish; the other is still free.
+    expect(byName(container, "Publish game-rewards@1.0.0")).toBeNull();
+    expect(
+      byName(container, "Review the step publishing game-rewards@1.0.0"),
+    ).not.toBeNull();
+    await click(byName(container, "Publish milestone-collectible@1.0.0"));
     expect(fake.start).toHaveBeenLastCalledWith(
       expect.objectContaining({ feeSpeed: "fast" }),
     );
@@ -230,11 +247,11 @@ describe("choosing how fast a template is published", () => {
     const fake = api();
     const container = await mount(<TemplatesPanel api={fake} />);
     await settle(() =>
-      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
+      expect(byName(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
     );
     expect(container.querySelector("input[type=radio]")).toBeNull();
     await enterWallet(container);
-    await click(button(container, "Publish game-rewards@1.0.0"));
+    await click(byName(container, "Publish game-rewards@1.0.0"));
     const asked = vi.mocked(fake.start).mock.calls.at(-1)?.[0];
     expect(asked).not.toHaveProperty("feeSpeed");
   });

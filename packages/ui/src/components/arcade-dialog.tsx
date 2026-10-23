@@ -7,14 +7,20 @@ import { useEffect, useId, useRef, type ReactNode } from "react";
 // behind it inert; `onClose` runs however it closed, so the page's state never disagrees with what is on screen.
 export function ArcadeDialog({
   children,
+  footer,
   onClose,
   open,
   title,
+  wide = false,
 }: {
   readonly children: ReactNode;
+  // What stays in view under a long body: the buttons that finish the job.
+  readonly footer?: ReactNode;
   readonly onClose: () => void;
   readonly open: boolean;
   readonly title: string;
+  // For a dialog with a summary to read, not a short choice.
+  readonly wide?: boolean;
 }) {
   const titleId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -27,7 +33,7 @@ export function ArcadeDialog({
   return (
     <dialog
       aria-labelledby={titleId}
-      className="arcade-modal"
+      className={wide ? "arcade-modal arcade-modal--wide" : "arcade-modal"}
       onClose={onClose}
       ref={dialog}
     >
@@ -44,6 +50,9 @@ export function ArcadeDialog({
         </button>
       </div>
       <div className="arcade-modal__body">{children}</div>
+      {footer === undefined ? null : (
+        <div className="arcade-modal__footer">{footer}</div>
+      )}
     </dialog>
   );
 }

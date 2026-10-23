@@ -1,25 +1,18 @@
 "use client";
 
-import { Avatar } from "@repo/ui/arcade";
+import { Avatar, Popover } from "@repo/ui/arcade";
 import {
   hasRememberedWallet,
   useWalletChooser,
   useWalletConnection,
 } from "@ador/wallet/client";
 import type { WalletNetwork } from "@ador/wallet/contracts";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";
 import type { WalletCandidate } from "../wallet-config.ts";
 import { WalletChooserDialog } from "./chooser-dialog.tsx";
-import { abbreviated } from "./format.ts";
-import { HeaderBalance } from "./header-balance.tsx";
+import { shortAddress } from "./format.ts";
 import { useBalance } from "./use-balance.ts";
 import { WalletMenu } from "./wallet-menu.tsx";
 
@@ -47,7 +40,6 @@ export function WalletWidget({
   const wallet = useWalletConnection();
   const chooser = useWalletChooser();
   const session = useWalletSession(wallet);
-  const [menuRequested, setMenuRequested] = useState(false);
   // A wallet the library remembers comes back a moment after load; until it does, or the wait runs out, say so
   // instead of showing "Account" or "Connect wallet" as if there were none. The server's markup assumes none, so the
   // first client render agrees with it and the remembered wallet is noticed right after.
@@ -66,78 +58,50 @@ export function WalletWidget({
   const signedIn =
     session.view.kind === "disconnected" && session.view.signedIn;
   const hasMenu = wallet.connected || signedIn || session.methods !== null;
-  const menuOpen = menuRequested && hasMenu;
   const balance = useBalance({ intervalMs: balanceRefreshMs, wallet });
-  const root = useRef<HTMLDivElement>(null);
-  const trigger = useRef<HTMLButtonElement>(null);
-  const menuId = useId();
-  useEffect(() => {
-    if (!menuOpen) return;
-    const away = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        root.current !== null &&
-        !root.current.contains(event.target)
-      )
-        setMenuRequested(false);
-    };
-    document.addEventListener("pointerdown", away);
-    return () => document.removeEventListener("pointerdown", away);
-  }, [menuOpen]);
   const mismatch = wallet.connected && wallet.network !== network;
   return (
-    <div
-      className="wallet-widget"
-      onKeyDown={(event) => {
-        if (event.key === "Escape" && menuOpen) {
-          setMenuRequested(false);
-          trigger.current?.focus();
+    <div className="wallet-widget">
+      <Popover
+        align="end"
+        busy={waiting}
+        label="Wallet"
+        onTrigger={chooser.request}
+        trigger={
+          wallet.connected ? (
+            <>
+              <Avatar seed={wallet.address} size={20} />
+              <span title={wallet.address}>{shortAddress(wallet.address)}</span>
+              {mismatch ? <span aria-label="Wrong network">⚠</span> : null}
+            </>
+          ) : waiting ? (
+            "Reconnecting wallet…"
+          ) : signedIn ? (
+            "Account"
+          ) : (
+            "Connect wallet"
+          )
         }
-      }}
-      ref={root}
-    >
-      <button
-        aria-busy={waiting ? true : undefined}
-        aria-controls={hasMenu ? menuId : undefined}
-        aria-expanded={hasMenu ? menuOpen : undefined}
-        className="wallet-widget__trigger"
-        data-mismatch={mismatch ? "true" : undefined}
-        onClick={() =>
-          hasMenu ? setMenuRequested(!menuOpen) : chooser.request()
-        }
-        ref={trigger}
-        type="button"
+        triggerClassName="popover__trigger wallet-widget__trigger"
+        triggerData={{ "data-mismatch": mismatch ? "true" : undefined }}
       >
-        {wallet.connected ? (
-          <>
-            <Avatar seed={wallet.address} size={24} />
-            <span title={wallet.address}>{abbreviated(wallet.address)}</span>
-            <HeaderBalance balance={balance} network={wallet.network} />
-            {mismatch ? <span aria-label="Wrong network">⚠</span> : null}
-          </>
-        ) : waiting ? (
-          "Reconnecting wallet…"
-        ) : signedIn ? (
-          "Account"
-        ) : (
-          "Connect wallet"
-        )}
-      </button>
-      {menuOpen ? (
-        <WalletMenu
-          balance={balance}
-          expectedNetwork={network}
-          id={menuId}
-          onChoose={() => {
-            setMenuRequested(false);
-            chooser.request();
-          }}
-          onRefreshBalance={balance.refresh}
-          onSessionChange={onSessionChange}
-          session={session}
-          wallet={wallet}
-        />
-      ) : null}
+        {hasMenu
+          ? ({ close }) => (
+              <WalletMenu
+                balance={balance}
+                expectedNetwork={network}
+                onChoose={() => {
+                  close();
+                  chooser.request();
+                }}
+                onRefreshBalance={balance.refresh}
+                onSessionChange={onSessionChange}
+                session={session}
+                wallet={wallet}
+              />
+            )
+          : null}
+      </Popover>
       <WalletChooserDialog candidates={candidates} wallet={wallet} />
     </div>
   );

@@ -1,4 +1,6 @@
+import type { ArcadeTone } from "@repo/ui/arcade";
 import type {
+  GameAdminAction,
   GameAdminStep,
   GameAdminStepState,
   StartGameAdminStepResponse,
@@ -63,23 +65,67 @@ export const stepCopy = (
   (showsDelayed(step) ? delayedCopy[step.state] : undefined) ??
   stateCopy[step.state];
 
+// The colour a state's badge takes: waiting on you is yellow, waiting on the network is cyan, done is mint, stopped is red or pink.
+export const stateTone: Readonly<Record<GameAdminStepState, ArcadeTone>> = {
+  "awaiting-signature": "yellow",
+  complete: "mint",
+  confirmed: "cyan",
+  expired: "pink",
+  failed: "red",
+  pending: "cyan",
+};
+
 export const isSettledStep = (state: GameAdminStepState): boolean =>
   state === "complete" || state === "failed" || state === "expired";
 
-export const operationLabel = (
-  step: Pick<GameAdminStep, "operation" | "summary" | "templateRef">,
-): string => {
-  switch (step.operation) {
+// What a step is called, from what it is about: one wording for an action about to be started and a step already in the log.
+function labelFor({
+  milestoneId,
+  operation,
+  paused,
+  templateRef,
+}: {
+  readonly milestoneId?: string | undefined;
+  readonly operation: GameAdminStep["operation"];
+  readonly paused?: boolean | undefined;
+  readonly templateRef?: string | undefined;
+}): string {
+  switch (operation) {
     case "define-milestone":
-      return `Define milestone ${step.summary.milestoneId ?? ""}`.trim();
+      return `Define milestone ${milestoneId ?? ""}`.trim();
     case "deploy":
       return "Create the game's contract";
     case "publish-template":
-      return `Publish template ${step.templateRef ?? ""}`.trim();
+      return `Publish template ${templateRef ?? ""}`.trim();
     case "set-claims-paused":
-      return step.summary.paused === true ? "Pause claims" : "Resume claims";
+      return paused === true ? "Pause claims" : "Resume claims";
   }
-};
+}
+
+export const operationLabel = (
+  step: Pick<GameAdminStep, "operation" | "summary" | "templateRef">,
+): string =>
+  labelFor({
+    milestoneId: step.summary.milestoneId,
+    operation: step.operation,
+    paused: step.summary.paused,
+    templateRef: step.templateRef ?? undefined,
+  });
+
+// The same, for an action staff are about to start.
+export const actionLabel = (action: GameAdminAction): string =>
+  labelFor(
+    action.operation === "publish-template"
+      ? {
+          operation: action.operation,
+          templateRef: `${action.templateId}@${action.templateVersion}`,
+        }
+      : action.operation === "define-milestone"
+        ? { milestoneId: action.milestoneId, operation: action.operation }
+        : action.operation === "set-claims-paused"
+          ? { operation: action.operation, paused: action.paused }
+          : { operation: action.operation },
+  );
 
 export const startRefusalCopy: Readonly<
   Record<

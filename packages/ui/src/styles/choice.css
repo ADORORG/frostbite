@@ -1,0 +1,95 @@
+/* A few choices as side-by-side tiles; the chosen one is lit. Real radios underneath. */
+.segmented {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.segmented legend {
+  margin-bottom: var(--arcade-space-2);
+  padding: 0;
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.segmented__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+  gap: var(--arcade-space-2);
+}
+.segmented__option {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--arcade-space-1);
+  padding: var(--arcade-space-3);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+  cursor: pointer;
+  transition:
+    border-color var(--arcade-transition-fast),
+    background var(--arcade-transition-fast);
+}
+.segmented__option:hover {
+  border-color: var(--arcade-text-subtle);
+}
+.segmented__option:has(input:checked) {
+  border-color: var(--arcade-cyan);
+  background: color-mix(in srgb, var(--arcade-cyan) 12%, transparent);
+}
+.segmented__option:has(input:focus-visible) {
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.125rem;
+}
+.segmented__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.segmented__label {
+  font-weight: 700;
+}
+.segmented__meta {
+  color: var(--arcade-text);
+  font-size: var(--arcade-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.segmented__detail,
+.segmented__hint {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+@media (max-width: 36rem) {
+  .segmented__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.segmented__option[data-off="true"] {
+  border-style: dashed;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 0.4rem,
+    color-mix(in srgb, var(--arcade-text-subtle) 10%, transparent) 0.4rem 0.8rem
+  );
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.segmented__option[data-off="true"] .segmented__hint {
+  color: var(--arcade-yellow);
+}
+.segmented__detail {
+  white-space: pre-line;
+}
+.segmented__options--static {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.segmented__options--static .segmented__option {
+  cursor: default;
+}
+.segmented__options--static .segmented__option:hover {
+  border-color: var(--arcade-border-strong);
+}

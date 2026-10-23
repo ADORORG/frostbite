@@ -30,6 +30,8 @@
 }
 .arcade-badge {
   display: inline-block;
+  width: fit-content;
+  max-width: 100%;
   padding: 0.25rem 0.5rem;
   border: 0.125rem solid currentcolor;
   border-radius: var(--arcade-radius-small);
@@ -169,6 +171,8 @@
 }
 .arcade-media-tile__caption {
   display: grid;
+  justify-items: start;
+  overflow-wrap: anywhere;
   gap: var(--arcade-space-small);
   color: var(--arcade-text-muted);
   font-size: 0.875rem;
@@ -176,7 +180,8 @@
 .arcade-grid {
   display: grid;
   gap: var(--arcade-space-medium);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 20rem));
+  justify-content: start;
   margin: var(--arcade-space-medium) 0 0;
   padding: 0;
   list-style: none;

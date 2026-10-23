@@ -7,6 +7,7 @@ import {
 } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
+import { byName } from "./support/find.ts";
 import {
   apiError,
   defining,
@@ -32,7 +33,7 @@ describe("the log, the milestones and following a step", () => {
       createdBy: null,
     });
     const container = await panel(loaded(older, newer));
-    await settle(() => expect(textOf(container)).toContain("Built by Ada"));
+    await settle(() => expect(textOf(container)).toContain("built by Ada"));
     const items = [
       ...container.querySelectorAll('ul[aria-label="Steps taken"] li'),
     ];
@@ -69,8 +70,8 @@ describe("the log, the milestones and following a step", () => {
     );
     const row = container.querySelector('[data-milestone="first-win"]');
     expect(row?.textContent).toContain("Defined");
-    expect(button(container, "Define First win")).toBeNull();
-    expect(button(container, "Define Streak")).not.toBeNull();
+    expect(byName(container, "Define First win")).toBeNull();
+    expect(byName(container, "Define Streak")).not.toBeNull();
     expect(
       container.querySelector('[data-milestone="streak"]')?.textContent,
     ).toContain("Not defined");

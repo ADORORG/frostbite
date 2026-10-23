@@ -1,9 +1,14 @@
+import { shortenMiddle } from "@repo/ui/arcade";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
 export const abbreviated = (address: string) =>
   address.length <= 18
     ? address
     : `${address.slice(0, 8)}…${address.slice(-8)}`;
+
+// "tb1qrx…pj76": the start and end of an address, for a place with little room (the header's chip). The whole address stays in the
+// title and in the menu, to copy.
+export const shortAddress = (address: string) => shortenMiddle(address);
 
 const SATOSHIS_PER_BTC = 100_000_000;
 

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { AccountMenu } from "./account-menu.tsx";
 import { AreaSidebar } from "./area-sidebar.tsx";
 import { Breadcrumbs } from "./breadcrumbs.tsx";
+import { NavMenu } from "./nav-menu.tsx";
 import { HeaderSlot, HeaderStatusSlot } from "./shell-slots.tsx";
 import {
   buildNavigationModel,
@@ -86,10 +87,13 @@ export function AppShell({
               {area.label}
             </a>
           ))}
-          <AccountMenu items={model.account} />
         </nav>
-        <HeaderStatusSlot />
-        <HeaderSlot />
+        <div className="app-header__tools">
+          <HeaderStatusSlot />
+          <AccountMenu items={model.account} />
+          <HeaderSlot />
+          <NavMenu model={model} />
+        </div>
       </header>
       <div
         className="app-body"

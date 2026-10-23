@@ -39,9 +39,12 @@ describe("shell navigation", () => {
     const markup = render(visitor);
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/games"');
-    // One account link is shown as itself, not as a menu.
-    expect(markup).toContain('href="/connect"');
-    expect(markup).not.toContain("<details");
+    // One account link is not drawn in the bar (the wallet beside it links to the account page); the narrow-screen menu lists it.
+    expect(markup).not.toContain("app-nav-link--account");
+    expect(markup).toContain(
+      '<a class="menu-link" href="/connect">Connect</a>',
+    );
+    expect(markup).not.toContain("account-menu");
     expect(markup).toContain('aria-label="More"');
     expect(markup).toContain('href="/creators"');
     expect(markup).not.toContain("area-sidebar");
@@ -50,7 +53,7 @@ describe("shell navigation", () => {
 
   it("puts several account links in one menu", () => {
     const markup = render(creator);
-    expect(markup).toContain('<details class="account-menu">');
+    expect(markup).toContain('<details class="popover account-menu"');
     expect(markup).toContain('href="/account"');
     expect(markup).toContain('href="/connect"');
   });
@@ -173,9 +176,9 @@ describe("shell navigation", () => {
     ]);
     expect(menu).toContain('data-current="true">Account</summary>');
     expect(menu).toContain(
-      '<a aria-current="page" href="/account">Account</a>',
+      '<a aria-current="page" class="menu-link" href="/account">Account</a>',
     );
-    expect(menu).toContain('<a href="/connect">Connect</a>');
+    expect(menu).toContain('<a class="menu-link" href="/connect">Connect</a>');
     const elsewhere = render([
       { area: "account", href: "/account", label: "Account" },
       { area: "account", href: "/connect", label: "Connect" },

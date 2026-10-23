@@ -1,0 +1,106 @@
+/* A page made of parts: each set apart by its heading, with the same rhythm everywhere. */
+.block {
+  display: grid;
+  gap: var(--arcade-space-3);
+  padding-top: var(--arcade-space-4);
+  border-top: 0.125rem solid var(--arcade-border);
+}
+.block + .block {
+  margin-top: var(--arcade-space-5);
+}
+.block__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--arcade-space-2) var(--arcade-space-4);
+}
+.block .block__title {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  font-weight: 400;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.block__description {
+  margin: var(--arcade-space-1) 0 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+}
+.block__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+}
+.block__body {
+  display: grid;
+  gap: var(--arcade-space-3);
+}
+.block__body p {
+  margin: 0;
+}
+.tile-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--arcade-space-3);
+}
+.tile {
+  display: grid;
+  align-content: start;
+  gap: var(--arcade-space-3);
+  padding: var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.tile__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arcade-space-2);
+}
+.tile .tile__title {
+  margin: 0;
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-md);
+  font-weight: 700;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+.tile__body {
+  display: grid;
+  gap: var(--arcade-space-2);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+}
+.tile__body p {
+  margin: 0;
+}
+.tile__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  align-items: center;
+}
+/* A dialog with something to read: wider, and its buttons stay in view. */
+.arcade-modal--wide {
+  width: min(38rem, calc(100% - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+}
+.arcade-modal__footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  justify-content: flex-end;
+  padding: var(--arcade-space-3) var(--arcade-space-4);
+  border-top: 1px solid var(--arcade-border-strong);
+  background: var(--arcade-surface-raised);
+}

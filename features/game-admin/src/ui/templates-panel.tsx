@@ -1,13 +1,17 @@
 "use client";
 
-import { ArcadeActionButton, ArcadeInfoCard } from "@repo/ui/arcade";
+import { ArcadeInfoCard, SectionBlock } from "@repo/ui/arcade";
 import { useMemo } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
-import { SignerCard, useSigner } from "./signer-card.tsx";
-import { StepLog } from "./step-log.tsx";
-import { StepReview } from "./step-review.tsx";
+import { isSettledStep } from "../domain/copy.ts";
+import { ActivityLog } from "./activity-log.tsx";
+import { isStarting } from "./starting.ts";
+import { SignerBar } from "./signer-bar.tsx";
+import { StepSheet } from "./step-sheet.tsx";
+import { TemplateTile } from "./template-tile.tsx";
 import { useAdminSteps, type StepSigner } from "./use-admin-steps.ts";
+import { useSigner } from "./use-signer.ts";
 
 const ref = (template: { id: string; version: string }) =>
   `${template.id}@${template.version}`;
@@ -50,70 +54,53 @@ export function TemplatesPanel({
   );
   return (
     <>
-      <SignerCard
+      <SignerBar
         canSign={sign !== undefined}
         signer={signer}
         withAuthToken={false}
       />
-      <ArcadeInfoCard title="Templates">
-        <ul aria-label="Templates">
+      {admin.message !== null &&
+      admin.active === null &&
+      admin.starting === null ? (
+        <p role="alert">{admin.message}</p>
+      ) : null}
+      <SectionBlock
+        description="The code every game's rewards contract is made from. Each is published once, then reused."
+        title="Templates"
+      >
+        <ul aria-label="Templates" className="tile-grid">
           {overview.publishable.map((template) => {
             const key = ref(template);
-            const published = where.get(key);
+            const action = {
+              operation: "publish-template",
+              templateId: template.id,
+              templateVersion: template.version,
+            } as const;
             return (
-              <li data-template={key} key={key}>
-                <strong>{key}</strong> —{" "}
-                {published === undefined ? (
-                  <span>Not published</span>
-                ) : (
-                  <span>{`Published at ${published}`}</span>
+              <TemplateTile
+                address={where.get(key)}
+                busy={!signer.ready || admin.starting !== null}
+                key={key}
+                onOpen={admin.reopen}
+                onPublish={() => void admin.start(action, signer.context)}
+                preparing={isStarting(admin.starting, action)}
+                step={admin.steps.find(
+                  (step) =>
+                    step.templateRef === key && !isSettledStep(step.state),
                 )}
-                {published !== undefined ? null : (
-                  <>
-                    <ArcadeActionButton
-                      disabled={!signer.ready}
-                      onClick={() =>
-                        void admin.start(
-                          {
-                            operation: "publish-template",
-                            templateId: template.id,
-                            templateVersion: template.version,
-                          },
-                          signer.context,
-                        )
-                      }
-                      tone="mint"
-                    >
-                      {`Publish ${key}`}
-                    </ArcadeActionButton>
-                  </>
-                )}
-              </li>
+                template={template}
+              />
             );
           })}
         </ul>
-      </ArcadeInfoCard>
-      {admin.message !== null && admin.active === null ? (
-        <p role="alert">{admin.message}</p>
-      ) : null}
-      {admin.active === null ? null : (
-        <StepReview
-          canSign={admin.canSign}
-          message={admin.message}
-          onClose={admin.dismiss}
-          onRecord={(address) => void admin.record(address)}
-          onSendPasted={(payload) => void admin.sendPasted(payload)}
-          onSign={() => void admin.sign()}
-          step={admin.active}
-          working={admin.working}
-        />
-      )}
-      <StepLog
+      </SectionBlock>
+      <ActivityLog
         empty="No template has been published yet."
         onOpen={admin.reopen}
         steps={admin.steps}
         title="Template log"
       />
+      <StepSheet admin={admin} />
     </>
   );
 }

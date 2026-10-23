@@ -1,40 +1,28 @@
+import { DetailsMenu } from "../components/details-menu.tsx";
 import type { ShellNavigationItem } from "./navigation-model.ts";
 
-// Account links in one menu. A single link is shown as itself, since a menu of one is only a click more.
+// Account links in one menu. A single link is not drawn in the bar at all: the wallet beside it opens a menu that links to the account
+// page, and the narrow-screen menu lists it, so a second "Account" chip would only repeat it.
 // The menu is a plain disclosure, so it works without scripts and with the keyboard.
 export function AccountMenu({
   items,
 }: {
   readonly items: readonly ShellNavigationItem[];
 }) {
-  const [first] = items;
-  if (first === undefined) return null;
-  if (items.length === 1)
-    return (
-      <a
-        aria-current={first.current === "page" ? "page" : undefined}
-        className="app-nav-link app-nav-link--account"
-        data-current={first.current === undefined ? undefined : "true"}
-        href={first.href}
-      >
-        {first.label}
-      </a>
-    );
+  if (items.length <= 1) return null;
   return (
-    <details className="account-menu">
-      <summary
-        className="app-nav-link app-nav-link--account"
-        data-current={
-          items.some((item) => item.current !== undefined) ? "true" : undefined
-        }
-      >
-        Account
-      </summary>
-      <ul className="account-menu__list">
+    <DetailsMenu
+      className="account-menu"
+      current={items.some((item) => item.current !== undefined)}
+      label="Account"
+      trigger="Account"
+    >
+      <ul className="menu-list">
         {items.map((item) => (
           <li key={item.href}>
             <a
               aria-current={item.current === "page" ? "page" : undefined}
+              className="menu-link"
               href={item.href}
             >
               {item.label}
@@ -42,6 +30,6 @@ export function AccountMenu({
           </li>
         ))}
       </ul>
-    </details>
+    </DetailsMenu>
   );
 }

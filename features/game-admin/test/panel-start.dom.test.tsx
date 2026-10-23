@@ -7,6 +7,8 @@ import {
 } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
+import { byName } from "./support/find.ts";
+
 import { apiError, defining, fakeApi } from "./support/fake-api.ts";
 import { enterWallet, panel } from "./support/panel.tsx";
 
@@ -54,7 +56,7 @@ describe("starting a step", () => {
     });
     const container = await panel(api);
     await enterWallet(container);
-    await click(button(container, "Define First win"));
+    await click(byName(container, "Define First win"));
     expect(api.start).toHaveBeenLastCalledWith({
       action: {
         drawing: undefined,
@@ -65,7 +67,7 @@ describe("starting a step", () => {
       wallet: "sim:one:a1b2c3fe",
     });
     await typeInto(fieldByLabel(container, "Drawing for Streak"), "<svg/>");
-    await click(button(container, "Define Streak"));
+    await click(byName(container, "Define Streak"));
     expect(api.start).toHaveBeenLastCalledWith({
       action: {
         drawing: "<svg/>",

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  FeeSpeedPicker,
+  FeeSpeedChip,
   useFeeQuotes,
 } from "@ador/feature-chain-status/fee-picker";
 import type { ChainStatusApi } from "@ador/feature-chain-status/api";
@@ -9,8 +9,8 @@ import type { FeeSpeed } from "@ador/shared/chain";
 
 import type { ClaimFeeSettings } from "../wallet-config.ts";
 
-// How fast the player wants their claims confirmed, beside the milestones they claim: each speed with what it costs on the chain now
-// and, for a claim of about the usual size, in satoshis. The review the player signs from shows the exact fee. The choice covers every
+// How fast the player wants their claims confirmed, beside the milestones they claim, as one small control that opens each speed with what
+// it costs on the chain now and, for a claim of about the usual size, in satoshis. The review the player signs from shows the exact fee. The choice covers every
 // claim started after it, whether from the button or by the game asking.
 export function ClaimFees({
   api,
@@ -28,7 +28,7 @@ export function ClaimFees({
     refreshMs: settings.refreshMs,
   });
   return (
-    <FeeSpeedPicker
+    <FeeSpeedChip
       market={market}
       onChange={onChange}
       value={value}

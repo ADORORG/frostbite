@@ -129,7 +129,7 @@ describe("the wallet widget: signing in", () => {
     await act(async () =>
       container
         .querySelector(
-          `[aria-label="Remove ${second.slice(0, 8)}…${second.slice(-8)}"]`,
+          `[aria-label="Remove ${second.slice(0, 6)}…${second.slice(-4)}"]`,
         )
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     );

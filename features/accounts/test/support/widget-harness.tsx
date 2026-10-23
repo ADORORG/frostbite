@@ -53,7 +53,7 @@ export const sessionChanged: Mock = vi.fn();
 export const address = "tb1q9vza2e8x573nczrlzms0wvx3gsqjx7vaxwd45v";
 export const second = "tb1qsecondwalletaddress000000000000000000";
 export const requests: { body: unknown; path: string }[] = [];
-export const answers: Record<string, () => Response> = {};
+export const answers: Record<string, () => Response | Promise<Response>> = {};
 export let container: HTMLElement;
 let root: Root;
 
@@ -138,8 +138,10 @@ export const show = () =>
 export const settle = () =>
   act(() => new Promise<void>((resolve) => setTimeout(resolve, 10)));
 export const button = (name: string) =>
-  [...container.querySelectorAll("button")].find((b) =>
-    b.textContent.includes(name),
+  [...container.querySelectorAll("button")].find(
+    (b) =>
+      b.textContent.includes(name) ||
+      b.getAttribute("aria-label")?.includes(name) === true,
   );
 export const click = async (name: string) => {
   await act(async () =>
@@ -155,5 +157,10 @@ export const openMenu = async () => {
   );
   await settle();
 };
+// What the chip in the header says: the wallet's short address, or why there is none.
+export const chip = () => trigger()?.textContent ?? "";
+// The balance the menu shows, once it is open.
+export const balanceCard = () =>
+  container.querySelector(".wallet-balance")?.textContent ?? "";
 export const asks = (path: string) =>
   requests.filter((request) => request.path === path);

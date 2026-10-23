@@ -1,129 +1,64 @@
-/* The chain in the header: the lamp, and the block and fees one click beside it. */
-.chain-status-bar {
+/* The chain in the header: a small control, and a panel under it for the block, the reading and the fees. */
+.network-pill {
+  font-variant-numeric: tabular-nums;
+}
+.network-pill__block {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+.network-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arcade-space-2);
+}
+.network-panel__state {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--arcade-space-2);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
 }
-.chain-status {
-  position: relative;
+.network-panel__detail {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+.network-panel__sync,
+.network-panel__fees {
+  display: grid;
+  gap: var(--arcade-space-2);
+}
+.network-panel__heading {
+  margin: 0;
+  color: var(--arcade-yellow);
   font-family: var(--arcade-font-pixel);
-  font-size: 0.5625rem;
+  font-size: var(--arcade-label-size);
+  font-weight: 400;
   text-transform: uppercase;
 }
-.chain-status > summary {
-  cursor: pointer;
-  color: var(--arcade-text-muted);
-  white-space: nowrap;
-  list-style: none;
-}
-.chain-status > summary::-webkit-details-marker {
-  display: none;
-}
-.chain-status > summary:hover,
-.chain-status[open] > summary {
-  color: var(--arcade-cyan);
-}
-.chain-status__panel {
-  position: absolute;
-  right: 0;
-  z-index: 30;
-  display: grid;
-  gap: 0.5rem;
-  width: min(26rem, calc(100vw - 2.5rem));
-  margin-top: 0.5rem;
-  padding: 1rem;
-  border: var(--arcade-border-width) solid var(--arcade-border-strong);
-  border-radius: var(--arcade-radius-medium);
-  background: var(--arcade-surface);
-  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 50%);
-  color: var(--arcade-text);
-  font-family: var(--arcade-font-body);
-  font-size: 0.8125rem;
-  text-transform: none;
-}
-.chain-status__panel p {
-  margin: 0;
-}
-.chain-status__title small,
-.chain-status__panel small {
+.network-panel__sync small,
+.network-panel__fees small {
   color: var(--arcade-text-muted);
 }
-.chain-status__caption {
-  margin-bottom: 0.25rem;
-  color: var(--arcade-text-muted);
-  text-align: left;
-}
-.chain-status__panel table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.chain-status__panel th,
-.chain-status__panel td {
-  padding: 0.25rem 0.5rem 0.25rem 0;
-  text-align: left;
-  font-weight: normal;
-}
-.chain-status__panel thead th {
-  color: var(--arcade-text-muted);
-  font-size: 0.6875rem;
-}
-.chain-status__panel tbody th {
-  color: var(--arcade-cyan);
+@media (max-width: 36rem) {
+  .network-pill__chain {
+    display: none;
+  }
 }
 
-/* Choosing how fast a transaction confirms: one row per speed, in the order they are told. */
+/* Choosing how fast a transaction confirms: the speeds as tiles (see choice.css), with what to say about them under. */
 .fee-picker {
   display: grid;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-.fee-picker legend {
-  padding: 0;
-  font-weight: bold;
-}
-.fee-picker__option {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto auto;
-  gap: 0.25rem 0.75rem;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border: 0.125rem solid var(--arcade-border-strong);
-  border-radius: var(--arcade-radius-small);
-  cursor: pointer;
-}
-.fee-picker__option:has(input:checked) {
-  border-color: var(--arcade-cyan);
-  background: color-mix(in srgb, var(--arcade-cyan) 10%, transparent);
-}
-.fee-picker__option[data-over="true"] {
-  opacity: 0.6;
-  cursor: not-allowed;
+  gap: var(--arcade-space-2);
 }
 .fee-picker__alert {
   margin: 0;
   color: var(--arcade-pink);
   font-weight: bold;
 }
-.chain-status tr[data-over="true"] {
-  opacity: 0.6;
-}
-.fee-picker__name {
-  font-weight: bold;
-}
-.fee-picker__wait,
-.fee-picker__rate,
-.fee-picker__cost {
-  white-space: nowrap;
-}
-.fee-picker__wait,
-.fee-picker__hint,
 .fee-picker__note {
   color: var(--arcade-text-muted);
-}
-.fee-picker__hint {
-  grid-column: 2 / -1;
 }
 
 /* The cost of a transaction, wherever a person is about to act on the chain: the total, then what it was priced at. */
@@ -135,4 +70,28 @@
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+/* The speed chosen, as a small control that opens the tiles. */
+.fee-chip {
+  font-variant-numeric: tabular-nums;
+}
+.fee-chip__label {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+  font-weight: 400;
+}
+.fee-chip__rate,
+.fee-chip__wait {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+  font-weight: 400;
+}
+.fee-chip[data-off="true"] {
+  border-color: var(--arcade-yellow);
+}
+@media (max-width: 36rem) {
+  .fee-chip__wait {
+    display: none;
+  }
 }
