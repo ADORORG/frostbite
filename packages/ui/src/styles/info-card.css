@@ -1,0 +1,37 @@
+/* The cards that sit under a game or a hero: a row of short notes, each with a small title. */
+.arcade-info-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.arcade-info-card {
+  padding: 1rem 1.125rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  color: var(--arcade-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.arcade-info-card > * {
+  margin: 0;
+}
+.arcade-info-card > * + * {
+  margin-top: 0.625rem;
+}
+.arcade-info-card__title {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.arcade-info-card ul {
+  padding-inline-start: 1.125rem;
+}
+.arcade-info-card li + li {
+  margin-top: 0.5rem;
+}

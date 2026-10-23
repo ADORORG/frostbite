@@ -148,13 +148,50 @@ describe("the offer of full screen to a phone held sideways", () => {
     expect(prompt()).toBeNull();
   });
 
-  it("is not made where the browser does not allow full screen", async () => {
+  it("still offers theatre, but not full screen, where the browser does not allow full screen", async () => {
     phone(true);
     Object.defineProperty(document, "fullscreenEnabled", {
       configurable: true,
       value: false,
     });
     await mount();
+    const labels = [...(prompt()?.querySelectorAll("button") ?? [])].map(
+      (b) => b.textContent,
+    );
+    expect(labels).toEqual(["Theatre", "Not now"]);
+  });
+
+  it("goes away when the player enters theatre from the bar instead, since the game already has the window", async () => {
+    phone(true);
+    await mount();
+    expect(prompt()).not.toBeNull();
+    await act(async () =>
+      [...h.container.querySelectorAll(".arcade-stage__bar button")]
+        .find((b) => b.getAttribute("aria-label") === "Theatre")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    );
+    expect(
+      h.container.querySelector(".arcade-stage")?.getAttribute("data-theatre"),
+    ).toBe("true");
+    expect(prompt()).toBeNull();
+  });
+
+  it("gives the game the whole window, and goes away, when the player accepts theatre", async () => {
+    phone(true);
+    await mount();
+    await act(async () =>
+      [...(prompt()?.querySelectorAll("button") ?? [])]
+        .find((b) => b.textContent === "Theatre")
+        ?.click(),
+    );
+    expect(
+      h.container.querySelector(".arcade-stage")?.getAttribute("data-theatre"),
+    ).toBe("true");
+    expect(prompt()).toBeNull();
+    await act(async () =>
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })),
+    );
+    // Leaving theatre does not bring the offer back: the player has answered it.
     expect(prompt()).toBeNull();
   });
 });

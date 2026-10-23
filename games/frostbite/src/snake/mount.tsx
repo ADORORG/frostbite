@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 
+import { cabinetDock } from "../cabinet/dock.ts";
 import type { CabinetHost } from "../cabinet/host.ts";
 import { SatSnake } from "./snake-cabinet.tsx";
 
@@ -17,7 +18,7 @@ export function mountSatSnake(
   const page = options.document ?? document;
   const element = page.createElement("div");
   element.id = "sat-snake-root";
-  page.body.append(element);
+  cabinetDock(page).append(element);
   const root = createRoot(element);
   root.render(
     <SatSnake host={host} newSeed={options.newSeed} tickMs={options.tickMs} />,

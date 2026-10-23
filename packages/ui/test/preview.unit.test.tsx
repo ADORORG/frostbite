@@ -4,12 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  ArcadeCatalog,
-  ArcadeCatalogEntry,
-  ArcadePreview,
-  ArcadeTicker,
-} from "../src/arcade.ts";
+import { ArcadePreview, ArcadeTicker } from "../src/arcade.ts";
 
 let root: Root | null = null;
 afterEach(async () => {
@@ -128,34 +123,7 @@ describe("a preview", () => {
   });
 });
 
-describe("a catalog", () => {
-  it("lists entries with a numbered place, the preview first, and a way in that is named", () => {
-    const markup = renderToStaticMarkup(
-      <ArcadeCatalog label="Games">
-        <ArcadeCatalogEntry
-          actions={<a href="/g/a">View A</a>}
-          facts={<b>fact</b>}
-          href="/g/a"
-          position={3}
-          preview={<i>picture</i>}
-          summary="About A"
-          title="Game A"
-        />
-      </ArcadeCatalog>,
-    );
-    expect(markup).toContain('<ul aria-label="Games"');
-    expect(markup).toContain('<article aria-label="Game A"');
-    expect(markup).toContain(">03<");
-    expect(markup.indexOf("picture")).toBeLessThan(
-      markup.indexOf("Game A</h3>"),
-    );
-    // The picture is a convenience link: out of the tab order and unannounced, so the named one is the only stop.
-    expect(markup).toMatch(
-      /<a aria-hidden="true" class="arcade-catalog__preview" href="\/g\/a" tabindex="-1">/u,
-    );
-    expect(markup).toContain("View A");
-  });
-
+describe("the ticker", () => {
   it("scrolls its words twice so the loop has no seam, and keeps them from assistive technology", () => {
     const markup = renderToStaticMarkup(
       <ArcadeTicker items={["One", "Two"]} />,

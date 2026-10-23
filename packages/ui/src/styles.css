@@ -9,6 +9,7 @@
 @import "./styles/lists.css";
 @import "./styles/home.css";
 @import "./styles/stage.css";
+@import "./styles/info-card.css";
 @import "./styles/catalog.css";
 @import "./styles/dock.css";
 @import "./styles/wallet-widget.css";
@@ -18,3 +19,5 @@
 @import "./styles/summary.css";
 @import "./styles/section.css";
 @import "./styles/staff.css";
+@import "./styles/cover.css";
+@import "./styles/showcase.css";

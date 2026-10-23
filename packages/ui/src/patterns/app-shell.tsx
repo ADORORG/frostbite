@@ -21,6 +21,8 @@ interface AppShellProps {
   readonly children: ReactNode;
   readonly footerLabel: string;
   readonly homeHref: string;
+  // A page that is one thing to look at or play (a game) gives up the notices strip above the header, so that thing gets the room.
+  readonly immersive?: boolean;
   readonly navigation: readonly ShellNavigationItem[];
   readonly notices: readonly string[];
 }
@@ -43,6 +45,7 @@ export function AppShell({
   children,
   footerLabel,
   homeHref,
+  immersive = false,
   navigation,
   notices,
 }: AppShellProps) {
@@ -53,7 +56,11 @@ export function AppShell({
       ? model.active
       : null;
   return (
-    <div className="app-shell" id="top">
+    <div
+      className="app-shell"
+      data-immersive={immersive ? "true" : undefined}
+      id="top"
+    >
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>

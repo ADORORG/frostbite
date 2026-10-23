@@ -2,35 +2,19 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import {
   ArcadeBadge,
   ArcadeButton,
-  ArcadeMediaTile,
-  ArcadePanel,
+  SectionBlock,
+  Showcase,
   StatusLamp,
+  shortenMiddle,
 } from "@repo/ui/arcade";
 
-import type {
-  PublicCollection,
-  PublicImage,
-} from "../application/public-model.ts";
+import type { PublicCollection } from "../application/public-model.ts";
 import { collectionsPath } from "../paths.ts";
+import { CollectionPicture } from "./collection-picture.tsx";
 import { PublicFrame } from "./public-frame.tsx";
 
-function Picture({
-  caption,
-  image,
-}: {
-  readonly caption: string;
-  readonly image: PublicImage | null;
-}) {
-  return (
-    <ArcadeMediaTile
-      caption={<span>{caption}</span>}
-      image={image ?? undefined}
-      placeholder="Preview unavailable"
-    />
-  );
-}
-
-// One approved collection as it was approved: the frozen version, never the creator's current draft.
+// One approved collection as it was approved: the frozen version, never the creator's current draft. Its cover and banner lead,
+// then what it is, where it came from, and every item in it.
 export function CollectionDetail({
   collection,
   navigation,
@@ -39,54 +23,70 @@ export function CollectionDetail({
   readonly navigation: readonly NavigationItem[];
 }) {
   return (
-    <PublicFrame navigation={navigation}>
-      <StatusLamp label="Approved by review. Not yet minted." tone="ready" />
-      <ArcadePanel eyebrow="Collection" title={collection.name}>
-        <dl className="arcade-facts">
-          <dt>Chain</dt>
-          <dd>{collection.chainLabel}</dd>
-          <dt>Planned supply</dt>
-          <dd>{collection.plannedSupply.toLocaleString("en-US")}</dd>
-        </dl>
-        <Picture
-          caption={`Cover of ${collection.name}`}
-          image={collection.cover}
-        />
-        {collection.banner === null ? null : (
-          <Picture
-            caption={`Banner of ${collection.name}`}
-            image={collection.banner}
-          />
-        )}
-        <h3>About</h3>
-        <p>{collection.description}</p>
-        {collection.provenance === "" ? null : (
+    <PublicFrame navigation={navigation} variant="wall">
+      <Showcase
+        backdrop={
+          collection.banner === null ? undefined : (
+            <img
+              alt={`Banner of ${collection.name}`}
+              height={collection.banner.height}
+              src={collection.banner.src}
+              width={collection.banner.width}
+            />
+          )
+        }
+        cover={
+          <CollectionPicture image={collection.cover} name={collection.name} />
+        }
+        facts={
           <>
-            <h3>Provenance</h3>
-            <p>{collection.provenance}</p>
+            <span title={collection.chainLabel}>
+              <ArcadeBadge tone="cyan">
+                {shortenMiddle(collection.chainLabel, { head: 14, tail: 6 })}
+              </ArcadeBadge>
+            </span>
+            <ArcadeBadge tone="yellow">{`${collection.plannedSupply.toLocaleString("en-US")} planned`}</ArcadeBadge>
+            <ArcadeBadge tone="mint">{`${String(collection.items.length)} items so far`}</ArcadeBadge>
           </>
-        )}
-        <h3>{`Items (${String(collection.items.length)})`}</h3>
-        <ol aria-label="Items in this collection" className="arcade-grid">
+        }
+        status={
+          <StatusLamp
+            label="Approved by review. Not yet minted."
+            tone="ready"
+          />
+        }
+        title={collection.name}
+      >
+        <p>{collection.description}</p>
+      </Showcase>
+      {collection.provenance === "" ? null : (
+        <SectionBlock title="Provenance">
+          <p>{collection.provenance}</p>
+        </SectionBlock>
+      )}
+      <SectionBlock title={`Items (${String(collection.items.length)})`}>
+        <ol aria-label="Items in this collection" className="gallery">
           {collection.items.map((item) => (
-            <li key={item.position}>
-              <Picture
-                caption={`${String(item.position)}. ${item.name}`}
-                image={item.image}
-              />
+            <li className="gallery__tile" key={item.position}>
+              <div className="gallery__picture">
+                <CollectionPicture image={item.image} name={item.name} />
+              </div>
+              <strong className="gallery__name">{`${String(item.position)}. ${item.name}`}</strong>
               {item.description === "" ? null : <p>{item.description}</p>}
-              {item.attributes.map(({ trait, value }) => (
-                <ArcadeBadge key={trait} tone="cyan">
-                  {`${trait}: ${value}`}
-                </ArcadeBadge>
-              ))}
+              <div className="gallery__traits">
+                {item.attributes.map(({ trait, value }) => (
+                  <ArcadeBadge key={trait} tone="cyan">
+                    {`${trait}: ${value}`}
+                  </ArcadeBadge>
+                ))}
+              </div>
             </li>
           ))}
         </ol>
-        <ArcadeButton href={collectionsPath} tone="cyan">
-          Browse collections
-        </ArcadeButton>
-      </ArcadePanel>
+      </SectionBlock>
+      <ArcadeButton href={collectionsPath} tone="cyan">
+        Browse collections
+      </ArcadeButton>
     </PublicFrame>
   );
 }

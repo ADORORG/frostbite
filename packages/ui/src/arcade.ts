@@ -28,14 +28,9 @@ export {
   ArcadeInfoCard,
   ArcadeInfoRow,
   ArcadeStage,
-  ArcadeStageHead,
 } from "./patterns/stage.tsx";
 export { ArcadePreview } from "./components/arcade-preview.tsx";
-export {
-  ArcadeCatalog,
-  ArcadeCatalogEntry,
-  ArcadeTicker,
-} from "./patterns/catalog.tsx";
+export { ArcadeTicker } from "./patterns/catalog.tsx";
 export { ArcadeDock } from "./patterns/dock.tsx";
 export type { DockSection } from "./patterns/dock.tsx";
 export { Popover } from "./components/popover.tsx";
@@ -54,3 +49,10 @@ export type {
 export { StatusDot } from "./primitives/status-dot.tsx";
 export { SectionBlock, Tile, TileGrid } from "./components/section-block.tsx";
 export { shortenMiddle } from "./components/shorten-middle.ts";
+export { CoverCard, CoverGrid } from "./patterns/cover-grid.tsx";
+export {
+  standInInitials,
+  standInTone,
+  standInTones,
+} from "./components/stand-in.ts";
+export { Showcase } from "./patterns/showcase.tsx";

@@ -70,6 +70,67 @@ describe("collection index", () => {
   });
 });
 
+describe("a chain that has no configured name", () => {
+  const id = "bip122:00000008819873e925422c1ff0f99f7c";
+  const card = {
+    chainLabel: id,
+    cover: null,
+    description: "A collection.",
+    id: "c1",
+    itemCount: 1,
+    name: "Odd chain",
+    plannedSupply: 10,
+  };
+
+  it("is shown shortened on the card with the whole id in its title, and a configured name is shown whole", () => {
+    const markup = renderToStaticMarkup(
+      <CollectionIndex
+        cards={[card, { ...card, chainLabel: "Bitcoin signet", id: "c2" }]}
+        navigation={navigation}
+      />,
+    );
+    expect(markup).toContain(`title="${id}"`);
+    expect(markup).toContain("bip122:0000000…f99f7c");
+    expect(markup).not.toContain(`>${id}<`);
+    expect(markup).toContain(">Bitcoin signet<");
+    expect(markup).not.toContain('title="Bitcoin signet"…');
+  });
+
+  it("opens the wall on its first collection, drawn larger, and no other", () => {
+    const markup = renderToStaticMarkup(
+      <CollectionIndex
+        cards={[
+          card,
+          { ...card, id: "c2", name: "Second" },
+          { ...card, id: "c3", name: "Third" },
+        ]}
+        navigation={navigation}
+      />,
+    );
+    expect(markup.match(/data-featured="true"/gu)).toHaveLength(1);
+    expect(markup.indexOf('data-featured="true"')).toBeLessThan(
+      markup.indexOf("Second"),
+    );
+    expect(markup.indexOf("Odd chain")).toBeGreaterThan(
+      markup.indexOf('data-featured="true"'),
+    );
+    expect(markup).toContain('data-ratio="square"');
+  });
+
+  it("is shortened the same way on the collection's own page", () => {
+    const approved = version();
+    const base = presentCollection(approved, previewsFor(approved), chains);
+    const markup = renderToStaticMarkup(
+      <CollectionDetail
+        collection={{ ...base, chainLabel: id }}
+        navigation={navigation}
+      />,
+    );
+    expect(markup).toContain(`title="${id}"`);
+    expect(markup).toContain("bip122:0000000…f99f7c");
+  });
+});
+
 describe("collection detail", () => {
   it("shows the approved version in full, with the approval stated honestly", () => {
     const approved = version();

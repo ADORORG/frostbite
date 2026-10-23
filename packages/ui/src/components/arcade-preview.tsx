@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type RefObject,
+} from "react";
+
+import { standInInitials, standInTone } from "./stand-in.ts";
 
 const reducedMotion = "(prefers-reduced-motion: reduce)";
 
@@ -23,6 +31,25 @@ function usePrefersReducedMotion(): boolean {
   );
 }
 
+// Whether the box is on screen. A clip plays only while it is, so a wall of them does not run every video at once, and a clip that
+// has scrolled away stops costing anything. Where the browser cannot tell, it is taken to be.
+function useOnScreen(box: RefObject<HTMLElement | null>): boolean {
+  const [onScreen, setOnScreen] = useState(
+    () => typeof IntersectionObserver === "undefined",
+  );
+  useEffect(() => {
+    const node = box.current;
+    if (node === null || typeof IntersectionObserver === "undefined") return;
+    const watch = new IntersectionObserver(
+      ([entry]) => setOnScreen(entry?.isIntersecting === true),
+      { threshold: 0.2 },
+    );
+    watch.observe(node);
+    return () => watch.disconnect();
+  }, [box]);
+  return onScreen;
+}
+
 // The picture that stands for something in a catalog: a still, and over it a short silent clip when there is
 // one and motion is welcome. With no picture a stand-in is drawn from the name, so a row is never blank. The clip
 // is decoration (the picture's text says what it shows), so a clip that cannot play simply leaves the still.
@@ -39,12 +66,17 @@ export function ArcadePreview({
 }) {
   const reduced = usePrefersReducedMotion();
   const [clipFailed, setClipFailed] = useState(false);
-  const playing = video !== null && !reduced && !clipFailed;
+  const box = useRef<HTMLDivElement>(null);
+  const onScreen = useOnScreen(box);
+  const playing = video !== null && !reduced && !clipFailed && onScreen;
   return (
-    <div className="arcade-preview" data-playing={playing}>
+    <div className="arcade-preview" data-playing={playing} ref={box}>
       {image === null ? (
-        <div aria-hidden="true" className="arcade-preview__stand-in">
-          {name.slice(0, 1)}
+        <div
+          aria-hidden="true"
+          className={`arcade-preview__stand-in arcade-preview__stand-in--${String(standInTone(name))}`}
+        >
+          {standInInitials(name)}
         </div>
       ) : (
         <img alt={alt} decoding="async" loading="lazy" src={image} />

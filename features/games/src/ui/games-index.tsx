@@ -2,11 +2,10 @@ import { gameHref } from "@ador/shared/games";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import {
   ArcadeBadge,
-  ArcadeButton,
-  ArcadeCatalog,
-  ArcadeCatalogEntry,
   ArcadePreview,
   ArcadeTicker,
+  CoverCard,
+  CoverGrid,
   StatusLamp,
 } from "@repo/ui/arcade";
 
@@ -16,7 +15,8 @@ import { GamesFrame } from "./games-frame.tsx";
 const milestoneCount = (count: number) =>
   `${String(count)} ${count === 1 ? "milestone" : "milestones"}`;
 
-// The registered games as a wall of previews. A game with no play address says it cannot be played yet.
+// The registered games as a wall of covers, the first one larger, each picture alive (a clip plays while it is on screen). A game
+// with no play address says it cannot be played yet, and one with no picture gets a stand-in drawn from its name.
 export function GamesIndex({
   games,
   navigation,
@@ -24,6 +24,7 @@ export function GamesIndex({
   readonly games: readonly PublicGame[];
   readonly navigation: readonly NavigationItem[];
 }) {
+  const playable = games.filter((game) => game.playable).length;
   return (
     <GamesFrame navigation={navigation} variant="wall">
       <ArcadeTicker
@@ -31,26 +32,15 @@ export function GamesIndex({
       />
       <header className="arcade-wall-head">
         <StatusLamp label="Registered games" tone="ready" />
-        <p className="arcade-eyebrow">Public catalog</p>
         <h2>Games</h2>
         <p>
-          Games that are registered with the platform. A game is playable only
-          when it has a play address.
+          {`${String(games.length)} registered, ${String(playable)} you can play now. A game is playable only when it has a play address.`}
         </p>
       </header>
-      <ArcadeCatalog label="Registered games">
+      <CoverGrid label="Registered games">
         {games.map((game, index) => (
-          <ArcadeCatalogEntry
-            actions={
-              <ArcadeButton
-                ariaLabel={`View ${game.title}`}
-                href={gameHref(game.id)}
-                tone={game.playable ? "mint" : "cyan"}
-              >
-                {game.playable ? "Play now" : "View game"}
-              </ArcadeButton>
-            }
-            facts={
+          <CoverCard
+            badges={
               <>
                 <ArcadeBadge tone={game.playable ? "mint" : "pink"}>
                   {game.playable ? "Playable" : "Not playable yet"}
@@ -63,10 +53,13 @@ export function GamesIndex({
                 )}
               </>
             }
+            cta={game.playable ? "▶ Play now" : "View game"}
+            featured={index === 0}
             href={gameHref(game.id)}
             key={game.id}
-            position={index + 1}
-            preview={
+            label={`View ${game.title}`}
+            rank={index + 1}
+            media={
               <ArcadePreview
                 alt={game.cover?.alt ?? ""}
                 image={game.cover?.image ?? null}
@@ -78,7 +71,7 @@ export function GamesIndex({
             title={game.title}
           />
         ))}
-      </ArcadeCatalog>
+      </CoverGrid>
     </GamesFrame>
   );
 }

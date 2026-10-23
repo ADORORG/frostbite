@@ -1,22 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import {
-  ArcadeInfoCard,
-  ArcadeInfoRow,
-  ArcadeStage,
-  ArcadeStageHead,
-} from "../src/arcade.ts";
+import { ArcadeInfoCard, ArcadeInfoRow, ArcadeStage } from "../src/arcade.ts";
 
 describe("the stage pattern", () => {
-  it("puts the title and its small facts on one line", () => {
-    const markup = renderToStaticMarkup(
-      <ArcadeStageHead meta={<span>v1</span>} title="Tap Tower" />,
-    );
-    expect(markup).toContain('<h2 class="arcade-stage-title">Tap Tower</h2>');
-    expect(markup).toContain('class="arcade-stage-meta"><span>v1</span>');
-  });
-
   it("holds the bar above the stage, and draws an overlay only when there is one", () => {
     const plain = renderToStaticMarkup(
       <ArcadeStage bar={<b>controls</b>}>

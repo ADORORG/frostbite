@@ -13,8 +13,8 @@
   height: var(--arcade-dock-height);
   padding: 0.375rem 0.5rem;
   overflow-x: auto;
-  border: var(--arcade-border-width) solid var(--arcade-text);
-  border-radius: var(--arcade-radius-medium) var(--arcade-radius-medium) 0 0;
+  border-top: 0.125rem solid
+    color-mix(in srgb, var(--arcade-cyan) 55%, transparent);
   background: var(--arcade-surface-raised);
 }
 .arcade-dock__button {

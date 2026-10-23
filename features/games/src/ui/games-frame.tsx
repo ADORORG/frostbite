@@ -20,6 +20,7 @@ export function GamesFrame({
       brand="Adorbitals"
       footerLabel="Public discovery"
       homeHref="/"
+      immersive={variant === "stage"}
       navigation={navigation}
       notices={[
         "◆ VERIFIED PUBLIC RECORDS",

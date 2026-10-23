@@ -1,0 +1,185 @@
+/* The head of a page about one thing: its cover large, art behind, its name as the heading. */
+.showcase {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.showcase__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--arcade-ink);
+}
+.showcase__backdrop img,
+.showcase__backdrop video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.2) brightness(0.5);
+}
+.showcase__backdrop::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--arcade-surface) 0, transparent 70%),
+    linear-gradient(transparent 30%, var(--arcade-surface));
+  content: "";
+}
+.showcase__inner {
+  display: grid;
+  grid-template-columns: minmax(9rem, 16rem) minmax(0, 1fr);
+  gap: var(--arcade-space-5);
+  align-items: end;
+  min-height: 16rem;
+  padding: clamp(1rem, 4vw, 2.5rem);
+}
+.showcase__cover {
+  overflow: hidden;
+  border: 0.1875rem solid var(--arcade-text);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow: 0 0 2rem color-mix(in srgb, var(--arcade-cyan) 30%, transparent);
+  aspect-ratio: 1;
+}
+.showcase__cover .arcade-preview,
+.showcase__cover .arcade-media-tile__frame {
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.showcase__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.showcase__text {
+  display: grid;
+  gap: var(--arcade-space-3);
+  min-width: 0;
+}
+.showcase__text > p,
+.showcase__text > .status-lamp {
+  margin: 0;
+}
+.showcase .showcase__title {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow:
+    0.2rem 0.2rem 0 var(--arcade-red),
+    -0.1rem -0.1rem 0 var(--arcade-cyan);
+  overflow-wrap: anywhere;
+}
+.showcase__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+}
+.showcase__text > p:not(.status-lamp) {
+  max-width: 42rem;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-md);
+  line-height: 1.6;
+}
+@media (max-width: 40rem) {
+  .showcase__inner {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+  .showcase__cover {
+    max-width: 12rem;
+  }
+}
+
+/* A gallery of what is in a collection: square tiles that light up. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--arcade-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gallery__tile {
+  display: grid;
+  align-content: start;
+  gap: var(--arcade-space-2);
+  overflow: hidden;
+  padding-bottom: var(--arcade-space-3);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  transition:
+    border-color var(--arcade-transition-fast),
+    box-shadow var(--arcade-transition-fast);
+}
+.gallery__tile:hover,
+.gallery__tile:focus-within {
+  border-color: var(--arcade-pink);
+  box-shadow: 0 0 1.25rem
+    color-mix(in srgb, var(--arcade-pink) 35%, transparent);
+}
+.gallery__picture {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--arcade-ink);
+}
+.gallery__picture .arcade-preview {
+  height: 100%;
+  aspect-ratio: auto;
+}
+.gallery__picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.gallery__name,
+.gallery__tile p,
+.gallery__traits {
+  margin: 0;
+  padding-inline: var(--arcade-space-3);
+}
+.gallery__name {
+  font-weight: 700;
+}
+.gallery__tile p {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+}
+.gallery__traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gallery__picture img {
+    transition: transform 400ms ease;
+  }
+  .gallery__tile:hover .gallery__picture img {
+    transform: scale(1.06);
+  }
+}
+
+.gallery__picture,
+.showcase__cover {
+  position: relative;
+}
+/* Says a picture is missing, on the stand-in drawn in its place. */
+.gallery__note {
+  position: absolute;
+  inset: auto 0 0;
+  padding: var(--arcade-space-1) var(--arcade-space-2);
+  background: rgb(0 0 0 / 70%);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+  text-align: center;
+}

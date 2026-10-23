@@ -14,7 +14,6 @@ import {
   ArcadeDock,
   ArcadeInfoCard,
   ArcadeStage,
-  StatusLamp,
   type DockSection,
 } from "@repo/ui/arcade";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -27,7 +26,9 @@ import { claimsDockSection } from "./claims-card.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
 import type { ClaimSigner } from "./use-claims.ts";
 import { usePlayerClaims } from "./use-player-claims.ts";
+import { GameBar } from "./game-bar.tsx";
 import { useFullscreen } from "./use-fullscreen.ts";
+import { useTheatre } from "./use-theatre.ts";
 import { usePhoneLandscape } from "./use-phone-landscape.ts";
 import { useGameSession } from "./use-game-session.ts";
 import { WalletCard } from "./wallet-card.tsx";
@@ -137,9 +138,10 @@ export function GamePlayer({
     bindTelling(emitClaim);
   }, [bindTelling, emitClaim]);
   const fullscreen = useFullscreen(frame);
+  const theatre = useTheatre();
   const phoneLandscape = usePhoneLandscape();
   const [promptDismissed, setPromptDismissed] = useState(false);
-  const prompt = phoneLandscape && fullscreen.supported && !promptDismissed;
+  const prompt = phoneLandscape && !theatre.on && !promptDismissed;
   const dock: DockSection[] = [
     ...(game.milestones.length === 0
       ? []
@@ -197,40 +199,17 @@ export function GamePlayer({
   return (
     <>
       <ArcadeStage
+        theatre={theatre.on}
         bar={
-          <>
-            {back}
-            <h2 className="arcade-stage__title">{title}</h2>
-            {meta === undefined ? null : (
-              <span className="arcade-stage__facts">{meta}</span>
-            )}
-            <StatusLamp
-              label={connected ? "Connected to the platform" : "Connecting"}
-              tone={connected ? "ready" : "attention"}
-            />
-            <span
-              className="arcade-stage__save"
-              title={kept ? keptCopy[sync] : blockedCopy[sync]}
-            >
-              {kept ? keptCopy[sync] : blockedCopy[sync]}
-            </span>
-            {fullscreen.supported ? (
-              <span className="arcade-stage__bar-end">
-                {fullscreen.refused ? (
-                  <span role="status">
-                    The browser did not allow full screen. Try again, or use the
-                    browser&apos;s own full screen.
-                  </span>
-                ) : null}
-                <span className="arcade-stage__hint">
-                  Press Esc to leave full screen.
-                </span>
-                <ArcadeActionButton onClick={fullscreen.enter} tone="cyan">
-                  Full screen
-                </ArcadeActionButton>
-              </span>
-            ) : null}
-          </>
+          <GameBar
+            back={back}
+            connected={connected}
+            fullscreen={fullscreen}
+            meta={meta}
+            saveText={kept ? keptCopy[sync] : blockedCopy[sync]}
+            theatre={theatre}
+            title={title}
+          />
         }
         overlay={
           <>
@@ -259,18 +238,29 @@ export function GamePlayer({
             {prompt ? (
               <div className="arcade-prompt" data-testid="fullscreen-prompt">
                 <p>
-                  Playing on a phone? Full screen gives the game the whole
-                  screen.
+                  Playing on a phone? Theatre or full screen gives the game the
+                  whole screen.
                 </p>
                 <ArcadeActionButton
                   onClick={() => {
                     setPromptDismissed(true);
-                    fullscreen.enter();
+                    theatre.toggle();
                   }}
-                  tone="cyan"
+                  tone="pink"
                 >
-                  Full screen
+                  Theatre
                 </ArcadeActionButton>
+                {fullscreen.supported ? (
+                  <ArcadeActionButton
+                    onClick={() => {
+                      setPromptDismissed(true);
+                      fullscreen.enter();
+                    }}
+                    tone="cyan"
+                  >
+                    Full screen
+                  </ArcadeActionButton>
+                ) : null}
                 <ArcadeActionButton
                   onClick={() => setPromptDismissed(true)}
                   tone="pink"

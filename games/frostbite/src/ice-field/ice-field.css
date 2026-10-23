@@ -1,9 +1,17 @@
 /* The ice-field cabinet. Classes only: the frame's policy allows no inline styles. Colours are the game's own tokens. */
-.if-launcher {
+/* The launchers sit in one row (see cabinet/dock.ts), so each takes the room its words need and none can lie over another. */
+.cabinet-dock {
   position: fixed;
   right: 12px;
   bottom: 12px;
   z-index: 9000;
+  display: flex;
+  flex-flow: row-reverse wrap-reverse;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+}
+.if-launcher {
   padding: 8px 12px;
   border: 2px solid var(--frost);
   border-radius: 4px;

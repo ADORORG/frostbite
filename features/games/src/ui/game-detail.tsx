@@ -5,7 +5,8 @@ import {
   ArcadeButton,
   ArcadeInfoCard,
   ArcadeInfoRow,
-  ArcadeStageHead,
+  ArcadePreview,
+  Showcase,
   type DockSection,
   StatusLamp,
 } from "@repo/ui/arcade";
@@ -109,15 +110,46 @@ export function GameDetail({
       )}
       {game.embedSrc !== null ? null : (
         <>
-          <ArcadeStageHead
-            meta={
+          <Showcase
+            backdrop={
+              game.cover === null ? undefined : (
+                <img alt="" src={game.cover.image} />
+              )
+            }
+            cover={
+              <ArcadePreview
+                alt={game.cover?.alt ?? ""}
+                image={game.cover?.image ?? null}
+                name={game.title}
+                video={game.cover?.video ?? null}
+              />
+            }
+            facts={
               <>
-                {facts}
-                <StatusLamp label="Not playable yet" tone="attention" />
+                <ArcadeBadge tone="cyan">{game.networkLabel}</ArcadeBadge>
+                <ArcadeBadge tone="yellow">{`v${game.version}`}</ArcadeBadge>
+                {game.milestones.length === 0 ? null : (
+                  <ArcadeBadge tone="mint">
+                    {`${String(game.milestones.length)} ${game.milestones.length === 1 ? "milestone" : "milestones"}`}
+                  </ArcadeBadge>
+                )}
               </>
             }
+            status={<StatusLamp label="Not playable yet" tone="attention" />}
             title={game.title}
-          />
+          >
+            <p>{game.summary}</p>
+            <div className="arcade-actions">
+              {game.playUrl === null ? null : (
+                <ArcadeButton href={game.playUrl} tone="mint">
+                  {`Play ${game.title}`}
+                </ArcadeButton>
+              )}
+              <ArcadeButton href={gamesPath} tone="cyan">
+                All games
+              </ArcadeButton>
+            </div>
+          </Showcase>
           <ArcadeInfoRow>
             <ArcadeInfoCard title="Where to play">
               {game.playUrl === null ? (
@@ -126,12 +158,7 @@ export function GameDetail({
                   cannot be opened from here.
                 </p>
               ) : (
-                <>
-                  <ArcadeButton href={game.playUrl} tone="mint">
-                    {`Play ${game.title}`}
-                  </ArcadeButton>
-                  <p>{`It opens at ${new URL(game.playUrl).host}, not on this site.`}</p>
-                </>
+                <p>{`It opens at ${new URL(game.playUrl).host}, not on this site.`}</p>
               )}
             </ArcadeInfoCard>
             {about}
@@ -147,9 +174,6 @@ export function GameDetail({
               </ArcadeInfoCard>
             )}
           </ArcadeInfoRow>
-          <ArcadeButton href={gamesPath} tone="cyan">
-            All games
-          </ArcadeButton>
         </>
       )}
     </GamesFrame>

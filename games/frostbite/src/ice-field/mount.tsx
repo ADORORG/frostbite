@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 
+import { cabinetDock } from "../cabinet/dock.ts";
 import { IceField, type IceFieldHost } from "./ice-field.tsx";
 
 // Puts the cabinet on the page, in a root of its own beside the game's, so it needs nothing from the game's code and no
@@ -12,7 +13,7 @@ export function mountIceField(
   const page = options.document ?? document;
   const element = page.createElement("div");
   element.id = "ice-field-root";
-  page.body.append(element);
+  cabinetDock(page).append(element);
   const root = createRoot(element);
   root.render(<IceField host={host} newSeed={options.newSeed} />);
   return () => {
