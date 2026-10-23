@@ -109,6 +109,8 @@ function ports(): ClaimChainPorts {
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {
+      freeTemplateAddress: (...asked) =>
+        contracts.freeTemplateAddress(...asked),
       inspect: (ref) => contracts.inspect(ref),
       simulate: (intent) =>
         chainFailure.simulate

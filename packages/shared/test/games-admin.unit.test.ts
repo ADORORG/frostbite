@@ -89,7 +89,6 @@ describe("the staff administration contract", () => {
 
   it("takes publishing a template and creating a game's contract, with only their own fields", () => {
     const publish = {
-      address: "4:100",
       operation: "publish-template",
       templateId: "game-rewards",
       templateVersion: "1.0.0",
@@ -102,7 +101,8 @@ describe("the staff administration contract", () => {
       }),
     ).toBeDefined();
     for (const bad of [
-      { ...publish, address: " " },
+      // The platform chooses the address; a person cannot name one.
+      { ...publish, address: "4:100" },
       { ...publish, templateVersion: undefined },
       { ...publish, paused: true },
       { maxDrawingBytes: 0, operation: "deploy" },
@@ -117,7 +117,6 @@ describe("the staff administration contract", () => {
   it("publishes a template for no game, and every other step for one", () => {
     const wallet = "tb1qwallet";
     const publish = {
-      address: "4:100",
       operation: "publish-template",
       templateId: "game-rewards",
       templateVersion: "1.0.0",

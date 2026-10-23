@@ -27,8 +27,6 @@ export type AdminAction =
       readonly operation: "deploy";
     }
   | {
-      // Where on the chain staff publish the code, in the chain's notation.
-      readonly address: string;
       readonly operation: "publish-template";
       readonly templateId: string;
       readonly templateVersion: string;

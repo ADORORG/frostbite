@@ -13,13 +13,13 @@ import {
 import { templateKey, type AdminOptions } from "./templates.ts";
 
 // Published code lives in block 4 (`{3, n}` publishes it at `{4, n}`).
-const codeBlock = 4n;
+export const templateCodeBlock = 4n;
 
 function publishedCode(
   at: { readonly id: string } | undefined,
 ): AlkaneId | null {
   const id = parseAlkaneId(at?.id ?? "");
-  return id !== null && id.block === codeBlock ? id : null;
+  return id !== null && id.block === templateCodeBlock ? id : null;
 }
 
 export const adminOperations = [

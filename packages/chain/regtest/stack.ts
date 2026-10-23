@@ -127,6 +127,7 @@ export async function regtest() {
         rpc: { fetch, headers: {}, timeoutMs: 60_000, url: gateway },
         transactions: {
           changeDustSats: 294n,
+          templateSequence: { attempts: 200, first: 1000n },
           claimOutputSats: 546n,
           feeTargetBlocks: 3,
           lifetimeMs: 30 * 60_000,
@@ -245,6 +246,7 @@ export async function ensureAuthTokenFactory(
     new Map([[regtestChain, { network: "regtest" as const, node }]]),
     {
       changeDustSats: 294n,
+      templateSequence: { attempts: 200, first: 1000n },
       claimOutputSats: 546n,
       feeTargetBlocks: 3,
       lifetimeMs: 30 * 60_000,

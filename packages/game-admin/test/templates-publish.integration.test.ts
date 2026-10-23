@@ -5,6 +5,7 @@ import {
   contracts,
   chain,
   gameId,
+  placement,
   publishInput,
   registerDatabase,
   seedStaff,
@@ -26,7 +27,7 @@ describe("publishing a template", () => {
       state: "awaiting_signature",
       templateRef: "game-rewards@1.0.0",
     });
-    expect(started.step.summary.template?.at?.id).toBe("at-1");
+    expect(started.step.summary.template?.at?.id).toBe("template-1");
 
     const done = await runToEnd(publishInput(staff));
     expect(done).toMatchObject({ id: started.step.id, state: "complete" });
@@ -35,7 +36,7 @@ describe("publishing a template", () => {
       "game-rewards@1.0.0",
     );
     expect(recorded).toMatchObject({
-      address: "at-1",
+      address: "template-1",
       codeHash: started.step.summary.template?.codeHash,
     });
     expect(
@@ -69,15 +70,30 @@ describe("publishing a template", () => {
     const staff = await seedStaff();
     const first = await service.start(publishInput(staff));
     const second = await service.start(
-      publishInput(staff, collectibleTemplate, "at-2"),
+      publishInput(staff, collectibleTemplate),
     );
     if (!first.ok || !second.ok) throw new Error("not started");
     expect(second.resumed).toBe(false);
     expect(second.step.id).not.toBe(first.step.id);
     expect(second.step.templateRef).toBe("milestone-collectible@1.0.0");
+    // The first is not on the chain yet, but its address is spoken for: the second is not given the same one.
+    expect(first.step.summary.template?.at?.id).toBe("template-1");
+    expect(second.step.summary.template?.at?.id).toBe("template-2");
   });
 
-  it("refuses what the platform did not decide to publish, what is published, and an address that is taken", async () => {
+  it("says so, and builds nothing, when the chain finds no free address", async () => {
+    const staff = await seedStaff();
+    placement.exhausted = true;
+    const result = await service.start(publishInput(staff));
+    expect(result).toEqual({
+      code: "could-not-build",
+      ok: false,
+      reason: "No free address was found for the template.",
+    });
+    expect(await service.list(null)).toEqual([]);
+  });
+
+  it("refuses what the platform did not decide to publish, and what is published", async () => {
     const staff = await seedStaff();
     const start = (input: ReturnType<typeof publishInput>) =>
       service
@@ -98,10 +114,7 @@ describe("publishing a template", () => {
     );
     await runToEnd(publishInput(staff));
     expect(await start(publishInput(staff))).toBe("already-published");
-    expect(await start(publishInput(staff, collectibleTemplate, "at-1"))).toBe(
-      "address-taken",
-    );
-    expect(await start(publishInput(staff, collectibleTemplate, "at-2"))).toBe(
+    expect(await start(publishInput(staff, collectibleTemplate))).toBe(
       "started",
     );
   });

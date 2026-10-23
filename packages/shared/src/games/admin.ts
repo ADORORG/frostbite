@@ -43,8 +43,6 @@ export const gameAdminActionSchema = z.discriminatedUnion("operation", [
     .strict(),
   z
     .object({
-      // Where on the chain the code is published, in the chain's own notation.
-      address: z.string().trim().min(1).max(128),
       operation: z.literal("publish-template"),
       templateId: z.string().trim().min(1).max(64),
       templateVersion: z.string().trim().min(1).max(64),

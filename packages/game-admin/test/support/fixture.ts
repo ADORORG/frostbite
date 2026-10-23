@@ -76,6 +76,8 @@ export const rewards: RewardsPlan = {
 export const contracts = createDrizzleContractStore(database);
 export const chainAvailable = { value: true };
 export const chainFailure = { build: false };
+// Makes the chain find no free address for a template.
+export const placement = { exhausted: false };
 // Makes the chain say nothing of what a step created.
 export const hideCreated = { value: false };
 // What the chain says of a contract staff enter by hand: whether code is there, its hash, or that the node cannot be asked.
@@ -116,6 +118,10 @@ function ports(): AdminChainPorts {
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {
+      freeTemplateAddress: (...asked) =>
+        placement.exhausted
+          ? Promise.resolve(null)
+          : contracts.freeTemplateAddress(...asked),
       inspect: async (ref) => {
         if (inspected.down) throw new Error("the node is down");
         return { ...inspected, ref };
@@ -202,10 +208,8 @@ export const defineInput = (
 export const publishInput = (
   staffId: string,
   template = gameTemplate,
-  address = "at-1",
 ): StartStepInput => ({
   action: {
-    address,
     operation: "publish-template",
     templateId: template.id,
     templateVersion: template.version,
@@ -254,6 +258,7 @@ export function registerDatabase(): void {
     game.current = administeredGame();
     chainAvailable.value = true;
     chainFailure.build = false;
+    placement.exhausted = false;
     hideCreated.value = false;
     Object.assign(inspected, { codeHash: null, down: false, exists: false });
     Object.assign(indexer, { behind: 0, down: false });

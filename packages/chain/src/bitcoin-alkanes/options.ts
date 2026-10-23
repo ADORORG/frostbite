@@ -1,3 +1,5 @@
+import type { TemplateSequence } from "./admin/free-address.ts";
+
 // What sending and watching a transaction needs beyond the node: the policy values, all from configuration.
 export interface TransactionOptions {
   // Below this a change output is not worth making; the remainder is paid as fee.
@@ -11,6 +13,8 @@ export interface TransactionOptions {
   readonly now: () => Date;
   // Names the node in the evidence an observation records.
   readonly providerId: string;
+  // Where a new template's address is looked for (see `freeTemplateAddress`).
+  readonly templateSequence: TemplateSequence;
 }
 
 export function assertTransactionOptions(options: TransactionOptions): void {
@@ -21,6 +25,15 @@ export function assertTransactionOptions(options: TransactionOptions): void {
     if (!Number.isInteger(value) || value < 1) {
       throw new Error(`${name} must be a positive whole number.`);
     }
+  }
+  if (
+    !Number.isInteger(options.templateSequence.attempts) ||
+    options.templateSequence.attempts < 1 ||
+    options.templateSequence.first < 0n
+  ) {
+    throw new Error(
+      "templateSequence needs a first number of zero or more and a positive whole number of attempts.",
+    );
   }
   for (const [name, value] of [
     ["changeDustSats", options.changeDustSats],

@@ -4,6 +4,7 @@ import type { ChainRef, TransactionIntent } from "@ador/shared/chain";
 import { validateBitcoinAddress } from "../bitcoin/address.ts";
 import type { ContractGateway } from "../ports.ts";
 import { gameRewardsOpcodes } from "./abi.ts";
+import { freeTemplateAddress } from "./admin/free-address.ts";
 import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
 import { inspectContract } from "./inspect.ts";
 import { milestoneKey } from "./milestone-key.ts";
@@ -73,6 +74,12 @@ export function createContractGateway(
     };
   };
   return {
+    freeTemplateAddress: async (chain, taken) =>
+      freeTemplateAddress(
+        servedChain(chains, chain).node,
+        options.templateSequence,
+        taken,
+      ),
     inspect: async (ref) =>
       inspectContract(servedChain(chains, ref.chain).node, ref),
     simulate: async (intent) =>

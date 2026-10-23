@@ -53,7 +53,10 @@ test("a template cannot be published without a network, and the page says so", a
   await expect(publish).toBeDisabled();
   await page.getByLabel("Wallet address").fill("tb1qexamplewalletaddress");
   await expect(publish).toBeDisabled();
-  await page.getByLabel("Address for game-rewards@1.0.0").fill("4:100");
+  // There is no address to type: the platform chooses where the code goes.
+  await expect(page.getByLabel("Address for game-rewards@1.0.0")).toHaveCount(
+    0,
+  );
   await publish.click();
   await expect(
     page.getByRole("alert").filter({ hasText: "not available yet" }),

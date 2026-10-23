@@ -3,6 +3,7 @@ import type {
   Address,
   ChainRef,
   ContractRef,
+  TrackedState,
   TransactionIntent,
 } from "@ador/shared/chain";
 
@@ -56,8 +57,50 @@ export function onChain(
   }
 }
 
-// The step that publishes a template: one of the templates the platform may publish, not already published, at an address nothing
-// else on the chain has.
+// The states in which a template step never put code at its address: refused by the network, run and reverted, or never signed in time.
+const addressFreedBy: ReadonlySet<TrackedState> = new Set([
+  "broadcast_rejected",
+  "expired",
+  "indexed_failure",
+]);
+
+// The part of a stored step that says whether it still holds the address it was built for.
+export interface StepAddress {
+  readonly operation: string;
+  readonly state: TrackedState;
+  readonly unsigned: {
+    readonly summary: {
+      readonly template?: { readonly at?: { readonly id: string } | undefined };
+    };
+  };
+}
+
+// Whether a template step that may still put code on the chain is for this address: one not refused, reverted or expired.
+export function stepsHoldAddress(
+  steps: readonly StepAddress[],
+  address: string,
+): boolean {
+  return steps.some(
+    (step) =>
+      step.operation === "publish-template" &&
+      !addressFreedBy.has(step.state) &&
+      step.unsigned.summary.template?.at?.id === address,
+  );
+}
+
+// Whether the platform already holds an address: recorded as a template or a game's contract, or named by a template step that has
+// not failed or run out of time (it may still be sent, and would then be there).
+async function addressHeld(
+  dependencies: GameAdminDependencies,
+  address: string,
+): Promise<boolean> {
+  const { contracts, repository, rewards } = dependencies;
+  if (await contracts.addressTaken(rewards.chain, address)) return true;
+  return stepsHoldAddress(await repository.list(null), address);
+}
+
+// The step that publishes a template: one of the templates the platform may publish, not already published, at an address the
+// platform chooses that nothing else on the chain has.
 export async function planPublish(
   dependencies: GameAdminDependencies,
   input: StartStepInput,
@@ -74,8 +117,17 @@ export async function planPublish(
   if (!parsed.ok) return parsed.refusal;
   if ((await contracts.publishedTemplate(rewards.chain, templateRef)) !== null)
     return { code: "already-published", ok: false };
-  if (await contracts.addressTaken(rewards.chain, action.address))
-    return { code: "address-taken", ok: false };
+  const address = await dependencies
+    .ports(rewards.chain)
+    ?.contracts.freeTemplateAddress(rewards.chain, (candidate) =>
+      addressHeld(dependencies, candidate),
+    );
+  if (address === null || address === undefined)
+    return {
+      code: "could-not-build",
+      ok: false,
+      reason: "No free address was found for the template.",
+    };
   return {
     chain: rewards.chain,
     contract: null,
@@ -87,7 +139,7 @@ export async function planPublish(
       templateAt: {
         chain: rewards.chain,
         family: rewards.family,
-        id: action.address,
+        id: address,
       },
       templateId: action.templateId,
       templateVersion: action.templateVersion,

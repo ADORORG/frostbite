@@ -1,4 +1,8 @@
-import { gameContracts, publishedTemplates } from "@ador/database";
+import {
+  gameAdminSteps,
+  gameContracts,
+  publishedTemplates,
+} from "@ador/database";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
@@ -26,8 +30,8 @@ registerDatabase();
 
 describe("creating a game's contract", () => {
   const publishBoth = async (staff: string) => {
-    await runToEnd(publishInput(staff, gameTemplate, "at-1"));
-    await runToEnd(publishInput(staff, collectibleTemplate, "at-2"));
+    await runToEnd(publishInput(staff, gameTemplate));
+    await runToEnd(publishInput(staff, collectibleTemplate));
   };
 
   it("needs both templates published first", async () => {
@@ -37,7 +41,7 @@ describe("creating a game's contract", () => {
       code: "template-not-published",
       ok: false,
     });
-    await runToEnd(publishInput(staff, gameTemplate, "at-1"));
+    await runToEnd(publishInput(staff, gameTemplate));
     expect(await service.start(deployInput(staff))).toEqual({
       code: "template-not-published",
       ok: false,
@@ -56,9 +60,9 @@ describe("creating a game's contract", () => {
       templateRef: null,
     });
     expect(started.step.summary).toMatchObject({
-      collectibleAt: { id: "at-2" },
+      collectibleAt: { id: "template-2" },
       maxDrawingBytes: 2048,
-      template: { at: { id: "at-1" }, id: "game-rewards" },
+      template: { at: { id: "template-1" }, id: "game-rewards" },
     });
 
     const done = await runToEnd(deployInput(staff, 2048));
@@ -71,22 +75,28 @@ describe("creating a game's contract", () => {
     });
   });
 
-  it("leaves no template to be published where a game's contract is", async () => {
+  it("never chooses an address a game's contract is at", async () => {
     withoutContract();
     const staff = await seedStaff();
     await publishBoth(staff);
-    const done = await runToEnd(deployInput(staff));
-    const address = done.createdContracts[0] ?? "";
-    expect(address).not.toBe("");
-    expect(
-      await service.start(publishInput(staff, gameTemplate, address)),
-    ).toEqual({ code: "already-published", ok: false });
+    await runToEnd(deployInput(staff));
+    expect(await service.start(publishInput(staff, gameTemplate))).toEqual({
+      code: "already-published",
+      ok: false,
+    });
+    // The game's contract sits where the first template would go, and the game template's own record is gone.
+    await database.update(gameContracts).set({ address: "template-1" });
     await database
       .delete(publishedTemplates)
       .where(eq(publishedTemplates.templateRef, "game-rewards@1.0.0"));
-    expect(
-      await service.start(publishInput(staff, gameTemplate, address)),
-    ).toEqual({ code: "address-taken", ok: false });
+    // Nor does its step remember the address, so only the record of the game's contract holds it.
+    await database
+      .delete(gameAdminSteps)
+      .where(eq(gameAdminSteps.templateRef, "game-rewards@1.0.0"));
+    const started = await service.start(publishInput(staff, gameTemplate));
+    if (!started.ok) throw new Error("not started");
+    // `template-2` holds the collectible.
+    expect(started.step.summary.template?.at?.id).toBe("template-3");
   });
 
   it("tells the step what the chain says it created as soon as it is confirmed", async () => {
@@ -141,17 +151,18 @@ describe("what a completed step adds to the record", () => {
   it("is written with the step, so a record that cannot be written leaves the step confirmed", async () => {
     const staff = await seedStaff();
     const collectible = await runToEnd(
-      publishInput(staff, collectibleTemplate, "at-2"),
+      publishInput(staff, collectibleTemplate),
     );
     const { signed, step } = await startAndSign(publishInput(staff));
     await service.submitSigned({ signed, staffId: staff, stepId: step.id });
     network.controls.advance(chain, 3);
     const confirmed = await service.refresh(step.id);
     expect(confirmed.ok && confirmed.step.state).toBe("confirmed");
-    // Another record already holds the address, so the record of this step cannot be written.
+    // Another record already holds the address (the collectible was published first, so this step's is the second), so the record of
+    // this step cannot be written.
     await database
       .update(publishedTemplates)
-      .set({ address: "at-1" })
+      .set({ address: "template-2" })
       .where(
         and(
           eq(publishedTemplates.chain, chain),
@@ -172,8 +183,8 @@ describe("what a completed step adds to the record", () => {
   it("refuses to record a second contract for a game on the chain, or two at one address", async () => {
     withoutContract();
     const staff = await seedStaff();
-    await runToEnd(publishInput(staff, gameTemplate, "at-1"));
-    await runToEnd(publishInput(staff, collectibleTemplate, "at-2"));
+    await runToEnd(publishInput(staff, gameTemplate));
+    await runToEnd(publishInput(staff, collectibleTemplate));
     const done = await runToEnd(deployInput(staff));
     const [row] = await database.select().from(gameContracts);
     if (row === undefined) throw new Error("no contract");
@@ -196,9 +207,9 @@ describe("where a game stands before any step", () => {
       drawingCeiling: 8192,
       templatesReady: false,
     });
-    await runToEnd(publishInput(staff, gameTemplate, "at-1"));
+    await runToEnd(publishInput(staff, gameTemplate));
     expect((await service.status(gameId))?.templatesReady).toBe(false);
-    await runToEnd(publishInput(staff, collectibleTemplate, "at-2"));
+    await runToEnd(publishInput(staff, collectibleTemplate));
     expect((await service.status(gameId))?.templatesReady).toBe(true);
   });
 

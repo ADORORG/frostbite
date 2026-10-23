@@ -39,8 +39,11 @@ after a review.
    wallet asks you to approve it. Without a connected wallet from that list, enter the address you will sign with, sign elsewhere
    and paste the result. The wallets are not yet qualified with evidence (finding S77): try a template publish first, and treat a
    refusal by the wallet or by the platform's check as information, not as a fault to bypass.
-2. Publish `game-rewards@1.0.0` and `milestone-collectible@1.0.0`: type the address each goes to (`4:n`, an id nothing else uses),
-   prepare the step, read the summary, sign, send. The template appears as published when the step completes.
+2. Publish `game-rewards@1.0.0` and `milestone-collectible@1.0.0`: prepare the step, read the summary (it shows the address the platform
+   chose, `4:n`: the first number from `rewardsPolicy.templateSequence` that has no code on the chain and that no recorded template, game
+   contract or template step still to be sent holds), sign, send. The template appears as published when the step completes. Two staff
+   preparing different templates in the same moment could be given the same address; the second to complete is refused when the platform
+   records it, and prepares again.
 3. Open a game, enter the largest drawing its contract should keep (it cannot be changed), create the contract, sign, send. The
    page shows the contract's address once the chain reports it.
 4. Define the game's milestones and pause or resume claims as before.

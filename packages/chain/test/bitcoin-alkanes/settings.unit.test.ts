@@ -76,6 +76,7 @@ describe("the services the adapter is wired to", () => {
     },
     transactions: {
       changeDustSats: 294n,
+      templateSequence: { attempts: 200, first: 1000n },
       claimOutputSats: 546n,
       feeTargetBlocks: 3,
       lifetimeMs: 60_000,
@@ -92,6 +93,7 @@ describe("the services the adapter is wired to", () => {
     });
     expect(services.transactions).toMatchObject({
       changeDustSats: 294n,
+      templateSequence: { attempts: 200, first: 1000n },
       claimOutputSats: 546n,
       feeTargetBlocks: 3,
       lifetimeMs: 60_000,

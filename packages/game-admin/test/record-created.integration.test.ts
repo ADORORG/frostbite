@@ -28,8 +28,8 @@ registerDatabase();
 async function unreadable() {
   withoutContract();
   const staff = await seedStaff();
-  await runToEnd(publishInput(staff, gameTemplate, "at-1"));
-  await runToEnd(publishInput(staff, collectibleTemplate, "at-2"));
+  await runToEnd(publishInput(staff, gameTemplate));
+  await runToEnd(publishInput(staff, collectibleTemplate));
   hideCreated.value = true;
   const step = await runToEnd(deployInput(staff, 2048));
   hideCreated.value = false;
@@ -138,7 +138,10 @@ describe("recording a contract's address by hand", () => {
     expect(await ask()).toEqual({ code: "different-code", ok: false });
     // An address the record already holds for a template.
     found(codeHash);
-    expect(await ask("at-1")).toEqual({ code: "address-taken", ok: false });
+    expect(await ask("template-1")).toEqual({
+      code: "address-taken",
+      ok: false,
+    });
     inspected.down = true;
     expect(await ask()).toEqual({ code: "chain-unavailable", ok: false });
     inspected.down = false;

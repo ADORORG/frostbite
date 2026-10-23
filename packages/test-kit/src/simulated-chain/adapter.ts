@@ -100,6 +100,14 @@ export function createSimulatedChain(
     },
   };
   const contracts: ContractGateway = {
+    // The simulated family has no contracts, so no address is ever in use on it; it hands out numbered ones the platform has not named.
+    freeTemplateAddress: async (_chain, taken) => {
+      for (let n = 1; n <= 100; n += 1) {
+        const address = `template-${n}`;
+        if (!(await taken(address))) return address;
+      }
+      return null;
+    },
     // The simulated family has no contracts, so it truthfully reports none.
     inspect: (ref) => Promise.resolve({ codeHash: null, exists: false, ref }),
     simulate: (intent) => {

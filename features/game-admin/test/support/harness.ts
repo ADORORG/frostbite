@@ -100,10 +100,9 @@ export const pause = {
   gameId,
   wallet,
 } as const;
-export const publishing = (id: string, address: string) =>
+export const publishing = (id: string) =>
   ({
     action: {
-      address,
       operation: "publish-template",
       templateId: id,
       templateVersion: "1.0.0",
@@ -147,8 +146,8 @@ export async function runStep(
 
 // Gives the game its contract the way the platform does: both templates published, then the contract created.
 export async function createContract(ops: Operations, staff: string) {
-  await runStep(ops, staff, publishing("game-rewards", "at-1"));
-  await runStep(ops, staff, publishing("milestone-collectible", "at-2"));
+  await runStep(ops, staff, publishing("game-rewards"));
+  await runStep(ops, staff, publishing("milestone-collectible"));
   return runStep(ops, staff, creation());
 }
 

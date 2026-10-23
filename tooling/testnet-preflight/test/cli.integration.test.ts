@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { betaChains } from "../../../configs/beta-chains.ts";
+import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 const run = promisify(execFile);
 const servers: Server[] = [];
@@ -21,7 +22,8 @@ const answers: Readonly<Record<string, string | number | object>> = {
     .padEnd(64, "0"),
   "esplora_blocks:tip:hash": "00",
   "esplora_blocks:tip:height": 100,
-  "esplora_fee-estimates": { "3": 2 },
+  // The platform asks for the policy's target, whatever it is.
+  "esplora_fee-estimates": { [String(rewardsPolicy.feeTargetBlocks)]: 2 },
   metashrew_height: "100",
   metashrew_view: "0x0061736d",
 };

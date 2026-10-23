@@ -63,6 +63,7 @@ const settings = (
   },
   transactions: {
     changeDustSats: 294n,
+    templateSequence: { attempts: 200, first: 1000n },
     claimOutputSats: 546n,
     feeTargetBlocks: 3,
     lifetimeMs: 60_000,

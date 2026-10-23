@@ -30,7 +30,7 @@ describe("publishing templates and creating a game's contract through the operat
         steps: [],
       },
     });
-    const done = await runStep(ops, ada, publishing("game-rewards", "at-1"));
+    const done = await runStep(ops, ada, publishing("game-rewards"));
     expect(done).toMatchObject({
       createdBy: "Ada",
       gameId: null,
@@ -40,7 +40,9 @@ describe("publishing templates and creating a game's contract through the operat
     });
     expect(await ops.templates.execute({}, sessionFor(ada))).toMatchObject({
       value: {
-        published: [{ address: "at-1", templateRef: "game-rewards@1.0.0" }],
+        published: [
+          { address: "template-1", templateRef: "game-rewards@1.0.0" },
+        ],
         steps: [{ id: done.id, state: "complete" }],
       },
     });
@@ -86,17 +88,12 @@ describe("publishing templates and creating a game's contract through the operat
         : "started";
     };
     expect(await refused(creation())).toBe("template-not-published");
-    expect(await refused(publishing("something-else", "at-1"))).toBe(
+    expect(await refused(publishing("something-else"))).toBe(
       "unknown-template",
     );
-    await runStep(ops, ada, publishing("game-rewards", "at-1"));
-    expect(await refused(publishing("game-rewards", "at-9"))).toBe(
-      "already-published",
-    );
-    expect(await refused(publishing("milestone-collectible", "at-1"))).toBe(
-      "address-taken",
-    );
-    await runStep(ops, ada, publishing("milestone-collectible", "at-2"));
+    await runStep(ops, ada, publishing("game-rewards"));
+    expect(await refused(publishing("game-rewards"))).toBe("already-published");
+    await runStep(ops, ada, publishing("milestone-collectible"));
     expect(await refused(creation(1_000_000))).toBe("could-not-build");
     await runStep(ops, ada, creation());
     expect(await refused(creation())).toBe("already-created");

@@ -6,6 +6,7 @@ import { idA, idB, idC, utxo } from "../support/claims.ts";
 
 const base = {
   changeDustSats: 294n,
+  templateSequence: { attempts: 200, first: 1000n },
   fixedOutputs: ["p2wpkh"] as const,
   fixedSats: 546n,
   feeRate: 2,

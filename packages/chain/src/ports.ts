@@ -48,6 +48,13 @@ export interface ChainReader {
 }
 
 export interface ContractGateway {
+  // Chooses where on the chain a new template goes, so staff never type the chain's notation: an address with no contract at it that
+  // `taken` (the platform's own record, steps not yet confirmed among them) does not name, or null when none was found in the range the
+  // chain's settings allow. Asking again before anything is published may give the same address.
+  freeTemplateAddress(
+    chain: ChainRef,
+    taken: (address: string) => Promise<boolean>,
+  ): Promise<string | null>;
   inspect(ref: ContractRef): Promise<ContractInspection>;
   simulate(intent: TransactionIntent): Promise<SimulationResult>;
 }

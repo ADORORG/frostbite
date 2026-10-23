@@ -76,20 +76,18 @@ describe("the templates staff publish", () => {
     );
   });
 
-  it("publishes a template at the address staff typed, once they say who signs", async () => {
+  it("publishes a template once they say who signs, without asking for an address, and shows the one the platform chose", async () => {
     const fake = api();
     const container = await mount(<TemplatesPanel api={fake} />);
     await settle(() =>
       expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
     );
     const publish = () => button(container, "Publish game-rewards@1.0.0");
+    // The platform finds the address; there is nothing to type for it.
+    expect(container.textContent).not.toContain("Address for");
+    expect(container.querySelectorAll("input")).toHaveLength(1);
     expect(publish()?.disabled).toBe(true);
     await enterWallet(container);
-    expect(publish()?.disabled).toBe(true);
-    await typeInto(
-      fieldByLabel(container, "Address for game-rewards@1.0.0"),
-      " 4:100 ",
-    );
     expect(publish()?.disabled).toBe(false);
     fake.start = vi.fn(async () => ({
       resumed: false,
@@ -99,7 +97,6 @@ describe("the templates staff publish", () => {
     await click(publish());
     expect(fake.start).toHaveBeenCalledWith({
       action: {
-        address: "4:100",
         operation: "publish-template",
         templateId: "game-rewards",
         templateVersion: "1.0.0",
@@ -115,26 +112,10 @@ describe("the templates staff publish", () => {
     expect(review?.textContent).not.toContain("Rewards contract");
   });
 
-  it("keeps an address typed for one template from being used for another", async () => {
-    const fake = api();
-    const container = await mount(<TemplatesPanel api={fake} />);
-    await settle(() =>
-      expect(button(container, "Publish game-rewards@1.0.0")).not.toBeNull(),
-    );
-    await enterWallet(container);
-    await typeInto(
-      fieldByLabel(container, "Address for game-rewards@1.0.0"),
-      "4:100",
-    );
-    expect(
-      button(container, "Publish milestone-collectible@1.0.0")?.disabled,
-    ).toBe(true);
-  });
-
   it("says why a template was refused, and shows the log of the steps that published templates", async () => {
     const fake = api({
       start: vi.fn(async () => ({
-        reason: "address-taken" as const,
+        reason: "already-published" as const,
         status: "refused" as const,
       })),
       templates: vi.fn(async () => ({
@@ -150,11 +131,7 @@ describe("the templates staff publish", () => {
     expect(textOf(container)).toContain("Publish template game-rewards@1.0.0");
     expect(textOf(container)).toContain("sent by Grace");
     await enterWallet(container);
-    await typeInto(
-      fieldByLabel(container, "Address for milestone-collectible@1.0.0"),
-      "at-1",
-    );
     await click(button(container, "Publish milestone-collectible@1.0.0"));
-    expect(textOf(container)).toContain("already holds a template");
+    expect(textOf(container)).toContain("This template is already published.");
   });
 });

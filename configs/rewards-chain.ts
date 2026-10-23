@@ -106,6 +106,7 @@ function configuredChain(
           claimOutputSats: rewardsPolicy.claimOutputSats,
           feeTargetBlocks: rewardsPolicy.feeTargetBlocks,
           lifetimeMs: rewardsPolicy.lifetimeMs,
+          templateSequence: rewardsPolicy.templateSequence,
         },
       },
     },

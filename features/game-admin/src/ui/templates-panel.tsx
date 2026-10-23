@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  ArcadeActionButton,
-  ArcadeInfoCard,
-  ArcadeTextField,
-} from "@repo/ui/arcade";
-import { useMemo, useState } from "react";
+import { ArcadeActionButton, ArcadeInfoCard } from "@repo/ui/arcade";
+import { useMemo } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
 import { SignerCard, useSigner } from "./signer-card.tsx";
@@ -17,8 +13,8 @@ const ref = (template: { id: string; version: string }) =>
   `${template.id}@${template.version}`;
 
 // The templates the platform publishes, for staff: which are on the chain and where, and a way to publish each that is not. Staff
-// choose the address the code is published at; it is checked against the chain's records and cannot be used twice. The step is
-// reviewed and signed like any other, and the template is recorded only when it completes.
+// do not choose the address the code is published at: the platform finds one nothing is at and nothing else is set to use, and the
+// review shows it. The step is reviewed and signed like any other, and the template is recorded only when it completes.
 export function TemplatesPanel({
   api: injected,
   pollMs,
@@ -39,9 +35,6 @@ export function TemplatesPanel({
     ...(sign === undefined ? {} : { sign }),
   });
   const signer = useSigner(connectedAddress);
-  const [addresses, setAddresses] = useState<Readonly<Record<string, string>>>(
-    {},
-  );
   const { overview } = admin;
   if (overview === null || overview.kind !== "templates")
     return (
@@ -67,7 +60,6 @@ export function TemplatesPanel({
           {overview.publishable.map((template) => {
             const key = ref(template);
             const published = where.get(key);
-            const address = addresses[key] ?? "";
             return (
               <li data-template={key} key={key}>
                 <strong>{key}</strong> —{" "}
@@ -78,20 +70,11 @@ export function TemplatesPanel({
                 )}
                 {published !== undefined ? null : (
                   <>
-                    <ArcadeTextField
-                      hint="Where on the chain to publish it, as block:tx. It must be an address nothing else uses."
-                      label={`Address for ${key}`}
-                      onChange={(value) =>
-                        setAddresses((held) => ({ ...held, [key]: value }))
-                      }
-                      value={address}
-                    />
                     <ArcadeActionButton
-                      disabled={!signer.ready || address.trim() === ""}
+                      disabled={!signer.ready}
                       onClick={() =>
                         void admin.start(
                           {
-                            address: address.trim(),
                             operation: "publish-template",
                             templateId: template.id,
                             templateVersion: template.version,

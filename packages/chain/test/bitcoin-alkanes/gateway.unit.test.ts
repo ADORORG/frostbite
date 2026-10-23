@@ -159,3 +159,22 @@ describe("inspecting a contract", () => {
     });
   });
 });
+
+describe("choosing a template address through the gateway", () => {
+  it("asks the served chain's node, from the configured first number", async () => {
+    const { gateway: contracts } = gateway(success, null);
+    expect(await contracts.freeTemplateAddress(chain, async () => false)).toBe(
+      `4:${options.templateSequence.first}`,
+    );
+  });
+
+  it("is refused for a chain it does not serve", async () => {
+    const { gateway: contracts } = gateway(success, null);
+    await expect(
+      contracts.freeTemplateAddress(
+        chainRefSchema.parse("bip122:00000000000000000000000000000000"),
+        async () => false,
+      ),
+    ).rejects.toThrow();
+  });
+});
