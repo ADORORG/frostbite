@@ -17,13 +17,19 @@ export const gameAdminStepStates = [
   "pending",
 ] as const;
 
+// The most characters a step's transaction may hold, on the page and in the platform's record of the step. A step that publishes a
+// template carries the template's code in its transaction, and a template may be up to 512 KiB (`rewardsPolicy.maxTemplateCodeBytes`),
+// which is about 683,000 characters as text; this leaves room for the rest of the transaction and stays under the 1 MiB a request
+// body may be, since the signed copy travels back in one. A claim's transaction holds no such data and keeps its own, smaller bound.
+export const maxAdminPayloadChars = 786_432;
+
 // The transaction as it crosses the page: the one staff sign, and the same once signed. Plain text throughout.
 export const gameAdminTransactionSchema = z
   .object({
     chain: chainRefTextSchema,
     family: chainFamilyIdTextSchema,
     format: z.string().trim().min(1).max(64),
-    payload: z.string().min(1).max(262_144),
+    payload: z.string().min(1).max(maxAdminPayloadChars),
   })
   .strict();
 

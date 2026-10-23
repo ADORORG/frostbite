@@ -60,9 +60,16 @@ interface TrackedTable {
   readonly unsignedPayload: AnyPgColumn;
 }
 
+// How many characters a tracked transaction may hold unless its table says otherwise: a claim's is small.
+export const defaultMaxPayloadChars = 65_536;
+
 // The checks every such table carries, named after the table. The signed transaction exists from the moment it is signed, and the
 // network's id for it from the moment the network answered; a transaction that failed says why, and no other has a reason.
-export function trackedTransactionChecks(name: string, table: TrackedTable) {
+export function trackedTransactionChecks(
+  name: string,
+  table: TrackedTable,
+  maxPayloadChars: number = defaultMaxPayloadChars,
+) {
   const {
     broadcastAt,
     failureReason,
@@ -75,7 +82,8 @@ export function trackedTransactionChecks(name: string, table: TrackedTable) {
     check(`${name}_state_known`, sql`${state} in (${states})`),
     check(
       `${name}_payload_bounded`,
-      sql`char_length(${unsignedPayload}) <= 65536 and (${signedPayload} is null or char_length(${signedPayload}) <= 65536)`,
+      // The bound is part of the table's definition, not a value to bind: a check constraint takes a literal.
+      sql`char_length(${unsignedPayload}) <= ${sql.raw(String(maxPayloadChars))} and (${signedPayload} is null or char_length(${signedPayload}) <= ${sql.raw(String(maxPayloadChars))})`,
     ),
     check(
       `${name}_signed_coherent`,

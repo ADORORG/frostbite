@@ -80,6 +80,7 @@ export function createRequester(fetchImpl: FetchLike): Requester {
           envelope.data.error.code,
           response.status,
           envelope.data.error.message,
+          envelope.data.error.correlationId,
         );
       throw new ApiError(
         "invalid-response",

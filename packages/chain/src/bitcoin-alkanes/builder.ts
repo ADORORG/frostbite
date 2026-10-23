@@ -22,7 +22,7 @@ import {
   assertTransactionOptions,
   type TransactionOptions,
 } from "./options.ts";
-import { selectCoins } from "./tx/coins.ts";
+import { selectCoins, shortfallNote, type CoinRequest } from "./tx/coins.ts";
 import { claimScript } from "./tx/claim-call.ts";
 import { buildClaimPsbt } from "./tx/psbt.ts";
 import { verifySignedClaim } from "./verify.ts";
@@ -64,7 +64,7 @@ export function createTransactionBuilder(
       const feeRate = await node.feeRate(
         feeTargetFor(options, intent.feeSpeed),
       );
-      const selection = selectCoins({
+      const request: CoinRequest = {
         changeDustSats: options.changeDustSats,
         feeRate,
         fixedOutputs: [sender.value.type],
@@ -72,11 +72,12 @@ export function createTransactionBuilder(
         kind: sender.value.type,
         opReturnScriptLength: call.length,
         utxos: await node.utxos(sender.value.address),
-      });
+      };
+      const selection = selectCoins(request);
       if (selection === null) {
         throw new BuildRefusedError(
           "insufficient-funds",
-          "The sender's confirmed balance cannot pay for the claim.",
+          `The sender's confirmed balance cannot pay for the claim${shortfallNote(request)}`,
         );
       }
       if (selection.fee > funding.maxFee.baseUnits) {

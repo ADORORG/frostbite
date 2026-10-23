@@ -1,4 +1,3 @@
-import { ApiError } from "@ador/client-http";
 import type { FeeSpeed } from "@ador/shared/chain";
 import type {
   GameAdminAction,
@@ -15,9 +14,9 @@ import {
   recordRefusalCopy,
   startRefusalCopy,
   submitRefusalCopy,
-  unreachableCopy,
   walletRefusedCopy,
 } from "../domain/copy.ts";
+import { failureCopy } from "../domain/failure-copy.ts";
 
 // What staff's wallet is asked to sign, and what it gives back. Where no wallet can sign steps there is none, and the page lets
 // staff sign elsewhere and paste the result.
@@ -114,8 +113,8 @@ export function useAdminSteps(options: {
       (state) => {
         if (current) apply(state);
       },
-      () => {
-        if (current) setMessage(unreachableCopy);
+      (error: unknown) => {
+        if (current) setMessage(failureCopy(error, "load"));
       },
     );
     return () => {
@@ -175,11 +174,7 @@ export function useAdminSteps(options: {
           );
         }
       } catch (error) {
-        setMessage(
-          error instanceof ApiError && error.code === "unauthorized"
-            ? "You are signed out. Sign in again."
-            : unreachableCopy,
-        );
+        setMessage(failureCopy(error, "start"));
       }
     },
     [api, gameId, upsert],
@@ -194,8 +189,8 @@ export function useAdminSteps(options: {
         const answer = await api.submit({ signed, stepId: active.id });
         if (answer.status === "submitted") upsert(answer.step);
         else setMessage(submitRefusalCopy[answer.reason]);
-      } catch {
-        setMessage(unreachableCopy);
+      } catch (error) {
+        setMessage(failureCopy(error, "send"));
       }
     },
     [active, api, upsert],
@@ -214,8 +209,8 @@ export function useAdminSteps(options: {
           upsert(answer.step);
           apply(await fetchState());
         } else setMessage(recordRefusalCopy[answer.reason]);
-      } catch {
-        setMessage(unreachableCopy);
+      } catch (error) {
+        setMessage(failureCopy(error, "record"));
       } finally {
         setWorking(false);
       }
@@ -238,8 +233,6 @@ export function useAdminSteps(options: {
     }
     try {
       await send(signed);
-    } catch {
-      setMessage(unreachableCopy);
     } finally {
       setWorking(false);
     }

@@ -117,5 +117,7 @@ export function fakeApi(overrides: Partial<GameAdminApi> = {}) {
   return api;
 }
 
-export const apiError = (code: ConstructorParameters<typeof ApiError>[0]) =>
-  new ApiError(code, null, "failed");
+export const apiError = (
+  code: ConstructorParameters<typeof ApiError>[0],
+  correlationId: string | null = null,
+) => new ApiError(code, null, "failed", correlationId);

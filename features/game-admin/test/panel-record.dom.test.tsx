@@ -8,7 +8,13 @@ import {
 } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
-import { creating, fakeApi, listing, step } from "./support/fake-api.ts";
+import {
+  apiError,
+  creating,
+  fakeApi,
+  listing,
+  step,
+} from "./support/fake-api.ts";
 import { panel } from "./support/panel.tsx";
 
 const unreadable = () =>
@@ -118,17 +124,17 @@ describe("entering the address of a contract the platform could not read", () =>
     ).not.toBeNull();
   });
 
-  it("says the platform could not be reached when the request fails", async () => {
+  it("says the platform could not be reached, and that nothing was changed, when the request has no answer", async () => {
     const api = fakeApi();
     const { container } = await opened(api);
     api.record = vi.fn(async () => {
-      throw new Error("offline");
+      throw apiError("network");
     });
     await typeInto(fieldByLabel(container, "Contract address"), "2:77");
     await click(button(container, "Check and record"));
     await settle(() =>
       expect(container.querySelector('[role="alert"]')?.textContent).toContain(
-        "could not be reached",
+        "could not be reached while recording the contract's address",
       ),
     );
   });

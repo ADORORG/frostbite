@@ -1,3 +1,4 @@
+import { maxAdminPayloadChars } from "@ador/shared/games";
 import { sql } from "drizzle-orm";
 import { check, index, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
@@ -68,6 +69,10 @@ export const gameAdminSteps = platformSchema.table(
       "game_admin_steps_milestone_coherent",
       sql`(${table.operation} = 'define-milestone') = (${table.milestoneId} is not null)`,
     ),
-    ...trackedTransactionChecks("game_admin_steps", table),
+    ...trackedTransactionChecks(
+      "game_admin_steps",
+      table,
+      maxAdminPayloadChars,
+    ),
   ],
 );

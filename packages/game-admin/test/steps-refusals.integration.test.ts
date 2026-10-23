@@ -78,6 +78,18 @@ describe("a step that cannot start", () => {
       reason: "the node is down",
     });
   });
+
+  it("refuses, in words and before storing anything, a step larger than the platform keeps", async () => {
+    const staff = await seedStaff();
+    chainFailure.oversize = true;
+    const refused = await service.start(pauseInput(staff));
+    if (refused.ok || refused.code !== "could-not-build")
+      throw new Error("The oversized step was not refused as unbuildable.");
+    expect(refused.reason).toMatch(
+      /^The step's transaction is \d+ characters, more than the \d+ the platform keeps\.$/u,
+    );
+    expect(await service.list("arcade")).toEqual([]);
+  });
 });
 
 describe("sending a signed step", () => {

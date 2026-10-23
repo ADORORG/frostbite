@@ -127,6 +127,39 @@ describe("starting a step", () => {
     );
     await enterWallet(down);
     await click(button(down, "Pause claims"));
-    expect(textOf(down)).toContain("could not be reached");
+    expect(textOf(down)).toContain("could not be reached while building");
+    expect(textOf(down)).toContain("Nothing was changed.");
+  });
+
+  it("names a fault in the platform, with the reference it logged it under, and says nothing was changed", async () => {
+    const reference = "018f22f2-9c1a-7b21-8c45-0000000000aa";
+    const container = await panel(
+      fakeApi({
+        start: vi.fn(async () => {
+          throw apiError("internal_error", reference);
+        }),
+      }),
+    );
+    await enterWallet(container);
+    await click(button(container, "Pause claims"));
+    const alert = container.querySelector('[role="alert"]')?.textContent ?? "";
+    expect(alert).toContain("The platform failed while building the step.");
+    expect(alert).toContain(`Reference ${reference}`);
+    expect(alert).toContain("Nothing was changed.");
+    expect(alert).not.toContain("could not be reached");
+  });
+
+  it("says when the platform took too long, which is not the same as being unreachable", async () => {
+    const container = await panel(
+      fakeApi({
+        start: vi.fn(async () => {
+          throw new DOMException("timed out", "TimeoutError");
+        }),
+      }),
+    );
+    await enterWallet(container);
+    await click(button(container, "Pause claims"));
+    expect(textOf(container)).toContain("took too long to answer");
+    expect(textOf(container)).not.toContain("could not be reached");
   });
 });

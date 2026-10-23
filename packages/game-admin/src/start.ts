@@ -1,4 +1,5 @@
 import type { UnsignedTransaction } from "@ador/shared/chain";
+import { maxAdminPayloadChars } from "@ador/shared/games";
 
 import {
   planDeploy,
@@ -54,6 +55,13 @@ export async function startStep(
         error instanceof Error ? error.message : "The step could not be built.",
     };
   }
+  // What the platform cannot keep is refused here, in words, rather than failing as it is stored.
+  if (unsigned.payload.length > maxAdminPayloadChars)
+    return {
+      code: "could-not-build",
+      ok: false,
+      reason: `The step's transaction is ${unsigned.payload.length} characters, more than the ${maxAdminPayloadChars} the platform keeps.`,
+    };
   const result = await dependencies.repository.create({
     chain: planned.chain,
     contract: planned.contract,

@@ -2,7 +2,12 @@ import { Psbt, Transaction } from "bitcoinjs-lib";
 
 import { fromHex } from "../node/hex.ts";
 import { callScript, type Call } from "../tx/call-script.ts";
-import { selectCoins, unconfirmedNote } from "../tx/coins.ts";
+import {
+  selectCoins,
+  shortfallNote,
+  unconfirmedNote,
+  type CoinRequest,
+} from "../tx/coins.ts";
 import { feeFor } from "../tx/fees.ts";
 import { createEnvelope, tapscriptLeafVersion } from "./envelope.ts";
 import type { OneTimeKey } from "./one-time-key.ts";
@@ -98,7 +103,7 @@ export function planEnvelopeStep(
         : 0n;
     const commitSats = revealFee + top;
 
-    const selection = selectCoins({
+    const request: CoinRequest = {
       changeDustSats: funding.changeDustSats,
       feeRate: funding.feeRate,
       fixedOutputs: ["p2tr"],
@@ -106,10 +111,11 @@ export function planEnvelopeStep(
       kind: funder.kind,
       opReturnScriptLength: null,
       utxos: funder.utxos,
-    });
+    };
+    const selection = selectCoins(request);
     if (selection === null) {
       throw new StepRefusedError(
-        `The wallet's confirmed balance cannot pay for the step.${unconfirmedNote(funder.utxos)}`,
+        `The wallet's confirmed balance cannot pay for the step${shortfallNote(request)}${unconfirmedNote(funder.utxos)}`,
         "insufficient-funds",
       );
     }

@@ -12,7 +12,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import { FeeSettingsBoundary } from "../src/ui/fee-settings.tsx";
 import { TemplatesPanel } from "../src/ui/templates-panel.tsx";
-import { fakeApi, publishable, publishing } from "./support/fake-api.ts";
+import {
+  apiError,
+  fakeApi,
+  publishable,
+  publishing,
+} from "./support/fake-api.ts";
 
 const published = [
   {
@@ -67,13 +72,15 @@ describe("the templates staff publish", () => {
       <TemplatesPanel
         api={api({
           templates: vi.fn(async () => {
-            throw new Error("down");
+            throw apiError("network");
           }),
         })}
       />,
     );
     await settle(() =>
-      expect(textOf(container)).toContain("The platform could not be reached"),
+      expect(textOf(container)).toContain(
+        "The platform could not be reached while loading the steps",
+      ),
     );
   });
 

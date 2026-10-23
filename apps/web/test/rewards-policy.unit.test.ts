@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
+import { maxAdminPayloadChars } from "@ador/shared/games";
+
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 const abi = (name: string): { version: string } =>
@@ -39,5 +41,14 @@ describe("the rewards policy", () => {
     expect(rewardsPolicy.claimOutputSats).toBeGreaterThan(
       rewardsPolicy.changeDustSats,
     );
+  });
+
+  it("allows templates no larger than the step that publishes one can hold", () => {
+    // A transaction carries code as bytes the page and the record keep as base64 text, a third larger; the size test in the chain
+    // package builds the largest such step and checks it against the same bound.
+    expect(
+      Math.ceil((rewardsPolicy.maxTemplateCodeBytes * 4) / 3),
+    ).toBeLessThan(maxAdminPayloadChars);
+    expect(rewardsPolicy.maxTemplateCodeBytes).toBe(512 * 1024);
   });
 });

@@ -1,4 +1,5 @@
 import { authUsers, gameAdminSteps } from "@ador/database";
+import { maxAdminPayloadChars } from "@ador/shared/games";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
@@ -31,6 +32,42 @@ describe("the log of administration", () => {
       database
         .insert(gameAdminSteps)
         .values({ ...copy, signedPayload: "signed" }),
+    ).rejects.toThrow();
+  });
+
+  it("holds a step's whole transaction, as large as the page allows, and no more", async () => {
+    const staff = await seedStaff();
+    const started = await service.start(defineInput(staff));
+    if (!started.ok) throw new Error("not started");
+    const [row] = await database.select().from(gameAdminSteps);
+    if (row === undefined) throw new Error("no row");
+    const copy = (gameId: string) => ({
+      ...row,
+      gameId,
+      id: crypto.randomUUID(),
+    });
+    const full = "x".repeat(maxAdminPayloadChars);
+    const over = `${full}x`;
+    const signed = { state: "signed" } as const;
+    await database
+      .insert(gameAdminSteps)
+      .values({ ...copy("unsigned-at-bound"), unsignedPayload: full });
+    await database.insert(gameAdminSteps).values({
+      ...copy("signed-at-bound"),
+      ...signed,
+      signedPayload: full,
+    });
+    await expect(
+      database
+        .insert(gameAdminSteps)
+        .values({ ...copy("unsigned-over"), unsignedPayload: over }),
+    ).rejects.toThrow();
+    await expect(
+      database.insert(gameAdminSteps).values({
+        ...copy("signed-over"),
+        ...signed,
+        signedPayload: over,
+      }),
     ).rejects.toThrow();
   });
 

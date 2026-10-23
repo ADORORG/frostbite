@@ -1,7 +1,12 @@
 import { Psbt } from "bitcoinjs-lib";
 
 import { callScript, type Call } from "../tx/call-script.ts";
-import { selectCoins, unconfirmedNote } from "../tx/coins.ts";
+import {
+  selectCoins,
+  shortfallNote,
+  unconfirmedNote,
+  type CoinRequest,
+} from "../tx/coins.ts";
 import type { StepFunding } from "./types.ts";
 import { StepRefusedError } from "./types.ts";
 
@@ -26,7 +31,7 @@ export function planPlainStep(call: Call, funding: StepFunding): PlainStep {
     unallocated: admin === null ? 0 : callOutput,
   });
   const firstValue = admin === null ? funding.outputDustSats : admin.value;
-  const selection = selectCoins({
+  const request: CoinRequest = {
     changeDustSats: funding.changeDustSats,
     existingInputs: admin === null ? [] : [admin.kind],
     feeRate: funding.feeRate,
@@ -35,10 +40,11 @@ export function planPlainStep(call: Call, funding: StepFunding): PlainStep {
     kind: funder.kind,
     opReturnScriptLength: script.length,
     utxos: funder.utxos,
-  });
+  };
+  const selection = selectCoins(request);
   if (selection === null) {
     throw new StepRefusedError(
-      `The wallet's confirmed balance cannot pay for the step.${unconfirmedNote(funder.utxos)}`,
+      `The wallet's confirmed balance cannot pay for the step${shortfallNote(request)}${unconfirmedNote(funder.utxos)}`,
       "insufficient-funds",
     );
   }

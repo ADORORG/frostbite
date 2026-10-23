@@ -76,11 +76,12 @@ describe("JSON requester", () => {
     async (code, status) => {
       const { request } = requesterWith(async () => envelope(code, status));
       const error = await failureOf(request(route, schema));
-      expect([error.code, error.status, error.message]).toEqual([
-        code,
-        status,
-        "Nope.",
-      ]);
+      expect([
+        error.code,
+        error.status,
+        error.message,
+        error.correlationId,
+      ]).toEqual([code, status, "Nope.", correlationId]);
       expect(isRetryableApiError(error)).toBe(false);
     },
   );
@@ -99,7 +100,11 @@ describe("JSON requester", () => {
       async () => new Response("oops", { status: 502 }),
     );
     const error = await failureOf(request(route, schema));
-    expect([error.code, error.status]).toEqual(["invalid-response", 502]);
+    expect([error.code, error.status, error.correlationId]).toEqual([
+      "invalid-response",
+      502,
+      null,
+    ]);
     expect(isRetryableApiError(error)).toBe(true);
   });
 

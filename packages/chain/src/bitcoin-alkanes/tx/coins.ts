@@ -35,6 +35,27 @@ export function unconfirmedNote(utxos: readonly NodeUtxo[]): string {
     : ` ${waiting} sats in the wallet are still waiting for their first confirmation, and a step does not spend them; try again once they confirm.`;
 }
 
+// What to add to a refusal for want of funds so the person sees the numbers: what the step costs at this fee rate (counting every
+// confirmed output as spent, the most it could need) against what the wallet's confirmed outputs hold.
+export function shortfallNote(request: CoinRequest): string {
+  const confirmed = request.utxos.filter((utxo) => utxo.confirmed);
+  const held = confirmed.reduce((sum, utxo) => sum + utxo.value, 0n);
+  const kinds = [
+    ...(request.existingInputs ?? []),
+    ...Array.from(
+      { length: Math.max(confirmed.length, 1) },
+      () => request.kind,
+    ),
+  ];
+  const needed =
+    request.fixedSats +
+    feeFor(
+      estimateVsize(kinds, request.fixedOutputs, request.opReturnScriptLength),
+      request.feeRate,
+    );
+  return `: it needs about ${needed} sats at ${request.feeRate} sat/vB, but the wallet holds ${held} confirmed.`;
+}
+
 // Picks the fewest, largest confirmed outputs that pay for the fixed outputs and the fee. Unconfirmed outputs are never spent: a
 // claim built on one would fail if that transaction were replaced.
 export function selectCoins(request: CoinRequest): CoinSelection | null {

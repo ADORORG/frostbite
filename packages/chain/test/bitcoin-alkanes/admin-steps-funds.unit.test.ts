@@ -46,3 +46,40 @@ describe("a step the wallet cannot pay for yet", () => {
     ).toThrow(/5000000 sats in the wallet are still waiting/u);
   });
 });
+
+// The numbers in a refusal for want of funds: what the step needs at the rate it was priced at, and what the wallet holds.
+function needs(message: string): bigint {
+  const found =
+    /it needs about (\d+) sats at 2 sat\/vB, but the wallet holds 100 confirmed\./u.exec(
+      message,
+    );
+  if (found?.[1] === undefined) throw new Error(`No amounts in: ${message}`);
+  return BigInt(found[1]);
+}
+
+describe("a step refused for want of funds says how much is missing", () => {
+  const poor = () => fundingFor(null, 100n);
+  const message = (run: () => unknown): string => {
+    try {
+      run();
+    } catch (error) {
+      if (error instanceof Error) return error.message;
+    }
+    throw new Error("The step was not refused.");
+  };
+
+  it("gives the cost at its fee rate and the confirmed balance (plain step)", () => {
+    // At least the output's dust limit, plus a fee for a transaction with an input, outputs and a call.
+    expect(needs(message(() => planPlainStep(call, poor())))).toBeGreaterThan(
+      546n + 100n,
+    );
+  });
+
+  it("gives them for an envelope step too, which costs more because its reveal carries the data", () => {
+    const plain = needs(message(() => planPlainStep(call, poor())));
+    const envelope = needs(
+      message(() => planEnvelopeStep(call, drawing, poor(), fixedKey())),
+    );
+    expect(envelope).toBeGreaterThan(plain);
+  });
+});

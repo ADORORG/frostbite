@@ -16,6 +16,7 @@ import {
   type Address,
   type TransactionIntent,
 } from "@ador/shared/chain";
+import { maxAdminPayloadChars } from "@ador/shared/games";
 import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
 import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
 import {
@@ -79,7 +80,8 @@ export const rewards: RewardsPlan = {
 };
 export const contracts = createDrizzleContractStore(database);
 export const chainAvailable = { value: true };
-export const chainFailure = { build: false };
+// Makes the chain fail to build, or build a transaction larger than the platform keeps.
+export const chainFailure = { build: false, oversize: false };
 // The intents the chain was asked to build, oldest first.
 export const builtIntents: TransactionIntent[] = [];
 // Makes the chain find no free address for a template.
@@ -117,11 +119,16 @@ function ports(): AdminChainPorts {
       },
     },
     builder: {
-      build: (...asked) => {
+      build: async (...asked) => {
         builtIntents.push(asked[0]);
-        return chainFailure.build
-          ? Promise.reject(new Error("the node is down"))
-          : builder.build(...asked);
+        if (chainFailure.build) throw new Error("the node is down");
+        const built = await builder.build(...asked);
+        return chainFailure.oversize
+          ? {
+              ...built,
+              payload: built.payload.padEnd(maxAdminPayloadChars + 1),
+            }
+          : built;
       },
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
@@ -268,6 +275,7 @@ export function registerDatabase(): void {
     game.current = administeredGame();
     chainAvailable.value = true;
     chainFailure.build = false;
+    chainFailure.oversize = false;
     builtIntents.length = 0;
     placement.exhausted = false;
     hideCreated.value = false;

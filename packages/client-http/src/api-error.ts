@@ -6,12 +6,20 @@ export type ApiErrorCode = HttpErrorCode | "invalid-response" | "network";
 
 export class ApiError extends Error {
   readonly code: ApiErrorCode;
+  // The reference the server logged this failure under, when it sent one, so a person can quote it and staff can find the log line.
+  readonly correlationId: string | null;
   readonly status: number | null;
 
-  constructor(code: ApiErrorCode, status: number | null, message: string) {
+  constructor(
+    code: ApiErrorCode,
+    status: number | null,
+    message: string,
+    correlationId: string | null = null,
+  ) {
     super(message);
     this.name = "ApiError";
     this.code = code;
+    this.correlationId = correlationId;
     this.status = status;
   }
 }

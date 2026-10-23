@@ -153,7 +153,12 @@ describe("building a milestone claim", () => {
     ]);
     await expect(
       poor.builder.build(intent, funding(10_000n)),
-    ).rejects.toMatchObject({ code: "insufficient-funds" });
+    ).rejects.toMatchObject({
+      code: "insufficient-funds",
+      message: expect.stringMatching(
+        /needs about \d+ sats at [\d.]+ sat\/vB, but the wallet holds 500 confirmed\./u,
+      ) as string,
+    });
     const { builder } = builderOn();
     await expect(builder.build(intent, funding(401n))).rejects.toMatchObject({
       code: "fee-above-limit",

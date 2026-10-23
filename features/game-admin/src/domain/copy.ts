@@ -131,8 +131,6 @@ export const walletUnavailableCopy =
 export const walletRefusedCopy =
   "Your wallet did not sign, so nothing was sent.";
 
-export const unreachableCopy =
-  "The platform could not be reached. Nothing was changed.";
 export const noSignerCopy =
   "This version has no wallet connection that signs administration steps. Sign the transaction below with a wallet you trust, and paste the signed result.";
 
