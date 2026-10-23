@@ -11,8 +11,10 @@ export const rewardsPolicy = {
   // When a wait is called delayed rather than ordinary (ADR-018): the indexer is more than this many blocks behind the chain's tip, or a
   // sent step or claim has gone this long without finishing. Delayed is shown, never as failed, and nothing is retried or cancelled.
   delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60 * 1000 },
-  // The fee rate is taken for confirmation within this many blocks.
-  feeTargetBlocks: 3,
+  // The fee rate is taken for confirmation within this many blocks. 25 (owner's decision, 2026-10-23) because the testnet4 gateway quotes
+  // 588,235 sat/vB for any target under 13 blocks and about 1 sat/vB from 25; test coins cost nothing to wait on. It applies to every
+  // network the policy serves: a mainnet record would need its own target.
+  feeTargetBlocks: 25,
   // How long one reading of the indexer is reused. Every page of the site shows it, so the node is asked at most once in this time
   // however many people are looking; a reading is never older than this.
   indexingReadingMs: 15_000,
