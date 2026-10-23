@@ -1,14 +1,16 @@
 import { address, networks, opcodes, script } from "bitcoinjs-lib";
 
-export const bitcoinNetworks = ["mainnet", "signet", "regtest"] as const;
-export type BitcoinNetwork = (typeof bitcoinNetworks)[number];
+import type { BitcoinNetwork } from "@ador/shared/chain";
 
-// What tells one network's addresses from another's: the bech32 prefix (BIP-173) and the legacy version bytes. Signet shares
-// testnet's.
+export type { BitcoinNetwork };
+
+// What tells one network's addresses from another's: the bech32 prefix (BIP-173) and the legacy version bytes. Signet and testnet4
+// share testnet's, so an address cannot say which of the three it is for; the chain a request names does.
 const addressRules = {
   mainnet: { legacy: networks.bitcoin, prefix: "bc" },
   regtest: { legacy: networks.regtest, prefix: "bcrt" },
   signet: { legacy: networks.testnet, prefix: "tb" },
+  testnet4: { legacy: networks.testnet, prefix: "tb" },
 } as const satisfies Record<
   BitcoinNetwork,
   { readonly legacy: typeof networks.bitcoin; readonly prefix: string }

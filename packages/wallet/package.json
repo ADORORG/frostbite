@@ -21,6 +21,7 @@
   "dependencies": {
     "@ador/chain": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
+    "@ador/shared": "workspace:*",
     "@omnisat/lasereyes-core": "0.0.85",
     "@omnisat/lasereyes-react": "0.0.80",
     "nanostores": "0.11.4",

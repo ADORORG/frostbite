@@ -13,6 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { networkInList } from "./network-check.ts";
 import { platformSchema } from "./platform.ts";
 
 function timestamps() {
@@ -93,10 +94,7 @@ export const walletIdentities = platformSchema.table(
       table.scriptIdentity,
     ),
     index("wallet_identities_user_id_idx").on(table.userId),
-    check(
-      "wallet_identities_network_supported",
-      sql`${table.network} in ('mainnet', 'signet')`,
-    ),
+    check("wallet_identities_network_supported", networkInList(table.network)),
     check(
       "wallet_identities_adapter_nonempty",
       sql`length(${table.walletAdapter}) > 0 and ${table.walletAdapter} = btrim(${table.walletAdapter})`,
@@ -157,10 +155,7 @@ export const walletChallenges = platformSchema.table(
       "wallet_challenges_expiry_after_issue",
       sql`${table.expiresAt} > ${table.issuedAt}`,
     ),
-    check(
-      "wallet_challenges_network_supported",
-      sql`${table.network} in ('mainnet', 'signet')`,
-    ),
+    check("wallet_challenges_network_supported", networkInList(table.network)),
     check(
       "wallet_challenges_signature_scheme_supported",
       sql`${table.signatureScheme} = 'bip322-simple'`,

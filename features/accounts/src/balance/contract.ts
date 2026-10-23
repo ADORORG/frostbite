@@ -1,3 +1,4 @@
+import { walletNetworkSchema } from "@ador/shared/chain";
 import { z } from "zod";
 
 // The one route that tells the widget a wallet's balance. It is a POST because the platform's operations take their
@@ -15,7 +16,7 @@ export const maxSatoshis = 21_000_000 * 100_000_000;
 
 export const walletBalanceRequestSchema = z.strictObject({
   address: z.string().regex(/^[A-Za-z0-9]{14,90}$/u),
-  network: z.enum(["mainnet", "signet"]),
+  network: walletNetworkSchema,
 });
 
 // Told honestly in two states: a number the platform got from its data source, or why there is none. Never a zero

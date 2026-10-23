@@ -1,4 +1,5 @@
 import type { Requester } from "@ador/client-http";
+import type { WalletNetwork } from "@ador/wallet/contracts";
 
 import {
   walletBalanceResponseSchema,
@@ -7,7 +8,7 @@ import {
 
 export interface BalanceTarget {
   readonly address: string;
-  readonly network: "mainnet" | "signet";
+  readonly network: WalletNetwork;
 }
 
 export interface BalanceReading {

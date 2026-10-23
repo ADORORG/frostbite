@@ -1,3 +1,4 @@
+import type { WalletNetwork } from "@ador/shared/chain";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { CorrelationId } from "@ador/shared/http";
 
@@ -8,7 +9,7 @@ export interface LinkedWallet {
   readonly address: string;
   readonly id: UuidV7;
   readonly linkedAt: Date;
-  readonly network: "mainnet" | "signet";
+  readonly network: WalletNetwork;
   readonly walletAdapter: string;
 }
 

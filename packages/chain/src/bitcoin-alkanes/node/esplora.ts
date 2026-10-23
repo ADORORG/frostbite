@@ -23,10 +23,12 @@ export interface ChainTip {
   readonly height: number;
 }
 
-const hexTxid = /^[0-9a-f]{64}$/u;
+const hexId = /^[0-9a-f]{64}$/u;
 
 // The Bitcoin side of a node, over Esplora's JSON-RPC names.
 export interface EsploraClient {
+  // The hash of the block at `height` on the node's best chain: height 0 is the genesis block, which says which chain it is.
+  blockHash(height: number): Promise<string>;
   // Sends a signed transaction; the answer is its id.
   broadcast(hex: string): Promise<string>;
   // Fee rate in satoshis per virtual byte for confirmation within `target` blocks (the nearest estimate at or above it).
@@ -53,12 +55,24 @@ function utxoOf(value: JsonValue): NodeUtxo {
 
 export function createEsploraClient(rpc: JsonRpc): EsploraClient {
   return {
+    blockHash: async (height) => {
+      const hash = textOf(
+        await rpc.call("esplora_block-height", [height]),
+        "block hash",
+      );
+      if (!hexId.test(hash)) {
+        throw new NodeUnavailableError(
+          "The node's block answer is not a block hash.",
+        );
+      }
+      return hash;
+    },
     broadcast: async (hex) => {
       const txid = textOf(
         await rpc.call("esplora_broadcast", [hex]),
         "broadcast answer",
       );
-      if (!hexTxid.test(txid)) {
+      if (!hexId.test(txid)) {
         throw new NodeUnavailableError(
           "The node's broadcast answer is not a transaction id.",
         );

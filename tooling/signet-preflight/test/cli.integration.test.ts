@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { betaChain } from "../../../configs/chains.ts";
+
 const run = promisify(execFile);
 const servers: Server[] = [];
 afterEach(() => {
@@ -13,6 +15,10 @@ afterEach(() => {
 });
 
 const answers: Readonly<Record<string, string | number | object>> = {
+  // The genesis block of the chain the platform is set to use: its id's thirty-two digits, padded to a block hash.
+  "esplora_block-height": betaChain.chain.chainId
+    .slice("bip122:".length)
+    .padEnd(64, "0"),
   "esplora_blocks:tip:hash": "00",
   "esplora_blocks:tip:height": 100,
   "esplora_fee-estimates": { "3": 2 },

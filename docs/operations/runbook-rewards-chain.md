@@ -1,4 +1,4 @@
-# Runbook: the rewards chain (signet)
+# Runbook: the rewards chain (signet or testnet4)
 
 How a deployment is pointed at the chain its games' rewards contracts live on, and how to turn it on and off. The settings are
 `REWARDS_*` in `.env.example`; the rules (dust, claim output, fee target, signing window, the templates and their released code
@@ -9,8 +9,9 @@ Game rewards page, and the platform records them when each step completes (`ador
 
 ## Turn it on
 
-1. `REWARDS_CHAIN_RPC_URL`: one JSON-RPC address serving the Bitcoin (`esplora_*`) and Alkanes (`metashrew_*`) methods. Signet is
-   the only chain wired today (`configs/chains.ts`). Blank means no rewards chain: claims and staff administration say
+1. `REWARDS_CHAIN_RPC_URL`: one JSON-RPC address serving the Bitcoin (`esplora_*`) and Alkanes (`metashrew_*`) methods. The node must serve the
+   beta's test network, `betaNetwork` in `configs/chains.ts` (`signet`, shipped; or `testnet4`, ADR-019); `pnpm signet:preflight`
+   reads the node's genesis block and fails if it is the other chain, which the addresses alone would not show. Blank means no rewards chain: claims and staff administration say
    "not available".
 2. `REWARDS_MAX_FEE_SATS`: the most one claim or step may pay in fee. Required with the address; boot stops without it. The `game-rewards` template is 294 KB, which costs about 150,000 sats to publish at 2 sat/vB, so the ceiling must be above that (finding S78): 500000 suits signet. Tighten it before any real network.
 3. `REWARDS_CHAIN_RPC_API_KEY` and `REWARDS_CHAIN_RPC_API_KEY_HEADER` (optional, together): for a gateway that wants a key, the key
@@ -20,6 +21,10 @@ Game rewards page, and the platform records them when each step completes (`ador
 5. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
    SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
+
+To move a deployment between test networks, change `betaNetwork`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
+network, apply migrations (`wallet_network_testnet4` widens the wallet network checks), run the preflight, restart, and connect a
+wallet set to the same network. Games, collections and records made on the other network stay on it (their chain ids differ).
 
 Restart the web process after changing any of these. A malformed value stops boot with the name of the setting.
 

@@ -5,6 +5,7 @@ import {
   walletIdentities,
 } from "@ador/database/schema/auth";
 import { releasedWallets } from "@ador/database/schema/wallet-release";
+import { walletNetworkSchema } from "@ador/shared/chain";
 import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
@@ -28,7 +29,7 @@ export function createDrizzleWalletMethodsRepository(
         address: row.address,
         id: uuidV7Schema.parse(row.id),
         linkedAt: row.createdAt,
-        network: row.network === "mainnet" ? "mainnet" : "signet",
+        network: walletNetworkSchema.parse(row.network),
         walletAdapter: row.walletAdapter,
       }));
     },

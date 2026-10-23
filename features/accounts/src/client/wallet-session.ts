@@ -8,13 +8,14 @@ import {
   type AuthMethodsResponse,
 } from "@ador/auth";
 import { ApiError, type Parser, type Requester } from "@ador/client-http";
+import type { WalletNetwork } from "@ador/wallet/contracts";
 
 // What this module needs to know about the player's connected wallet: a narrow slice of the connection library's
 // state, so the sign-in logic does not depend on a vendor and is tested without one.
 export interface WalletConnection {
   readonly address: string;
   readonly connected: boolean;
-  readonly network: "mainnet" | "signet";
+  readonly network: WalletNetwork;
   readonly provider: string | null;
   signMessage(message: string): Promise<string>;
 }

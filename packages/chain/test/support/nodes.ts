@@ -5,6 +5,7 @@ export function fakeNode(overrides: Partial<AlkanesNode> = {}): AlkanesNode {
   const unexpected = (name: string) => (): Promise<never> =>
     Promise.reject(new Error(`${name} was not expected`));
   return {
+    blockHash: unexpected("blockHash"),
     broadcast: unexpected("broadcast"),
     bytecode: unexpected("bytecode"),
     feeRate: unexpected("feeRate"),

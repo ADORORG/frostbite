@@ -7,7 +7,10 @@ export function walletNetworkUnavailableReason(
   provider: LaserEyesProviderId,
   network: WalletNetwork,
 ): string | null {
-  if (provider === "phantom" && network === "signet") {
+  if (
+    provider === "phantom" &&
+    (network === "signet" || network === "testnet4")
+  ) {
     return `Unavailable on ${network} with the current wallet adapter`;
   }
   return null;

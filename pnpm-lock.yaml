@@ -2394,6 +2394,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../plugin-kit
+      '@ador/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@omnisat/lasereyes-core':
         specifier: 0.0.85
         version: 0.0.85(@types/node@26.4.0)(nanostores@0.11.4)(typescript@5.9.3)

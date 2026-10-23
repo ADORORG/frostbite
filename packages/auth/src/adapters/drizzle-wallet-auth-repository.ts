@@ -11,10 +11,8 @@ import type {
   DatabaseClient,
   DatabaseTransaction,
 } from "@ador/database/connection";
-import {
-  validateBitcoinAddress,
-  type BitcoinNetwork,
-} from "@ador/chain/bitcoin";
+import { validateBitcoinAddress } from "@ador/chain/bitcoin";
+import { isWalletNetwork } from "@ador/shared/chain";
 import {
   createUuidV7,
   uuidV7Schema,
@@ -35,16 +33,12 @@ import type {
 
 const WALLET_USER_NAME = "Bitcoin wallet user";
 
-function isNetwork(value: string): value is BitcoinNetwork {
-  return value === "mainnet" || value === "signet";
-}
-
 function isAction(value: string): value is WalletAuthAction {
   return walletAuthActions.some((action) => action === value);
 }
 
 function mapChallenge(row: WalletChallenge): StoredWalletChallenge | null {
-  if (!isNetwork(row.network) || !isAction(row.action)) return null;
+  if (!isWalletNetwork(row.network) || !isAction(row.action)) return null;
   const address = validateBitcoinAddress(row.address, row.network);
   const challengeId = uuidV7Schema.safeParse(row.id);
   const requestId = uuidV7Schema.safeParse(row.requestId);

@@ -1,4 +1,6 @@
-export type WalletNetwork = "mainnet" | "signet";
+import type { WalletNetwork } from "@ador/shared/chain";
+
+export type { WalletNetwork };
 
 export interface WalletAccount {
   readonly address: string;

@@ -71,7 +71,7 @@ describe("the rewards chain", () => {
         ...(
           await original<typeof import("../../../configs/rewards-policy.ts")>()
         ).rewardsPolicy,
-        signetReleaseGate: "closed",
+        testChainReleaseGate: "closed",
       },
     }));
     try {
@@ -161,7 +161,7 @@ describe("the rewards chain", () => {
     for (const finality of Object.values(config.confirmations)) {
       expect(finality).toEqual({ kind: "confirmations", required: 1 });
     }
-    expect(config.releaseGate).toBe(rewardsPolicy.signetReleaseGate);
+    expect(config.releaseGate).toBe(rewardsPolicy.testChainReleaseGate);
     expect(config.releaseGate).toBe("open");
   });
 

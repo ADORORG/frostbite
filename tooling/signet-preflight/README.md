@@ -2,7 +2,7 @@
 
 Developer tooling. Not shipped, and nothing in the platform imports it.
 
-Checks, before any coin is spent, what a first signet run of the rewards chain needs. It reads, and never signs, broadcasts or writes.
+Checks, before any coin is spent, what a first run of the rewards chain needs on the beta's test network (signet or testnet4, `betaNetwork` in `configs/chains.ts`; the package keeps the name it was made with). It reads, and never signs, broadcasts or writes.
 
 ## Public API
 
@@ -14,6 +14,7 @@ something could not be checked).
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
 | Settings           | The platform's own parser (`parseRewardsChainEnvironment`) accepts `REWARDS_*`.                       |
 | Template code      | Each template in `rewardsPolicy.templates` is in `REWARDS_TEMPLATES_DIR` and has the released hash.   |
+| Chain              | The node's genesis block is the configured chain's (signet and testnet4 addresses look alike).        |
 | Indexer            | The indexer is no more than `rewardsPolicy.delay.maxLagBlocks` behind the tip (the site lamp's rule). |
 | Auth-token factory | Code is deployed at `4:65517`, which the game template calls to make an auth token.                   |
 | Fee                | The estimated cost of publishing each template at the quoted rate is within `REWARDS_MAX_FEE_SATS`.   |
@@ -24,7 +25,7 @@ Verdicts: `PASS`, `FAIL`, `UNVERIFIED` (the node could not be asked, so nothing 
 ## Invariants
 
 - Read-only: no signing, no broadcast, no database, no file written.
-- The decisions it checks against (`delay`, `feeTargetBlocks`, `templates`) are the platform's own policy, not copies.
+- The decisions it checks against (`chainId`, `delay`, `feeTargetBlocks`, `templates`) are the platform's own policy, not copies.
 - The fee is an estimate (packed code at a quarter weight plus fixed framing); the platform's builder prices the real
   transaction. It is a check that the ceiling is not clearly too low, not a quote.
 - A check that cannot be made is `UNVERIFIED`, never `PASS`.

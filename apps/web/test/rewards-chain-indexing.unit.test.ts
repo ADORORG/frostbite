@@ -110,7 +110,7 @@ describe("how far the rewards chain's indexer has read", () => {
         ...(
           await original<typeof import("../../../configs/rewards-policy.ts")>()
         ).rewardsPolicy,
-        signetReleaseGate: "closed",
+        testChainReleaseGate: "closed",
       },
     }));
     try {

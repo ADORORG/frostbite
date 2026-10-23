@@ -1,13 +1,15 @@
 import { chainRefSchema } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
-import { bitcoinSignetChainId } from "../../../configs/chains.ts";
+import { betaChain } from "../../../configs/chains.ts";
 import { rewardsPlan } from "../../../configs/rewards-plan.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 describe("the rewards plan staff administration follows", () => {
-  it("is signet, with the family the chain is configured with", () => {
-    expect(rewardsPlan.chain).toBe(chainRefSchema.parse(bitcoinSignetChainId));
+  it("is the beta's chain, with the family the chain is configured with", () => {
+    expect(rewardsPlan.chain).toBe(
+      chainRefSchema.parse(betaChain.chain.chainId),
+    );
     expect(rewardsPlan.family).toBe("bitcoin-alkanes");
   });
 

@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { check, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 import { authUsers } from "./auth.ts";
+import { networkInList } from "./network-check.ts";
 import { platformSchema } from "./platform.ts";
 
 // A wallet an account removed, held for a while before another account may take it, so a wallet cannot be moved
@@ -30,10 +31,7 @@ export const releasedWallets = platformSchema.table(
       table.network,
       table.scriptIdentity,
     ),
-    check(
-      "released_wallets_network_supported",
-      sql`${table.network} in ('mainnet', 'signet')`,
-    ),
+    check("released_wallets_network_supported", networkInList(table.network)),
     check(
       "released_wallets_hold_after_release",
       sql`${table.heldUntil} > ${table.releasedAt}`,

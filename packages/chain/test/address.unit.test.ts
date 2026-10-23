@@ -6,7 +6,8 @@ const mainnetP2wpkh = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
 const mainnetP2tr =
   "bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0";
 const signetP2wpkh = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
-// An address Bitcoin Core's regtest wallet made, and a legacy testnet one (regtest and signet share testnet's version bytes).
+// An address Bitcoin Core's regtest wallet made, and a legacy testnet one (regtest, signet and testnet4 share testnet's version bytes).
+// Signet and testnet4 write addresses alike (`tb`), so the same address is valid on both: the chain a request names says which.
 const regtestP2wpkh = "bcrt1qn42y974s76dhr4jsswtqer8sl2h8aracmelqvs";
 const testnetLegacy = "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn";
 
@@ -15,6 +16,7 @@ describe("validateBitcoinAddress", () => {
     [mainnetP2wpkh, "mainnet", "p2wpkh", 44],
     [mainnetP2tr, "mainnet", "p2tr", 68],
     [signetP2wpkh, "signet", "p2wpkh", 44],
+    [signetP2wpkh, "testnet4", "p2wpkh", 44],
     [regtestP2wpkh, "regtest", "p2wpkh", 44],
   ] as const)("validates %s", (candidate, network, type, scriptLength) => {
     const result = validateBitcoinAddress(candidate, network);
@@ -34,6 +36,9 @@ describe("validateBitcoinAddress", () => {
     [testnetLegacy, "regtest", "unsupported-address-type"],
     [testnetLegacy, "mainnet", "invalid-address"],
     [mainnetP2wpkh, "signet", "invalid-address"],
+    [mainnetP2wpkh, "testnet4", "invalid-address"],
+    [regtestP2wpkh, "testnet4", "invalid-address"],
+    [testnetLegacy, "testnet4", "unsupported-address-type"],
     [signetP2wpkh, "mainnet", "invalid-address"],
     [` ${mainnetP2wpkh}`, "mainnet", "invalid-address"],
     [mainnetP2wpkh.toUpperCase(), "mainnet", "invalid-address"],

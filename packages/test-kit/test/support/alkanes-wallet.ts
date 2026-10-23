@@ -62,6 +62,7 @@ export function raiseFirstOutput(signed: SignedTransaction): SignedTransaction {
 export function claimNode(): AlkanesNode {
   let sent = false;
   return {
+    blockHash: () => Promise.resolve("aa".repeat(32)),
     broadcast: () => {
       sent = true;
       return Promise.resolve("00".repeat(32));

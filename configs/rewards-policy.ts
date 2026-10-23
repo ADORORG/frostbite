@@ -27,14 +27,14 @@ export const rewardsPolicy = {
   maxTemplateCodeBytes: 512 * 1024,
   // The most a new game's contract may be created to accept; staff choose within it when they create the contract.
   maxDrawingBytes: 16_384n,
-  // Whether the platform may build, send and watch transactions on signet. Signet is open (ADR-018: signet first); a mainnet record
-  // is added closed and opened by the owner after review, as an edit to this file.
-  signetReleaseGate: "open",
+  // Whether the platform may build, send and watch transactions on the beta's test network (signet or testnet4, ADR-018 and ADR-019).
+  // It is open; a mainnet record is added closed and opened by the owner after review, as an edit to this file.
+  testChainReleaseGate: "open",
   // The wallets (LaserEyes provider ids) staff may sign administration steps with from the page. Chosen by the owner; each still
   // needs qualification evidence (packages/wallet README) before it is relied on for real funds.
   signingWallets: ["xverse", "unisat", "oyl"],
-  // The confirmations after which a step is done on signet (ADR-018, D22); the indexer must also have run it.
-  signetConfirmations: 1,
+  // The confirmations after which a step is done on the beta's test network (ADR-018, D22); the indexer must also have run it.
+  testChainConfirmations: 1,
   // The templates the platform may publish. Their code hashes are the released ones, so a rebuilt template that differs is
   // refused until a new version is released and listed here.
   templates: [

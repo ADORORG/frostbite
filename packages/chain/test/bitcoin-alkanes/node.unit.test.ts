@@ -121,6 +121,21 @@ describe("the chain side", () => {
     ).rejects.toThrow("not a whole number");
   });
 
+  it("reads the hash of the block at a height, and refuses an answer that is not one", async () => {
+    const genesis =
+      "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043";
+    const { calls, rpc } = scriptedRpc({ "esplora_block-height": genesis });
+    expect(await createRpcNode(rpc).blockHash(0)).toBe(genesis);
+    expect(calls).toEqual([{ method: "esplora_block-height", params: [0] }]);
+    for (const bad of ["Block not found", genesis.toUpperCase(), 7]) {
+      await expect(
+        createRpcNode(
+          scriptedRpc({ "esplora_block-height": bad }).rpc,
+        ).blockHash(0),
+      ).rejects.toThrow();
+    }
+  });
+
   it("lists unspent outputs with their confirmation", async () => {
     const { calls, rpc } = scriptedRpc({
       "esplora_address::utxo": unspentOutputs,

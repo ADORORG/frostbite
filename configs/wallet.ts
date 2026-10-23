@@ -1,6 +1,8 @@
 import type { GameWalletConfig } from "@ador/feature-games";
 import type { WalletAuthConfig } from "@ador/feature-accounts";
 
+import { betaChain } from "./chains.ts";
+
 // How wallet sign-in behaves and which wallets a player can choose, as the business decided them. A change is a
 // reviewed change to this record.
 export const walletAuthConfig = {
@@ -25,7 +27,8 @@ export const walletAuthConfig = {
   challengeLifetimeMs: 300_000,
   // Three wrong signatures kill a challenge, so a guess at a signature is not worth making.
   maximumVerificationAttempts: 3,
-  network: "signet",
+  // The wallet must be on the beta's test network (configs/chains.ts).
+  network: betaChain.network,
   // The connection library reconnects to the last wallet about two seconds after load (it waits for extensions);
   // a wallet that has not come back within ten seconds is not coming back.
   reconnectWaitMs: 10_000,

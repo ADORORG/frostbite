@@ -17,8 +17,15 @@ export function formatBalance(satoshis: number): string {
 // The time of an ISO timestamp, in UTC, so the same reading reads the same everywhere.
 export const updatedAt = (iso: string) => `${iso.slice(11, 19)} UTC`;
 
-const networkNames: Record<WalletNetwork, string> = {
-  mainnet: "Mainnet",
-  signet: "Signet",
-};
-export const networkName = (network: WalletNetwork) => networkNames[network];
+// A map, and the wallet's own word when there is none: the connection library reports whatever network the wallet is on
+// ("testnet", "regtest", …), which is not always one of ours, and the widget must not show "undefined".
+const networkNames: ReadonlyMap<string, string> = new Map<
+  WalletNetwork,
+  string
+>([
+  ["mainnet", "Mainnet"],
+  ["signet", "Signet"],
+  ["testnet4", "Testnet4"],
+]);
+export const networkName = (network: string) =>
+  networkNames.get(network) ?? network;

@@ -133,6 +133,38 @@ describe("the wallet a game can see", () => {
     expect(h.container.textContent).not.toContain("this game uses");
   });
 
+  it("names testnet4 on the card, and warns about a wallet that is on signet instead", async () => {
+    const { target } = await mount(undefined, {
+      game: walletGame,
+      wallet: {
+        connect,
+        current: { address, network: "signet" },
+        expectedNetwork: "testnet4",
+      },
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    await flush();
+    expect(h.container.textContent).toContain(
+      "⚠ Signet — this game uses Testnet4",
+    );
+  });
+
+  it("shows a network it has no word for as the wallet reported it", async () => {
+    const { target } = await mount(undefined, {
+      game: walletGame,
+      wallet: {
+        connect,
+        current: { address, network: "constructor" },
+        expectedNetwork: "signet",
+      },
+    });
+    send(target, "ready", { sdkVersion: 1 }, "a");
+    await flush();
+    expect(h.container.textContent).toContain(
+      "⚠ constructor — this game uses Signet",
+    );
+  });
+
   it("tells the game when the wallet connects or leaves, without restarting it", async () => {
     const { reply, target } = await mount(undefined, asking(null));
     send(target, "ready", { sdkVersion: 1 }, "a");

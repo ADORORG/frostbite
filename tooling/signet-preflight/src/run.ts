@@ -6,7 +6,9 @@ import {
 
 import type { DelayPolicy } from "@ador/shared/chain";
 
+import { betaChain } from "../../../configs/chains.ts";
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+import { chainName, checkChain } from "./checks/chain.ts";
 import { checkConfiguration } from "./checks/configuration.ts";
 import { checkFee, feeName } from "./checks/fee.ts";
 import {
@@ -21,6 +23,8 @@ import type { CheckResult } from "./result.ts";
 
 // The decisions the checks hold the setup to; the platform's own policy unless a test supplies another.
 export interface PreflightPolicy {
+  // The chain the platform is set to use (CAIP-2), which the node must serve.
+  readonly chainId: string;
   readonly delay: DelayPolicy;
   readonly feeTargetBlocks: number;
   readonly templates: readonly TemplateSpec[];
@@ -37,12 +41,15 @@ const skipped = (name: string): CheckResult => ({
   verdict: "skipped",
 });
 
-// Everything that can be checked on the way to a first signet run without sending a transaction, in the order a person would fix
+// Everything that can be checked on the way to a first run on the beta's test network without sending a transaction, in the order a person would fix
 // it. Nothing here signs, broadcasts or writes.
 export async function runPreflight(
   source: NodeJS.ProcessEnv,
   platform: PreflightPlatform,
-  policy: PreflightPolicy = rewardsPolicy,
+  policy: PreflightPolicy = {
+    ...rewardsPolicy,
+    chainId: betaChain.chain.chainId,
+  },
 ): Promise<readonly CheckResult[]> {
   const { environment, result } = checkConfiguration(source);
   const templates = await checkTemplates(
@@ -54,6 +61,7 @@ export async function runPreflight(
     return [
       result,
       templates.result,
+      skipped(chainName),
       skipped(indexerName),
       skipped(factoryName),
       skipped(feeName),
@@ -70,6 +78,7 @@ export async function runPreflight(
   return [
     result,
     templates.result,
+    await checkChain(node, policy.chainId),
     await checkIndexer(node, policy.delay),
     await checkFactory(node, authTokenFactory),
     await checkFee(

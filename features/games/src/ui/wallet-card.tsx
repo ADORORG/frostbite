@@ -12,9 +12,14 @@ export const shortAddress = (address: string) =>
 
 // What this game can see of the player's wallet, said as it is: the address and the network, when one is
 // connected, and nothing else. Shown only for a game that declared the wallet capability.
-// The protocol names the network as plain text; the two the platform knows are written as words.
-const networkName = (network: string) =>
-  network === "mainnet" ? "Mainnet" : network === "signet" ? "Signet" : network;
+// The protocol names the network as plain text; the ones the platform knows are written as words.
+// A map, not an object: the name comes from the game's side of the protocol, and "constructor" must not find a function.
+const networkNames: ReadonlyMap<string, string> = new Map([
+  ["mainnet", "Mainnet"],
+  ["signet", "Signet"],
+  ["testnet4", "Testnet4"],
+]);
+const networkName = (network: string) => networkNames.get(network) ?? network;
 
 export function WalletCard({
   connect,

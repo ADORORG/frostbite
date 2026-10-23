@@ -1,3 +1,4 @@
+import { walletNetworkSchema } from "@ador/shared/chain";
 import { uuidV7TextSchema } from "@ador/shared/identifiers";
 import { z } from "zod";
 
@@ -55,7 +56,8 @@ export const walletAuthRoutes = {
 // The path the signed message names as the page asking for it (the origin comes from the platform's own address).
 export const walletAuthUriPath = "/auth/wallet";
 
-export const walletNetworkSchema = z.enum(["mainnet", "signet"]);
+// The networks a wallet may sign in from: the platform-wide vocabulary, stated once in `@ador/shared/chain`.
+export { walletNetworkSchema };
 
 export const walletChallengeRequestSchema = z.strictObject({
   address: z.string().regex(/^[A-Za-z0-9]{14,90}$/u),

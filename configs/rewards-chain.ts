@@ -16,7 +16,7 @@ import {
 } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
-import { bitcoinSignetChainId, targetChains } from "./chains.ts";
+import { betaChain, type BetaChain } from "./chains.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";
 
 // What the process provides, so a test can stand in for the network, the clock and the disk.
@@ -43,24 +43,16 @@ export interface RewardsChain {
   };
 }
 
-const signet = chainRefSchema.parse(bitcoinSignetChainId);
-
-function signetOption() {
-  const option = targetChains.find(({ chainId }) => chainId === signet);
-  if (option === undefined)
-    throw new Error(`${signet} is not a configured chain.`);
-  return option;
-}
-
-// The chain's record: every operation held to the confirmations decided for signet, and the gate the policy states.
-export function chainConfig(): ChainConfig {
+// The chain's record: every operation held to the confirmations decided for the beta's test network, and the gate the policy states.
+// `beta` is the deployment's chain unless a test names another.
+export function chainConfig(beta: BetaChain = betaChain): ChainConfig {
   const finality = {
     kind: "confirmations",
-    required: rewardsPolicy.signetConfirmations,
+    required: rewardsPolicy.testChainConfirmations,
   } as const;
-  const option = signetOption();
+  const option = beta.chain;
   return {
-    chainId: signet,
+    chainId: option.chainId,
     confirmations: {
       deploy: finality,
       mint: finality,
@@ -73,7 +65,7 @@ export function chainConfig(): ChainConfig {
     displayName: option.displayName,
     enabled: true,
     family: option.family,
-    releaseGate: rewardsPolicy.signetReleaseGate,
+    releaseGate: rewardsPolicy.testChainReleaseGate,
     role: option.role,
   };
 }
@@ -81,6 +73,7 @@ export function chainConfig(): ChainConfig {
 function configuredChain(
   environment: RewardsChainEnvironment,
   platform: RewardsPlatform,
+  beta: BetaChain,
 ): ConfiguredChain {
   const directory = environment.templatesDirectory;
   return {
@@ -98,9 +91,9 @@ function configuredChain(
                   platform.readFile(join(directory, `${crate}.wasm`)),
                 templates: rewardsPolicy.templates,
               },
-        chain: signet,
+        chain: chainRefSchema.parse(beta.chain.chainId),
         maxPreviewBytes: rewardsPolicy.maxPreviewBytes,
-        network: "signet",
+        network: beta.network,
         now: platform.now,
         rpc: {
           fetch: platform.fetch,
@@ -116,25 +109,26 @@ function configuredChain(
         },
       },
     },
-    config: chainConfig(),
+    config: chainConfig(beta),
   };
 }
 
 function portsOf(
   registry: ReturnType<typeof createConfiguredRegistry>,
   platform: RewardsPlatform,
+  chain: ChainRef,
 ) {
   return {
-    addressCodec: registry.port(signet, "addressCodec"),
-    broadcaster: registry.port(signet, "broadcaster"),
-    builder: registry.port(signet, "builder"),
-    contracts: registry.port(signet, "contracts"),
+    addressCodec: registry.port(chain, "addressCodec"),
+    broadcaster: registry.port(chain, "broadcaster"),
+    builder: registry.port(chain, "builder"),
+    contracts: registry.port(chain, "contracts"),
     // Every page of the site shows how far the indexer has read, so the node is asked once in a while and not once a visitor.
-    observer: cacheIndexing(registry.port(signet, "observer"), {
+    observer: cacheIndexing(registry.port(chain, "observer"), {
       now: platform.now,
       ttlMs: rewardsPolicy.indexingReadingMs,
     }),
-    rewards: registry.port(signet, "rewards"),
+    rewards: registry.port(chain, "rewards"),
   };
 }
 
@@ -143,20 +137,22 @@ function portsOf(
 export function createRewardsChain(
   environment: RewardsChainEnvironment | null,
   platform: RewardsPlatform,
+  beta: BetaChain = betaChain,
 ): RewardsChain | null {
   if (environment === null) return null;
-  const configured = configuredChain(environment, platform);
+  const served = chainRefSchema.parse(beta.chain.chainId);
+  const configured = configuredChain(environment, platform, beta);
   const registry = createConfiguredRegistry([configured]);
-  const ports = portsOf(registry, platform);
-  const offered = registry.broadcastAllowed(signet)
+  const ports = portsOf(registry, platform, served);
+  const offered = registry.broadcastAllowed(served)
     ? { funding: feeCeiling(configured, environment.maxFeeSats), ports }
     : null;
   return {
-    chain: (chain) => (chain === signet ? offered : null),
+    chain: (chain) => (chain === served ? offered : null),
     // Reading how far the indexer has come moves nothing, so it does not wait on the release gate that guards sending.
     followed: {
       displayName: configured.config.displayName,
-      indexing: () => ports.observer.indexing(signet),
+      indexing: () => ports.observer.indexing(served),
     },
   };
 }

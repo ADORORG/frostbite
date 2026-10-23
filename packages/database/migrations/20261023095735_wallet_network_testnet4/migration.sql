@@ -1,0 +1,3 @@
+ALTER TABLE "ador"."wallet_challenges" DROP CONSTRAINT "wallet_challenges_network_supported", ADD CONSTRAINT "wallet_challenges_network_supported" CHECK ("network" in ('mainnet', 'signet', 'testnet4'));--> statement-breakpoint
+ALTER TABLE "ador"."wallet_identities" DROP CONSTRAINT "wallet_identities_network_supported", ADD CONSTRAINT "wallet_identities_network_supported" CHECK ("network" in ('mainnet', 'signet', 'testnet4'));--> statement-breakpoint
+ALTER TABLE "ador"."released_wallets" DROP CONSTRAINT "released_wallets_network_supported", ADD CONSTRAINT "released_wallets_network_supported" CHECK ("network" in ('mainnet', 'signet', 'testnet4'));

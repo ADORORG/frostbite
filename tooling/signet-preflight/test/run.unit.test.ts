@@ -5,7 +5,10 @@ import { exitCodeOf, formatReport, messageOf } from "../src/result.ts";
 import { runPreflight } from "../src/run.ts";
 
 const code = new Uint8Array([0, 97, 115, 109]);
+const genesis =
+  "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043";
 const policy = {
+  chainId: "bip122:00000000da84f2bafbbc53dee25a72ae",
   delay: { maxLagBlocks: 2, maxUnsettledMs: 3_600_000 },
   feeTargetBlocks: 3,
   templates: [
@@ -34,6 +37,7 @@ function nodeAnswering(
 }
 
 const healthy = {
+  "esplora_block-height": genesis,
   "esplora_blocks:tip:hash": "00",
   "esplora_blocks:tip:height": 100,
   "esplora_fee-estimates": { "3": 2 },
@@ -49,6 +53,7 @@ describe("the whole preflight", () => {
   it("passes every check against a healthy node with the released code", async () => {
     const results = await runPreflight(env, platform(healthy), policy);
     expect(results.map(({ verdict }) => verdict)).toEqual([
+      "pass",
       "pass",
       "pass",
       "pass",
@@ -78,6 +83,34 @@ describe("the whole preflight", () => {
     expect(exitCodeOf(results)).toBe(2);
   });
 
+  it("fails, naming both chains, when the node serves another chain than the platform is set to use", async () => {
+    const signetGenesis =
+      "00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6";
+    const results = await runPreflight(
+      env,
+      platform({ ...healthy, "esplora_block-height": signetGenesis }),
+      policy,
+    );
+    expect(results[2]).toMatchObject({
+      name: "The node serves the configured chain",
+      verdict: "fail",
+    });
+    expect(results[2]?.detail).toContain(
+      "bip122:00000008819873e925422c1ff0f99f7c",
+    );
+    expect(results[2]?.detail).toContain(policy.chainId);
+    expect(exitCodeOf(results)).toBe(1);
+  });
+
+  it("does not claim the chain when the node cannot be asked for its genesis block", async () => {
+    const results = await runPreflight(
+      env,
+      platform({ ...healthy, "esplora_block-height": new Error("no backend") }),
+      policy,
+    );
+    expect(results[2]?.verdict).toBe("unverified");
+  });
+
   it("checks nothing against the node when the settings are not usable", async () => {
     let calls = 0;
     const results = await runPreflight(
@@ -98,6 +131,7 @@ describe("the whole preflight", () => {
       "skipped",
       "skipped",
       "skipped",
+      "skipped",
     ]);
     expect(exitCodeOf(results)).toBe(1);
   });
@@ -109,7 +143,7 @@ describe("the whole preflight", () => {
       policy,
     );
     expect(results[1]?.verdict).toBe("fail");
-    expect(results[4]?.verdict).toBe("unverified");
+    expect(results[5]?.verdict).toBe("unverified");
   });
 });
 
