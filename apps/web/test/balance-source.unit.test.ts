@@ -2,9 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import { betaChain } from "../../../configs/chains.ts";
 
-// A valid address on the test networks (signet and testnet4 write addresses alike), and one that is mainnet's.
 const testAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
-const mainnetAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
+// What the chain accepts as an address is the chain's word (see the rewards chain tests); here it accepts only the test address.
+const chainAccepting = (
+  balance: () => Promise<unknown> = async () => null,
+) => ({
+  accepts: (address: string) => address === testAddress,
+  balance,
+});
 
 async function sourceWith(followed: unknown) {
   vi.resetModules();
@@ -25,16 +30,15 @@ describe("where the header's balance comes from", () => {
     expect(await sourceWith(null)).toBeNull();
   });
 
-  it("reads only an address valid on the network the deployment runs on", async () => {
-    const source = await sourceWith({ balance: async () => null });
+  it("reads only an address the chain accepts, for the network the deployment runs on", async () => {
+    const source = await sourceWith(chainAccepting());
     expect(source?.accepts(testAddress, betaChain.network)).toBe(true);
-    // A wallet on another network, or an address from another network, is not looked up.
+    // A wallet on another network is not looked up, whatever its address.
     expect(source?.accepts(testAddress, "mainnet")).toBe(false);
     // Signet and testnet4 write addresses alike, so only the network the wallet is on tells them apart.
     const otherTestNetwork =
       betaChain.network === "signet" ? "testnet4" : "signet";
     expect(source?.accepts(testAddress, otherTestNetwork)).toBe(false);
-    expect(source?.accepts(mainnetAddress, betaChain.network)).toBe(false);
     expect(source?.accepts("not-an-address", betaChain.network)).toBe(false);
   });
 
@@ -43,7 +47,7 @@ describe("where the header's balance comes from", () => {
       confirmed: 123_456n,
       pending: 5_000_000n,
     }));
-    const source = await sourceWith({ balance });
+    const source = await sourceWith({ ...chainAccepting(), balance });
     expect(await source?.balance(testAddress, betaChain.network)).toEqual({
       confirmedSats: 123_456,
       pendingSats: 5_000_000,

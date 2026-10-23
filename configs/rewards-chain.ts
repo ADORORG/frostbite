@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
 import { cacheIndexing } from "@ador/chain/indexing";
-import type { AddressBalance } from "@ador/chain/ports";
+import { InvalidAddressError, type AddressBalance } from "@ador/chain/ports";
 import {
   createConfiguredRegistry,
   feeCeiling,
@@ -40,6 +40,8 @@ export interface RewardsChain {
   } | null;
   // The chain as anyone may see how far its indexer has read: its name, and the reading (which rejects where the node cannot be asked).
   readonly followed: {
+    // Whether this is an address on the chain, in its notation; nothing is looked up for one that is not.
+    accepts(address: string): boolean;
     // What an address holds on the chain (see `ChainObserver.balance`).
     balance(address: string): Promise<AddressBalance>;
     readonly displayName: string;
@@ -158,6 +160,15 @@ export function createRewardsChain(
     chain: (chain) => (chain === served ? offered : null),
     // Reading how far the indexer has come moves nothing, so it does not wait on the release gate that guards sending.
     followed: {
+      accepts: (address) => {
+        try {
+          ports.addressCodec.parse(served, address);
+          return true;
+        } catch (error) {
+          if (error instanceof InvalidAddressError) return false;
+          throw error;
+        }
+      },
       balance: (address) => ports.observer.balance(served, address),
       displayName: configured.config.displayName,
       feeRates: (targets) => ports.observer.feeRates(served, targets),

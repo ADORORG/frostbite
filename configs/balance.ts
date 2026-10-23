@@ -1,4 +1,3 @@
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
 import type { BalanceSource } from "@ador/feature-accounts";
 
 import { betaChain } from "./chains.ts";
@@ -14,8 +13,7 @@ export const balanceSource: BalanceSource | null =
     ? null
     : {
         accepts: (address, network) =>
-          network === betaChain.network &&
-          validateBitcoinAddress(address, network).ok,
+          network === betaChain.network && followed.accepts(address),
         balance: async (address) => {
           const held = await followed.balance(address);
           return {

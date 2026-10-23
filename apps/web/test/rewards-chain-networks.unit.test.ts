@@ -125,3 +125,23 @@ describe("BETA_NETWORK", () => {
     await expect(followed("testnet3")).rejects.toThrow("BETA_NETWORK");
   });
 });
+
+describe("which addresses the followed chain accepts", () => {
+  const testAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
+  const mainnetAddress = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
+
+  it.each(Object.values(betaChains))(
+    "takes only the notation of $network",
+    ({ network }) => {
+      const followed = createRewardsChain(
+        environment,
+        platform,
+        betaChains[network],
+      )?.followed;
+      expect(followed?.accepts(testAddress)).toBe(true);
+      expect(followed?.accepts(mainnetAddress)).toBe(false);
+      expect(followed?.accepts("not-an-address")).toBe(false);
+      expect(followed?.accepts("")).toBe(false);
+    },
+  );
+});
