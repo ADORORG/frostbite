@@ -3,7 +3,7 @@ import { createServer, request as httpRequest, type Server } from "node:http";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { stackActors } from "../src/manual-stack.ts";
+import { stackActors, type StackActor } from "../src/manual-stack.ts";
 import { createStackProxy } from "../src/stack-proxy.ts";
 
 const origin = "http://localhost:4174";
@@ -41,9 +41,17 @@ function echoUpstream() {
   });
 }
 
-async function proxy(upstreamPort: number): Promise<string> {
+async function proxy(
+  upstreamPort: number,
+  startSession?: (actor: StackActor) => Promise<void>,
+): Promise<string> {
   const port = await start(
-    createStackProxy({ actors: stackActors, origin, upstreamPort }),
+    createStackProxy({
+      actors: stackActors,
+      origin,
+      upstreamPort,
+      ...(startSession === undefined ? {} : { startSession }),
+    }),
   );
   return `http://127.0.0.1:${String(port)}`;
 }
@@ -86,6 +94,29 @@ describe("the stack front door", () => {
     expect(response.headers.get("set-cookie")).toContain(
       `${platformSessionCookieName}=`,
     );
+  });
+
+  it("makes the person's session usable before it hands out the cookie, and only for the person asked for", async () => {
+    const started: string[] = [];
+    const base = await proxy(1, async ({ id }) => {
+      started.push(id);
+    });
+    const response = await post(`${base}/dev/sign-in`, "actor=staff");
+    expect(response.status).toBe(303);
+    expect(response.headers.get("set-cookie")).toContain("e2e-staff");
+    expect(started).toEqual(["staff"]);
+    expect((await post(`${base}/dev/sign-in`, "actor=nobody")).status).toBe(
+      400,
+    );
+    await post(`${base}/dev/sign-out`, "");
+    expect(started).toEqual(["staff"]);
+  });
+
+  it("gives no cookie when the session could not be started", async () => {
+    const base = await proxy(1, () => Promise.reject(new Error("down")));
+    const response = await post(`${base}/dev/sign-in`, "actor=staff");
+    expect(response.status).toBe(500);
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("signs a person out", async () => {

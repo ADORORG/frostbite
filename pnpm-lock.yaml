@@ -2632,6 +2632,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.11)
+      drizzle-orm:
+        specifier: 1.0.0-rc.4
+        version: 1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.0)(valibot@1.4.2(typescript@7.0.2))(zod@4.5.4)
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
@@ -11009,6 +11012,14 @@ snapshots:
       valibot: 1.4.2(typescript@5.9.3)
       zod: 4.5.4
 
+  drizzle-orm@1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.0)(valibot@1.4.2(typescript@7.0.2))(zod@4.5.4):
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+      '@types/pg': 8.23.1
+      pg: 8.23.0
+      valibot: 1.4.2(typescript@7.0.2)
+      zod: 4.5.4
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -13145,6 +13156,11 @@ snapshots:
   valibot@1.4.2(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
+
+  valibot@1.4.2(typescript@7.0.2):
+    optionalDependencies:
+      typescript: 7.0.2
+    optional: true
 
   validate-npm-package-license@3.0.4:
     dependencies:

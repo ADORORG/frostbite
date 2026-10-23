@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 
+import { eq } from "drizzle-orm";
+
 import {
   applyMigrations,
   authSessions,
@@ -34,6 +36,22 @@ function seededActors() {
     fixture,
     name: `E2E ${key}`,
   }));
+}
+
+// Makes a seeded session usable again: signing out in the web app revokes the row, and the stack's tokens are fixed, so the same token
+// would otherwise be refused for good. The idle window starts again from now.
+export async function reviveSession(
+  database: ReturnType<typeof createDatabaseClient>,
+  token: string,
+  now: Date = new Date(),
+): Promise<void> {
+  await database
+    .update(authSessions)
+    .set({
+      idleExpiresAt: new Date(now.getTime() + 86_400_000),
+      revokedAt: null,
+    })
+    .where(eq(authSessions.tokenHash, hash(token)));
 }
 
 export async function seed(databaseUrl: string): Promise<void> {

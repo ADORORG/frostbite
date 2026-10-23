@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import { resolve } from "node:path";
 
+import { createDatabaseClient, createDatabasePool } from "@ador/database";
+
 import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
 
 import {
@@ -16,7 +18,7 @@ import {
 } from "../src/stack-chain-environment.ts";
 import { createStackProxy } from "../src/stack-proxy.ts";
 import { withUploadServices } from "../src/services.ts";
-import { applicationEnvironment, seed } from "./stack-setup.ts";
+import { applicationEnvironment, reviveSession, seed } from "./stack-setup.ts";
 
 // Runs the whole product locally for a person to drive by hand: a disposable PostgreSQL, local S3,
 // the worker, a self-hosted Inngest, and the web server, with the same users the browser tests use.
@@ -127,44 +129,59 @@ const { baseURL, port } = resolveStackServer();
 await withDisposablePostgres(async (databaseUrl) => {
   await seed(databaseUrl);
   const baseEnvironment = applicationEnvironment(databaseUrl, baseURL);
-  await withUploadServices(
-    { baseEnvironment, webOrigin: new URL(baseURL).origin },
-    async (serviceEnvironment) => {
-      // The server is started directly (not through pnpm) so the process stopped below is the server
-      // itself: a wrapper that is stopped would leave the real server running and the port taken.
-      const upstreamPort = await freePort();
-      const server = run(
-        ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
-        {
-          ...stackEnvironment,
-          ...baseEnvironment,
-          ...serviceEnvironment,
-          HOSTNAME: "127.0.0.1",
-          PORT: String(upstreamPort),
-        },
-        resolve(repositoryRoot, "apps/web"),
-      );
-      try {
-        await waitUntilServing(`http://127.0.0.1:${upstreamPort}`, server);
-        // The people use the stack's address; the front door serves the test sign-in and passes the rest on.
-        const frontDoor = createStackProxy({
-          actors: stackActors,
-          origin: baseURL,
-          upstreamPort,
-        });
-        await listen(frontDoor, Number(port));
-        console.log(formatStackGuide({ baseURL }));
-        console.log(`${describeChain(stackEnvironment)}\n`);
+  // For the front door's sign-in, which makes a signed-out person's session usable again.
+  const sessionPool = createDatabasePool({
+    DATABASE_ACQUIRE_TIMEOUT_MS: 5_000,
+    DATABASE_IDLE_TIMEOUT_MS: 1_000,
+    DATABASE_POOL_MAX: 2,
+    DATABASE_SSL_MODE: "disable",
+    DATABASE_STATEMENT_TIMEOUT_MS: 5_000,
+    DATABASE_URL: databaseUrl,
+  });
+  try {
+    await withUploadServices(
+      { baseEnvironment, webOrigin: new URL(baseURL).origin },
+      async (serviceEnvironment) => {
+        // The server is started directly (not through pnpm) so the process stopped below is the server
+        // itself: a wrapper that is stopped would leave the real server running and the port taken.
+        const upstreamPort = await freePort();
+        const server = run(
+          ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
+          {
+            ...stackEnvironment,
+            ...baseEnvironment,
+            ...serviceEnvironment,
+            HOSTNAME: "127.0.0.1",
+            PORT: String(upstreamPort),
+          },
+          resolve(repositoryRoot, "apps/web"),
+        );
         try {
-          await untilInterrupted();
+          await waitUntilServing(`http://127.0.0.1:${upstreamPort}`, server);
+          // The people use the stack's address; the front door serves the test sign-in and passes the rest on.
+          const sessions = createDatabaseClient(sessionPool);
+          const frontDoor = createStackProxy({
+            actors: stackActors,
+            origin: baseURL,
+            startSession: ({ token }) => reviveSession(sessions, token),
+            upstreamPort,
+          });
+          await listen(frontDoor, Number(port));
+          console.log(formatStackGuide({ baseURL }));
+          console.log(`${describeChain(stackEnvironment)}\n`);
+          try {
+            await untilInterrupted();
+          } finally {
+            frontDoor.closeAllConnections();
+            frontDoor.close();
+          }
         } finally {
-          frontDoor.closeAllConnections();
-          frontDoor.close();
+          server.kill("SIGTERM");
+          await finished(server).catch(() => null);
         }
-      } finally {
-        server.kill("SIGTERM");
-        await finished(server).catch(() => null);
-      }
-    },
-  );
+      },
+    );
+  } finally {
+    await sessionPool.end();
+  }
 });

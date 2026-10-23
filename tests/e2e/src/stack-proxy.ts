@@ -25,6 +25,9 @@ export interface StackProxyOptions {
   readonly actors: readonly StackActor[];
   // The origin people use, e.g. http://localhost:4174. A sign-in posted from any other origin is refused.
   readonly origin: string;
+  // Makes the person's session usable again before the cookie is handed out. Signing out in the web app revokes the session row, and
+  // the stack's sessions are fixed tokens, so without this a person could never sign in again after signing out.
+  readonly startSession?: (actor: StackActor) => Promise<void>;
   readonly upstreamPort: number;
 }
 
@@ -85,13 +88,19 @@ export function createStackProxy(options: StackProxyOptions): Server {
         return;
       }
       readForm(request).then(
-        (form) =>
-          send(
-            response,
-            path === signInPath
-              ? signInResponse(options.actors, form)
-              : signOutResponse(),
-          ),
+        async (form) => {
+          if (path === signOutPath) return send(response, signOutResponse());
+          const actor = options.actors.find(
+            ({ id }) => id === form.get("actor"),
+          );
+          try {
+            if (actor !== undefined) await options.startSession?.(actor);
+          } catch {
+            response.writeHead(500).end("The session could not be started.");
+            return;
+          }
+          send(response, signInResponse(options.actors, form));
+        },
         () => response.writeHead(413).end("Form too large."),
       );
       return;
