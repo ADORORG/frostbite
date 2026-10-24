@@ -53,3 +53,4 @@ yarn-error.log*
 
 # Local regtest state and built indexer (tooling/regtest)
 tooling/regtest/.regtest/
+tooling/regtest/.signet/
