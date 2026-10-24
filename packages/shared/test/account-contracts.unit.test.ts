@@ -16,16 +16,18 @@ const policy = {
     owner: ["organization:ownership"],
   },
   platform: {
+    admin: [],
     reviewer: ["creator:review"],
     staff: ["platform:operate"],
   },
+  requiredMethods: {},
   version: "test-v1",
 };
 
 describe("account contracts", () => {
   it("keeps organization and platform roles separate", () => {
     expect(organizationRoles).toEqual(["owner", "admin", "editor", "analyst"]);
-    expect(platformRoles).toEqual(["reviewer", "staff"]);
+    expect(platformRoles).toEqual(["reviewer", "staff", "admin"]);
   });
 
   it("validates a complete versioned capability policy", () => {

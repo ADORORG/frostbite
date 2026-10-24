@@ -6,6 +6,7 @@ import {
   createAuthorizationService,
   createDrizzleAuthorizationRepository,
 } from "@ador/authorization";
+import { authMethods, createHeldMethodKinds } from "@ador/feature-accounts";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 
 import { getDatabase } from "../database";
@@ -25,7 +26,10 @@ export function getPageAccessDependencies(): PageAccessDependencies {
   });
   const authorization = createAuthorizationService({
     policy: authorizationPolicy,
-    repository: createDrizzleAuthorizationRepository(database),
+    repository: createDrizzleAuthorizationRepository(
+      database,
+      createHeldMethodKinds(authMethods),
+    ),
   });
   services = {
     findSession: sessions.find,

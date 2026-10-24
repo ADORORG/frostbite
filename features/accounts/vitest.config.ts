@@ -5,5 +5,5 @@ export default packageVitestConfig({
   environment: "node",
   react: true,
   tsconfigPaths: true,
-  tests: { integration: "tsx", unit: "tsx" },
+  tests: { integration: "tsx", unit: "{ts,tsx}" },
 });

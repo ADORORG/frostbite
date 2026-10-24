@@ -5,6 +5,7 @@ import {
 } from "@ador/shared/accounts";
 import type { UuidV7 } from "@ador/shared/identifiers";
 
+import { effectiveRoles, requiresMethods } from "./effective-roles.ts";
 import type { AuthorizationRepository } from "./repository.ts";
 
 export interface AuthorizationDecision {
@@ -54,9 +55,16 @@ export function createAuthorizationService(dependencies: {
     }): Promise<AuthorizationDecision> {
       if (!capabilitySchema.safeParse(input.capability).success)
         return decision(false, policy);
-      const roles = await dependencies.repository.findPlatformRoles(
+      const assigned = await dependencies.repository.findPlatformRoles(
         input.userId,
       );
+      // Only a role that needs a sign-in method makes the repository look at the account's methods.
+      const held = assigned.some((role) =>
+        requiresMethods(role, policy.requiredMethods),
+      )
+        ? await dependencies.repository.findHeldMethodKinds(input.userId)
+        : new Set<string>();
+      const roles = effectiveRoles(assigned, held, policy.requiredMethods);
       return decision(
         roles.some((role) => policy.platform[role].includes(input.capability)),
         policy,

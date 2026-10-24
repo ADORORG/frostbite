@@ -8,7 +8,12 @@ import { createCreatorAdmissionService } from "../src/application/service.ts";
 
 const policy: AuthorizationPolicy = {
   organization: { admin: [], analyst: [], editor: [], owner: [] },
-  platform: { reviewer: ["creator:review"], staff: ["platform:operate"] },
+  platform: {
+    admin: [],
+    reviewer: ["creator:review"],
+    staff: ["platform:operate"],
+  },
+  requiredMethods: {},
   version: "test-v1",
 };
 const draft: CreatorApplicationDraft = {

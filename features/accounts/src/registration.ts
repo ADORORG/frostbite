@@ -6,9 +6,10 @@ import type { BalanceSource } from "./balance/source.ts";
 
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
+  createPasskeyServiceResolver,
   createWalletServicesResolver,
-  getPasskeyLinkingService,
   offeredSignInKinds,
+  type AccountMethods,
 } from "./runtime.ts";
 import {
   validateWalletAuthConfig,
@@ -16,14 +17,18 @@ import {
 } from "./wallet-config.ts";
 
 export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
+export { authMethods, createHeldMethodKinds } from "./methods.ts";
 
 // `balanceSource` is where the widget's balance comes from (confirmed and pending apart); `null` means the platform has no chain to ask
 // and the widget says no balance is available.
 export function createAccountsFeature(
   input: WalletAuthConfig,
   balanceSource: BalanceSource | null,
+  methods: AccountMethods,
 ) {
   const wallet = validateWalletAuthConfig(input);
+  // One passkey service for the whole feature, made when a request first needs it.
+  const passkeys = createPasskeyServiceResolver(methods);
   return defineFeature({
     manifest: {
       capabilities: [
@@ -71,10 +76,13 @@ export function createAccountsFeature(
       import("@ador/feature-accounts/entrypoint").then(
         ({ createAccountsEntrypoint }) =>
           createAccountsEntrypoint(
-            createWalletServicesResolver(wallet),
+            createWalletServicesResolver(wallet, methods, passkeys),
             balanceSource,
-            getPasskeyLinkingService,
-            { network: wallet.network, offered: offeredSignInKinds },
+            passkeys,
+            {
+              network: wallet.network,
+              offered: () => offeredSignInKinds(methods),
+            },
           ),
       ),
   });

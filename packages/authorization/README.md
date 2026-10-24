@@ -11,6 +11,14 @@ Detachable server-side account mutation and authorization policy boundaries.
 - `@ador/authorization/role-guard` exports `holdsActivePlatformRole`, which a domain transaction uses to
   check a platform role with a shared lock on the assignment row, so a role withdrawal waits for the
   decision it would have authorized.
+- A platform role can be tied to a kind of sign-in method by the policy (`requiredMethods`: staff and admin need a `wallet`). Such a
+  role is recorded but does not work while the account lacks the method (`effectiveRoles`); `forPlatform` applies this, using the
+  methods the composition root supplies (`HeldKinds`), so this package knows no method. A reviewer cannot be given requirements:
+  reviewer decisions are checked inside their own transactions (`role-guard`), which do not read them.
+- `createRoleAdministration` and `createDrizzleRoleAdministration` grant, reinstate and suspend platform roles. Only an
+  administrator whose own role works may change a role; asking for what is already so changes nothing and writes nothing; every
+  change writes `platform_role_events` in its transaction; role changes are serialized platform-wide; and the last working
+  administrator can never be suspended, including by themselves or concurrently.
 - Drizzle adapters persist account records, recheck actor membership inside the mutation transaction,
   preserve the last-active-owner invariant, and append audit evidence.
 

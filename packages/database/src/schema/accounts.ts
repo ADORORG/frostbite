@@ -42,6 +42,16 @@ export const accountAuditAction = platformSchema.enum("account_audit_action", [
   "membership-updated",
 ]);
 
+// How a platform role came to change, for the evidence in `platform_role_events`.
+export const platformRoleEventAction = platformSchema.enum(
+  "platform_role_event_action",
+  ["granted", "reinstated", "suspended"],
+);
+export const platformRoleEventVia = platformSchema.enum(
+  "platform_role_event_via",
+  ["role-screen", "setup-link"],
+);
+
 export const organizations = platformSchema.table(
   "organizations",
   {
@@ -146,6 +156,42 @@ export const accountAuditEvents = platformSchema.table(
     check(
       "account_audit_events_reason_code_valid",
       sql`${table.reasonCode} ~ '^[a-z][a-z0-9-]{2,63}$'`,
+    ),
+  ],
+);
+
+// Every change to who holds a platform role, in the transaction that made it: who did it, to whom, from what to what, and by which
+// route. A repeated request that changes nothing writes nothing.
+export const platformRoleEvents = platformSchema.table(
+  "platform_role_events",
+  {
+    id: uuid("id").primaryKey(),
+    action: platformRoleEventAction("action").notNull(),
+    // The person who made the change; for a setup link, the person who used it.
+    actorUserId: uuid("actor_user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "restrict" }),
+    targetUserId: uuid("target_user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "restrict" }),
+    role: platformRole("role").notNull(),
+    previousStatus: accountStatus("previous_status"),
+    nextStatus: accountStatus("next_status").notNull(),
+    via: platformRoleEventVia("via").notNull(),
+    policyVersion: text("policy_version").notNull(),
+    correlationId: uuid("correlation_id").notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("platform_role_events_target_created_idx").on(
+      table.targetUserId,
+      table.createdAt,
+    ),
+    check(
+      "platform_role_events_policy_version_nonempty",
+      sql`length(${table.policyVersion}) > 0 and ${table.policyVersion} = btrim(${table.policyVersion})`,
     ),
   ],
 );

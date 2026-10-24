@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { AccountMethods } from "../src/runtime.ts";
+
 const factories = vi.hoisted(() => ({
   authEnvironment: vi.fn(() => ({
     AUTH_SESSION_ABSOLUTE_TIMEOUT_MS: 604_800_000,
@@ -10,16 +12,6 @@ const factories = vi.hoisted(() => ({
   databaseClient: vi.fn(() => "database"),
   databaseEnvironment: vi.fn(() => "database-environment"),
   databasePool: vi.fn(() => "pool"),
-  methodRegistry: vi.fn<
-    (adapters: readonly string[]) => { describe: () => unknown; list: string }
-  >(() => ({
-    describe: () => [
-      { assurance: "strong", canSignIn: true, kind: "wallet" },
-      { assurance: "strong", canSignIn: false, kind: "passkey" },
-      { assurance: "standard", canSignIn: true, kind: "email" },
-    ],
-    list: "list-methods",
-  })),
   passkeyRepository: vi.fn(() => "repository"),
   passkeyService: vi.fn((input: { readonly clock: () => Date }) => {
     input.clock();
@@ -34,11 +26,8 @@ const factories = vi.hoisted(() => ({
 
 vi.mock("@ador/auth", () => ({
   createDrizzlePasskeyRepository: factories.passkeyRepository,
-  createMethodRegistry: factories.methodRegistry,
   createPasskeyLinkingService: factories.passkeyService,
-  passkeyMethod: "passkey-method",
   simpleWebAuthnRegistrationAdapter: "adapter",
-  walletMethod: "wallet-method",
 }));
 vi.mock("@ador/database/connection", () => ({
   createDatabaseClient: factories.databaseClient,
@@ -50,22 +39,29 @@ vi.mock("@repo/config/env", () => ({
   parseEnvironment: factories.platformEnvironment,
 }));
 
+// The deployment's method registry, as the feature is given it.
+const methods: AccountMethods = {
+  describe: () => [
+    { assurance: "strong", canSignIn: true, kind: "wallet" },
+    { assurance: "strong", canSignIn: false, kind: "passkey" },
+    { assurance: "standard", canSignIn: true, kind: "email" },
+  ],
+  list: vi.fn(async () => []),
+};
+
 describe("passkey runtime composition", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("builds one service from validated provider-neutral configuration", async () => {
-    const { getPasskeyLinkingService } = await import("../src/runtime.ts");
-    const first = getPasskeyLinkingService();
-    const second = getPasskeyLinkingService();
+    const { createPasskeyServiceResolver } = await import("../src/runtime.ts");
+    const getService = createPasskeyServiceResolver(methods);
+    const first = getService();
+    const second = getService();
     expect(second).toBe(first);
-    // The repository removes a passkey under the registry's rule, and the registry is the wallet and passkey methods.
-    expect(factories.methodRegistry).toHaveBeenCalledWith([
-      "wallet-method",
-      "passkey-method",
-    ]);
+    // The repository removes a passkey under the registry's rule: it is handed the registry's listing.
     expect(factories.passkeyRepository).toHaveBeenCalledWith(
       "database",
-      "list-methods",
+      methods.list,
     );
     expect(factories.passkeyService).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -86,6 +82,6 @@ describe("passkey runtime composition", () => {
 
   it("offers on the sign-in page the registered methods that can start a session, in registration order, and not a passkey, which cannot yet", async () => {
     const { offeredSignInKinds } = await import("../src/runtime.ts");
-    expect(offeredSignInKinds()).toEqual(["wallet", "email"]);
+    expect(offeredSignInKinds(methods)).toEqual(["wallet", "email"]);
   });
 });

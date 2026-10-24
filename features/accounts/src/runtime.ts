@@ -1,5 +1,4 @@
 import {
-  createMethodRegistry,
   createDrizzlePasskeyRepository,
   createDrizzleSessionRepository,
   createDrizzleWalletAuthRepository,
@@ -8,10 +7,9 @@ import {
   createSessionService,
   createWalletAuthService,
   createWalletMethodsService,
-  passkeyMethod,
   simpleWebAuthnRegistrationAdapter,
   strictBip322Verifier,
-  walletMethod,
+  type MethodRegistry,
 } from "@ador/auth";
 import {
   createDatabaseClient,
@@ -26,24 +24,18 @@ import {
   parseEnvironment,
 } from "@repo/config/env";
 
-let service: ReturnType<typeof createPasskeyLinkingService> | undefined;
 let sharedDatabase: ReturnType<typeof createDatabaseClient> | undefined;
-let sharedRegistry:
-  ReturnType<typeof createMethodRegistry<DatabaseTransaction>> | undefined;
 
-// The sign-in methods this deployment offers. A new method (email, phone) is one adapter added to this list, with its own routes: the
-// rules, the repositories and the pages read the registry and are not edited (ADR-021).
+// The sign-in methods the deployment offers (composed once, in the platform's configuration) as this feature uses them.
+export type AccountMethods = MethodRegistry<DatabaseTransaction>;
+type PasskeyService = ReturnType<typeof createPasskeyLinkingService>;
+
 // The kinds of method the sign-in page may offer: those registered that can start a session, in registration order.
-export function offeredSignInKinds(): readonly string[] {
-  return methodRegistry()
+export function offeredSignInKinds(methods: AccountMethods): readonly string[] {
+  return methods
     .describe()
     .filter(({ canSignIn }) => canSignIn)
     .map(({ kind }) => kind);
-}
-
-function methodRegistry() {
-  sharedRegistry ??= createMethodRegistry([walletMethod, passkeyMethod]);
-  return sharedRegistry;
 }
 
 // One connection pool for everything this feature does, made when something first needs it.
@@ -54,12 +46,23 @@ function database() {
   return sharedDatabase;
 }
 
-export function getPasskeyLinkingService() {
-  if (service) return service;
+// The passkey service, made when a request first needs it.
+export function createPasskeyServiceResolver(
+  methods: AccountMethods,
+): () => PasskeyService {
+  let service: PasskeyService | undefined;
+  return () => {
+    if (service) return service;
+    service = buildPasskeyService(methods);
+    return service;
+  };
+}
+
+function buildPasskeyService(methods: AccountMethods): PasskeyService {
   const app = parseEnvironment(process.env);
   const policy = parseAuthSessionEnvironment(process.env);
   const origin = new URL(app.PUBLIC_BASE_URL);
-  service = createPasskeyLinkingService({
+  return createPasskeyLinkingService({
     adapter: simpleWebAuthnRegistrationAdapter,
     clock: () => new Date(),
     policy: {
@@ -71,18 +74,16 @@ export function getPasskeyLinkingService() {
       sessionAbsoluteLifetimeMs: policy.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
       sessionIdleLifetimeMs: policy.AUTH_SESSION_IDLE_TIMEOUT_MS,
     },
-    repository: createDrizzlePasskeyRepository(
-      database(),
-      methodRegistry().list,
-    ),
+    repository: createDrizzlePasskeyRepository(database(), methods.list),
   });
-  return service;
 }
 
 // The wallet sign-in services: challenges and verification, removing a wallet, and ending a session. Built from the
 // platform's wallet policy and the environment's session lifetimes, once, when the first request needs them.
 export function createWalletServicesResolver(
   config: WalletAuthConfig,
+  methods: AccountMethods,
+  getPasskeyService: () => PasskeyService,
 ): () => WalletAuthServices {
   let services: WalletAuthServices | undefined;
   return () => {
@@ -115,11 +116,11 @@ export function createWalletServicesResolver(
         },
         repository: createDrizzleWalletMethodsRepository(
           database(),
-          methodRegistry().list,
+          methods.list,
         ),
       }),
       origin: new URL(app.PUBLIC_BASE_URL).origin,
-      passkeys: getPasskeyLinkingService(),
+      passkeys: getPasskeyService(),
       recentAuthenticationWindowMs: environment.PASSKEY_RECENT_AUTH_WINDOW_MS,
       sessions: createSessionService({
         clock,

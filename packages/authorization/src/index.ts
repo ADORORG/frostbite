@@ -12,3 +12,17 @@ export type {
   AccountRepository,
   MembershipMutationResult,
 } from "./application/account-repository.ts";
+export { createDrizzleRoleAdministration } from "./adapters/drizzle-role-administration.ts";
+export { createRoleAdministration } from "./application/role-administration.ts";
+export type {
+  GrantOutcome,
+  RoleAdministrationRepository,
+  RoleChange,
+  SuspendOutcome,
+} from "./application/role-administration.ts";
+export type { HeldKinds } from "./adapters/drizzle-authorization-repository.ts";
+export {
+  effectiveRoles,
+  requiresMethods,
+  type RoleRequirements,
+} from "./application/effective-roles.ts";

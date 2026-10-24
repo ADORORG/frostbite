@@ -43,7 +43,10 @@ describe("creator admission refusals", () => {
     ).resolves.toEqual({ kind: "not-found" });
     const noReviewerService = createCreatorAdmissionService({
       ...dependencies,
-      authorizationPolicy: { ...policy, platform: { reviewer: [], staff: [] } },
+      authorizationPolicy: {
+        ...policy,
+        platform: { admin: [], reviewer: [], staff: [] },
+      },
     });
     const applicant = await user();
     await service.saveDraft(draft, request(applicant, "draft-no-role-001"));

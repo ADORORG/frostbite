@@ -30,6 +30,7 @@ export {
   organizationMemberships,
   organizations,
   platformRoleAssignments,
+  platformRoleEvents,
   type AccountAuditEvent,
   type Organization,
   type OrganizationMembership,

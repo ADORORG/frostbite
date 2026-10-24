@@ -12,7 +12,8 @@ const policy: AuthorizationPolicy = {
     editor: [],
     owner: ["organization:members"],
   },
-  platform: { reviewer: [], staff: [] },
+  platform: { admin: [], reviewer: [], staff: [] },
+  requiredMethods: {},
   version: "test-v1",
 };
 

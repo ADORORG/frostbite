@@ -29,7 +29,12 @@ const policy: AuthorizationPolicy = {
     editor: ["organization:edit"],
     owner: ["organization:members", "organization:ownership"],
   },
-  platform: { reviewer: ["creator:review"], staff: ["platform:operate"] },
+  platform: {
+    admin: [],
+    reviewer: ["creator:review"],
+    staff: ["platform:operate"],
+  },
+  requiredMethods: {},
   version: "test-v1",
 };
 const accounts = createAccountService({
@@ -40,7 +45,10 @@ const accounts = createAccountService({
 });
 const authorization = createAuthorizationService({
   policy,
-  repository: createDrizzleAuthorizationRepository(database),
+  repository: createDrizzleAuthorizationRepository(
+    database,
+    async () => new Set(),
+  ),
 });
 
 beforeAll(async () => runMigrations(environment));

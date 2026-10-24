@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { createAccountsFeature } from "../src/registration.ts";
+import { authMethods } from "../src/methods.ts";
 import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 import { walletBalanceRoute } from "../src/balance/contract.ts";
 import { walletConfig } from "./support/wallet-config.ts";
 
-const accountsFeature = createAccountsFeature(walletConfig, null);
+const accountsFeature = createAccountsFeature(walletConfig, null, authMethods);
 const allRoutes = [
   ...Object.values(passkeyRoutes),
   ...Object.values(walletAuthRoutes),

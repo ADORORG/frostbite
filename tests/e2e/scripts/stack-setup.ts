@@ -139,14 +139,25 @@ export async function seed(databaseUrl: string): Promise<void> {
     ]);
     await seedFeedbackApplication(database);
     await seedPublicCollection(database);
-    await database.insert(walletIdentities).values({
-      address: "tb1qe2eapplicant",
-      id: "01994b10-0000-7000-8000-000000000006",
-      network: "signet",
-      scriptIdentity: "0014e2eapplicant",
-      userId: creatorE2EFixtures.passkeyUser.userId,
-      walletAdapter: "e2e-fixture",
-    });
+    await database.insert(walletIdentities).values([
+      {
+        address: "tb1qe2eapplicant",
+        id: "01994b10-0000-7000-8000-000000000006",
+        network: "signet",
+        scriptIdentity: "0014e2eapplicant",
+        userId: creatorE2EFixtures.passkeyUser.userId,
+        walletAdapter: "e2e-fixture",
+      },
+      // Staff need a wallet for their role to work (ADR-021).
+      {
+        address: "tb1qe2estaff",
+        id: "01994b10-0000-7000-8000-000000000007",
+        network: "signet",
+        scriptIdentity: "0014e2estaff",
+        userId: creatorE2EFixtures.staff.userId,
+        walletAdapter: "e2e-fixture",
+      },
+    ]);
   } finally {
     await pool.end();
   }

@@ -11,12 +11,12 @@ import { createWalletSignInOperations } from "./application/wallet-sign-in-opera
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
-import { getPasskeyLinkingService } from "./runtime.ts";
+import type { createPasskeyLinkingService } from "@ador/auth";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
 import { SignInPage } from "./ui/sign-in-page.tsx";
 
-type PasskeyService = ReturnType<typeof getPasskeyLinkingService>;
+type PasskeyService = ReturnType<typeof createPasskeyLinkingService>;
 
 async function account(
   actorUserId: UuidV7 | null,

@@ -3,18 +3,30 @@ import {
   organizations,
   platformRoleAssignments,
 } from "@ador/database/schema/accounts";
-import type { DatabaseClient } from "@ador/database/connection";
+import type {
+  DatabaseClient,
+  DatabaseTransaction,
+} from "@ador/database/connection";
 import {
   accountStatusSchema,
   organizationRoleSchema,
   platformRoleSchema,
+  type MethodKind,
 } from "@ador/shared/accounts";
 import { and, eq } from "drizzle-orm";
 
 import type { AuthorizationRepository } from "../application/repository.ts";
 
+// The kinds of sign-in method an account holds, read in the caller's transaction. Supplied by the composition root from the sign-in
+// method registry, so this package knows no method.
+export type HeldKinds = (
+  context: DatabaseTransaction,
+  userId: string,
+) => Promise<ReadonlySet<MethodKind>>;
+
 export function createDrizzleAuthorizationRepository(
   database: DatabaseClient,
+  heldKinds: HeldKinds,
 ): AuthorizationRepository {
   return {
     async findOrganizationAccess(userId, organizationId) {
@@ -45,6 +57,9 @@ export function createDrizzleAuthorizationRepository(
         role: organizationRoleSchema.parse(record.role),
       };
     },
+
+    findHeldMethodKinds: (userId) =>
+      database.transaction((transaction) => heldKinds(transaction, userId)),
 
     async findPlatformRoles(userId) {
       const records = await database

@@ -16,9 +16,11 @@ const request = {
 const policy: AuthorizationPolicy = {
   organization: { admin: [], analyst: [], editor: [], owner: [] },
   platform: {
+    admin: [],
     reviewer: [collectionReviewCapability],
     staff: ["platform:operate"],
   },
+  requiredMethods: {},
   version: "test-v1",
 };
 
@@ -52,7 +54,10 @@ describe("deciding", () => {
       allowedReviewerRoles: ["reviewer"],
       submissionId: submission,
     });
-    const nobody = setup({ ...policy, platform: { reviewer: [], staff: [] } });
+    const nobody = setup({
+      ...policy,
+      platform: { admin: [], reviewer: [], staff: [] },
+    });
     await nobody.service.decide(decision, request);
     expect(nobody.calls[0]?.input).toMatchObject({ allowedReviewerRoles: [] });
   });

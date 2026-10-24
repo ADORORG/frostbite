@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { methodKindSchema, type MethodKind } from "@ador/shared/accounts";
 
 // What every sign-in method has in common, and the one port a method implements to join an account. Nothing here names a method: the
 // kinds are data (`wallet`, `passkey`, `email`, later `phone`), so adding one changes no rule and no repository.
 
-// A method's name: lower case, starting with a letter, as it appears in routes, audit evidence and the pages.
-export const methodKindSchema = z.string().regex(/^[a-z][a-z0-9-]{1,31}$/u);
-export type MethodKind = z.infer<typeof methodKindSchema>;
+// A method's name: lower case, starting with a letter, as it appears in routes, audit evidence and the pages. Defined once, in
+// `@ador/shared/accounts`, because the platform roles' requirements name kinds too.
+export { methodKindSchema, type MethodKind };
 
 // How much an account's holding a method says about the person, lowest first. Policy states the level an action needs; a method never
 // decides its own importance. Wallet and passkey are strong; an email code is standard; a text message is basic (SIM swap).
