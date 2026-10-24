@@ -234,10 +234,13 @@ export function useAdminSteps(options: {
     let signed: GameAdminTransaction | null;
     try {
       signed = await sign(transaction);
-    } catch {
-      // The wallet was closed, declined, or could not sign: nothing was sent, and the step can be signed again.
+    } catch (error) {
+      // The wallet was closed or declined, or what it answered could not be used: nothing was sent, and the step can be signed again.
+      // The cause is kept for the console and told on the page, so a wallet that signed but answered in a shape the platform cannot
+      // use is not reported as a refusal.
+      console.error("Signing a game administration step failed.", error);
       setWorking(false);
-      return setMessage(walletRefusedCopy);
+      return setMessage(walletRefusedCopy(error));
     }
     try {
       await send(signed);

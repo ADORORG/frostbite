@@ -79,13 +79,20 @@ describe("reviewing and sending a step", () => {
     const nothing = await review(fakeApi(), { sign: vi.fn(async () => null) });
     await click(button(nothing, "Sign with your wallet"));
     expect(textOf(nothing)).toContain("Nothing was signed.");
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     const broken = await review(fakeApi(), {
       sign: vi.fn(async () => {
         throw new Error("x");
       }),
     });
     await click(button(broken, "Sign with your wallet"));
-    expect(textOf(broken)).toContain("Your wallet did not sign");
+    expect(textOf(broken)).toContain("Your wallet did not give back a signed");
+    expect(textOf(broken)).toContain("Reason: x");
+    expect(logged).toHaveBeenCalledWith(
+      "Signing a game administration step failed.",
+      expect.objectContaining({ message: "x" }),
+    );
+    logged.mockRestore();
     expect(button(broken, "Sign with your wallet")?.disabled).toBe(false);
     const unreachable = await review(
       fakeApi({

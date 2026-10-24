@@ -174,8 +174,14 @@ export const submitRefusalCopy = {
 
 export const walletUnavailableCopy =
   "No wallet that signs steps is connected. Connect one from the wallet button in the header, or sign elsewhere and paste the result.";
-export const walletRefusedCopy =
-  "Your wallet did not sign, so nothing was sent.";
+// What is said when signing with the wallet did not give a signed transaction: the wallet's own words (or the platform's, when the
+// wallet answered with something unusable) follow, so the cause is not hidden behind "did not sign".
+export const walletRefusedCopy = (error: unknown): string => {
+  const reason = error instanceof Error ? error.message.trim() : "";
+  return reason === ""
+    ? "Your wallet did not sign, so nothing was sent."
+    : `Your wallet did not give back a signed transaction, so nothing was sent. Reason: ${reason.slice(0, 300)}`;
+};
 
 export const noSignerCopy =
   "This version has no wallet connection that signs administration steps. Sign the transaction below with a wallet you trust, and paste the signed result.";
