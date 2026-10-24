@@ -2,8 +2,8 @@ import { defineGame } from "@ador/shared/games";
 
 import { targetChains } from "../chains.ts";
 
-const [signet] = targetChains;
-if (signet === undefined) throw new Error("No target chain is configured.");
+const [betaTarget] = targetChains;
+if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // Tap Tower, the sample game in /games/sample-game. It exists to prove the host: it is played in the isolated
 // frame, saves through the platform and unlocks milestones. It is registered only where the platform is run
@@ -30,7 +30,7 @@ export const sampleGame = defineGame({
       title: "Ten taps",
     },
   ],
-  network: signet.chainId,
+  network: betaTarget.chainId,
   schemaVersion: 1,
   summary: "A tiny tapping game that shows how a game talks to the platform.",
   title: "Tap Tower",

@@ -15,6 +15,7 @@ import {
   type RewardsPlatform,
 } from "../../../configs/rewards-chain.ts";
 import { rewardsPlan } from "../../../configs/rewards-plan.ts";
+import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 import { walletAuthConfig } from "../../../configs/wallet.ts";
 
 const environment: RewardsChainEnvironment = {
@@ -73,6 +74,19 @@ describe("the rewards chain on testnet4", () => {
     for (const finality of Object.values(config.confirmations)) {
       expect(finality).toEqual({ kind: "confirmations", required: 1 });
     }
+  });
+
+  it("holds testnet4 to the very policy signet is held to: one record, no value of its own", () => {
+    // ADR-019, point 7: the policy (`rewardsPolicy`) is not keyed by network, so every beta network reads the same confirmations,
+    // gate, fee speeds and delay. This fails if a network ever gets a record that differs without the decision being taken.
+    const reference = chainConfig(betaChains.signet);
+    for (const beta of Object.values(betaChains)) {
+      const config = chainConfig(beta);
+      expect(config.confirmations).toEqual(reference.confirmations);
+      expect(config.releaseGate).toBe(reference.releaseGate);
+    }
+    expect(Object.keys(rewardsPolicy)).not.toContain("signet");
+    expect(Object.keys(rewardsPolicy)).not.toContain("testnet4");
   });
 
   it("offers testnet4 and not signet, and names it as the chain whose indexer it follows", () => {

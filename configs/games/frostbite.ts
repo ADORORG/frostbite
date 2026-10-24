@@ -2,8 +2,8 @@ import { defineGame } from "@ador/shared/games";
 
 import { targetChains } from "../chains.ts";
 
-const [signet] = targetChains;
-if (signet === undefined) throw new Error("No target chain is configured.");
+const [betaTarget] = targetChains;
+if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // FROST·BITE, the first game, played by the platform itself in the isolated frame (/games/frostbite, source in
 // /games/frostbite). It runs as a simulation: nothing in it touches a chain or a server, and the page says so.
@@ -61,7 +61,7 @@ export const frostbite = defineGame({
       title: "First cash-out",
     },
   ],
-  network: signet.chainId,
+  network: betaTarget.chainId,
   schemaVersion: 1,
   summary: "A predictive minefield game on Bitcoin.",
   title: "FROST·BITE",

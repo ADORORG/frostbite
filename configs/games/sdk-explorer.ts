@@ -2,8 +2,8 @@ import { defineGame } from "@ador/shared/games";
 
 import { targetChains } from "../chains.ts";
 
-const [signet] = targetChains;
-if (signet === undefined) throw new Error("No target chain is configured.");
+const [betaTarget] = targetChains;
+if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // The SDK explorer, in /games/sdk-explorer: it calls every method the platform offers a game and shows what
 // came back, so a builder can see each answer in the real isolated frame. It is registered only where the
@@ -35,7 +35,7 @@ export const sdkExplorerGame = defineGame({
       title: "Ten presses",
     },
   ],
-  network: signet.chainId,
+  network: betaTarget.chainId,
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "Calls every part of the game SDK and shows the answers.",
