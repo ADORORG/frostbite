@@ -34,7 +34,9 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
   codec for the few indexer messages used, every answer validated, the trace decoder; `fee-api.ts` prices fees from a public explorer's
   recommendation when the chain's settings give one (`feeApi`), because the hosted nodes' own estimates are not usable on the test
-  networks, and never falls back to them); `tx/` builds a claim (the
+  networks, and never falls back to them);
+  `admin/free-address.ts` chooses a new template's address at random from widening ranges (`templateSequence`: `first`, `window`,
+  `attempts`), not by counting up, so low crowded numbers and a predictable sequence are both avoided; `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,
   `broadcaster.ts`, `observer.ts`, `contracts.ts`, `rewards.ts` and `inspect.ts` are the ports; `abi.ts` holds the template
   opcodes, and `milestone-key.ts` and `holder.ts` the rules shared with the contracts, all tested against the vector files in

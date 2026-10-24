@@ -78,6 +78,7 @@ export function createContractGateway(
       freeTemplateAddress(
         servedChain(chains, chain).node,
         options.templateSequence,
+        options.random,
         taken,
       ),
     inspect: async (ref) =>

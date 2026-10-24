@@ -7,7 +7,11 @@ import {
   type FeeSpeedPolicy,
 } from "@ador/shared/chain";
 
-import type { TemplateSequence } from "./admin/free-address.ts";
+import {
+  alkaneIdLimit,
+  sequenceReach,
+  type TemplateSequence,
+} from "./admin/free-address.ts";
 
 // What sending and watching a transaction needs beyond the node: the policy values, all from configuration.
 export interface TransactionOptions {
@@ -22,9 +26,11 @@ export interface TransactionOptions {
   // How long a built transaction may be signed for.
   readonly lifetimeMs: number;
   readonly now: () => Date;
+  // Random bytes, for choosing where a template goes.
+  readonly random: (length: number) => Uint8Array;
   // Names the node in the evidence an observation records.
   readonly providerId: string;
-  // Where a new template's address is looked for (see `freeTemplateAddress`).
+  // Where a new template's address is drawn from (see `freeTemplateAddress`).
   readonly templateSequence: TemplateSequence;
 }
 
@@ -75,10 +81,16 @@ export function assertTransactionOptions(options: TransactionOptions): void {
   if (
     !Number.isInteger(options.templateSequence.attempts) ||
     options.templateSequence.attempts < 1 ||
-    options.templateSequence.first < 0n
+    options.templateSequence.first < 0n ||
+    options.templateSequence.window < 1n
   ) {
     throw new Error(
-      "templateSequence needs a first number of zero or more and a positive whole number of attempts.",
+      "templateSequence needs a first number of zero or more, a window of at least one and a positive whole number of attempts.",
+    );
+  }
+  if (sequenceReach(options.templateSequence) >= alkaneIdLimit) {
+    throw new Error(
+      "templateSequence reaches past the largest number an address can hold.",
     );
   }
   for (const [name, value] of [

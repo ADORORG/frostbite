@@ -64,7 +64,8 @@ const settings = (
   },
   transactions: {
     changeDustSats: 294n,
-    templateSequence: { attempts: 200, first: 1000n },
+    random: (length) => new Uint8Array(length),
+    templateSequence: { attempts: 10, first: 1_000_000n, window: 1_000_000n },
     claimOutputSats: 546n,
     feeTargetBlocks: 3,
     feeSpeeds: {

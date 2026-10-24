@@ -2,9 +2,9 @@ import type { TransactionIntent } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { parseAlkaneId } from "../src/bitcoin-alkanes/node/alkane-id.ts";
+import { ensureAuthTokenFactory } from "./auth-token-factory.ts";
 import {
   core,
-  ensureAuthTokenFactory,
   family,
   mine,
   newAddress,

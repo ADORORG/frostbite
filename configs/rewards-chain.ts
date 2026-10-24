@@ -125,6 +125,7 @@ function configuredChain(
           feeSpeeds: rewardsPolicy.feeSpeeds,
           feeTargetBlocks: defaultFeeTargetBlocks,
           lifetimeMs: rewardsPolicy.lifetimeMs,
+          random: platform.random,
           templateSequence: rewardsPolicy.templateSequence,
         },
       },

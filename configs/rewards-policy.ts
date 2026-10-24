@@ -69,10 +69,12 @@ export const rewardsPolicy = {
   signingWallets: ["xverse", "unisat", "oyl"],
   // The confirmations after which a step is done on the beta's test network (ADR-018, D22); the indexer must also have run it.
   testChainConfirmations: 1,
-  // Where a new template is published: the platform looks for the first free address in the chain's code block from this number, and
-  // gives up after this many in a row. 1000 is the figure the platform's predecessor used, well above the low ids the first
-  // deployments of a chain tend to hold.
-  templateSequence: { attempts: 200, first: 1000n },
+  // Where a new template is published: an address is drawn at random in the chain's code block, from a range starting at `first` and
+  // `window` wide, then from ranges twice as wide for each further attempt, until one is free or `attempts` are used. The low,
+  // round numbers are the ones other deployers use first (4:1000 was already taken on signet), and a sequence anyone can predict is
+  // one anyone can occupy ahead of a publish; a random draw from a wide, high range is neither. Ten attempts reach 512 times the
+  // window (finding S107).
+  templateSequence: { attempts: 10, first: 1_000_000n, window: 1_000_000n },
   // The templates the platform may publish. Their code hashes are the released ones, so a rebuilt template that differs is
   // refused until a new version is released and listed here.
   templates: [
