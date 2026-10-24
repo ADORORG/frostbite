@@ -8,6 +8,7 @@ import { validateBitcoinAddress } from "../../bitcoin/address.ts";
 import { BuildRefusedError } from "../build-refused.ts";
 import { nativeAsset, servedChain, type ServedChain } from "../chains.ts";
 import { psbtFormat } from "../format.ts";
+import { psbtToBase64 } from "../psbt-text.ts";
 import { parseAlkaneId } from "../node/alkane-id.ts";
 import { feeDetailFor, type TransactionOptions } from "../options.ts";
 import { adminCall, type AdminIntent } from "./action.ts";
@@ -113,7 +114,7 @@ export async function buildAdmin(
     if (data === null) {
       const step = planPlainStep(call, stepFunds);
       fee = step.fee;
-      payload = step.transaction.toBase64();
+      payload = psbtToBase64(step.transaction);
       format = psbtFormat;
     } else {
       const step = planEnvelopeStep(

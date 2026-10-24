@@ -12,6 +12,7 @@ import { verifySignedAdmin } from "./admin/verify.ts";
 import { BuildRefusedError } from "./build-refused.ts";
 import type { TransactionBuilder } from "../ports.ts";
 import { psbtFormat } from "./format.ts";
+import { psbtToBase64 } from "./psbt-text.ts";
 import { milestoneKey } from "./milestone-key.ts";
 import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
@@ -97,7 +98,7 @@ export function createTransactionBuilder(
         chain: intent.chain,
         family,
         format: psbtFormat,
-        payload: psbt.toBase64(),
+        payload: psbtToBase64(psbt),
         summary: {
           chain: intent.chain,
           expiresAt: new Date(

@@ -2,6 +2,7 @@ import { Psbt } from "bitcoinjs-lib";
 
 import { bundleFormat, decodeBundle, encodeBundle } from "./admin/bundle.ts";
 import { psbtFormat } from "./format.ts";
+import { psbtToBase64 } from "./psbt-text.ts";
 import { inputIsSigned, parse } from "./verify.ts";
 
 // What a person's wallet is asked to sign for a built transaction, and how its answer is put back. A step is one PSBT, or a pair
@@ -42,7 +43,7 @@ export function walletRequests(
   if (psbts === null) return null;
   return psbts.flatMap((psbt) => {
     const inputs = unsignedInputs(psbt);
-    return inputs.length === 0 ? [] : [{ inputs, psbt: psbt.toBase64() }];
+    return inputs.length === 0 ? [] : [{ inputs, psbt: psbtToBase64(psbt) }];
   });
 }
 
@@ -71,7 +72,7 @@ export function withWalletSignatures(
   }
   const [first, second] = merged;
   if (format === psbtFormat)
-    return first === undefined ? null : first.toBase64();
+    return first === undefined ? null : psbtToBase64(first);
   return first === undefined || second === undefined
     ? null
     : encodeBundle({ commit: first, reveal: second });

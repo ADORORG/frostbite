@@ -1,5 +1,7 @@
 import { Psbt } from "bitcoinjs-lib";
 
+import { psbtToBase64 } from "../psbt-text.ts";
+
 // A step with two transactions travels as one payload: the commit (which the staff's wallet signs) and the reveal (which is signed
 // already, except for the input that spends the auth token). They are sent in that order.
 export const bundleFormat = "bitcoin-psbt-bundle";
@@ -11,8 +13,8 @@ export interface Bundle {
 
 export function encodeBundle(bundle: Bundle): string {
   return JSON.stringify({
-    commit: bundle.commit.toBase64(),
-    reveal: bundle.reveal.toBase64(),
+    commit: psbtToBase64(bundle.commit),
+    reveal: psbtToBase64(bundle.reveal),
   });
 }
 
