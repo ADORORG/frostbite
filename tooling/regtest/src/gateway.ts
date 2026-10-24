@@ -142,7 +142,7 @@ export function createGateway(dependencies: GatewayDependencies): Gateway {
         return bitcoin.call("getbestblockhash");
       case "esplora_fee-estimates":
         return { ...feeEstimates };
-      case "esplora_broadcast":
+      case "sendrawtransaction":
         return bitcoin.call("sendrawtransaction", [
           text(params[0], "The transaction"),
         ]);

@@ -32,7 +32,7 @@ Verdicts: `PASS`, `FAIL`, `UNVERIFIED` (the node could not be asked, so nothing 
 
 ## Not covered
 
-`esplora_broadcast` acceptance (it needs a real transaction), that a created instance reports its template's code hash, wallet
+`sendrawtransaction` acceptance of a good transaction (it needs a real one; the live gateway was shown to answer the method, and to refuse a corrupted transaction with Core's reason, while `esplora_broadcast` does not work on it), that a created instance reports its template's code hash, wallet
 signing with Xverse, UniSat or OYL, and the staff account and game manifest.
 
 ## Test commands

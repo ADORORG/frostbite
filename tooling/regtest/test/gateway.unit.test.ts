@@ -40,7 +40,7 @@ describe("the regtest gateway", () => {
       "1": 2,
       "6": 1,
     });
-    expect(await gateway("esplora_broadcast", ["0200"])).toBe(txid);
+    expect(await gateway("sendrawtransaction", ["0200"])).toBe(txid);
     expect(bitcoin.call).toHaveBeenCalledWith("sendrawtransaction", ["0200"]);
   });
 
@@ -137,7 +137,7 @@ describe("the regtest gateway", () => {
     });
     for (const method of [
       "esplora_tx",
-      "esplora_broadcast",
+      "sendrawtransaction",
       "esplora_address::utxo",
     ])
       await expect(gateway(method, [])).rejects.toBeInstanceOf(GatewayError);

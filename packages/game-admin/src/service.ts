@@ -22,6 +22,10 @@ import type {
   SubmitStepResult,
 } from "./types.ts";
 
+// What a step that never reached the network says when it is given up.
+export const neverReceivedReason =
+  "The network never received it, although the platform looked and sent it again for over an hour. Nothing was spent. Start the step again.";
+
 export function createGameAdminService(dependencies: GameAdminDependencies) {
   const { clock, ports, repository } = dependencies;
   const viewer = stepViewerFor(dependencies);
@@ -41,6 +45,24 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
     return change === null
       ? step
       : repository.update(step.id, moveTo(from, change));
+  }
+
+  // A step the network has not been seen to hold, after the time any wait is called delayed, is over: the platform looked and sent it
+  // again and the network never had it. It ends as failed, so it does not wait for what will not come; a new step can be started.
+  async function givenUp(step: StoredStep): Promise<StoredStep | null> {
+    const since = step.broadcastAt;
+    if (
+      since === null ||
+      clock().getTime() - since.getTime() <= dependencies.delay.maxUnsettledMs
+    )
+      return step;
+    return repository.update(
+      step.id,
+      moveTo("broadcast_unknown", {
+        failureReason: neverReceivedReason,
+        state: "broadcast_rejected",
+      }),
+    );
   }
 
   return {
@@ -146,8 +168,13 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
         // Sent, but the network does not have it: the same signed bytes are sent again (the network gives the same id and says so if
         // it already holds them), so a step is not left waiting for a transaction that never arrived. The outcome is told as it is:
         // taken, or refused with the network's reason.
-        if (from === "broadcast_unknown" && observation.status === "not-found")
-          return view(await broadcast(step, chain, from));
+        if (
+          from === "broadcast_unknown" &&
+          observation.status === "not-found"
+        ) {
+          const sent = (await broadcast(step, chain, from)) ?? step;
+          return view(sent.state === from ? await givenUp(sent) : sent);
+        }
         const next = afterObservation(from, observation);
         if (next === null) return view(step);
         const move = moveTo(from, next);

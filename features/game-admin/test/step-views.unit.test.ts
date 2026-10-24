@@ -1,12 +1,12 @@
 import { gameAdminStepStates } from "@ador/shared/games";
 import { describe, expect, it } from "vitest";
 
-import { stateTone } from "../src/domain/copy.ts";
+import { stateTone, stepCopy } from "../src/domain/copy.ts";
 import { shortTime, stepFacts } from "../src/domain/facts.ts";
 import { lifecycleSteps } from "../src/domain/lifecycle.ts";
 
 const marks = (state: Parameters<typeof lifecycleSteps>[0]["state"]) =>
-  lifecycleSteps({ delayed: false, state }).map(
+  lifecycleSteps({ delayed: false, state, unconfirmedSend: false }).map(
     (step) => `${step.label}:${step.state}`,
   );
 
@@ -54,11 +54,43 @@ describe("a step's life as stages", () => {
   });
 
   it("tells, on the stage it waits at, what it waits for, and says so when it is taking longer than expected", () => {
-    const waiting = lifecycleSteps({ delayed: false, state: "pending" });
+    const waiting = lifecycleSteps({
+      delayed: false,
+      state: "pending",
+      unconfirmedSend: false,
+    });
     expect(waiting[3]?.detail).toBe("Sent, waiting");
-    const late = lifecycleSteps({ delayed: true, state: "pending" });
+    const late = lifecycleSteps({
+      delayed: true,
+      state: "pending",
+      unconfirmedSend: false,
+    });
     expect(late[3]?.detail).toBe("Sent, delayed");
     expect(late[0]?.detail).toBeUndefined();
+  });
+
+  it("does not call a step sent that the network has not been seen to hold: sent is still being done, and nothing after it is claimed", () => {
+    const unconfirmed = lifecycleSteps({
+      delayed: false,
+      state: "pending",
+      unconfirmedSend: true,
+    });
+    expect(unconfirmed.map(({ label, state }) => `${label}:${state}`)).toEqual([
+      "Built:done",
+      "Signed:done",
+      "Sent:active",
+      "Confirmed:pending",
+      "Indexed:pending",
+    ]);
+    expect(unconfirmed[2]?.detail).toBe("Not confirmed sent");
+    expect(
+      stepCopy({ delayed: true, state: "pending", unconfirmedSend: true })
+        .label,
+    ).toBe("Not confirmed sent");
+    expect(
+      stepCopy({ delayed: false, state: "pending", unconfirmedSend: false })
+        .label,
+    ).toBe("Sent, waiting");
   });
 
   it("is told for every state there is", () => {

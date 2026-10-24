@@ -36,6 +36,13 @@ export const stateCopy: Readonly<
   },
 };
 
+// A step the platform tried to send but the network has not been seen to hold. It is not "sent": nothing says the network has it.
+const notConfirmedSentCopy = {
+  detail:
+    "The platform tried to send it and the network has not been seen to hold it, so it may not have arrived. It keeps looking and sending the same signed transaction again. If the network never has it, this ends as failed.",
+  label: "Not confirmed sent",
+} as const;
+
 // What a step in a waiting state says when it has waited longer than expected: more than an hour since it was sent, or the network's
 // records are far behind. It says so and says it has not failed, because it has not.
 const delayedCopy: Readonly<
@@ -60,10 +67,12 @@ export const showsDelayed = (
 
 // The words for a step as it stands now: its state's, or the delayed ones while it is waiting longer than expected.
 export const stepCopy = (
-  step: Pick<GameAdminStep, "delayed" | "state">,
+  step: Pick<GameAdminStep, "delayed" | "state" | "unconfirmedSend">,
 ): { detail: string; label: string } =>
-  (showsDelayed(step) ? delayedCopy[step.state] : undefined) ??
-  stateCopy[step.state];
+  step.unconfirmedSend && step.state === "pending"
+    ? notConfirmedSentCopy
+    : ((showsDelayed(step) ? delayedCopy[step.state] : undefined) ??
+      stateCopy[step.state]);
 
 // The colour a state's badge takes: waiting on you is yellow, waiting on the network is cyan, done is mint, stopped is red or pink.
 export const stateTone: Readonly<Record<GameAdminStepState, ArcadeTone>> = {

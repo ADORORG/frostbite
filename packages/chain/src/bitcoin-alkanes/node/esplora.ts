@@ -1,6 +1,6 @@
 import type { FeeRate, JsonValue } from "@ador/shared/chain";
 
-import { NodeUnavailableError } from "./errors.ts";
+import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
 import { isRecord, listOf, recordOf, textOf, wholeNumberOf } from "./json.ts";
 import type { JsonRpc } from "./transport.ts";
 
@@ -98,14 +98,19 @@ export function createEsploraClient(rpc: JsonRpc): EsploraClient {
       }
       return hash;
     },
+    // Bitcoin Core's own call, with the transaction in the request body. The gateway's `esplora_broadcast` is not used: it forwards
+    // the hex as part of a web address, which the explorer behind it does not serve (it answers "endpoint does not exist") and which
+    // is too long for a large transaction (414).
     broadcast: async (hex) => {
       const txid = textOf(
-        await rpc.call("esplora_broadcast", [hex]),
+        await rpc.call("sendrawtransaction", [hex]),
         "broadcast answer",
       );
       if (!hexId.test(txid)) {
-        throw new NodeUnavailableError(
-          "The node's broadcast answer is not a transaction id.",
+        // The node answered, and not with the id of a transaction it holds: the transaction was not taken, whatever the text says.
+        // It is a refusal with the node's own words, not an unknown, so the step ends instead of waiting for what will not come.
+        throw new NodeRejectedError(
+          `The node did not take the transaction: ${txid.slice(0, 200)}`,
         );
       }
       return txid;

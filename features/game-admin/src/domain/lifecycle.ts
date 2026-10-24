@@ -17,7 +17,7 @@ const finished = {
 // A step's life as stages with where each stands, from its state alone: nothing is claimed done that the record does not show. A step
 // that failed or ran out of time stops after being built and says so, since the record does not say which stage it stopped at.
 export function lifecycleSteps(
-  step: Pick<GameAdminStep, "delayed" | "state">,
+  step: Pick<GameAdminStep, "delayed" | "state" | "unconfirmedSend">,
 ): readonly ProgressStep[] {
   if (step.state === "failed" || step.state === "expired")
     return [
@@ -27,7 +27,13 @@ export function lifecycleSteps(
         state: "failed",
       },
     ];
-  const done = step.state === "complete" ? stages.length : finished[step.state];
+  // Sent is done only when the network has been seen to hold the step; one the platform could not confirm is still being sent.
+  const done =
+    step.state === "complete"
+      ? stages.length
+      : step.unconfirmedSend && step.state === "pending"
+        ? 2
+        : finished[step.state];
   return stages.map((label, index): ProgressStep => {
     if (index < done) return { label, state: "done" };
     if (index === done)

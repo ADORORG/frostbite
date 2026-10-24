@@ -13,7 +13,7 @@ game's contract, define a milestone, claim) with nothing simulated. It exists be
 | Gateway                            | `src/gateway.ts`: one URL for both, as the platform expects | 18081                |
 
 The platform reads a chain through one JSON-RPC URL that answers Esplora's names and Metashrew's. The gateway answers the eight the
-adapter uses (`esplora_blocks:tip:height`, `…:tip:hash`, `esplora_fee-estimates`, `esplora_broadcast`, `esplora_tx`,
+adapter uses (`esplora_blocks:tip:height`, `…:tip:hash`, `esplora_fee-estimates`, `sendrawtransaction`, `esplora_tx`,
 `esplora_address::utxo`, `metashrew_height`, `metashrew_view`) from Core and the indexer, and refuses anything else.
 
 ## Use

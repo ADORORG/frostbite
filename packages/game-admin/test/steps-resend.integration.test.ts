@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { neverReceivedReason } from "../src/service.ts";
+
 import {
   chain,
+  clock,
   lostSend,
   network,
   pauseInput,
@@ -64,6 +67,26 @@ describe("a step sent without the network being seen to hold it", () => {
       ok: true,
       step: {
         failureReason: "rejected by the simulated network",
+        state: "broadcast_rejected",
+        transactionId: null,
+        unconfirmedSend: false,
+      },
+    });
+  });
+
+  it("gives up on a step the network never has after the hour any wait is called delayed, as a failure that says so", async () => {
+    lostSend.always = true;
+    const { step } = await sendLost();
+    clock.now = new Date(clock.now.getTime() + 30 * 60_000);
+    expect(await service.refresh(step.id)).toMatchObject({
+      ok: true,
+      step: { state: "broadcast_unknown", unconfirmedSend: true },
+    });
+    clock.now = new Date(clock.now.getTime() + 31 * 60_000);
+    expect(await service.refresh(step.id)).toMatchObject({
+      ok: true,
+      step: {
+        failureReason: neverReceivedReason,
         state: "broadcast_rejected",
         transactionId: null,
         unconfirmedSend: false,

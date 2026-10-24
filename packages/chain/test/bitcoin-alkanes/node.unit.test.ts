@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { JsonValue } from "@ador/shared/chain";
 
+import { NodeRejectedError } from "../../src/bitcoin-alkanes/node/errors.ts";
 import { createRpcNode } from "../../src/bitcoin-alkanes/node/node.ts";
 import {
   bytecodeRequestOfTwoZero,
@@ -235,13 +236,21 @@ describe("the chain side", () => {
   });
 
   it("broadcasts and returns the id the node reports", async () => {
-    const { calls, rpc } = scriptedRpc({ esplora_broadcast: txid });
+    const { calls, rpc } = scriptedRpc({ sendrawtransaction: txid });
     expect(await createRpcNode(rpc).broadcast("0200")).toBe(txid);
-    expect(calls[0]).toEqual({ method: "esplora_broadcast", params: ["0200"] });
-    await expect(
-      createRpcNode(scriptedRpc({ esplora_broadcast: "nope" }).rpc).broadcast(
-        "0200",
-      ),
-    ).rejects.toThrow("not a transaction id");
+    expect(calls[0]).toEqual({
+      method: "sendrawtransaction",
+      params: ["0200"],
+    });
+  });
+
+  it("takes an answer that is not a transaction id as a refusal, with the node's words, not as an unknown", async () => {
+    const refused = createRpcNode(
+      scriptedRpc({
+        sendrawtransaction: 'endpoint does not exist "/broadcast/0200"',
+      }).rpc,
+    ).broadcast("0200");
+    await expect(refused).rejects.toBeInstanceOf(NodeRejectedError);
+    await expect(refused).rejects.toThrow("endpoint does not exist");
   });
 });
