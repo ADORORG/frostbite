@@ -76,6 +76,14 @@ describe("the rewards chain on testnet4", () => {
     }
   });
 
+  it("gives each beta network the explorer its transactions are followed on, with a place for the id", () => {
+    for (const beta of Object.values(betaChains)) {
+      expect(beta.explorerTxUrl).toMatch(/^https:\/\/.+\{id\}$/u);
+    }
+    expect(betaChains.testnet4.explorerTxUrl).toContain("/testnet4/");
+    expect(betaChains.signet.explorerTxUrl).toContain("/signet/");
+  });
+
   it("holds testnet4 to the very policy signet is held to: one record, no value of its own", () => {
     // ADR-019, point 7: the policy (`rewardsPolicy`) is not keyed by network, so every beta network reads the same confirmations,
     // gate, fee speeds and delay. This fails if a network ever gets a record that differs without the decision being taken.

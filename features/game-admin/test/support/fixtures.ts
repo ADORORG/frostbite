@@ -69,6 +69,7 @@ export const collectibleTemplate = {
 export const config = (): GameAdminConfig => ({
   chain: () => null,
   delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 },
+  explorerTxUrl: "https://explorer.test/tx/{id}",
   fees: { defaultSpeed: "slow", refreshMs: 60_000 },
   drawingLimits: { maxAttributeLength: 4096, maxDepth: 8, maxElements: 200 },
   rewards: {
@@ -121,6 +122,8 @@ export const view = (over: Partial<StepView> = {}): StepView => ({
     summary: summary(),
   },
   transactionId: null,
+  transactions: [],
+  unconfirmedSend: false,
   ...over,
 });
 

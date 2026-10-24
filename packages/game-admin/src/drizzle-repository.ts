@@ -166,7 +166,15 @@ export function createDrizzleGameAdminRepository(
         const change = decide(step);
         if (change === null) return step;
         const updatedAt = options.clock();
-        const broadcastAt = sentAtAfter(step.broadcastAt, change, updatedAt);
+        // A refused step holds no transaction (the table says so): one refused after it had been sent without the network being seen to
+        // hold it lets go of the id it was following, since there is nothing on the network to follow.
+        const refused = change.state === "broadcast_rejected";
+        const broadcastAt = refused
+          ? null
+          : sentAtAfter(step.broadcastAt, change, updatedAt);
+        const transactionId = refused
+          ? null
+          : (change.transactionId ?? row.transactionId);
         await transaction
           .update(gameAdminSteps)
           .set({
@@ -182,7 +190,7 @@ export function createDrizzleGameAdminRepository(
             signedPayload: change.signedPayload ?? row.signedPayload,
             state: change.state,
             submittedBy: change.submittedBy ?? row.submittedBy,
-            transactionId: change.transactionId ?? row.transactionId,
+            transactionId,
             updatedAt,
           })
           .where(eq(gameAdminSteps.id, stepId));
@@ -200,7 +208,7 @@ export function createDrizzleGameAdminRepository(
           signedPayload: change.signedPayload ?? step.signedPayload,
           state: change.state,
           submittedBy: change.submittedBy ?? step.submittedBy,
-          transactionId: change.transactionId ?? step.transactionId,
+          transactionId,
           updatedAt,
         };
       }),

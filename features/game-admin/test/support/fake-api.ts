@@ -34,6 +34,8 @@ export const step = (over: Partial<GameAdminStep> = {}): GameAdminStep => ({
     payload: "{}",
   },
   transactionId: null,
+  transactions: [],
+  unconfirmedSend: false,
   ...over,
 });
 

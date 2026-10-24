@@ -35,6 +35,7 @@ const viewerFor = (behind: number | null) =>
   createStepViewer({
     clock: () => now,
     delay,
+    transactionIds: () => [],
     ports: () => ({
       observer: {
         indexing: async (asked) => {

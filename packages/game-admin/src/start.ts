@@ -8,7 +8,7 @@ import {
   type Plan,
   type Refusal,
 } from "./plan.ts";
-import { createStepViewer } from "./steps.ts";
+import { stepViewerFor } from "./steps.ts";
 import type {
   GameAdminDependencies,
   StartStepInput,
@@ -80,6 +80,6 @@ export async function startStep(
   return {
     ok: true,
     resumed: result.kind === "in-progress",
-    step: await createStepViewer(dependencies).one(result.step),
+    step: await stepViewerFor(dependencies).one(result.step),
   };
 }

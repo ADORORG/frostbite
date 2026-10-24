@@ -40,6 +40,11 @@ which a game and its collectibles are made from, the most a contract may be crea
   only the inputs nobody has signed. Otherwise the review shows the transaction to sign and a box for the signed result. Either
   way the platform checks what comes back is exactly what it built and showed; nothing else is sent. A wallet that declines
   leaves the step signable again.
+- **Every transaction of a sent step is listed by id** (a template publish is a commit and a reveal), each linking to the block
+  explorer in `GameAdminConfig.explorerTxUrl` (`{id}` where the id goes; per network in `configs/beta-chains.ts`), so staff can follow
+  it by hand. A step sent without the network being seen to hold it says so, and on each refresh the platform looks the transaction
+  up and, if the network does not have it, sends the same signed bytes again (the network gives the same id, and says so if it
+  already holds them). A refusal is told as a failure with the network's reason.
 - **Nothing is called done early.** A step is "complete" only when the network's records show it; "Confirmed, not yet indexed" and
   "Sent, waiting" are separate.
 - **A milestone is defined once.** The page shows the log's standing and hides the form once a definition completed; the contract

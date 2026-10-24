@@ -183,6 +183,19 @@ export const walletRefusedCopy = (error: unknown): string => {
     : `Your wallet did not give back a signed transaction, so nothing was sent. Reason: ${reason.slice(0, 300)}`;
 };
 
+// What each transaction of a step is called where its id is shown.
+export const transactionRoleLabel: Readonly<
+  Record<GameAdminStep["transactions"][number]["role"], string>
+> = {
+  commit: "Commit transaction",
+  reveal: "Reveal transaction",
+  transaction: "Transaction",
+};
+
+// Said while a sent step has not been seen on the network: it may not have arrived, and the platform is looking again.
+export const unconfirmedSendCopy =
+  "Sent, but the network has not been seen to hold it yet, so it may not have arrived. The platform looks again and sends the same signed transaction again, which is safe. Check the ids below on the explorer.";
+
 export const noSignerCopy =
   "This version has no wallet connection that signs administration steps. Sign the transaction below with a wallet you trust, and paste the signed result.";
 

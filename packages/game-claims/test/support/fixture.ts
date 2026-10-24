@@ -114,6 +114,7 @@ function ports(): ClaimChainPorts {
           ? Promise.reject(new Error("the node is down"))
           : builder.build(...asked);
       },
+      transactionIds: (...asked) => builder.transactionIds(...asked),
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {

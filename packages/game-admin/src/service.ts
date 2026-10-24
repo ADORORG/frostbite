@@ -11,7 +11,7 @@ import { completing } from "./completion.ts";
 import { refOf } from "./plan.ts";
 import { recordCreated } from "./record.ts";
 import { startStep } from "./start.ts";
-import { createStepViewer } from "./steps.ts";
+import { stepViewerFor } from "./steps.ts";
 import type {
   AdminChainPorts,
   GameAdminDependencies,
@@ -24,12 +24,14 @@ import type {
 
 export function createGameAdminService(dependencies: GameAdminDependencies) {
   const { clock, ports, repository } = dependencies;
-  const viewer = createStepViewer(dependencies);
+  const viewer = stepViewerFor(dependencies);
 
-  // Sends a signed step to the network, once; asking again sends the same bytes and the network gives the same id.
+  // Sends a signed step to the network; asking again sends the same bytes and the network gives the same id. `from` is where the step
+  // stands: signed, or sent without the network being seen to hold it.
   async function broadcast(
     step: StoredStep,
     chain: AdminChainPorts,
+    from: "broadcast_unknown" | "signed" = "signed",
   ): Promise<StoredStep | null> {
     const signed = signedOf(step);
     if (signed === null) return step;
@@ -38,7 +40,7 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
     );
     return change === null
       ? step
-      : repository.update(step.id, moveTo("signed", change));
+      : repository.update(step.id, moveTo(from, change));
   }
 
   return {
@@ -141,6 +143,11 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
           chain: step.chain,
           id: step.transactionId,
         });
+        // Sent, but the network does not have it: the same signed bytes are sent again (the network gives the same id and says so if
+        // it already holds them), so a step is not left waiting for a transaction that never arrived. The outcome is told as it is:
+        // taken, or refused with the network's reason.
+        if (from === "broadcast_unknown" && observation.status === "not-found")
+          return view(await broadcast(step, chain, from));
         const next = afterObservation(from, observation);
         if (next === null) return view(step);
         const move = moveTo(from, next);

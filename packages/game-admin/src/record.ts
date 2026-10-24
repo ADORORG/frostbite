@@ -1,7 +1,7 @@
 import { walk } from "@ador/shared/chain";
 
 import { isUnreadableCreation } from "./completion.ts";
-import { createStepViewer } from "./steps.ts";
+import { stepViewerFor } from "./steps.ts";
 import type { GameAdminDependencies, RecordCreatedResult } from "./types.ts";
 
 // Recording by hand is a reconciliation: a failed step is made right by a person, then complete. The lifecycle allows no jump.
@@ -62,6 +62,6 @@ export async function recordCreated(
       : null,
   );
   return done?.state === "complete" && done.recordedBy === input.staffId
-    ? { ok: true, step: await createStepViewer(dependencies).one(done) }
+    ? { ok: true, step: await stepViewerFor(dependencies).one(done) }
     : { code: "not-recordable", ok: false };
 }

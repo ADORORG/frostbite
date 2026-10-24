@@ -21,6 +21,8 @@ export interface GameAdminConfig {
   readonly clock?: () => Date;
   // When a step's wait is called delayed (see `rewardsPolicy.delay`).
   readonly delay: DelayPolicy;
+  // Where a transaction is shown on a block explorer, with `{id}` where its id goes, so staff can follow a step they sent.
+  readonly explorerTxUrl: string;
   // The speed a step is offered at first, and how often the page asks the chain what each speed costs (milliseconds).
   readonly fees: {
     readonly defaultSpeed: FeeSpeed;

@@ -96,6 +96,8 @@ export const inspected: {
 } = { codeHash: null, down: false, exists: false };
 // How far behind the tip the chain's indexer is, or that the node cannot be asked.
 export const indexer = { behind: 0, down: false };
+// Makes the next broadcast end as the real adapter does when its node cannot be reached: ambiguous, never received.
+export const lostSend = { next: false };
 // Held broadcasts, so two steps on one transaction can be made to overlap.
 export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
@@ -115,6 +117,11 @@ function ports(): AdminChainPorts {
           await new Promise<void>((release) =>
             broadcastGate.held.push(release),
           );
+        if (lostSend.next) {
+          lostSend.next = false;
+          const id = builder.transactionIds(signed)[0]?.id ?? "";
+          return { kind: "ambiguous", ref: { chain: signed.chain, id } };
+        }
         return broadcaster.broadcast(signed);
       },
     },
@@ -130,6 +137,7 @@ function ports(): AdminChainPorts {
             }
           : built;
       },
+      transactionIds: (...asked) => builder.transactionIds(...asked),
       verifySigned: (...asked) => builder.verifySigned(...asked),
     },
     contracts: {
@@ -283,6 +291,7 @@ export function registerDatabase(): void {
     Object.assign(indexer, { behind: 0, down: false });
     broadcastGate.enabled = false;
     broadcastGate.held = [];
+    lostSend.next = false;
     network.controls.fund(chain, wallet.value, 100n);
   });
   afterAll(async () => pool.end());

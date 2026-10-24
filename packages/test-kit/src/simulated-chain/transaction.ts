@@ -240,6 +240,16 @@ export function createSimulatedBuilder(now: () => Date): TransactionBuilder {
         },
       });
     },
+    // The simulated network follows one id per payload (see `Ledger.transactionRef`); the signed payload is what it hashes.
+    transactionIds: (signed) => [
+      {
+        id: createHash("sha256")
+          .update(signed.payload)
+          .digest("hex")
+          .slice(0, 32),
+        role: "transaction",
+      },
+    ],
     verifySigned: (unsigned, signed): VerificationResult => {
       if (
         signed.chain !== unsigned.chain ||

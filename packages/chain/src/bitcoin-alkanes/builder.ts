@@ -26,6 +26,7 @@ import {
 import { selectCoins, shortfallNote, type CoinRequest } from "./tx/coins.ts";
 import { claimScript } from "./tx/claim-call.ts";
 import { buildClaimPsbt } from "./tx/psbt.ts";
+import { transactionParts } from "./signed-transactions.ts";
 import { verifySignedClaim } from "./verify.ts";
 
 export function createTransactionBuilder(
@@ -112,6 +113,7 @@ export function createTransactionBuilder(
         },
       };
     },
+    transactionIds: (signed) => transactionParts(signed),
     verifySigned: (unsigned, signed) =>
       admin !== undefined && isAdminOperation(unsigned.summary.operation)
         ? verifySignedAdmin(admin, unsigned, signed)

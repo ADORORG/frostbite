@@ -80,6 +80,8 @@ export function toWireStep(
             payload: view.toSign.payload,
           },
     transactionId: view.transactionId,
+    transactions: view.transactions.map(({ id, role }) => ({ id, role })),
+    unconfirmedSend: view.unconfirmedSend,
   };
 }
 

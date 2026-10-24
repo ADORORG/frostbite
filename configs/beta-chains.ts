@@ -15,8 +15,8 @@ export const bitcoinSignetChainId = "bip122:00000008819873e925422c1ff0f99f7c";
 // chainparams.cpp, CTestNet4Params), the same block the Subfrost gateway answers for height 0.
 export const bitcoinTestnet4ChainId = "bip122:00000000da84f2bafbbc53dee25a72ae";
 
-// The test networks the beta can run on. Each is a chain record and the wallet network a person's wallet
-// must be on to use it.
+// The test networks the beta can run on. Each is a chain record, the wallet network a person's wallet must be on to use it, and
+// the block explorer staff follow its transactions on.
 export const betaChains = {
   signet: {
     chain: chainOptionSchema.parse({
@@ -26,6 +26,7 @@ export const betaChains = {
       family: "bitcoin-alkanes",
       role: "public-beta",
     }),
+    explorerTxUrl: "https://mempool.space/signet/tx/{id}",
     network: "signet",
   },
   testnet4: {
@@ -36,11 +37,18 @@ export const betaChains = {
       family: "bitcoin-alkanes",
       role: "public-beta",
     }),
+    explorerTxUrl: "https://mempool.space/testnet4/tx/{id}",
     network: "testnet4",
   },
 } as const satisfies Record<
   BetaNetwork,
-  { readonly chain: ChainOption; readonly network: WalletNetwork }
+  {
+    readonly chain: ChainOption;
+    // Where a transaction on the network is shown, with `{id}` where its id goes. A public page, so linking to it sends nothing but
+    // the id.
+    readonly explorerTxUrl: string;
+    readonly network: WalletNetwork;
+  }
 >;
 
 export type BetaChain = (typeof betaChains)[keyof typeof betaChains];

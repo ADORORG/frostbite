@@ -60,6 +60,13 @@ export interface ContractGateway {
   simulate(intent: TransactionIntent): Promise<SimulationResult>;
 }
 
+// One transaction a signed payload holds, for a person who follows it on a block explorer. A step that needs two (a commit that pays
+// for the data and a reveal that shows it) lists both, in the order they are sent.
+export interface TransactionPart {
+  readonly id: string;
+  readonly role: "commit" | "reveal" | "transaction";
+}
+
 export interface TransactionBuilder {
   build(
     intent: TransactionIntent,
@@ -71,6 +78,8 @@ export interface TransactionBuilder {
     unsigned: UnsignedTransaction,
     signed: SignedTransaction,
   ): VerificationResult;
+  // The ids of the transactions a signed payload holds, in the order they are sent; none for a payload that is not fully signed.
+  transactionIds(signed: SignedTransaction): readonly TransactionPart[];
 }
 
 export interface Broadcaster {

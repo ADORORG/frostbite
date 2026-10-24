@@ -110,6 +110,22 @@ export const gameAdminStepSchema = z
     templateRef: z.string().min(1).max(130).nullable(),
     toSign: gameAdminTransactionSchema.nullable(),
     transactionId: z.string().min(1).max(128).nullable(),
+    // Every transaction the signed step holds, in the order they are sent (a template is a commit and a reveal), so each can be
+    // followed on a block explorer. None before the step is signed.
+    transactions: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1).max(128),
+            role: z.enum(["commit", "reveal", "transaction"]),
+          })
+          .strict(),
+      )
+      .max(4)
+      .readonly(),
+    // Sent, but the network has not been seen to hold it. The platform looks again and sends the same signed bytes again; staff can
+    // check the ids on an explorer meanwhile.
+    unconfirmedSend: z.boolean(),
   })
   .strict();
 

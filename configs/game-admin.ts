@@ -1,5 +1,6 @@
 import type { GameAdminConfig } from "@ador/feature-game-admin";
 
+import { betaChain } from "./chains.ts";
 import { rewardsChain } from "./game-rewards.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";
 import { rewardsPlan } from "./rewards-plan.ts";
@@ -10,6 +11,7 @@ import { rewardsPlan } from "./rewards-plan.ts";
 export const gameAdminConfig = {
   chain: rewardsChain,
   delay: rewardsPolicy.delay,
+  explorerTxUrl: betaChain.explorerTxUrl,
   fees: {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
     refreshMs: rewardsPolicy.indexingRefreshMs,

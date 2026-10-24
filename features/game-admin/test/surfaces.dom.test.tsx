@@ -20,6 +20,7 @@ describe("the staff pages", () => {
       inApp(
         <GamesSurface
           api={fakeApi()}
+          explorerTxUrl="https://explorer.test/tx/{id}"
           fees={fees}
           games={info()}
           navigation={navigation}
@@ -44,6 +45,7 @@ describe("the staff pages", () => {
       inApp(
         <GamesSurface
           api={fakeApi()}
+          explorerTxUrl="https://explorer.test/tx/{id}"
           fees={fees}
           games={[]}
           navigation={navigation}
@@ -60,6 +62,7 @@ describe("the staff pages", () => {
       inApp(
         <GameSurface
           api={fakeApi()}
+          explorerTxUrl="https://explorer.test/tx/{id}"
           fees={fees}
           game={arcade}
           navigation={navigation}
@@ -77,6 +80,7 @@ describe("the staff pages", () => {
       inApp(
         <GameSurface
           api={fakeApi()}
+          explorerTxUrl="https://explorer.test/tx/{id}"
           fees={fees}
           game={undefined}
           navigation={navigation}

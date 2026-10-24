@@ -29,4 +29,6 @@ export const adminStep = {
     payload: "{}",
   },
   transactionId: null,
+  transactions: [],
+  unconfirmedSend: false,
 };

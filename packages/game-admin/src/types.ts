@@ -1,4 +1,4 @@
-import type { ChainPorts } from "@ador/chain/ports";
+import type { ChainPorts, TransactionPart } from "@ador/chain/ports";
 import type {
   ChainFamilyId,
   ChainRef,
@@ -198,6 +198,10 @@ export interface StepView {
   readonly templateRef: string | null;
   readonly toSign: UnsignedTransaction | null;
   readonly transactionId: string | null;
+  // Every transaction the signed step holds, in the order they are sent; none before it is signed.
+  readonly transactions: readonly TransactionPart[];
+  // Whether the network has not been seen to hold the step although it was sent (see `refresh`).
+  readonly unconfirmedSend: boolean;
 }
 
 export interface StartStepInput {
