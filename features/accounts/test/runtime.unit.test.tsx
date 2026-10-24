@@ -10,6 +10,9 @@ const factories = vi.hoisted(() => ({
   databaseClient: vi.fn(() => "database"),
   databaseEnvironment: vi.fn(() => "database-environment"),
   databasePool: vi.fn(() => "pool"),
+  methodRegistry: vi.fn<(adapters: readonly string[]) => { list: string }>(
+    () => ({ list: "list-methods" }),
+  ),
   passkeyRepository: vi.fn(() => "repository"),
   passkeyService: vi.fn((input: { readonly clock: () => Date }) => {
     input.clock();
@@ -24,8 +27,11 @@ const factories = vi.hoisted(() => ({
 
 vi.mock("@ador/auth", () => ({
   createDrizzlePasskeyRepository: factories.passkeyRepository,
+  createMethodRegistry: factories.methodRegistry,
   createPasskeyLinkingService: factories.passkeyService,
+  passkeyMethod: "passkey-method",
   simpleWebAuthnRegistrationAdapter: "adapter",
+  walletMethod: "wallet-method",
 }));
 vi.mock("@ador/database/connection", () => ({
   createDatabaseClient: factories.databaseClient,
@@ -45,7 +51,15 @@ describe("passkey runtime composition", () => {
     const first = getPasskeyLinkingService();
     const second = getPasskeyLinkingService();
     expect(second).toBe(first);
-    expect(factories.passkeyRepository).toHaveBeenCalledWith("database");
+    // The repository removes a passkey under the registry's rule, and the registry is the wallet and passkey methods.
+    expect(factories.methodRegistry).toHaveBeenCalledWith([
+      "wallet-method",
+      "passkey-method",
+    ]);
+    expect(factories.passkeyRepository).toHaveBeenCalledWith(
+      "database",
+      "list-methods",
+    );
     expect(factories.passkeyService).toHaveBeenCalledWith(
       expect.objectContaining({
         adapter: "adapter",

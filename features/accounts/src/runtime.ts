@@ -1,4 +1,5 @@
 import {
+  createMethodRegistry,
   createDrizzlePasskeyRepository,
   createDrizzleSessionRepository,
   createDrizzleWalletAuthRepository,
@@ -7,13 +8,16 @@ import {
   createSessionService,
   createWalletAuthService,
   createWalletMethodsService,
+  passkeyMethod,
   simpleWebAuthnRegistrationAdapter,
   strictBip322Verifier,
+  walletMethod,
 } from "@ador/auth";
 import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
+  type DatabaseTransaction,
 } from "@ador/database/connection";
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import type { WalletAuthConfig } from "./wallet-config.ts";
@@ -24,6 +28,15 @@ import {
 
 let service: ReturnType<typeof createPasskeyLinkingService> | undefined;
 let sharedDatabase: ReturnType<typeof createDatabaseClient> | undefined;
+let sharedRegistry:
+  ReturnType<typeof createMethodRegistry<DatabaseTransaction>> | undefined;
+
+// The sign-in methods this deployment offers. A new method (email, phone) is one adapter added to this list, with its own routes: the
+// rules, the repositories and the pages read the registry and are not edited (ADR-021).
+function methodRegistry() {
+  sharedRegistry ??= createMethodRegistry([walletMethod, passkeyMethod]);
+  return sharedRegistry;
+}
 
 // One connection pool for everything this feature does, made when something first needs it.
 function database() {
@@ -50,7 +63,10 @@ export function getPasskeyLinkingService() {
       sessionAbsoluteLifetimeMs: policy.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
       sessionIdleLifetimeMs: policy.AUTH_SESSION_IDLE_TIMEOUT_MS,
     },
-    repository: createDrizzlePasskeyRepository(database()),
+    repository: createDrizzlePasskeyRepository(
+      database(),
+      methodRegistry().list,
+    ),
   });
   return service;
 }
@@ -89,7 +105,10 @@ export function createWalletServicesResolver(
           releaseHoldMs: config.releaseHoldMs,
           ...lifetimes,
         },
-        repository: createDrizzleWalletMethodsRepository(database()),
+        repository: createDrizzleWalletMethodsRepository(
+          database(),
+          methodRegistry().list,
+        ),
       }),
       origin: new URL(app.PUBLIC_BASE_URL).origin,
       passkeys: getPasskeyLinkingService(),

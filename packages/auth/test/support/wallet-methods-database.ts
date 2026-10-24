@@ -21,6 +21,7 @@ import { createWalletAuthService } from "../../src/application/service.ts";
 import { strictBip322Verifier } from "../../src/bitcoin/verifier.ts";
 import { sha256 } from "../../src/domain/crypto.ts";
 import { createDrizzleWalletMethodsRepository } from "../../src/wallets/drizzle-repository.ts";
+import { methodRegistry } from "./registry.ts";
 import { createWalletMethodsService } from "../../src/wallets/service.ts";
 import {
   signWalletMessage,
@@ -47,7 +48,10 @@ export const methods = createWalletMethodsService({
     sessionAbsoluteLifetimeMs: 86_400_000,
     sessionIdleLifetimeMs: 3_600_000,
   },
-  repository: createDrizzleWalletMethodsRepository(database),
+  repository: createDrizzleWalletMethodsRepository(
+    database,
+    methodRegistry.list,
+  ),
 });
 
 // Security events keep their session and user (restrict), so they go first; other files clean up without them.

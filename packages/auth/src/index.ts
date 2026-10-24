@@ -51,11 +51,28 @@ export {
   type PasskeyUnlinkInput,
 } from "./passkeys/http.ts";
 export {
+  assuranceLevels,
+  assuranceRank,
+  methodKindSchema,
+  type AssuranceLevel,
+  type LinkedMethod,
+  type ListMethods,
+  type MethodAdapter,
+  type MethodDescription,
+  type MethodKind,
+} from "./methods/contracts.ts";
+export {
+  createMethodRegistry,
+  type MethodRegistry,
+} from "./methods/registry.ts";
+export {
+  holdsMethod,
+  meetsAssurance,
   removalOutcome,
-  type AccountMethod,
-  type AccountMethodKind,
   type RemovalOutcome,
 } from "./methods/rule.ts";
+export { walletMethod, walletMethodKind } from "./wallets/method.ts";
+export { passkeyMethod, passkeyMethodKind } from "./passkeys/method.ts";
 export { createWalletMethodsService } from "./wallets/service.ts";
 export type {
   UnlinkWalletOutcome,

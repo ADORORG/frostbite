@@ -1,4 +1,7 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type {
+  DatabaseClient,
+  DatabaseTransaction,
+} from "@ador/database/connection";
 import {
   authSecurityEvents,
   authSessions,
@@ -10,12 +13,15 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { lockActiveSession } from "../adapters/lock-active-session.ts";
 import { sha256 } from "../domain/crypto.ts";
-import { listAccountMethods } from "../methods/drizzle-account-methods.ts";
+import type { ListMethods } from "../methods/contracts.ts";
 import { removalOutcome } from "../methods/rule.ts";
+import { passkeyMethodKind } from "./method.ts";
 import type { PasskeyRepository } from "./repository.ts";
 
+// `listMethods` is the method registry's: whether a passkey may be removed depends on every method the account has.
 export function createDrizzlePasskeyRepository(
   database: DatabaseClient,
+  listMethods: ListMethods<DatabaseTransaction>,
 ): PasskeyRepository {
   return {
     async issueChallenge(challenge) {
@@ -176,10 +182,10 @@ export function createDrizzlePasskeyRepository(
           .limit(1);
         if (!credential) return { kind: "missing" };
         // Whether the account would still have a way in is the shared rule's decision, on what it holds now.
-        const outcome = removalOutcome(
-          await listAccountMethods(transaction, userId),
-          { id: credentialId, kind: "passkey" },
-        );
+        const outcome = removalOutcome(await listMethods(transaction, userId), {
+          id: credentialId,
+          kind: passkeyMethodKind,
+        });
         if (outcome !== "ok") return { kind: outcome };
         await transaction
           .delete(passkeyCredentials)

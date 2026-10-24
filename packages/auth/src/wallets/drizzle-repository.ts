@@ -1,4 +1,7 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type {
+  DatabaseClient,
+  DatabaseTransaction,
+} from "@ador/database/connection";
 import {
   authSecurityEvents,
   authSessions,
@@ -11,12 +14,15 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { lockActiveSession } from "../adapters/lock-active-session.ts";
 import { sha256 } from "../domain/crypto.ts";
-import { listAccountMethods } from "../methods/drizzle-account-methods.ts";
+import type { ListMethods } from "../methods/contracts.ts";
 import { removalOutcome } from "../methods/rule.ts";
+import { walletMethodKind } from "./method.ts";
 import type { WalletMethodsRepository } from "./repository.ts";
 
+// `listMethods` is the method registry's: whether a wallet may be removed depends on every method the account has, not on wallets alone.
 export function createDrizzleWalletMethodsRepository(
   database: DatabaseClient,
+  listMethods: ListMethods<DatabaseTransaction>,
 ): WalletMethodsRepository {
   return {
     async list(userId) {
@@ -42,8 +48,8 @@ export function createDrizzleWalletMethodsRepository(
         if (!(await lockActiveSession(transaction, input)))
           return { kind: "missing" };
         const outcome = removalOutcome(
-          await listAccountMethods(transaction, input.userId),
-          { id: input.walletId, kind: "wallet" },
+          await listMethods(transaction, input.userId),
+          { id: input.walletId, kind: walletMethodKind },
         );
         if (outcome !== "ok") return { kind: outcome };
         const [wallet] = await transaction

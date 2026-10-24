@@ -1,25 +1,21 @@
-// What an account can sign in with, and what it merely has. A wallet signs in; a passkey is added to an account
-// and cannot start a session by itself (it is link-only today); an email will sign in when that adapter exists.
-// The rule below is the one place that decides whether a method may be removed, so wallets and passkeys cannot
-// disagree about it.
-export type AccountMethodKind = "email" | "passkey" | "wallet";
+import {
+  assuranceRank,
+  type AssuranceLevel,
+  type LinkedMethod,
+  type MethodKind,
+} from "./contracts.ts";
 
-export interface AccountMethod {
-  // Whether this method can start a session. Removing the last one that can would lock the account out.
-  readonly canSignIn: boolean;
-  // The method's own identifier: the wallet identity's id, the passkey's credential id.
-  readonly id: string;
-  readonly kind: AccountMethodKind;
-}
+// The rules about an account's methods. They are pure, take the methods the account has, and know no kind by name, so adding a method
+// changes none of them. The repositories use them under the account's lock; policy uses them to decide who may hold a role.
 
 export type RemovalOutcome = "final-method" | "missing" | "ok";
 
-// May this method be removed from the account? `missing` when the account has no such method; `final-method` when
-// removing it would leave nothing that can sign in. Everything else is allowed, including removing the last of a
-// method that cannot sign in (a passkey), because the account still has a way in.
+// May this method be removed from the account? `missing` when the account has no such method (the same answer when a request is
+// repeated); `final-method` when removing it would leave nothing that can sign in. Everything else is allowed, including removing the
+// last of a method that cannot sign in, because the account still has a way in.
 export function removalOutcome(
-  methods: readonly AccountMethod[],
-  removing: { readonly id: string; readonly kind: AccountMethodKind },
+  methods: readonly LinkedMethod[],
+  removing: { readonly id: string; readonly kind: MethodKind },
 ): RemovalOutcome {
   const target = methods.find(
     ({ id, kind }) => id === removing.id && kind === removing.kind,
@@ -27,4 +23,23 @@ export function removalOutcome(
   if (target === undefined) return "missing";
   const remaining = methods.filter((method) => method !== target);
   return remaining.some(({ canSignIn }) => canSignIn) ? "ok" : "final-method";
+}
+
+// Does the account hold a method of this kind? (Staff and admin need a wallet.)
+export function holdsMethod(
+  methods: readonly LinkedMethod[],
+  kind: MethodKind,
+): boolean {
+  return methods.some((method) => method.kind === kind);
+}
+
+// Does the account hold a method at or above this assurance level? Holding is enough; whether it was used to sign in just now is the
+// session's business.
+export function meetsAssurance(
+  methods: readonly LinkedMethod[],
+  required: AssuranceLevel,
+): boolean {
+  return methods.some(
+    ({ assurance }) => assuranceRank(assurance) >= assuranceRank(required),
+  );
 }

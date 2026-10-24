@@ -12,6 +12,11 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
 - `createDrizzleSessionRepository` stores only SHA-256 token hashes and enforces idle, absolute,
   and revocation predicates in PostgreSQL.
 - `strictBip322Verifier` contains the `bip322-js` boundary.
+- Sign-in methods are adapters (ADR-021). `MethodAdapter<Context>` is the one port a method implements (`kind`, `assurance`,
+  `canSignIn`, `list`); `createMethodRegistry` composes them at the composition root and refuses a malformed or repeated kind
+  or a set in which nothing can sign in. `walletMethod` and `passkeyMethod` are the two that exist. The rules (`removalOutcome`,
+  `holdsMethod`, `meetsAssurance`) are pure, take the account's listed methods and know no kind by name. A new method is an
+  adapter, one line in the composition root (`features/accounts/src/runtime.ts`) and its own routes: nothing here is edited.
 - `removalOutcome` is the one rule for removing a sign-in method (wallet or passkey): an account keeps at least one
   method that can sign in. `createWalletMethodsService` lists an account's wallets and removes one (recent session,
   never the last way in, other sessions signed out, the removed wallet held before another account may take it).

@@ -14,11 +14,12 @@ import { createUuidV7 } from "@ador/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createDrizzlePasskeyRepository } from "../src/passkeys/drizzle-repository.ts";
+import { listMethods } from "./support/registry.ts";
 
 const environment = parseDatabaseEnvironment(process.env);
 const pool = createDatabasePool(environment);
 const database = createDatabaseClient(pool);
-const repository = createDrizzlePasskeyRepository(database);
+const repository = createDrizzlePasskeyRepository(database, listMethods);
 const now = new Date("2026-09-10T12:00:00.000Z");
 let userId = createUuidV7();
 let sessionId = createUuidV7();
