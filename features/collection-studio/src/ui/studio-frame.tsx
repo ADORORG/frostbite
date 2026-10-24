@@ -2,7 +2,7 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { PageFrame } from "@repo/ui/arcade";
 import type { ReactNode } from "react";
 
-// The shared frame of the collection pages: the platform page frame with the studio's notices. Every page
+// The shared frame of the collection pages: the platform page frame. Every page
 // uses it, so they cannot drift apart.
 export function StudioFrame({
   children,
@@ -22,7 +22,6 @@ export function StudioFrame({
       heading={heading}
       intro={intro}
       navigation={navigation}
-      notices={["◆ PRIVATE DRAFTS", "▲ NOTHING PUBLISHED", "★ NO CHAIN ACTION"]}
     >
       {children}
     </PageFrame>

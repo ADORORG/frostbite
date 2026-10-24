@@ -25,7 +25,6 @@ describe("arcade panel composition", () => {
         footerLabel="Test foundation"
         homeHref="#top"
         navigation={[{ area: "main", href: "#launches", label: "Launches" }]}
-        notices={["Foundation in progress"]}
       >
         <h1>Home</h1>
       </AppShell>,
@@ -36,8 +35,7 @@ describe("arcade panel composition", () => {
     expect(markup).toContain('aria-label="Primary navigation"');
     expect(markup).toContain('aria-label="Test arcade home"');
     expect(markup).toContain('href="#launches"');
-    expect(markup).toContain("Foundation in progress");
-    expect(markup).toContain('role="region" aria-label="Platform status"');
+    expect(markup).not.toContain("Platform status");
     expect(markup).toContain("Test foundation");
   });
 });

@@ -2,7 +2,7 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { AppShell } from "@repo/ui/arcade";
 import type { ReactNode } from "react";
 
-// The frame of the public collection pages: the platform shell with the public notices, and one section. Both pages and every state
+// The frame of the public collection pages: the platform shell, and one section. Both pages and every state
 // use it, so they cannot drift apart. `wall` is wide, for a page of covers; `catalog` is the narrower page of a single message.
 export function PublicFrame({
   children,
@@ -19,11 +19,6 @@ export function PublicFrame({
       footerLabel="Public discovery"
       homeHref="/"
       navigation={navigation}
-      notices={[
-        "◆ VERIFIED PUBLIC RECORDS",
-        "▲ APPROVED, NOT LAUNCHED",
-        "★ BITCOIN ALKANES",
-      ]}
     >
       <section className={`arcade-section arcade-section--${variant}`}>
         {children}

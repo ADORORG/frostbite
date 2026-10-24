@@ -11,7 +11,6 @@ const shell = (immersive?: boolean) =>
       footerLabel="Footer"
       homeHref="/"
       navigation={[]}
-      notices={["Notice"]}
       {...(immersive === undefined ? {} : { immersive })}
     >
       <p>Page</p>
@@ -19,14 +18,13 @@ const shell = (immersive?: boolean) =>
   );
 
 describe("a page that is one thing to play", () => {
-  it("is marked immersive, so the notices strip above the header can give up its room", () => {
+  it("is marked immersive, so the stage can take the room around it", () => {
     expect(shell(true)).toContain('data-immersive="true"');
   });
 
-  it("is not marked on an ordinary page, which keeps its notices", () => {
+  it("is not marked on an ordinary page", () => {
     expect(shell()).not.toContain("data-immersive");
     expect(shell(false)).not.toContain("data-immersive");
-    expect(shell()).toContain("arcade-marquee");
   });
 });
 

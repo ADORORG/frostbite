@@ -186,14 +186,14 @@ test("once approved the collection is public, as the version that was approved, 
   const visitor = await browser.newContext({ baseURL });
   const page = await visitor.newPage();
   await page.goto("/collections");
-  await expect(page.getByText("Approved by review")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /^Collections/u, level: 2 }),
+  ).toBeVisible();
   await page.getByRole("link", { name: `View ${name}` }).click();
   await expect(page).toHaveURL(
     new RegExp(`/collections/${collectionId}$`, "u"),
   );
-  await expect(
-    page.getByText("Approved by review. Not yet minted."),
-  ).toBeVisible();
+  await expect(page.getByText("Not on sale yet")).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
   await expect(
     page.getByText("A small ready collection, drawn by hand", { exact: true }),

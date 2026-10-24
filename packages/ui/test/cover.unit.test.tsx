@@ -124,7 +124,7 @@ describe("a preview that moves only while it is seen", () => {
 describe("a wall of covers", () => {
   it("makes one link of a card, named for what it does, with the words and the invitation inside", async () => {
     const box = await show(
-      <CoverGrid label="Registered games">
+      <CoverGrid label="Games">
         <CoverCard
           badges={<span>Playable</span>}
           cta="Play now"
@@ -136,9 +136,7 @@ describe("a wall of covers", () => {
         />
       </CoverGrid>,
     );
-    expect(box.querySelector("ul")?.getAttribute("aria-label")).toBe(
-      "Registered games",
-    );
+    expect(box.querySelector("ul")?.getAttribute("aria-label")).toBe("Games");
     const links = box.querySelectorAll("a");
     expect(links).toHaveLength(1);
     expect(links[0]?.getAttribute("href")).toBe("/games/frost");

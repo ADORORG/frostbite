@@ -31,11 +31,6 @@ export function PlatformHome({
       footerLabel="Adorbitals beta foundation"
       homeHref="#top"
       navigation={navigation}
-      notices={[
-        "★ BUILT ON BITCOIN",
-        "◆ POWERED BY ALKANES",
-        "▲ BETA FOUNDATION IN PROGRESS",
-      ]}
     >
       <section className="arcade-hero">
         <div className="arcade-hero-copy">

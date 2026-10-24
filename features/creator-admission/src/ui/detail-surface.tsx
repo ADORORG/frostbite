@@ -19,7 +19,6 @@ export function ReviewDetailSurface({
       heading="Review an application"
       intro="This is the version the applicant sent. Editing their draft later does not change it."
       navigation={navigation}
-      notices={["◆ STAFF ONLY", "▲ PRIVATE EVIDENCE", "★ SERVER AUTHORITY"]}
     >
       <ReviewDetail applicationId={applicationId} />
     </PageFrame>

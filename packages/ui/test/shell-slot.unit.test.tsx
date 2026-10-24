@@ -13,7 +13,6 @@ const shell = (
     footerLabel="Test foundation"
     homeHref="#top"
     navigation={[{ area: "main", href: "#launches", label: "Launches" }]}
-    notices={["Foundation in progress"]}
   >
     <h1>Home</h1>
   </AppShell>

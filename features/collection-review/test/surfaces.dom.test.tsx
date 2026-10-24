@@ -14,12 +14,12 @@ const navigation = [
 ] as const;
 
 describe("review page surfaces", () => {
-  it("frames the queue in the platform shell with staff notices, and says nothing here publishes", async () => {
+  it("frames the queue in the platform shell and says nothing here publishes", async () => {
     const container = await mount(<QueueSurface navigation={navigation} />);
     expect(container.querySelector("h1")?.textContent).toBe(
       "Collection reviews",
     );
-    expect(textOf(container)).toContain("STAFF ONLY");
+    expect(textOf(container)).not.toContain("STAFF ONLY");
     expect(container.querySelector(".arcade-eyebrow")?.textContent).toBe(
       "Admin",
     );

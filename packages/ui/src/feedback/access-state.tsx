@@ -44,7 +44,6 @@ export function AccessState({
       footerLabel="Protected platform route"
       homeHref="/"
       navigation={navigation}
-      notices={["◆ PRIVATE ROUTE", "▲ SERVER VERIFIED", "★ FAIL CLOSED"]}
     >
       <section className="arcade-section arcade-section--raised">
         <StatusLamp label={content.label} tone={content.tone} />

@@ -20,7 +20,6 @@ export function AccountSurface({
       footerLabel="Authenticated beta workspace"
       homeHref="/"
       navigation={navigation}
-      notices={["◆ SESSION VERIFIED", "▲ PRIVATE ROUTE", "★ SERVER AUTHORITY"]}
     >
       <section className="arcade-section arcade-section--raised">
         <StatusLamp label="Authenticated session" tone="ready" />

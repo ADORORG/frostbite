@@ -13,7 +13,6 @@ const render = () =>
       navigation={[
         { area: "main", href: "/collections", label: "Collections" },
       ]}
-      notices={["First notice", "Second notice"]}
     >
       <p>The page itself</p>
     </PageFrame>,
@@ -31,11 +30,10 @@ describe("page frame", () => {
     );
   });
 
-  it("sits in the platform shell, with the footer label, the notices and the navigation given", () => {
+  it("sits in the platform shell, with the footer label and the navigation given, and no strip of notices above the header", () => {
     const markup = render();
     expect(markup).toContain("Things beta");
-    expect(markup).toContain("First notice");
-    expect(markup).toContain("Second notice");
+    expect(markup).not.toContain("arcade-marquee");
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain("Skip to main content");
   });

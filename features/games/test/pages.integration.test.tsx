@@ -44,7 +44,7 @@ describe("the games index", () => {
     const markup = await render([], "/games");
     expect(markup).toContain("No games online");
     expect(markup).toContain("not presented as playable");
-    expect(markup).not.toContain("Registered games");
+    expect(markup).not.toContain("registered, ");
   });
 
   it("lists each game with whether it can be played, and a link to it", async () => {
@@ -81,7 +81,7 @@ describe("the games index", () => {
     );
     expect(markup.indexOf(">01<")).toBeLessThan(markup.indexOf(">02<"));
     expect(markup.indexOf(">02<")).toBeLessThan(markup.indexOf(">03<"));
-    expect(markup).toContain("3 registered");
+    expect(markup).toContain("Games <span>3</span>");
   });
 
   it("shows a cover's picture with its words, and starts no clip on the server", async () => {

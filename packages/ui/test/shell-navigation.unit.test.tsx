@@ -12,7 +12,6 @@ function render(navigation: readonly ShellNavigationItem[]) {
       footerLabel="Footer"
       homeHref="/"
       navigation={navigation}
-      notices={["Notice"]}
     >
       <h1>Page</h1>
     </AppShell>,

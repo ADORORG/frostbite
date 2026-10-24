@@ -35,7 +35,7 @@ const navigation = [
 ] as const;
 
 describe("collection pages", () => {
-  it("frame the list in the platform shell, with a heading and the studio notices", () => {
+  it("frame the list in the platform shell, with a heading", () => {
     const markup = renderToStaticMarkup(
       <CollectionsSurface navigation={navigation} targetChains={[enabled]} />,
     );
@@ -43,8 +43,7 @@ describe("collection pages", () => {
     expect(markup).toContain('<p class="arcade-eyebrow">Studio</p>');
     expect(markup).toContain("Collections beta");
     expect(markup).toContain("Skip to main content");
-    expect(markup).toContain("PRIVATE DRAFTS");
-    expect(markup).toContain("NO CHAIN ACTION");
+    expect(markup).not.toContain("NO CHAIN ACTION");
     expect(markup).toContain('href="/studio/collections"');
     expect(markup).toContain("Loading your collections…");
     // Starting a collection is a page of its own, reached by a button here, never a form on this page.

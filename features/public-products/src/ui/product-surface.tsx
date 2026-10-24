@@ -21,11 +21,6 @@ export function ProductIndex({
       footerLabel="Public discovery"
       homeHref="/"
       navigation={navigation}
-      notices={[
-        "◆ VERIFIED PUBLIC RECORDS",
-        "▲ TRUTHFUL SYSTEM STATE",
-        "★ BITCOIN ALKANES",
-      ]}
     >
       <section className="arcade-section arcade-section--catalog">
         <StatusLamp label="Catalog empty" tone="attention" />
@@ -56,11 +51,6 @@ export function ProductDetailUnavailable({
       footerLabel="Public discovery"
       homeHref="/"
       navigation={navigation}
-      notices={[
-        "◆ VERIFIED PUBLIC RECORDS",
-        "▲ FAIL CLOSED",
-        "★ BITCOIN ALKANES",
-      ]}
     >
       <section className="arcade-section arcade-section--catalog">
         <StatusLamp

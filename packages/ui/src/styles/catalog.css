@@ -49,6 +49,13 @@
     0.2rem 0.2rem 0 var(--arcade-red),
     -0.1rem -0.1rem 0 var(--arcade-cyan);
 }
+.arcade-wall-head h2 span {
+  margin-inline-start: 0.5rem;
+  color: var(--arcade-text-muted);
+  font-size: 0.4em;
+  text-shadow: none;
+  vertical-align: middle;
+}
 .arcade-wall-head p:not(.arcade-eyebrow) {
   max-width: 40rem;
   color: var(--arcade-text-muted);

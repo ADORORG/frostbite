@@ -23,11 +23,6 @@ export function CreatorApplicationSurface({
       heading="Apply to create"
       intro="Admission is separate from project publication, deployment, launch, mint, and game permissions."
       navigation={navigation}
-      notices={[
-        "◆ PRIVATE EVIDENCE",
-        "▲ EXPLICIT STATES",
-        "★ SERVER AUTHORITY",
-      ]}
     >
       {unavailable ? (
         <StatusLamp

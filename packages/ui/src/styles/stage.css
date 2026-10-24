@@ -1,8 +1,5 @@
 /* A page built around one stage (a game): the game is the page. It takes everything the header and the dock leave, edge to edge, with
    one slim bar above it, no card around it. Nothing forces a minimum height, so a short window gives the game all of what is there. */
-.app-shell[data-immersive="true"] .arcade-marquee {
-  display: none;
-}
 .arcade-section--stage {
   padding: 0;
   border-top: 0;

@@ -49,12 +49,7 @@ export function CollectionDetail({
             <ArcadeBadge tone="mint">{`${String(collection.items.length)} items so far`}</ArcadeBadge>
           </>
         }
-        status={
-          <StatusLamp
-            label="Approved by review. Not yet minted."
-            tone="ready"
-          />
-        }
+        status={<StatusLamp label="Not on sale yet" tone="ready" />}
         title={collection.name}
       >
         <p>{collection.description}</p>

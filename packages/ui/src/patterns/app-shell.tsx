@@ -21,10 +21,9 @@ interface AppShellProps {
   readonly children: ReactNode;
   readonly footerLabel: string;
   readonly homeHref: string;
-  // A page that is one thing to look at or play (a game) gives up the notices strip above the header, so that thing gets the room.
+  // A page that is one thing to look at or play (a game) gives up the room around it, so that thing gets it.
   readonly immersive?: boolean;
   readonly navigation: readonly ShellNavigationItem[];
-  readonly notices: readonly string[];
 }
 
 function NavLink({ item }: { readonly item: ShellNavigationItem }) {
@@ -47,7 +46,6 @@ export function AppShell({
   homeHref,
   immersive = false,
   navigation,
-  notices,
 }: AppShellProps) {
   const model = buildNavigationModel(navigation);
   // A sidebar of one link says nothing the bar does not, so it appears only when there is somewhere to go.
@@ -64,17 +62,6 @@ export function AppShell({
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
-      <div
-        className="arcade-marquee"
-        role="region"
-        aria-label="Platform status"
-      >
-        <div className="arcade-marquee__track">
-          {notices.map((notice) => (
-            <span key={notice}>{notice}</span>
-          ))}
-        </div>
-      </div>
       <header className="app-header">
         <a className="app-brand" href={homeHref} aria-label={`${brand} home`}>
           <span className="app-brand__orbit" aria-hidden="true" />

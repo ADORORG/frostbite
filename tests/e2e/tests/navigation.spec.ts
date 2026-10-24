@@ -35,13 +35,14 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
     // Collections shows whatever has been approved and Games the registered games; the other catalogs
     // have nothing published yet.
     await expect(
-      page.getByText(
-        label === "Collections"
-          ? /Catalog empty|Approved by review/u
-          : label === "Games"
-            ? "Registered games"
-            : "Catalog empty",
-      ),
+      label === "Collections" || label === "Games"
+        ? page
+            .getByRole("heading", {
+              name: new RegExp(`^${label}`, "u"),
+              level: 2,
+            })
+            .or(page.getByText("Catalog empty"))
+        : page.getByText("Catalog empty"),
     ).toBeVisible();
   }
 });

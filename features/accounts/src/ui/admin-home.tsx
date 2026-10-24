@@ -20,7 +20,6 @@ export function AdminHome({
       heading="Admin console"
       intro="Choose a staff area. Reviews are separated from broader platform authority, and nothing here publishes or deploys anything."
       navigation={navigation}
-      notices={["◆ STAFF ONLY", "▲ PRIVATE ROUTE", "★ SERVER AUTHORITY"]}
     >
       {areas.length === 0 ? (
         <ArcadeEmptyState title="No staff areas yet">

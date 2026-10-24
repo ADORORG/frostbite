@@ -47,10 +47,10 @@ describe("uploads entrypoint", () => {
       }),
     );
     expect(markup).toContain("<h1>Uploads</h1>");
-    // The frame's own words: the area, the footer, and the notices.
+    // The frame's own words: the area and the footer.
     expect(markup).toContain('<p class="arcade-eyebrow">Studio</p>');
     expect(markup).toContain("Uploads beta");
-    expect(markup).toContain("PRIVATE DRAFTS");
+    expect(markup).not.toContain("PRIVATE DRAFTS");
     expect(markup).toContain('href="/studio"');
     expect(markup).toContain("Upload an image");
     expect(markup).toContain("Your library");

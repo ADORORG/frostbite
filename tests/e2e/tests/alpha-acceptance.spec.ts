@@ -179,9 +179,7 @@ test("the revised version is submitted again and approved, and the public sees o
 
   const visitor = await (await browser.newContext({ baseURL })).newPage();
   await visitor.goto(`/collections/${collectionId}`);
-  await expect(
-    visitor.getByText("Approved by review. Not yet minted."),
-  ).toBeVisible();
+  await expect(visitor.getByText("Not on sale yet")).toBeVisible();
   await expect(
     visitor.getByRole("img", { name: "1. Alpha edited after submitting" }),
   ).toBeVisible();

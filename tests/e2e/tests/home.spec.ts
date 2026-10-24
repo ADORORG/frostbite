@@ -121,7 +121,9 @@ test("serves every public catalog and validates detail identifiers", async ({
   }
   // Collections lists whatever has been approved (the seeded public collection at least).
   await page.goto("/collections");
-  await expect(page.getByText("Approved by review")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /^Collections/u, level: 2 }),
+  ).toBeVisible();
   await page.goto("/collections/Not-A-Collection");
   await expect(page.getByText("Invalid identifier")).toBeVisible();
   await page.goto("/games/frostbite");

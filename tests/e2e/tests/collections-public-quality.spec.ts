@@ -70,9 +70,7 @@ test("an approved collection's page closes the experience-quality matrix", async
   await expect(
     page.getByRole("heading", { level: 2, name: publicCollection.name }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Approved by review. Not yet minted."),
-  ).toBeVisible();
+  await expect(page.getByText("Not on sale yet")).toBeVisible();
   await skipToMain(page);
   await closeMatrix(page, "public-collection-detail.png");
 });

@@ -17,22 +17,6 @@
     ),
     var(--arcade-canvas);
 }
-.arcade-marquee {
-  overflow: hidden;
-  border-bottom: var(--arcade-border-width) solid var(--arcade-border);
-  background: var(--arcade-ink);
-}
-.arcade-marquee__track {
-  display: flex;
-  justify-content: center;
-  gap: clamp(1rem, 4vw, 3rem);
-  padding: 0.875rem 1rem;
-  color: var(--arcade-yellow);
-  font-family: var(--arcade-font-pixel);
-  font-size: 0.625rem;
-  line-height: 1.5;
-  white-space: nowrap;
-}
 .app-header {
   position: sticky;
   top: 0;
@@ -91,13 +75,6 @@
   );
 }
 @media (max-width: 40rem) {
-  .arcade-marquee__track {
-    justify-content: flex-start;
-    overflow: hidden;
-  }
-  .arcade-marquee__track span:not(:first-child) {
-    display: none;
-  }
   .app-brand > span:not(.app-brand__orbit) {
     display: none;
   }

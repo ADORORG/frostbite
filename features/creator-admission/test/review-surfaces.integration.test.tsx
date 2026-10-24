@@ -9,7 +9,7 @@ describe("review page surfaces", () => {
   it("frames the queue as the staff's list of applications", () => {
     const markup = renderToStaticMarkup(<ReviewQueueSurface navigation={[]} />);
     expect(markup).toContain("<h1>Creator reviews</h1>");
-    expect(markup).toContain("STAFF ONLY");
+    expect(markup).not.toContain("STAFF ONLY");
     expect(markup).toContain("Loading applications…");
   });
 

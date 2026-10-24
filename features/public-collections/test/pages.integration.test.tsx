@@ -28,7 +28,7 @@ describe("the public collection pages over the real database", () => {
     expect(index).toContain(signedUrl(approved.coverKey));
     const detail = await pages.render("detail", approved.collectionId);
     for (const text of [
-      "Approved by review. Not yet minted.",
+      "Not on sale yet",
       "First light",
       "About",
       "Items (1)",
@@ -68,7 +68,7 @@ describe("the public collection pages over the real database", () => {
     const approved = await collectionThrough("approved");
     const pages = await pagesFor();
     expect(await pages.render("detail", approved.collectionId)).toContain(
-      "Approved by review",
+      "Not on sale yet",
     );
     await suspendCreator(approved.ownerUserId);
     expect(await pages.render("detail", approved.collectionId)).toContain(

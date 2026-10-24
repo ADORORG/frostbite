@@ -62,10 +62,9 @@ describe("collection index", () => {
         navigation={navigation}
       />,
     );
-    expect(markup).toContain("Approved by review");
-    expect(markup).toContain(
-      "does not mean they are minted, listed, or on sale",
-    );
+    expect(markup).toContain("Collections <span>1</span>");
+    expect(markup).not.toContain("passed review");
+    expect(markup).not.toContain("Approved by review");
     expect(markup).toContain("<img");
   });
 });
@@ -141,7 +140,7 @@ describe("collection detail", () => {
       />,
     );
     for (const text of [
-      "Approved by review. Not yet minted.",
+      "Not on sale yet",
       "First light",
       "Bitcoin signet",
       "A small collection of hand-drawn lights.",

@@ -3,7 +3,6 @@ import {
   ArcadeBadge,
   CoverCard,
   CoverGrid,
-  StatusLamp,
   shortenMiddle,
 } from "@repo/ui/arcade";
 
@@ -12,8 +11,7 @@ import { collectionHref } from "../paths.ts";
 import { CollectionPicture } from "./collection-picture.tsx";
 import { PublicFrame } from "./public-frame.tsx";
 
-// The approved collections, newest approval first, as a wall of covers. Approval is a review decision, not a launch, and the page
-// says so.
+// The approved collections, newest approval first, as a wall of covers.
 export function CollectionIndex({
   cards,
   navigation,
@@ -24,12 +22,9 @@ export function CollectionIndex({
   return (
     <PublicFrame navigation={navigation} variant="wall">
       <header className="arcade-wall-head">
-        <StatusLamp label="Approved by review" tone="ready" />
-        <h2>Collections</h2>
-        <p>
-          These collections passed review. Approval does not mean they are
-          minted, listed, or on sale.
-        </p>
+        <h2>
+          Collections <span>{cards.length}</span>
+        </h2>
       </header>
       <CoverGrid label="Approved collections">
         {cards.map((card, index) => (
