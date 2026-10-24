@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { maxAdminPayloadChars } from "@ador/shared/games";
 
+import release from "../../../contracts/templates/release.json" with { type: "json" };
 import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 
 const abi = (name: string): { version: string } =>
@@ -49,6 +50,14 @@ describe("the rewards policy", () => {
     expect(
       Math.ceil((rewardsPolicy.maxTemplateCodeBytes * 4) / 3),
     ).toBeLessThan(maxAdminPayloadChars);
-    expect(rewardsPolicy.maxTemplateCodeBytes).toBe(512 * 1024);
+    expect(rewardsPolicy.maxTemplateCodeBytes).toBe(320 * 1024);
+  });
+
+  it("allows every released template, with room to grow", () => {
+    for (const { bytes } of Object.values(release)) {
+      expect(bytes).toBeLessThanOrEqual(rewardsPolicy.maxTemplateCodeBytes);
+    }
+    const largest = Math.max(...Object.values(release).map((t) => t.bytes));
+    expect(rewardsPolicy.maxTemplateCodeBytes).toBeGreaterThan(largest * 1.05);
   });
 });

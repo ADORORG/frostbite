@@ -1,0 +1,1 @@
+ALTER TABLE "ador"."game_admin_steps" DROP CONSTRAINT "game_admin_steps_payload_bounded", ADD CONSTRAINT "game_admin_steps_payload_bounded" CHECK (char_length("unsigned_payload") <= 520000 and ("signed_payload" is null or char_length("signed_payload") <= 520000));

@@ -18,10 +18,13 @@ export const gameAdminStepStates = [
 ] as const;
 
 // The most characters a step's transaction may hold, on the page and in the platform's record of the step. A step that publishes a
-// template carries the template's code in its transaction, and a template may be up to 512 KiB (`rewardsPolicy.maxTemplateCodeBytes`),
-// which is about 683,000 characters as text; this leaves room for the rest of the transaction and stays under the 1 MiB a request
-// body may be, since the signed copy travels back in one. A claim's transaction holds no such data and keeps its own, smaller bound.
-export const maxAdminPayloadChars = 786_432;
+// template carries the template's code, compressed, in the witness of its reveal transaction, and Bitcoin nodes relay no transaction
+// above 100,000 vB (`maxStandardVirtualBytes` in the chain package). Measured on steps built by the platform, the text of a step
+// (two base64 PSBTs in JSON) is 5.33 characters per vB of its reveal (a real template publish: 37,355 vB); 520,000 characters is
+// therefore about 97,600 vB, below the limit with room for what a wallet adds. A test builds steps at the bound and holds the ratio.
+// A claim's transaction holds no such data and keeps its own, smaller bound. The text stays under the 1 MiB a request body may be,
+// since the signed copy travels back in one.
+export const maxAdminPayloadChars = 520_000;
 
 // The transaction as it crosses the page: the one staff sign, and the same once signed. Plain text throughout.
 export const gameAdminTransactionSchema = z

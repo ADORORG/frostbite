@@ -86,7 +86,7 @@ describe("a step that cannot start", () => {
     if (refused.ok || refused.code !== "could-not-build")
       throw new Error("The oversized step was not refused as unbuildable.");
     expect(refused.reason).toMatch(
-      /^The step's transaction is \d+ characters, more than the \d+ the platform keeps\.$/u,
+      /^The step's transaction is \d+ characters, more than the \d+ the platform keeps, which is the most Bitcoin nodes relay\.$/u,
     );
     expect(await service.list("arcade")).toEqual([]);
   });

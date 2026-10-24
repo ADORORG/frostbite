@@ -55,8 +55,10 @@ export const rewardsPolicy = {
   // The largest collectible picture the platform will read back from a chain for display; not below the largest drawing a contract
   // may be created to accept, or a drawing the platform allowed could not be shown.
   maxPreviewBytes: 16_384,
-  // What a template's code may weigh uncompressed, checked before it is unpacked; the released templates are well below it.
-  maxTemplateCodeBytes: 512 * 1024,
+  // What a template's code may weigh uncompressed, checked before it is unpacked. The released templates are below it (the largest is
+  // 294,119 bytes). Set so that even code that does not compress at all, sent as it is, builds a publish step under the 100,000 vB
+  // Bitcoin relays (about 82,000 vB at this size); a test builds that step.
+  maxTemplateCodeBytes: 320 * 1024,
   // The most a new game's contract may be created to accept; staff choose within it when they create the contract.
   maxDrawingBytes: 16_384n,
   // Whether the platform may build, send and watch transactions on the beta's test network (signet or testnet4, ADR-018 and ADR-019).

@@ -9,6 +9,7 @@ import {
   type CoinRequest,
 } from "../tx/coins.ts";
 import { feeFor } from "../tx/fees.ts";
+import { maxStandardVirtualBytes } from "../tx/standardness.ts";
 import { createEnvelope, tapscriptLeafVersion } from "./envelope.ts";
 import type { OneTimeKey } from "./one-time-key.ts";
 import { StepRefusedError, type StepFunding } from "./types.ts";
@@ -85,16 +86,19 @@ export function planEnvelopeStep(
       refund: 0,
       unallocated: admin === null ? 0 : callOutput,
     });
-    const revealFee = feeFor(
-      revealVirtualSize(
-        funding,
-        envelope.script,
-        envelope.controlBlock,
-        callOutputScript,
-        recipient.script,
-      ),
-      funding.feeRate,
+    const revealSize = revealVirtualSize(
+      funding,
+      envelope.script,
+      envelope.controlBlock,
+      callOutputScript,
+      recipient.script,
     );
+    if (revealSize > maxStandardVirtualBytes) {
+      throw new StepRefusedError(
+        `The data is too large to send: its transaction would be ${revealSize.toLocaleString("en-US")} vB, and Bitcoin nodes relay none above ${maxStandardVirtualBytes.toLocaleString("en-US")} vB.`,
+      );
+    }
+    const revealFee = feeFor(revealSize, funding.feeRate);
     // The reveal's first output gets the commit and the token's output, less the fee; it must clear the dust limit.
     const adminValue = admin?.value ?? 0n;
     const top =

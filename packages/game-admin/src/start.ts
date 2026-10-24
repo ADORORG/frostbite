@@ -60,7 +60,7 @@ export async function startStep(
     return {
       code: "could-not-build",
       ok: false,
-      reason: `The step's transaction is ${unsigned.payload.length} characters, more than the ${maxAdminPayloadChars} the platform keeps.`,
+      reason: `The step's transaction is ${unsigned.payload.length} characters, more than the ${maxAdminPayloadChars} the platform keeps, which is the most Bitcoin nodes relay.`,
     };
   const result = await dependencies.repository.create({
     chain: planned.chain,
