@@ -186,7 +186,9 @@ test("the page follows signing in and out: the navigation changes at once, and a
   await expect(
     page.getByRole("heading", { name: "Account console" }),
   ).toHaveCount(0);
-  await expect(page.getByText("Authentication required")).toBeVisible();
+  // With the session ended, a private page sends the visitor to sign in again, and back to it afterwards.
+  await expect(page).toHaveURL(/\/sign-in\?returnTo=%2Faccount$/u);
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   await context.close();
 });
 

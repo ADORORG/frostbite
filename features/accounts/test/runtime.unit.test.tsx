@@ -10,9 +10,16 @@ const factories = vi.hoisted(() => ({
   databaseClient: vi.fn(() => "database"),
   databaseEnvironment: vi.fn(() => "database-environment"),
   databasePool: vi.fn(() => "pool"),
-  methodRegistry: vi.fn<(adapters: readonly string[]) => { list: string }>(
-    () => ({ list: "list-methods" }),
-  ),
+  methodRegistry: vi.fn<
+    (adapters: readonly string[]) => { describe: () => unknown; list: string }
+  >(() => ({
+    describe: () => [
+      { assurance: "strong", canSignIn: true, kind: "wallet" },
+      { assurance: "strong", canSignIn: false, kind: "passkey" },
+      { assurance: "standard", canSignIn: true, kind: "email" },
+    ],
+    list: "list-methods",
+  })),
   passkeyRepository: vi.fn(() => "repository"),
   passkeyService: vi.fn((input: { readonly clock: () => Date }) => {
     input.clock();
@@ -75,5 +82,10 @@ describe("passkey runtime composition", () => {
         repository: "repository",
       }),
     );
+  });
+
+  it("offers on the sign-in page the registered methods that can start a session, in registration order, and not a passkey, which cannot yet", async () => {
+    const { offeredSignInKinds } = await import("../src/runtime.ts");
+    expect(offeredSignInKinds()).toEqual(["wallet", "email"]);
   });
 });

@@ -9,9 +9,12 @@ import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
 import { createWalletSignInOperations } from "./application/wallet-sign-in-operations.ts";
 import type { WalletAuthServices } from "./application/wallet-services.ts";
+import type { WalletNetwork } from "@ador/wallet/contracts";
+
 import { getPasskeyLinkingService } from "./runtime.ts";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
+import { SignInPage } from "./ui/sign-in-page.tsx";
 
 type PasskeyService = ReturnType<typeof getPasskeyLinkingService>;
 
@@ -43,7 +46,12 @@ async function account(
 export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
   balanceSource: BalanceSource | null,
-  getService: () => PasskeyService = getPasskeyLinkingService,
+  getService: () => PasskeyService,
+  // What the sign-in page needs of the platform: the kinds of method the deployment offers, and the network a wallet is asked for.
+  signIn: {
+    readonly network: WalletNetwork;
+    readonly offered: () => readonly string[];
+  },
 ): FeatureEntrypoint {
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
   const [beginSignIn, verifySignIn, signOut] =
@@ -57,7 +65,12 @@ export function createAccountsEntrypoint(
     listMethods,
   ] = createWalletMethodsOperations(getWalletServices);
   return {
-    capabilities: ["api-routes", "authenticated-page", "navigation"],
+    capabilities: [
+      "api-routes",
+      "authenticated-page",
+      "navigation",
+      "public-page",
+    ],
     id: "accounts",
     operations: [
       registerHttpOperation(list),
@@ -81,6 +94,17 @@ export function createAccountsEntrypoint(
       ),
     ],
     pages: [
+      {
+        access: { kind: "public" },
+        path: "/sign-in",
+        render: ({ navigation }) => (
+          <SignInPage
+            expectedNetwork={signIn.network}
+            navigation={navigation}
+            offered={signIn.offered()}
+          />
+        ),
+      },
       {
         access: { kind: "authenticated" },
         path: "/account",

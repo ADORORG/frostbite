@@ -5,7 +5,11 @@ import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
 
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
-import { createWalletServicesResolver } from "./runtime.ts";
+import {
+  createWalletServicesResolver,
+  getPasskeyLinkingService,
+  offeredSignInKinds,
+} from "./runtime.ts";
 import {
   validateWalletAuthConfig,
   type WalletAuthConfig,
@@ -22,7 +26,12 @@ export function createAccountsFeature(
   const wallet = validateWalletAuthConfig(input);
   return defineFeature({
     manifest: {
-      capabilities: ["api-routes", "authenticated-page", "navigation"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "public-page",
+      ],
       dependencies: [],
       navigation: [
         {
@@ -42,6 +51,7 @@ export function createAccountsFeature(
       ],
       id: "accounts",
       pages: [
+        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -63,6 +73,8 @@ export function createAccountsFeature(
           createAccountsEntrypoint(
             createWalletServicesResolver(wallet),
             balanceSource,
+            getPasskeyLinkingService,
+            { network: wallet.network, offered: offeredSignInKinds },
           ),
       ),
   });

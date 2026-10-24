@@ -17,9 +17,15 @@ const byOperation = (a: { operationId: string }, b: { operationId: string }) =>
 describe("accounts feature registration", () => {
   it("declares the complete detachable access contract", () => {
     expect(accountsFeature.manifest).toMatchObject({
-      capabilities: ["api-routes", "authenticated-page", "navigation"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "public-page",
+      ],
       id: "accounts",
       pages: [
+        { access: { kind: "public" }, path: "/sign-in" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -30,9 +36,11 @@ describe("accounts feature registration", () => {
     });
   });
 
-  it("has no page or navigation entry of its own for signing in: that is the wallet widget's job", () => {
+  it("has one public page, the sign-in page, and no navigation entry for it: signing in is reached from a protected page or the wallet button", () => {
     const { navigation = [], pages = [] } = accountsFeature.manifest;
-    expect(pages.some(({ access }) => access.kind === "public")).toBe(false);
+    expect(pages.filter(({ access }) => access.kind === "public")).toEqual([
+      { access: { kind: "public" }, path: "/sign-in" },
+    ]);
     expect(navigation.some(({ access }) => access.kind === "public")).toBe(
       false,
     );
@@ -57,6 +65,7 @@ describe("accounts feature registration", () => {
       version: accountsFeature.manifest.version,
     });
     expect(entrypoint.pages?.map(({ path }) => path)).toEqual([
+      "/sign-in",
       "/account",
       "/admin",
     ]);

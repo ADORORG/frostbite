@@ -1,6 +1,6 @@
 // A test harness for the wallet widget: a stand-in for the wallet connection library, a scripted server, and the
 // handful of helpers every widget test uses. Import it before the widget so the library mock is in place.
-import { act } from "react";
+import { act, type ReactElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, beforeEach, vi, type Mock } from "vitest";
 
@@ -123,17 +123,20 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-export const show = () =>
+// The wallet widget, or whatever else a test puts on the same stand-in connection and scripted server.
+export const show = (
+  element: ReactElement = (
+    <WalletWidget
+      balanceRefreshMs={60_000}
+      candidates={walletConfig.candidates}
+      network="signet"
+      onSessionChange={sessionChanged}
+      reconnectWaitMs={10_000}
+    />
+  ),
+) =>
   act(async () => {
-    root.render(
-      <WalletWidget
-        balanceRefreshMs={60_000}
-        candidates={walletConfig.candidates}
-        network="signet"
-        onSessionChange={sessionChanged}
-        reconnectWaitMs={10_000}
-      />,
-    );
+    root.render(element);
   });
 export const settle = () =>
   act(() => new Promise<void>((resolve) => setTimeout(resolve, 10)));

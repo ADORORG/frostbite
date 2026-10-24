@@ -33,6 +33,14 @@ let sharedRegistry:
 
 // The sign-in methods this deployment offers. A new method (email, phone) is one adapter added to this list, with its own routes: the
 // rules, the repositories and the pages read the registry and are not edited (ADR-021).
+// The kinds of method the sign-in page may offer: those registered that can start a session, in registration order.
+export function offeredSignInKinds(): readonly string[] {
+  return methodRegistry()
+    .describe()
+    .filter(({ canSignIn }) => canSignIn)
+    .map(({ kind }) => kind);
+}
+
 function methodRegistry() {
   sharedRegistry ??= createMethodRegistry([walletMethod, passkeyMethod]);
   return sharedRegistry;

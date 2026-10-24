@@ -9,12 +9,17 @@ const noWalletServices = () => {
   throw new Error("The wallet services are not needed to render a page.");
 };
 
+// What the sign-in page needs of the platform; the pages tested here do not use it.
+const signIn = { network: "signet", offered: () => ["wallet"] } as const;
+const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[2]) =>
+  createAccountsEntrypoint(noWalletServices, null, service, signIn);
+
 describe("accounts entrypoint", () => {
   it.each([
     ["/account", "Account console", "Authenticated session"],
     ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
-    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+    const entrypoint = withSignIn(() => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn(async () => []),
@@ -41,7 +46,7 @@ describe("accounts entrypoint", () => {
 
   it("does not render private content without an actor", async () => {
     const pages =
-      createAccountsEntrypoint(noWalletServices, null, () => ({
+      withSignIn(() => ({
         begin: vi.fn(),
         finish: vi.fn(),
         list: vi.fn(async () => []),
@@ -59,7 +64,7 @@ describe("accounts entrypoint", () => {
   });
 
   it("fails closed when passkey status persistence is unavailable", async () => {
-    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+    const entrypoint = withSignIn(() => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn().mockRejectedValue(new Error("database unavailable")),
@@ -77,14 +82,13 @@ describe("accounts entrypoint", () => {
     expect(markup).not.toContain("Passkey 1");
   });
 
-  it("has no page for signing in: the wallet widget in the header is the only way in, and the account page says so", async () => {
-    const entrypoint = createAccountsEntrypoint(noWalletServices, null, () => ({
+  it("tells a signed-in player on the account page that the wallet button in the header manages their wallets", async () => {
+    const entrypoint = withSignIn(() => ({
       begin: vi.fn(),
       finish: vi.fn(),
       list: vi.fn(async () => []),
       unlink: vi.fn(),
     }));
-    expect(entrypoint.pages?.map(({ path }) => path)).not.toContain("/sign-in");
     const page = entrypoint.pages?.find(({ path }) => path === "/account");
     const markup = renderToStaticMarkup(
       await page?.render({
@@ -94,5 +98,23 @@ describe("accounts entrypoint", () => {
       }),
     );
     expect(markup).toContain("wallet button in the header");
+  });
+
+  it("serves the sign-in page without a session, and says so when no method can be offered", async () => {
+    const entrypoint = createAccountsEntrypoint(
+      noWalletServices,
+      null,
+      () => {
+        throw new Error("passkeys are not needed to render the sign-in page");
+      },
+      { network: "signet", offered: () => [] },
+    );
+    const page = entrypoint.pages?.find(({ path }) => path === "/sign-in");
+    expect(page?.access).toEqual({ kind: "public" });
+    const markup = renderToStaticMarkup(
+      await page?.render({ actorUserId: null, navigation: [], params: {} }),
+    );
+    expect(markup).toContain("Sign in");
+    expect(markup).toContain("Signing in is not available right now.");
   });
 });

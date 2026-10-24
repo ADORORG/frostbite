@@ -198,6 +198,7 @@ for (const path of [uploadsStudioPath, uploadsNewPath])
   test(`${path} requires a session`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBeLessThan(500);
-    await expect(page.getByText("Authentication required")).toBeVisible();
+    await expect(page).toHaveURL(/\/sign-in\?returnTo=/u);
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
     await expect(page.locator('input[type="file"]')).toHaveCount(0);
   });

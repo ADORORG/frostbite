@@ -1,10 +1,12 @@
-import { notFound } from "next/navigation";
+import type { Route } from "next";
+import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { AccessState } from "@repo/ui/arcade";
 
 import { platformComposition } from "../../../../../configs/platform";
 import { resolvePageAccess } from "../../server/auth/page-access";
+import { pageOutcome } from "../../server/auth/page-outcome";
 import { getPageAccessDependencies } from "../../server/auth/runtime";
 import {
   actorNavigation,
@@ -39,12 +41,15 @@ export default async function FeaturePage({
     token,
     getPageAccessDependencies,
   );
-  if (access.kind !== "allowed") {
+  const outcome = pageOutcome(access, routePath);
+  // The sign-in page's address is built from a validated path (`signInHref`), so the router's typed routes cannot check it ahead of time.
+  if (outcome.kind === "redirect") redirect(outcome.to as Route);
+  if (outcome.kind === "state" || access.kind !== "allowed") {
     return (
       <AccessState
         navigation={visitorNavigation(navigationContributions, routePath)}
         retryHref={routePath}
-        state={access.kind}
+        state={outcome.kind === "state" ? outcome.state : "unavailable"}
       />
     );
   }

@@ -6,7 +6,11 @@ Detachable authenticated account, studio, and staff route contributions.
 
 `createAccountsFeature(walletConfig, balanceSource)` is the registration export; `./widget` exports `WalletRoot`,
 which the app layout mounts once. The wallet widget (header, every page) is how a player connects a wallet, signs in
-with it, links and removes wallets and signs out; there is no sign-in page. The route family also has
+with it, links and removes wallets and signs out. The public `/sign-in` page (ADR-021) offers every method the server's method
+registry says can start a session, each in its own panel (`src/sign-in/`: `registry.ts` lists how each kind is shown, so a new method
+is one view there plus its adapter in `runtime.ts`); a protected page sends a signed-out visitor to it with `?returnTo=` (checked by
+`safeReturnPath` in `@ador/shared/auth/sign-in-path`: a plain path on this site, never the sign-in page, the API or another site),
+and it goes on to that page once the server says the visitor is signed in. The route family also has
 `POST /api/v1/wallet/balance`. `balanceSource` is where the widget's balance comes from: the beta wires the rewards chain's
 own node (`configs/balance.ts`), and the answer keeps what is **spendable** (confirmed) apart from what is **pending** (waiting
 for its first confirmation). With no chain configured it passes `null` and the widget says "Balance unavailable: no data

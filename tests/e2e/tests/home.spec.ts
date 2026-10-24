@@ -184,7 +184,11 @@ test("keeps authenticated route content closed without a session", async ({
     "/admin/creator-applications",
   ]) {
     await page.goto(path);
-    await expect(page.getByText("Authentication required")).toBeVisible();
+    // A visitor without a session is sent to sign in, and nothing of the private page is shown.
+    await expect(page).toHaveURL(
+      new RegExp(`/sign-in\\?returnTo=${encodeURIComponent(path)}$`),
+    );
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
     await expect(page.getByText(/session active/i)).toHaveCount(0);
     await expect(page.locator(".app-shell")).toBeVisible();
   }
