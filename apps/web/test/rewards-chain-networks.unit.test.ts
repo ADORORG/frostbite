@@ -26,6 +26,7 @@ const environment: RewardsChainEnvironment = {
   templatesDirectory: null,
 };
 const platform: RewardsPlatform = {
+  get: () => Promise.reject(new Error("offline")),
   fetch: () => Promise.reject(new Error("offline")),
   now: () => new Date("2026-01-01T00:00:00.000Z"),
   random: (length) => new Uint8Array(length),

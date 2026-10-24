@@ -11,6 +11,7 @@ import { createRewardsChain } from "./rewards-chain.ts";
 // on record once staff have created each (`ador.game_contracts`).
 const rewards = createRewardsChain(parseRewardsChainEnvironment(process.env), {
   fetch: (url, init) => fetch(url, init),
+  get: (url, init) => fetch(url, init),
   now: () => new Date(),
   random: (length) => new Uint8Array(randomBytes(length)),
   readFile,

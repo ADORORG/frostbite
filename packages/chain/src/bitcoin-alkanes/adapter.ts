@@ -26,6 +26,7 @@ import { createRewardsReader } from "./rewards.ts";
 
 // What a caller needs to wire the adapter to a node.
 export { createRpcNode, type AlkanesNode } from "./node/node.ts";
+export { createFeeApi, type FeeApi, type GetLike } from "./node/fee-api.ts";
 export {
   createJsonRpc,
   type FetchLike,

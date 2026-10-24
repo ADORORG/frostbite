@@ -34,6 +34,18 @@ function platform() {
   }[] = [];
   const reads: string[] = [];
   const platform: RewardsPlatform = {
+    get: async () => ({
+      json: () =>
+        Promise.resolve({
+          economyFee: 1,
+          fastestFee: 1,
+          halfHourFee: 1,
+          hourFee: 1,
+          minimumFee: 1,
+        }),
+      ok: true,
+      status: 200,
+    }),
     fetch: async (address, init) => {
       requests.push({ body: init.body, headers: init.headers, url: address });
       await new Promise((resolve) => setTimeout(resolve, 20));

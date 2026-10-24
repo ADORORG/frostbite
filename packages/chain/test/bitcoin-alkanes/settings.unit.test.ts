@@ -57,6 +57,7 @@ describe("template entries", () => {
 describe("the services the adapter is wired to", () => {
   const random = (length: number) => new Uint8Array(length);
   const settings: AlkanesChainSettings = {
+    feeApi: null,
     administration: {
       maxCodeBytes: 1000,
       maxDrawingBytes: 2048n,

@@ -32,7 +32,9 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   and `verifySigned` proves the pair, the call, the data and the total fee are what the summary says. The auth token's output is named by
   `extension.adminOutput` ("txid:vout") and checked against the indexer and the game's `get_auth_token`. The adapter declares only what it provides.
   Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
-  codec for the few indexer messages used, every answer validated, the trace decoder); `tx/` builds a claim (the
+  codec for the few indexer messages used, every answer validated, the trace decoder; `fee-api.ts` prices fees from a public explorer's
+  recommendation when the chain's settings give one (`feeApi`), because the hosted nodes' own estimates are not usable on the test
+  networks, and never falls back to them); `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,
   `broadcaster.ts`, `observer.ts`, `contracts.ts`, `rewards.ts` and `inspect.ts` are the ports; `abi.ts` holds the template
   opcodes, and `milestone-key.ts` and `holder.ts` the rules shared with the contracts, all tested against the vector files in

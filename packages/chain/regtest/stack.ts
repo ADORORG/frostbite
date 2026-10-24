@@ -94,6 +94,7 @@ export async function regtest() {
     adapter: {
       kind: "bitcoin-alkanes",
       settings: {
+        feeApi: null,
         administration: {
           maxCodeBytes: 512 * 1024,
           maxDrawingBytes: 16_384n,

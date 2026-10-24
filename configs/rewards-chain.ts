@@ -7,6 +7,7 @@ import {
   feeCeiling,
   type ConfiguredChain,
   type FetchLike,
+  type GetLike,
 } from "@ador/chain/configured";
 import {
   chainRefSchema,
@@ -24,6 +25,8 @@ import { defaultFeeTargetBlocks, rewardsPolicy } from "./rewards-policy.ts";
 // What the process provides, so a test can stand in for the network, the clock and the disk.
 export interface RewardsPlatform {
   readonly fetch: FetchLike;
+  // A plain GET, for the public fee source.
+  readonly get: GetLike;
   readonly now: () => Date;
   readonly random: (length: number) => Uint8Array;
   readonly readFile: (path: string) => Promise<Uint8Array>;
@@ -102,6 +105,11 @@ function configuredChain(
                 templates: rewardsPolicy.templates,
               },
         chain: chainRefSchema.parse(beta.chain.chainId),
+        feeApi: {
+          fetch: platform.get,
+          timeoutMs: environment.rpcTimeoutMs,
+          url: beta.feeApiUrl,
+        },
         maxPreviewBytes: rewardsPolicy.maxPreviewBytes,
         network: beta.network,
         now: platform.now,

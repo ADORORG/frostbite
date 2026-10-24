@@ -27,6 +27,7 @@ export const betaChains = {
       role: "public-beta",
     }),
     explorerTxUrl: "https://mempool.space/signet/tx/{id}",
+    feeApiUrl: "https://mempool.space/signet",
     network: "signet",
   },
   testnet4: {
@@ -38,6 +39,7 @@ export const betaChains = {
       role: "public-beta",
     }),
     explorerTxUrl: "https://mempool.space/testnet4/tx/{id}",
+    feeApiUrl: "https://mempool.space/testnet4",
     network: "testnet4",
   },
 } as const satisfies Record<
@@ -47,6 +49,9 @@ export const betaChains = {
     // Where a transaction on the network is shown, with `{id}` where its id goes. A public page, so linking to it sends nothing but
     // the id.
     readonly explorerTxUrl: string;
+    // Where the network's fee rates are read: a public explorer's address up to the network (the adapter adds the path). The hosted
+    // nodes' own fee estimates follow a few outlying transactions and are not used (finding S106).
+    readonly feeApiUrl: string;
     readonly network: WalletNetwork;
   }
 >;

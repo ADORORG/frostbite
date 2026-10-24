@@ -1,4 +1,6 @@
 import type { AlkaneId } from "./alkane-id.ts";
+import { NodeUnavailableError } from "./errors.ts";
+import type { FeeApi } from "./fee-api.ts";
 import { createEsploraClient, type EsploraClient } from "./esplora.ts";
 import { createIndexerClient, type IndexerClient } from "./indexer.ts";
 import type { ViewResult } from "./messages.ts";
@@ -22,11 +24,26 @@ export interface AlkanesNode extends EsploraClient {
   ): Promise<ViewResult>;
 }
 
-export function createRpcNode(rpc: JsonRpc): AlkanesNode {
+// `fees`, when given, answers every fee rate in place of the node's own estimates.
+export function createRpcNode(rpc: JsonRpc, fees?: FeeApi): AlkanesNode {
   const esplora = createEsploraClient(rpc);
   const indexer = createIndexerClient(rpc);
   return {
     ...esplora,
+    ...(fees === undefined
+      ? {}
+      : {
+          feeRate: async (target: number) => {
+            const [only] = await fees.feeRates([target]);
+            if (only === undefined) {
+              throw new NodeUnavailableError(
+                "The fee source has no rate for the target.",
+              );
+            }
+            return only.satPerVb;
+          },
+          feeRates: fees.feeRates,
+        }),
     bytecode: indexer.bytecode,
     holdings: indexer.holdings,
     indexedHeight: indexer.indexedHeight,

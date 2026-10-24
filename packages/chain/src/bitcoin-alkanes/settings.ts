@@ -8,6 +8,7 @@ import {
   createBitcoinAlkanesAdapter,
   type BitcoinAlkanesNodes,
 } from "./adapter.ts";
+import { createFeeApi, type GetLike } from "./node/fee-api.ts";
 import { createRpcNode } from "./node/node.ts";
 import { createJsonRpc, type FetchLike } from "./node/transport.ts";
 import type { TransactionOptions } from "./options.ts";
@@ -60,6 +61,13 @@ export interface AlkanesChainSettings {
   // `null`: the adapter reads and builds claims but refuses staff steps.
   readonly administration: AlkanesAdministrationSettings | null;
   readonly chain: ChainRef;
+  // Where fee rates come from: a public explorer's recommendation, in place of the node's own estimates (see `createFeeApi`).
+  // `null`: the node's estimates are used (a chain whose node prices fees sensibly, such as a local regtest).
+  readonly feeApi: {
+    readonly fetch: GetLike;
+    readonly timeoutMs: number;
+    readonly url: string;
+  } | null;
   readonly maxPreviewBytes: number;
   readonly network: BitcoinNetwork;
   readonly now: () => Date;
@@ -104,6 +112,7 @@ export function alkanesServices(
             timeoutMs: settings.rpc.timeoutMs,
             url: settings.rpc.url,
           }),
+          settings.feeApi === null ? undefined : createFeeApi(settings.feeApi),
         ),
       ],
     ]),

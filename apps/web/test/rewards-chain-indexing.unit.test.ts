@@ -25,6 +25,18 @@ function node(heights: { indexed: number; tip: number }) {
   const clock = { now: new Date("2026-10-17T12:00:00.000Z") };
   const down = { value: false };
   const platform: RewardsPlatform = {
+    get: async () => ({
+      json: () =>
+        Promise.resolve({
+          economyFee: 1,
+          fastestFee: 1,
+          halfHourFee: 1,
+          hourFee: 1,
+          minimumFee: 1,
+        }),
+      ok: true,
+      status: 200,
+    }),
     fetch: async (_address, init) => {
       const { id, method } = JSON.parse(init.body) as {
         id: number;

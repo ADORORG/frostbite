@@ -37,6 +37,7 @@ const settings = (
 ): AlkanesChainSettings => ({
   administration,
   chain,
+  feeApi: null,
   maxPreviewBytes: 1024,
   network: "signet",
   now: () => new Date("2026-01-01T00:00:00.000Z"),
