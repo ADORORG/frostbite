@@ -8,9 +8,12 @@ const postgresDataDirectory = "/var/lib/postgresql";
 const databaseName = "ador_test";
 const databaseUser = "ador_test";
 
+// `volume` keeps the data in a named Docker volume that outlives the container; without it the data is in memory and is gone with the
+// container (what a test run wants).
 export function createPostgresContainerArguments(input: {
   readonly containerName: string;
   readonly password: string;
+  readonly volume?: string;
 }): readonly string[] {
   return [
     "run",
@@ -23,8 +26,9 @@ export function createPostgresContainerArguments(input: {
     `POSTGRES_USER=${databaseUser}`,
     "--env",
     `POSTGRES_PASSWORD=${input.password}`,
-    "--tmpfs",
-    `${postgresDataDirectory}:rw`,
+    ...(input.volume === undefined
+      ? ["--tmpfs", `${postgresDataDirectory}:rw`]
+      : ["--volume", `${input.volume}:${postgresDataDirectory}`]),
     "--publish",
     "127.0.0.1::5432",
     postgresImage,
@@ -49,7 +53,7 @@ function run(command: string, args: readonly string[]): Promise<string> {
   });
 }
 
-async function waitForPostgres(containerName: string): Promise<void> {
+export async function waitForPostgres(containerName: string): Promise<void> {
   let consecutiveReadyChecks = 0;
   for (let attempt = 0; attempt < 30; attempt += 1) {
     try {
@@ -71,6 +75,16 @@ async function waitForPostgres(containerName: string): Promise<void> {
     }
   }
   throw new Error("PostgreSQL test container did not become ready");
+}
+
+// The address a client reaches the container at, given the password it was made with and the host port Docker mapped.
+export async function postgresUrl(
+  containerName: string,
+  password: string,
+): Promise<string> {
+  const mapping = await run("docker", ["port", containerName, postgresPort]);
+  const port = mapping.slice(mapping.lastIndexOf(":") + 1);
+  return `postgresql://${databaseUser}:${password}@127.0.0.1:${port}/${databaseName}`;
 }
 
 export async function withDisposablePostgres(
@@ -99,11 +113,7 @@ export async function withDisposablePostgres(
     );
     started = true;
     await waitForPostgres(containerName);
-    const mapping = await run("docker", ["port", containerName, postgresPort]);
-    const port = mapping.slice(mapping.lastIndexOf(":") + 1);
-    await callback(
-      `postgresql://${databaseUser}:${password}@127.0.0.1:${port}/${databaseName}`,
-    );
+    await callback(await postgresUrl(containerName, password));
   } finally {
     process.off("SIGINT", interrupt);
     process.off("SIGTERM", interrupt);

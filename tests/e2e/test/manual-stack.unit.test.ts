@@ -63,7 +63,10 @@ describe("the guide", () => {
     for (const [path] of stackPages)
       expect(guide).toContain(`http://localhost:4174${path}`);
     expect(guide).toContain("Ctrl+C");
-    expect(guide).toContain("the only real thing here");
+    expect(guide).toContain("kept in Docker volumes");
+    expect(guide).toContain("pnpm stack --fresh");
+    expect(guide).toContain("is real: what is sent to it stays there");
+    expect(guide).not.toContain("disposable");
   });
 
   it("uses the actors it is given", () => {

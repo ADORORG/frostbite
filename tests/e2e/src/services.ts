@@ -67,6 +67,11 @@ export async function withUploadServices(
   input: {
     readonly baseEnvironment: NodeJS.ProcessEnv;
     readonly launchers?: ServiceLaunchers;
+    // Where the object storage comes from, when it is not the disposable one a test run starts (the local stack keeps its own).
+    readonly startStorage?: (settings: {
+      readonly buckets: readonly string[];
+      readonly corsOrigins: readonly string[];
+    }) => Promise<S3Runtime>;
     readonly webOrigin: string;
   },
   callback: (environment: NodeJS.ProcessEnv) => Promise<void>,
@@ -79,10 +84,13 @@ export async function withUploadServices(
   const record = (error: unknown) =>
     failures.push(error instanceof Error ? error : new Error(String(error)));
   try {
-    const storage: S3Runtime = await launch.startS3Runtime({
+    const storageSettings = {
       buckets: [privateBucket, publicBucket],
       corsOrigins: [input.webOrigin],
-    });
+    };
+    const storage: S3Runtime = await (
+      input.startStorage ?? launch.startS3Runtime
+    )(storageSettings);
     stops.push(storage.stop);
     const workerPort = await launch.freePort();
     const inngestPort = await launch.freePort();

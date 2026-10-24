@@ -54,6 +54,35 @@ export async function reviveSession(
     .where(eq(authSessions.tokenHash, hash(token)));
 }
 
+// Seeds a database that may already hold a stack's data: migrations are applied (they only go forward), and the people and sample
+// content are written only if they are not there, so a stack that keeps its data keeps what was done in it. "kept" when it already
+// had them.
+export async function seedOnce(
+  databaseUrl: string,
+): Promise<"kept" | "seeded"> {
+  const pool = createDatabasePool({
+    DATABASE_ACQUIRE_TIMEOUT_MS: 5_000,
+    DATABASE_IDLE_TIMEOUT_MS: 1_000,
+    DATABASE_POOL_MAX: 2,
+    DATABASE_SSL_MODE: "disable",
+    DATABASE_STATEMENT_TIMEOUT_MS: 5_000,
+    DATABASE_URL: databaseUrl,
+  });
+  try {
+    const database = createDatabaseClient(pool);
+    await applyMigrations(database);
+    const [present] = await database
+      .select({ id: authUsers.id })
+      .from(authUsers)
+      .where(eq(authUsers.id, creatorE2EFixtures.reviewer.userId));
+    if (present !== undefined) return "kept";
+  } finally {
+    await pool.end();
+  }
+  await seed(databaseUrl);
+  return "seeded";
+}
+
 export async function seed(databaseUrl: string): Promise<void> {
   const pool = createDatabasePool({
     DATABASE_ACQUIRE_TIMEOUT_MS: 5_000,

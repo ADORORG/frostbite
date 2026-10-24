@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 
 import { createDatabaseClient, createDatabasePool } from "@ador/database";
 
-import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
+import { startDurableS3Runtime } from "@ador/test-kit/s3-durable";
 
 import {
   formatStackGuide,
@@ -16,18 +16,33 @@ import {
   chainSettingsFrom,
   describeChain,
 } from "../src/stack-chain-environment.ts";
+import {
+  durableStack,
+  stackSecrets,
+  wipeStack,
+  withDurablePostgres,
+} from "../src/durable-stack.ts";
+import { confirmWipe } from "../src/confirm-wipe.ts";
 import { createStackProxy } from "../src/stack-proxy.ts";
 import { withUploadServices } from "../src/services.ts";
-import { applicationEnvironment, reviveSession, seed } from "./stack-setup.ts";
+import {
+  applicationEnvironment,
+  reviveSession,
+  seedOnce,
+} from "./stack-setup.ts";
 
-// Runs the whole product locally for a person to drive by hand: a disposable PostgreSQL, local S3,
-// the worker, a self-hosted Inngest, and the web server, with the same users the browser tests use.
+// Runs the whole product locally for a person to drive by hand: PostgreSQL, local S3, the worker, a
+// self-hosted Inngest, and the web server, with the same users the browser tests use. The database and the
+// storage are kept between runs (Docker volumes), so what was done in them, such as a template published on
+// a real test network, is still there next time. `pnpm stack --fresh` deletes them first, after asking.
 // Stops everything when interrupted. Start it with `pnpm stack` from the repository root.
 
 const repositoryRoot = resolve(import.meta.dirname, "../../..");
 // The app's own settings file, where a developer keeps the rewards chain; only its chain settings are used (see the module).
 const settingsFile = resolve(repositoryRoot, "apps/web/.env.local");
 const readyTimeoutMilliseconds = 90_000;
+// Where the passwords the kept database and storage were made with are held (ignored by git).
+const dataDirectory = resolve(repositoryRoot, ".stack-data");
 
 function run(
   command: string[],
@@ -124,10 +139,23 @@ const chainSettings = chainSettingsFrom(
   process.env,
 );
 const stackEnvironment = { ...process.env, ...chainSettings };
+if (process.argv.includes("--fresh")) {
+  if (!(await confirmWipe(process.argv.includes("--yes")))) {
+    console.log("Nothing was deleted.");
+    process.exit(0);
+  }
+  await wipeStack(dataDirectory);
+  console.log("The stack's database and storage were deleted.");
+}
 await build(stackEnvironment);
 const { baseURL, port } = resolveStackServer();
-await withDisposablePostgres(async (databaseUrl) => {
-  await seed(databaseUrl);
+const secrets = await stackSecrets(dataDirectory);
+await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
+  console.log(
+    (await seedOnce(databaseUrl)) === "kept"
+      ? "Keeping the data this stack already has (`pnpm stack --fresh` starts over)."
+      : "Made a new database and seeded it.",
+  );
   const baseEnvironment = applicationEnvironment(databaseUrl, baseURL);
   // For the front door's sign-in, which makes a signed-out person's session usable again.
   const sessionPool = createDatabasePool({
@@ -140,7 +168,17 @@ await withDisposablePostgres(async (databaseUrl) => {
   });
   try {
     await withUploadServices(
-      { baseEnvironment, webOrigin: new URL(baseURL).origin },
+      {
+        baseEnvironment,
+        startStorage: (settings) =>
+          startDurableS3Runtime({
+            ...settings,
+            container: durableStack.s3.container,
+            secret: secrets.s3Secret,
+            volume: durableStack.s3.volume,
+          }),
+        webOrigin: new URL(baseURL).origin,
+      },
       async (serviceEnvironment) => {
         // The server is started directly (not through pnpm) so the process stopped below is the server
         // itself: a wrapper that is stopped would leave the real server running and the port taken.

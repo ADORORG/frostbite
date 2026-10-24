@@ -5,8 +5,8 @@ import {
   type E2EServerConfig,
 } from "./server-config.ts";
 
-// The local manual-test stack: the same disposable services and seeded users as the browser test run,
-// kept alive so a person can drive the product by hand. This module holds the parts that are plain
+// The local manual-test stack: the same services and seeded users as the browser test run, kept alive, with their data kept between
+// runs, so a person can drive the product by hand. This module holds the parts that are plain
 // data and text; `scripts/manual-stack.ts` starts the processes.
 
 // A different default port from the test run, so the two can run side by side.
@@ -107,8 +107,9 @@ export function formatStackGuide(input: {
     lines.push(`  ${input.baseURL}${path}  ${note}`);
   lines.push(
     "",
-    "Everything here is disposable: the database, the storage, and the users disappear when you stop",
-    "the stack (Ctrl+C). Storage is local MinIO, not R2. The rewards chain, if the line below names one, is the only real thing here.",
+    "The database and the stored files are kept in Docker volumes when you stop the stack (Ctrl+C), and are there next time.",
+    "`pnpm stack --fresh` deletes them (after asking) and starts over. Storage is local MinIO, not R2. The rewards chain, if the line",
+    "below names one, is real: what is sent to it stays there whatever happens to this stack.",
     "",
   );
   return lines.join("\n");

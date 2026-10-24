@@ -113,6 +113,40 @@ describe("with upload services", () => {
     });
   });
 
+  it("uses the storage it is given in place of the disposable one, with the same buckets, and stops that one with the rest", async () => {
+    const order: string[] = [];
+    const fakes = launchers(order);
+    const given = vi.fn(async () => ({
+      accessKeyId: "kept-access",
+      endpoint: "http://127.0.0.1:9100",
+      logs: async () => "",
+      secretAccessKey: "kept-secret",
+      stop: async () => void order.push("stop kept"),
+    }));
+    let seen: NodeJS.ProcessEnv = {};
+    await withUploadServices(
+      {
+        baseEnvironment: base,
+        launchers: fakes,
+        startStorage: given,
+        webOrigin: "http://localhost:4173",
+      },
+      async (environment) => {
+        seen = environment;
+      },
+    );
+    expect(fakes.startS3Runtime).not.toHaveBeenCalled();
+    expect(given).toHaveBeenCalledWith({
+      buckets: ["e2e-private-drafts", "e2e-public-assets"],
+      corsOrigins: ["http://localhost:4173"],
+    });
+    expect(seen).toMatchObject({
+      R2_ACCESS_KEY_ID: "kept-access",
+      R2_ENDPOINT: "http://127.0.0.1:9100",
+    });
+    expect(order.at(-1)).toBe("stop kept");
+  });
+
   it("gives the worker the app environment, the shared service environment, and its own port", async () => {
     const fakes = launchers([]);
     await withUploadServices(

@@ -14,7 +14,7 @@ import {
 export const s3ImageReference =
   "quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e";
 
-const accessKeyId = "ador-local-access";
+export const accessKeyId = "ador-local-access";
 const readyAttempts = 60;
 const readyPollMs = 500;
 const containerPort = 9000;
@@ -27,7 +27,7 @@ export interface S3Runtime {
   stop(): Promise<void>;
 }
 
-async function waitUntilReady(endpoint: string): Promise<void> {
+export async function waitUntilReady(endpoint: string): Promise<void> {
   for (let attempt = 0; attempt < readyAttempts; attempt += 1) {
     try {
       if ((await fetch(`${endpoint}/minio/health/ready`)).ok) return;
@@ -37,6 +37,21 @@ async function waitUntilReady(endpoint: string): Promise<void> {
     await delay(readyPollMs);
   }
   throw new Error("S3 runtime did not become ready.");
+}
+
+// Creates the buckets that are not there yet: a store that kept its data from an earlier run already has them.
+export async function createBuckets(
+  client: S3Client,
+  buckets: readonly string[],
+): Promise<void> {
+  for (const Bucket of buckets) {
+    try {
+      await client.send(new CreateBucketCommand({ Bucket }));
+    } catch (error) {
+      if (!(error instanceof Error) || error.name !== "BucketAlreadyOwnedByYou")
+        throw error;
+    }
+  }
 }
 
 // Starts a disposable S3-compatible service on a loopback port and creates the named buckets.
@@ -85,8 +100,7 @@ export async function startS3Runtime(input: {
       forcePathStyle: true,
       region: "us-east-1",
     });
-    for (const Bucket of input.buckets)
-      await client.send(new CreateBucketCommand({ Bucket }));
+    await createBuckets(client, input.buckets);
     client.destroy();
     return {
       accessKeyId,

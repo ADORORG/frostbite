@@ -31,6 +31,16 @@ PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the s
 until Ctrl+C. It builds the web app first (every start; Next reuses its cache, `--no-build` skips it), then
 prints the address, the pages worth visiting, and which rewards chain it is on.
 
+- **The data is kept.** The stack's PostgreSQL and S3 store (MinIO) are containers named `ador-stack-postgres` and
+  `ador-stack-minio` with their data in Docker volumes (`ador-stack-postgres-data`, `ador-stack-minio-data`). Ctrl+C
+  stops them and keeps them; the next `pnpm stack` starts them again, applies any new migrations, and seeds the people and
+  sample content only if they are not there. The passwords they were made with are in `.stack-data/secrets.json` (ignored by
+  git, owner-readable). `pnpm stack --fresh` deletes the containers, volumes and passwords first, after you type `delete`
+  (`--yes` skips the question). Reasons to start over: switching to an older branch whose code is behind the data's migrations,
+  or a new seeded person you want (a new fixture is not added to data that already has the others). If the volumes exist and
+  `.stack-data` is gone, the stack stops and tells you to use `--fresh`. The browser tests (`pnpm test:e2e`) still use a
+  disposable database and never touch these.
+
 - **Rewards chain:** the stack takes `BETA_NETWORK` and the `REWARDS_*` settings from `apps/web/.env.local` (and
   nothing else from that file; a variable already in your shell wins). With them set it talks to that node, so staff
   steps sent from the stack are real transactions on that network; with none, claims and game administration say
