@@ -21,7 +21,7 @@ const rates = [
   { satPerVb: 9, targetBlocks: 1 },
 ];
 // An everyday step of 200 vB may pay up to 1,000 sats: the usual rates are within that, the 9 sat/vB one is not.
-const limit = { exampleVbytes: 200, maxFeeSats: 1_000 };
+const limit = { smallestStepVbytes: 200, maxFeeSats: 1_000 };
 const status = {
   chain: "bip122:00000000da84f2bafbbc53dee25a72ae",
   indexedHeight: 157_400,
@@ -41,7 +41,7 @@ const followed = (
 });
 const answer = (value: Parameters<typeof createFeesOperation>[0]["followed"]) =>
   createFeesOperation({
-    exampleVbytes: limit.exampleVbytes,
+    smallestStepVbytes: limit.smallestStepVbytes,
     feeSpeeds,
     followed: value,
   }).execute({}, context);
@@ -49,7 +49,7 @@ const answer = (value: Parameters<typeof createFeesOperation>[0]["followed"]) =>
 describe("the chain fees route", () => {
   it("is public, takes no input, and answers in the shared contract", () => {
     const operation = createFeesOperation({
-      exampleVbytes: limit.exampleVbytes,
+      smallestStepVbytes: limit.smallestStepVbytes,
       feeSpeeds,
       followed: null,
     });

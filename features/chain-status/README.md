@@ -16,11 +16,11 @@ step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/s
   asks again every `refreshMs` (not while the tab is hidden), draws nothing where the platform follows no chain, and says
   "Chain status unknown" when the platform cannot be reached. The app places it in the header through `ShellStatusProvider` in the layout.
 - The badge also opens a panel one click beside the lamp: the latest block and, for each fee speed (slow, medium, fast, lightning),
-  the chain's rate, the approximate wait and what an example transaction (`exampleVbytes`) would pay. Where the chain or the
+  the chain's rate, the approximate wait and, only where the page knows the size of a transaction already built, what it would pay. No cost is told for a size that is only assumed. Where the chain or the
   platform cannot be asked it says "Fees unknown" and draws no rate.
 - `@ador/feature-chain-status/fee-picker`: `<FeeSpeedPicker market value onChange vbytes? maxFeeSats?>` and `useFeeQuotes({ refreshMs })`,
   the one control any step that pays a fee uses (staff steps and a player's claim today; minting next). It shows the four speeds with their
-  wait and rate, an optional cost for a transaction of `vbytes`, refuses a speed above `maxFeeSats` with the reason, never offers a speed the server marked `withinLimit: false` (the chain quotes more for it than any step, even a small one, may pay: the platform's `maxFeeSats`, told in the `/fees` answer, against an everyday step of `exampleVbytes`; the header panel marks those rows too), and says plainly
+  wait and rate, an optional cost for a transaction of `vbytes`, refuses a speed above `maxFeeSats` with the reason, never offers a speed the server marked `withinLimit: false` (the chain quotes more for it than any step, even a small one, may pay: the platform's `maxFeeSats`, told in the `/fees` answer, against the smallest step, `smallestStepVbytes`, which is never shown as a cost; the header panel marks those rows too), and says plainly
   when the market is unknown. The choice is the speed, never the rate: the speed travels on the intent (`feeSpeed`) and the adapter
   quotes the rate for its block target when it builds the transaction. Other features import only this subpath.
 - `<CostOverview asset baseUnits detail?>` (same entry): the cost of a built transaction, told wherever a person is about to act on the chain. A fee in satoshis (`btc`) is shown as sats, then the rate it was priced at, the speed with its wait and about how large the transaction is (fee ÷ rate); any other asset is its amount and name. `detail` is the `feeDetail` the builder put on the summary.

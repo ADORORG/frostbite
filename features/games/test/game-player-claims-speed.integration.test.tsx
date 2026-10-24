@@ -52,7 +52,9 @@ describe("choosing how fast a claim confirms", () => {
       ["fast", false],
       ["lightning", false],
     ]);
-    expect(text()).toContain("≈ 202 sats");
+    // No size is known before the claim is built, so no cost is told, only the rate and the wait.
+    expect(text()).toContain("1.01 sat/vB");
+    expect(text()).not.toContain("≈");
     await act(async () => radios[3]?.click());
     await click("Claim ");
     await flush();

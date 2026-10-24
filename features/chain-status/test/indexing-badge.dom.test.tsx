@@ -34,7 +34,7 @@ describe("the header badge", () => {
     let answer: (value: ChainIndexing) => void = () => undefined;
     const api = apiOf(() => new Promise((resolve) => (answer = resolve)));
     const container = await mount(
-      <IndexingBadge api={api} exampleVbytes={200} refreshMs={60_000} />,
+      <IndexingBadge api={api} refreshMs={60_000} />,
     );
     expect(textOf(container)).toBe("");
     answer(ok("delayed", 7));
@@ -51,7 +51,7 @@ describe("the header badge", () => {
     const container = await mount(
       <IndexingBadge
         api={apiOf(indexing)}
-        exampleVbytes={200}
+
         refreshMs={20}
       />,
     );
@@ -67,7 +67,7 @@ describe("the header badge", () => {
     await mount(
       <IndexingBadge
         api={apiOf(indexing)}
-        exampleVbytes={200}
+
         refreshMs={10}
       />,
     );
@@ -84,7 +84,7 @@ describe("the header badge", () => {
         api={apiOf(async () => {
           throw new ApiError("network", null, "unreachable");
         })}
-        exampleVbytes={200}
+
         refreshMs={60_000}
       />,
     );
@@ -100,7 +100,7 @@ describe("the header badge", () => {
     const container = await mount(
       <IndexingBadge
         api={apiOf(indexing)}
-        exampleVbytes={200}
+
         refreshMs={60_000}
       />,
     );

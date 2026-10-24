@@ -43,7 +43,6 @@ export const walletAuthConfig = {
 export const gameWalletConfig = {
   fees: {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
-    exampleVbytes: rewardsPolicy.exampleTransactionVbytes,
     refreshMs: rewardsPolicy.indexingRefreshMs,
   },
   network: walletAuthConfig.network,

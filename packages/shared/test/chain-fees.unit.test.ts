@@ -70,7 +70,7 @@ describe("the quotes for the speeds", () => {
   ];
 
   // An everyday step of 200 vB may pay 1,000 sats: 5 sat/vB is exactly that, 9 is over.
-  const limit = { exampleVbytes: 200, maxFeeSats: 1_000 };
+  const limit = { smallestStepVbytes: 200, maxFeeSats: 1_000 };
 
   it("pair each speed with the rate for its target and the wait the policy tells, and say whether any step could afford it", () => {
     expect(quotesFor(policy, rates, limit)).toEqual([

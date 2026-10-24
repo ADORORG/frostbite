@@ -12,13 +12,10 @@ import { useFeeQuotes } from "./use-fee-quotes.ts";
 // ask fails it keeps showing the last answer's age honestly by saying the status is unknown.
 export function IndexingBadge({
   api: given,
-  exampleVbytes,
   refreshMs,
 }: {
   // Where the status comes from; the platform's own route unless a test supplies another.
   readonly api?: ChainStatusApi;
-  // The size of an everyday transaction, for the example cost in the fee panel.
-  readonly exampleVbytes: number;
   readonly refreshMs: number;
 }) {
   const api = useMemo(() => given ?? createChainStatusApi(), [given]);
@@ -37,7 +34,6 @@ export function IndexingBadge({
   if (state.status === "loading") return null;
   return (
     <NetworkPill
-      exampleVbytes={exampleVbytes}
       indexing={state.status === "ready" ? state.data : null}
       market={market}
     />

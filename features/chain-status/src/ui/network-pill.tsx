@@ -18,11 +18,9 @@ const clock = (iso: string) => `${iso.slice(11, 19)} UTC`;
 // how far the platform's reading of the chain has come and what a transaction costs at each speed. Nothing is drawn where the
 // platform follows no chain, and no figure is drawn that was not read: an unknown is said as unknown.
 export function NetworkPill({
-  exampleVbytes,
   indexing,
   market,
 }: {
-  readonly exampleVbytes: number;
   // `null` is the platform not being reachable.
   readonly indexing: ChainIndexing | null;
   readonly market: FeeMarket;
@@ -43,7 +41,6 @@ export function NetworkPill({
       : feeChoices({
           platformMaxFeeSats: fees.maxFeeSats,
           quotes: fees.quotes,
-          vbytes: exampleVbytes,
         });
   return (
     <Popover
@@ -82,7 +79,7 @@ export function NetworkPill({
         </div>
       )}
       <section aria-label="Fees" className="network-panel__fees">
-        <h3 className="network-panel__heading">{`What a ${exampleVbytes} vB transaction costs`}</h3>
+        <h3 className="network-panel__heading">What each speed costs</h3>
         {market.status === "loading" ? (
           <p role="status">Loading what each speed costs…</p>
         ) : fees === null || choices === null ? (

@@ -16,12 +16,7 @@ const reading: Extract<ChainIndexing, { state: "ok" }> = {
   tipHeight: 157_401,
 };
 const pill = (props: Partial<Parameters<typeof NetworkPill>[0]> = {}) => (
-  <NetworkPill
-    exampleVbytes={200}
-    indexing={reading}
-    market={answered(ok)}
-    {...props}
-  />
+  <NetworkPill indexing={reading} market={answered(ok)} {...props} />
 );
 const trigger = (container: HTMLElement) =>
   container.querySelector<HTMLButtonElement>("button.network-pill");
@@ -42,7 +37,7 @@ describe("the network pill in the header", () => {
     expect(container.querySelector(".status-dot--ready")).not.toBeNull();
   });
 
-  it("opens to how far the platform has read the chain, and what each speed costs for an everyday transaction", async () => {
+  it("opens to how far the platform has read the chain, and each speed with its rate and wait, with no cost told for a transaction that does not exist yet", async () => {
     const container = await opened(pill());
     const panel = container.querySelector(".popover__panel");
     expect(panel?.getAttribute("aria-label")).toBe("Chain and fees");
@@ -53,15 +48,15 @@ describe("the network pill in the header", () => {
       container.querySelector("progress")?.getAttribute("aria-label"),
     ).toBe("How far the platform has read the chain");
     expect(container.querySelector("progress")?.value).toBe(100);
-    expect(textOf(container)).toContain("What a 200 vB transaction costs");
+    expect(textOf(container)).toContain("What each speed costs");
     const tiles = [...container.querySelectorAll(".segmented__option")].map(
       (tile) => tile.textContent,
     );
     expect(tiles).toEqual([
-      "Slow1.01 sat/vBabout 4 h\n≈ 202 sats",
-      "Medium3.00 sat/vBabout 1 h\n≈ 600 sats",
-      "Fast5.00 sat/vBabout 30 min\n≈ 1,000 sats",
-      "Lightning9.00 sat/vBabout 15 min\n≈ 1,800 sats",
+      "Slow1.01 sat/vBabout 4 h",
+      "Medium3.00 sat/vBabout 1 h",
+      "Fast5.00 sat/vBabout 30 min",
+      "Lightning9.00 sat/vBabout 15 min",
     ]);
     expect(textOf(container)).toContain("Read 12:00:00 UTC");
     expect(textOf(container)).toContain(

@@ -6,7 +6,7 @@ import { createChainStatusFeature } from "../src/registration.ts";
 
 const config = {
   delay: { maxLagBlocks: 2 },
-  exampleVbytes: 200,
+  smallestStepVbytes: 200,
   feeSpeeds: {
     fast: { approxMinutes: 30, targetBlocks: 3 },
     lightning: { approxMinutes: 15, targetBlocks: 1 },

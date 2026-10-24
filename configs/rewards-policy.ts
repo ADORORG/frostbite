@@ -41,9 +41,9 @@ export const rewardsPolicy = {
   // sent step or claim has gone this long without finishing. Delayed is shown, never as failed, and nothing is retried or cancelled.
   delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60 * 1000 },
   defaultFeeSpeed,
-  // About how large an everyday transaction (a player's claim) is, in virtual bytes, for the example cost the fee panel shows. Not a
-  // quote: the platform prices the real transaction when it builds it.
-  exampleTransactionVbytes: 200,
+  // How large the smallest step is, in virtual bytes: the size a speed is tested at to tell whether any step could afford it. Never shown as a cost, and not a
+  // quote: the platform prices the real transaction when it builds it, and the page tells a cost only for a step already built.
+  smallestStepVbytes: 200,
   feeSpeeds,
   // How long one reading of the indexer is reused. Every page of the site shows it, so the node is asked at most once in this time
   // however many people are looking; a reading is never older than this.

@@ -82,7 +82,7 @@ export const chainFeesSchema = z.discriminatedUnion("state", [
               satPerVb: z.number().positive().finite(),
               speed: feeSpeedSchema,
               targetBlocks: z.number().int().positive(),
-              // Whether even an everyday-sized step could be sent at this rate without passing `maxFeeSats`. Where it is false no
+              // Whether even the smallest step could be sent at this rate without passing `maxFeeSats`. Where it is false no
               // step can be, however small, and the speed is not offered.
               withinLimit: z.boolean(),
             })
@@ -123,9 +123,9 @@ export type FeeQuoteView = Extract<
   { state: "ok" }
 >["quotes"][number];
 
-// What a speed is measured against to tell whether it can be offered: the most a step may pay, and about how large an everyday step is.
+// What a speed is measured against to tell whether it can be offered: the most a step may pay, and how large the smallest step is.
 export interface FeeLimit {
-  readonly exampleVbytes: number;
+  readonly smallestStepVbytes: number;
   readonly maxFeeSats: number;
 }
 
@@ -149,7 +149,7 @@ export function quotesFor(
       speed,
       targetBlocks,
       withinLimit:
-        feeAtRate(rate.satPerVb, limit.exampleVbytes) <= limit.maxFeeSats,
+        feeAtRate(rate.satPerVb, limit.smallestStepVbytes) <= limit.maxFeeSats,
     });
   }
   return quotes;

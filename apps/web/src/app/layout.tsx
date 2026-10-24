@@ -53,12 +53,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <ClientNavigation />
         <ShellStatusProvider
-          status={
-            <IndexingBadge
-              exampleVbytes={chainStatusConfig.exampleVbytes}
-              refreshMs={chainStatusConfig.refreshMs}
-            />
-          }
+          status={<IndexingBadge refreshMs={chainStatusConfig.refreshMs} />}
         >
           <WalletShell
             balanceRefreshMs={walletAuthConfig.balanceRefreshMs}

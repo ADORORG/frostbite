@@ -114,7 +114,6 @@ export const fees = {
     indexing: () => Promise.reject(new Error("not used")),
   },
   defaultSpeed: "slow" as const,
-  exampleVbytes: 200,
   refreshMs: 60_000,
 };
 

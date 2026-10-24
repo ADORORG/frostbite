@@ -6,7 +6,7 @@ import type { WalletNetwork } from "@ador/wallet/contracts";
 // platform's configuration, not to any game. Connecting a wallet is the header widget's job, not a page's.
 export interface GameWalletConfig {
   // How a claim's fee speed is offered next to the milestones: the speed it starts on, how often the chain is asked what each
-  // costs, and about how large a claim is (to tell a cost). Absent: no choice is offered and claims use the platform's usual speed.
+  // costs. Absent: no choice is offered and claims use the platform's usual speed.
   readonly fees?: ClaimFeeSettings;
   readonly network: WalletNetwork;
 }
@@ -15,6 +15,5 @@ export interface ClaimFeeSettings {
   // Where the quotes come from; the platform's own route unless a test supplies another.
   readonly api?: ChainStatusApi;
   readonly defaultSpeed: FeeSpeed;
-  readonly exampleVbytes: number;
   readonly refreshMs: number;
 }
