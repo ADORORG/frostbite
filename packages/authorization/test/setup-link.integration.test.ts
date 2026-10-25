@@ -227,6 +227,8 @@ describe("redeeming a setup link", () => {
 describe("the table's own checks", () => {
   const insert = (values: Partial<typeof platformSetupLinks.$inferInsert>) =>
     database.insert(platformSetupLinks).values({
+      // Both times come from the test's clock; a creation time left to the database would be the real one, which is past the fixed expiry.
+      createdAt: clock.now,
       expiresAt: new Date(clock.now.getTime() + hour),
       id: createUuidV7(),
       tokenHash: "a".repeat(64),

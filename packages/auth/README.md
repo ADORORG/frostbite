@@ -31,6 +31,17 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
   `finish` spends the challenge first (one attempt each, atomically), finds the account from the credential that signed, has the
   library verify the signature, origin, relying party, user verification and that the signature counter moved forward, then
   starts a session (other sessions stay). Every failure looks the same to the caller.
+- `createContactCodeService` (`src/contacts/`, with `createDrizzleContactCodeRepository`) signs a person in with a one-time code
+  sent to a contact. It is the same for every channel: a `ContactChannel` says how a destination is written (`normalize`), how a
+  code is delivered (`deliver`), and its policy (digits, lifetime, tries, resend cooldown, sends per window); `createEmailChannel`
+  is the email one (over the `MailSender` port of `@ador/mail`) and a text-message channel would be another. `request` normalizes
+  the destination, then issues under a per-destination lock (cooldown and window limits are decided where two requests together
+  cannot both slip under them; a newer code replaces the older ones), sends it, and forgets the code if the send failed. `verify`
+  counts a try before it compares (so tries cannot be dodged), checks the salted hash in constant time, then spends the code and
+  signs in by one transaction: of any number of attempts with a code, one signs in. The account is found or made only after the
+  code is right, so nothing before that depends on whether the address has an account. `emailMethod` (`createContactMethod`) lists an
+  account's addresses for the method registry (standard assurance, can sign in). Routes: `POST /api/v1/email/sign-in/request` and
+  `/verify`, both public.
 
 Callers compose these exports explicitly. Removing wallet authentication requires removing its
 registration and route adapter; no feature discovery or global registration is used.
@@ -59,6 +70,10 @@ registration and route adapter; no feature discovery or global registration is u
   counter, which is what a cloned authenticator does, cannot both succeed. A passkey is bound to the site's domain: the policy
   refuses to start unless the relying party is the host of the platform's own origin.
 - The UI makes no recovery claim for passkeys.
+- Email codes: only a salted hash is stored; five tries, right or wrong, then the code is dead; a code works once; a code does not
+  outlive its lifetime to the millisecond; a failed send leaves no code and no cooldown. A contact identity (`kind` + normalized
+  value) belongs to one account for good: no merging (ADR-021 point 5). `auth_users.email` is a placeholder
+  (`contact-<id>@contact.invalid`), never read for sign-in.
 
 ## Configuration
 

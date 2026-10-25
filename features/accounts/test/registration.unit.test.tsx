@@ -1,21 +1,28 @@
 import { describe, expect, it } from "vitest";
 
 import { createAccountsFeature } from "../src/registration.ts";
-import { authMethods } from "../src/methods.ts";
-import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import { createAuthMethods } from "../src/methods.ts";
+import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 import { setupLinkRoutes } from "../src/setup/contract.ts";
 import { walletBalanceRoute } from "../src/balance/contract.ts";
 import { walletConfig } from "./support/wallet-config.ts";
 
-const accountsFeature = createAccountsFeature(walletConfig, null, authMethods, {
-  lifetimeMs: 3_600_000,
-  policyVersion: "test-v2",
-  requiredMethods: { admin: ["wallet"] },
-});
+const accountsFeature = createAccountsFeature(
+  walletConfig,
+  null,
+  createAuthMethods({ email: false }),
+  {
+    lifetimeMs: 3_600_000,
+    policyVersion: "test-v2",
+    requiredMethods: { admin: ["wallet"] },
+  },
+  null,
+);
 const allRoutes = [
   ...Object.values(passkeyRoutes),
   ...Object.values(walletAuthRoutes),
   ...Object.values(setupLinkRoutes),
+  ...Object.values(emailCodeRoutes),
   walletBalanceRoute,
 ];
 const byOperation = (a: { operationId: string }, b: { operationId: string }) =>

@@ -123,10 +123,11 @@ describe("the passkey sign-in view", () => {
 });
 
 describe("the sign-in page's views", () => {
-  it("show the passkey beside the wallet, under the kind the server's registry names", () => {
+  it("show each method under the kind the server's registry names", () => {
     expect(signInViews.map(({ kind, label }) => [kind, label])).toEqual([
       ["wallet", "Wallet"],
       ["passkey", "Passkey"],
+      ["email", "Email"],
     ]);
   });
 });

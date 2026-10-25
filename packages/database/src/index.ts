@@ -54,6 +54,12 @@ export {
   type WalletIdentity,
 } from "./schema/auth.ts";
 export {
+  contactCodes,
+  contactIdentities,
+  type ContactCode,
+  type ContactIdentity,
+} from "./schema/contact-sign-in.ts";
+export {
   passkeySignInChallenges,
   type PasskeySignInChallenge,
 } from "./schema/passkey-sign-in.ts";

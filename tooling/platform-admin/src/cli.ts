@@ -7,7 +7,9 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
 } from "@ador/database/connection";
+import { createAuthMethods } from "@ador/feature-accounts/methods";
 import { parseEnvironment } from "@repo/config/env";
+import { parseMailEnvironment } from "@repo/config/mail";
 
 import { exitCodeOf, formatSetupLinkReport, mintSetupLink } from "./link.ts";
 import { createSetupLinkServiceFor } from "./services.ts";
@@ -29,7 +31,10 @@ const pool = createDatabasePool(parseDatabaseEnvironment(environment));
 try {
   const report = await mintSetupLink({
     baseUrl: parseEnvironment(environment).PUBLIC_BASE_URL,
-    service: createSetupLinkServiceFor(createDatabaseClient(pool)),
+    service: createSetupLinkServiceFor(
+      createDatabaseClient(pool),
+      createAuthMethods({ email: parseMailEnvironment(environment) !== null }),
+    ),
   });
   console.log(formatSetupLinkReport(report));
   process.exitCode = exitCodeOf(report);

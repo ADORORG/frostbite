@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import {
   formatStackGuide,
+  captureMailEnvironment,
   resolveStackServer,
   stackActors,
   stackPages,
@@ -69,6 +70,13 @@ describe("the guide", () => {
     expect(guide).not.toContain("disposable");
   });
 
+  it("says how to sign in for real, and where the emailed codes can be read", () => {
+    const guide = formatStackGuide({ baseURL: "http://localhost:4174" });
+    expect(guide).toContain("http://localhost:4174/sign-in");
+    expect(guide).toContain("pnpm mailbox");
+    expect(guide).not.toContain("not enabled yet");
+  });
+
   it("uses the actors it is given", () => {
     const guide = formatStackGuide({
       actors: [
@@ -84,5 +92,15 @@ describe("the guide", () => {
     });
     expect(guide).toContain("Only me");
     expect(guide).not.toContain(creatorE2EFixtures.reviewer.sessionToken);
+  });
+});
+
+describe("the stack's mail", () => {
+  it("is captured in a mailbox inside the stack's data directory, never sent", () => {
+    expect(captureMailEnvironment("/data/.stack-data")).toEqual({
+      MAIL_CAPTURE_DIRECTORY: "/data/.stack-data/mailbox",
+      MAIL_FROM_ADDRESS: "login@stack.invalid",
+      MAIL_TRANSPORT: "capture",
+    });
   });
 });

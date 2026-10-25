@@ -89,6 +89,26 @@ from ador.wallet_challenges order by issued_at desc limit 10;
 
 Never log, paste or ticket a signature, a session token or a challenge message.
 
+## Symptom: "the email code never arrives" / the Email panel is missing
+
+1. **No Email panel on `/sign-in`.** Email sign-in is offered only where mail is set up: `MAIL_TRANSPORT` is blank, so the platform
+   has no mail and says so by not showing it. Set the `MAIL_*` keys (see `.env.example`) and restart: the mail settings are read once, at boot (a wrong
+   one stops the process with a message naming the key), and the page is rendered on request.
+2. **"The code could not be sent."** The mail server refused or did not answer. The process's error output has no address or
+   password (only a short code such as `EAUTH` for a wrong login or `ETIMEDOUT`); check `MAIL_SMTP_HOST`, `MAIL_SMTP_PORT`,
+   `MAIL_SMTP_ENCRYPTION` (465 is `tls`, 587 is `starttls`), the login, and the provider's own dashboard. A failed send leaves no
+   code and no cooldown, so the person can try again at once.
+3. **Sent but not received.** The sender address (`MAIL_FROM_ADDRESS`) must be on a domain the provider has verified (SPF, DKIM); an
+   unverified domain is filtered as spam or refused. Look in the provider's delivery log for the message.
+4. **"A code was sent recently."** One minute between codes to an address and five an hour (`emailCodePolicy`). A newer code
+   replaces the older one, so a person who asked twice must use the **latest** email. Read-only check:
+   ```sql
+   select issued_at, expires_at, attempts, consumed_at from ador.contact_codes
+   where kind = 'email' and destination = '<lower-case address>' order by issued_at desc limit 5;
+   ```
+   `attempts` of 5 means the code is spent (five tries, right or wrong); `consumed_at` set means it was used or replaced.
+5. **Local stack.** Nothing is sent: `pnpm mailbox` prints what the stack "sent" (newest first).
+
 ## Containment (security events)
 
 - Revoke one user's sessions (**write**; production approval required, record who and why):

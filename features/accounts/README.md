@@ -11,7 +11,12 @@ registry says can start a session, each in its own panel (`src/sign-in/`: `regis
 is one view there plus its adapter in `runtime.ts`); a protected page sends a signed-out visitor to it with `?returnTo=` (checked by
 `safeReturnPath` in `@ador/shared/auth/sign-in-path`: a plain path on this site, never the sign-in page, the API or another site),
 and it goes on to that page once the server says the visitor is signed in. Passkeys sign in on the same page (`src/sign-in/passkey-sign-in*.ts(x)`; `POST /api/v1/passkeys/sign-in/options` and
-`/verify`, both public, each with its own rate limit). The public `/setup` page and `POST /api/v1/auth/setup-link/redeem`
+`/verify`, both public, each with its own rate limit). Email signs in on the same page (`src/sign-in/email-sign-in*.ts(x)`; `POST /api/v1/email/sign-in/request` and `/verify`, both public, each
+with its own rate limit): the person gives an address, is told a code is on its way *if that address can receive mail* (the page never
+says whether the address has an account), enters the code, and the server sets the session. It is offered only where mail is set up
+(`MAIL_TRANSPORT`; `createAuthMethods({ email })` in `src/methods.ts` is how the composition root says so); without mail the request
+route answers "not available" and the page does not show the panel. `createAccountsFeature` takes `EmailSignInRules | null` (the mail
+settings and the code policy) from the composition root. The public `/setup` page and `POST /api/v1/auth/setup-link/redeem`
 open the single-use link that makes the first administrator (ADR-021; `src/setup/`): the token follows the link's `#`, so the server
 never sees it in an address; the page saves it for the visit, clears it from the address bar, and opens the link for whoever is signed
 in (asking them to sign in if nobody is). It says "administrator" only after the server granted it, and a person missing a wallet is told

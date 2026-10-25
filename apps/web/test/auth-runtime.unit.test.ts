@@ -21,8 +21,10 @@ vi.mock("@ador/auth", () => ({
 }));
 // The sign-in methods are the accounts feature's; this test is about how the adapters are put together, not which methods exist.
 vi.mock("@ador/feature-accounts", () => ({
-  authMethods: { list: "the-method-registry" },
   createHeldMethodKinds: factories.heldKinds,
+}));
+vi.mock("../../../configs/auth-methods", () => ({
+  authMethods: { list: "the-method-registry" },
 }));
 vi.mock("@ador/authorization", () => ({
   createAuthorizationService: factories.authorizationService,

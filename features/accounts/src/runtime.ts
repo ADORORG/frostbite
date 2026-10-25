@@ -1,4 +1,9 @@
 import {
+  createContactCodeService,
+  createDrizzleContactCodeRepository,
+  createEmailChannel,
+  type ContactCodePolicy,
+  type ContactCodeService,
   createDrizzlePasskeyRepository,
   createDrizzlePasskeySignInRepository,
   createPasskeySignInService,
@@ -27,6 +32,7 @@ import {
   parseDatabaseEnvironment,
   type DatabaseTransaction,
 } from "@ador/database/connection";
+import { createMailSender, type MailSettings } from "@ador/mail";
 import { randomBytes } from "node:crypto";
 
 import { createHeldMethodKinds } from "./held-method-kinds.ts";
@@ -190,6 +196,45 @@ export function createSetupLinkResolver(
         heldKinds: createHeldMethodKinds(methods),
         requiredMethods: rules.requiredMethods,
       }),
+    });
+    return service;
+  };
+}
+
+// What signing in by email needs of the platform's configuration: how mail is sent and the code policy. Supplied by the composition
+// root, never read here; `null` means the deployment has no mail, and the email routes answer that they are not available.
+export interface EmailSignInRules {
+  readonly mail: MailSettings;
+  readonly policy: ContactCodePolicy;
+}
+
+// The one-time-code service, made when a request first needs it. With no mail it has no channel at all, so asking for a code is
+// refused as unsupported and nothing is stored.
+export function createEmailSignInResolver(
+  rules: EmailSignInRules | null,
+): () => ContactCodeService {
+  let service: ContactCodeService | undefined;
+  return () => {
+    if (service) return service;
+    const clock = () => new Date();
+    const environment = parseAuthSessionEnvironment(process.env);
+    service = createContactCodeService({
+      channels:
+        rules === null
+          ? []
+          : [
+              createEmailChannel({
+                appName: parseEnvironment(process.env).NEXT_PUBLIC_APP_NAME,
+                policy: rules.policy,
+                sender: createMailSender(rules.mail, { clock }),
+              }),
+            ],
+      clock,
+      repository: createDrizzleContactCodeRepository(database()),
+      sessions: {
+        sessionAbsoluteLifetimeMs: environment.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
+        sessionIdleLifetimeMs: environment.AUTH_SESSION_IDLE_TIMEOUT_MS,
+      },
     });
     return service;
   };

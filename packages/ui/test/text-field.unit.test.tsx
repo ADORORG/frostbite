@@ -74,6 +74,51 @@ describe("arcade text field", () => {
     expect(onChange).toHaveBeenCalledWith("12");
   });
 
+  it("passes the browser what to fill in and which keyboard to show, and can be an email field", async () => {
+    const container = await mount(
+      <ArcadeTextField
+        autoComplete="email"
+        inputMode="email"
+        label="Email address"
+        onChange={() => undefined}
+        type="email"
+        value=""
+      />,
+    );
+    const input = control(container);
+    expect(input.getAttribute("type")).toBe("email");
+    expect(input.getAttribute("autocomplete")).toBe("email");
+    expect(input.getAttribute("inputmode")).toBe("email");
+  });
+
+  it("lets a text field ask for the numeric keyboard (a code), and a number field be told otherwise", async () => {
+    const code = await mount(
+      <ArcadeTextField
+        inputMode="numeric"
+        label="Code"
+        onChange={() => undefined}
+        value=""
+      />,
+    );
+    expect(control(code).getAttribute("inputmode")).toBe("numeric");
+    expect(control(code).getAttribute("type")).toBe("text");
+    const plain = await mount(
+      <ArcadeTextField label="Name" onChange={() => undefined} value="" />,
+    );
+    expect(control(plain).hasAttribute("inputmode")).toBe(false);
+    expect(control(plain).hasAttribute("autocomplete")).toBe(false);
+    const overridden = await mount(
+      <ArcadeTextField
+        inputMode="text"
+        label="Supply"
+        onChange={() => undefined}
+        type="number"
+        value=""
+      />,
+    );
+    expect(control(overridden).getAttribute("inputmode")).toBe("text");
+  });
+
   it("links a hint to the control and marks nothing invalid", async () => {
     const container = await mount(
       <ArcadeTextField

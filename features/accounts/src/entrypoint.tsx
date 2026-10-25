@@ -5,6 +5,7 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
 import { createBalanceOperation } from "./application/balance-operation.ts";
 import type { BalanceSource } from "./balance/source.ts";
+import { createEmailSignInOperations } from "./application/email-sign-in-operations.ts";
 import { createPasskeySignInOperations } from "./application/passkey-sign-in-operations.ts";
 import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
@@ -13,6 +14,7 @@ import type { WalletAuthServices } from "./application/wallet-services.ts";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
 import type {
+  ContactCodeService,
   createPasskeyLinkingService,
   PasskeySignInService,
 } from "@ador/auth";
@@ -55,6 +57,7 @@ export function createAccountsEntrypoint(
   balanceSource: BalanceSource | null,
   getSetupLinks: () => SetupLinkService,
   getPasskeySignIn: () => PasskeySignInService,
+  getEmailSignIn: () => ContactCodeService,
   getService: () => PasskeyService,
   // What the sign-in page needs of the platform: the kinds of method the deployment offers, and the network a wallet is asked for.
   signIn: {
@@ -65,6 +68,8 @@ export function createAccountsEntrypoint(
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
   const [beginPasskeySignIn, finishPasskeySignIn] =
     createPasskeySignInOperations(getPasskeySignIn);
+  const [requestEmailCode, verifyEmailCode] =
+    createEmailSignInOperations(getEmailSignIn);
   const [beginSignIn, verifySignIn, signOut] =
     createWalletSignInOperations(getWalletServices);
   const [
@@ -90,6 +95,8 @@ export function createAccountsEntrypoint(
       registerHttpOperation(unlink),
       registerHttpOperation(beginPasskeySignIn),
       registerHttpOperation(finishPasskeySignIn),
+      registerHttpOperation(requestEmailCode),
+      registerHttpOperation(verifyEmailCode),
       registerHttpOperation(beginSignIn),
       registerHttpOperation(verifySignIn),
       registerHttpOperation(signOut),

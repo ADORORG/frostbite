@@ -11,6 +11,7 @@ import {
   formatStackGuide,
   resolveStackServer,
   stackActors,
+  captureMailEnvironment,
 } from "../src/manual-stack.ts";
 import {
   chainSettingsFrom,
@@ -187,6 +188,7 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
           {
             ...stackEnvironment,
+            ...captureMailEnvironment(dataDirectory),
             ...baseEnvironment,
             ...serviceEnvironment,
             HOSTNAME: "127.0.0.1",

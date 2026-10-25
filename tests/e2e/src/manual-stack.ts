@@ -1,3 +1,5 @@
+import { join } from "node:path";
+
 import { creatorE2EFixtures, publicCollection } from "./creator-fixtures.ts";
 import { signInPath } from "./sign-in-picker.ts";
 import {
@@ -11,6 +13,16 @@ import {
 
 // A different default port from the test run, so the two can run side by side.
 const defaultStackBaseURL = "http://localhost:4174";
+
+// Mail that is captured, not sent: each message becomes a file under `<directory>/mailbox`. The local stack uses its data directory (beside
+// the database passwords, ignored by git) and the browser tests a temporary one.
+export function captureMailEnvironment(directory: string): NodeJS.ProcessEnv {
+  return {
+    MAIL_CAPTURE_DIRECTORY: join(directory, "mailbox"),
+    MAIL_FROM_ADDRESS: "login@stack.invalid",
+    MAIL_TRANSPORT: "capture",
+  };
+}
 
 export function resolveStackServer(
   environment: NodeJS.ProcessEnv = process.env,
@@ -97,8 +109,9 @@ export function formatStackGuide(input: {
     "",
     `The Well is running at ${input.baseURL}`,
     "",
-    `To sign in, open ${input.baseURL}${signInPath} and pick a person. Real sign-in is by wallet and is not`,
-    "enabled yet, so this local page stands in for it. Sign out from the same page.",
+    `To become one of the people below, open ${input.baseURL}${signInPath} and pick one (a local stand-in; sign out from the same page).`,
+    `Real sign-in is at ${input.baseURL}/sign-in: a wallet, a passkey, or an emailed code. Nothing is sent: the stack keeps the emails in a`,
+    "local mailbox. Ask for a code on the page, then run `pnpm mailbox` in another terminal to read it.",
     "",
   ];
   for (const actor of actors) lines.push(`  ${actor.label}: ${actor.goal}`);

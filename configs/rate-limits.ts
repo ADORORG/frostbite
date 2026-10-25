@@ -33,6 +33,9 @@ export const rateLimits = rateLimitConfigSchema.parse({
     importCollectionItems: perMinute(20),
     // Opening a setup link is for the one person setting up the platform; a token cannot be guessed, but nothing needs more than a few.
     redeemSetupLink: perMinute(10),
+    // Each request sends a real message, which costs money and can annoy whoever owns the address, so a caller gets a few a minute on top of
+    // the per-address limits the code service keeps. Entering a code is a guess, so it is as tight as the other sign-in steps.
+    requestEmailCode: perMinute(5),
     reviewCreatorApplication: perMinute(60),
     signOut: perMinute(30),
     // A run is started when a game begins a round and submitted when it ends; a replay costs the server real work, so these
@@ -45,6 +48,7 @@ export const rateLimits = rateLimitConfigSchema.parse({
     syncGameState: perMinute(120),
     unlinkPasskey: perMinute(10),
     unlinkWallet: perMinute(10),
+    verifyEmailCode: perMinute(20),
     verifyWalletLink: perMinute(20),
     verifyWalletSignIn: perMinute(20),
     verifyWalletStepUp: perMinute(20),

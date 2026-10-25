@@ -1,3 +1,5 @@
+import { mailEnvironmentDefinitions } from "./mail-definitions.ts";
+
 export const environmentNames = [
   "local",
   "test",
@@ -15,7 +17,7 @@ export interface EnvironmentDefinition {
   secret: boolean;
 }
 
-export const environmentDefinitions = [
+const coreDefinitions = [
   {
     key: "APP_ENV",
     description: "Runtime environment; independent from the hosting provider.",
@@ -279,5 +281,11 @@ export const environmentDefinitions = [
     secret: false,
   },
 ] as const satisfies readonly EnvironmentDefinition[];
+
+// Every key the application reads, in the order the templates list them (see `check-files.ts`).
+export const environmentDefinitions = [
+  ...coreDefinitions,
+  ...mailEnvironmentDefinitions,
+] as const;
 
 export const environmentKeys = environmentDefinitions.map(({ key }) => key);

@@ -1,7 +1,11 @@
 import { spawn } from "node:child_process";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
 
+import { captureMailEnvironment } from "../src/manual-stack.ts";
 import { normalizePlaywrightArguments } from "../src/playwright-arguments.ts";
 import { resolveE2EServerConfig } from "../src/server-config.ts";
 import { withUploadServices } from "../src/services.ts";
@@ -36,9 +40,19 @@ async function runPlaywright(
 await withDisposablePostgres(async (databaseUrl) => {
   await seed(databaseUrl);
   const { baseURL } = resolveE2EServerConfig(process.env.E2E_BASE_URL);
-  const baseEnvironment = applicationEnvironment(databaseUrl, baseURL);
-  await withUploadServices(
-    { baseEnvironment, webOrigin: new URL(baseURL).origin },
-    (serviceEnvironment) => runPlaywright(baseEnvironment, serviceEnvironment),
-  );
+  // The emails the app "sends" land in a directory the specs read, so a test can enter the code it was sent.
+  const mailDirectory = await mkdtemp(join(tmpdir(), "ador-e2e-mail-"));
+  const baseEnvironment = {
+    ...applicationEnvironment(databaseUrl, baseURL),
+    ...captureMailEnvironment(mailDirectory),
+  };
+  try {
+    await withUploadServices(
+      { baseEnvironment, webOrigin: new URL(baseURL).origin },
+      (serviceEnvironment) =>
+        runPlaywright(baseEnvironment, serviceEnvironment),
+    );
+  } finally {
+    await rm(mailDirectory, { force: true, recursive: true });
+  }
 });

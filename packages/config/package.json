@@ -6,8 +6,10 @@
   "exports": {
     "./env": "./src/env/runtime.ts",
     "./beta-network": "./src/env/beta-network.ts",
+    "./mail": "./src/env/mail.ts",
     "./rewards-chain": "./src/env/rewards-chain.ts",
     "./authorization": "./src/policy/authorization.ts",
+    "./email-code": "./src/policy/email-code.ts",
     "./setup-link": "./src/policy/setup-link.ts",
     "./transport": "./src/transport/loopback-transport.ts"
   },
@@ -20,6 +22,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
+    "@ador/mail": "workspace:*",
     "@ador/shared": "workspace:*",
     "zod": "^4.5.4"
   },

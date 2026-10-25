@@ -17,6 +17,7 @@
     "@ador/auth": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/game-sdk": "workspace:*",
+    "@ador/mail": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/test-kit": "workspace:*",
     "@axe-core/playwright": "4.13.0",

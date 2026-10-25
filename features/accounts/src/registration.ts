@@ -1,17 +1,19 @@
 import { defineFeature } from "@ador/plugin-kit";
-import { passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 
 import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
 
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
+  createEmailSignInResolver,
   createPasskeyServiceResolver,
   createPasskeySignInResolver,
   createSetupLinkResolver,
   createWalletServicesResolver,
   offeredSignInKinds,
   type AccountMethods,
+  type EmailSignInRules,
   type SetupRules,
 } from "./runtime.ts";
 import { setupLinkRoutes } from "./setup/contract.ts";
@@ -21,7 +23,8 @@ import {
 } from "./wallet-config.ts";
 
 export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
-export { authMethods, createHeldMethodKinds } from "./methods.ts";
+export { createAuthMethods, createHeldMethodKinds } from "./methods.ts";
+export type { EmailSignInRules } from "./runtime.ts";
 
 // `balanceSource` is where the widget's balance comes from (confirmed and pending apart); `null` means the platform has no chain to ask
 // and the widget says no balance is available.
@@ -30,6 +33,8 @@ export function createAccountsFeature(
   balanceSource: BalanceSource | null,
   methods: AccountMethods,
   setup: SetupRules,
+  // How email sign-in works here, or null when the deployment has no mail (the routes then answer that email is not available).
+  email: EmailSignInRules | null,
 ) {
   const wallet = validateWalletAuthConfig(input);
   // One passkey service for the whole feature, made when a request first needs it.
@@ -75,6 +80,7 @@ export function createAccountsFeature(
         ...Object.values(passkeyRoutes),
         ...Object.values(walletAuthRoutes),
         ...Object.values(setupLinkRoutes),
+        ...Object.values(emailCodeRoutes),
         walletBalanceRoute,
       ],
       version: "1.0.0",
@@ -87,6 +93,7 @@ export function createAccountsFeature(
             balanceSource,
             createSetupLinkResolver(methods, setup),
             createPasskeySignInResolver(),
+            createEmailSignInResolver(email),
             passkeys,
             {
               network: wallet.network,

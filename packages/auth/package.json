@@ -20,6 +20,7 @@
   "dependencies": {
     "@ador/chain": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/mail": "workspace:*",
     "@ador/shared": "workspace:*",
     "@simplewebauthn/server": "14.0.1",
     "bip322-js": "4.0.0",

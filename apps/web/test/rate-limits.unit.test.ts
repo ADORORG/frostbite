@@ -10,6 +10,8 @@ const signInSteps = [
   "beginWalletSignIn",
   "verifyWalletSignIn",
   "redeemSetupLink",
+  "requestEmailCode",
+  "verifyEmailCode",
 ];
 
 describe("the limits on signing in", () => {

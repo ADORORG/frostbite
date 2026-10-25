@@ -24,6 +24,7 @@
     "@ador/authorization": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/mail": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
     "@ador/shared": "workspace:*",

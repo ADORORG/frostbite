@@ -9,7 +9,16 @@ const factories = vi.hoisted(() => ({
     PASSKEY_CHALLENGE_TIMEOUT_MS: 300_000,
     PASSKEY_RECENT_AUTH_WINDOW_MS: 600_000,
   })),
+  contactRepository: vi.fn(() => "contact-repository"),
+  contactService: vi.fn(() => ({ contactService: true })),
   databaseClient: vi.fn(() => "database"),
+  emailChannel: vi.fn(() => "email-channel"),
+  mailSender: vi.fn(
+    (_settings: object, input: { readonly clock: () => Date }) => {
+      input.clock();
+      return "mail-sender";
+    },
+  ),
   databaseEnvironment: vi.fn(() => "database-environment"),
   databasePool: vi.fn(() => "pool"),
   passkeyRepository: vi.fn(() => "repository"),
@@ -26,7 +35,11 @@ const factories = vi.hoisted(() => ({
   })),
 }));
 
+vi.mock("@ador/mail", () => ({ createMailSender: factories.mailSender }));
 vi.mock("@ador/auth", () => ({
+  createContactCodeService: factories.contactService,
+  createDrizzleContactCodeRepository: factories.contactRepository,
+  createEmailChannel: factories.emailChannel,
   createDrizzlePasskeyRepository: factories.passkeyRepository,
   createDrizzlePasskeySignInRepository: factories.signInRepository,
   createPasskeyLinkingService: factories.passkeyService,
@@ -109,6 +122,56 @@ describe("passkey runtime composition", () => {
         }),
         repository: "sign-in-repository",
       }),
+    );
+  });
+
+  it("builds the code service once, with an email channel made from the mail settings and the policy, under the platform's session lifetimes", async () => {
+    const { createEmailSignInResolver } = await import("../src/runtime.ts");
+    const policy = {
+      codeLength: 6,
+      lifetimeMs: 600_000,
+      maximumAttempts: 5,
+      maximumSendsPerWindow: 5,
+      resendCooldownMs: 60_000,
+      sendWindowMs: 3_600_000,
+    };
+    const mail = {
+      directory: "inbox",
+      from: "login@launch.invalid",
+      transport: "capture",
+    } as const;
+    const getService = createEmailSignInResolver({ mail, policy });
+    const first = getService();
+    expect(getService()).toBe(first);
+    expect(factories.contactService).toHaveBeenCalledOnce();
+    expect(factories.mailSender).toHaveBeenCalledWith(mail, {
+      clock: expect.any(Function),
+    });
+    expect(factories.emailChannel).toHaveBeenCalledWith({
+      appName: "Launch",
+      policy,
+      sender: "mail-sender",
+    });
+    expect(factories.contactRepository).toHaveBeenCalledWith("database");
+    expect(factories.contactService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channels: ["email-channel"],
+        repository: "contact-repository",
+        sessions: {
+          sessionAbsoluteLifetimeMs: 604_800_000,
+          sessionIdleLifetimeMs: 86_400_000,
+        },
+      }),
+    );
+  });
+
+  it("has no channel at all while the deployment has no mail, and builds no sender", async () => {
+    const { createEmailSignInResolver } = await import("../src/runtime.ts");
+    createEmailSignInResolver(null)();
+    expect(factories.mailSender).not.toHaveBeenCalled();
+    expect(factories.emailChannel).not.toHaveBeenCalled();
+    expect(factories.contactService).toHaveBeenCalledWith(
+      expect.objectContaining({ channels: [] }),
     );
   });
 });

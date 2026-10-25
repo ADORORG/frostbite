@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { authMethods, createHeldMethodKinds } from "../src/methods.ts";
+import { createAuthMethods, createHeldMethodKinds } from "../src/methods.ts";
 
 describe("the sign-in methods this deployment offers", () => {
   it("are the wallet and the passkey, and both can start a session", () => {
-    expect(authMethods.describe()).toEqual([
+    expect(createAuthMethods({ email: false }).describe()).toEqual([
       { assurance: "strong", canSignIn: true, kind: "wallet" },
       { assurance: "strong", canSignIn: true, kind: "passkey" },
+    ]);
+  });
+
+  it("include email, a standard-assurance way in, only where mail is set up", () => {
+    expect(createAuthMethods({ email: true }).describe()).toEqual([
+      { assurance: "strong", canSignIn: true, kind: "wallet" },
+      { assurance: "strong", canSignIn: true, kind: "passkey" },
+      { assurance: "standard", canSignIn: true, kind: "email" },
     ]);
   });
 

@@ -1,17 +1,21 @@
 import { useId } from "react";
 
 interface ArcadeTextFieldProps {
+  // What the browser may fill in or offer (`email`, `one-time-code`); see the HTML autocomplete values.
+  readonly autoComplete?: string;
   readonly disabled?: boolean;
   // Shown under the control when there is nothing wrong. Linked to it for assistive technology.
   readonly hint?: string;
   // What is wrong, in plain words. Present means the field is marked invalid.
   readonly error?: string | null;
+  // The on-screen keyboard to offer. A number field asks for the numeric one unless this says otherwise.
+  readonly inputMode?: "email" | "numeric" | "text";
   readonly label: string;
   readonly maxLength?: number;
   readonly multiline?: boolean;
   readonly onChange: (value: string) => void;
   readonly required?: boolean;
-  readonly type?: "number" | "text";
+  readonly type?: "email" | "number" | "text";
   readonly value: string;
 }
 
@@ -19,9 +23,11 @@ interface ArcadeTextFieldProps {
 // it, so what the person typed is never rewritten under them. The hint and the error are linked with
 // `aria-describedby`, and an error also sets `aria-invalid`.
 export function ArcadeTextField({
+  autoComplete,
   disabled = false,
   error = null,
   hint,
+  inputMode,
   label,
   maxLength,
   multiline = false,
@@ -35,6 +41,7 @@ export function ArcadeTextField({
   const common = {
     "aria-describedby": note === undefined ? undefined : noteId,
     "aria-invalid": error === null ? undefined : true,
+    autoComplete,
     disabled,
     maxLength,
     required,
@@ -52,7 +59,7 @@ export function ArcadeTextField({
       ) : (
         <input
           {...common}
-          inputMode={type === "number" ? "numeric" : undefined}
+          inputMode={inputMode ?? (type === "number" ? "numeric" : undefined)}
           onChange={(event) => onChange(event.target.value)}
           type={type}
         />

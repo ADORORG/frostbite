@@ -18,12 +18,16 @@ const noSetupLinks = () => {
 const noPasskeySignIn = () => {
   throw new Error("Passkey sign-in is not needed to render a page.");
 };
-const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[4]) =>
+const noEmailSignIn = () => {
+  throw new Error("Email sign-in is not needed to render a page.");
+};
+const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[5]) =>
   createAccountsEntrypoint(
     noWalletServices,
     null,
     noSetupLinks,
     noPasskeySignIn,
+    noEmailSignIn,
     service,
     signIn,
   );
@@ -122,6 +126,7 @@ describe("accounts entrypoint", () => {
       null,
       noSetupLinks,
       noPasskeySignIn,
+      noEmailSignIn,
       () => {
         throw new Error("passkeys are not needed to render the sign-in page");
       },

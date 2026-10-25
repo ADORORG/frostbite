@@ -13,6 +13,7 @@
     "./schema/auth": "./src/schema/auth.ts",
     "./schema/collection-submissions": "./src/schema/collection-submissions.ts",
     "./schema/collections": "./src/schema/collections.ts",
+    "./schema/contact-sign-in": "./src/schema/contact-sign-in.ts",
     "./schema/creator-admission": "./src/schema/creator-admission.ts",
     "./schema/derivatives": "./src/schema/derivatives.ts",
     "./schema/game-admin": "./src/schema/game-admin.ts",

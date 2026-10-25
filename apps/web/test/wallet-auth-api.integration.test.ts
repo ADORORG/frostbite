@@ -11,6 +11,11 @@ beforeAll(() => {
   process.env.APP_ENV = "test";
   process.env.NEXT_PUBLIC_APP_NAME = "Adorbitals test";
   process.env.PUBLIC_BASE_URL = "https://launch.example";
+  // What building the sign-in services reads; the email routes build theirs on the first request.
+  process.env.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS = "604800000";
+  process.env.AUTH_SESSION_IDLE_TIMEOUT_MS = "86400000";
+  process.env.PASSKEY_CHALLENGE_TIMEOUT_MS = "300000";
+  process.env.PASSKEY_RECENT_AUTH_WINDOW_MS = "600000";
 });
 
 const origin = "https://launch.example";
@@ -44,6 +49,8 @@ const publicPosts = [
   "auth/wallet/verify",
   "passkeys/sign-in/options",
   "passkeys/sign-in/verify",
+  "email/sign-in/request",
+  "email/sign-in/verify",
 ];
 
 describe("the wallet sign-in routes at the HTTP boundary", () => {
@@ -141,4 +148,59 @@ describe("the wallet sign-in routes at the HTTP boundary", () => {
       expect(response.headers.get("set-cookie")).toBeNull();
     },
   );
+
+  it.each([
+    ["no body fields", {}],
+    ["an empty address", { email: "" }],
+    ["an address of absurd length", { email: "a".repeat(400) }],
+    [
+      "a field nobody declared",
+      { email: "ada@example.com", userId: "someone" },
+    ],
+  ])(
+    "asks for an emailed code only with a valid request: %s",
+    async (_why, body) => {
+      const response = await post("email/sign-in/request", body);
+      expect(response.status).toBe(400);
+      expect(await code(response)).toBe("invalid_request");
+    },
+  );
+
+  it.each([
+    ["no code", { email: "ada@example.com" }],
+    ["an empty code", { code: "", email: "ada@example.com" }],
+    [
+      "a code of absurd length",
+      { code: "1".repeat(40), email: "ada@example.com" },
+    ],
+    [
+      "a field nobody declared",
+      { code: "123456", email: "ada@example.com", userId: "x" },
+    ],
+  ])(
+    "enters an emailed code only with a valid request: %s",
+    async (_why, body) => {
+      const response = await post("email/sign-in/verify", body);
+      expect(response.status).toBe(400);
+      expect(await code(response)).toBe("invalid_request");
+      expect(response.headers.get("set-cookie")).toBeNull();
+    },
+  );
+
+  // This process has no mail set up, so the platform says email sign-in is not available instead of pretending to send a code, and a
+  // code cannot sign anyone in.
+  it("answers that email sign-in is not available while no mail is set up", async () => {
+    const asked = await post("email/sign-in/request", {
+      email: "ada@example.com",
+    });
+    expect(asked.status).toBe(404);
+    expect(await code(asked)).toBe("not_found");
+    const entered = await post("email/sign-in/verify", {
+      code: "123456",
+      email: "ada@example.com",
+    });
+    expect(entered.status).toBe(401);
+    expect(await code(entered)).toBe("unauthorized");
+    expect(entered.headers.get("set-cookie")).toBeNull();
+  });
 });

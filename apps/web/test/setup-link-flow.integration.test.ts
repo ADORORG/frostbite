@@ -15,12 +15,13 @@ import {
   runMigrations,
   walletIdentities,
 } from "@ador/database";
-import { authMethods, createHeldMethodKinds } from "@ador/feature-accounts";
+import { createHeldMethodKinds } from "@ador/feature-accounts";
 import { createRedeemSetupLinkOperation } from "@ador/feature-accounts/setup-operation";
 import { correlationIdSchema } from "@ador/shared/http";
 import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { authMethods } from "../../../configs/auth-methods";
 import { authorizationPolicy } from "../../../configs/authorization";
 
 // The setup link as the page drives it, against real PostgreSQL: the HTTP operation, the service and the platform's real sign-in

@@ -14,6 +14,7 @@ import { inArray } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { mintSetupLink } from "../src/link.ts";
+import { createAuthMethods } from "@ador/feature-accounts/methods";
 import { createSetupLinkServiceFor } from "../src/services.ts";
 
 // The command's own wiring against a real database: the service it builds is the platform's (the sign-in method registry reads the
@@ -21,7 +22,10 @@ import { createSetupLinkServiceFor } from "../src/services.ts";
 const environment = parseDatabaseEnvironment(process.env);
 const pool = createDatabasePool(environment);
 const database = createDatabaseClient(pool);
-const service = createSetupLinkServiceFor(database);
+const service = createSetupLinkServiceFor(
+  database,
+  createAuthMethods({ email: false }),
+);
 const baseUrl = "https://launch.example.com";
 const created: UuidV7[] = [];
 
