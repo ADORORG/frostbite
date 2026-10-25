@@ -36,6 +36,12 @@ Game rewards page, and the platform records them when each step completes (`ador
 
    Neither is ever chosen automatically: when the source fails, nothing is guessed.
 
+   **Looked at when the server starts.** With `REWARDS_FEE_API_URL` set, the server asks that explorer once as it starts and reads
+   all four levels. If it cannot be reached, answers with an error status, or does not answer as mempool.space does, the server does
+   not start and says so: `REWARDS_FEE_API_URL (host) is not usable: <reason>`. Fix the address, or blank the setting. The cost is
+   that an explorer that is down for a moment at start also stops the start; start again. The network's default explorer and a fixed
+   rate are not looked at (a fixed rate has nothing to ask).
+
 To move a deployment between test networks, set `BETA_NETWORK`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
 network, apply migrations (`wallet_network_testnet4` widens the wallet network checks), run the preflight, restart, and connect a
 wallet set to the same network. Games, collections and records made on the other network stay on it (their chain ids differ).

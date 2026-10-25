@@ -20,6 +20,7 @@ import {
 } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
+import { feeSourceStartupCheck } from "./rewards-startup.ts";
 import { betaChain, type BetaChain } from "./chains.ts";
 import { defaultFeeTargetBlocks, rewardsPolicy } from "./rewards-policy.ts";
 
@@ -55,6 +56,10 @@ export interface RewardsChain {
     // The most one step may pay in fees, in satoshis.
     readonly maxFeeSats: number;
   };
+  // Looks at the one outside thing the operator named that nothing else would look at until someone's first step: the explorer of
+  // `REWARDS_FEE_API_URL`. Rejects, saying which setting and why, when it cannot be reached or does not answer as an explorer does;
+  // the server then does not start. Resolves at once where no explorer was named.
+  startupCheck(): Promise<void>;
 }
 
 // The chain's record: every operation held to the confirmations decided for the beta's test network, and the gate the policy states.
@@ -106,6 +111,7 @@ function configuredChain(
   environment: RewardsChainEnvironment,
   platform: RewardsPlatform,
   beta: BetaChain,
+  feeApi: FeeSourceSettings,
 ): ConfiguredChain {
   const directory = environment.templatesDirectory;
   return {
@@ -124,7 +130,7 @@ function configuredChain(
                 templates: rewardsPolicy.templates,
               },
         chain: chainRefSchema.parse(beta.chain.chainId),
-        feeApi: feeSourceSettings(environment, platform, beta),
+        feeApi,
         maxPreviewBytes: rewardsPolicy.maxPreviewBytes,
         network: beta.network,
         now: platform.now,
@@ -185,7 +191,8 @@ export function createRewardsChain(
 ): RewardsChain | null {
   if (environment === null) return null;
   const served = chainRefSchema.parse(beta.chain.chainId);
-  const configured = configuredChain(environment, platform, beta);
+  const feeApi = feeSourceSettings(environment, platform, beta);
+  const configured = configuredChain(environment, platform, beta, feeApi);
   const registry = createConfiguredRegistry([configured]);
   const ports = portsOf(registry, platform, served);
   const offered = registry.broadcastAllowed(served)
@@ -193,6 +200,7 @@ export function createRewardsChain(
     : null;
   return {
     chain: (chain) => (chain === served ? offered : null),
+    startupCheck: () => feeSourceStartupCheck(environment, feeApi),
     // Reading how far the indexer has come moves nothing, so it does not wait on the release gate that guards sending.
     followed: {
       accepts: (address) => {

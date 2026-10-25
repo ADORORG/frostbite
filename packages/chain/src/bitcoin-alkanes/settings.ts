@@ -11,6 +11,7 @@ import {
 import {
   createFeeApi,
   createFixedFeeApi,
+  feeProbeTargets,
   type FeeApi,
   type GetLike,
 } from "./node/fee-api.ts";
@@ -150,4 +151,14 @@ function feeSourceOf(source: FeeSourceSettings | null): FeeApi | undefined {
   return source.kind === "fixed"
     ? createFixedFeeApi(source.satPerVb)
     : createFeeApi(source);
+}
+
+// Looks once at the explorer the operator named, reading every level the platform will use, so a wrong address or an answer of the
+// wrong shape is found when the platform starts and not at someone's first step. Rejects as `createFeeApi` does. A fixed rate, the
+// node's own estimates and no source have nothing to look at.
+export async function probeFeeSource(
+  source: FeeSourceSettings | null,
+): Promise<void> {
+  if (source === null || source.kind !== "explorer") return;
+  await createFeeApi(source).feeRates(feeProbeTargets);
 }

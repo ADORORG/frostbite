@@ -32,6 +32,13 @@ const levels = [
 ] as const;
 const slowest = "economyFee";
 
+// One target for each level the explorer names, so a look at the answer reads every field the platform will later use.
+const levelTargets = levels.map(({ upToBlocks }) => upToBlocks);
+export const feeProbeTargets: readonly number[] = [
+  ...levelTargets,
+  Math.max(...levelTargets) + 1,
+];
+
 function rateOf(fees: JsonRecord, field: string): number {
   const rate = fees[field];
   if (typeof rate !== "number" || !Number.isFinite(rate) || rate <= 0) {
