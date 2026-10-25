@@ -34,5 +34,24 @@ export function describeChain(environment: NodeJS.ProcessEnv): string {
     host = "an address that is not a URL";
   }
   const network = environment.BETA_NETWORK?.trim() || "signet";
-  return `Rewards chain: ${network}, through ${host}. Staff steps sent from here are real transactions on that network.`;
+  return `Rewards chain: ${network}, through ${host}. ${describeFeeSource(environment)} Staff steps sent from here are real transactions on that network.`;
+}
+
+// Where the fee levels come from, said plainly: a fixed rate is the operator's number and is not live, and the page must not be
+// mistaken for the network's own recommendation.
+function describeFeeSource(environment: NodeJS.ProcessEnv): string {
+  const rate = environment.REWARDS_FEE_RATE_SAT_VB?.trim() ?? "";
+  const url = environment.REWARDS_FEE_API_URL?.trim() ?? "";
+  if (rate !== "" && url !== "")
+    return "Both REWARDS_FEE_RATE_SAT_VB and REWARDS_FEE_API_URL are set; they are alternatives and the web server will refuse to start until one is blank.";
+  if (rate !== "")
+    return `Fee rate: FIXED at ${rate} sat/vB by REWARDS_FEE_RATE_SAT_VB (not live).`;
+  if (url !== "") {
+    try {
+      return `Fee levels from ${new URL(url).host} (REWARDS_FEE_API_URL).`;
+    } catch {
+      return "Fee levels from an address that is not a URL (REWARDS_FEE_API_URL).";
+    }
+  }
+  return "Fee levels from the network's default explorer.";
 }

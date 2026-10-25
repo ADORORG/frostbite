@@ -122,4 +122,48 @@ describe("the services the adapter is wired to", () => {
       alkanesServices({ ...settings, administration: null }).administration,
     ).toBeUndefined();
   });
+
+  it("take fee rates from an explorer, from the operator's fixed rate, or from the node", async () => {
+    const asked: string[] = [];
+    const explorer = {
+      ...settings,
+      feeApi: {
+        fetch: (url: string) => {
+          asked.push(url);
+          return Promise.resolve({
+            json: () =>
+              Promise.resolve({
+                economyFee: 1,
+                fastestFee: 9,
+                halfHourFee: 8,
+                hourFee: 7,
+              }),
+            ok: true,
+            status: 200,
+          });
+        },
+        kind: "explorer",
+        timeoutMs: 400,
+        url: "https://fees.example.invalid/signet",
+      },
+    } satisfies AlkanesChainSettings;
+    const chain = settings.chain;
+    const rateOf = (value: AlkanesChainSettings) =>
+      alkanesServices(value).nodes.get(chain)?.feeRate(1);
+    expect(await rateOf(explorer)).toBe(9);
+    expect(asked).toEqual([
+      "https://fees.example.invalid/signet/api/v1/fees/recommended",
+    ]);
+    expect(
+      await rateOf({ ...settings, feeApi: { kind: "fixed", satPerVb: 2.5 } }),
+    ).toBe(2.5);
+    // With no source it is the node that is asked; here the node is offline.
+    await expect(rateOf({ ...settings, feeApi: null })).rejects.toThrow();
+  });
+
+  it("stop boot on a fixed rate that cannot be one", () => {
+    expect(() =>
+      alkanesServices({ ...settings, feeApi: { kind: "fixed", satPerVb: 0 } }),
+    ).toThrow("positive number");
+  });
 });

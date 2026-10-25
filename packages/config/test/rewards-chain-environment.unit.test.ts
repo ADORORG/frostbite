@@ -20,6 +20,7 @@ describe("the rewards chain environment", () => {
 
   it("reads a node with the safe defaults: the standard timeout and no templates directory", () => {
     expect(parseRewardsChainEnvironment(node)).toEqual({
+      feeSource: { kind: "default" },
       maxFeeSats: 20_000n,
       rpcHeaders: {},
       rpcTimeoutMs: 15_000,
@@ -36,6 +37,7 @@ describe("the rewards chain environment", () => {
         REWARDS_TEMPLATES_DIR: " /srv/templates ",
       }),
     ).toEqual({
+      feeSource: { kind: "default" },
       maxFeeSats: 20_000n,
       rpcHeaders: {},
       rpcTimeoutMs: 5000,
@@ -114,5 +116,79 @@ describe("the rewards chain environment", () => {
     expect(
       parseRewardsChainEnvironment({ REWARDS_CHAIN_RPC_API_KEY: "k3y" }),
     ).toBeNull();
+  });
+
+  describe("the fee source", () => {
+    it("is the network's own explorer unless one of the two settings is given", () => {
+      expect(parseRewardsChainEnvironment(node)?.feeSource).toEqual({
+        kind: "default",
+      });
+      expect(
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_URL: "  ",
+          REWARDS_FEE_RATE_SAT_VB: " ",
+        })?.feeSource,
+      ).toEqual({ kind: "default" });
+    });
+
+    it("can be another explorer, whose address is read as typed once trimmed", () => {
+      expect(
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_URL: " https://fees.example.org/signet ",
+        })?.feeSource,
+      ).toEqual({ kind: "explorer", url: "https://fees.example.org/signet" });
+    });
+
+    it("can be a fixed rate, which may have a fraction", () => {
+      expect(
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_RATE_SAT_VB: "2.5",
+        })?.feeSource,
+      ).toEqual({
+        kind: "fixed",
+        satPerVb: 2.5,
+      });
+    });
+
+    it("refuses both together, an address that is not a web address, and a rate that is zero, negative, not a number or implausibly large", () => {
+      expect(() =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_URL: "https://a.example.org",
+          REWARDS_FEE_RATE_SAT_VB: "2",
+        }),
+      ).toThrow("alternatives");
+      expect(() =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_URL: "ftp://a.example.org",
+        }),
+      ).toThrow();
+      expect(() =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_URL: "not a url",
+        }),
+      ).toThrow();
+      for (const bad of ["0", "-1", "fast", "1000.01", "588235"])
+        expect(() =>
+          parseRewardsChainEnvironment({
+            ...node,
+            REWARDS_FEE_RATE_SAT_VB: bad,
+          }),
+        ).toThrow();
+      expect(
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_RATE_SAT_VB: "1000",
+        })?.feeSource,
+      ).toEqual({
+        kind: "fixed",
+        satPerVb: 1000,
+      });
+    });
   });
 });

@@ -8,7 +8,12 @@ import {
   createBitcoinAlkanesAdapter,
   type BitcoinAlkanesNodes,
 } from "./adapter.ts";
-import { createFeeApi, type GetLike } from "./node/fee-api.ts";
+import {
+  createFeeApi,
+  createFixedFeeApi,
+  type FeeApi,
+  type GetLike,
+} from "./node/fee-api.ts";
 import { createRpcNode } from "./node/node.ts";
 import { createJsonRpc, type FetchLike } from "./node/transport.ts";
 import type { TransactionOptions } from "./options.ts";
@@ -56,18 +61,25 @@ export interface AlkanesAdministrationSettings {
   readonly templates: readonly TemplateSetting[];
 }
 
+export type FeeSourceSettings =
+  | {
+      readonly fetch: GetLike;
+      readonly kind: "explorer";
+      readonly timeoutMs: number;
+      readonly url: string;
+    }
+  | { readonly kind: "fixed"; readonly satPerVb: number };
+
 // Everything the `bitcoin-alkanes` adapter needs for one chain, from configuration. Nothing here is defaulted: the caller states it.
 export interface AlkanesChainSettings {
   // `null`: the adapter reads and builds claims but refuses staff steps.
   readonly administration: AlkanesAdministrationSettings | null;
   readonly chain: ChainRef;
-  // Where fee rates come from: a public explorer's recommendation, in place of the node's own estimates (see `createFeeApi`).
-  // `null`: the node's estimates are used (a chain whose node prices fees sensibly, such as a local regtest).
-  readonly feeApi: {
-    readonly fetch: GetLike;
-    readonly timeoutMs: number;
-    readonly url: string;
-  } | null;
+  // Where fee rates come from, in place of the node's own estimates:
+  // - `explorer`: a public explorer's recommendation (see `createFeeApi`);
+  // - `fixed`: a rate the operator set, for when no explorer can be reached (see `createFixedFeeApi`);
+  // - `null`: the node's estimates are used (a chain whose node prices fees sensibly, such as a local regtest).
+  readonly feeApi: FeeSourceSettings | null;
   readonly maxPreviewBytes: number;
   readonly network: BitcoinNetwork;
   readonly now: () => Date;
@@ -112,7 +124,7 @@ export function alkanesServices(
             timeoutMs: settings.rpc.timeoutMs,
             url: settings.rpc.url,
           }),
-          settings.feeApi === null ? undefined : createFeeApi(settings.feeApi),
+          feeSourceOf(settings.feeApi),
         ),
       ],
     ]),
@@ -131,4 +143,11 @@ export function createAlkanesAdapter(
     new Map([[settings.chain, settings.network]]),
     alkanesServices(settings),
   );
+}
+
+function feeSourceOf(source: FeeSourceSettings | null): FeeApi | undefined {
+  if (source === null) return undefined;
+  return source.kind === "fixed"
+    ? createFixedFeeApi(source.satPerVb)
+    : createFeeApi(source);
 }

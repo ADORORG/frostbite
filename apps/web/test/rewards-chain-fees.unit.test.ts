@@ -9,6 +9,7 @@ import {
 } from "../../../configs/rewards-chain.ts";
 
 const environment: RewardsChainEnvironment = {
+  feeSource: { kind: "default" },
   maxFeeSats: 25_000n,
   rpcHeaders: {},
   rpcTimeoutMs: 400,
@@ -19,6 +20,7 @@ const environment: RewardsChainEnvironment = {
 // A node whose own fee estimates are the absurd ones the hosted gateways gave, and an explorer that recommends sensible ones.
 function world() {
   const explorerAsked: string[] = [];
+  const explorerSignals: AbortSignal[] = [];
   const nodeAsked: string[] = [];
   const platform: RewardsPlatform = {
     fetch: async (_address, init) => {
@@ -35,8 +37,9 @@ function world() {
         status: 200,
       };
     },
-    get: async (address) => {
+    get: async (address, init) => {
       explorerAsked.push(address);
+      explorerSignals.push(init.signal);
       return {
         json: () =>
           Promise.resolve({
@@ -54,7 +57,7 @@ function world() {
     random: (length) => new Uint8Array(length),
     readFile: () => Promise.reject(new Error("no disk in this test")),
   };
-  return { explorerAsked, nodeAsked, platform };
+  return { explorerAsked, explorerSignals, nodeAsked, platform };
 }
 
 describe("the fee rates of the beta networks", () => {
@@ -79,4 +82,58 @@ describe("the fee rates of the beta networks", () => {
       expect(nodeAsked).not.toContain("esplora_fee-estimates");
     });
   }
+
+  describe("when the operator names another explorer", () => {
+    for (const [name, beta] of Object.entries(betaChains)) {
+      it(`${name}: are asked of that explorer and not the network's own`, async () => {
+        const { explorerAsked, explorerSignals, nodeAsked, platform } = world();
+        const rewards = createRewardsChain(
+          {
+            ...environment,
+            feeSource: {
+              kind: "explorer",
+              url: "https://fees.example.invalid/mirror",
+            },
+          },
+          platform,
+          beta,
+        );
+        const chain = chainRefSchema.parse(beta.chain.chainId);
+        const rates = await rewards
+          ?.chain(chain)
+          ?.ports.observer.feeRates(chain, [1]);
+        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([3]);
+        expect(explorerAsked).toEqual([
+          "https://fees.example.invalid/mirror/api/v1/fees/recommended",
+        ]);
+        expect(nodeAsked).not.toContain("esplora_fee-estimates");
+        // The explorer is given the deployment's time limit (400 ms here), not a shorter one.
+        await new Promise((resolve) => setTimeout(resolve, 40));
+        expect(explorerSignals.map(({ aborted }) => aborted)).toEqual([false]);
+      });
+    }
+  });
+
+  describe("when the operator sets a fixed rate", () => {
+    for (const [name, beta] of Object.entries(betaChains)) {
+      it(`${name}: is used for every confirmation target, and nobody is asked`, async () => {
+        const { explorerAsked, nodeAsked, platform } = world();
+        const rewards = createRewardsChain(
+          { ...environment, feeSource: { kind: "fixed", satPerVb: 2.5 } },
+          platform,
+          beta,
+        );
+        const chain = chainRefSchema.parse(beta.chain.chainId);
+        const rates = await rewards
+          ?.chain(chain)
+          ?.ports.observer.feeRates(chain, [1, 3, 25]);
+        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([2.5, 2.5, 2.5]);
+        expect(rates?.map(({ targetBlocks }) => targetBlocks)).toEqual([
+          1, 3, 25,
+        ]);
+        expect(explorerAsked).toEqual([]);
+        expect(nodeAsked).not.toContain("esplora_fee-estimates");
+      });
+    }
+  });
 });

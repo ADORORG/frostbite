@@ -13,6 +13,7 @@ export type { FetchLike } from "./bitcoin-alkanes/node/transport.ts";
 export type {
   AlkanesAdministrationSettings,
   AlkanesChainSettings,
+  FeeSourceSettings,
   TemplateSetting,
 } from "./bitcoin-alkanes/settings.ts";
 

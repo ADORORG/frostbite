@@ -1,3 +1,4 @@
+import { feeSourceEnvironmentDefinitions } from "./fee-definitions.ts";
 import { mailEnvironmentDefinitions } from "./mail-definitions.ts";
 
 export const environmentNames = [
@@ -286,6 +287,7 @@ const coreDefinitions = [
 export const environmentDefinitions = [
   ...coreDefinitions,
   ...mailEnvironmentDefinitions,
+  ...feeSourceEnvironmentDefinitions,
 ] as const;
 
 export const environmentKeys = environmentDefinitions.map(({ key }) => key);

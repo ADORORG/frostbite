@@ -4,6 +4,7 @@ import type { JsonValue } from "@ador/shared/chain";
 import { NodeUnavailableError } from "../../src/bitcoin-alkanes/node/errors.ts";
 import {
   createFeeApi,
+  createFixedFeeApi,
   type GetLike,
 } from "../../src/bitcoin-alkanes/node/fee-api.ts";
 import { createRpcNode } from "../../src/bitcoin-alkanes/node/node.ts";
@@ -164,5 +165,32 @@ describe("a node given a fee source", () => {
     const node = createRpcNode(rpc);
     expect(await node.feeRate(1)).toBe(588235.294);
     expect(asked).toEqual(["esplora_fee-estimates"]);
+  });
+});
+
+describe("a fee rate the operator set", () => {
+  it("is the rate for every confirmation target, as many as are asked", async () => {
+    expect(await createFixedFeeApi(2.5).feeRates([1, 3, 25])).toEqual([
+      { satPerVb: 2.5, targetBlocks: 1 },
+      { satPerVb: 2.5, targetBlocks: 3 },
+      { satPerVb: 2.5, targetBlocks: 25 },
+    ]);
+    expect(await createFixedFeeApi(1).feeRates([])).toEqual([]);
+  });
+
+  it("replaces the node's absurd estimates and asks nobody", async () => {
+    const { asked, rpc } = absurdNode();
+    const node = createRpcNode(rpc, createFixedFeeApi(3));
+    expect(await node.feeRate(1)).toBe(3);
+    expect(await node.feeRates([1, 6])).toEqual([
+      { satPerVb: 3, targetBlocks: 1 },
+      { satPerVb: 3, targetBlocks: 6 },
+    ]);
+    expect(asked).toEqual([]);
+  });
+
+  it("refuses a rate that is not a positive number, when it is made and not at the first step", () => {
+    for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY])
+      expect(() => createFixedFeeApi(bad)).toThrow("positive number of sat/vB");
   });
 });

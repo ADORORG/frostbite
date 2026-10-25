@@ -88,3 +88,16 @@ export function createFeeApi(options: FeeApiOptions): FeeApi {
     },
   };
 }
+
+// A fee rate the operator has set, for every confirmation target, in place of asking a source. For when no explorer can be reached from
+// where the platform runs; the rate is theirs to keep honest, so it is a setting they must choose, never a fallback the adapter takes by
+// itself when a source fails.
+export function createFixedFeeApi(satPerVb: number): FeeApi {
+  if (!Number.isFinite(satPerVb) || satPerVb <= 0) {
+    throw new Error("A fixed fee rate must be a positive number of sat/vB.");
+  }
+  return {
+    feeRates: async (targets) =>
+      targets.map((target) => ({ satPerVb, targetBlocks: target })),
+  };
+}

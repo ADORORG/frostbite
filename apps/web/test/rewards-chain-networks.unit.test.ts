@@ -19,6 +19,7 @@ import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 import { walletAuthConfig } from "../../../configs/wallet.ts";
 
 const environment: RewardsChainEnvironment = {
+  feeSource: { kind: "default" },
   maxFeeSats: 25_000n,
   rpcHeaders: {},
   rpcTimeoutMs: 400,

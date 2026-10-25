@@ -21,6 +21,20 @@ Game rewards page, and the platform records them when each step completes (`ador
 5. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
    SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
+6. **Where the fee rate comes from.** Every step needs a fee rate, and the platform takes it from the network's public explorer
+   (`mempool.space/<network>`), never from the node's own estimates, which on the hosted test networks are absurd (hundreds of sat/vB
+   on signet, hundreds of thousands on testnet4). If that explorer cannot be reached from where the platform runs, a step fails with
+   "The fee source could not be reached." (a claim shows "The network could not be reached"). Two optional settings, alternatives
+   (both set stops boot):
+   - `REWARDS_FEE_API_URL`: another explorer that answers like mempool.space (its address up to the network, such as
+     `https://fees.example.org/signet`), for a mirror or one of your own. Check it first:
+     `curl <address>/api/v1/fees/recommended` must print `fastestFee`, `halfHourFee`, `hourFee` and `economyFee`.
+   - `REWARDS_FEE_RATE_SAT_VB`: a fixed rate (up to 1000, a fraction is fine) used for every step and every speed. It is yours to
+     keep honest: it does not follow the network, so a rate that is too low leaves a step unconfirmed and one that is too high wastes
+     fee. Each step's total fee is still held to `REWARDS_MAX_FEE_SATS`. The local stack's startup line says when a fixed rate is in
+     use.
+
+   Neither is ever chosen automatically: when the source fails, nothing is guessed.
 
 To move a deployment between test networks, set `BETA_NETWORK`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
 network, apply migrations (`wallet_network_testnet4` widens the wallet network checks), run the preflight, restart, and connect a

@@ -6,6 +6,7 @@ import {
   createConfiguredRegistry,
   feeCeiling,
   type ConfiguredChain,
+  type FeeSourceSettings,
   type FetchLike,
   type GetLike,
 } from "@ador/chain/configured";
@@ -83,6 +84,24 @@ export function chainConfig(beta: BetaChain = betaChain): ChainConfig {
   };
 }
 
+// Where this chain's fee levels come from: the operator's fixed rate if they set one, else an explorer (their choice of address, or
+// the network's own).
+function feeSourceSettings(
+  environment: RewardsChainEnvironment,
+  platform: RewardsPlatform,
+  beta: BetaChain,
+): FeeSourceSettings {
+  const { feeSource } = environment;
+  if (feeSource.kind === "fixed")
+    return { kind: "fixed", satPerVb: feeSource.satPerVb };
+  return {
+    fetch: platform.get,
+    kind: "explorer",
+    timeoutMs: environment.rpcTimeoutMs,
+    url: feeSource.kind === "explorer" ? feeSource.url : beta.feeApiUrl,
+  };
+}
+
 function configuredChain(
   environment: RewardsChainEnvironment,
   platform: RewardsPlatform,
@@ -105,11 +124,7 @@ function configuredChain(
                 templates: rewardsPolicy.templates,
               },
         chain: chainRefSchema.parse(beta.chain.chainId),
-        feeApi: {
-          fetch: platform.get,
-          timeoutMs: environment.rpcTimeoutMs,
-          url: beta.feeApiUrl,
-        },
+        feeApi: feeSourceSettings(environment, platform, beta),
         maxPreviewBytes: rewardsPolicy.maxPreviewBytes,
         network: beta.network,
         now: platform.now,
