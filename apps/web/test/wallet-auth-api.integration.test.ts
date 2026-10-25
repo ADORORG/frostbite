@@ -39,7 +39,12 @@ const protectedPosts = [
   // Opening a first-administrator setup link is for someone signed in.
   "auth/setup-link/redeem",
 ];
-const publicPosts = ["auth/wallet/challenge", "auth/wallet/verify"];
+const publicPosts = [
+  "auth/wallet/challenge",
+  "auth/wallet/verify",
+  "passkeys/sign-in/options",
+  "passkeys/sign-in/verify",
+];
 
 describe("the wallet sign-in routes at the HTTP boundary", () => {
   it.each(protectedPosts)(
@@ -115,4 +120,25 @@ describe("the wallet sign-in routes at the HTTP boundary", () => {
     expect(response.status).toBe(400);
     expect(await code(response)).toBe("invalid_request");
   });
+
+  it.each([
+    ["no body fields", {}],
+    ["a challenge id that is not one", { challengeId: "x", credential: {} }],
+    [
+      "a field nobody declared",
+      {
+        challengeId: "01890f0e-7c8a-7b3a-8a3e-0123456789ab",
+        credential: {},
+        userId: "someone",
+      },
+    ],
+  ])(
+    "finishes a passkey sign-in only with a valid request: %s",
+    async (_why, body) => {
+      const response = await post("passkeys/sign-in/verify", body);
+      expect(response.status).toBe(400);
+      expect(await code(response)).toBe("invalid_request");
+      expect(response.headers.get("set-cookie")).toBeNull();
+    },
+  );
 });

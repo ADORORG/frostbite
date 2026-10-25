@@ -54,6 +54,10 @@ export {
   type WalletIdentity,
 } from "./schema/auth.ts";
 export {
+  passkeySignInChallenges,
+  type PasskeySignInChallenge,
+} from "./schema/passkey-sign-in.ts";
+export {
   creatorAdmissionEvents,
   creatorApplications,
   creatorApplicationSnapshots,

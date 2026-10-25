@@ -13,6 +13,8 @@ const factories = vi.hoisted(() => ({
   databaseEnvironment: vi.fn(() => "database-environment"),
   databasePool: vi.fn(() => "pool"),
   passkeyRepository: vi.fn(() => "repository"),
+  signInRepository: vi.fn(() => "sign-in-repository"),
+  signInService: vi.fn(() => ({ signInService: true })),
   passkeyService: vi.fn((input: { readonly clock: () => Date }) => {
     input.clock();
     return { service: true };
@@ -26,7 +28,10 @@ const factories = vi.hoisted(() => ({
 
 vi.mock("@ador/auth", () => ({
   createDrizzlePasskeyRepository: factories.passkeyRepository,
+  createDrizzlePasskeySignInRepository: factories.signInRepository,
   createPasskeyLinkingService: factories.passkeyService,
+  createPasskeySignInService: factories.signInService,
+  simpleWebAuthnAuthenticationAdapter: "authentication-adapter",
   simpleWebAuthnRegistrationAdapter: "adapter",
 }));
 vi.mock("@ador/database/connection", () => ({
@@ -43,7 +48,7 @@ vi.mock("@repo/config/env", () => ({
 const methods: AccountMethods = {
   describe: () => [
     { assurance: "strong", canSignIn: true, kind: "wallet" },
-    { assurance: "strong", canSignIn: false, kind: "passkey" },
+    { assurance: "basic", canSignIn: false, kind: "phone" },
     { assurance: "standard", canSignIn: true, kind: "email" },
   ],
   list: vi.fn(async () => []),
@@ -80,8 +85,30 @@ describe("passkey runtime composition", () => {
     );
   });
 
-  it("offers on the sign-in page the registered methods that can start a session, in registration order, and not a passkey, which cannot yet", async () => {
+  it("offers on the sign-in page the registered methods that can start a session, in registration order, and not one that can only be linked", async () => {
     const { offeredSignInKinds } = await import("../src/runtime.ts");
     expect(offeredSignInKinds(methods)).toEqual(["wallet", "email"]);
+  });
+
+  it("builds one passkey sign-in service, under the same policy as linking, over the real repository", async () => {
+    const { createPasskeySignInResolver } = await import("../src/runtime.ts");
+    const getService = createPasskeySignInResolver();
+    const first = getService();
+    expect(getService()).toBe(first);
+    expect(factories.signInService).toHaveBeenCalledOnce();
+    expect(factories.signInRepository).toHaveBeenCalledWith("database");
+    expect(factories.signInService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        adapter: "authentication-adapter",
+        policy: expect.objectContaining({
+          challengeLifetimeMs: 300_000,
+          expectedOrigin: "https://launch.invalid",
+          relyingPartyId: "launch.invalid",
+          sessionAbsoluteLifetimeMs: 604_800_000,
+          sessionIdleLifetimeMs: 86_400_000,
+        }),
+        repository: "sign-in-repository",
+      }),
+    );
   });
 });

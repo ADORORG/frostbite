@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { authMethods, createHeldMethodKinds } from "../src/methods.ts";
 
 describe("the sign-in methods this deployment offers", () => {
-  it("are the wallet, which can start a session, and the passkey, which can be linked but cannot yet", () => {
+  it("are the wallet and the passkey, and both can start a session", () => {
     expect(authMethods.describe()).toEqual([
       { assurance: "strong", canSignIn: true, kind: "wallet" },
-      { assurance: "strong", canSignIn: false, kind: "passkey" },
+      { assurance: "strong", canSignIn: true, kind: "passkey" },
     ]);
   });
 

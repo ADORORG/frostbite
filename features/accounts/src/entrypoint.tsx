@@ -5,13 +5,17 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 
 import { createBalanceOperation } from "./application/balance-operation.ts";
 import type { BalanceSource } from "./balance/source.ts";
+import { createPasskeySignInOperations } from "./application/passkey-sign-in-operations.ts";
 import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
 import { createWalletSignInOperations } from "./application/wallet-sign-in-operations.ts";
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
-import type { createPasskeyLinkingService } from "@ador/auth";
+import type {
+  createPasskeyLinkingService,
+  PasskeySignInService,
+} from "@ador/auth";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
 import { SetupPage } from "./ui/setup-page.tsx";
@@ -50,6 +54,7 @@ export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
   balanceSource: BalanceSource | null,
   getSetupLinks: () => SetupLinkService,
+  getPasskeySignIn: () => PasskeySignInService,
   getService: () => PasskeyService,
   // What the sign-in page needs of the platform: the kinds of method the deployment offers, and the network a wallet is asked for.
   signIn: {
@@ -58,6 +63,8 @@ export function createAccountsEntrypoint(
   },
 ): FeatureEntrypoint {
   const [list, begin, finish, unlink] = createPasskeyOperations(getService);
+  const [beginPasskeySignIn, finishPasskeySignIn] =
+    createPasskeySignInOperations(getPasskeySignIn);
   const [beginSignIn, verifySignIn, signOut] =
     createWalletSignInOperations(getWalletServices);
   const [
@@ -81,6 +88,8 @@ export function createAccountsEntrypoint(
       registerHttpOperation(begin),
       registerHttpOperation(finish),
       registerHttpOperation(unlink),
+      registerHttpOperation(beginPasskeySignIn),
+      registerHttpOperation(finishPasskeySignIn),
       registerHttpOperation(beginSignIn),
       registerHttpOperation(verifySignIn),
       registerHttpOperation(signOut),

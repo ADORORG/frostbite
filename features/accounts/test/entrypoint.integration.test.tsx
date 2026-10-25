@@ -15,11 +15,15 @@ const signIn = { network: "signet", offered: () => ["wallet"] } as const;
 const noSetupLinks = () => {
   throw new Error("The setup links are not needed to render a page.");
 };
-const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[3]) =>
+const noPasskeySignIn = () => {
+  throw new Error("Passkey sign-in is not needed to render a page.");
+};
+const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[4]) =>
   createAccountsEntrypoint(
     noWalletServices,
     null,
     noSetupLinks,
+    noPasskeySignIn,
     service,
     signIn,
   );
@@ -117,6 +121,7 @@ describe("accounts entrypoint", () => {
       noWalletServices,
       null,
       noSetupLinks,
+      noPasskeySignIn,
       () => {
         throw new Error("passkeys are not needed to render the sign-in page");
       },

@@ -10,7 +10,8 @@ with it, links and removes wallets and signs out. The public `/sign-in` page (AD
 registry says can start a session, each in its own panel (`src/sign-in/`: `registry.ts` lists how each kind is shown, so a new method
 is one view there plus its adapter in `runtime.ts`); a protected page sends a signed-out visitor to it with `?returnTo=` (checked by
 `safeReturnPath` in `@ador/shared/auth/sign-in-path`: a plain path on this site, never the sign-in page, the API or another site),
-and it goes on to that page once the server says the visitor is signed in. The public `/setup` page and `POST /api/v1/auth/setup-link/redeem`
+and it goes on to that page once the server says the visitor is signed in. Passkeys sign in on the same page (`src/sign-in/passkey-sign-in*.ts(x)`; `POST /api/v1/passkeys/sign-in/options` and
+`/verify`, both public, each with its own rate limit). The public `/setup` page and `POST /api/v1/auth/setup-link/redeem`
 open the single-use link that makes the first administrator (ADR-021; `src/setup/`): the token follows the link's `#`, so the server
 never sees it in an address; the page saves it for the visit, clears it from the address bar, and opens the link for whoever is signed
 in (asking them to sign in if nobody is). It says "administrator" only after the server granted it, and a person missing a wallet is told

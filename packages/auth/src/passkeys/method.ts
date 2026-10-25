@@ -6,10 +6,10 @@ import type { MethodAdapter } from "../methods/contracts.ts";
 
 export const passkeyMethodKind = "passkey";
 
-// A passkey: strong, and link-only until passkey sign-in is built (then `canSignIn` becomes true and nothing else changes).
+// A passkey: strong, and it can start a session (the sign-in ceremony is `sign-in-service.ts`).
 export const passkeyMethod: MethodAdapter<DatabaseTransaction> = {
   assurance: "strong",
-  canSignIn: false,
+  canSignIn: true,
   kind: passkeyMethodKind,
   list: async (transaction, userId) =>
     (

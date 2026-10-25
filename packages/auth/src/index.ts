@@ -22,6 +22,19 @@ export type {
   SessionRepository,
 } from "./application/session-repository.ts";
 export { createPasskeyLinkingService } from "./passkeys/service.ts";
+export { createPasskeySignInService } from "./passkeys/sign-in-service.ts";
+export type {
+  PasskeySignInPolicy,
+  PasskeySignInService,
+} from "./passkeys/sign-in-service.ts";
+export { createDrizzlePasskeySignInRepository } from "./passkeys/drizzle-sign-in-repository.ts";
+export { simpleWebAuthnAuthenticationAdapter } from "./passkeys/simplewebauthn-authentication.ts";
+export type {
+  PasskeyAuthenticationAdapter,
+  PasskeyAuthenticationOptions,
+  PasskeyAuthenticationPayload,
+  PasskeySignInFailure,
+} from "./passkeys/sign-in-contracts.ts";
 export { createDrizzlePasskeyRepository } from "./passkeys/drizzle-repository.ts";
 export { simpleWebAuthnRegistrationAdapter } from "./passkeys/simplewebauthn-adapter.ts";
 export type {
@@ -43,11 +56,16 @@ export {
   passkeyListResponseSchema,
   passkeyMutationResponseSchema,
   passkeyRoutes,
+  passkeySignedInResponseSchema,
+  passkeySignInBeginResponseSchema,
+  passkeySignInFinishInputSchema,
   passkeyUnlinkInputSchema,
   type PasskeyBeginResponse,
   type PasskeyFinishInput,
   type PasskeyListResponse,
   type PasskeyMutationResponse,
+  type PasskeySignInBeginResponse,
+  type PasskeySignInFinishInput,
   type PasskeyUnlinkInput,
 } from "./passkeys/http.ts";
 export {

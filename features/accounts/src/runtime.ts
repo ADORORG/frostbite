@@ -1,5 +1,9 @@
 import {
   createDrizzlePasskeyRepository,
+  createDrizzlePasskeySignInRepository,
+  createPasskeySignInService,
+  simpleWebAuthnAuthenticationAdapter,
+  type PasskeySignInService,
   createDrizzleSessionRepository,
   createDrizzleWalletAuthRepository,
   createDrizzleWalletMethodsRepository,
@@ -67,24 +71,43 @@ export function createPasskeyServiceResolver(
   };
 }
 
-function buildPasskeyService(methods: AccountMethods): PasskeyService {
+// The passkey policy both services (linking and signing in) run under: the relying party is the host of the platform's own address.
+function passkeyPolicy() {
   const app = parseEnvironment(process.env);
   const policy = parseAuthSessionEnvironment(process.env);
   const origin = new URL(app.PUBLIC_BASE_URL);
+  return {
+    challengeLifetimeMs: policy.PASSKEY_CHALLENGE_TIMEOUT_MS,
+    expectedOrigin: origin.origin,
+    recentAuthenticationWindowMs: policy.PASSKEY_RECENT_AUTH_WINDOW_MS,
+    relyingPartyId: origin.hostname,
+    relyingPartyName: app.NEXT_PUBLIC_APP_NAME,
+    sessionAbsoluteLifetimeMs: policy.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
+    sessionIdleLifetimeMs: policy.AUTH_SESSION_IDLE_TIMEOUT_MS,
+  };
+}
+
+function buildPasskeyService(methods: AccountMethods): PasskeyService {
   return createPasskeyLinkingService({
     adapter: simpleWebAuthnRegistrationAdapter,
     clock: () => new Date(),
-    policy: {
-      challengeLifetimeMs: policy.PASSKEY_CHALLENGE_TIMEOUT_MS,
-      expectedOrigin: origin.origin,
-      recentAuthenticationWindowMs: policy.PASSKEY_RECENT_AUTH_WINDOW_MS,
-      relyingPartyId: origin.hostname,
-      relyingPartyName: app.NEXT_PUBLIC_APP_NAME,
-      sessionAbsoluteLifetimeMs: policy.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
-      sessionIdleLifetimeMs: policy.AUTH_SESSION_IDLE_TIMEOUT_MS,
-    },
+    policy: passkeyPolicy(),
     repository: createDrizzlePasskeyRepository(database(), methods.list),
   });
+}
+
+// The passkey sign-in service, made when a request first needs it.
+export function createPasskeySignInResolver(): () => PasskeySignInService {
+  let service: PasskeySignInService | undefined;
+  return () => {
+    service ??= createPasskeySignInService({
+      adapter: simpleWebAuthnAuthenticationAdapter,
+      clock: () => new Date(),
+      policy: passkeyPolicy(),
+      repository: createDrizzlePasskeySignInRepository(database()),
+    });
+    return service;
+  };
 }
 
 // The wallet sign-in services: challenges and verification, removing a wallet, and ending a session. Built from the

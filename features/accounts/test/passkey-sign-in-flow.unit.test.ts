@@ -1,0 +1,92 @@
+import { ApiError, type Requester } from "@ador/client-http";
+import { describe, expect, it, vi } from "vitest";
+
+import { signInWithPasskey } from "../src/sign-in/passkey-sign-in-flow.ts";
+
+const challengeId = "01890f0e-7c8a-7b3a-8a3e-0123456789ab";
+const options = {
+  challenge: "Y2hhbGxlbmdl",
+  rpId: "launch.invalid",
+  userVerification: "required" as const,
+};
+const credential = { id: "credential-one" };
+
+// A requester that answers each step from the real response schemas' own parse of a good answer, or fails it with an ApiError.
+function server(failAt?: { step: 1 | 2; code: ApiError["code"] }) {
+  let step = 0;
+  const sent: { path: string; body: object | undefined }[] = [];
+  const request: Requester = async (route, schema, requestOptions) => {
+    step += 1;
+    sent.push({ body: requestOptions?.body, path: route.path });
+    if (failAt?.step === step)
+      throw new ApiError(failAt.code, 400, "the server said no");
+    const parsed = schema.safeParse(
+      step === 1
+        ? {
+            challengeId,
+            expiresAt: "2026-10-25T12:05:00.000Z",
+            options,
+          }
+        : { signedIn: true },
+    );
+    if (!parsed.success) throw new Error("fixture does not fit the contract");
+    return parsed.data;
+  };
+  return { request, sent };
+}
+
+describe("signing in with a passkey in the browser", () => {
+  it("asks the server for a challenge, lets the person choose a passkey, and sends back what it signed", async () => {
+    const { request, sent } = server();
+    const ask = vi.fn(async () => credential);
+    expect(
+      await signInWithPasskey({ ask, request, supported: () => true }),
+    ).toEqual({ kind: "signed-in" });
+    expect(ask).toHaveBeenCalledExactlyOnceWith(options);
+    expect(sent).toEqual([
+      { body: {}, path: "/api/v1/passkeys/sign-in/options" },
+      {
+        body: { challengeId, credential },
+        path: "/api/v1/passkeys/sign-in/verify",
+      },
+    ]);
+  });
+
+  it("does nothing when the browser has no passkeys", async () => {
+    const { request, sent } = server();
+    const ask = vi.fn(async () => credential);
+    expect(
+      await signInWithPasskey({ ask, request, supported: () => false }),
+    ).toEqual({ kind: "unsupported" });
+    expect(sent).toHaveLength(0);
+    expect(ask).not.toHaveBeenCalled();
+  });
+
+  it("says the person did not choose one, and sends nothing more, when the prompt is closed", async () => {
+    const { request, sent } = server();
+    const ask = vi.fn(async () => {
+      throw new DOMException("closed", "NotAllowedError");
+    });
+    expect(
+      await signInWithPasskey({ ask, request, supported: () => true }),
+    ).toEqual({ kind: "cancelled" });
+    expect(sent).toHaveLength(1);
+  });
+
+  it.each([
+    [1, "network", "network"],
+    [2, "network", "network"],
+    [1, "internal_error", "not-verified"],
+    [2, "unauthorized", "not-verified"],
+  ] as const)(
+    "reports a failure at step %s (%s) as %s",
+    async (step, code, expected) => {
+      const { request } = server({ code, step });
+      const ask = vi.fn(async () => credential);
+      expect(
+        await signInWithPasskey({ ask, request, supported: () => true }),
+      ).toEqual({ kind: expected });
+      expect(ask).toHaveBeenCalledTimes(step === 1 ? 0 : 1);
+    },
+  );
+});

@@ -10,6 +10,7 @@ import type {
   PasskeyRegistrationAdapter,
   PasskeyRegistrationPayload,
 } from "./contracts.ts";
+import { assertValidPasskeyPolicy } from "./policy.ts";
 import type { PasskeyRepository } from "./repository.ts";
 
 const CHALLENGE_BYTES = 32;
@@ -22,21 +23,8 @@ export function createPasskeyLinkingService(dependencies: {
   readonly repository: PasskeyRepository;
 }) {
   const { adapter, clock, policy, repository } = dependencies;
-  let origin: URL;
-  try {
-    origin = new URL(policy.expectedOrigin);
-  } catch {
-    throw new Error("Passkey policy is invalid");
-  }
-  if (
-    policy.challengeLifetimeMs <= 0 ||
-    policy.recentAuthenticationWindowMs <= 0 ||
-    policy.sessionIdleLifetimeMs <= 0 ||
-    policy.sessionAbsoluteLifetimeMs < policy.sessionIdleLifetimeMs ||
-    origin.origin !== policy.expectedOrigin ||
-    origin.hostname !== policy.relyingPartyId ||
-    (origin.protocol !== "https:" && origin.hostname !== "localhost")
-  )
+  assertValidPasskeyPolicy(policy);
+  if (policy.recentAuthenticationWindowMs <= 0)
     throw new Error("Passkey policy is invalid");
   const isRecent = (session: ActiveSession, now: Date) => {
     const authenticationAgeMs =

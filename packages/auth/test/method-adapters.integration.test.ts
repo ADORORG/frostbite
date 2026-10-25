@@ -54,7 +54,7 @@ describe("the wallet and passkey methods, read from the database", () => {
       { assurance: "strong", canSignIn: true, id: walletId, kind: "wallet" },
       {
         assurance: "strong",
-        canSignIn: false,
+        canSignIn: true,
         id: `cred-${walletId}`,
         kind: "passkey",
       },

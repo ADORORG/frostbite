@@ -12,6 +12,8 @@ export const rateLimits = rateLimitConfigSchema.parse({
   operations: {
     addCollectionItem: perMinute(120),
     beginPasskeyRegistration: perMinute(10),
+    // Like the wallet steps: signing in is a guess an attacker can repeat. A person makes one of each.
+    beginPasskeySignIn: perMinute(10),
     // Signing in is a guess an attacker can repeat, so every wallet step is tight: a challenge a few at a time, a
     // signature a few more (a real player makes one of each).
     beginWalletLink: perMinute(10),
@@ -24,10 +26,13 @@ export const rateLimits = rateLimitConfigSchema.parse({
     createUploadIntent: perMinute(120),
     decideCollectionReview: perMinute(60),
     finishPasskeyRegistration: perMinute(10),
+    finishPasskeySignIn: perMinute(20),
     // A balance asks an outside data source, and anyone may ask: a few a minute covers the widget's refresh and a
     // manual one with room to spare.
     getWalletBalance: perMinute(30),
     importCollectionItems: perMinute(20),
+    // Opening a setup link is for the one person setting up the platform; a token cannot be guessed, but nothing needs more than a few.
+    redeemSetupLink: perMinute(10),
     reviewCreatorApplication: perMinute(60),
     signOut: perMinute(30),
     // A run is started when a game begins a round and submitted when it ends; a replay costs the server real work, so these

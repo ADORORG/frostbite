@@ -26,6 +26,11 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
 - `createPasskeyLinkingService` owns recent-auth registration, conflict-safe linking, final-method
   protection, session rotation, and provider-neutral contracts.
 - `simpleWebAuthnRegistrationAdapter` contains the exact-pinned SimpleWebAuthn server boundary.
+- `createPasskeySignInService` (with `createDrizzlePasskeySignInRepository` and `simpleWebAuthnAuthenticationAdapter`) signs a
+  person in with a discoverable passkey: `begin` issues a challenge that belongs to nobody and offers no list of credentials;
+  `finish` spends the challenge first (one attempt each, atomically), finds the account from the credential that signed, has the
+  library verify the signature, origin, relying party, user verification and that the signature counter moved forward, then
+  starts a session (other sessions stay). Every failure looks the same to the caller.
 
 Callers compose these exports explicitly. Removing wallet authentication requires removing its
 registration and route adapter; no feature discovery or global registration is used.
@@ -49,7 +54,11 @@ registration and route adapter; no feature discovery or global registration is u
 - Passkey challenges bind one user, session, RP ID, origin, and expiry. Linking and unlinking lock
   the active recent session, rotate all sessions, and atomically append privacy-preserving audit
   evidence.
-- Linking does not imply that passkey assertion sign-in is enabled; the UI makes no recovery claim.
+- Passkey sign-in challenges (`passkey_sign_in_challenges`) bind an RP ID, origin and expiry, and are stored as hashes. The
+  credential's counter is updated only if it is still the value read (`counter = expected`), so two sign-ins that use the same
+  counter, which is what a cloned authenticator does, cannot both succeed. A passkey is bound to the site's domain: the policy
+  refuses to start unless the relying party is the host of the platform's own origin.
+- The UI makes no recovery claim for passkeys.
 
 ## Configuration
 

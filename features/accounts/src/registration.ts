@@ -7,6 +7,7 @@ import type { BalanceSource } from "./balance/source.ts";
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
   createPasskeyServiceResolver,
+  createPasskeySignInResolver,
   createSetupLinkResolver,
   createWalletServicesResolver,
   offeredSignInKinds,
@@ -85,6 +86,7 @@ export function createAccountsFeature(
             createWalletServicesResolver(wallet, methods, passkeys),
             balanceSource,
             createSetupLinkResolver(methods, setup),
+            createPasskeySignInResolver(),
             passkeys,
             {
               network: wallet.network,

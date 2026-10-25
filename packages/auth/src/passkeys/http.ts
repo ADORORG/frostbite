@@ -5,6 +5,10 @@ import {
   passkeyRegistrationOptionsSchema,
   passkeyRegistrationPayloadSchema,
 } from "./contracts.ts";
+import {
+  passkeyAuthenticationOptionsSchema,
+  passkeyAuthenticationPayloadSchema,
+} from "./sign-in-contracts.ts";
 
 export const passkeyRoutes = {
   list: {
@@ -21,6 +25,17 @@ export const passkeyRoutes = {
     method: "POST",
     operationId: "finishPasskeyRegistration",
     path: "/api/v1/passkeys/registration/verify",
+  },
+  // Signing in with a passkey: both steps are open to anyone, because there is no session yet.
+  beginSignIn: {
+    method: "POST",
+    operationId: "beginPasskeySignIn",
+    path: "/api/v1/passkeys/sign-in/options",
+  },
+  finishSignIn: {
+    method: "POST",
+    operationId: "finishPasskeySignIn",
+    path: "/api/v1/passkeys/sign-in/verify",
   },
   unlink: {
     method: "POST",
@@ -47,6 +62,18 @@ export const passkeyFinishInputSchema = z.strictObject({
   challengeId: uuidV7TextSchema,
   credential: passkeyRegistrationPayloadSchema,
 });
+export const passkeySignInBeginResponseSchema = z.strictObject({
+  challengeId: uuidV7TextSchema,
+  expiresAt: z.iso.datetime(),
+  options: passkeyAuthenticationOptionsSchema,
+});
+export const passkeySignInFinishInputSchema = z.strictObject({
+  challengeId: uuidV7TextSchema,
+  credential: passkeyAuthenticationPayloadSchema,
+});
+export const passkeySignedInResponseSchema = z.strictObject({
+  signedIn: z.literal(true),
+});
 export const passkeyUnlinkInputSchema = z.strictObject({
   credentialId: z
     .string()
@@ -64,3 +91,9 @@ export type PasskeyMutationResponse = z.infer<
 >;
 export type PasskeyListResponse = z.infer<typeof passkeyListResponseSchema>;
 export type PasskeyUnlinkInput = z.infer<typeof passkeyUnlinkInputSchema>;
+export type PasskeySignInBeginResponse = z.infer<
+  typeof passkeySignInBeginResponseSchema
+>;
+export type PasskeySignInFinishInput = z.infer<
+  typeof passkeySignInFinishInputSchema
+>;
