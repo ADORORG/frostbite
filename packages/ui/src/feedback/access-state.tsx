@@ -13,8 +13,8 @@ const states = {
     tone: "unavailable",
   },
   unauthenticated: {
-    action: "Return home",
-    body: "Wallet sign-in is not enabled in this build. This private route remains closed until a supported wallet completes qualification.",
+    action: "Sign in",
+    body: "This page is for signed-in people. Sign in with a wallet, a passkey or an emailed code to continue.",
     label: "Authentication required",
     title: "Insert player identity",
     tone: "attention",
@@ -27,6 +27,10 @@ const states = {
     tone: "attention",
   },
 } as const;
+
+// Where the button goes: home for a person who may not enter, the sign-in page for one who has not signed in. (A protected page
+// normally sends a signed-out visitor to sign in with a return address before this is shown.)
+const destinations = { forbidden: "/", unauthenticated: "/sign-in" } as const;
 
 export function AccessState({
   navigation = [{ area: "main", href: "/", label: "Home" }],
@@ -50,7 +54,7 @@ export function AccessState({
         <ArcadePanel eyebrow="Route access" title={content.title}>
           <p>{content.body}</p>
           <ArcadeButton
-            href={state === "unavailable" ? retryHref : "/"}
+            href={state === "unavailable" ? retryHref : destinations[state]}
             tone="cyan"
           >
             {content.action}

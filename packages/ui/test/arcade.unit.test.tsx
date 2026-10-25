@@ -62,6 +62,20 @@ describe("arcade controls", () => {
     expect(markup).toContain("arcade-panel");
   });
 
+  it("sends a visitor who has not signed in to the sign-in page, and says how they can, without claiming sign-in is off", () => {
+    const markup = renderToStaticMarkup(
+      <AccessState state="unauthenticated" />,
+    );
+    expect(markup).toMatch(/<a [^>]*href="\/sign-in"[^>]*>Sign in<\/a>/u);
+    expect(markup).toContain("wallet, a passkey or an emailed code");
+    expect(markup).not.toContain("not enabled");
+  });
+
+  it("sends a person who may not enter home, not to sign in again", () => {
+    const markup = renderToStaticMarkup(<AccessState state="forbidden" />);
+    expect(markup).toMatch(/<a [^>]*href="\/"[^>]*>Return home<\/a>/u);
+  });
+
   it("uses the protected route for an unavailable-state retry", () => {
     const markup = renderToStaticMarkup(
       <AccessState retryHref="/studio" state="unavailable" />,

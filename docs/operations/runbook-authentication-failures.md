@@ -1,30 +1,36 @@
 # Runbook: authentication failures
 
-Status: **early draft (W8-07).** Written from the code as it is today. Nothing below has been exercised
-against a real deployment, and every command is read-only unless it says otherwise. There is no structured
-error logging yet (task: structured logging at the HTTP boundary), so diagnosis relies on the database, the
-response's correlation id, and the platform's logs.
+Status: **current as of the sign-in work of ADR-021 (steps 1 to 7), written from the code.** The commands are read-only unless one
+says otherwise. Nothing here has been exercised against a real deployment: the mail server, a physical passkey device and a real
+wallet extension have not been tried (see the gaps at the end). An internal error and an unreachable session service each write one
+JSON line with the correlation id to the web process's error output (`http.internal_error`, `http.auth_unavailable`); other failures
+are answered with a code and are not logged, so diagnosis relies on the database, the response's correlation id and the platform's logs.
 
 ## What exists today (so you know what can fail)
 
+- **Ways in** (the page is `/sign-in`; a protected page sends a signed-out visitor there with `?returnTo=`): a Bitcoin **wallet**
+  (a signed challenge), a **passkey** (a discoverable credential), and an **email code** (only where mail is set up). One account can
+  hold several, and no account is ever merged into another. The set a deployment offers is composed once in
+  `configs/auth-methods.ts` from the method registry (ADR-021).
 - **Sessions.** Server-side, hash-only: the database stores a SHA-256 of the session token, never the token
   (`ador.auth_sessions`). The browser holds the token in an HTTP-only, secure, same-site cookie. A session ends
   when idle time (`AUTH_SESSION_IDLE_TIMEOUT_MS`, default 24 h, sliding) or absolute time
   (`AUTH_SESSION_ABSOLUTE_TIMEOUT_MS`, default 7 days) passes, or it is revoked (`revoked_at`).
 - **Authorization.** Roles and permissions come from the authorization policy and platform role assignments
-  (`platform_role_assignments`); a session without the role gets `forbidden`, not a sign-in prompt.
-- **Passkey linking** (`/account`): needs a recent sign-in (`PASSKEY_RECENT_AUTH_WINDOW_MS`, default 10 min);
-  the ceremony lasts at most `PASSKEY_CHALLENGE_TIMEOUT_MS` (default 5 min). Linking or unlinking replaces the
-  session.
-- **Wallet challenge and verification** (BIP-322 simple signature) exists as a service
-  (`@ador/auth`): a challenge lives 60 seconds by default, allows a bounded number of verification attempts,
-  and is single-use. Its results are `challenge-expired`, `challenge-invalid`, `challenge-replayed`,
-  `identity-conflict`, `signature-invalid`.
-- **Not wired yet.** At the time of writing no public HTTP route issues wallet challenges or creates a
-  session from one; the only routes that replace a session are the passkey operations, and the wallet routes
-  that exist (`/api/v1/...qualification`) are diagnostic. Local and test sign-in uses seeded sessions
-  (`pnpm stack`, `/dev/sign-in`), which does not exist in the application itself. Treat "user cannot sign in
-  with a wallet" as an expected gap until that route ships, then update this runbook.
+  (`platform_role_assignments`); a session without the role gets `forbidden`, not a sign-in prompt. `staff` and `admin` work only
+  while the account holds a wallet.
+- **Changes to sign-in methods and roles** need a recent sign-in (`PASSKEY_RECENT_AUTH_WINDOW_MS`, default 10 min), replace the
+  account's sessions, and are audited: wallets, passkeys and email addresses in `ador.auth_security_events`, role changes in
+  `ador.platform_role_events`.
+- **Wallet challenge and verification** (BIP-322 simple signature): a challenge lives 60 seconds by default, allows a bounded number of
+  verification attempts, and is single-use. A removed wallet is held for a while: only the account that had it can take it back.
+- **Passkey linking** (`/account`): the ceremony lasts at most `PASSKEY_CHALLENGE_TIMEOUT_MS` (default 5 min). Passkey sign-in spends
+  its challenge on the first attempt, right or wrong.
+- **First administrator.** `pnpm platform:setup-link` prints a single-use link (`/setup#<token>`, valid for an hour) while no working
+  administrator exists; after that, administrators use the role screen (`/admin/roles`).
+- **Local and test stacks.** `pnpm stack` runs the real sign-in (wallet, passkey, email with the codes captured by `pnpm mailbox`) and
+  also a front door at `/dev/sign-in` that signs in as a seeded person. That page belongs to the stack's own front door, never to the
+  application, so it cannot exist in a deployed build.
 
 ## Error shapes
 
@@ -70,17 +76,19 @@ restart the ceremony from `/account`. If it repeats, confirm `PASSKEY_*` timeout
 party origin matches the site's origin exactly; a mismatch fails every ceremony. Do not unlink a user's final
 method by hand.
 
-## Symptom: wallet signature rejected (service-level codes, once wired)
+## Symptom: wallet sign-in or linking fails
 
 | Code                 | Meaning                                                             | Action                                                                                   |
 | -------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `challenge-expired`  | 60 seconds passed (or the clock is wrong)                           | Retry; if constant, check server clock drift                                             |
-| `challenge-invalid`  | Unknown challenge, wrong origin/domain/network, or attempts used up | Retry from a fresh challenge; confirm the wallet network matches (`mainnet` or `signet`) |
+| `challenge-invalid`  | Unknown challenge, wrong origin/domain/network, or attempts used up | Retry from a fresh challenge; confirm the wallet network matches `BETA_NETWORK` |
 | `challenge-replayed` | The challenge was already used                                      | Expected after a double submit; retry fresh                                              |
 | `signature-invalid`  | The wallet's signature did not verify                               | Wallet-specific; see the wallet conformance records before blaming the server            |
 | `identity-conflict`  | The address belongs to a different account                          | Do not merge accounts by hand; escalate                                                  |
 
-Check a challenge (read-only; the message and signature are never stored here):
+The person is told only "The wallet could not be verified. Request a fresh challenge." for all of these but `identity-conflict`, which reads
+"This wallet cannot be used for that." (it also covers a wallet that was just removed from another account and is still held). The
+codes above are for you; they are not shown. Check a challenge (read-only; the message and signature are never stored here):
 
 ```sql
 select id, action, network, wallet_adapter, attempts, issued_at, expires_at, consumed_at
@@ -134,11 +142,13 @@ confirm the session row shows a fresh `authenticated_at` and a future `idle_expi
 
 ## Gaps to close (feed the backlog)
 
-- A public wallet sign-in route and its failure copy (then rewrite the wallet section).
-- Shipping the logs somewhere searchable. An internal error (`http.internal_error`) and an unreachable session service
-  (`http.auth_unavailable`) already write one JSON line each with the correlation id to the web process's error output; the
-  other failures above are answered with a code and are not logged.
-- An alert on a spike of `challenge-invalid` or `signature-invalid`. Rate limits now exist for the wallet
-  challenge and passkey operations (10 a minute per address or person to start one, 20 to verify; see
-  `configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.
-- An operator view of a user's sessions that does not need SQL.
+- Nothing here has met a real deployment: a physical or platform passkey, a real wallet extension, and a real mail provider (the
+  SMTP sender is proven against a local SMTP server; implicit TLS and the STARTTLS upgrade are not exercised) are all untried.
+- Shipping the logs somewhere searchable. Only internal errors and an unreachable session service are logged; the other failures
+  above are answered with a code and are not logged.
+- An alert on a spike of `challenge-invalid`, `signature-invalid` or failed email codes. Rate limits exist for every sign-in step
+  (`configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.
+- A view of audit events and of a user's sessions that does not need SQL (the role screen shows who holds roles, not the history).
+- No sweep of expired challenge and code rows (`passkey_sign_in_challenges`, `wallet_challenges`, `contact_codes`); their expiry
+  indexes are there for a cleanup job.
+- Sign-ins are not audited (only changes to ways in and to roles are).

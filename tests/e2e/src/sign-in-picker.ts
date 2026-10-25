@@ -2,8 +2,8 @@ import { platformSessionCookieName } from "@ador/shared/auth";
 
 import type { StackActor } from "./manual-stack.ts";
 
-// The local stack's stand-in for wallet sign-in, which is not enabled yet: a page that lists the seeded
-// people and starts a session as the one you pick. It lives in the stack's own front door
+// The local stack's shortcut: a page that lists the seeded people and starts a session as the one you pick, so a manual tour does not
+// need a wallet extension for every role. Real sign-in (wallet, passkey, email) works in the stack too, at /sign-in. It lives in the stack's own front door
 // (`stack-proxy.ts`), never in the web app, so it cannot be present in a deployed build.
 
 export const signInPath = "/dev/sign-in";
@@ -65,7 +65,7 @@ button { font: inherit; padding: .5rem .75rem; text-align: left; cursor: pointer
 </head>
 <body>
 <h1>Local test sign-in</h1>
-<p>This page exists only in the local test stack. Real sign-in is by wallet and is not enabled yet. Pick a person to sign in as.</p>
+<p>This page exists only in the local test stack, as a shortcut: pick a person to sign in as. The application's own sign-in (a wallet, a passkey or an emailed code) is at <a href="/sign-in">/sign-in</a>.</p>
 <ul>
 ${people}
 </ul>

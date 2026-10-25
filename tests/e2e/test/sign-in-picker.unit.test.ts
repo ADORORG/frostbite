@@ -23,7 +23,9 @@ describe("the sign-in page", () => {
     }
     expect(page.body).toContain(`action="${signInPath}"`);
     expect(page.body).toContain(`action="${signOutPath}"`);
-    expect(page.body).toContain("not enabled yet");
+    expect(page.body).toContain("shortcut");
+    expect(page.body).toContain('href="/sign-in"');
+    expect(page.body).not.toContain("not enabled");
   });
 
   it("never puts a session token on the page", () => {

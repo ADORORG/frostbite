@@ -46,9 +46,12 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   steps sent from the stack are real transactions on that network; with none, claims and game administration say
   "not available". The line it prints names the network and the node's host, never the key.
 
-- **Signing in:** open `http://localhost:4174/dev/sign-in` and click a person (creator, second creator,
-  applicant, reviewer, staff). It sets the session and lands on that person's page. Real sign-in is by
-  wallet and is not enabled yet; this page stands in for it. Sign out from the same page.
+- **Signing in, two ways.** The shortcut: open `http://localhost:4174/dev/sign-in` and click a person (creator, second creator,
+  applicant, reviewer, administrator, email-only person, staff). It sets the session (as a fresh sign-in) and lands on that person's
+  page; sign out from the same page. The real thing: `http://localhost:4174/sign-in` offers a wallet, a passkey and an emailed code.
+  The stack sends no mail: ask for a code on the page, then run `pnpm mailbox` in another terminal to read it. The seeded
+  administrator (`admin@example.test`, with a wallet) can give roles at `/admin/roles`; `candidate@example.test` is an email-only
+  person to give one to.
 - The sign-in page is served by the stack's own front door (`src/stack-proxy.ts`), which passes every
   other request to the web server. It is not part of the web app, so it cannot ship with a build. Its
   session cookie is secure, so use Chrome or Firefox on `localhost`.
