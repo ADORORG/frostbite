@@ -5,6 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./methods": "./src/methods.ts",
+    "./setup-operation": "./src/setup/operation.ts",
     "./entrypoint": "./src/entrypoint.tsx",
     "./widget": "./src/widget/wallet-root.tsx"
   },
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "@ador/auth": "workspace:*",
+    "@ador/authorization": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
     "@ador/http": "workspace:*",

@@ -22,12 +22,17 @@ import { gameClaimsConfig } from "./game-claims.ts";
 import { gameRunsConfig } from "./game-runs.ts";
 import { games } from "./games.ts";
 import { providerRegistry } from "./providers.ts";
+import { setupLinkPolicy } from "./setup-link.ts";
 import { gameWalletConfig, walletAuthConfig } from "./wallet.ts";
 
 export const featureRegistry = createFeatureRegistry([
   platformShellFeature,
   createChainStatusFeature(chainStatusConfig),
-  createAccountsFeature(walletAuthConfig, balanceSource, authMethods),
+  createAccountsFeature(walletAuthConfig, balanceSource, authMethods, {
+    lifetimeMs: setupLinkPolicy.lifetimeMs,
+    policyVersion: authorizationPolicy.version,
+    requiredMethods: authorizationPolicy.requiredMethods,
+  }),
   creatorAdmissionFeature,
   launchesFeature,
   createPublicCollectionsFeature(providerRegistry, targetChains),

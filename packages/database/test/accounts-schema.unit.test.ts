@@ -7,6 +7,8 @@ import {
   organizationMemberships,
   organizations,
   platformRoleAssignments,
+  platformRoleEvents,
+  platformSetupLinks,
 } from "../src/index.ts";
 
 function indexNames(config: ReturnType<typeof getTableConfig>): string[] {
@@ -65,5 +67,34 @@ describe("account schema", () => {
     expect(foreignTables(config)).toEqual(
       expect.arrayContaining(["auth_users", "organizations"]),
     );
+  });
+
+  it("keeps platform role evidence with both people it names, and refuses an empty policy version", () => {
+    const config = getTableConfig(platformRoleEvents);
+    expect(indexNames(config)).toContain(
+      "platform_role_events_target_created_idx",
+    );
+    expect(config.checks.map((check) => check.name)).toContain(
+      "platform_role_events_policy_version_nonempty",
+    );
+    expect(foreignTables(config)).toEqual(["auth_users", "auth_users"]);
+    expect(config.foreignKeys.map((key) => key.onDelete)).toEqual([
+      "restrict",
+      "restrict",
+    ]);
+  });
+
+  it("keeps setup links unique by hash, with the table refusing a bad hash, a backwards expiry and a half-recorded use", () => {
+    const config = getTableConfig(platformSetupLinks);
+    expect(indexNames(config)).toContain(
+      "platform_setup_links_token_hash_unique",
+    );
+    expect(config.checks.map((check) => check.name).sort()).toEqual([
+      "platform_setup_links_consumption_consistent",
+      "platform_setup_links_expiry_after_creation",
+      "platform_setup_links_token_hash_valid",
+    ]);
+    expect(foreignTables(config)).toEqual(["auth_users"]);
+    expect(config.foreignKeys.map((key) => key.onDelete)).toEqual(["restrict"]);
   });
 });

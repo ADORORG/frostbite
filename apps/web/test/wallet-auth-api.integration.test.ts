@@ -36,6 +36,8 @@ const protectedPosts = [
   "auth/wallet/step-up/verify",
   "auth/wallet/unlink",
   "auth/sign-out",
+  // Opening a first-administrator setup link is for someone signed in.
+  "auth/setup-link/redeem",
 ];
 const publicPosts = ["auth/wallet/challenge", "auth/wallet/verify"];
 

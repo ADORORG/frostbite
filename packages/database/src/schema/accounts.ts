@@ -196,6 +196,44 @@ export const platformRoleEvents = platformSchema.table(
   ],
 );
 
+// The one-time links an operator mints to make the first administrator. Only a hash of the token is kept: the database alone cannot
+// redeem a link. A link is spent when `consumed_at` is set, and void when `revoked_at` is (a newer link replaces it).
+export const platformSetupLinks = platformSchema.table(
+  "platform_setup_links",
+  {
+    id: uuid("id").primaryKey(),
+    tokenHash: text("token_hash").notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expires_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    consumedAt: timestamp("consumed_at", { mode: "date", withTimezone: true }),
+    consumedByUserId: uuid("consumed_by_user_id").references(
+      () => authUsers.id,
+      { onDelete: "restrict" },
+    ),
+    revokedAt: timestamp("revoked_at", { mode: "date", withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("platform_setup_links_token_hash_unique").on(table.tokenHash),
+    check(
+      "platform_setup_links_token_hash_valid",
+      sql`${table.tokenHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "platform_setup_links_expiry_after_creation",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    check(
+      "platform_setup_links_consumption_consistent",
+      sql`(${table.consumedAt} is null) = (${table.consumedByUserId} is null)`,
+    ),
+  ],
+);
+
 export type Organization = typeof organizations.$inferSelect;
 export type OrganizationMembership =
   typeof organizationMemberships.$inferSelect;

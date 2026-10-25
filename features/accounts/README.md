@@ -10,7 +10,12 @@ with it, links and removes wallets and signs out. The public `/sign-in` page (AD
 registry says can start a session, each in its own panel (`src/sign-in/`: `registry.ts` lists how each kind is shown, so a new method
 is one view there plus its adapter in `runtime.ts`); a protected page sends a signed-out visitor to it with `?returnTo=` (checked by
 `safeReturnPath` in `@ador/shared/auth/sign-in-path`: a plain path on this site, never the sign-in page, the API or another site),
-and it goes on to that page once the server says the visitor is signed in. The route family also has
+and it goes on to that page once the server says the visitor is signed in. The public `/setup` page and `POST /api/v1/auth/setup-link/redeem`
+open the single-use link that makes the first administrator (ADR-021; `src/setup/`): the token follows the link's `#`, so the server
+never sees it in an address; the page saves it for the visit, clears it from the address bar, and opens the link for whoever is signed
+in (asking them to sign in if nobody is). It says "administrator" only after the server granted it, and a person missing a wallet is told
+so and can retry with the same link. `createAccountsFeature` takes the policy's `SetupRules` (lifetime, policy version, required
+methods) from the composition root. The operator makes the link with `pnpm platform:setup-link` (`tooling/platform-admin`). The route family also has
 `POST /api/v1/wallet/balance`. `balanceSource` is where the widget's balance comes from: the beta wires the rewards chain's
 own node (`configs/balance.ts`), and the answer keeps what is **spendable** (confirmed) apart from what is **pending** (waiting
 for its first confirmation). With no chain configured it passes `null` and the widget says "Balance unavailable: no data

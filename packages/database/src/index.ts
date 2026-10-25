@@ -31,6 +31,7 @@ export {
   organizations,
   platformRoleAssignments,
   platformRoleEvents,
+  platformSetupLinks,
   type AccountAuditEvent,
   type Organization,
   type OrganizationMembership,

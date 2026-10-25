@@ -19,6 +19,12 @@ Detachable server-side account mutation and authorization policy boundaries.
   administrator whose own role works may change a role; asking for what is already so changes nothing and writes nothing; every
   change writes `platform_role_events` in its transaction; role changes are serialized platform-wide; and the last working
   administrator can never be suspended, including by themselves or concurrently.
+- `createSetupLinkService` and `createDrizzleSetupLinks` make and open the single-use link for the first administrator. The token is 256
+  random bits and only its SHA-256 is stored. Minting takes the platform-wide role lock, is refused while a working administrator exists,
+  and voids earlier unused links; opening is refused for an unknown, expired, replaced or spent link (one answer for all), or when
+  setup is already over, and tells a person missing a required method to add it (the link stays unspent). The grant is an
+  `admin` role event with `via: "setup-link"` and the redeemer as the actor; a retry by the same person changes nothing; two people
+  opening one link together produce exactly one administrator (the link's row lock).
 - Drizzle adapters persist account records, recheck actor membership inside the mutation transaction,
   preserve the last-active-owner invariant, and append audit evidence.
 

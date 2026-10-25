@@ -14,7 +14,10 @@ import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { createPasskeyLinkingService } from "@ador/auth";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
+import { SetupPage } from "./ui/setup-page.tsx";
 import { SignInPage } from "./ui/sign-in-page.tsx";
+import { createRedeemSetupLinkOperation } from "./setup/operation.ts";
+import type { SetupLinkService } from "@ador/authorization";
 
 type PasskeyService = ReturnType<typeof createPasskeyLinkingService>;
 
@@ -46,6 +49,7 @@ async function account(
 export function createAccountsEntrypoint(
   getWalletServices: () => WalletAuthServices,
   balanceSource: BalanceSource | null,
+  getSetupLinks: () => SetupLinkService,
   getService: () => PasskeyService,
   // What the sign-in page needs of the platform: the kinds of method the deployment offers, and the network a wallet is asked for.
   signIn: {
@@ -86,6 +90,7 @@ export function createAccountsEntrypoint(
       registerHttpOperation(verifyStepUp),
       registerHttpOperation(unlinkWallet),
       registerHttpOperation(listMethods),
+      registerHttpOperation(createRedeemSetupLinkOperation(getSetupLinks)),
       registerHttpOperation(
         createBalanceOperation({
           clock: () => new Date(),
@@ -99,6 +104,17 @@ export function createAccountsEntrypoint(
         path: "/sign-in",
         render: ({ navigation }) => (
           <SignInPage
+            expectedNetwork={signIn.network}
+            navigation={navigation}
+            offered={signIn.offered()}
+          />
+        ),
+      },
+      {
+        access: { kind: "public" },
+        path: "/setup",
+        render: ({ navigation }) => (
+          <SetupPage
             expectedNetwork={signIn.network}
             navigation={navigation}
             offered={signIn.offered()}

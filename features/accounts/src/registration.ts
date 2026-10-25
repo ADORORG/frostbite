@@ -7,10 +7,13 @@ import type { BalanceSource } from "./balance/source.ts";
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
   createPasskeyServiceResolver,
+  createSetupLinkResolver,
   createWalletServicesResolver,
   offeredSignInKinds,
   type AccountMethods,
+  type SetupRules,
 } from "./runtime.ts";
+import { setupLinkRoutes } from "./setup/contract.ts";
 import {
   validateWalletAuthConfig,
   type WalletAuthConfig,
@@ -25,6 +28,7 @@ export function createAccountsFeature(
   input: WalletAuthConfig,
   balanceSource: BalanceSource | null,
   methods: AccountMethods,
+  setup: SetupRules,
 ) {
   const wallet = validateWalletAuthConfig(input);
   // One passkey service for the whole feature, made when a request first needs it.
@@ -57,6 +61,7 @@ export function createAccountsFeature(
       id: "accounts",
       pages: [
         { access: { kind: "public" }, path: "/sign-in" },
+        { access: { kind: "public" }, path: "/setup" },
         { access: { kind: "authenticated" }, path: "/account" },
         {
           access: { capability: "platform:operate", kind: "platform" },
@@ -68,6 +73,7 @@ export function createAccountsFeature(
       routes: [
         ...Object.values(passkeyRoutes),
         ...Object.values(walletAuthRoutes),
+        ...Object.values(setupLinkRoutes),
         walletBalanceRoute,
       ],
       version: "1.0.0",
@@ -78,6 +84,7 @@ export function createAccountsFeature(
           createAccountsEntrypoint(
             createWalletServicesResolver(wallet, methods, passkeys),
             balanceSource,
+            createSetupLinkResolver(methods, setup),
             passkeys,
             {
               network: wallet.network,

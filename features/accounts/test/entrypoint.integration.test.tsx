@@ -11,8 +11,18 @@ const noWalletServices = () => {
 
 // What the sign-in page needs of the platform; the pages tested here do not use it.
 const signIn = { network: "signet", offered: () => ["wallet"] } as const;
-const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[2]) =>
-  createAccountsEntrypoint(noWalletServices, null, service, signIn);
+// Nor do they reach for the setup links; the one operation that does is tested on its own.
+const noSetupLinks = () => {
+  throw new Error("The setup links are not needed to render a page.");
+};
+const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[3]) =>
+  createAccountsEntrypoint(
+    noWalletServices,
+    null,
+    noSetupLinks,
+    service,
+    signIn,
+  );
 
 describe("accounts entrypoint", () => {
   it.each([
@@ -53,8 +63,10 @@ describe("accounts entrypoint", () => {
         unlink: vi.fn(),
       })).pages ?? [];
 
-    // The sign-in page is open to everyone; every other page is private.
-    for (const page of pages.filter(({ path }) => path !== "/sign-in")) {
+    // The sign-in and setup pages are open to everyone (the person opening a setup link may not be signed in yet); every other page is
+    // private.
+    const open = ["/sign-in", "/setup"];
+    for (const page of pages.filter(({ path }) => !open.includes(path))) {
       expect(
         renderToStaticMarkup(
           await page.render({ actorUserId: null, navigation: [], params: {} }),
@@ -104,6 +116,7 @@ describe("accounts entrypoint", () => {
     const entrypoint = createAccountsEntrypoint(
       noWalletServices,
       null,
+      noSetupLinks,
       () => {
         throw new Error("passkeys are not needed to render the sign-in page");
       },
@@ -116,5 +129,22 @@ describe("accounts entrypoint", () => {
     );
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Signing in is not available right now.");
+  });
+
+  it("serves the first-time setup page without a session, which signs the visitor in itself and says nothing of any link until it has looked", async () => {
+    const entrypoint = withSignIn(() => ({
+      begin: vi.fn(),
+      finish: vi.fn(),
+      list: vi.fn(async () => []),
+      unlink: vi.fn(),
+    }));
+    const page = entrypoint.pages?.find(({ path }) => path === "/setup");
+    expect(page?.access).toEqual({ kind: "public" });
+    const markup = renderToStaticMarkup(
+      await page?.render({ actorUserId: null, navigation: [], params: {} }),
+    );
+    expect(markup).toContain("First-time setup");
+    expect(markup).toContain("Opening your setup link");
+    expect(markup).not.toContain("administrator");
   });
 });

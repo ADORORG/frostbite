@@ -20,6 +20,16 @@ export type {
   RoleChange,
   SuspendOutcome,
 } from "./application/role-administration.ts";
+export { createDrizzleSetupLinks } from "./adapters/drizzle-setup-link.ts";
+export { createSetupLinkService } from "./application/setup-link.ts";
+export type {
+  MintedLink,
+  MintResult,
+  RedeemResult,
+  SetupLinkPolicy,
+  SetupLinkRepository,
+  SetupLinkService,
+} from "./application/setup-link.ts";
 export type { HeldKinds } from "./adapters/drizzle-authorization-repository.ts";
 export {
   effectiveRoles,

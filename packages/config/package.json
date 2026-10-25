@@ -8,6 +8,7 @@
     "./beta-network": "./src/env/beta-network.ts",
     "./rewards-chain": "./src/env/rewards-chain.ts",
     "./authorization": "./src/policy/authorization.ts",
+    "./setup-link": "./src/policy/setup-link.ts",
     "./transport": "./src/transport/loopback-transport.ts"
   },
   "scripts": {

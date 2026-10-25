@@ -12,11 +12,20 @@ import {
   type MethodRegistry,
 } from "@ador/auth";
 import {
+  createDrizzleSetupLinks,
+  createSetupLinkService,
+  type RoleRequirements,
+  type SetupLinkService,
+} from "@ador/authorization";
+import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
   type DatabaseTransaction,
 } from "@ador/database/connection";
+import { randomBytes } from "node:crypto";
+
+import { createHeldMethodKinds } from "./held-method-kinds.ts";
 import type { WalletAuthServices } from "./application/wallet-services.ts";
 import type { WalletAuthConfig } from "./wallet-config.ts";
 import {
@@ -129,5 +138,36 @@ export function createWalletServicesResolver(
       }),
     };
     return services;
+  };
+}
+
+// What the first-administrator setup needs of the platform's policy: which methods the administrator role requires, the version
+// recorded with the grant, and how long a link lives. Supplied by the composition root, never read here.
+export interface SetupRules {
+  readonly lifetimeMs: number;
+  readonly policyVersion: string;
+  readonly requiredMethods: RoleRequirements;
+}
+
+// The setup-link service, made when a request first needs it.
+export function createSetupLinkResolver(
+  methods: AccountMethods,
+  rules: SetupRules,
+): () => SetupLinkService {
+  let service: SetupLinkService | undefined;
+  return () => {
+    service ??= createSetupLinkService({
+      clock: () => new Date(),
+      policy: {
+        lifetimeMs: rules.lifetimeMs,
+        policyVersion: rules.policyVersion,
+      },
+      randomBytes: (length) => randomBytes(length),
+      repository: createDrizzleSetupLinks(database(), {
+        heldKinds: createHeldMethodKinds(methods),
+        requiredMethods: rules.requiredMethods,
+      }),
+    });
+    return service;
   };
 }
