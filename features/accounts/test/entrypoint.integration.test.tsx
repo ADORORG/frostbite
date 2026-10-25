@@ -1,3 +1,4 @@
+import type { ContactLinkService } from "@ador/auth";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -21,13 +22,17 @@ const noPasskeySignIn = () => {
 const noEmailSignIn = () => {
   throw new Error("Email sign-in is not needed to render a page.");
 };
-const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[5]) =>
+const noEmailLinks = () => {
+  throw new Error("Email links are not needed to render a page.");
+};
+const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[6]) =>
   createAccountsEntrypoint(
     noWalletServices,
     null,
     noSetupLinks,
     noPasskeySignIn,
     noEmailSignIn,
+    noEmailLinks,
     service,
     signIn,
   );
@@ -127,6 +132,7 @@ describe("accounts entrypoint", () => {
       noSetupLinks,
       noPasskeySignIn,
       noEmailSignIn,
+      noEmailLinks,
       () => {
         throw new Error("passkeys are not needed to render the sign-in page");
       },
@@ -156,5 +162,79 @@ describe("accounts entrypoint", () => {
     expect(markup).toContain("First-time setup");
     expect(markup).toContain("Opening your setup link");
     expect(markup).not.toContain("administrator");
+  });
+
+  describe("the email panel on the account page", () => {
+    // Only `list` is used by the page; the rest of the link service is not.
+    const linkService = (
+      list: ContactLinkService["list"],
+    ): ContactLinkService => ({
+      confirm: vi.fn(),
+      list,
+      request: vi.fn(),
+      unlink: vi.fn(),
+    });
+    const passkeys = () => ({
+      begin: vi.fn(),
+      finish: vi.fn(),
+      list: vi.fn(async () => []),
+      unlink: vi.fn(),
+    });
+    async function accountPage(options: {
+      readonly links: () => ContactLinkService;
+      readonly offered: readonly string[];
+    }) {
+      const entrypoint = createAccountsEntrypoint(
+        noWalletServices,
+        null,
+        noSetupLinks,
+        noPasskeySignIn,
+        noEmailSignIn,
+        options.links,
+        passkeys,
+        { network: "signet", offered: () => options.offered },
+      );
+      const page = entrypoint.pages?.find(({ path }) => path === "/account");
+      return renderToStaticMarkup(
+        await page?.render({
+          actorUserId: createUuidV7(),
+          navigation: [],
+          params: {},
+        }),
+      );
+    }
+
+    it("lists the account's addresses where mail is set up", async () => {
+      const list = vi.fn(async () => ["a@b.co"]);
+      const markup = await accountPage({
+        links: () => linkService(list),
+        offered: ["wallet", "email"],
+      });
+      expect(markup).toContain("Email addresses");
+      expect(markup).toContain("a@b.co");
+      expect(list).toHaveBeenCalledWith(expect.any(String), "email");
+    });
+
+    it("shows no panel, and reads nothing, where there is no mail", async () => {
+      const list = vi.fn(async () => ["a@b.co"]);
+      const markup = await accountPage({
+        links: () => linkService(list),
+        offered: ["wallet"],
+      });
+      expect(markup).not.toContain("Email addresses");
+      expect(list).not.toHaveBeenCalled();
+    });
+
+    it("shows no panel rather than a list it did not read", async () => {
+      const markup = await accountPage({
+        links: () =>
+          linkService(async () => {
+            throw new Error("down");
+          }),
+        offered: ["email"],
+      });
+      expect(markup).not.toContain("Email addresses");
+      expect(markup).toContain("Account console");
+    });
   });
 });

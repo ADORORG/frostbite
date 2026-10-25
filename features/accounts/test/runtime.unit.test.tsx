@@ -11,6 +11,8 @@ const factories = vi.hoisted(() => ({
   })),
   contactRepository: vi.fn(() => "contact-repository"),
   contactService: vi.fn(() => ({ contactService: true })),
+  linkRepository: vi.fn(() => "link-repository"),
+  linkService: vi.fn(() => ({ linkService: true })),
   databaseClient: vi.fn(() => "database"),
   emailChannel: vi.fn(() => "email-channel"),
   mailSender: vi.fn(
@@ -38,6 +40,8 @@ const factories = vi.hoisted(() => ({
 vi.mock("@ador/mail", () => ({ createMailSender: factories.mailSender }));
 vi.mock("@ador/auth", () => ({
   createContactCodeService: factories.contactService,
+  createContactLinkService: factories.linkService,
+  createDrizzleContactLinkRepository: factories.linkRepository,
   createDrizzleContactCodeRepository: factories.contactRepository,
   createEmailChannel: factories.emailChannel,
   createDrizzlePasskeyRepository: factories.passkeyRepository,
@@ -126,7 +130,7 @@ describe("passkey runtime composition", () => {
   });
 
   it("builds the code service once, with an email channel made from the mail settings and the policy, under the platform's session lifetimes", async () => {
-    const { createEmailSignInResolver } = await import("../src/runtime.ts");
+    const { createEmailResolvers } = await import("../src/runtime.ts");
     const policy = {
       codeLength: 6,
       lifetimeMs: 600_000,
@@ -140,9 +144,9 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const getService = createEmailSignInResolver({ mail, policy });
-    const first = getService();
-    expect(getService()).toBe(first);
+    const emails = createEmailResolvers({ mail, policy }, methods);
+    const first = emails.codes();
+    expect(emails.codes()).toBe(first);
     expect(factories.contactService).toHaveBeenCalledOnce();
     expect(factories.mailSender).toHaveBeenCalledWith(mail, {
       clock: expect.any(Function),
@@ -166,12 +170,51 @@ describe("passkey runtime composition", () => {
   });
 
   it("has no channel at all while the deployment has no mail, and builds no sender", async () => {
-    const { createEmailSignInResolver } = await import("../src/runtime.ts");
-    createEmailSignInResolver(null)();
+    const { createEmailResolvers } = await import("../src/runtime.ts");
+    createEmailResolvers(null, methods).codes();
     expect(factories.mailSender).not.toHaveBeenCalled();
     expect(factories.emailChannel).not.toHaveBeenCalled();
     expect(factories.contactService).toHaveBeenCalledWith(
       expect.objectContaining({ channels: [] }),
+    );
+  });
+
+  it("builds the link service with the same channel and code service, the registry's listing for the removal rule, and the recent-sign-in window", async () => {
+    const { createEmailResolvers } = await import("../src/runtime.ts");
+    const policy = {
+      codeLength: 6,
+      lifetimeMs: 600_000,
+      maximumAttempts: 5,
+      maximumSendsPerWindow: 5,
+      resendCooldownMs: 60_000,
+      sendWindowMs: 3_600_000,
+    };
+    const mail = {
+      directory: "inbox",
+      from: "login@launch.invalid",
+      transport: "capture",
+    } as const;
+    const emails = createEmailResolvers({ mail, policy }, methods);
+    const links = emails.links();
+    expect(emails.links()).toBe(links);
+    // One service of each, and one channel and one sender between them.
+    expect(factories.contactService).toHaveBeenCalledOnce();
+    expect(factories.emailChannel).toHaveBeenCalledOnce();
+    expect(factories.linkRepository).toHaveBeenCalledWith(
+      "database",
+      methods.list,
+    );
+    expect(factories.linkService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channels: ["email-channel"],
+        codes: expect.objectContaining({ contactService: true }),
+        policy: {
+          recentAuthenticationWindowMs: 600_000,
+          sessionAbsoluteLifetimeMs: 604_800_000,
+          sessionIdleLifetimeMs: 86_400_000,
+        },
+        repository: "link-repository",
+      }),
     );
   });
 });

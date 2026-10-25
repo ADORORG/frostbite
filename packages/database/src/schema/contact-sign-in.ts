@@ -57,6 +57,12 @@ export const contactCodes = platformSchema.table(
   {
     id: uuid("id").primaryKey(),
     kind: text("kind").notNull(),
+    // What the code is for: signing in (no account yet known) or linking the destination to the signed-in account `userId`. A code
+    // opens only the thing it was sent for.
+    purpose: text("purpose").notNull().default("sign-in"),
+    userId: uuid("user_id").references(() => authUsers.id, {
+      onDelete: "cascade",
+    }),
     destination: text("destination").notNull(),
     codeHash: text("code_hash").notNull(),
     salt: text("salt").notNull(),
@@ -86,6 +92,10 @@ export const contactCodes = platformSchema.table(
     check(
       "contact_codes_expiry_after_issue",
       sql`${table.expiresAt} > ${table.issuedAt}`,
+    ),
+    check(
+      "contact_codes_purpose_consistent",
+      sql`(${table.purpose} = 'sign-in' and ${table.userId} is null) or (${table.purpose} = 'link' and ${table.userId} is not null)`,
     ),
     check("contact_codes_salt_nonempty", sql`${table.salt} <> ''`),
   ],

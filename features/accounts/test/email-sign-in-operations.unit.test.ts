@@ -12,6 +12,7 @@ const context = {
 
 function operations(overrides: Partial<ContactCodeService> = {}) {
   const service: ContactCodeService = {
+    confirm: vi.fn(async () => ({ ok: false, reason: "invalid" }) as const),
     request: vi.fn(async () => ({ ok: true }) as const),
     verify: vi.fn(
       async () => ({ ok: true, sessionToken: "session-token" }) as const,

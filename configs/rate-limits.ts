@@ -36,6 +36,8 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // Each request sends a real message, which costs money and can annoy whoever owns the address, so a caller gets a few a minute on top of
     // the per-address limits the code service keeps. Entering a code is a guess, so it is as tight as the other sign-in steps.
     requestEmailCode: perMinute(5),
+    // Adding an address also sends a real message, and entering its code is a guess; so the same limits as signing in by email.
+    requestEmailLinkCode: perMinute(5),
     reviewCreatorApplication: perMinute(60),
     signOut: perMinute(30),
     // A run is started when a game begins a round and submitted when it ends; a replay costs the server real work, so these
@@ -46,9 +48,11 @@ export const rateLimits = rateLimitConfigSchema.parse({
     submitGameRun: perMinute(30),
     // Sent when a game is opened and after each save or unlock, so it is the busiest write; one a second.
     syncGameState: perMinute(120),
+    unlinkEmailAddress: perMinute(10),
     unlinkPasskey: perMinute(10),
     unlinkWallet: perMinute(10),
     verifyEmailCode: perMinute(20),
+    verifyEmailLinkCode: perMinute(20),
     verifyWalletLink: perMinute(20),
     verifyWalletSignIn: perMinute(20),
     verifyWalletStepUp: perMinute(20),

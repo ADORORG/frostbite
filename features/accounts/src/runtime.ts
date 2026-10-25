@@ -1,9 +1,12 @@
 import {
   createContactCodeService,
+  createContactLinkService,
   createDrizzleContactCodeRepository,
+  createDrizzleContactLinkRepository,
   createEmailChannel,
   type ContactCodePolicy,
   type ContactCodeService,
+  type ContactLinkService,
   createDrizzlePasskeyRepository,
   createDrizzlePasskeySignInRepository,
   createPasskeySignInService,
@@ -208,34 +211,60 @@ export interface EmailSignInRules {
   readonly policy: ContactCodePolicy;
 }
 
-// The one-time-code service, made when a request first needs it. With no mail it has no channel at all, so asking for a code is
-// refused as unsupported and nothing is stored.
-export function createEmailSignInResolver(
+// The email services, made when a request first needs them: the one-time-code service (signing in) and the link service (adding and
+// removing an address on a signed-in account), over one channel and one sender. With no mail there is no channel at all, so asking for a
+// code is refused as unsupported and nothing is stored.
+export function createEmailResolvers(
   rules: EmailSignInRules | null,
-): () => ContactCodeService {
-  let service: ContactCodeService | undefined;
-  return () => {
-    if (service) return service;
+  methods: AccountMethods,
+): {
+  readonly codes: () => ContactCodeService;
+  readonly links: () => ContactLinkService;
+} {
+  let built:
+    { codes: ContactCodeService; links: ContactLinkService } | undefined;
+  function build() {
+    if (built) return built;
     const clock = () => new Date();
     const environment = parseAuthSessionEnvironment(process.env);
-    service = createContactCodeService({
-      channels:
-        rules === null
-          ? []
-          : [
-              createEmailChannel({
-                appName: parseEnvironment(process.env).NEXT_PUBLIC_APP_NAME,
-                policy: rules.policy,
-                sender: createMailSender(rules.mail, { clock }),
-              }),
-            ],
+    const sessions = {
+      sessionAbsoluteLifetimeMs: environment.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
+      sessionIdleLifetimeMs: environment.AUTH_SESSION_IDLE_TIMEOUT_MS,
+    };
+    const channels =
+      rules === null
+        ? []
+        : [
+            createEmailChannel({
+              appName: parseEnvironment(process.env).NEXT_PUBLIC_APP_NAME,
+              policy: rules.policy,
+              sender: createMailSender(rules.mail, { clock }),
+            }),
+          ];
+    const codes = createContactCodeService({
+      channels,
       clock,
       repository: createDrizzleContactCodeRepository(database()),
-      sessions: {
-        sessionAbsoluteLifetimeMs: environment.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS,
-        sessionIdleLifetimeMs: environment.AUTH_SESSION_IDLE_TIMEOUT_MS,
-      },
+      sessions,
     });
-    return service;
-  };
+    built = {
+      codes,
+      links: createContactLinkService({
+        channels,
+        clock,
+        codes,
+        policy: {
+          ...sessions,
+          recentAuthenticationWindowMs:
+            environment.PASSKEY_RECENT_AUTH_WINDOW_MS,
+        },
+        repository: createDrizzleContactLinkRepository(
+          database(),
+          methods.list,
+        ),
+      }),
+    };
+    return built;
+  }
+  return { codes: () => build().codes, links: () => build().links };
 }

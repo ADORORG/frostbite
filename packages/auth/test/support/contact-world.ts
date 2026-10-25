@@ -1,5 +1,6 @@
 // The database, repository and clock the contact-code tests share.
 import {
+  authSecurityEvents,
   authSessions,
   authUsers,
   contactCodes,
@@ -38,15 +39,25 @@ export const sessionMaterial = () => ({
   tokenHash: sha256(createUuidV7()),
 });
 
-// Migrates once, empties the contact and account tables before each test, and closes the pool at the end.
+async function empty() {
+  await database.delete(contactCodes);
+  await database.delete(contactIdentities);
+  // Audit rows hold their session and user, so they go first; another test file's cleanup could not delete those sessions otherwise.
+  await database.delete(authSecurityEvents);
+  await database.delete(authSessions);
+  await database.delete(authUsers);
+}
+
+// Migrates once, empties the contact and account tables before each test and again when the file is done (so the next file starts from
+// what it expects), and closes the pool at the end.
 export function useContactWorld() {
   beforeAll(async () => runMigrations(environment));
-  afterAll(async () => pool.end());
+  afterAll(async () => {
+    await empty();
+    await pool.end();
+  });
   beforeEach(async () => {
-    await database.delete(contactCodes);
-    await database.delete(contactIdentities);
-    await database.delete(authSessions);
-    await database.delete(authUsers);
+    await empty();
     clock.now = start;
   });
 }
@@ -63,7 +74,9 @@ export function issueInput(
     issuedAt,
     kind: "email",
     limits,
+    purpose: "sign-in",
     salt: "salt",
+    userId: null,
     ...overrides,
   };
 }
@@ -80,4 +93,52 @@ export function signInInput(
     now: overrides.now ?? clock.now,
     session: sessionMaterial(),
   };
+}
+
+// A signed-in account that holds one address: its user, its identity and a session authenticated at `authenticatedAt`.
+export async function signedInAccount(
+  input: {
+    readonly address?: string;
+    readonly authenticatedAt?: Date;
+  } = {},
+) {
+  const userId = createUuidV7();
+  const sessionId = createUuidV7();
+  await database.insert(authUsers).values({
+    email: `contact-${userId}@contact.invalid`,
+    id: userId,
+    name: "Email user",
+  });
+  if (input.address !== undefined)
+    await database.insert(contactIdentities).values({
+      createdAt: start,
+      id: createUuidV7(),
+      kind: "email",
+      userId,
+      value: input.address,
+      verifiedAt: start,
+    });
+  await database.insert(authSessions).values({
+    absoluteExpiresAt: new Date(start.getTime() + 7_200_000),
+    authenticatedAt: input.authenticatedAt ?? start,
+    id: sessionId,
+    idleExpiresAt: new Date(start.getTime() + 3_600_000),
+    tokenHash: sha256(createUuidV7()),
+    userId,
+  });
+  return { sessionId, userId };
+}
+
+// Another live session for an account that already exists.
+export async function signedInAccountSession(userId: string) {
+  const sessionId = createUuidV7();
+  await database.insert(authSessions).values({
+    absoluteExpiresAt: new Date(start.getTime() + 7_200_000),
+    authenticatedAt: start,
+    id: sessionId,
+    idleExpiresAt: new Date(start.getTime() + 3_600_000),
+    tokenHash: sha256(createUuidV7()),
+    userId,
+  });
+  return sessionId;
 }

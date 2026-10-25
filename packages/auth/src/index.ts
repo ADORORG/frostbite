@@ -122,7 +122,22 @@ export {
   type WalletVerifyRequest,
 } from "./wallets/http.ts";
 export { createContactCodeService } from "./contacts/service.ts";
+export { createContactLinkService } from "./contacts/link-service.ts";
 export type {
+  ConfirmLinkResult,
+  ContactLinkPolicy,
+  ContactLinkService,
+  RequestLinkResult,
+  UnlinkContactOutcome,
+} from "./contacts/link-service.ts";
+export { createDrizzleContactLinkRepository } from "./contacts/drizzle-link-repository.ts";
+export type {
+  CompleteLinkResult,
+  ContactLinkRepository,
+  UnlinkContactResult,
+} from "./contacts/link-repository.ts";
+export type {
+  ConfirmCodeResult,
   ContactCodeService,
   RequestCodeResult,
   VerifyCodeResult,
@@ -143,11 +158,14 @@ export {
 } from "./contacts/email-channel.ts";
 export { createContactMethod, emailMethod } from "./contacts/method.ts";
 export {
+  emailAddressesResponseSchema,
   emailCodeRequestResponseSchema,
   emailCodeRequestSchema,
   emailCodeRoutes,
   emailCodeSignedInResponseSchema,
   emailCodeVerifySchema,
+  emailEmptyInputSchema,
+  emailLinkedResponseSchema,
   type EmailCodeRequest,
   type EmailCodeVerify,
 } from "./contacts/email-http.ts";

@@ -105,4 +105,28 @@ describe("contact codes in the database", () => {
       database.insert(contactCodes).values(code()),
     ).resolves.toBeDefined();
   });
+
+  it("ties a code to an account exactly when it is a link code", async () => {
+    const user = await aUser();
+    for (const bad of [
+      code({ purpose: "link" }),
+      code({ purpose: "sign-in", userId: user }),
+      code({ purpose: "other" }),
+    ])
+      await expect(database.insert(contactCodes).values(bad)).rejects.toThrow();
+    await expect(
+      database
+        .insert(contactCodes)
+        .values(code({ purpose: "link", userId: user })),
+    ).resolves.toBeDefined();
+  });
+
+  it("goes with the account a link code was sent to", async () => {
+    const user = await aUser();
+    await database
+      .insert(contactCodes)
+      .values(code({ purpose: "link", userId: user }));
+    await database.delete(authUsers);
+    expect(await database.select().from(contactCodes)).toEqual([]);
+  });
 });

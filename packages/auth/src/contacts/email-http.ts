@@ -2,6 +2,27 @@ import { z } from "zod";
 
 // Signing in with a code sent by email. Both steps are open to anyone, because there is no session yet.
 export const emailCodeRoutes = {
+  // Adding an address to, listing the addresses of, and removing one from the account that is signed in.
+  addresses: {
+    method: "GET",
+    operationId: "listEmailAddresses",
+    path: "/api/v1/email/addresses",
+  },
+  linkRequest: {
+    method: "POST",
+    operationId: "requestEmailLinkCode",
+    path: "/api/v1/email/link/request",
+  },
+  linkVerify: {
+    method: "POST",
+    operationId: "verifyEmailLinkCode",
+    path: "/api/v1/email/link/verify",
+  },
+  unlink: {
+    method: "POST",
+    operationId: "unlinkEmailAddress",
+    path: "/api/v1/email/unlink",
+  },
   request: {
     method: "POST",
     operationId: "requestEmailCode",
@@ -30,6 +51,14 @@ export const emailCodeVerifySchema = z.strictObject({
 });
 export const emailCodeSignedInResponseSchema = z.strictObject({
   signedIn: z.literal(true),
+});
+
+export const emailEmptyInputSchema = z.strictObject({});
+export const emailAddressesResponseSchema = z.strictObject({
+  addresses: z.array(z.string().min(1)),
+});
+export const emailLinkedResponseSchema = z.strictObject({
+  changed: z.literal(true),
 });
 
 export type EmailCodeRequest = z.infer<typeof emailCodeRequestSchema>;

@@ -42,6 +42,14 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
   code is right, so nothing before that depends on whether the address has an account. `emailMethod` (`createContactMethod`) lists an
   account's addresses for the method registry (standard assurance, can sign in). Routes: `POST /api/v1/email/sign-in/request` and
   `/verify`, both public.
+- `createContactLinkService` (with `createDrizzleContactLinkRepository`) adds an address to the signed-in account and removes one. Adding needs
+  a recent sign-in and the code sent to the new address (`request` asks the code service for a *link* code that belongs to the account;
+  `confirm` counts the try and checks the code without spending it; `completeLink` spends it with the change, in one transaction under
+  the address's lock and from a session that is still recent). An address another account holds is refused after the code has proved the
+  mailbox, the code is spent, and nothing moves and nothing says whose it is (ADR-021 point 5). Removing needs a recent sign-in and
+  never takes the last way in (the registry's `removalOutcome`), under the account's lock. Both replace every session of the account
+  and write `email-linked` / `email-unlinked` to `auth_security_events` with a hash of the address. Routes (all need a session):
+  `GET /api/v1/email/addresses`, `POST /api/v1/email/link/request`, `/link/verify`, `/unlink`.
 
 Callers compose these exports explicitly. Removing wallet authentication requires removing its
 registration and route adapter; no feature discovery or global registration is used.
@@ -70,6 +78,8 @@ registration and route adapter; no feature discovery or global registration is u
   counter, which is what a cloned authenticator does, cannot both succeed. A passkey is bound to the site's domain: the policy
   refuses to start unless the relying party is the host of the platform's own origin.
 - The UI makes no recovery claim for passkeys.
+- A code opens only the thing it was sent for: a sign-in code cannot link and a link code cannot sign in (the code row carries the
+  account it was sent to, and a try is counted only against the matching one).
 - Email codes: only a salted hash is stored; five tries, right or wrong, then the code is dead; a code works once; a code does not
   outlive its lifetime to the millisecond; a failed send leaves no code and no cooldown. A contact identity (`kind` + normalized
   value) belongs to one account for good: no merging (ADR-021 point 5). `auth_users.email` is a placeholder

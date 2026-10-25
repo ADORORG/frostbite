@@ -12,6 +12,7 @@ import {
   database,
   issueInput,
   repository,
+  signedInAccount,
   signInInput,
   start,
   useContactWorld,
@@ -139,5 +140,14 @@ describe("completing a sign-in", () => {
       ),
     ).toEqual({ kind: "conflict" });
     expect(await database.select().from(authUsers)).toHaveLength(0);
+  });
+
+  it("refuses a code that was sent for linking, even when asked for by its id", async () => {
+    const account = await signedInAccount({ address: "mine@example.com" });
+    const code = await issued({ purpose: "link", userId: account.userId });
+    expect(await repository.completeSignIn(signInInput(code.id))).toEqual({
+      kind: "conflict",
+    });
+    expect(await database.select().from(authUsers)).toHaveLength(1);
   });
 });

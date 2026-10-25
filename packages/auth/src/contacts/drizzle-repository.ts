@@ -83,7 +83,9 @@ export function createDrizzleContactCodeRepository(
           id: input.id,
           issuedAt: input.issuedAt,
           kind: input.kind,
+          purpose: input.purpose,
           salt: input.salt,
+          userId: input.userId,
         });
         return { kind: "issued" };
       }),
@@ -102,6 +104,9 @@ export function createDrizzleContactCodeRepository(
             and(
               eq(contactCodes.kind, input.kind),
               eq(contactCodes.destination, input.destination),
+              input.userId === null
+                ? isNull(contactCodes.userId)
+                : eq(contactCodes.userId, input.userId),
               isNull(contactCodes.consumedAt),
               gt(contactCodes.expiresAt, input.now),
               lt(contactCodes.attempts, input.maximumAttempts),
@@ -127,6 +132,7 @@ export function createDrizzleContactCodeRepository(
           .where(
             and(
               eq(contactCodes.id, input.codeId),
+              eq(contactCodes.purpose, "sign-in"),
               isNull(contactCodes.consumedAt),
               gt(contactCodes.expiresAt, input.now),
             ),

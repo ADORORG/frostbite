@@ -108,6 +108,7 @@ Never log, paste or ticket a signature, a session token or a challenge message.
    ```
    `attempts` of 5 means the code is spent (five tries, right or wrong); `consumed_at` set means it was used or replaced.
 5. **Local stack.** Nothing is sent: `pnpm mailbox` prints what the stack "sent" (newest first).
+6. **Adding an address to an account.** "Recent authentication is required" means the session is older than `PASSKEY_RECENT_AUTH_WINDOW_MS`: the person signs in again, then retries. "This address cannot be added to this account" means another account holds it (the page does not say whose); the person signs in with that address instead, or removes it from the other account first. There is no merging. Every add or remove signs the account's other sessions out and writes `email-linked` / `email-unlinked` to `ador.auth_security_events` (read-only check: `select action, created_at, correlation_id from ador.auth_security_events where actor_user_id = '<user-id>' order by created_at desc limit 10;`).
 
 ## Containment (security events)
 

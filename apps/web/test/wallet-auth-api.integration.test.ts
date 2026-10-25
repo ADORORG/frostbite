@@ -43,6 +43,10 @@ const protectedPosts = [
   "auth/sign-out",
   // Opening a first-administrator setup link is for someone signed in.
   "auth/setup-link/redeem",
+  // Adding and removing an email address change the account's ways in, so they need the account's own session.
+  "email/link/request",
+  "email/link/verify",
+  "email/unlink",
 ];
 const publicPosts = [
   "auth/wallet/challenge",
@@ -63,6 +67,17 @@ describe("the wallet sign-in routes at the HTTP boundary", () => {
       expect(response.headers.get("set-cookie")).toBeNull();
     },
   );
+
+  it("lists the account's email addresses only for a session", async () => {
+    const response = await GET(
+      new Request(`${origin}/api/v1/email/addresses`),
+      {
+        params: Promise.resolve({ segments: ["email", "addresses"] }),
+      },
+    );
+    expect(response.status).toBe(401);
+    expect(await code(response)).toBe("unauthorized");
+  });
 
   it("lists the account's ways in only for a session", async () => {
     const response = await GET(new Request(`${origin}/api/v1/auth/methods`), {

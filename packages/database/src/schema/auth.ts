@@ -108,6 +108,8 @@ export const authChallengeAction = platformSchema.enum(
 );
 
 export const authSecurityAction = platformSchema.enum("auth_security_action", [
+  "email-linked",
+  "email-unlinked",
   "passkey-linked",
   "passkey-unlinked",
   "wallet-linked",

@@ -6,7 +6,7 @@ import type { BalanceSource } from "./balance/source.ts";
 
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
-  createEmailSignInResolver,
+  createEmailResolvers,
   createPasskeyServiceResolver,
   createPasskeySignInResolver,
   createSetupLinkResolver,
@@ -39,6 +39,8 @@ export function createAccountsFeature(
   const wallet = validateWalletAuthConfig(input);
   // One passkey service for the whole feature, made when a request first needs it.
   const passkeys = createPasskeyServiceResolver(methods);
+  // One channel and one sender for signing in by email and for adding an address to an account.
+  const emails = createEmailResolvers(email, methods);
   return defineFeature({
     manifest: {
       capabilities: [
@@ -93,7 +95,8 @@ export function createAccountsFeature(
             balanceSource,
             createSetupLinkResolver(methods, setup),
             createPasskeySignInResolver(),
-            createEmailSignInResolver(email),
+            emails.codes,
+            emails.links,
             passkeys,
             {
               network: wallet.network,

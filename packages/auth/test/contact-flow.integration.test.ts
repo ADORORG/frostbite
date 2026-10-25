@@ -1,85 +1,22 @@
-import { mkdtemp, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { authSessions, contactCodes } from "@ador/database";
-import {
-  createCapturingMailbox,
-  readCapturedMail,
-  type MailSender,
-} from "@ador/mail";
-import { afterEach, describe, expect, it } from "vitest";
+import type { MailSender } from "@ador/mail";
+import { describe, expect, it } from "vitest";
 
-import { sha256 } from "../src/domain/crypto.ts";
-import { createEmailChannel } from "../src/contacts/email-channel.ts";
 import { emailMethod } from "../src/contacts/method.ts";
-import { createContactCodeService } from "../src/contacts/service.ts";
 import { createMethodRegistry } from "../src/methods/registry.ts";
+import { sha256 } from "../src/domain/crypto.ts";
 import { passkeyMethod } from "../src/passkeys/method.ts";
 import { walletMethod } from "../src/wallets/method.ts";
+import { policy, world } from "./support/contact-flow-world.ts";
 import {
   clock,
   database,
-  repository,
   start,
   useContactWorld,
 } from "./support/contact-world.ts";
 
 useContactWorld();
 
-const policy = {
-  codeLength: 6,
-  lifetimeMs: 600_000,
-  maximumAttempts: 5,
-  maximumSendsPerWindow: 4,
-  resendCooldownMs: 60_000,
-  sendWindowMs: 3_600_000,
-};
-const sessions = {
-  sessionAbsoluteLifetimeMs: 3_600_000,
-  sessionIdleLifetimeMs: 600_000,
-};
-
-const directories: string[] = [];
-afterEach(async () => {
-  await Promise.all(
-    directories
-      .splice(0)
-      .map((path) => rm(path, { force: true, recursive: true })),
-  );
-});
-
-// The whole path with nothing stood in for: real codes, a real database, and a mailbox that keeps what it is sent.
-async function world(sender?: MailSender) {
-  const directory = await mkdtemp(join(tmpdir(), "ador-contact-"));
-  directories.push(directory);
-  const mailbox = createCapturingMailbox({
-    clock: () => clock.now,
-    directory,
-    from: "login@example.org",
-  });
-  const service = createContactCodeService({
-    channels: [
-      createEmailChannel({
-        appName: "Ador",
-        policy,
-        sender: sender ?? mailbox,
-      }),
-    ],
-    clock: () => clock.now,
-    repository,
-    sessions,
-  });
-  const codeSentTo = async (address: string) => {
-    const mail = (await readCapturedMail(directory)).find(
-      ({ to }) => to === address,
-    );
-    const code = /sign-in code is (\d{6})/u.exec(mail?.text ?? "")?.[1];
-    if (code === undefined) throw new Error(`No code was sent to ${address}.`);
-    return code;
-  };
-  return { codeSentTo, directory, service };
-}
 const ada = { destination: "Ada@Example.com", kind: "email" } as const;
 const wrongOf = (code: string) => (code === "000000" ? "111111" : "000000");
 

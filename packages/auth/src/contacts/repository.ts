@@ -1,6 +1,8 @@
 import type { SessionMaterial } from "../application/repository.ts";
 import type { MethodKind } from "../methods/contracts.ts";
 
+export type CodePurpose = "link" | "sign-in";
+
 export interface IssueCodeInput {
   readonly codeHash: string;
   readonly destination: string;
@@ -8,6 +10,8 @@ export interface IssueCodeInput {
   readonly id: string;
   readonly issuedAt: Date;
   readonly kind: MethodKind;
+  // What the code opens: signing in, or linking the destination to the signed-in account `userId` (null for signing in).
+  readonly purpose: CodePurpose;
   // The limits the issue is decided under, so two requests together cannot both slip under them.
   readonly limits: {
     readonly cooldownMs: number;
@@ -15,6 +19,7 @@ export interface IssueCodeInput {
     readonly windowMs: number;
   };
   readonly salt: string;
+  readonly userId: string | null;
 }
 
 export type IssueCodeResult =
@@ -57,6 +62,9 @@ export interface ContactCodeRepository {
     readonly kind: MethodKind;
     readonly maximumAttempts: number;
     readonly now: Date;
+    // Only a code sent for this can be tried: null for signing in, or the account a link code was sent to. (A code with an account is a
+    // link code; the table checks that.)
+    readonly userId: string | null;
   }): Promise<HeldCode | null>;
   // Records a new code for the destination and replaces the older live ones, unless the limits say not yet.
   issue(input: IssueCodeInput): Promise<IssueCodeResult>;

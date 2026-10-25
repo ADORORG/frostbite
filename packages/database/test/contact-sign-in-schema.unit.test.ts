@@ -39,6 +39,7 @@ describe("contact code schema", () => {
         "contact_codes_attempts_nonnegative",
         "contact_codes_expiry_after_issue",
         "contact_codes_hash_sha256",
+        "contact_codes_purpose_consistent",
         "contact_codes_salt_nonempty",
       ],
       indexes: [
@@ -46,6 +47,11 @@ describe("contact code schema", () => {
         "contact_codes_expiry_idx",
       ],
     });
-    expect(config.foreignKeys).toEqual([]);
+    expect(
+      config.foreignKeys.map((key) =>
+        getTableName(key.reference().foreignTable),
+      ),
+    ).toEqual(["auth_users"]);
+    expect(config.foreignKeys.map((key) => key.onDelete)).toEqual(["cascade"]);
   });
 });

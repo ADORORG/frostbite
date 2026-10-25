@@ -8,6 +8,7 @@ import {
   issueInput,
   limits,
   repository,
+  signedInAccount,
   start,
   useContactWorld,
 } from "./support/contact-world.ts";
@@ -21,6 +22,7 @@ const take = (now = clock.now, destination = "ada@example.com") =>
     kind: "email",
     maximumAttempts: 5,
     now,
+    userId: null,
   });
 
 describe("issuing a code", () => {
@@ -169,9 +171,43 @@ describe("trying a code", () => {
         kind: "phone",
         maximumAttempts: 5,
         now: clock.now,
+        userId: null,
       }),
     ).toBeNull();
     await database.update(contactCodes).set({ consumedAt: clock.now });
     expect(await take()).toBeNull();
+  });
+});
+
+describe("trying a code sent for a different purpose", () => {
+  const takeFor = (userId: string | null) =>
+    repository.takeAttempt({
+      destination: "ada@example.com",
+      kind: "email",
+      maximumAttempts: 5,
+      now: clock.now,
+      userId,
+    });
+  const attemptsOf = async () =>
+    (await database.select().from(contactCodes))[0]?.attempts;
+
+  it("finds a sign-in code only when signing in, and does not count a try against it otherwise", async () => {
+    await repository.issue(issueInput());
+    expect(await takeFor("00000000-0000-7000-8000-000000000001")).toBeNull();
+    expect(await attemptsOf()).toBe(0);
+    expect(await takeFor(null)).not.toBeNull();
+  });
+
+  it("finds a link code only for the account it was sent to, and does not count a try against it otherwise", async () => {
+    const owner = await signedInAccount({ address: "owner@example.com" });
+    const other = await signedInAccount({ address: "other@example.com" });
+    await repository.issue(
+      issueInput({ purpose: "link", userId: owner.userId }),
+    );
+    expect(await takeFor(null)).toBeNull();
+    expect(await takeFor(other.userId)).toBeNull();
+    expect(await attemptsOf()).toBe(0);
+    expect(await takeFor(owner.userId)).not.toBeNull();
+    expect(await attemptsOf()).toBe(1);
   });
 });

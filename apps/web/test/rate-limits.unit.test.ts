@@ -12,6 +12,8 @@ const signInSteps = [
   "redeemSetupLink",
   "requestEmailCode",
   "verifyEmailCode",
+  "requestEmailLinkCode",
+  "verifyEmailLinkCode",
 ];
 
 describe("the limits on signing in", () => {
