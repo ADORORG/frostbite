@@ -38,6 +38,12 @@ export interface MethodDescription {
 export interface MethodAdapter<Context> extends MethodDescription {
   // The ids of this kind of method the account has. Reads only.
   list(context: Context, userId: string): Promise<readonly string[]>;
+  // A short, human way to name an account by what it holds of this kind (an address, a shortened wallet), or null when it holds none
+  // or the kind has nothing readable. Used where an administrator must recognise a person.
+  label?(context: Context, userId: string): Promise<string | null>;
+  // The accounts that hold this kind of method written exactly as `text` (after the kind's own normalizing). Exact only: it finds a
+  // person who is named, it never browses.
+  lookup?(context: Context, text: string): Promise<readonly string[]>;
 }
 
 export type ListMethods<Context> = (

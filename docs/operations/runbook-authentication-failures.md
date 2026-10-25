@@ -110,6 +110,14 @@ Never log, paste or ticket a signature, a session token or a challenge message.
 5. **Local stack.** Nothing is sent: `pnpm mailbox` prints what the stack "sent" (newest first).
 6. **Adding an address to an account.** "Recent authentication is required" means the session is older than `PASSKEY_RECENT_AUTH_WINDOW_MS`: the person signs in again, then retries. "This address cannot be added to this account" means another account holds it (the page does not say whose); the person signs in with that address instead, or removes it from the other account first. There is no merging. Every add or remove signs the account's other sessions out and writes `email-linked` / `email-unlinked` to `ador.auth_security_events` (read-only check: `select action, created_at, correlation_id from ador.auth_security_events where actor_user_id = '<user-id>' order by created_at desc limit 10;`).
 
+## Symptom: "an administrator cannot change roles" / "a role I gave does not work"
+
+1. **"Recent authentication is required."** Role changes need a sign-in within `PASSKEY_RECENT_AUTH_WINDOW_MS` (ten minutes). The administrator signs in again and retries.
+2. **"Only an administrator whose role is working can change roles."** Their own `admin` role is suspended, or they no longer hold a wallet (administrators need one). The role screen lists each role as `active`, `active, not working yet` or `suspended`.
+3. **A role was given and shows "not working yet".** `staff` and `admin` need a wallet linked to the account; an email-only account holds the role but it does not act. The person links a wallet from the header, and it starts working. Read-only check: `select r.role, r.status from ador.platform_role_assignments r where r.user_id = '<user-id>';` and `select count(*) from ador.wallet_identities where user_id = '<user-id>';`.
+4. **"This is the last working administrator."** Make another administrator first (the role screen), then suspend. If nobody can use the screen at all, mint a setup link (`pnpm platform:setup-link`), which works only while no working administrator exists.
+5. **Who changed what.** Every grant, reinstatement and suspension is in `ador.platform_role_events` with the actor, the target, the policy version and `via` (`role-screen` or `setup-link`).
+
 ## Containment (security events)
 
 - Revoke one user's sessions (**write**; production approval required, record who and why):

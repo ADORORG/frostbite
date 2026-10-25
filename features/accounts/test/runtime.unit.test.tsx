@@ -10,6 +10,10 @@ const factories = vi.hoisted(() => ({
     PASSKEY_RECENT_AUTH_WINDOW_MS: 600_000,
   })),
   contactRepository: vi.fn(() => "contact-repository"),
+  roleAdministration: vi.fn(() => ({ roleAdministration: true })),
+  roleAdministrationRepository: vi.fn(() => "role-administration-repository"),
+  roleDirectory: vi.fn(() => ({ roleDirectory: true })),
+  roleDirectoryRepository: vi.fn(() => "role-directory-repository"),
   contactService: vi.fn(() => ({ contactService: true })),
   linkRepository: vi.fn(() => "link-repository"),
   linkService: vi.fn(() => ({ linkService: true })),
@@ -37,6 +41,13 @@ const factories = vi.hoisted(() => ({
   })),
 }));
 
+vi.mock("@ador/authorization", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@ador/authorization")>()),
+  createDrizzleRoleAdministration: factories.roleAdministrationRepository,
+  createDrizzleRoleDirectory: factories.roleDirectoryRepository,
+  createRoleAdministration: factories.roleAdministration,
+  createRoleDirectory: factories.roleDirectory,
+}));
 vi.mock("@ador/mail", () => ({ createMailSender: factories.mailSender }));
 vi.mock("@ador/auth", () => ({
   createContactCodeService: factories.contactService,
@@ -68,7 +79,9 @@ const methods: AccountMethods = {
     { assurance: "basic", canSignIn: false, kind: "phone" },
     { assurance: "standard", canSignIn: true, kind: "email" },
   ],
+  label: vi.fn(async () => null),
   list: vi.fn(async () => []),
+  lookup: vi.fn(async () => []),
 };
 
 describe("passkey runtime composition", () => {
@@ -130,7 +143,7 @@ describe("passkey runtime composition", () => {
   });
 
   it("builds the code service once, with an email channel made from the mail settings and the policy, under the platform's session lifetimes", async () => {
-    const { createEmailResolvers } = await import("../src/runtime.ts");
+    const { createEmailResolvers } = await import("../src/email-runtime.ts");
     const policy = {
       codeLength: 6,
       lifetimeMs: 600_000,
@@ -170,7 +183,7 @@ describe("passkey runtime composition", () => {
   });
 
   it("has no channel at all while the deployment has no mail, and builds no sender", async () => {
-    const { createEmailResolvers } = await import("../src/runtime.ts");
+    const { createEmailResolvers } = await import("../src/email-runtime.ts");
     createEmailResolvers(null, methods).codes();
     expect(factories.mailSender).not.toHaveBeenCalled();
     expect(factories.emailChannel).not.toHaveBeenCalled();
@@ -180,7 +193,7 @@ describe("passkey runtime composition", () => {
   });
 
   it("builds the link service with the same channel and code service, the registry's listing for the removal rule, and the recent-sign-in window", async () => {
-    const { createEmailResolvers } = await import("../src/runtime.ts");
+    const { createEmailResolvers } = await import("../src/email-runtime.ts");
     const policy = {
       codeLength: 6,
       lifetimeMs: 600_000,
@@ -216,5 +229,39 @@ describe("passkey runtime composition", () => {
         repository: "link-repository",
       }),
     );
+  });
+
+  it("builds the role services once: administration and directory over the platform's rules, the registry's naming and finding, and the recent-sign-in window", async () => {
+    const { createRoleServicesResolver } =
+      await import("../src/roles/runtime.ts");
+    const rules = {
+      lifetimeMs: 3_600_000,
+      policyVersion: "test-v2",
+      requiredMethods: { admin: ["wallet"] },
+    };
+    const getServices = createRoleServicesResolver(methods, rules);
+    const first = getServices();
+    expect(getServices()).toBe(first);
+    expect(factories.roleAdministration).toHaveBeenCalledOnce();
+    expect(factories.roleAdministration).toHaveBeenCalledWith(
+      expect.objectContaining({
+        policy: { version: "test-v2" },
+        repository: "role-administration-repository",
+      }),
+    );
+    expect(factories.roleAdministrationRepository).toHaveBeenCalledWith(
+      "database",
+      expect.objectContaining({ requiredMethods: { admin: ["wallet"] } }),
+    );
+    expect(factories.roleDirectoryRepository).toHaveBeenCalledWith(
+      "database",
+      expect.objectContaining({
+        label: methods.label,
+        lookup: methods.lookup,
+        requiredMethods: { admin: ["wallet"] },
+      }),
+    );
+    expect(first.recentAuthenticationWindowMs).toBe(600_000);
+    expect(first.directory).toEqual({ roleDirectory: true });
   });
 });

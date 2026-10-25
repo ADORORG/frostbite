@@ -16,6 +16,22 @@ export const creatorE2EFixtures = {
     sessionToken: "e2e-staff-session-token",
     userId: "01994b10-0000-7000-8000-00000000000b",
   },
+  // The administrator (wallet and email identities are seeded with them): manages who holds platform roles (ADR-021).
+  admin: {
+    emailIdentityId: "01994b10-0000-7000-8000-000000000094",
+    roleId: "01994b10-0000-7000-8000-000000000090",
+    sessionId: "01994b10-0000-7000-8000-000000000091",
+    sessionToken: "e2e-admin-session-token",
+    userId: "01994b10-0000-7000-8000-000000000092",
+    walletId: "01994b10-0000-7000-8000-000000000093",
+  },
+  // A person who signs in by email only: no wallet, no role. The one an administrator finds and gives a role in the role screen.
+  roleCandidate: {
+    emailIdentityId: "01994b10-0000-7000-8000-000000000097",
+    sessionId: "01994b10-0000-7000-8000-000000000096",
+    sessionToken: "e2e-role-candidate-session-token",
+    userId: "01994b10-0000-7000-8000-000000000095",
+  },
   passkeyUser: {
     sessionId: "01994b10-0000-7000-8000-000000000008",
     sessionToken: "e2e-passkey-session-token",
@@ -224,4 +240,10 @@ export const feedbackApplication = {
 export const publicCollection = {
   id: "01994b10-0000-7000-8000-000000000050",
   name: "Public light",
+} as const;
+
+// The addresses the seeded people sign in with by email, so the role screen can find them.
+export const seededEmails = {
+  admin: "admin@example.test",
+  roleCandidate: "candidate@example.test",
 } as const;

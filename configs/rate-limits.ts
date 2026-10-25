@@ -30,6 +30,9 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // A balance asks an outside data source, and anyone may ask: a few a minute covers the widget's refresh and a
     // manual one with room to spare.
     getWalletBalance: perMinute(30),
+    // Changing who holds a platform role is rare and sensitive; finding a person to change is a lookup that names one account at a time.
+    findPlatformRoleCandidates: perMinute(30),
+    grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),
     // Opening a setup link is for the one person setting up the platform; a token cannot be guessed, but nothing needs more than a few.
     redeemSetupLink: perMinute(10),
@@ -44,6 +47,7 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // are far tighter than a save.
     startGameRun: perMinute(30),
     submitCollection: perMinute(10),
+    suspendPlatformRole: perMinute(20),
     submitCreatorApplication: perMinute(10),
     submitGameRun: perMinute(30),
     // Sent when a game is opened and after each save or unlock, so it is the busiest write; one a second.

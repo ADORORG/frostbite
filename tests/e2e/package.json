@@ -15,7 +15,9 @@
   },
   "devDependencies": {
     "@ador/auth": "workspace:*",
+    "@ador/authorization": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/feature-accounts": "workspace:*",
     "@ador/game-sdk": "workspace:*",
     "@ador/mail": "workspace:*",
     "@ador/shared": "workspace:*",

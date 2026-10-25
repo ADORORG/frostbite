@@ -2,6 +2,8 @@ import type { DatabaseTransaction } from "@ador/database/connection";
 import { walletIdentities } from "@ador/database/schema/auth";
 import { eq } from "drizzle-orm";
 
+import { shortenAddress } from "./short-address.ts";
+
 import type { MethodAdapter } from "../methods/contracts.ts";
 
 export const walletMethodKind = "wallet";
@@ -18,4 +20,22 @@ export const walletMethod: MethodAdapter<DatabaseTransaction> = {
         .from(walletIdentities)
         .where(eq(walletIdentities.userId, userId))
     ).map(({ id }) => id),
+  // Named by the first wallet linked, shortened.
+  label: async (transaction, userId) => {
+    const [wallet] = await transaction
+      .select({ address: walletIdentities.address })
+      .from(walletIdentities)
+      .where(eq(walletIdentities.userId, userId))
+      .orderBy(walletIdentities.createdAt, walletIdentities.id)
+      .limit(1);
+    return wallet === undefined ? null : shortenAddress(wallet.address);
+  },
+  // A wallet is found by its address, written as stored.
+  lookup: async (transaction, text) =>
+    (
+      await transaction
+        .select({ userId: walletIdentities.userId })
+        .from(walletIdentities)
+        .where(eq(walletIdentities.address, text.trim()))
+    ).map(({ userId }) => userId),
 };

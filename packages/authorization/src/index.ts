@@ -16,6 +16,7 @@ export { createDrizzleRoleAdministration } from "./adapters/drizzle-role-adminis
 export { createRoleAdministration } from "./application/role-administration.ts";
 export type {
   GrantOutcome,
+  RoleAdministration,
   RoleAdministrationRepository,
   RoleChange,
   SuspendOutcome,
@@ -36,3 +37,14 @@ export {
   requiresMethods,
   type RoleRequirements,
 } from "./application/effective-roles.ts";
+export {
+  createDrizzleRoleDirectory,
+  type DirectoryRules,
+} from "./adapters/drizzle-role-directory.ts";
+export {
+  createRoleDirectory,
+  type DirectoryEntry,
+  type DirectoryRole,
+  type RoleDirectory,
+  type RoleDirectoryRepository,
+} from "./application/role-directory.ts";

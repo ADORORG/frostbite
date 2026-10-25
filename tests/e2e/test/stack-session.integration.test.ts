@@ -77,6 +77,8 @@ describe("a seeded session after the person signed out", () => {
           .from(authSessions)
           .where(eq(authSessions.id, sessionId));
         expect(mine?.revokedAt).toBeNull();
+        // Picking the person is signing in as them, so changes that need a recent sign-in work.
+        expect(mine?.authenticatedAt).toEqual(now);
         expect(mine?.idleExpiresAt.toISOString()).toBe(
           "2026-10-24T13:00:00.000Z",
         );
@@ -85,6 +87,7 @@ describe("a seeded session after the person signed out", () => {
           .from(authSessions)
           .where(eq(authSessions.tokenHash, hash("someone-else")));
         expect(theirs?.revokedAt).toEqual(revoked);
+        expect(theirs?.authenticatedAt).toEqual(revoked);
       } finally {
         await pool.end();
       }

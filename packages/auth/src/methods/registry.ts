@@ -10,6 +10,10 @@ export interface MethodRegistry<Context> {
   describe(): readonly MethodDescription[];
   // Every method the account has, from every adapter: the order they were registered, then by id, so the answer is the same each time.
   list(context: Context, userId: string): Promise<readonly LinkedMethod[]>;
+  // A name for the account from the first method that has one (in registration order), or null.
+  label(context: Context, userId: string): Promise<string | null>;
+  // The accounts any method finds for the text, each once.
+  lookup(context: Context, text: string): Promise<readonly string[]>;
 }
 
 // The set of sign-in methods a deployment offers, composed once at the composition root. A malformed or repeated kind, or a set in which
@@ -54,6 +58,19 @@ export function createMethodRegistry<Context>(
         }),
       );
       return listed.flat();
+    },
+    label: async (context, userId) => {
+      for (const adapter of adapters) {
+        const label = (await adapter.label?.(context, userId)) ?? null;
+        if (label !== null) return label;
+      }
+      return null;
+    },
+    lookup: async (context, text) => {
+      const found = await Promise.all(
+        adapters.map((adapter) => adapter.lookup?.(context, text) ?? []),
+      );
+      return [...new Set(found.flat())];
     },
   };
 }

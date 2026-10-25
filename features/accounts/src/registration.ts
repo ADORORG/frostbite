@@ -1,21 +1,26 @@
 import { defineFeature } from "@ador/plugin-kit";
 import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import { manageRolesCapability } from "@ador/shared/accounts";
 
 import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
 
 export type { AddressHoldings, BalanceSource } from "./balance/source.ts";
 import {
-  createEmailResolvers,
   createPasskeyServiceResolver,
   createPasskeySignInResolver,
   createSetupLinkResolver,
   createWalletServicesResolver,
   offeredSignInKinds,
   type AccountMethods,
-  type EmailSignInRules,
   type SetupRules,
 } from "./runtime.ts";
+import {
+  createEmailResolvers,
+  type EmailSignInRules,
+} from "./email-runtime.ts";
+import { roleRoutes } from "./roles/contract.ts";
+import { createRoleServicesResolver } from "./roles/runtime.ts";
 import { setupLinkRoutes } from "./setup/contract.ts";
 import {
   validateWalletAuthConfig,
@@ -24,7 +29,7 @@ import {
 
 export type { WalletAuthConfig, WalletCandidate } from "./wallet-config.ts";
 export { createAuthMethods, createHeldMethodKinds } from "./methods.ts";
-export type { EmailSignInRules } from "./runtime.ts";
+export type { EmailSignInRules } from "./email-runtime.ts";
 
 // `balanceSource` is where the widget's balance comes from (confirmed and pending apart); `null` means the platform has no chain to ask
 // and the widget says no balance is available.
@@ -65,6 +70,13 @@ export function createAccountsFeature(
           label: "Overview",
           order: 0,
         },
+        {
+          access: { capability: manageRolesCapability, kind: "platform" },
+          area: "admin",
+          href: "/admin/roles",
+          label: "Roles",
+          order: 90,
+        },
       ],
       id: "accounts",
       pages: [
@@ -75,6 +87,10 @@ export function createAccountsFeature(
           access: { capability: "platform:operate", kind: "platform" },
           path: "/admin",
         },
+        {
+          access: { capability: manageRolesCapability, kind: "platform" },
+          path: "/admin/roles",
+        },
       ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: [],
@@ -83,6 +99,7 @@ export function createAccountsFeature(
         ...Object.values(walletAuthRoutes),
         ...Object.values(setupLinkRoutes),
         ...Object.values(emailCodeRoutes),
+        ...Object.values(roleRoutes),
         walletBalanceRoute,
       ],
       version: "1.0.0",
@@ -90,19 +107,20 @@ export function createAccountsFeature(
     load: async () =>
       import("@ador/feature-accounts/entrypoint").then(
         ({ createAccountsEntrypoint }) =>
-          createAccountsEntrypoint(
-            createWalletServicesResolver(wallet, methods, passkeys),
+          createAccountsEntrypoint({
             balanceSource,
-            createSetupLinkResolver(methods, setup),
-            createPasskeySignInResolver(),
-            emails.codes,
-            emails.links,
+            emailLinks: emails.links,
+            emailSignIn: emails.codes,
             passkeys,
-            {
+            passkeySignIn: createPasskeySignInResolver(),
+            roles: createRoleServicesResolver(methods, setup),
+            setupLinks: createSetupLinkResolver(methods, setup),
+            signIn: {
               network: wallet.network,
               offered: () => offeredSignInKinds(methods),
             },
-          ),
+            wallet: createWalletServicesResolver(wallet, methods, passkeys),
+          }),
       ),
   });
 }

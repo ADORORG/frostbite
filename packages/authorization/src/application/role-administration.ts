@@ -3,6 +3,7 @@ import {
   type AuthorizationPolicy,
   type PlatformRole,
 } from "@ador/shared/accounts";
+import type { CorrelationId } from "@ador/shared/http";
 import type { UuidV7 } from "@ador/shared/identifiers";
 
 // Who may grant and suspend platform roles, and the rules that keep that safe. An administrator does it, from the role screen; every
@@ -11,7 +12,7 @@ import type { UuidV7 } from "@ador/shared/identifiers";
 
 export interface RoleChange {
   readonly actorUserId: UuidV7;
-  readonly correlationId: UuidV7;
+  readonly correlationId: CorrelationId;
   readonly role: string;
   readonly targetUserId: UuidV7;
 }
@@ -53,7 +54,8 @@ export interface RoleAdministrationRepository {
 
 export function createRoleAdministration(dependencies: {
   readonly clock: () => Date;
-  readonly policy: AuthorizationPolicy;
+  // Only the version is used: it is written with every change, so a change can be read against the policy that was in force.
+  readonly policy: Pick<AuthorizationPolicy, "version">;
   readonly repository: RoleAdministrationRepository;
 }) {
   const { clock, policy, repository } = dependencies;
@@ -80,3 +82,5 @@ export function createRoleAdministration(dependencies: {
     },
   };
 }
+
+export type RoleAdministration = ReturnType<typeof createRoleAdministration>;

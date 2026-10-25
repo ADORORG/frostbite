@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createAccountsFeature } from "../src/registration.ts";
 import { createAuthMethods } from "../src/methods.ts";
+import { roleRoutes } from "../src/roles/contract.ts";
 import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
 import { setupLinkRoutes } from "../src/setup/contract.ts";
 import { walletBalanceRoute } from "../src/balance/contract.ts";
@@ -23,6 +24,7 @@ const allRoutes = [
   ...Object.values(walletAuthRoutes),
   ...Object.values(setupLinkRoutes),
   ...Object.values(emailCodeRoutes),
+  ...Object.values(roleRoutes),
   walletBalanceRoute,
 ];
 const byOperation = (a: { operationId: string }, b: { operationId: string }) =>
@@ -45,6 +47,10 @@ describe("accounts feature registration", () => {
         {
           access: { capability: "platform:operate", kind: "platform" },
           path: "/admin",
+        },
+        {
+          access: { capability: "platform:manage-roles", kind: "platform" },
+          path: "/admin/roles",
         },
       ],
       routes: allRoutes,
@@ -69,6 +75,17 @@ describe("accounts feature registration", () => {
     });
   });
 
+  it("puts the role screen in the admin area, for the capability that manages roles and no other", () => {
+    const { navigation = [] } = accountsFeature.manifest;
+    expect(
+      navigation.find(({ href }) => href === "/admin/roles"),
+    ).toMatchObject({
+      access: { capability: "platform:manage-roles", kind: "platform" },
+      area: "admin",
+      label: "Roles",
+    });
+  });
+
   it("loads the matching detachable entrypoint", async () => {
     const entrypoint = await accountsFeature.load({
       registeredFeatureCount: 1,
@@ -85,6 +102,7 @@ describe("accounts feature registration", () => {
       "/setup",
       "/account",
       "/admin",
+      "/admin/roles",
     ]);
     // Every route the manifest declares has an operation, and no operation is declared without a route.
     expect(

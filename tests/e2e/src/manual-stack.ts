@@ -73,6 +73,20 @@ export const stackActors: readonly StackActor[] = [
     token: creatorE2EFixtures.reviewer.sessionToken,
   },
   {
+    id: "admin",
+    landing: "/admin/roles",
+    goal: "Administrator (with a wallet): see who holds roles, find a person by email, and give or take away a role.",
+    label: "Administrator",
+    token: creatorE2EFixtures.admin.sessionToken,
+  },
+  {
+    id: "email-person",
+    landing: "/account",
+    goal: "Signed in by email only, no wallet, no role. The administrator can find candidate@example.test and give them a role: it is recorded but does not work until they link a wallet.",
+    label: "Email-only person",
+    token: creatorE2EFixtures.roleCandidate.sessionToken,
+  },
+  {
     id: "staff",
     landing: "/admin",
     goal: "Staff without the reviewer role: the admin console, but not collection decisions.",
@@ -92,6 +106,10 @@ export const stackPages = [
   ["/studio/uploads/new", "Creator: add an image"],
   ["/studio/collections", "Creator: collection drafts and the wizard"],
   ["/admin", "Staff: the admin overview of the areas you may open"],
+  [
+    "/admin/roles",
+    "Administrator: who holds platform roles, find a person, give or take away a role",
+  ],
   ["/admin/collection-reviews", "Reviewer: the review queue"],
   ["/admin/collection-activity", "Reviewer: the activity log"],
   [

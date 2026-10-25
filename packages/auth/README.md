@@ -78,6 +78,7 @@ registration and route adapter; no feature discovery or global registration is u
   counter, which is what a cloned authenticator does, cannot both succeed. A passkey is bound to the site's domain: the policy
   refuses to start unless the relying party is the host of the platform's own origin.
 - The UI makes no recovery claim for passkeys.
+- A method adapter may also give `label` (a short human name for an account, such as a shortened wallet address or the first email address) and `lookup` (the accounts that hold the method written exactly as typed). The registry offers the first label and the union of lookups; the role screen uses them to show and find people without knowing any method.
 - A code opens only the thing it was sent for: a sign-in code cannot link and a link code cannot sign in (the code row carries the
   account it was sent to, and a try is counted only against the matching one).
 - Email codes: only a salted hash is stored; five tries, right or wrong, then the code is dead; a code works once; a code does not

@@ -3,39 +3,34 @@ import { createUuidV7 } from "@ador/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import { createAccountsEntrypoint } from "../src/entrypoint.tsx";
+import {
+  createAccountsEntrypoint,
+  type AccountsEntrypointServices,
+} from "../src/entrypoint.tsx";
 
-// The pages never reach for the wallet services, so a call to them would be a bug.
-const noWalletServices = () => {
-  throw new Error("The wallet services are not needed to render a page.");
+// The pages reach only for what they render; a call to anything else is a bug, so everything is a stand-in that refuses.
+const nothing = (what: string) => () => {
+  throw new Error(`${what} is not needed to render a page.`);
 };
-
 // What the sign-in page needs of the platform; the pages tested here do not use it.
 const signIn = { network: "signet", offered: () => ["wallet"] } as const;
-// Nor do they reach for the setup links; the one operation that does is tested on its own.
-const noSetupLinks = () => {
-  throw new Error("The setup links are not needed to render a page.");
-};
-const noPasskeySignIn = () => {
-  throw new Error("Passkey sign-in is not needed to render a page.");
-};
-const noEmailSignIn = () => {
-  throw new Error("Email sign-in is not needed to render a page.");
-};
-const noEmailLinks = () => {
-  throw new Error("Email links are not needed to render a page.");
-};
-const withSignIn = (service: Parameters<typeof createAccountsEntrypoint>[6]) =>
-  createAccountsEntrypoint(
-    noWalletServices,
-    null,
-    noSetupLinks,
-    noPasskeySignIn,
-    noEmailSignIn,
-    noEmailLinks,
-    service,
+
+function entrypointWith(overrides: Partial<AccountsEntrypointServices> = {}) {
+  return createAccountsEntrypoint({
+    balanceSource: null,
+    emailLinks: nothing("Email links"),
+    emailSignIn: nothing("Email sign-in"),
+    passkeys: nothing("Passkeys"),
+    passkeySignIn: nothing("Passkey sign-in"),
+    roles: nothing("The role services"),
+    setupLinks: nothing("The setup links"),
     signIn,
-  );
+    wallet: nothing("The wallet services"),
+    ...overrides,
+  });
+}
+const withSignIn = (passkeys: AccountsEntrypointServices["passkeys"]) =>
+  entrypointWith({ passkeys });
 
 describe("accounts entrypoint", () => {
   it.each([
@@ -126,18 +121,10 @@ describe("accounts entrypoint", () => {
   });
 
   it("serves the sign-in page without a session, and says so when no method can be offered", async () => {
-    const entrypoint = createAccountsEntrypoint(
-      noWalletServices,
-      null,
-      noSetupLinks,
-      noPasskeySignIn,
-      noEmailSignIn,
-      noEmailLinks,
-      () => {
-        throw new Error("passkeys are not needed to render the sign-in page");
-      },
-      { network: "signet", offered: () => [] },
-    );
+    const entrypoint = entrypointWith({
+      passkeys: nothing("Passkeys"),
+      signIn: { network: "signet", offered: () => [] },
+    });
     const page = entrypoint.pages?.find(({ path }) => path === "/sign-in");
     expect(page?.access).toEqual({ kind: "public" });
     const markup = renderToStaticMarkup(
@@ -184,16 +171,11 @@ describe("accounts entrypoint", () => {
       readonly links: () => ContactLinkService;
       readonly offered: readonly string[];
     }) {
-      const entrypoint = createAccountsEntrypoint(
-        noWalletServices,
-        null,
-        noSetupLinks,
-        noPasskeySignIn,
-        noEmailSignIn,
-        options.links,
+      const entrypoint = entrypointWith({
+        emailLinks: options.links,
         passkeys,
-        { network: "signet", offered: () => options.offered },
-      );
+        signIn: { network: "signet", offered: () => options.offered },
+      });
       const page = entrypoint.pages?.find(({ path }) => path === "/account");
       return renderToStaticMarkup(
         await page?.render({
@@ -235,6 +217,59 @@ describe("accounts entrypoint", () => {
       });
       expect(markup).not.toContain("Email addresses");
       expect(markup).toContain("Account console");
+    });
+  });
+
+  describe("the role screen", () => {
+    const page = (entrypoint: ReturnType<typeof entrypointWith>) =>
+      entrypoint.pages?.find(({ path }) => path === "/admin/roles");
+
+    it("is for the capability that manages roles, and lists the people who hold them", async () => {
+      const holders = vi.fn(async () => [
+        {
+          label: "ada@example.com",
+          roles: [
+            {
+              effective: true,
+              role: "admin" as const,
+              status: "active" as const,
+            },
+          ],
+          userId: createUuidV7(),
+        },
+      ]);
+      const entrypoint = entrypointWith({
+        roles: () => ({
+          administration: { grant: vi.fn(), suspend: vi.fn() },
+          directory: { find: vi.fn(), holders },
+          recentAuthenticationWindowMs: 600_000,
+        }),
+      });
+      expect(page(entrypoint)?.access).toEqual({
+        capability: "platform:manage-roles",
+        kind: "platform",
+      });
+      const markup = renderToStaticMarkup(
+        await page(entrypoint)?.render({
+          actorUserId: createUuidV7(),
+          navigation: [],
+          params: {},
+        }),
+      );
+      expect(markup).toContain("Platform roles");
+      expect(markup).toContain("ada@example.com");
+      expect(holders).toHaveBeenCalledOnce();
+    });
+
+    it("shows nothing, and reads nothing, without a session", async () => {
+      const entrypoint = entrypointWith();
+      expect(
+        await page(entrypoint)?.render({
+          actorUserId: null,
+          navigation: [],
+          params: {},
+        }),
+      ).toBeNull();
     });
   });
 });

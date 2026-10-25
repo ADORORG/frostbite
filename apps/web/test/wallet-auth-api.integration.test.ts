@@ -47,6 +47,10 @@ const protectedPosts = [
   "email/link/request",
   "email/link/verify",
   "email/unlink",
+  // The role screen's changes are for an administrator's own session.
+  "admin/roles/find",
+  "admin/roles/grant",
+  "admin/roles/suspend",
 ];
 const publicPosts = [
   "auth/wallet/challenge",
@@ -67,6 +71,14 @@ describe("the wallet sign-in routes at the HTTP boundary", () => {
       expect(response.headers.get("set-cookie")).toBeNull();
     },
   );
+
+  it("lists who holds platform roles only for a session", async () => {
+    const response = await GET(new Request(`${origin}/api/v1/admin/roles`), {
+      params: Promise.resolve({ segments: ["admin", "roles"] }),
+    });
+    expect(response.status).toBe(401);
+    expect(await code(response)).toBe("unauthorized");
+  });
 
   it("lists the account's email addresses only for a session", async () => {
     const response = await GET(

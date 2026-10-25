@@ -111,4 +111,34 @@ describe("the registry of sign-in methods", () => {
     expect(seen[0]).toBe(context);
     expect(seen[1]).toBe("alice");
   });
+
+  it("names an account by the first method that has a name for it, in registration order, and by nothing when none does", async () => {
+    const registry = createMethodRegistry([
+      adapter("wallet", { label: async () => null }),
+      adapter("passkey"),
+      adapter("email", { label: async (_c, userId) => `${userId}@x` }),
+      adapter("phone", { label: async () => "never reached" }),
+    ]);
+    expect(await registry.label(context, "alice")).toBe("alice@x");
+    expect(
+      await createMethodRegistry([adapter("wallet")]).label(context, "alice"),
+    ).toBeNull();
+  });
+
+  it("finds the accounts any method finds for the text, each once, and none from a method that cannot look", async () => {
+    const registry = createMethodRegistry([
+      adapter("wallet", {
+        lookup: async (_c, text) => (text === "t" ? ["a", "b"] : []),
+      }),
+      adapter("passkey"),
+      adapter("email", {
+        lookup: async (_c, text) => (text === "t" ? ["b", "c"] : []),
+      }),
+    ]);
+    expect(await registry.lookup(context, "t")).toEqual(["a", "b", "c"]);
+    expect(await registry.lookup(context, "other")).toEqual([]);
+    expect(
+      await createMethodRegistry([adapter("wallet")]).lookup(context, "t"),
+    ).toEqual([]);
+  });
 });
