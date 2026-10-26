@@ -104,7 +104,7 @@ describe("a claim as the page is told of it", () => {
     expect(accepts(gameClaimSchema, { ...claim, ...change })).toBe(false);
   });
 
-  it("names the six states and the seven reasons a claim cannot start", () => {
+  it("names the six states and the twelve reasons a claim cannot start", () => {
     expect([...gameClaimStates]).toEqual([
       "awaiting-signature",
       "pending",
@@ -114,7 +114,13 @@ describe("a claim as the page is told of it", () => {
       "expired",
     ]);
     expect([...gameClaimUnavailableReasons]).toEqual([
+      "claims-paused",
+      "contract-refused",
+      "fee-too-high",
+      "index-behind",
       "limit-reached",
+      "milestone-not-defined",
+      "no-funds",
       "no-wallet",
       "not-claimable",
       "not-earned",
