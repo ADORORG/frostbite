@@ -1,4 +1,3 @@
-import { ApiError } from "@ador/client-http";
 import { describe, expect, it } from "vitest";
 
 import { createWalletSession } from "../src/client/wallet-session.ts";
@@ -132,39 +131,7 @@ describe("removing a wallet", () => {
   );
 });
 
-describe("signing out", () => {
-  it("ends the session and says the player is signed out, whether or not a wallet is connected", async () => {
-    const s = server({
-      "/api/v1/auth/methods": () => methods(),
-      "/api/v1/auth/sign-out": () => ({ changed: true }),
-    });
-    const session = createWalletSession({ request: s.request });
-    session.setConnection(wallet());
-    await session.refresh();
-    expect(session.snapshot().view).toEqual({ kind: "linked" });
-    expect(await session.signOut()).toBe(true);
-    expect(session.snapshot()).toMatchObject({
-      busy: null,
-      methods: null,
-      view: { kind: "connected-signed-out" },
-    });
-  });
-
-  it("stays signed in, and says why, when the request did not get through", async () => {
-    const s = server({
-      "/api/v1/auth/methods": () => methods(),
-      "/api/v1/auth/sign-out": () => new ApiError("network", null, "x"),
-    });
-    const session = createWalletSession({ request: s.request });
-    session.setConnection(wallet());
-    await session.refresh();
-    expect(await session.signOut()).toBe(false);
-    expect(session.snapshot()).toMatchObject({
-      failure: "network",
-      view: { kind: "linked" },
-    });
-  });
-
+describe("an action while another runs", () => {
   it("refreshing while an action runs is ignored, and a refresh reports its own busy state", async () => {
     const s = server({ "/api/v1/auth/methods": () => methods() });
     const session = createWalletSession({ request: s.request });

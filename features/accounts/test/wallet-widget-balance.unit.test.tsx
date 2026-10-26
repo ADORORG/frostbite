@@ -29,7 +29,6 @@ const ready = (satoshis: number, pendingSats = 0) =>
 describe("the wallet widget: the balance", () => {
   it("asks for the balance of the connected wallet as soon as it is connected, keeps it out of the chip, and shows it in the menu with the time it was read", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(123_456);
     await show();
     await settle();
@@ -47,7 +46,6 @@ describe("the wallet widget: the balance", () => {
 
   it("shows what is still waiting for its first confirmation apart from what can be spent", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(0, 5_000_000);
     await show();
     await settle();
@@ -62,7 +60,6 @@ describe("the wallet widget: the balance", () => {
 
   it("will not start another read while one is under way, and says it is refreshing", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     let answer: (response: Response) => void = () => undefined;
     answers[balancePath] = () =>
       new Promise<Response>((resolve) => (answer = resolve));
@@ -82,7 +79,6 @@ describe("the wallet widget: the balance", () => {
 
   it("says nothing of what is waiting when nothing is", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(42, 0);
     await show();
     await settle();
@@ -94,7 +90,6 @@ describe("the wallet widget: the balance", () => {
 
   it("names the coin by the network: bitcoin on mainnet, tBTC on a test network", async () => {
     Object.assign(connection, { address, connected: true, network: "mainnet" });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(100_000_000);
     await show();
     await settle();
@@ -107,7 +102,6 @@ describe("the wallet widget: the balance", () => {
 
   it("does not ask for the balance of a tab nobody is looking at, and asks once it shows", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     answers[balancePath] = () => ready(42);
     Object.defineProperty(document, "hidden", {
       configurable: true,
@@ -137,7 +131,6 @@ describe("the wallet widget: the balance", () => {
   });
 
   it("asks for nothing while no wallet is connected, and says nothing about a balance", async () => {
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     expect(asks(balancePath)).toHaveLength(0);
@@ -147,7 +140,6 @@ describe("the wallet widget: the balance", () => {
 
   it("says why there is no balance instead of showing a zero, and refreshes when asked", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     // The chip says nothing of a balance; the menu says why there is none.

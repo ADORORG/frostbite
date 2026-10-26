@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { platformSessionCookieName } from "@ador/shared/auth";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import { IndexingBadge } from "@ador/feature-chain-status/badge";
 import { ShellStatusProvider } from "@repo/ui/arcade";
@@ -7,6 +8,8 @@ import "@repo/ui/styles.css";
 import "./globals.css";
 import { chainStatusConfig } from "../../../../configs/chain-status";
 import { walletAuthConfig } from "../../../../configs/wallet";
+import { getPageAccessDependencies } from "../server/auth/runtime";
+import { readSessionState } from "../server/auth/session-state";
 import { ClientNavigation } from "./client-navigation";
 import { WalletShell } from "./wallet-shell";
 
@@ -39,6 +42,10 @@ const validationSetup = "globalThis.__zod_globalConfig={jitless:true};";
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // The policy lets only scripts with this response's nonce run, and this one is ours.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const session = await readSessionState(
+    (await cookies()).get(platformSessionCookieName)?.value,
+    getPageAccessDependencies,
+  );
   return (
     <html
       lang="en"
@@ -60,6 +67,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             candidates={walletAuthConfig.candidates}
             network={walletAuthConfig.network}
             reconnectWaitMs={walletAuthConfig.reconnectWaitMs}
+            session={session}
           >
             {children}
           </WalletShell>

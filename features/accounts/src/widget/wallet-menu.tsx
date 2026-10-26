@@ -5,46 +5,43 @@ import type { WalletConnectionClient } from "@ador/wallet/client";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
 import type { BalanceSnapshot } from "../client/balance-store.ts";
-import type { useWalletSession } from "../client/use-wallet-session.ts";
 import { BalanceLine } from "./balance-line.tsx";
 import { CopyAddress } from "./copy-address.tsx";
 import { outcomeMessage } from "@ador/shared/account-outcomes";
+import type { AccountOutcome } from "@ador/shared/account-outcomes";
 import { networkName, shortAddress } from "./format.ts";
-import { MenuWallets } from "./menu-wallets.tsx";
-
-type Session = ReturnType<typeof useWalletSession>;
+import type { SessionState } from "./session-state.ts";
 
 const statusText = {
-  checking: "Checking your session…",
-  disconnected: "No wallet is connected in this browser.",
-  "connected-signed-out": "Connected, not signed in.",
-  "not-linked": "Signed in. This wallet is not linked to your account.",
-  linked: "Signed in with this wallet.",
+  "signed-in": "Signed in.",
+  "signed-out": "Not signed in.",
+  unknown: "Your session could not be checked.",
 } as const;
 
-// What the wallet menu offers, by what is true now: the wallet that is connected, whether it is the account's, and
-// the balance. Every change goes through the session store, which says "signed in" only after the server did.
+// What the wallet menu offers: the wallet that is connected and its balance, and where to go about the session. It does not sign in or
+// manage how you sign in: signing in is the sign-in page, and linking or removing wallets the account page. Signing out is the one
+// change made here, and the menu says it worked only after the server did.
 export function WalletMenu({
   balance,
+  busy,
   expectedNetwork,
+  failure,
   onChoose,
   onRefreshBalance,
-  onSessionChange,
+  onSignOut,
   session,
   wallet,
 }: {
   readonly balance: BalanceSnapshot;
+  readonly busy: boolean;
   readonly expectedNetwork: WalletNetwork;
+  readonly failure: AccountOutcome | null;
   readonly onChoose: () => void;
   readonly onRefreshBalance: () => void;
-  // Called after signing in or out succeeded, so the page can show what the new session may see.
-  readonly onSessionChange: () => void;
-  readonly session: Session;
+  readonly onSignOut: () => void;
+  readonly session: SessionState;
   readonly wallet: WalletConnectionClient;
 }) {
-  const { actions, busy, failure, methods, view } = session;
-  const working = busy !== null;
-  const waiting = "Waiting for your wallet…";
   return (
     <div className="wallet-menu">
       {wallet.connected ? (
@@ -65,47 +62,9 @@ export function WalletMenu({
         </p>
       ) : null}
       <p className="wallet-menu__status" role="status">
-        {
-          statusText[
-            view.kind === "disconnected" && view.signedIn ? "linked" : view.kind
-          ]
-        }
+        {statusText[session]}
       </p>
       {failure === null ? null : <p role="alert">{outcomeMessage(failure)}</p>}
-      <div className="wallet-menu__actions">
-        {view.kind === "connected-signed-out" ? (
-          <button
-            className="wallet-menu__primary"
-            disabled={working}
-            onClick={() =>
-              void actions.signIn().then((ok) => ok && onSessionChange())
-            }
-            type="button"
-          >
-            {busy === "sign-in" ? waiting : "Sign in with wallet"}
-          </button>
-        ) : null}
-        {view.kind === "not-linked" ? (
-          <button
-            className="wallet-menu__primary"
-            disabled={working}
-            onClick={() => void actions.link()}
-            type="button"
-          >
-            {busy === "link" ? waiting : "Link this wallet"}
-          </button>
-        ) : null}
-        {failure === "recent-authentication-required" && wallet.connected ? (
-          <button
-            className="wallet-menu__primary"
-            disabled={working}
-            onClick={() => void actions.stepUp()}
-            type="button"
-          >
-            {busy === "step-up" ? waiting : "Sign again to confirm"}
-          </button>
-        ) : null}
-      </div>
       {wallet.connected ? (
         <BalanceLine
           balance={balance}
@@ -113,13 +72,6 @@ export function WalletMenu({
           onRefresh={onRefreshBalance}
         />
       ) : null}
-      {methods === null ? null : (
-        <MenuWallets
-          busy={working}
-          methods={methods}
-          onRemove={(walletId) => void actions.unlink(walletId)}
-        />
-      )}
       <ul className="menu-list wallet-menu__rows">
         <li>
           <button className="menu-link" onClick={onChoose} type="button">
@@ -130,7 +82,6 @@ export function WalletMenu({
           <li>
             <button
               className="menu-link"
-              disabled={working}
               onClick={wallet.disconnect}
               type="button"
             >
@@ -138,27 +89,25 @@ export function WalletMenu({
             </button>
           </li>
         ) : null}
-        {view.kind === "linked" ||
-        view.kind === "not-linked" ||
-        (view.kind === "disconnected" && view.signedIn) ? (
-          <li>
-            <button
-              className="menu-link"
-              disabled={working}
-              onClick={() =>
-                void actions.signOut().then((ok) => ok && onSessionChange())
-              }
-              type="button"
-            >
-              Sign out
-            </button>
-          </li>
+        {session === "signed-in" ? (
+          <>
+            <li>
+              <a className="menu-link" href="/account">
+                Account and sign-in methods
+              </a>
+            </li>
+            <li>
+              <button
+                className="menu-link"
+                disabled={busy}
+                onClick={onSignOut}
+                type="button"
+              >
+                Sign out
+              </button>
+            </li>
+          </>
         ) : null}
-        <li>
-          <a className="menu-link" href="/account">
-            Account and passkeys
-          </a>
-        </li>
       </ul>
     </div>
   );

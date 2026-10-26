@@ -64,6 +64,19 @@ export async function connectWallet(page: Page, wallet: TestWallet) {
   await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
 }
 
+// Signs in as a player does: on the sign-in page, which is the only place that signs anyone in. Connects the (fake) wallet there, signs the
+// challenge, and waits until the page has taken them on and the header shows the wallet.
+export async function signInWithWallet(page: Page, wallet: TestWallet) {
+  await page.goto("/sign-in");
+  await connectWallet(page, wallet);
+  await page
+    .getByRole("tabpanel")
+    .getByRole("button", { name: "Sign in with wallet" })
+    .click();
+  await expect(page).not.toHaveURL(/\/sign-in/u);
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
+}
+
 // Opens the widget's menu if it is not open.
 export async function openWalletMenu(page: Page) {
   if ((await walletButton(page).getAttribute("aria-expanded")) !== "true")

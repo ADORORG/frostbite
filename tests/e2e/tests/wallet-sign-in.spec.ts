@@ -17,12 +17,13 @@ import {
   connectWallet,
   installFakeWallet,
   openWalletMenu,
+  signInWithWallet,
   walletButton,
   walletMenu,
   type TestWallet,
 } from "./support/fake-wallet.ts";
 
-// Signing in with a wallet through the header widget, the real challenge and the real verifier, against a real server
+// Signing in with a wallet on the sign-in page, managing wallets on the account page, the real challenge and the real verifier, against a real server
 // and database. Each test has wallets of its own, because accounts persist for the whole run.
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop only.");
@@ -40,6 +41,10 @@ const methodsOf = async (page: Page) => {
     status: response.status(),
   };
 };
+
+// The account page's button that links the wallet connected in this browser to the signed-in account.
+const linkButton = (page: Page) =>
+  page.getByRole("button", { name: /^Link tb1/u });
 
 async function openApp(
   browser: Browser,
@@ -60,14 +65,7 @@ async function signInWith(
   wallet: TestWallet,
 ) {
   const opened = await openApp(browser, baseURL, wallet);
-  await connectWallet(opened.page, wallet);
-  await openWalletMenu(opened.page);
-  await walletMenu(opened.page)
-    .getByRole("button", { name: "Sign in with wallet" })
-    .click();
-  await expect(walletMenu(opened.page)).toContainText(
-    "Signed in with this wallet.",
-  );
+  await signInWithWallet(opened.page, wallet);
   return opened;
 }
 
@@ -97,7 +95,8 @@ test("a player signs in with a wallet, stays signed in across a reload, and sign
   ).toBeVisible();
   await openWalletMenu(page);
   await walletMenu(page).getByRole("button", { name: "Sign out" }).click();
-  await expect(walletMenu(page)).toContainText("Connected, not signed in.");
+  // The private page does not go on showing the session that has just ended; the visitor is sent to sign in.
+  await expect(page).toHaveURL(/\/sign-in\?returnTo=%2Faccount$/u);
   expect((await methodsOf(page)).status).toBe(401);
   await ctx.close();
 });
@@ -111,16 +110,11 @@ test("a wallet that belongs to another account is refused, and the refusal says 
   // Another tab of the same browser reconnects to the wallet by itself (here, the one it now has).
   const second = await openApp(browser, baseURL, w1, mine.ctx);
   await expect(walletButton(second.page)).toContainText(w1.address.slice(0, 6));
-  await openWalletMenu(second.page);
-  await expect(walletMenu(second.page)).toContainText(
-    "This wallet is not linked to your account",
-  );
-  await walletMenu(second.page)
-    .getByRole("button", { name: "Link this wallet" })
-    .click();
-  await expect(walletMenu(second.page).getByRole("alert")).toHaveText(
-    accountOutcomes["wallet-on-another-account"].message,
-  );
+  await second.page.goto("/account");
+  await linkButton(second.page).click();
+  await expect(
+    second.page.getByText(accountOutcomes["wallet-on-another-account"].message),
+  ).toBeVisible();
   expect(
     (await methodsOf(second.page)).body?.wallets.map(
       (wallet) => wallet.address,
@@ -137,17 +131,14 @@ test("a second wallet can be linked, removed, and while it is held no other acco
   const mine = await signInWith(browser, baseURL, w3);
   const second = await openApp(browser, baseURL, w4, mine.ctx);
   await expect(walletButton(second.page)).toContainText(w4.address.slice(0, 6));
-  await openWalletMenu(second.page);
-  await walletMenu(second.page)
-    .getByRole("button", { name: "Link this wallet" })
-    .click();
-  await expect(walletMenu(second.page)).toContainText(
-    "Signed in with this wallet.",
-  );
-  expect((await methodsOf(second.page)).body?.wallets).toHaveLength(2);
-  await walletMenu(second.page)
+  await second.page.goto("/account");
+  await linkButton(second.page).click();
+  await expect
+    .poll(async () => (await methodsOf(second.page)).body?.wallets.length)
+    .toBe(2);
+  await second.page
     .getByRole("button", {
-      name: new RegExp(`^Remove ${w4.address.slice(0, 8)}`, "u"),
+      name: new RegExp(`^Remove ${w4.address.slice(0, 6)}`, "u"),
     })
     .click();
   await expect
@@ -155,22 +146,19 @@ test("a second wallet can be linked, removed, and while it is held no other acco
     .toBe(1);
   // Held: a new account cannot be started with it, and the refusal says it is held, not whose it was.
   const stranger = await openApp(browser, baseURL, w4);
+  await stranger.page.goto("/sign-in");
   await connectWallet(stranger.page, w4);
-  await openWalletMenu(stranger.page);
-  await walletMenu(stranger.page)
+  await stranger.page
+    .getByRole("tabpanel")
     .getByRole("button", { name: "Sign in with wallet" })
     .click();
-  await expect(walletMenu(stranger.page).getByRole("alert")).toHaveText(
-    accountOutcomes["wallet-held"].message,
-  );
+  await expect(
+    stranger.page.getByRole("tabpanel").getByRole("alert"),
+  ).toHaveText(accountOutcomes["wallet-held"].message);
   expect((await methodsOf(stranger.page)).status).toBe(401);
   // The account that removed it may take it back at once.
-  await expect(walletMenu(second.page)).toContainText(
-    "This wallet is not linked to your account",
-  );
-  await walletMenu(second.page)
-    .getByRole("button", { name: "Link this wallet" })
-    .click();
+  await second.page.reload();
+  await linkButton(second.page).click();
   await expect
     .poll(async () => (await methodsOf(second.page)).body?.wallets.length)
     .toBe(2);
@@ -183,10 +171,13 @@ test("the only way in cannot be removed, in the page or by asking the server", a
   browser,
 }) => {
   const mine = await signInWith(browser, baseURL, w5);
-  await expect(walletMenu(mine.page)).toContainText("only way to sign in");
-  await expect(
-    walletMenu(mine.page).getByRole("button", { name: /^Remove/u }),
-  ).toHaveCount(0);
+  await mine.page.goto("/account");
+  await expect(mine.page.getByRole("main")).toContainText(
+    "only way to sign in",
+  );
+  await expect(mine.page.getByRole("button", { name: /^Remove/u })).toHaveCount(
+    0,
+  );
   const only = (await methodsOf(mine.page)).body?.wallets[0];
   const response = await mine.page.request.post("/api/v1/auth/wallet/unlink", {
     data: { walletId: only?.id },

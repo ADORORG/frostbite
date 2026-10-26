@@ -156,7 +156,7 @@ test("an address another account holds cannot be added, and nothing says whose i
   await other.close();
 });
 
-test("a person who signed in by email links a wallet from the header, and the account then holds both", async ({
+test("a person who signed in by email links a wallet from the account page, and the account then holds both", async ({
   baseURL,
   context,
   page,
@@ -164,26 +164,25 @@ test("a person who signed in by email links a wallet from the header, and the ac
   const wallet = testWallets[10];
   await signedInAccount(context, baseURL, unique());
   await installFakeWallet(page, wallet);
-  await page.goto("/");
-  // Signed in by email with no wallet, the header's button is "Account" and its menu offers to connect one.
+  await page.goto("/account");
+  // Signed in by email with no wallet, the header's button is "Account"; wallets are linked on this page, not from the header.
   await expect(walletButton(page)).toHaveText("Account");
-  await walletButton(page).click();
-  await page
-    .getByRole("dialog", { name: "Wallet" })
-    .getByRole("button", { name: "Connect wallet" })
-    .click();
+  await page.getByRole("button", { name: "Connect a wallet" }).click();
   await page
     .getByRole("button", { name: "Connect UniSat", exact: true })
     .click();
   await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
-  // The menu may still be open from the chooser, or not; either way it is open when the next step needs it.
-  const menu = page.getByRole("dialog", { name: "Wallet" });
-  if (!(await menu.isVisible())) await walletButton(page).click();
-  await expect(menu).toContainText("This wallet is not linked to your account");
-  await menu.getByRole("button", { name: "Link this wallet" }).click();
-  await expect(menu).not.toContainText(
-    "This wallet is not linked to your account",
-  );
+  await page.getByRole("button", { name: /^Link tb1/u }).click();
+  // While the wallet signs the button's words change, so it is the server's record that says the link happened.
+  await expect
+    .poll(async () => {
+      const response = await page.request.get("/api/v1/auth/methods");
+      return response.ok()
+        ? authMethodsResponseSchema.parse(await response.json()).wallets.length
+        : 0;
+    })
+    .toBe(1);
+  await expect(page.getByRole("button", { name: /^Link tb1/u })).toHaveCount(0);
   const methods = authMethodsResponseSchema.parse(
     await (await page.request.get("/api/v1/auth/methods")).json(),
   );

@@ -141,7 +141,6 @@ describe("signing in", () => {
     expect(await session.link()).toBe(false);
     expect(await session.stepUp()).toBe(false);
     expect(await session.unlink(walletId)).toBe(false);
-    expect(await session.signOut()).toBe(false);
     await session.refresh();
     expect(
       s.calls.filter(({ path }) => path.endsWith("/challenge")),

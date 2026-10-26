@@ -4,17 +4,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   address,
-  answers,
   asks,
   button,
   chooser,
   click,
   connection,
   container,
-  json,
-  methods,
   openMenu,
   remembered,
+  setSession,
   settle,
   show,
   trigger,
@@ -27,7 +25,6 @@ afterEach(() => {
 
 describe("the wallet widget: the button", () => {
   it("is one button that opens the wallet chooser when no wallet is connected and nobody is signed in", async () => {
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     expect(trigger()?.textContent).toBe("Connect wallet");
@@ -39,7 +36,6 @@ describe("the wallet widget: the button", () => {
 
   it("shows the connected wallet's picture and short address, and opens a menu that names itself", async () => {
     Object.assign(connection, { address, connected: true, provider: "xverse" });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     expect(trigger()?.textContent).toBe(
@@ -63,7 +59,6 @@ describe("the wallet widget: the button", () => {
 
   it("closes the menu with Escape and puts focus back on the button, and closes it when the page is clicked elsewhere", async () => {
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     await openMenu();
@@ -96,7 +91,6 @@ describe("the wallet widget: the button", () => {
 
   it("warns on the button and in the menu when the wallet is on another network than the platform", async () => {
     Object.assign(connection, { address, connected: true, network: "mainnet" });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     expect(trigger()?.dataset.mismatch).toBe("true");
@@ -111,12 +105,12 @@ describe("the wallet widget: the button", () => {
   });
 
   it("is an account menu when signed in with no wallet connected, and can ask for a wallet from there", async () => {
-    answers["/api/v1/auth/methods"] = () => methods([address]);
+    setSession("signed-in");
     await show();
     await settle();
     expect(trigger()?.textContent).toBe("Account");
     await openMenu();
-    expect(container.textContent).toContain("Signed in with this wallet.");
+    expect(container.textContent).toContain("Signed in.");
     expect(container.querySelector(".wallet-menu__identity")).toBeNull();
     expect(asks(balancePath)).toHaveLength(0);
     await click("Connect wallet");
@@ -124,14 +118,14 @@ describe("the wallet widget: the button", () => {
     expect(container.querySelector(".popover__panel")).toBeNull();
   });
 
-  it("switches and disconnects the wallet from the menu, and links to the account page for passkeys", async () => {
+  it("switches and disconnects the wallet from the menu, and links to the account page once signed in", async () => {
+    setSession("signed-in");
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     await openMenu();
     expect(container.querySelector('a[href="/account"]')?.textContent).toBe(
-      "Account and passkeys",
+      "Account and sign-in methods",
     );
     await click("Disconnect wallet");
     expect(connection.disconnect).toHaveBeenCalledTimes(1);
@@ -148,7 +142,6 @@ describe("the wallet widget: copying the address", () => {
       value: { writeText },
     });
     Object.assign(connection, { address, connected: true });
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     await openMenu();
@@ -173,7 +166,7 @@ describe("the wallet widget: copying the address", () => {
 describe("the wallet widget: a wallet coming back after a reload", () => {
   it("says it is reconnecting, not 'Account' or 'Connect wallet', while a remembered wallet is on its way", async () => {
     remembered.value = true;
-    answers["/api/v1/auth/methods"] = () => methods([address]);
+    setSession("signed-in");
     await show();
     await settle();
     expect(trigger()?.textContent).toBe("Reconnecting wallet…");
@@ -191,7 +184,7 @@ describe("the wallet widget: a wallet coming back after a reload", () => {
     vi.useFakeTimers();
     try {
       remembered.value = true;
-      answers["/api/v1/auth/methods"] = () => methods([address]);
+      setSession("signed-in");
       await show();
       await act(async () => vi.advanceTimersByTimeAsync(9_999));
       expect(trigger()?.textContent).toBe("Reconnecting wallet…");
@@ -203,7 +196,6 @@ describe("the wallet widget: a wallet coming back after a reload", () => {
   });
 
   it("does not claim to be reconnecting when no wallet is remembered", async () => {
-    answers["/api/v1/auth/methods"] = () => json({}, 401);
     await show();
     await settle();
     expect(trigger()?.textContent).toBe("Connect wallet");

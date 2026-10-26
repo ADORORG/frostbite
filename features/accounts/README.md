@@ -5,8 +5,10 @@ Detachable authenticated account, studio, and staff route contributions.
 ## Public API
 
 `createAccountsFeature(walletConfig, balanceSource)` is the registration export; `./widget` exports `WalletRoot`,
-which the app layout mounts once. The wallet widget (header, every page) is how a player connects a wallet, signs in
-with it, links and removes wallets and signs out. The public `/sign-in` page (ADR-021) offers every method the server's method
+which the app layout mounts once. One place per job: signing in is the `/sign-in` page only, and managing how you sign in (link, remove and re-confirm
+wallets, passkeys, email) is the account page only. The wallet widget (header, every page) connects a wallet, shows it and its
+balance, leads to those two pages, and signs out. It does not read the session itself: the layout reads it on the server
+(`readSessionState` in the app) and passes `session` (`signed-in`, `signed-out` or `unknown`) down. The public `/sign-in` page (ADR-021) offers every method the server's method
 registry says can start a session, each in its own panel (`src/sign-in/`: `registry.ts` lists how each kind is shown, so a new method
 is one view there plus its adapter in `runtime.ts`); a protected page sends a signed-out visitor to it with `?returnTo=` (checked by
 `safeReturnPath` in `@ador/shared/auth/sign-in-path`: a plain path on this site, never the sign-in page, the API or another site),
@@ -32,8 +34,9 @@ and capability-gated admin navigation items.
 
 ## Invariants
 
-- After a successful sign-in or sign-out the widget calls `onSessionChange` (the app refreshes the server-rendered
-  page); a failed sign-in does not. While a remembered wallet is reconnecting the button says so, for at most
+- After a successful sign-out the widget calls `onSignedOut` (the app refreshes the server-rendered page, which sends a private
+  page's visitor to sign in); a failed sign-out does not and says why. `unknown` (the server could not read the session) is shown as
+  neither signed in nor out. While a remembered wallet is reconnecting the button says so, for at most
   `reconnectWaitMs`.
 - The wallet chooser closes when the choice is made (a wallet connected that was not, or a different one), never merely
   because a wallet is connected, so "Switch wallet" works.

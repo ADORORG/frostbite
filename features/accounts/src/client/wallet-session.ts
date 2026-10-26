@@ -3,7 +3,6 @@ import {
   walletAuthRoutes,
   walletChallengeResponseSchema,
   walletChangedResponseSchema,
-  walletEmptyRequestSchema,
   walletSignedInResponseSchema,
   type AuthMethodsResponse,
 } from "@ador/auth";
@@ -32,7 +31,7 @@ export const disconnected: WalletConnection = {
   },
 };
 
-type Step = "link" | "refresh" | "sign-in" | "sign-out" | "step-up" | "unlink";
+type Step = "link" | "refresh" | "sign-in" | "step-up" | "unlink";
 
 // Why the last action did not work: an outcome of the catalogue, whose words the screen shows.
 export type Failure = AccountOutcome;
@@ -66,8 +65,8 @@ function failureOf(error: unknown): Failure {
     : "wallet-refused";
 }
 
-// The player's wallet session as a small store: who is signed in, which wallet is connected, and the five things a
-// player does about it (sign in, link another wallet, sign again, remove a wallet, sign out). One action runs at a
+// The player's wallet session as a small store: who is signed in, which wallet is connected, and the four things a
+// player does about it (sign in, link another wallet, sign again, remove a wallet). One action runs at a
 // time. A signature is discarded if the wallet changed while it was being made.
 export function createWalletSession(dependencies: {
   readonly request: Requester;
@@ -209,21 +208,6 @@ export function createWalletSession(dependencies: {
         },
         walletSignedInResponseSchema,
       ),
-    signOut: async (): Promise<boolean> => {
-      if (busy !== null) return false;
-      set({ busy: "sign-out", failure: null });
-      try {
-        await request(walletAuthRoutes.signOut, walletChangedResponseSchema, {
-          body: walletEmptyRequestSchema.parse({}),
-        });
-        account = { kind: "signed-out" };
-        set({ busy: null });
-        return true;
-      } catch (error) {
-        set({ busy: null, failure: failureOf(error) });
-        return false;
-      }
-    },
     snapshot: (): WalletSessionSnapshot =>
       (snapshot ??= {
         busy,
