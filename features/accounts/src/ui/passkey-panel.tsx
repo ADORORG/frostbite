@@ -9,8 +9,8 @@ import {
 } from "@ador/auth";
 import {
   ArcadeActionButton,
-  SectionBlock,
-  ListRow,
+  ConsoleCard,
+  ConsoleRow,
   StatusLamp,
 } from "@repo/ui/arcade";
 
@@ -98,12 +98,13 @@ export function PasskeyPanel({
   }
 
   return (
-    <SectionBlock
-      description="Keys saved on a device or a security key. They sign you in and confirm changes; nothing is sent on chain."
+    <ConsoleCard
+      count={credentialIds.length}
+      glyph="⌁"
+      lead="Keys saved on a device or a security key. They sign you in and confirm changes; nothing is sent on chain."
       title="Passkeys"
     >
       <StatusLamp
-        plain
         label={message}
         tone={
           status === "success"
@@ -116,9 +117,9 @@ export function PasskeyPanel({
       {credentialIds.length === 0 ? (
         <p>No passkey is linked to this account yet.</p>
       ) : (
-        <ul aria-label="Linked passkeys" className="list-rows">
+        <ul aria-label="Linked passkeys" className="console-list">
           {credentialIds.map((credentialId, index) => (
-            <ListRow
+            <ConsoleRow
               action={
                 <ArcadeActionButton
                   ariaLabel={`Remove passkey ${String(index + 1)}`}
@@ -145,6 +146,6 @@ export function PasskeyPanel({
           Add passkey
         </ArcadeActionButton>
       </div>
-    </SectionBlock>
+    </ConsoleCard>
   );
 }

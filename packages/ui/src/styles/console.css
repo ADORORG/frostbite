@@ -1,0 +1,264 @@
+/* The console pages: a "player card" header and a grid of cards, in the same language as the sign-in page. */
+.console-page {
+  position: relative;
+  display: grid;
+  gap: var(--arcade-space-5);
+  padding: clamp(1.5rem, 4vw, 3rem)
+    max(1.25rem, calc((100vw - var(--arcade-content-width)) / 2));
+  background:
+    radial-gradient(
+      ellipse at 85% 0%,
+      color-mix(in srgb, var(--arcade-pink) 18%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 0% 100%,
+      color-mix(in srgb, var(--arcade-cyan) 14%, transparent),
+      transparent 55%
+    ),
+    var(--arcade-canvas);
+}
+.console-hero {
+  display: flex;
+  gap: var(--arcade-space-5);
+  align-items: center;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  border-radius: var(--arcade-radius-medium);
+  background: color-mix(in srgb, var(--arcade-surface) 92%, transparent);
+  box-shadow:
+    0.5rem 0.5rem 0 var(--arcade-red),
+    0 0 2.5rem color-mix(in srgb, var(--arcade-cyan) 14%, transparent);
+}
+.console-hero__picture {
+  display: grid;
+  flex: none;
+  place-items: center;
+  padding: var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--arcade-cyan) 40%, transparent);
+}
+.console-hero__text {
+  min-width: 0;
+}
+.console-hero h1 {
+  margin: var(--arcade-space-1) 0 var(--arcade-space-2);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 0.15rem 0.15rem 0 var(--arcade-red);
+}
+.console-hero__lead {
+  max-width: 44rem;
+  margin: 0 0 var(--arcade-space-3);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.55;
+}
+.console-hero .status-lamp {
+  margin: 0;
+}
+
+.console-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--arcade-space-4);
+  align-items: stretch;
+}
+/* A list whose items are the cards themselves: it lays out as the grid does, and stays a list to a screen reader. */
+.console-grid__items {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.console-grid__items > li {
+  display: grid;
+  min-width: 0;
+}
+.console-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--arcade-space-3);
+  min-width: 0;
+  padding: var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  transition: border-color var(--arcade-transition-fast);
+}
+.console-card:hover,
+.console-card:focus-within {
+  border-color: var(--arcade-cyan);
+}
+.console-card[data-wide="true"] {
+  grid-column: 1 / -1;
+}
+.console-card__head {
+  display: flex;
+  gap: var(--arcade-space-3);
+  align-items: flex-start;
+}
+.console-card__glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+  box-shadow: 0 0 0.75rem
+    color-mix(in srgb, var(--arcade-cyan) 35%, transparent);
+  color: var(--arcade-cyan);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+.console-card__title {
+  flex: 1;
+  min-width: 0;
+}
+.console-card__title h2 {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.console-card__title p {
+  margin: var(--arcade-space-1) 0 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+  line-height: 1.5;
+}
+.console-card__count {
+  flex: none;
+  min-width: 1.75rem;
+  padding: 0.125rem var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-yellow);
+  border-radius: 999px;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-align: center;
+}
+.console-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--arcade-space-3);
+  min-width: 0;
+}
+.console-card__body > p {
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.55;
+}
+/* The buttons of every card sit on one line of their own, the same distance from what is above them. */
+.console-card__body .arcade-actions,
+.console-card__body .arcade-form {
+  margin: 0;
+  gap: var(--arcade-space-2);
+}
+.console-card__body .arcade-form {
+  gap: var(--arcade-space-3);
+}
+/* The buttons of every card end it, on the same line across a row of cards. */
+.console-card__body > .arcade-actions {
+  margin-top: auto;
+}
+/* A message (a note, a failure, a warning) is a banner with a bar down its side in the colour of what it says: never a line of small
+   capitals among the text, so it is not missed. */
+.console-card__body .status-lamp {
+  align-items: flex-start;
+  margin: var(--arcade-space-1) 0;
+  padding: var(--arcade-space-3);
+  border: 0.0625rem solid var(--lamp-tone);
+  border-left-width: 0.25rem;
+  border-radius: var(--arcade-radius-small);
+  background: color-mix(in srgb, var(--lamp-tone) 10%, var(--arcade-ink));
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.5;
+  text-transform: none;
+}
+.console-card__body .status-lamp--attention {
+  --lamp-tone: var(--arcade-yellow);
+}
+.console-card__body .status-lamp--ready {
+  --lamp-tone: var(--arcade-mint);
+}
+.console-card__body .status-lamp--neutral {
+  --lamp-tone: var(--arcade-text-muted);
+}
+.console-card__body .status-lamp--unavailable {
+  --lamp-tone: var(--arcade-red);
+}
+.console-card__body .status-lamp__light {
+  flex: none;
+  margin-top: 0.3125rem;
+  background: var(--lamp-tone);
+  box-shadow: none;
+}
+
+.console-list {
+  display: grid;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.console-row {
+  display: flex;
+  gap: var(--arcade-space-3);
+  align-items: center;
+  padding: var(--arcade-space-2) var(--arcade-space-3);
+  border: 0.0625rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+}
+.console-row__leading {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+.console-row__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.console-row__name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.console-row__detail {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+.console-row__action {
+  flex: none;
+}
+.console-row[data-here="true"] {
+  border-color: var(--arcade-mint);
+}
+
+@media (max-width: 40rem) {
+  .console-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0.3rem 0.3rem 0 var(--arcade-red);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-card {
+    transition: none;
+  }
+}

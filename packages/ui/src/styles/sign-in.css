@@ -1,28 +1,107 @@
-/* The sign-in page: the page frame, with the keys for each method and, under them, the chosen method's panel. Layout only; what is offered
-   and what is said comes from the page. */
-.sign-in-console {
+/* The sign-in page: a "player login" screen. Everything here is decoration or layout; what is offered and what is said comes from the page. */
+.sign-in-page {
+  position: relative;
   display: grid;
-  gap: var(--arcade-space-4);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(1.5rem, 5vw, 3.5rem);
+  align-items: center;
+  min-height: calc(100vh - var(--arcade-header-height) - 6rem);
+  padding: clamp(1.75rem, 5vw, 3.5rem)
+    max(1.25rem, calc((100vw - var(--arcade-content-width)) / 2));
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      ellipse at 20% 0%,
+      color-mix(in srgb, var(--arcade-pink) 22%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 90% 100%,
+      color-mix(in srgb, var(--arcade-cyan) 20%, transparent),
+      transparent 55%
+    ),
+    var(--arcade-canvas);
+}
+/* A floor of grid lines receding to a horizon, drifting toward the viewer. */
+.sign-in-page::before {
+  position: absolute;
+  inset: 45% -30% -10%;
+  z-index: -1;
+  background:
+    linear-gradient(
+        color-mix(in srgb, var(--arcade-cyan) 38%, transparent) 0.0625rem,
+        transparent 0.0625rem
+      )
+      0 0 / 100% 3rem,
+    linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--arcade-cyan) 38%, transparent) 0.0625rem,
+        transparent 0.0625rem
+      )
+      0 0 / 3rem 100%;
+  mask-image: linear-gradient(transparent, #000 65%);
+  transform: perspective(28rem) rotateX(62deg);
+  transform-origin: top;
+  animation: sign-in-drift 6s linear infinite;
+  content: "";
+}
+/* Faint scanlines over the whole screen, as on a cabinet's glass. */
+.sign-in-page::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(
+    transparent 0 0.1875rem,
+    color-mix(in srgb, var(--arcade-ink) 28%, transparent) 0.1875rem 0.25rem
+  );
+  pointer-events: none;
+  content: "";
+}
+@keyframes sign-in-drift {
+  to {
+    background-position:
+      0 3rem,
+      0 0;
+  }
+}
+
+/* The console: the keys, and under them the chosen method's panel. */
+.sign-in-console {
+  position: relative;
+  display: grid;
+  gap: var(--arcade-space-5);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: var(--arcade-border-width) solid var(--arcade-text);
+  border-radius: var(--arcade-radius-medium);
+  background: color-mix(in srgb, var(--arcade-surface) 92%, transparent);
+  box-shadow:
+    0.75rem 0.75rem 0 var(--arcade-red),
+    0 0 3rem color-mix(in srgb, var(--arcade-cyan) 18%, transparent);
+  backdrop-filter: blur(0.5rem);
 }
 .sign-in-keys {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
-  gap: var(--arcade-space-2);
+  gap: var(--arcade-space-3);
 }
 .sign-in-key {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: center;
-  gap: var(--arcade-space-1) var(--arcade-space-2);
-  padding: var(--arcade-space-2) var(--arcade-space-3);
+  display: grid;
+  justify-items: center;
+  gap: var(--arcade-space-1);
+  padding: var(--arcade-space-3) var(--arcade-space-2);
   border: 0.125rem solid var(--arcade-border-strong);
   border-radius: var(--arcade-radius-small);
   background: var(--arcade-surface-recessed);
+  box-shadow: 0 0.25rem 0 var(--arcade-ink);
   color: var(--arcade-text-muted);
   cursor: pointer;
   font: inherit;
-  transition: border-color var(--arcade-transition-fast);
+  transition:
+    transform var(--arcade-transition-fast),
+    border-color var(--arcade-transition-fast),
+    box-shadow var(--arcade-transition-fast),
+    color var(--arcade-transition-fast);
 }
 .sign-in-key:hover {
   border-color: var(--arcade-text-subtle);
@@ -31,10 +110,14 @@
 .sign-in-key[aria-selected="true"] {
   border-color: var(--arcade-cyan);
   background: color-mix(in srgb, var(--arcade-cyan) 14%, var(--arcade-ink));
+  box-shadow:
+    0 0.25rem 0 var(--arcade-ink),
+    0 0 1.25rem color-mix(in srgb, var(--arcade-cyan) 45%, transparent);
   color: var(--arcade-text);
+  transform: translateY(-0.125rem);
 }
 .sign-in-key__glyph {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1;
 }
 .sign-in-key[aria-selected="true"] .sign-in-key__glyph {
@@ -46,7 +129,6 @@
   text-transform: uppercase;
 }
 .sign-in-key__tagline {
-  flex-basis: 100%;
   font-size: var(--arcade-text-xs);
   text-align: center;
 }
@@ -54,33 +136,38 @@
 .sign-in-slot[hidden] {
   display: none;
 }
-.sign-in-slot .sign-in-slot__title {
-  margin: 0 0 var(--arcade-space-2);
-  color: var(--arcade-yellow);
-  font-family: var(--arcade-font-pixel);
-  font-size: var(--arcade-label-size);
+.sign-in-slot__title {
+  margin: 0 0 var(--arcade-space-4);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   font-weight: 400;
-  line-height: 1.6;
   text-transform: uppercase;
 }
 .sign-in-slot .sign-in-method {
   display: grid;
-  gap: var(--arcade-space-3);
+  gap: var(--arcade-space-4);
 }
 .sign-in-slot .sign-in-method > p {
   margin: 0;
   color: var(--arcade-text-muted);
+  line-height: 1.6;
 }
+/* A message: set apart from the text around it, so it is not missed. */
 .sign-in-slot .sign-in-method > p[role="alert"] {
-  padding: var(--arcade-space-2) var(--arcade-space-3);
-  border: 0.125rem solid var(--arcade-red);
+  margin-block: var(--arcade-space-1);
+  padding: var(--arcade-space-3) var(--arcade-space-4);
+  border: 0.0625rem solid color-mix(in srgb, var(--arcade-red) 60%, transparent);
+  border-left: 0.25rem solid var(--arcade-red);
   border-radius: var(--arcade-radius-small);
+  background: color-mix(in srgb, var(--arcade-red) 12%, var(--arcade-ink));
   color: var(--arcade-text);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.5;
 }
 .sign-in-slot .sign-in-method > button {
-  justify-self: start;
-  min-height: 2.5rem;
-  padding: var(--arcade-space-2) var(--arcade-space-4);
+  justify-self: stretch;
+  min-height: 2.75rem;
+  padding: var(--arcade-space-3) var(--arcade-space-5);
   border: 0.125rem solid var(--arcade-yellow);
   border-radius: var(--arcade-radius-small);
   background: var(--arcade-yellow);
@@ -100,12 +187,28 @@
   opacity: 0.6;
   cursor: progress;
 }
+
+@media (max-width: 56rem) {
+  .sign-in-page {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  /* On a narrow screen the keys come first: the way in is what the person came for. */
+  .sign-in-console {
+    order: -1;
+    box-shadow: 0.375rem 0.375rem 0 var(--arcade-red);
+  }
+}
+/* Three keys must fit one row on a phone, so the line under each name gives way. */
 @media (max-width: 30rem) {
   .sign-in-key__tagline {
     display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .sign-in-page::before {
+    animation: none;
+  }
   .sign-in-key,
   .sign-in-slot .sign-in-method > button {
     transition: none;

@@ -12,7 +12,11 @@ export { AccessState } from "./feedback/access-state.tsx";
 export type { StatusTone } from "./arcade/status-lamp.tsx";
 export { AppShell } from "./patterns/app-shell.tsx";
 export { PageFrame } from "./patterns/page-frame.tsx";
-export { ListRow } from "./components/list-row.tsx";
+export {
+  ConsoleCard,
+  ConsolePage,
+  ConsoleRow,
+} from "./patterns/console-page.tsx";
 export type { ShellNavigationItem } from "./patterns/app-shell.tsx";
 export { ArcadeButton } from "./primitives/arcade-button.tsx";
 export type { ArcadeTone } from "./primitives/arcade-button.tsx";

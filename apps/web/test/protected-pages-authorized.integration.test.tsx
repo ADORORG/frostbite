@@ -33,7 +33,7 @@ import FeaturePage from "../src/app/[[...path]]/page";
 
 describe("authorized protected page delivery", () => {
   it.each([
-    ["account", "Account", "Every way you can sign in"],
+    ["account", "Account", "Player profile"],
     ["admin", "Admin console", 'aria-label="Staff areas"'],
   ])("renders the authorized /%s contribution", async (path, heading, own) => {
     const page = await FeaturePage({
