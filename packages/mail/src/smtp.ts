@@ -31,6 +31,7 @@ export function smtpTransportOptions(
 export interface SmtpTransport {
   sendMail(mail: {
     readonly from: string;
+    readonly html?: string;
     readonly subject: string;
     readonly text: string;
     readonly to: string;
@@ -47,6 +48,7 @@ export function createSmtpSender(
         // With one recipient the library rejects when the server refuses it, so a resolved send is an accepted one.
         await transport.sendMail({
           from: settings.from,
+          ...(message.html === undefined ? {} : { html: message.html }),
           subject: message.subject,
           text: message.text,
           to: message.to,

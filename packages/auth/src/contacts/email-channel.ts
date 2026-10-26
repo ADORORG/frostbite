@@ -1,6 +1,7 @@
 import type { MailSender } from "@ador/mail";
 import { z } from "zod";
 
+import { renderCodeEmail } from "./code-email.ts";
 import type { ContactChannel, ContactCodePolicy } from "./channel.ts";
 
 export const emailMethodKind = "email";
@@ -27,15 +28,7 @@ export function createEmailChannel(dependencies: {
   return {
     accountName: "Email user",
     deliver: (destination, code) =>
-      sender.send({
-        subject: `${code} is your ${appName} sign-in code`,
-        text: [
-          `Your ${appName} sign-in code is ${code}.`,
-          "",
-          `It works once and expires in ${minutes} minutes. If you did not ask for it, ignore this message: nobody can sign in without the code.`,
-        ].join("\n"),
-        to: destination,
-      }),
+      sender.send(renderCodeEmail({ appName, code, minutes, to: destination })),
     kind: emailMethodKind,
     normalize: normalizeEmailAddress,
     policy,

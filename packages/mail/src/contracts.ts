@@ -4,7 +4,9 @@ import { z } from "zod";
 // message names a provider, and a provider names nothing of the platform.
 export interface MailMessage {
   readonly subject: string;
-  // Plain text only: a one-time code needs nothing else, and plain text cannot carry a script or a tracking image.
+  // A styled version for clients that show one. Optional, and the caller owns what is in it: it must be self-contained (inline styles,
+  // no script, no remote image or link), so it cannot track or imitate anything. `text` is always required and always says all of it.
+  readonly html?: string;
   readonly text: string;
   // One recipient address, already normalized by the caller.
   readonly to: string;

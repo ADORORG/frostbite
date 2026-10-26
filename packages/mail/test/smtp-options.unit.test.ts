@@ -73,3 +73,31 @@ describe("a library failure with no code", () => {
     ).rejects.toThrow("(unknown)");
   });
 });
+
+describe("a message with a styled version", () => {
+  const sent: object[] = [];
+  const transport = {
+    sendMail: (mail: object) => {
+      sent.push(mail);
+      return Promise.resolve();
+    },
+  };
+
+  it("hands the library both versions, and only the plain one when there is no other", async () => {
+    const sender = createSmtpSender(base, transport);
+    await sender.send({
+      html: "<p>h</p>",
+      subject: "s",
+      text: "t",
+      to: "a@example.com",
+    });
+    await sender.send({ subject: "s", text: "t", to: "a@example.com" });
+    expect(sent[0]).toMatchObject({ html: "<p>h</p>", text: "t" });
+    expect(sent[1]).toStrictEqual({
+      from: base.from,
+      subject: "s",
+      text: "t",
+      to: "a@example.com",
+    });
+  });
+});

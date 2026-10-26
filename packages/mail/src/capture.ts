@@ -12,6 +12,8 @@ import {
 
 const capturedMailSchema = z.strictObject({
   from: z.string().min(1),
+  // The styled version, when the message had one; also written beside the JSON as a page to open in a browser.
+  html: z.string().optional(),
   sentAt: z.iso.datetime(),
   subject: z.string(),
   text: z.string(),
@@ -32,18 +34,24 @@ export function createCapturingMailbox(input: {
       const captured: CapturedMail = {
         from: input.from,
         sentAt: sentAt.toISOString(),
+        ...(message.html === undefined ? {} : { html: message.html }),
         subject: message.subject,
         text: message.text,
         to: message.to,
       };
+      const name = createUuidV7();
       try {
         await mkdir(input.directory, { recursive: true });
         // The UUID (version 7) makes the name unique and ordered by creation, so two messages in one millisecond neither collide nor swap.
         await writeFile(
-          join(input.directory, `${createUuidV7()}.json`),
+          join(input.directory, `${name}.json`),
           JSON.stringify(captured, null, 2),
           { flag: "wx" },
         );
+        if (message.html !== undefined)
+          await writeFile(join(input.directory, `${name}.html`), message.html, {
+            flag: "wx",
+          });
       } catch (error) {
         throw new MailDeliveryError(
           "the capture directory could not be written.",

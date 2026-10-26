@@ -16,6 +16,7 @@ import {
   chainSettingsFrom,
   describeChain,
 } from "../src/stack-chain-environment.ts";
+import { appNameFrom } from "../src/stack-app-name.ts";
 import {
   describeMail,
   mailEnvironmentFrom,
@@ -143,8 +144,10 @@ const chainSettings = chainSettingsFrom(
   process.env,
 );
 const stackEnvironment = { ...process.env, ...chainSettings };
+const settingsText = await readFile(settingsFile, "utf8").catch(() => null);
+const appName = appNameFrom(settingsText, process.env);
 const mailEnvironment = mailEnvironmentFrom(
-  await readFile(settingsFile, "utf8").catch(() => null),
+  settingsText,
   process.env,
   dataDirectory,
 );
@@ -198,6 +201,7 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
             ...stackEnvironment,
             ...mailEnvironment,
             ...baseEnvironment,
+            ...(appName === null ? {} : { NEXT_PUBLIC_APP_NAME: appName }),
             ...serviceEnvironment,
             HOSTNAME: "127.0.0.1",
             PORT: String(upstreamPort),

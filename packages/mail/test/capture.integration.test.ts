@@ -1,4 +1,4 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -43,6 +43,33 @@ describe("the capturing mailbox", () => {
       text: "222222",
       to: "b@example.com",
     });
+  });
+
+  it("keeps a message's styled version in its record and as a page beside it, and writes no page for a plain message", async () => {
+    const directory = await scratch();
+    const sender = createCapturingMailbox({
+      clock: () => new Date(0),
+      directory,
+      from: "login@example.org",
+    });
+    await sender.send({
+      html: "<p>hi</p>",
+      subject: "styled",
+      text: "t",
+      to: "a@example.com",
+    });
+    await sender.send({ subject: "plain", text: "t", to: "a@example.com" });
+    const mail = await readCapturedMail(directory);
+    // Found by subject: two messages in one millisecond have no order to rely on.
+    const styled = mail.find(({ subject }) => subject === "styled");
+    const plain = mail.find(({ subject }) => subject === "plain");
+    expect(styled?.html).toBe("<p>hi</p>");
+    expect(plain).not.toHaveProperty("html");
+    const files = (await readdir(directory)).filter((n) => n.endsWith(".html"));
+    expect(files).toHaveLength(1);
+    expect(await readFile(join(directory, files[0] ?? ""), "utf8")).toBe(
+      "<p>hi</p>",
+    );
   });
 
   it("is what the capture setting builds", async () => {

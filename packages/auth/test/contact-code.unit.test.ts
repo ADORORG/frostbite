@@ -91,6 +91,8 @@ describe("the email channel", () => {
     expect(message?.text).toContain("Your Ador sign-in code is 123456.");
     expect(message?.text).toContain("expires in 10 minutes");
     expect(message?.text).toContain("ignore this message");
+    // The styled version goes with it, so a client that shows one has it.
+    expect(message?.html).toContain(">123456</td>");
   });
 
   it("lets a failed send reach the caller", async () => {
