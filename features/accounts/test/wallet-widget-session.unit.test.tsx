@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { act } from "react";
+import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it } from "vitest";
+
+import { walletConflictMessages } from "../src/wallet-conflicts.ts";
 
 import {
   address,
@@ -100,6 +103,46 @@ describe("the wallet widget: signing in", () => {
     // Nothing changed about who is signed in, so the page is not asked to refresh.
     expect(sessionChanged).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [
+      "is already linked to a different account",
+      walletConflictMessages.otherAccount,
+    ],
+    ["was recently removed from an account", walletConflictMessages.held],
+  ] as const)(
+    "says why a wallet cannot be linked when it %s, in the server's words, not a vague refusal",
+    async (_why, message) => {
+      Object.assign(connection, {
+        address: second,
+        connected: true,
+        provider: "xverse",
+      });
+      Object.assign(answers, {
+        "/api/v1/auth/methods": () => methods([address]),
+        "/api/v1/auth/wallet/link/challenge": challenge,
+        "/api/v1/auth/wallet/link/verify": () =>
+          json(
+            {
+              error: {
+                code: "conflict",
+                correlationId: createUuidV7(),
+                message,
+              },
+            },
+            409,
+          ),
+      });
+      await show();
+      await settle();
+      await openMenu();
+      await click("Link this wallet");
+      expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+        message,
+      );
+      expect(container.textContent).not.toContain("cannot be used for that");
+    },
+  );
 
   it("lists the wallets that sign in, lets one be removed only while another remains, and says why the last cannot be", async () => {
     Object.assign(connection, { address, connected: true });

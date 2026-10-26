@@ -95,7 +95,11 @@ async function resolveUser(
   challenge: StoredWalletChallenge,
   now: Date,
 ): Promise<
-  { readonly ok: true; readonly userId: UuidV7 } | { readonly ok: false }
+  | { readonly ok: true; readonly userId: UuidV7 }
+  | {
+      readonly ok: false;
+      readonly reason: "held" | "other-account" | "unusable";
+    }
 > {
   await transaction.execute(
     sql`select pg_advisory_xact_lock(hashtextextended(${`${challenge.network}:${challenge.scriptIdentity}`}, 0))`,
@@ -114,12 +118,12 @@ async function resolveUser(
     const userId = uuidV7Schema.parse(identity.userId);
     return challenge.expectedUserId !== null &&
       challenge.expectedUserId !== userId
-      ? { ok: false }
+      ? { ok: false, reason: "other-account" }
       : { ok: true, userId };
   }
-  if (challenge.action === "step-up") return { ok: false };
+  if (challenge.action === "step-up") return { ok: false, reason: "unusable" };
   // A wallet an account removed is held for a while: only that account may take it back, and nobody may start a
-  // new account with it. The refusal is the same one as any other conflict, so it says nothing about who had it.
+  // new account with it. The refusal says it is held, and nothing about which account had it.
   const [held] = await transaction
     .select({ previousUserId: releasedWallets.previousUserId })
     .from(releasedWallets)
@@ -136,9 +140,9 @@ async function resolveUser(
     (challenge.action === "sign-in" ||
       challenge.expectedUserId !== held.previousUserId)
   )
-    return { ok: false };
+    return { ok: false, reason: "held" };
   if (challenge.action !== "sign-in" && challenge.expectedUserId === null) {
-    return { ok: false };
+    return { ok: false, reason: "unusable" };
   }
   const userId = challenge.expectedUserId ?? createUuidV7();
   if (challenge.expectedUserId !== null) {
@@ -147,7 +151,7 @@ async function resolveUser(
       .from(authUsers)
       .where(eq(authUsers.id, challenge.expectedUserId))
       .limit(1);
-    if (user === undefined) return { ok: false };
+    if (user === undefined) return { ok: false, reason: "unusable" };
   }
   if (challenge.expectedUserId === null) {
     await transaction.insert(authUsers).values({
@@ -237,7 +241,7 @@ export function createDrizzleWalletAuthRepository(
           return { kind: "invalid" };
 
         const user = await resolveUser(transaction, challenge, now);
-        if (!user.ok) return { kind: "identity-conflict" };
+        if (!user.ok) return { kind: "identity-conflict", reason: user.reason };
         if (challenge.action !== "sign-in") {
           await transaction
             .update(authSessions)

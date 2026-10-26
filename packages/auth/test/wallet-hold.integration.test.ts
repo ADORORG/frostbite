@@ -48,12 +48,9 @@ describe("a removed wallet is held", () => {
     });
   };
 
-  it("cannot start a new account while it is held, and the refusal is the ordinary conflict", async () => {
+  it("cannot start a new account while it is held, and the refusal says it is held and not whose it was", async () => {
     await releaseTestWallet();
-    expect(await signInAgain()).toEqual({
-      code: "identity-conflict",
-      ok: false,
-    });
+    expect(await signInAgain()).toEqual({ code: "wallet-held", ok: false });
   });
 
   it("cannot be taken by another account while it is held", async () => {
@@ -79,7 +76,7 @@ describe("a removed wallet is held", () => {
         challengeId: challenge.challengeId,
         signature: signWalletMessage(challenge.message),
       }),
-    ).toEqual({ code: "identity-conflict", ok: false });
+    ).toEqual({ code: "wallet-held", ok: false });
   });
 
   it("can be taken back at once by the account that removed it, which records the link", async () => {

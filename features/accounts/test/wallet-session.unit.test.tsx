@@ -1,9 +1,11 @@
+import { ApiError } from "@ador/client-http";
 import { describe, expect, it, vi } from "vitest";
 
 import {
   createWalletSession,
   disconnected,
 } from "../src/client/wallet-session.ts";
+import { walletConflictMessages } from "../src/wallet-conflicts.ts";
 import {
   address,
   challenge,
@@ -202,6 +204,16 @@ describe("signing in", () => {
       "a wallet that cannot be used",
       err("conflict", 409),
       "unavailable-wallet",
+    ],
+    [
+      "a wallet already linked to a different account",
+      new ApiError("conflict", 409, walletConflictMessages.otherAccount),
+      "wallet-on-another-account",
+    ],
+    [
+      "a wallet recently removed from an account",
+      new ApiError("conflict", 409, walletConflictMessages.held),
+      "wallet-held",
     ],
     ["a request that never arrived", err("network", null), "network"],
   ] as const)(

@@ -61,6 +61,12 @@ function toMessage(challenge: StoredWalletChallenge): WalletChallengeMessage {
   };
 }
 
+const conflictCodes = {
+  held: "wallet-held",
+  "other-account": "wallet-on-another-account",
+  unusable: "identity-conflict",
+} as const;
+
 export function createWalletAuthService(dependencies: {
   readonly clock: () => Date;
   readonly policy: WalletAuthPolicy;
@@ -182,8 +188,9 @@ export function createWalletAuthService(dependencies: {
         now,
         dependencies.policy.maximumVerificationAttempts,
       );
+      // Reached only once the signature has verified, so only whoever holds the wallet's key is told why it cannot be used.
       if (result.kind === "identity-conflict")
-        return { code: result.kind, ok: false };
+        return { code: conflictCodes[result.reason], ok: false };
       if (result.kind === "expired")
         return { code: "challenge-expired", ok: false };
       if (result.kind === "invalid")

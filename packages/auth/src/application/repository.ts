@@ -36,7 +36,12 @@ export interface SessionMaterial {
 export type ConsumeChallengeResult =
   | { readonly kind: "consumed"; readonly userId: UuidV7 }
   | { readonly kind: "expired" }
-  | { readonly kind: "identity-conflict" }
+  // The wallet cannot be used for this: `other-account` it is linked to another account, `held` it was recently removed from one and is
+  // kept for that account, and `unusable` it is none of those (for example a wallet not on the account being asked to sign again).
+  | {
+      readonly kind: "identity-conflict";
+      readonly reason: "held" | "other-account" | "unusable";
+    }
   | { readonly kind: "invalid" }
   | { readonly kind: "unavailable" };
 

@@ -275,7 +275,7 @@ describe("wallet authentication", () => {
     await expect(
       verifyIssued(linked, { expectedAction: "link-wallet", expectedUserId }),
     ).resolves.toEqual({
-      code: "identity-conflict",
+      code: "wallet-on-another-account",
       ok: false,
     });
   });

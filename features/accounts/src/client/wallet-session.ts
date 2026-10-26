@@ -9,6 +9,7 @@ import {
 } from "@ador/auth";
 import { ApiError, type Parser, type Requester } from "@ador/client-http";
 import type { WalletNetwork } from "@ador/wallet/contracts";
+import { walletConflictMessages } from "../wallet-conflicts.ts";
 
 // What this module needs to know about the player's connected wallet: a narrow slice of the connection library's
 // state, so the sign-in logic does not depend on a vendor and is tested without one.
@@ -40,6 +41,8 @@ export type Failure =
   | "recent-authentication-required"
   | "refused-by-wallet"
   | "unavailable-wallet"
+  | "wallet-held"
+  | "wallet-on-another-account"
   | "wallet-changed";
 
 type Account =
@@ -65,7 +68,13 @@ export interface WalletSessionSnapshot {
 
 function failureOf(error: unknown): Failure {
   if (error instanceof ApiError) {
-    if (error.code === "conflict") return "unavailable-wallet";
+    if (error.code === "conflict") {
+      if (error.message === walletConflictMessages.otherAccount)
+        return "wallet-on-another-account";
+      return error.message === walletConflictMessages.held
+        ? "wallet-held"
+        : "unavailable-wallet";
+    }
     if (error.code === "forbidden") return "recent-authentication-required";
     if (error.code === "network") return "network";
     return "not-verified";

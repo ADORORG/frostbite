@@ -1,5 +1,6 @@
 import { createWalletMethodsOperations } from "../src/application/wallet-methods-operations.ts";
 import { createUuidV7 } from "@ador/shared/identifiers";
+import { walletConflictMessages } from "../src/wallet-conflicts.ts";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -80,7 +81,27 @@ describe("linking another wallet and signing again", () => {
     },
   );
 
-  it("answers a wallet that belongs elsewhere, or is held, with the generic conflict, and a bad challenge as not verified", async () => {
+  it.each([
+    ["wallet-on-another-account", walletConflictMessages.otherAccount],
+    ["wallet-held", walletConflictMessages.held],
+  ] as const)(
+    "tells whoever just proved they hold a wallet's key why it cannot be used (%s), as a conflict",
+    async (code, message) => {
+      const s = services();
+      const operations = createWalletMethodsOperations(() => s.services);
+      s.verify.mockResolvedValueOnce({ code, ok: false } as never);
+      expect(
+        await operations[1].execute(
+          { challengeId, signature: "s" } as never,
+          signedIn(),
+        ),
+      ).toMatchObject({ error: "conflict", message, ok: false });
+      // Neither names the other account.
+      expect(message).not.toMatch(/\b[0-9a-f]{8}-[0-9a-f]{4}/iu);
+    },
+  );
+
+  it("answers a wallet that cannot be used for any other reason with the generic conflict, and a bad challenge as not verified", async () => {
     const s = services();
     const operations = createWalletMethodsOperations(() => s.services);
     s.verify.mockResolvedValueOnce({

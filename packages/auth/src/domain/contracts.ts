@@ -38,7 +38,9 @@ export type WalletAuthenticationFailure =
   | "challenge-invalid"
   | "challenge-replayed"
   | "identity-conflict"
-  | "signature-invalid";
+  | "signature-invalid"
+  | "wallet-held"
+  | "wallet-on-another-account";
 
 export type WalletAuthenticationResult =
   | {

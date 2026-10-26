@@ -7,6 +7,7 @@ import { failure, type HttpFailure } from "@ador/http/outcome";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import { createUuidV7 } from "@ador/shared/identifiers";
 
+import { walletConflictMessages } from "../wallet-conflicts.ts";
 import type { WalletAuthServices } from "./wallet-services.ts";
 
 // How a failed wallet step is told to the caller: as few ways as possible, so nothing says whose a conflicting
@@ -19,6 +20,14 @@ export const cannotUseWallet: HttpFailure = failure(
   "conflict",
   "This wallet cannot be used for that.",
 );
+export const walletOnAnotherAccount: HttpFailure = failure(
+  "conflict",
+  walletConflictMessages.otherAccount,
+);
+export const walletHeld: HttpFailure = failure(
+  "conflict",
+  walletConflictMessages.held,
+);
 export const badWalletRequest: HttpFailure = failure(
   "invalid_request",
   "The wallet request is not valid.",
@@ -28,9 +37,10 @@ export const recentAuthenticationRequired: HttpFailure = failure(
   "Recent authentication is required.",
 );
 
-// A verification failure as the caller is told it: a conflict (a wallet that belongs elsewhere, or is held) is its
-// own answer; everything else (expired, replayed, wrong signature, a challenge that is not this route's) is one.
+// A verification failure as the caller is told it: a conflict (a wallet that belongs to another account, or is held) says which; everything else (expired, replayed, wrong signature, a challenge that is not this route's) is one.
 export function verificationFailure(code: string): HttpFailure {
+  if (code === "wallet-on-another-account") return walletOnAnotherAccount;
+  if (code === "wallet-held") return walletHeld;
   return code === "identity-conflict" ? cannotUseWallet : notVerified;
 }
 
