@@ -6,6 +6,8 @@ interface StatusLampProps {
   // More than the label has room for. Shown on hover and keyboard focus, and always read out with the label.
   readonly detail?: string;
   readonly label: string;
+  // The label is a sentence to read, not a state's name: shown in the body type, not as pixel capitals.
+  readonly plain?: boolean;
   readonly tone?: StatusTone;
 }
 
@@ -13,12 +15,14 @@ export function StatusLamp({
   compact = false,
   detail,
   label,
+  plain = false,
   tone = "attention",
 }: StatusLampProps) {
   return (
     <p
       className={`status-lamp status-lamp--${tone}`}
       data-compact={compact ? "true" : undefined}
+      data-plain={plain ? "true" : undefined}
       role="status"
       tabIndex={detail === undefined ? undefined : 0}
     >

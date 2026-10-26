@@ -112,6 +112,18 @@
   line-height: 1.5;
   text-transform: none;
 }
+.status-lamp[data-plain] {
+  align-items: flex-start;
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.5;
+  text-transform: none;
+}
+.status-lamp[data-plain] .status-lamp__light {
+  flex: none;
+  margin-top: 0.3125rem;
+  box-shadow: none;
+}
 .status-lamp--attention {
   color: var(--arcade-yellow);
 }

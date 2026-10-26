@@ -4,7 +4,7 @@ import { createRequester, sameOriginFetch } from "@ador/client-http";
 import { platformRoles, type PlatformRole } from "@ador/shared/accounts";
 import {
   ArcadeActionButton,
-  ConsoleCard,
+  SectionBlock,
   ArcadeTextField,
   StatusLamp,
 } from "@repo/ui/arcade";
@@ -110,12 +110,17 @@ export function RolesPanel({
 
   function row(person: Person) {
     return (
-      <li key={person.userId}>
+      <li className="list-row list-row--stack" key={person.userId}>
         <strong>{person.label}</strong>
-        <ul aria-label={`Roles of ${person.label}`}>
+        <ul aria-label={`Roles of ${person.label}`} className="inline-items">
           {platformRoles.map((role) => {
             const held = person.roles.find((entry) => entry.role === role);
             const active = held?.status === "active";
+            const verb = active
+              ? "Suspend"
+              : held === undefined
+                ? "Grant"
+                : "Reinstate";
             return (
               <li key={role}>
                 <span>
@@ -123,7 +128,7 @@ export function RolesPanel({
                   {held === undefined ? "not held" : describe(held)}
                 </span>{" "}
                 <ArcadeActionButton
-                  ariaLabel={`${active ? "Suspend" : held === undefined ? "Grant" : "Reinstate"} ${role} for ${person.label}`}
+                  ariaLabel={`${verb} ${role} for ${person.label}`}
                   disabled={working}
                   onClick={() =>
                     void change(person, role, active ? "suspend" : "grant")
@@ -131,11 +136,7 @@ export function RolesPanel({
                   size="small"
                   tone={active ? "yellow" : "mint"}
                 >
-                  {active
-                    ? "Suspend"
-                    : held === undefined
-                      ? "Grant"
-                      : "Reinstate"}
+                  {verb}
                 </ArcadeActionButton>
               </li>
             );
@@ -147,25 +148,22 @@ export function RolesPanel({
 
   return (
     <>
-      <ConsoleCard
-        count={people.length}
-        glyph="★"
-        lead="Everyone who holds a platform role, and whether it works yet."
+      <SectionBlock
+        description="Everyone who holds a platform role, and whether it works yet."
         title="Current role holders"
-        wide
       >
-        <StatusLamp label={message.text} tone={message.tone} />
+        <StatusLamp plain label={message.text} tone={message.tone} />
         {people.length === 0 ? (
           <p>Nobody holds a platform role.</p>
         ) : (
-          <ul aria-label="People with roles">{people.map(row)}</ul>
+          <ul aria-label="People with roles" className="list-rows">
+            {people.map(row)}
+          </ul>
         )}
-      </ConsoleCard>
-      <ConsoleCard
-        glyph="⌕"
-        lead="Find a person to give a role to, by something they sign in with."
+      </SectionBlock>
+      <SectionBlock
+        description="Find a person to give a role to, by something they sign in with."
         title="Find a person"
-        wide
       >
         <form className="arcade-form" onSubmit={(event) => void search(event)}>
           <ArcadeTextField
@@ -182,9 +180,11 @@ export function RolesPanel({
           </div>
         </form>
         {found === null || found.length === 0 ? null : (
-          <ul aria-label="Search results">{found.map(row)}</ul>
+          <ul aria-label="Search results" className="list-rows">
+            {found.map(row)}
+          </ul>
         )}
-      </ConsoleCard>
+      </SectionBlock>
     </>
   );
 }

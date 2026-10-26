@@ -41,6 +41,14 @@
 .block__body p {
   margin: 0;
 }
+.block .arcade-actions {
+  gap: var(--arcade-space-2);
+  margin-top: 0;
+}
+.block .arcade-form {
+  gap: var(--arcade-space-3);
+  margin-top: 0;
+}
 .tile-grid {
   margin: 0;
   padding: 0;

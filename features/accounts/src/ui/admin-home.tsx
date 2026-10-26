@@ -2,8 +2,8 @@ import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import {
   ArcadeButton,
   ArcadeEmptyState,
-  ConsoleCard,
-  ConsolePage,
+  PageFrame,
+  Tile,
 } from "@repo/ui/arcade";
 
 // The staff overview: where each staff area the person may open begins. The areas come from the
@@ -19,8 +19,9 @@ export function AdminHome({
     (item) => item.area === "admin" && item.current !== "page",
   );
   return (
-    <ConsolePage
-      eyebrow="Platform operations"
+    <PageFrame
+      eyebrow="Admin"
+      footerLabel="Admin"
       heading="Admin console"
       intro="Choose a staff area. Reviews are separated from broader platform authority, and nothing here publishes or deploys anything."
       navigation={navigation}
@@ -30,15 +31,11 @@ export function AdminHome({
           Staff areas appear here as they are enabled for your assignment.
         </ArcadeEmptyState>
       ) : (
-        <ul
-          aria-label="Staff areas"
-          className="console-grid__items"
-          role="list"
-        >
+        <ul aria-label="Staff areas" className="tile-grid" role="list">
           {areas.map((area) => (
             <li key={area.href}>
-              <ConsoleCard glyph="◆" title={area.label}>
-                <div className="arcade-actions">
+              <Tile
+                footer={
                   <ArcadeButton
                     ariaLabel={`Open ${area.label}`}
                     href={area.href}
@@ -46,12 +43,13 @@ export function AdminHome({
                   >
                     Open
                   </ArcadeButton>
-                </div>
-              </ConsoleCard>
+                }
+                title={area.label}
+              />
             </li>
           ))}
         </ul>
       )}
-    </ConsolePage>
+    </PageFrame>
   );
 }

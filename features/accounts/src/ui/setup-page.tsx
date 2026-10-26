@@ -1,6 +1,6 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import type { WalletNetwork } from "@ador/wallet/contracts";
-import { AppShell } from "@repo/ui/arcade";
+import { PageFrame } from "@repo/ui/arcade";
 
 import { SetupSurface } from "../setup/setup-surface.tsx";
 
@@ -16,17 +16,14 @@ export function SetupPage({
   readonly offered: readonly string[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
+    <PageFrame
+      eyebrow="Platform"
       footerLabel="Setup"
-      homeHref="/"
+      heading="First-time setup"
+      intro="Finish setting up the platform with the single-use link its operator made."
       navigation={navigation}
     >
-      <section className="arcade-section arcade-section--raised">
-        <p className="arcade-eyebrow">Platform</p>
-        <h1>First-time setup</h1>
-        <SetupSurface expectedNetwork={expectedNetwork} offered={offered} />
-      </section>
-    </AppShell>
+      <SetupSurface expectedNetwork={expectedNetwork} offered={offered} />
+    </PageFrame>
   );
 }

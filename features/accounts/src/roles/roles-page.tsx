@@ -1,5 +1,5 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { ConsolePage } from "@repo/ui/arcade";
+import { PageFrame } from "@repo/ui/arcade";
 
 import type { Person } from "./roles-flow.ts";
 import { RolesPanel } from "./roles-panel.tsx";
@@ -13,13 +13,14 @@ export function RolesPage({
   readonly people: readonly Person[];
 }) {
   return (
-    <ConsolePage
-      eyebrow="Platform administration"
+    <PageFrame
+      eyebrow="Admin"
+      footerLabel="Roles"
       heading="Platform roles"
       intro="Give a role to a person, or take it away. Staff and administrator roles work only while the account holds a wallet. Every change is recorded with who made it."
       navigation={navigation}
     >
       <RolesPanel initialPeople={people} />
-    </ConsolePage>
+    </PageFrame>
   );
 }

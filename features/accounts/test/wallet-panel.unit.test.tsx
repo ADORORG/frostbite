@@ -30,7 +30,7 @@ const text = () => container.textContent;
 const alert = () => container.querySelector('[role="status"]')?.textContent;
 
 describe("the wallets card on the account page", () => {
-  it("lists the account's wallets with how many there are, and marks the one connected in this browser", async () => {
+  it("lists the account's wallets, and marks the one connected in this browser", async () => {
     Object.assign(connection, { address, connected: true });
     Object.assign(answers, {
       "/api/v1/auth/methods": () => methods([address, second]),
@@ -40,9 +40,6 @@ describe("the wallets card on the account page", () => {
     expect(
       container.querySelectorAll('[aria-label="Linked wallets"] li'),
     ).toHaveLength(2);
-    expect(container.querySelector(".console-card__count")?.textContent).toBe(
-      "2",
-    );
     expect(text()).toContain("connected in this browser");
     // Only the connected one is marked.
     expect(text()?.match(/connected in this browser/gu)).toHaveLength(1);

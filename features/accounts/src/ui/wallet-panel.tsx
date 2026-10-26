@@ -5,8 +5,8 @@ import type { WalletNetwork } from "@ador/wallet/contracts";
 import {
   ArcadeActionButton,
   Avatar,
-  ConsoleCard,
-  ConsoleRow,
+  SectionBlock,
+  ListRow,
   StatusLamp,
 } from "@repo/ui/arcade";
 
@@ -34,14 +34,12 @@ export function WalletPanel({
   const removable = wallets.length + otherWays > 1;
   const waiting = "Waiting for your wallet…";
   return (
-    <ConsoleCard
-      count={methods === null ? undefined : wallets.length}
-      glyph="◈"
-      lead="Bitcoin wallets that can sign in to this account. Connecting one in the header never signs you in by itself; linking proves it is yours."
+    <SectionBlock
+      description="Bitcoin wallets that can sign in to this account. Connecting one in the header never signs you in by itself; linking proves it is yours."
       title="Wallets"
     >
       {failure === null ? null : (
-        <StatusLamp label={outcomeMessage(failure)} tone="unavailable" />
+        <StatusLamp plain label={outcomeMessage(failure)} tone="unavailable" />
       )}
       {methods === null ? (
         <p role="status">
@@ -52,9 +50,9 @@ export function WalletPanel({
       ) : wallets.length === 0 ? (
         <p>No wallet is linked to this account yet.</p>
       ) : (
-        <ul aria-label="Linked wallets" className="console-list">
+        <ul aria-label="Linked wallets" className="list-rows">
           {wallets.map((linked) => (
-            <ConsoleRow
+            <ListRow
               action={
                 removable ? (
                   <ArcadeActionButton
@@ -92,6 +90,7 @@ export function WalletPanel({
       ) : null}
       {wallet.connected && wallet.network !== expectedNetwork ? (
         <StatusLamp
+          plain
           label={`Your wallet is on ${networkName(wallet.network)}; this platform uses ${networkName(expectedNetwork)}.`}
           tone="attention"
         />
@@ -124,6 +123,6 @@ export function WalletPanel({
           {wallet.connected ? "Connect another wallet" : "Connect a wallet"}
         </ArcadeActionButton>
       </div>
-    </ConsoleCard>
+    </SectionBlock>
   );
 }

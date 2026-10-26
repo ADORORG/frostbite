@@ -1,0 +1,55 @@
+/* A plain list: one compact row each, set apart by a rule. */
+.list-rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.list-row {
+  display: flex;
+  gap: var(--arcade-space-3);
+  align-items: center;
+  padding: var(--arcade-space-2) 0;
+  border-bottom: 0.0625rem solid var(--arcade-border);
+}
+.list-row__leading {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+.list-row__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.list-row__name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-row__detail {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+.list-row__action {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+}
+/* A row that holds a small list of its own (a person and the roles they hold): the name, and the items beneath it. */
+.list-row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--arcade-space-1);
+}
+.inline-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-1) var(--arcade-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--arcade-text-sm);
+}

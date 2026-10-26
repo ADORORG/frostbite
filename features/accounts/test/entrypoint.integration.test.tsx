@@ -45,7 +45,7 @@ const withSignIn = (passkeys: AccountsEntrypointServices["passkeys"]) =>
 
 describe("accounts entrypoint", () => {
   it.each([
-    ["/account", "Account", "Signed in"],
+    ["/account", "Account", "Every way you can sign in"],
     ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
     const entrypoint = withSignIn(() => ({
@@ -129,9 +129,9 @@ describe("accounts entrypoint", () => {
       }),
     );
     expect(markup).toContain("never signs you in by itself");
-    expect(markup).toContain("<h2>Wallets</h2>");
-    expect(markup).toContain("<h2>Passkeys</h2>");
-    expect(markup).toContain("<h2>Account id</h2>");
+    expect(markup).toContain(">Wallets</h2>");
+    expect(markup).toContain(">Passkeys</h2>");
+    expect(markup).toContain(">Account id</h2>");
   });
 
   it("serves the sign-in page without a session, and says so when no method can be offered", async () => {

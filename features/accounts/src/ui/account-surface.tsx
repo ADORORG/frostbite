@@ -1,7 +1,7 @@
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { ConsoleCard, ConsolePage } from "@repo/ui/arcade";
+import { PageFrame, SectionBlock } from "@repo/ui/arcade";
 
 import { EmailPanel } from "./email-panel.tsx";
 import { PasskeyPanel } from "./passkey-panel.tsx";
@@ -27,13 +27,12 @@ export function AccountSurface({
   readonly passkeysUnavailable?: boolean;
 }) {
   return (
-    <ConsolePage
-      avatarSeed={actorUserId}
-      eyebrow="Player profile"
+    <PageFrame
+      eyebrow="Account"
+      footerLabel="Account"
       heading="Account"
-      intro="Every way you can sign in, and your account's id. Connecting a wallet in the header never signs you in by itself; link it here, or sign in with it."
+      intro="Every way you can sign in. Connecting a wallet in the header never signs you in by itself."
       navigation={navigation}
-      status={{ label: "Signed in", tone: "ready" }}
     >
       <WalletPanel
         expectedNetwork={expectedNetwork}
@@ -46,15 +45,14 @@ export function AccountSurface({
       {emailAddresses === null ? null : (
         <EmailPanel initialAddresses={emailAddresses} />
       )}
-      <ConsoleCard
-        glyph="#"
-        lead="The id support asks for. It is not a secret, and it never changes."
+      <SectionBlock
+        description="The id support asks for. It is not a secret, and it never changes."
         title="Account id"
       >
         <p>
           <code>{actorUserId}</code>
         </p>
-      </ConsoleCard>
-    </ConsolePage>
+      </SectionBlock>
+    </PageFrame>
   );
 }
