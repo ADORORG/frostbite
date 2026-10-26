@@ -42,6 +42,7 @@ async function account(
   getService: () => PasskeyService,
   getEmailLinks: () => ContactLinkService,
   emailOffered: boolean,
+  expectedNetwork: WalletNetwork,
   navigation: readonly NavigationItem[],
 ) {
   if (actorUserId === null) return null;
@@ -57,6 +58,7 @@ async function account(
       <AccountSurface
         actorUserId={actorUserId}
         emailAddresses={emailAddresses}
+        expectedNetwork={expectedNetwork}
         navigation={navigation}
         passkeyCredentialIds={await getService().list(actorUserId)}
       />
@@ -66,6 +68,7 @@ async function account(
       <AccountSurface
         actorUserId={actorUserId}
         emailAddresses={emailAddresses}
+        expectedNetwork={expectedNetwork}
         navigation={navigation}
         passkeysUnavailable
       />
@@ -194,6 +197,7 @@ export function createAccountsEntrypoint({
             getService,
             getEmailLinks,
             signIn.offered().includes(emailMethodKind),
+            signIn.network,
             navigation,
           ),
       },

@@ -66,7 +66,7 @@ test("a signed-in person keeps their links on public pages and finds the account
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(
-    page.getByRole("heading", { name: "Account console" }),
+    page.getByRole("heading", { exact: true, name: "Account" }),
   ).toBeVisible();
 });
 

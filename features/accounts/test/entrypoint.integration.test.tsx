@@ -3,6 +3,17 @@ import { createUuidV7 } from "@ador/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
+// The account page holds the wallets card, which reads the wallet connection; there is none to read in a page rendered to text.
+vi.mock("@ador/wallet/client", () => ({
+  useWalletChooser: () => ({ request: () => undefined }),
+  useWalletConnection: () => ({
+    address: "",
+    connected: false,
+    network: "signet",
+    provider: null,
+  }),
+}));
+
 import {
   createAccountsEntrypoint,
   type AccountsEntrypointServices,
@@ -34,7 +45,7 @@ const withSignIn = (passkeys: AccountsEntrypointServices["passkeys"]) =>
 
 describe("accounts entrypoint", () => {
   it.each([
-    ["/account", "Account console", "Authenticated session"],
+    ["/account", "Account", "Signed in"],
     ["/admin", "Admin console", "Staff areas"],
   ])("renders the authorized %s surface", async (path, title, status) => {
     const entrypoint = withSignIn(() => ({
@@ -102,7 +113,7 @@ describe("accounts entrypoint", () => {
     expect(markup).not.toContain("Passkey 1");
   });
 
-  it("tells a signed-in player on the account page that the wallet button in the header manages their wallets", async () => {
+  it("gives a signed-in player the wallets card on the account page, and says a connected wallet alone does not sign them in", async () => {
     const entrypoint = withSignIn(() => ({
       begin: vi.fn(),
       finish: vi.fn(),
@@ -117,7 +128,10 @@ describe("accounts entrypoint", () => {
         params: {},
       }),
     );
-    expect(markup).toContain("wallet button in the header");
+    expect(markup).toContain("never signs you in by itself");
+    expect(markup).toContain("<h2>Wallets</h2>");
+    expect(markup).toContain("<h2>Passkeys</h2>");
+    expect(markup).toContain("<h2>Account id</h2>");
   });
 
   it("serves the sign-in page without a session, and says so when no method can be offered", async () => {
@@ -216,7 +230,7 @@ describe("accounts entrypoint", () => {
         offered: ["email"],
       });
       expect(markup).not.toContain("Email addresses");
-      expect(markup).toContain("Account console");
+      expect(markup).toContain("Account");
     });
   });
 

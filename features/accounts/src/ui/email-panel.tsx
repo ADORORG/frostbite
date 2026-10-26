@@ -3,7 +3,8 @@
 import { createRequester, sameOriginFetch } from "@ador/client-http";
 import {
   ArcadeActionButton,
-  ArcadePanel,
+  ConsoleCard,
+  ConsoleRow,
   ArcadeTextField,
   StatusLamp,
 } from "@repo/ui/arcade";
@@ -137,24 +138,34 @@ export function EmailPanel({
   }
 
   return (
-    <ArcadePanel eyebrow="Account security" title="Email addresses">
+    <ConsoleCard
+      count={addresses.length}
+      glyph="✉"
+      lead="Addresses that can sign in to this account with a one-time code."
+      title="Email addresses"
+    >
       <StatusLamp label={message.text} tone={message.tone} />
       {addresses.length === 0 ? (
         <p>No email address is linked to this account.</p>
       ) : (
-        <ul>
+        <ul aria-label="Linked email addresses" className="console-list">
           {addresses.map((address) => (
-            <li key={address}>
-              <span>{address}</span>{" "}
-              <ArcadeActionButton
-                disabled={working}
-                onClick={() => void remove(address)}
-                size="small"
-                tone="yellow"
-              >
-                {`Remove ${address}`}
-              </ArcadeActionButton>
-            </li>
+            <ConsoleRow
+              action={
+                <ArcadeActionButton
+                  ariaLabel={`Remove ${address}`}
+                  disabled={working}
+                  onClick={() => void remove(address)}
+                  size="small"
+                  tone="yellow"
+                >
+                  Remove
+                </ArcadeActionButton>
+              }
+              key={address}
+              leading={<span aria-hidden="true">✉</span>}
+              name={address}
+            />
           ))}
         </ul>
       )}
@@ -212,6 +223,6 @@ export function EmailPanel({
           </div>
         </form>
       )}
-    </ArcadePanel>
+    </ConsoleCard>
   );
 }

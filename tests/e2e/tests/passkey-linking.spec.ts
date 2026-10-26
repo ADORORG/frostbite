@@ -46,7 +46,7 @@ test("links and removes a platform passkey with a real browser ceremony", async 
   expect(malformed.status()).toBe(400);
   await page.goto("/account");
   await expect(
-    page.getByRole("heading", { name: "Account console" }),
+    page.getByRole("heading", { exact: true, name: "Account" }),
   ).toBeVisible();
   const optionsResponse = page.waitForResponse((response) =>
     response.url().endsWith("/passkeys/registration/options"),

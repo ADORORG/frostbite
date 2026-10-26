@@ -178,13 +178,13 @@ test("the page follows signing in and out: the navigation changes at once, and a
   await expect(links).toHaveText(["Collections", "Games", "Studio", "Account"]);
   await page.goto("/account");
   await expect(
-    page.getByRole("heading", { name: "Account console" }),
+    page.getByRole("heading", { exact: true, name: "Account" }),
   ).toBeVisible();
   await openWalletMenu(page);
   await walletMenu(page).getByRole("button", { name: "Sign out" }).click();
   // The private page does not go on showing the session that has just ended.
   await expect(
-    page.getByRole("heading", { name: "Account console" }),
+    page.getByRole("heading", { exact: true, name: "Account" }),
   ).toHaveCount(0);
   // With the session ended, a private page sends the visitor to sign in again, and back to it afterwards.
   await expect(page).toHaveURL(/\/sign-in\?returnTo=%2Faccount$/u);

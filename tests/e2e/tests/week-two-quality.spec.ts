@@ -7,7 +7,7 @@ import { loadFonts } from "./support/quality.ts";
 
 const authenticatedSurfaces = [
   {
-    heading: "Account console",
+    heading: "Account",
     path: "/account",
     snapshot: "account",
     token: creatorE2EFixtures.visualUser.sessionToken,
@@ -58,7 +58,7 @@ for (const surface of authenticatedSurfaces) {
     await page.goto(surface.path);
 
     await expect(
-      page.getByRole("heading", { level: 1, name: surface.heading }),
+      page.getByRole("heading", { exact: true, level: 1, name: surface.heading }),
     ).toBeVisible();
     // Pages that load their content in the browser are checked once it has loaded, not while it loads.
     await expect(page.getByText(/^Loading /u)).toHaveCount(0);

@@ -92,7 +92,7 @@ test("a player signs in with a wallet, stays signed in across a reload, and sign
   await expect(walletButton(page)).toContainText(w0.address.slice(0, 6));
   await page.goto("/account");
   await expect(
-    page.getByRole("heading", { name: "Account console" }),
+    page.getByRole("heading", { exact: true, name: "Account" }),
   ).toBeVisible();
   await openWalletMenu(page);
   await walletMenu(page).getByRole("button", { name: "Sign out" }).click();
@@ -101,7 +101,7 @@ test("a player signs in with a wallet, stays signed in across a reload, and sign
   await ctx.close();
 });
 
-test("a wallet that belongs to another account is refused, and the refusal says nothing about whose it is", async ({
+test("a wallet that belongs to another account is refused, and the refusal says so without saying whose it is", async ({
   baseURL,
   browser,
 }) => {
@@ -118,7 +118,7 @@ test("a wallet that belongs to another account is refused, and the refusal says 
     .getByRole("button", { name: "Link this wallet" })
     .click();
   await expect(walletMenu(second.page).getByRole("alert")).toHaveText(
-    "This wallet cannot be used for that.",
+    "This wallet is already linked to a different account. Sign in to that account and remove it there first, or use another wallet.",
   );
   expect(
     (await methodsOf(second.page)).body?.wallets.map(

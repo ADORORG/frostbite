@@ -33,7 +33,9 @@ async function begin(page: Page, baseURL: string | undefined, token?: string) {
 }
 
 async function heading(page: Page, name: string) {
-  await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { exact: true, level: 1, name }),
+  ).toBeVisible();
 }
 
 // The top bar, kept as a baseline on desktop and mobile. A person with only the account page has one link to it, not a menu.
@@ -94,7 +96,7 @@ test("someone who never applied is led from the studio to the application and ba
   await breadcrumb(page).getByRole("link", { name: "Studio" }).click();
   await heading(page, "Creator studio");
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
-  await heading(page, "Account console");
+  await heading(page, "Account");
   await pictureOfTheBar(page, "applicant");
 });
 
@@ -185,6 +187,6 @@ test("staff without the reviewer role see their console and no review links", as
     0,
   );
   await bar(page).getByRole("link", { name: "Account", exact: true }).click();
-  await heading(page, "Account console");
+  await heading(page, "Account");
   await pictureOfTheBar(page, "staff");
 });

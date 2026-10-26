@@ -4,7 +4,7 @@ import { createRequester, sameOriginFetch } from "@ador/client-http";
 import { platformRoles, type PlatformRole } from "@ador/shared/accounts";
 import {
   ArcadeActionButton,
-  ArcadePanel,
+  ConsoleCard,
   ArcadeTextField,
   StatusLamp,
 } from "@repo/ui/arcade";
@@ -168,15 +168,26 @@ export function RolesPanel({
 
   return (
     <>
-      <ArcadePanel eyebrow="Who holds roles" title="Current role holders">
+      <ConsoleCard
+        count={people.length}
+        glyph="★"
+        lead="Everyone who holds a platform role, and whether it works yet."
+        title="Current role holders"
+        wide
+      >
         <StatusLamp label={message.text} tone={message.tone} />
         {people.length === 0 ? (
           <p>Nobody holds a platform role.</p>
         ) : (
           <ul aria-label="People with roles">{people.map(row)}</ul>
         )}
-      </ArcadePanel>
-      <ArcadePanel eyebrow="Give a role" title="Find a person">
+      </ConsoleCard>
+      <ConsoleCard
+        glyph="⌕"
+        lead="Find a person to give a role to, by something they sign in with."
+        title="Find a person"
+        wide
+      >
         <form className="arcade-form" onSubmit={(event) => void search(event)}>
           <ArcadeTextField
             hint="An email address or wallet address they sign in with, or their account id. Exact matches only."
@@ -194,7 +205,7 @@ export function RolesPanel({
         {found === null || found.length === 0 ? null : (
           <ul aria-label="Search results">{found.map(row)}</ul>
         )}
-      </ArcadePanel>
+      </ConsoleCard>
     </>
   );
 }

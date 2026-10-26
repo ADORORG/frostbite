@@ -73,7 +73,7 @@ test("a signed-out visitor to a protected page signs in with an emailed code and
   expect(cookies.some(({ name }) => name === platformSessionCookieName)).toBe(
     true,
   );
-  await expect(page.getByText("Authenticated session")).toBeVisible();
+  await expect(page.getByText("Signed in", { exact: true })).toBeVisible();
 });
 
 test("asking again at once is refused and says when to try again; a code that signed someone in cannot be used again", async ({

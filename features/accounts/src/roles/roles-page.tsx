@@ -1,5 +1,5 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { PageFrame } from "@repo/ui/arcade";
+import { ConsolePage } from "@repo/ui/arcade";
 
 import type { Person } from "./roles-flow.ts";
 import { RolesPanel } from "./roles-panel.tsx";
@@ -13,7 +13,7 @@ export function RolesPage({
   readonly people: readonly Person[];
 }) {
   return (
-    <PageFrame
+    <ConsolePage
       eyebrow="Platform administration"
       footerLabel="Authenticated beta workspace"
       heading="Platform roles"
@@ -21,6 +21,6 @@ export function RolesPage({
       navigation={navigation}
     >
       <RolesPanel initialPeople={people} />
-    </PageFrame>
+    </ConsolePage>
   );
 }

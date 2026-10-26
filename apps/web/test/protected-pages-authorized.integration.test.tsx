@@ -1,6 +1,17 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
+// The wallet provider lives in the app's layout, which these tests do not render; the account page's wallets card reads the connection.
+vi.mock("@ador/wallet/client", () => ({
+  useWalletChooser: () => ({ request: () => undefined }),
+  useWalletConnection: () => ({
+    address: "",
+    connected: false,
+    network: "signet",
+    provider: null,
+  }),
+}));
+
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session-token" }) }),
 }));
@@ -22,7 +33,7 @@ import FeaturePage from "../src/app/[[...path]]/page";
 
 describe("authorized protected page delivery", () => {
   it.each([
-    ["account", "Account console", "Session active"],
+    ["account", "Account", "Player profile"],
     ["admin", "Admin console", 'aria-label="Staff areas"'],
   ])("renders the authorized /%s contribution", async (path, heading, own) => {
     const page = await FeaturePage({

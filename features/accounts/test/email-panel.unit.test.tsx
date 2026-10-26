@@ -21,6 +21,16 @@ const flow = vi.hoisted(() => ({
   requestLinkCode: vi.fn(),
 }));
 vi.mock("../src/ui/email-link-flow.ts", () => flow);
+// The account page also holds the wallets card, which reads the wallet connection; there is none to read in a page rendered to text.
+vi.mock("@ador/wallet/client", () => ({
+  useWalletChooser: () => ({ request: () => undefined }),
+  useWalletConnection: () => ({
+    address: "",
+    connected: false,
+    network: "signet",
+    provider: null,
+  }),
+}));
 
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { EmailPanel } from "../src/ui/email-panel.tsx";
@@ -46,9 +56,12 @@ afterEach(() => {
 const mount = (addresses: readonly string[]) =>
   act(() => root.render(<EmailPanel initialAddresses={addresses} />));
 const input = () => container.querySelector("input");
+// A button is found by its words, or by its accessible name where its words repeat down a list ("Remove" beside each address).
 const button = (name: string) =>
   [...container.querySelectorAll("button")].find(
-    ({ textContent }) => textContent === name,
+    (candidate) =>
+      candidate.textContent === name ||
+      candidate.getAttribute("aria-label") === name,
   );
 const lamp = () =>
   container.querySelector('[role="status"]')?.textContent ?? "";
@@ -86,13 +99,18 @@ describe("the account page", () => {
       <AccountSurface
         actorUserId={createUuidV7()}
         emailAddresses={["a@b.co"]}
+        expectedNetwork="signet"
       />,
     );
     const without = renderToStaticMarkup(
-      <AccountSurface actorUserId={createUuidV7()} emailAddresses={null} />,
+      <AccountSurface
+        actorUserId={createUuidV7()}
+        emailAddresses={null}
+        expectedNetwork="signet"
+      />,
     );
     const unspecified = renderToStaticMarkup(
-      <AccountSurface actorUserId={createUuidV7()} />,
+      <AccountSurface actorUserId={createUuidV7()} expectedNetwork="signet" />,
     );
     expect(withMail).toContain("Email addresses");
     expect(withMail).toContain("a@b.co");

@@ -1,50 +1,61 @@
 import type { UuidV7 } from "@ador/shared/identifiers";
-import { AppShell, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
+import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import { ConsoleCard, ConsolePage } from "@repo/ui/arcade";
+
 import { EmailPanel } from "./email-panel.tsx";
 import { PasskeyPanel } from "./passkey-panel.tsx";
+import { WalletPanel } from "./wallet-panel.tsx";
 
+// The signed-in person's account: every way in to it, each in its own card, and the id of the account. What can change here signs the
+// other sessions out, and the cards say so only after the server did it.
 export function AccountSurface({
   actorUserId,
   emailAddresses = null,
+  expectedNetwork,
   navigation = [],
   passkeyCredentialIds = [],
   passkeysUnavailable = false,
 }: {
   readonly actorUserId: UuidV7;
-  // The account's email addresses, or null when this deployment has no mail and the panel is not shown.
+  // The account's email addresses, or null when this deployment has no mail and the card is not shown.
   readonly emailAddresses?: readonly string[] | null;
+  // The network wallets are asked for; a wallet on another one is flagged.
+  readonly expectedNetwork: WalletNetwork;
   readonly navigation?: readonly NavigationItem[];
   readonly passkeyCredentialIds?: readonly string[];
   readonly passkeysUnavailable?: boolean;
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
+    <ConsolePage
+      avatarSeed={actorUserId}
+      eyebrow="Player profile"
       footerLabel="Authenticated beta workspace"
-      homeHref="/"
+      heading="Account"
+      intro="Every way you can sign in, and your account's id. Connecting a wallet in the header never signs you in by itself; link it here, or sign in with it."
       navigation={navigation}
+      status={{ label: "Signed in", tone: "ready" }}
     >
-      <section className="arcade-section arcade-section--raised">
-        <StatusLamp label="Authenticated session" tone="ready" />
-        <p className="arcade-eyebrow">Player identity</p>
-        <h1>Account console</h1>
+      <WalletPanel
+        expectedNetwork={expectedNetwork}
+        otherWays={passkeyCredentialIds.length + (emailAddresses?.length ?? 0)}
+      />
+      <PasskeyPanel
+        initialCredentialIds={passkeyCredentialIds}
+        initialUnavailable={passkeysUnavailable}
+      />
+      {emailAddresses === null ? null : (
+        <EmailPanel initialAddresses={emailAddresses} />
+      )}
+      <ConsoleCard
+        glyph="#"
+        lead="The id support asks for. It is not a secret, and it never changes."
+        title="Account id"
+      >
         <p>
-          Your platform session is active. Wallet connection alone never unlocks
-          this surface. Sign in and manage your wallets from the wallet button
-          in the header.
+          <code>{actorUserId}</code>
         </p>
-        <ArcadePanel eyebrow="Current player" title="Session active">
-          <p className="arcade-muted">User {actorUserId}</p>
-        </ArcadePanel>
-        <PasskeyPanel
-          initialCredentialIds={passkeyCredentialIds}
-          initialUnavailable={passkeysUnavailable}
-        />
-        {emailAddresses === null ? null : (
-          <EmailPanel initialAddresses={emailAddresses} />
-        )}
-      </section>
-    </AppShell>
+      </ConsoleCard>
+    </ConsolePage>
   );
 }

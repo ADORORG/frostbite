@@ -7,7 +7,12 @@ import {
   passkeyListResponseSchema,
   passkeyMutationResponseSchema,
 } from "@ador/auth";
-import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
+import {
+  ArcadeActionButton,
+  ConsoleCard,
+  ConsoleRow,
+  StatusLamp,
+} from "@repo/ui/arcade";
 
 type Status = "idle" | "working" | "success" | "error";
 
@@ -93,7 +98,12 @@ export function PasskeyPanel({
   }
 
   return (
-    <ArcadePanel eyebrow="Account security" title="Linked passkeys">
+    <ConsoleCard
+      count={credentialIds.length}
+      glyph="⌁"
+      lead="Keys saved on a device or a security key. They sign you in and confirm changes; nothing is sent on chain."
+      title="Passkeys"
+    >
       <StatusLamp
         label={message}
         tone={
@@ -104,29 +114,38 @@ export function PasskeyPanel({
               : "attention"
         }
       />
-      <ul>
-        {credentialIds.map((credentialId, index) => (
-          <li key={credentialId}>
-            <span>Passkey {index + 1}</span>{" "}
-            <button
-              className="arcade-button arcade-button--yellow"
-              disabled={status === "working"}
-              onClick={() => unlink(credentialId)}
-              type="button"
-            >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
-      <button
-        className="arcade-button arcade-button--cyan"
-        disabled={status === "working"}
-        onClick={link}
-        type="button"
-      >
-        Add passkey
-      </button>
-    </ArcadePanel>
+      {credentialIds.length === 0 ? (
+        <p>No passkey is linked to this account yet.</p>
+      ) : (
+        <ul aria-label="Linked passkeys" className="console-list">
+          {credentialIds.map((credentialId, index) => (
+            <ConsoleRow
+              action={
+                <ArcadeActionButton
+                  ariaLabel={`Remove passkey ${String(index + 1)}`}
+                  disabled={status === "working"}
+                  onClick={() => void unlink(credentialId)}
+                  size="small"
+                  tone="yellow"
+                >
+                  Remove
+                </ArcadeActionButton>
+              }
+              key={credentialId}
+              leading={<span aria-hidden="true">⌁</span>}
+              name={`Passkey ${String(index + 1)}`}
+            />
+          ))}
+        </ul>
+      )}
+      <div className="arcade-actions">
+        <ArcadeActionButton
+          busy={status === "working"}
+          onClick={() => void link()}
+        >
+          Add passkey
+        </ArcadeActionButton>
+      </div>
+    </ConsoleCard>
   );
 }

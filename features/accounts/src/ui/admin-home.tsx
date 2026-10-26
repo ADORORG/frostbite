@@ -1,5 +1,10 @@
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { ArcadeButton, ArcadeEmptyState, PageFrame } from "@repo/ui/arcade";
+import {
+  ArcadeButton,
+  ArcadeEmptyState,
+  ConsoleCard,
+  ConsolePage,
+} from "@repo/ui/arcade";
 
 // The staff overview: where each staff area the person may open begins. The areas come from the
 // navigation the platform already resolved for this person, so a link here never leads to a page that
@@ -14,7 +19,7 @@ export function AdminHome({
     (item) => item.area === "admin" && item.current !== "page",
   );
   return (
-    <PageFrame
+    <ConsolePage
       eyebrow="Platform operations"
       footerLabel="Authenticated beta workspace"
       heading="Admin console"
@@ -26,24 +31,28 @@ export function AdminHome({
           Staff areas appear here as they are enabled for your assignment.
         </ArcadeEmptyState>
       ) : (
-        <ul aria-label="Staff areas" className="arcade-cards">
+        <ul
+          aria-label="Staff areas"
+          className="console-grid__items"
+          role="list"
+        >
           {areas.map((area) => (
             <li key={area.href}>
-              <article className="arcade-card">
-                <p className="arcade-eyebrow">Admin</p>
-                <h3 className="arcade-card__title">{area.label}</h3>
-                <ArcadeButton
-                  ariaLabel={`Open ${area.label}`}
-                  href={area.href}
-                  tone="cyan"
-                >
-                  Open
-                </ArcadeButton>
-              </article>
+              <ConsoleCard glyph="◆" title={area.label}>
+                <div className="arcade-actions">
+                  <ArcadeButton
+                    ariaLabel={`Open ${area.label}`}
+                    href={area.href}
+                    tone="cyan"
+                  >
+                    Open
+                  </ArcadeButton>
+                </div>
+              </ConsoleCard>
             </li>
           ))}
         </ul>
       )}
-    </PageFrame>
+    </ConsolePage>
   );
 }
