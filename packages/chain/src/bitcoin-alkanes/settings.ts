@@ -9,12 +9,10 @@ import {
   type BitcoinAlkanesNodes,
 } from "./adapter.ts";
 import {
-  createFeeApi,
-  createFixedFeeApi,
-  feeProbeTargets,
-  type FeeApi,
-  type GetLike,
-} from "./node/fee-api.ts";
+  createFeeSource,
+  type FeeSource,
+  type FeeSourceSettings,
+} from "../fee-sources/index.ts";
 import { createRpcNode } from "./node/node.ts";
 import { createJsonRpc, type FetchLike } from "./node/transport.ts";
 import type { TransactionOptions } from "./options.ts";
@@ -62,23 +60,14 @@ export interface AlkanesAdministrationSettings {
   readonly templates: readonly TemplateSetting[];
 }
 
-export type FeeSourceSettings =
-  | {
-      readonly fetch: GetLike;
-      readonly kind: "explorer";
-      readonly timeoutMs: number;
-      readonly url: string;
-    }
-  | { readonly kind: "fixed"; readonly satPerVb: number };
-
 // Everything the `bitcoin-alkanes` adapter needs for one chain, from configuration. Nothing here is defaulted: the caller states it.
 export interface AlkanesChainSettings {
   // `null`: the adapter reads and builds claims but refuses staff steps.
   readonly administration: AlkanesAdministrationSettings | null;
   readonly chain: ChainRef;
   // Where fee rates come from, in place of the node's own estimates:
-  // - `explorer`: a public explorer's recommendation (see `createFeeApi`);
-  // - `fixed`: a rate the operator set, for when no explorer can be reached (see `createFixedFeeApi`);
+  // - `explorer`: a public explorer's quote, in the format named (see `fee-sources`);
+  // - `fixed`: a rate the operator set, for when no explorer can be reached;
   // - `null`: the node's estimates are used (a chain whose node prices fees sensibly, such as a local regtest).
   readonly feeApi: FeeSourceSettings | null;
   readonly maxPreviewBytes: number;
@@ -146,19 +135,6 @@ export function createAlkanesAdapter(
   );
 }
 
-function feeSourceOf(source: FeeSourceSettings | null): FeeApi | undefined {
-  if (source === null) return undefined;
-  return source.kind === "fixed"
-    ? createFixedFeeApi(source.satPerVb)
-    : createFeeApi(source);
-}
-
-// Looks once at the explorer the operator named, reading every level the platform will use, so a wrong address or an answer of the
-// wrong shape is found when the platform starts and not at someone's first step. Rejects as `createFeeApi` does. A fixed rate, the
-// node's own estimates and no source have nothing to look at.
-export async function probeFeeSource(
-  source: FeeSourceSettings | null,
-): Promise<void> {
-  if (source === null || source.kind !== "explorer") return;
-  await createFeeApi(source).feeRates(feeProbeTargets);
+function feeSourceOf(source: FeeSourceSettings | null): FeeSource | undefined {
+  return source === null ? undefined : createFeeSource(source);
 }

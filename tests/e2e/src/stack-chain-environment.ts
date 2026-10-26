@@ -48,7 +48,8 @@ function describeFeeSource(environment: NodeJS.ProcessEnv): string {
     return `Fee rate: FIXED at ${rate} sat/vB by REWARDS_FEE_RATE_SAT_VB (not live).`;
   if (url !== "") {
     try {
-      return `Fee levels from ${new URL(url).host} (REWARDS_FEE_API_URL).`;
+      const format = environment.REWARDS_FEE_API_FORMAT?.trim() || "mempool";
+      return `Fee levels from ${new URL(url).host}, read as ${format} (REWARDS_FEE_API_URL, REWARDS_FEE_API_FORMAT).`;
     } catch {
       return "Fee levels from an address that is not a URL (REWARDS_FEE_API_URL).";
     }

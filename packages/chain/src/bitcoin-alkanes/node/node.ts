@@ -1,6 +1,6 @@
 import type { AlkaneId } from "./alkane-id.ts";
 import { NodeUnavailableError } from "./errors.ts";
-import type { FeeApi } from "./fee-api.ts";
+import type { FeeSource } from "../../fee-sources/types.ts";
 import { createEsploraClient, type EsploraClient } from "./esplora.ts";
 import { createIndexerClient, type IndexerClient } from "./indexer.ts";
 import type { ViewResult } from "./messages.ts";
@@ -25,7 +25,7 @@ export interface AlkanesNode extends EsploraClient {
 }
 
 // `fees`, when given, answers every fee rate in place of the node's own estimates.
-export function createRpcNode(rpc: JsonRpc, fees?: FeeApi): AlkanesNode {
+export function createRpcNode(rpc: JsonRpc, fees?: FeeSource): AlkanesNode {
   const esplora = createEsploraClient(rpc);
   const indexer = createIndexerClient(rpc);
   return {

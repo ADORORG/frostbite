@@ -26,9 +26,13 @@ Game rewards page, and the platform records them when each step completes (`ador
    on signet, hundreds of thousands on testnet4). If that explorer cannot be reached from where the platform runs, a step fails with
    "The fee source could not be reached." (a claim shows "The network could not be reached"). Two optional settings, alternatives
    (both set stops boot):
-   - `REWARDS_FEE_API_URL`: another explorer that answers like mempool.space (its address up to the network, such as
-     `https://fees.example.org/signet`), for a mirror or one of your own. Check it first:
-     `curl <address>/api/v1/fees/recommended` must print `fastestFee`, `halfHourFee`, `hourFee` and `economyFee`.
+   - `REWARDS_FEE_API_URL`: another explorer (its address up to the network, such as `https://fees.example.org/signet`), for a
+     mirror or one of your own, and `REWARDS_FEE_API_FORMAT`: how it answers. `mempool` (the default when blank) is mempool.space's
+     own recommended fees; check with `curl <address>/api/v1/fees/recommended`, which must print `fastestFee`, `halfHourFee`,
+     `hourFee` and `economyFee`. `esplora` is the Esplora standard's estimate per confirmation target (Blockstream's Esplora,
+     electrs, mempool.space); check with `curl <address>/api/fee-estimates`, which must print a map such as `{"1": 9, "6": 5}`.
+     A format with no address is refused at start. Esplora estimates from a raw node can be far too high on signet, so look
+     at the numbers before choosing it there.
    - `REWARDS_FEE_RATE_SAT_VB`: a fixed rate (up to 1000, a fraction is fine) used for every step and every speed. It is yours to
      keep honest: it does not follow the network, so a rate that is too low leaves a step unconfirmed and one that is too high wastes
      fee. Each step's total fee is still held to `REWARDS_MAX_FEE_SATS`. The local stack's startup line says when a fixed rate is in
@@ -37,8 +41,8 @@ Game rewards page, and the platform records them when each step completes (`ador
    Neither is ever chosen automatically: when the source fails, nothing is guessed.
 
    **Looked at when the server starts.** With `REWARDS_FEE_API_URL` set, the server asks that explorer once as it starts and reads
-   all four levels. If it cannot be reached, answers with an error status, or does not answer as mempool.space does, the server does
-   not start and says so: `REWARDS_FEE_API_URL (host) is not usable: <reason>`. Fix the address, or blank the setting. The cost is
+   all four levels. If it cannot be reached, answers with an error status, or does not answer in the format named, the server does
+   not start and says so: `REWARDS_FEE_API_URL (host, read as <format>) is not usable: <reason>`. Fix the address, or blank the setting. The cost is
    that an explorer that is down for a moment at start also stops the start; start again. The network's default explorer and a fixed
    rate are not looked at (a fixed rate has nothing to ask).
 

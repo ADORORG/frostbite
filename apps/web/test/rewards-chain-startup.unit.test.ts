@@ -17,7 +17,11 @@ const base: RewardsChainEnvironment = {
 };
 const mirror: RewardsChainEnvironment = {
   ...base,
-  feeSource: { kind: "explorer", url: "https://fees.example.invalid/mirror" },
+  feeSource: {
+    format: "mempool",
+    kind: "explorer",
+    url: "https://fees.example.invalid/mirror",
+  },
 };
 
 // A platform whose public fetch is the explorer, and whose node must never be asked at startup.
@@ -67,7 +71,7 @@ describe("what the platform looks at when it starts", () => {
       beta,
     );
     await expect(rewards?.startupCheck()).rejects.toThrow(
-      "REWARDS_FEE_API_URL (fees.example.invalid) is not usable: The fee source's halfHourFee is not a positive number.",
+      "REWARDS_FEE_API_URL (fees.example.invalid, read as mempool) is not usable: The fee source's halfHourFee is not a positive number.",
     );
   });
 
@@ -78,7 +82,7 @@ describe("what the platform looks at when it starts", () => {
       beta,
     );
     await expect(rewards?.startupCheck()).rejects.toThrow(
-      "REWARDS_FEE_API_URL (fees.example.invalid) is not usable: The fee source could not be reached.",
+      "REWARDS_FEE_API_URL (fees.example.invalid, read as mempool) is not usable: The fee source could not be reached.",
     );
   });
 

@@ -91,6 +91,7 @@ describe("the fee rates of the beta networks", () => {
           {
             ...environment,
             feeSource: {
+              format: "mempool",
               kind: "explorer",
               url: "https://fees.example.invalid/mirror",
             },
@@ -110,6 +111,45 @@ describe("the fee rates of the beta networks", () => {
         // The explorer is given the deployment's time limit (400 ms here), not a shorter one.
         await new Promise((resolve) => setTimeout(resolve, 40));
         expect(explorerSignals.map(({ aborted }) => aborted)).toEqual([false]);
+      });
+    }
+  });
+
+  describe("when the operator names an Esplora-format explorer", () => {
+    for (const [name, beta] of Object.entries(betaChains)) {
+      it(`${name}: its estimates per target are read at its fee-estimates address`, async () => {
+        const { explorerAsked, platform } = world();
+        const esplora: RewardsPlatform = {
+          ...platform,
+          get: async (address, init) => {
+            explorerAsked.push(address);
+            return {
+              json: () => Promise.resolve({ "1": 9, "6": 5 }),
+              ok: true,
+              status: init.signal.aborted ? 500 : 200,
+            };
+          },
+        };
+        const rewards = createRewardsChain(
+          {
+            ...environment,
+            feeSource: {
+              format: "esplora",
+              kind: "explorer",
+              url: "https://fees.example.invalid/esplora",
+            },
+          },
+          esplora,
+          beta,
+        );
+        const chain = chainRefSchema.parse(beta.chain.chainId);
+        const rates = await rewards
+          ?.chain(chain)
+          ?.ports.observer.feeRates(chain, [1, 4]);
+        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([9, 5]);
+        expect(explorerAsked).toEqual([
+          "https://fees.example.invalid/esplora/api/fee-estimates",
+        ]);
       });
     }
   });

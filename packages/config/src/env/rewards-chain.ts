@@ -1,3 +1,4 @@
+import { feeApiFormatSchema, type FeeApiFormat } from "@ador/shared/chain";
 import { z } from "zod";
 
 const blankAsUnset = (value: string | undefined) =>
@@ -7,12 +8,16 @@ const blankAsUnset = (value: string | undefined) =>
 // a preview and a deployment is here; where a template or a game's contract is on the chain is recorded when staff publish it.
 export interface RewardsChainEnvironment {
   // Where the fee levels come from. `default`: the network's own explorer (see `configs/beta-chains.ts`). `explorer`: another explorer
-  // that answers like mempool.space does, for when the default cannot be reached from where the platform runs. `fixed`: a rate the operator
+  // of the format named by `REWARDS_FEE_API_FORMAT` (mempool.space's by default), for when the default cannot be reached from where the platform runs. `fixed`: a rate the operator
   // sets, used for every step instead of asking anyone (shown as fixed wherever it is shown; the step's total fee is still held to
   // `maxFeeSats`).
   readonly feeSource:
     | { readonly kind: "default" }
-    | { readonly kind: "explorer"; readonly url: string }
+    | {
+        readonly format: FeeApiFormat;
+        readonly kind: "explorer";
+        readonly url: string;
+      }
     | { readonly kind: "fixed"; readonly satPerVb: number };
   // The most a player's claim or a staff step may pay in fee, in satoshis.
   readonly maxFeeSats: bigint;
@@ -42,6 +47,7 @@ export const rewardsChainEnvironmentSchema = z
       .positive()
       .default(15_000),
     REWARDS_CHAIN_RPC_URL: z.url({ protocol: /^https?$/u }),
+    REWARDS_FEE_API_FORMAT: feeApiFormatSchema.optional(),
     REWARDS_FEE_API_URL: z.url({ protocol: /^https?$/u }).optional(),
     REWARDS_FEE_RATE_SAT_VB: z.coerce
       .number()
@@ -58,6 +64,15 @@ export const rewardsChainEnvironmentSchema = z
     {
       message:
         "REWARDS_FEE_API_URL and REWARDS_FEE_RATE_SAT_VB are alternatives: set one or neither.",
+    },
+  )
+  .refine(
+    (value) =>
+      value.REWARDS_FEE_API_FORMAT === undefined ||
+      value.REWARDS_FEE_API_URL !== undefined,
+    {
+      message:
+        "REWARDS_FEE_API_FORMAT says how the explorer of REWARDS_FEE_API_URL answers, so it needs REWARDS_FEE_API_URL.",
     },
   )
   .refine(
@@ -86,6 +101,7 @@ export function parseRewardsChainEnvironment(
       source.REWARDS_CHAIN_RPC_TIMEOUT_MS,
     ),
     REWARDS_CHAIN_RPC_URL: url,
+    REWARDS_FEE_API_FORMAT: blankAsUnset(source.REWARDS_FEE_API_FORMAT),
     REWARDS_FEE_API_URL: blankAsUnset(source.REWARDS_FEE_API_URL),
     REWARDS_FEE_RATE_SAT_VB: blankAsUnset(source.REWARDS_FEE_RATE_SAT_VB),
     REWARDS_MAX_FEE_SATS: blankAsUnset(source.REWARDS_MAX_FEE_SATS),
@@ -98,7 +114,11 @@ export function parseRewardsChainEnvironment(
       parsed.REWARDS_FEE_RATE_SAT_VB !== undefined
         ? { kind: "fixed", satPerVb: parsed.REWARDS_FEE_RATE_SAT_VB }
         : parsed.REWARDS_FEE_API_URL !== undefined
-          ? { kind: "explorer", url: parsed.REWARDS_FEE_API_URL }
+          ? {
+              format: parsed.REWARDS_FEE_API_FORMAT ?? "mempool",
+              kind: "explorer",
+              url: parsed.REWARDS_FEE_API_URL,
+            }
           : { kind: "default" },
     maxFeeSats: parsed.REWARDS_MAX_FEE_SATS,
     rpcHeaders:

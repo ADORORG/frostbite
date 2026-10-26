@@ -2,6 +2,7 @@ import {
   chainOptionSchema,
   type BetaNetwork,
   type ChainOption,
+  type FeeApiFormat,
   type WalletNetwork,
 } from "@ador/shared/chain";
 
@@ -27,6 +28,7 @@ export const betaChains = {
       role: "public-beta",
     }),
     explorerTxUrl: "https://mempool.space/signet/tx/{id}",
+    feeApiFormat: "mempool",
     feeApiUrl: "https://mempool.space/signet",
     network: "signet",
   },
@@ -39,6 +41,7 @@ export const betaChains = {
       role: "public-beta",
     }),
     explorerTxUrl: "https://mempool.space/testnet4/tx/{id}",
+    feeApiFormat: "mempool",
     feeApiUrl: "https://mempool.space/testnet4",
     network: "testnet4",
   },
@@ -51,6 +54,8 @@ export const betaChains = {
     readonly explorerTxUrl: string;
     // Where the network's fee rates are read: a public explorer's address up to the network (the adapter adds the path). The hosted
     // nodes' own fee estimates follow a few outlying transactions and are not used (finding S106).
+    // How that explorer answers (mempool.space serves both formats).
+    readonly feeApiFormat: FeeApiFormat;
     readonly feeApiUrl: string;
     readonly network: WalletNetwork;
   }

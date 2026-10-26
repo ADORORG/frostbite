@@ -128,6 +128,7 @@ describe("the services the adapter is wired to", () => {
     const explorer = {
       ...settings,
       feeApi: {
+        format: "mempool" as const,
         fetch: (url: string) => {
           asked.push(url);
           return Promise.resolve({

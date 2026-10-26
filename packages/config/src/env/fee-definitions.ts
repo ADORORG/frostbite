@@ -6,7 +6,15 @@ export const feeSourceEnvironmentDefinitions = [
   {
     key: "REWARDS_FEE_API_URL",
     description:
-      "Another explorer to take fee levels from, answering like mempool.space (its address up to the network, e.g. https://example.org/signet), for when the network's default explorer cannot be reached from here. Blank uses the default. Not together with REWARDS_FEE_RATE_SAT_VB.",
+      "Another explorer to take fee levels from (its address up to the network, e.g. https://example.org/signet; how it answers is REWARDS_FEE_API_FORMAT), for when the network's default explorer cannot be reached from here. Blank uses the default. Not together with REWARDS_FEE_RATE_SAT_VB.",
+    exposure: "server",
+    required: false,
+    secret: false,
+  },
+  {
+    key: "REWARDS_FEE_API_FORMAT",
+    description:
+      "Which way the explorer of REWARDS_FEE_API_URL answers: mempool (mempool.space's own recommended fees, GET <url>/api/v1/fees/recommended; the default) or esplora (the Esplora standard's estimate per confirmation target, GET <url>/api/fee-estimates, served by Blockstream's Esplora, electrs and mempool.space). Blank is mempool. Needs REWARDS_FEE_API_URL.",
     exposure: "server",
     required: false,
     secret: false,

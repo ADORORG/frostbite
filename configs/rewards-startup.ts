@@ -15,7 +15,7 @@ export async function feeSourceStartupCheck(
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `REWARDS_FEE_API_URL (${new URL(feeSource.url).host}) is not usable: ${reason}`,
+      `REWARDS_FEE_API_URL (${new URL(feeSource.url).host}, read as ${feeSource.format}) is not usable: ${reason}`,
     );
   }
 }

@@ -138,7 +138,42 @@ describe("the rewards chain environment", () => {
           ...node,
           REWARDS_FEE_API_URL: " https://fees.example.org/signet ",
         })?.feeSource,
-      ).toEqual({ kind: "explorer", url: "https://fees.example.org/signet" });
+      ).toEqual({
+        format: "mempool",
+        kind: "explorer",
+        url: "https://fees.example.org/signet",
+      });
+    });
+
+    it("reads the explorer in the format named, trimmed; a blank format is the default", () => {
+      const withFormat = (REWARDS_FEE_API_FORMAT: string) =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_FORMAT,
+          REWARDS_FEE_API_URL: "https://fees.example.org/signet",
+        })?.feeSource;
+      expect(withFormat(" esplora ")).toEqual({
+        format: "esplora",
+        kind: "explorer",
+        url: "https://fees.example.org/signet",
+      });
+      expect(withFormat(" ")).toMatchObject({ format: "mempool" });
+    });
+
+    it("refuses a format it does not know, and a format with no explorer to apply it to", () => {
+      expect(() =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_FORMAT: "blockbook",
+          REWARDS_FEE_API_URL: "https://fees.example.org/signet",
+        }),
+      ).toThrow();
+      expect(() =>
+        parseRewardsChainEnvironment({
+          ...node,
+          REWARDS_FEE_API_FORMAT: "esplora",
+        }),
+      ).toThrow("needs REWARDS_FEE_API_URL");
     });
 
     it("can be a fixed rate, which may have a fraction", () => {

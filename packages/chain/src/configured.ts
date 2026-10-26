@@ -8,13 +8,15 @@ import {
 import type { ChainAdapter } from "./adapter.ts";
 import { createChainRegistry, type ChainRegistry } from "./registry.ts";
 
-export { probeFeeSource } from "./bitcoin-alkanes/settings.ts";
-export type { GetLike } from "./bitcoin-alkanes/node/fee-api.ts";
+export {
+  probeFeeSource,
+  type FeeSourceSettings,
+  type GetLike,
+} from "./fee-sources/index.ts";
 export type { FetchLike } from "./bitcoin-alkanes/node/transport.ts";
 export type {
   AlkanesAdministrationSettings,
   AlkanesChainSettings,
-  FeeSourceSettings,
   TemplateSetting,
 } from "./bitcoin-alkanes/settings.ts";
 

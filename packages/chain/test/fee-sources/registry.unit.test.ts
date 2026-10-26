@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { GetLike } from "../../src/bitcoin-alkanes/node/fee-api.ts";
+import { feeApiFormats } from "@ador/shared/chain";
+
 import {
+  createFeeSource,
   probeFeeSource,
   type FeeSourceSettings,
-} from "../../src/bitcoin-alkanes/settings.ts";
+  type GetLike,
+} from "../../src/fee-sources/index.ts";
 
 const recommended = {
   economyFee: 4,
@@ -31,6 +34,7 @@ function explorer(
     asked,
     source: {
       fetch,
+      format: "mempool",
       kind: "explorer",
       timeoutMs: 1000,
       url: "https://fees.example.invalid/signet",
@@ -38,7 +42,7 @@ function explorer(
   };
 }
 
-describe("looking at the fee source when the platform starts", () => {
+describe("looking at the fee source when the platform starts (mempool format)", () => {
   it("passes an explorer that answers in the expected shape, after one look at its recommended-fees address", async () => {
     const { asked, source } = explorer(recommended);
     await expect(probeFeeSource(source)).resolves.toBeUndefined();
@@ -76,6 +80,7 @@ describe("looking at the fee source when the platform starts", () => {
   it("refuses an explorer that cannot be reached", async () => {
     const source: FeeSourceSettings = {
       fetch: () => Promise.reject(new Error("ENETUNREACH")),
+      format: "mempool",
       kind: "explorer",
       timeoutMs: 1000,
       url: "https://fees.example.invalid/signet",
@@ -90,5 +95,52 @@ describe("looking at the fee source when the platform starts", () => {
       probeFeeSource({ kind: "fixed", satPerVb: 2 }),
     ).resolves.toBeUndefined();
     await expect(probeFeeSource(null)).resolves.toBeUndefined();
+  });
+});
+
+describe("the registry of fee source formats", () => {
+  const explorerOf = (
+    format: (typeof feeApiFormats)[number],
+  ): FeeSourceSettings => ({
+    fetch: () =>
+      Promise.resolve({
+        json: () => Promise.resolve({}),
+        ok: false,
+        status: 404,
+      }),
+    format,
+    kind: "explorer",
+    timeoutMs: 1000,
+    url: "https://fees.example.invalid/signet",
+  });
+
+  it("has an adapter for every format that can be configured, and each is looked at on its own address", async () => {
+    const addresses: Record<string, string> = {};
+    for (const format of feeApiFormats) {
+      const asked: string[] = [];
+      const settings: FeeSourceSettings = {
+        ...explorerOf(format),
+        fetch: (url) => {
+          asked.push(url);
+          return Promise.resolve({
+            json: () => Promise.resolve({}),
+            ok: false,
+            status: 404,
+          });
+        },
+      } as FeeSourceSettings;
+      await expect(probeFeeSource(settings)).rejects.toThrow("HTTP 404");
+      addresses[format] = asked[0] ?? "";
+    }
+    expect(addresses).toEqual({
+      esplora: "https://fees.example.invalid/signet/api/fee-estimates",
+      mempool: "https://fees.example.invalid/signet/api/v1/fees/recommended",
+    });
+  });
+
+  it("makes the source the settings name: an explorer of that format, or the operator's fixed rate", async () => {
+    expect(
+      await createFeeSource({ kind: "fixed", satPerVb: 4 }).feeRates([2]),
+    ).toEqual([{ satPerVb: 4, targetBlocks: 2 }]);
   });
 });

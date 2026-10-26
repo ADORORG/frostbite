@@ -32,9 +32,11 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   and `verifySigned` proves the pair, the call, the data and the total fee are what the summary says. The auth token's output is named by
   `extension.adminOutput` ("txid:vout") and checked against the indexer and the game's `get_auth_token`. The adapter declares only what it provides.
   Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
-  codec for the few indexer messages used, every answer validated, the trace decoder; `fee-api.ts` prices fees from a public explorer's
-  recommendation when the chain's settings give one (`feeApi`), because the hosted nodes' own estimates are not usable on the test
-  networks, and never falls back to them);
+  codec for the few indexer messages used, every answer validated, the trace decoder);
+  `src/fee-sources/` is the fee adapter, one file per explorer format (`mempool.ts`, `esplora.ts`) and `fixed.ts`, chosen by the chain's
+  `feeApi` settings through the registry in `index.ts`, because the hosted nodes' own estimates are not usable on the test networks and
+  are never fallen back to. To add a provider: one adapter file, its name in `feeApiFormats` (`@ador/shared/chain`), and one entry in each
+  registry table in `index.ts`;
   `admin/free-address.ts` chooses a new template's address at random from widening ranges (`templateSequence`: `first`, `window`,
   `attempts`), not by counting up, so low crowded numbers and a predictable sequence are both avoided; `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,

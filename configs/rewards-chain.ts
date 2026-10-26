@@ -99,11 +99,13 @@ function feeSourceSettings(
   const { feeSource } = environment;
   if (feeSource.kind === "fixed")
     return { kind: "fixed", satPerVb: feeSource.satPerVb };
+  const named = feeSource.kind === "explorer" ? feeSource : null;
   return {
     fetch: platform.get,
+    format: named?.format ?? beta.feeApiFormat,
     kind: "explorer",
     timeoutMs: environment.rpcTimeoutMs,
-    url: feeSource.kind === "explorer" ? feeSource.url : beta.feeApiUrl,
+    url: named?.url ?? beta.feeApiUrl,
   };
 }
 
