@@ -63,6 +63,7 @@ function toMessage(challenge: StoredWalletChallenge): WalletChallengeMessage {
 
 const conflictCodes = {
   held: "wallet-held",
+  "not-on-account": "wallet-not-on-account",
   "other-account": "wallet-on-another-account",
   unusable: "identity-conflict",
 } as const;

@@ -13,6 +13,7 @@ export const failureCopy: Record<Failure, string> = {
   "refused-by-wallet": "The wallet did not sign. Nothing was changed.",
   "unavailable-wallet": "This wallet cannot be used for that.",
   "wallet-held": walletConflictMessages.held,
+  "wallet-not-on-account": walletConflictMessages.notOnAccount,
   "wallet-on-another-account": walletConflictMessages.otherAccount,
   "wallet-changed":
     "The wallet changed while you were signing. Nothing was changed.",

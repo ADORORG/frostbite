@@ -221,7 +221,7 @@ describe("wallet authentication", () => {
     await expect(
       verifyIssued(stepUp, { expectedAction: "step-up", expectedUserId }),
     ).resolves.toEqual({
-      code: "identity-conflict",
+      code: "wallet-not-on-account",
       ok: false,
     });
     expect(await database.select().from(walletIdentities)).toHaveLength(0);

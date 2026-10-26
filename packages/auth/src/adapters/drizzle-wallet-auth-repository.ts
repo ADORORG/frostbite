@@ -98,7 +98,7 @@ async function resolveUser(
   | { readonly ok: true; readonly userId: UuidV7 }
   | {
       readonly ok: false;
-      readonly reason: "held" | "other-account" | "unusable";
+      readonly reason: "held" | "not-on-account" | "other-account" | "unusable";
     }
 > {
   await transaction.execute(
@@ -121,7 +121,8 @@ async function resolveUser(
       ? { ok: false, reason: "other-account" }
       : { ok: true, userId };
   }
-  if (challenge.action === "step-up") return { ok: false, reason: "unusable" };
+  if (challenge.action === "step-up")
+    return { ok: false, reason: "not-on-account" };
   // A wallet an account removed is held for a while: only that account may take it back, and nobody may start a
   // new account with it. The refusal says it is held, and nothing about which account had it.
   const [held] = await transaction

@@ -14,6 +14,7 @@ import {
 import type { HttpOperation } from "@ador/http";
 import { failure, unauthenticated } from "@ador/http/outcome";
 
+import { emailTakenMessage } from "../email-conflict.ts";
 import {
   codeNotVerified,
   codeRequestFailure,
@@ -25,12 +26,9 @@ const recentAuthenticationRequired = failure(
   "forbidden",
   "Recent authentication is required. Sign in again, then retry.",
 );
-// One answer for an address another account holds, so a caller learns nothing about whose it is. It is given only after the code has
-// proved the caller controls the mailbox.
-const cannotUseAddress = failure(
-  "conflict",
-  "This address cannot be added to this account.",
-);
+// The answer for an address another account holds: that it is another account's, never whose. It is given only after the code has proved
+// the caller controls the mailbox.
+const cannotUseAddress = failure("conflict", emailTakenMessage);
 
 // The email steps of a person who is already signed in: seeing the account's addresses, asking for a code to add one, entering it, and
 // removing one. Every one acts on the session's own account, never on one the request names.

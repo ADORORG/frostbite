@@ -32,6 +32,7 @@ vi.mock("@ador/wallet/client", () => ({
   }),
 }));
 
+import { emailTakenMessage } from "../src/email-conflict.ts";
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { EmailPanel } from "../src/ui/email-panel.tsx";
 
@@ -247,7 +248,7 @@ describe("adding an address", () => {
 
   it.each([
     [{ kind: "wrong-code" }, "not right, or it has expired"],
-    [{ kind: "taken" }, "cannot be added"],
+    [{ kind: "taken" }, emailTakenMessage],
     [{ kind: "recent-authentication" }, "sign in again"],
     [{ kind: "signed-out" }, "signed out"],
     [{ kind: "network" }, "could not reach the server"],

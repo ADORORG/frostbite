@@ -42,6 +42,7 @@ export type Failure =
   | "refused-by-wallet"
   | "unavailable-wallet"
   | "wallet-held"
+  | "wallet-not-on-account"
   | "wallet-on-another-account"
   | "wallet-changed";
 
@@ -71,6 +72,8 @@ function failureOf(error: unknown): Failure {
     if (error.code === "conflict") {
       if (error.message === walletConflictMessages.otherAccount)
         return "wallet-on-another-account";
+      if (error.message === walletConflictMessages.notOnAccount)
+        return "wallet-not-on-account";
       return error.message === walletConflictMessages.held
         ? "wallet-held"
         : "unavailable-wallet";

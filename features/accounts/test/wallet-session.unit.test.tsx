@@ -215,6 +215,11 @@ describe("signing in", () => {
       new ApiError("conflict", 409, walletConflictMessages.held),
       "wallet-held",
     ],
+    [
+      "a wallet that is not one of the account's",
+      new ApiError("conflict", 409, walletConflictMessages.notOnAccount),
+      "wallet-not-on-account",
+    ],
     ["a request that never arrived", err("network", null), "network"],
   ] as const)(
     "reports %s from the server as %s, and the player is not signed in",

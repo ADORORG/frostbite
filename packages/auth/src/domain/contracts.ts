@@ -40,6 +40,7 @@ export type WalletAuthenticationFailure =
   | "identity-conflict"
   | "signature-invalid"
   | "wallet-held"
+  | "wallet-not-on-account"
   | "wallet-on-another-account";
 
 export type WalletAuthenticationResult =

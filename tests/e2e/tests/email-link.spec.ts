@@ -149,7 +149,7 @@ test("an address another account holds cannot be added, and nothing says whose i
   await page.goto("/account");
   await addAddress(page, taken);
   await expect(
-    lampOf(page).filter({ hasText: "cannot be added to this account" }),
+    lampOf(page).filter({ hasText: "already linked to a different account" }),
   ).toBeVisible();
   expect((await addressesOf(page)).addresses).toEqual([mine]);
   await other.close();

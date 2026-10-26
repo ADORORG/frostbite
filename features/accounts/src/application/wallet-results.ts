@@ -24,6 +24,10 @@ export const walletOnAnotherAccount: HttpFailure = failure(
   "conflict",
   walletConflictMessages.otherAccount,
 );
+export const walletNotOnAccount: HttpFailure = failure(
+  "conflict",
+  walletConflictMessages.notOnAccount,
+);
 export const walletHeld: HttpFailure = failure(
   "conflict",
   walletConflictMessages.held,
@@ -41,6 +45,7 @@ export const recentAuthenticationRequired: HttpFailure = failure(
 export function verificationFailure(code: string): HttpFailure {
   if (code === "wallet-on-another-account") return walletOnAnotherAccount;
   if (code === "wallet-held") return walletHeld;
+  if (code === "wallet-not-on-account") return walletNotOnAccount;
   return code === "identity-conflict" ? cannotUseWallet : notVerified;
 }
 

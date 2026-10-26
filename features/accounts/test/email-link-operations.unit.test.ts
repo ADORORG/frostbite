@@ -1,3 +1,4 @@
+import { emailTakenMessage } from "../src/email-conflict.ts";
 import type { ContactLinkService } from "@ador/auth";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
@@ -136,7 +137,7 @@ describe("entering a link code", () => {
   });
 
   it.each([
-    ["taken", "conflict", "cannot be added"],
+    ["taken", "conflict", emailTakenMessage],
     ["recent-authentication-required", "forbidden", "Recent authentication"],
     ["invalid", "unauthorized", "not right"],
   ] as const)("answers %s with %s", async (reason, error, text) => {

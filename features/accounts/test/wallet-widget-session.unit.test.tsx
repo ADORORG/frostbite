@@ -110,6 +110,10 @@ describe("the wallet widget: signing in", () => {
       walletConflictMessages.otherAccount,
     ],
     ["was recently removed from an account", walletConflictMessages.held],
+    [
+      "is not one of the account's wallets",
+      walletConflictMessages.notOnAccount,
+    ],
   ] as const)(
     "says why a wallet cannot be linked when it %s, in the server's words, not a vague refusal",
     async (_why, message) => {

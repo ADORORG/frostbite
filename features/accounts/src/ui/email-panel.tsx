@@ -10,6 +10,7 @@ import {
 } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 
+import { emailTakenMessage } from "../email-conflict.ts";
 import {
   confirmLinkCode,
   listEmailAddresses,
@@ -41,7 +42,7 @@ const confirmCopy: Record<
   network: "The request could not reach the server. Try again.",
   "recent-authentication": signInAgain,
   "signed-out": "You are signed out. Sign in again to continue.",
-  taken: "This address cannot be added to this account.",
+  taken: emailTakenMessage,
   "wrong-code":
     "That code is not right, or it has expired. Check it, or ask for a new one.",
 };

@@ -84,6 +84,7 @@ describe("linking another wallet and signing again", () => {
   it.each([
     ["wallet-on-another-account", walletConflictMessages.otherAccount],
     ["wallet-held", walletConflictMessages.held],
+    ["wallet-not-on-account", walletConflictMessages.notOnAccount],
   ] as const)(
     "tells whoever just proved they hold a wallet's key why it cannot be used (%s), as a conflict",
     async (code, message) => {

@@ -37,10 +37,10 @@ export type ConsumeChallengeResult =
   | { readonly kind: "consumed"; readonly userId: UuidV7 }
   | { readonly kind: "expired" }
   // The wallet cannot be used for this: `other-account` it is linked to another account, `held` it was recently removed from one and is
-  // kept for that account, and `unusable` it is none of those (for example a wallet not on the account being asked to sign again).
+  // kept for that account, `not-on-account` it is not one of the wallets of the account asked to sign again, and `unusable` it is none of those (for example a wallet not on the account being asked to sign again).
   | {
       readonly kind: "identity-conflict";
-      readonly reason: "held" | "other-account" | "unusable";
+      readonly reason: "held" | "not-on-account" | "other-account" | "unusable";
     }
   | { readonly kind: "invalid" }
   | { readonly kind: "unavailable" };
