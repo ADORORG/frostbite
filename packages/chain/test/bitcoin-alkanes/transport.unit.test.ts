@@ -49,6 +49,40 @@ describe("the JSON-RPC transport", () => {
     expect(seen[0]?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it("reports an index that is behind the chain as the node being unavailable, with how far behind, and not as a refusal", async () => {
+    const gateway =
+      "metashrew: no backend in sync (served 327982, chain tip 328088): every canonical backend is behind the chain tip";
+    const error = await rpc(
+      answering({
+        error: { code: -32000, message: gateway },
+        id: 1,
+        jsonrpc: "2.0",
+      }),
+    )
+      .call("metashrew_height", [])
+      .catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(NodeUnavailableError);
+    expect(error).toMatchObject({ reason: "behind" });
+    expect(error).not.toBeInstanceOf(NodeRejectedError);
+    expect((error as Error).message).toContain("block 327982");
+    expect((error as Error).message).toContain("the chain is at 328088");
+    // A node that cannot be reached is not "behind".
+    const down = await rpc(answering({}, 503))
+      .call("m", [])
+      .catch((caught: unknown) => caught);
+    expect(down).toMatchObject({ reason: "unreachable" });
+    // Other words from the gateway about being in sync are still a refusal.
+    await expect(
+      rpc(
+        answering({
+          error: { message: "no backend available" },
+          id: 1,
+          jsonrpc: "2.0",
+        }),
+      ).call("m", []),
+    ).rejects.toBeInstanceOf(NodeRejectedError);
+  });
+
   it("reports a node that refuses the request, with its message", async () => {
     const client = rpc(
       answering({

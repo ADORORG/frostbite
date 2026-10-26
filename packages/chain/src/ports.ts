@@ -33,6 +33,35 @@ export class InvalidAddressError extends Error {
   }
 }
 
+// The chain could not be asked right now: it cannot be reached, or the service that reads it is behind it. Both pass, so the caller tells
+// the person to try again; "behind" is told apart because it says what is wrong (the index, not the connection) and cannot be fixed from
+// here. Defined with the neutral ports so the services above the adapter can read it without knowing the chain family.
+export class ChainUnavailableError extends Error {
+  constructor(
+    message: string,
+    readonly reason: "behind" | "unreachable" = "unreachable",
+  ) {
+    super(message);
+    this.name = "ChainUnavailableError";
+  }
+}
+
+// Why a transaction could not be built, as a code the caller can act on. It names no chain family, so the services that start a claim or a
+// step can tell a wallet with no coins from a fee above the limit from a network that did not answer, without knowing which chain it is.
+export class BuildRefusedError extends Error {
+  constructor(
+    readonly code:
+      | "fee-above-limit"
+      | "insufficient-funds"
+      | "invalid-request"
+      | "unsupported-operation",
+    message: string,
+  ) {
+    super(message);
+    this.name = "BuildRefusedError";
+  }
+}
+
 export interface AddressCodec {
   // Returns the canonical address, or throws InvalidAddressError for non-canonical, malformed, or
   // cross-chain input. It never "fixes up" what it was given.

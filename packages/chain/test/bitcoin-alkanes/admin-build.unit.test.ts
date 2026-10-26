@@ -120,9 +120,6 @@ describe("building the staff's steps", () => {
         ),
       ),
     ).toBe("unsupported-operation");
-    expect(await build({ ...intents.pause, extension: {} })).toBe(
-      "invalid-request",
-    );
     expect(
       await build({ ...intents.pause, extension: { adminOutput: `${idB}:7` } }),
     ).toBe("invalid-request");

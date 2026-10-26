@@ -78,6 +78,10 @@ export function createGameClaimsResolver(
       },
       game: claimableGameLookup(games, createDrizzleContractStore(database)),
       newId: randomUUID,
+      report: ({ error, step }) =>
+        console.error(
+          `game claims: ${step} failed: ${error instanceof Error ? `${error.name}: ${error.message}` : "not an error"}`,
+        ),
       ports: (chain) => config.chain(chain)?.ports ?? null,
       repository: createDrizzleGameClaimRepository(database, { clock }),
     });

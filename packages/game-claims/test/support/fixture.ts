@@ -76,12 +76,21 @@ export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
 };
 // The intents the chain was asked to build, oldest first.
 export const builtIntents: TransactionIntent[] = [];
-export const chainFailure = {
+export const chainFailure: {
+  broadcast: boolean;
+  // What building throws: any error (the node is down by default), or none.
+  build: Error | boolean;
+  observe: boolean;
+  // Why the contract would refuse the claim, in its words, or none.
+  simulate: string | false;
+} = {
   broadcast: false,
   build: false,
   observe: false,
   simulate: false,
 };
+// What the service was told stopped a claim from starting, oldest first.
+export const reported: { error: unknown; step: string }[] = [];
 
 function ports(): ClaimChainPorts {
   const { addressCodec, broadcaster, builder, contracts, observer, rewards } =
@@ -111,7 +120,11 @@ function ports(): ClaimChainPorts {
       build: (...asked) => {
         builtIntents.push(asked[0]);
         return chainFailure.build
-          ? Promise.reject(new Error("the node is down"))
+          ? Promise.reject(
+              chainFailure.build instanceof Error
+                ? chainFailure.build
+                : new Error("the node is down"),
+            )
           : builder.build(...asked);
       },
       transactionIds: (...asked) => builder.transactionIds(...asked),
@@ -123,10 +136,7 @@ function ports(): ClaimChainPorts {
       inspect: (ref) => contracts.inspect(ref),
       simulate: (intent) =>
         chainFailure.simulate
-          ? Promise.resolve({
-              ok: false,
-              reason: "the contract would refuse it",
-            })
+          ? Promise.resolve({ ok: false, reason: chainFailure.simulate })
           : contracts.simulate(intent),
     },
     observer: {
@@ -172,6 +182,7 @@ export const service = createGameClaimsService({
   newId: randomUUID,
   ports: (requested) =>
     chainAvailable.value && requested === chain ? ports() : null,
+  report: (failure) => reported.push(failure),
   repository,
 });
 
@@ -231,6 +242,7 @@ export function registerDatabase(): void {
     chainFailure.broadcast = false;
     chainFailure.build = false;
     builtIntents.length = 0;
+    reported.length = 0;
     chainFailure.observe = false;
     chainFailure.simulate = false;
   });

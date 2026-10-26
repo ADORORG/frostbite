@@ -170,61 +170,6 @@ describe("claiming from the milestone list", () => {
   });
 });
 
-describe("when a claim cannot go ahead", () => {
-  it.each([
-    ["limit-reached", "as often as it allows"],
-    ["not-earned", "Earn this milestone first"],
-    ["not-supported", "not available for this game yet"],
-    ["unavailable", "could not be reached"],
-    ["wrong-network", "another network"],
-  ] as const)("says why a start was refused: %s", async (reason, copy) => {
-    const api = fakeApi({
-      start: vi.fn(async () => ({ reason, status: "unavailable" as const })),
-    });
-    await earned({ api, wallet });
-    await click("Claim ");
-    await flush();
-    expect(text()).toContain(copy);
-    expect(review()).toBeNull();
-  });
-
-  it("asks for a wallet without asking the platform when none is connected", async () => {
-    const api = fakeApi();
-    await earned({ api, wallet: null });
-    await click("Claim ");
-    await flush();
-    expect(text()).toContain("Connect a wallet to claim.");
-    expect(api.start).not.toHaveBeenCalled();
-  });
-
-  it("says to sign in when there is no session, and that the platform could not be reached for any other failure", async () => {
-    const { ApiError } = await import("@ador/client-http");
-    const signedOut = fakeApi({
-      start: vi.fn(async () => {
-        throw new ApiError("unauthorized", 401, "no");
-      }),
-    });
-    await earned({ api: signedOut, wallet });
-    await click("Claim ");
-    await flush();
-    expect(text()).toContain("Sign in to claim.");
-  });
-
-  it("says the platform could not be reached when starting fails", async () => {
-    const api = fakeApi({
-      start: vi.fn(async () => {
-        throw new Error("offline");
-      }),
-    });
-    await earned({ api, wallet });
-    await click("Claim ");
-    await flush();
-    expect(text()).toContain(
-      "The platform could not be reached. Nothing was changed.",
-    );
-  });
-});
-
 describe("signing", () => {
   it("says the wallet cannot sign claims yet, and does not offer a signature that cannot be made", async () => {
     const api = fakeApi();

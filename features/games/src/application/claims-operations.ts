@@ -76,12 +76,17 @@ export function toWireClaim(view: ClaimView): GameClaim {
 
 const unavailableReason = {
   "chain-unavailable": "unavailable",
+  "claims-paused": "claims-paused",
+  "contract-refused": "contract-refused",
+  "fee-too-high": "fee-too-high",
+  "index-behind": "index-behind",
   "limit-reached": "limit-reached",
+  "milestone-not-defined": "milestone-not-defined",
+  "no-funds": "no-funds",
   "not-claimable": "not-claimable",
   "not-earned": "not-earned",
   unavailable: "not-supported",
   "wrong-chain": "wrong-network",
-  "would-fail": "unavailable",
 } as const satisfies Record<string, GameClaimUnavailableReason>;
 
 // Starts a claim for the signed-in player. The owner is the session, never a field of the request. A milestone that cannot be

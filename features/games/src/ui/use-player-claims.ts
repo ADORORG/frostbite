@@ -42,7 +42,7 @@ export function usePlayerClaims(
     sign: claims?.sign,
     wallet: claims?.wallet ?? null,
   });
-  const { begin } = ui;
+  const { begin, refuse } = ui;
   // The speed the player has picked, read when the game asks for a claim (the game cannot see or choose it).
   const claimSpeed = useRef(ui.feeSpeed);
   useEffect(() => {
@@ -70,6 +70,7 @@ export function usePlayerClaims(
               api,
               feeSpeed: () => claimSpeed.current ?? undefined,
               gameId: id,
+              onRefused: refuse,
               onStarted: begin,
               wallet: () => claimWallet.current,
             })),

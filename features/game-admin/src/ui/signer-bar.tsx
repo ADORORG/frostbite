@@ -71,7 +71,7 @@ export function SignerBar({
           />
           {withAuthToken ? (
             <ArcadeTextField
-              hint="Where the game's auth token is held, as txid:vout. Needed to define milestones and pause on Bitcoin."
+              hint="Optional. Leave it blank and the platform finds the output that holds the game's auth token. Fill it in (txid:vout) only to name one yourself."
               label="Auth token output"
               onChange={signer.setAuthToken}
               value={signer.authToken}

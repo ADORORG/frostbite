@@ -1,8 +1,14 @@
-// The node cannot be reached, answered too slowly, or answered something that is not JSON-RPC.
-export class NodeUnavailableError extends Error {
+import { ChainUnavailableError } from "../../ports.ts";
+
+// The node cannot be reached, answered too slowly, answered something that is not JSON-RPC, or reads the chain through an index that
+// is behind it (`reason: "behind"`).
+export class NodeUnavailableError extends ChainUnavailableError {
   readonly code = "node-unavailable";
-  constructor(message: string) {
-    super(message);
+  constructor(
+    message: string,
+    reason: "behind" | "unreachable" = "unreachable",
+  ) {
+    super(message, reason);
     this.name = "NodeUnavailableError";
   }
 }

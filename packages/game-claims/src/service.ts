@@ -12,6 +12,7 @@ import {
   type UnsignedTransaction,
 } from "@ador/shared/chain";
 
+import { buildFailure, contractRefusal } from "./start-failures.ts";
 import { createClaimViewer } from "./claim-steps.ts";
 import type { ClaimChange, StoredClaim } from "./repository.ts";
 import type {
@@ -24,7 +25,7 @@ import type {
 } from "./types.ts";
 
 export function createGameClaimsService(dependencies: GameClaimsDependencies) {
-  const { clock, earned, funding, game, newId, ports, repository } =
+  const { clock, earned, funding, game, newId, ports, report, repository } =
     dependencies;
   const viewer = createClaimViewer(dependencies);
 
@@ -85,10 +86,12 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       try {
         const simulated = await chain.contracts.simulate(intent);
         if (!simulated.ok)
-          return { code: "would-fail", ok: false, reason: simulated.reason };
+          return { code: contractRefusal(simulated.reason), ok: false };
         unsigned = await chain.builder.build(intent, funding(current.chain));
-      } catch {
-        return { code: "chain-unavailable", ok: false };
+      } catch (error) {
+        const failure = buildFailure(error);
+        if (!failure.expected) report?.({ error, step: "start" });
+        return { code: failure.code, ok: false };
       }
       const result = await repository.create(
         {

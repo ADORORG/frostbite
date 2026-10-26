@@ -1,6 +1,10 @@
 import type { FetchLike } from "@ador/client-http";
 import type { FeeSpeed } from "@ador/shared/chain";
-import { gameClaimSchema, type GameClaim } from "@ador/shared/games";
+import {
+  gameClaimSchema,
+  type GameClaim,
+  type GameClaimUnavailableReason,
+} from "@ador/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { createClaimsApi } from "../src/client/claims-api.ts";
@@ -53,14 +57,16 @@ function setup(
 ) {
   const fetchImpl = vi.fn<FetchLike>(async () => answer());
   const onStarted = vi.fn<(started: GameClaim) => void>();
+  const onRefused = vi.fn<(reason: GameClaimUnavailableReason) => void>();
   const service = createClaimsService({
     api: createClaimsApi(fetchImpl),
     ...(feeSpeed === undefined ? {} : { feeSpeed }),
     gameId: "arcade",
+    onRefused,
     onStarted,
     wallet: () => connected,
   });
-  return { fetchImpl, onStarted, service };
+  return { fetchImpl, onRefused, onStarted, service };
 }
 
 describe("asking for a claim from the page", () => {
@@ -138,6 +144,40 @@ describe("asking for a claim from the page", () => {
       status: "unavailable",
     });
     expect(onStarted).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    "claims-paused",
+    "contract-refused",
+    "fee-too-high",
+    "index-behind",
+    "milestone-not-defined",
+    "no-funds",
+  ] as const)(
+    'tells the game only "unavailable" for %s, which its protocol has no word for, and tells the page the whole reason',
+    async (reason) => {
+      const { onRefused, service } = setup(() =>
+        json({ reason, status: "unavailable" }),
+      );
+      expect(await service.claim("first-win")).toEqual({
+        reason: "unavailable",
+        status: "unavailable",
+      });
+      expect(onRefused).toHaveBeenCalledExactlyOnceWith(reason);
+    },
+  );
+
+  it("tells the page the reason the game is also given, and nothing when a claim started", async () => {
+    const refused = setup(() =>
+      json({ reason: "not-earned", status: "unavailable" }),
+    );
+    await refused.service.claim("first-win");
+    expect(refused.onRefused).toHaveBeenCalledExactlyOnceWith("not-earned");
+    const started = setup(() =>
+      json({ claim, resumed: false, status: "started" }),
+    );
+    await started.service.claim("first-win");
+    expect(started.onRefused).not.toHaveBeenCalled();
   });
 
   it("says the player is signed out when there is no session", async () => {

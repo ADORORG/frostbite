@@ -3,6 +3,9 @@ import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
 import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
 import { isRecord } from "./json.ts";
 
+// How the gateway says its indexer is behind the chain: "metashrew: no backend in sync (served 327982, chain tip 328088): ...".
+const indexBehind = /no backend in sync \(served (\d+), chain tip (\d+)\)/u;
+
 export interface JsonRpc {
   call(method: string, params: readonly JsonValue[]): Promise<JsonValue>;
 }
@@ -70,6 +73,16 @@ export function createJsonRpc(options: JsonRpcOptions): JsonRpc {
       const failure = body["error"];
       if (failure !== undefined) {
         const message = isRecord(failure) ? failure["message"] : undefined;
+        const behind =
+          typeof message === "string" ? indexBehind.exec(message) : null;
+        if (behind !== null) {
+          // Not a refusal of the request: the gateway has no index that has read the chain to its tip, so nothing that needs the index
+          // can be answered until one has. Said as what it is, with how far behind it is.
+          throw new NodeUnavailableError(
+            `The network's Alkanes index is behind the chain (it has read to block ${behind[1] ?? "?"}; the chain is at ${behind[2] ?? "?"}). It clears when the index catches up.`,
+            "behind",
+          );
+        }
         throw new NodeRejectedError(
           typeof message === "string" ? message : `The node refused ${method}.`,
         );

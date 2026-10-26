@@ -33,6 +33,87 @@ async function authTokenOf(
   };
 }
 
+const holdsToken = (
+  held: Awaited<ReturnType<AlkanesNode["holdings"]>>,
+  token: AlkaneId,
+) =>
+  held.alkanes.some(
+    (alkane) =>
+      alkane.id.block === token.block &&
+      alkane.id.tx === token.tx &&
+      alkane.amount > 0n,
+  );
+
+// The most outputs looked at when the wallet is searched for the token. A token sits on a small output made by the step that last moved
+// it, so the smallest ones come first; a wallet with more than this many has been used for something other than this game.
+const searchedOutputs = 40;
+
+type Owned = Awaited<ReturnType<AlkanesNode["utxos"]>>;
+type OwnedOutput = Owned[number];
+
+// What staff typed for the token's output, trimmed, or null when they left it blank.
+function named(intent: TransactionIntent): string | null {
+  const text = intent.extension?.["adminOutput"];
+  return typeof text === "string" && text.trim() !== "" ? text.trim() : null;
+}
+
+// Which of the staff wallet's outputs holds the game's auth token. Named by the caller when they know it (and then it must be the
+// wallet's, confirmed, and hold the token); otherwise found by asking the indexer about the wallet's own outputs, so staff are never made
+// to read a transaction id off a block explorer. Each refusal says which of the ways it can fail it was.
+async function tokenOutput(
+  node: AlkanesNode,
+  owned: Owned,
+  token: AlkaneId,
+  typed: string | null,
+): Promise<OwnedOutput> {
+  if (typed !== null) {
+    const match = outpoint.exec(typed);
+    if (match === null) {
+      throw new StepRefusedError(
+        "The auth token output must be written as a transaction id, a colon and an output number (txid:vout). Clear it to have it found.",
+      );
+    }
+    const chosen = owned.find(
+      (utxo) => utxo.txid === match[1] && String(utxo.vout) === match[2],
+    );
+    if (chosen === undefined) {
+      throw new StepRefusedError(
+        "The auth token output you named is not one of this wallet's outputs. Clear it to have it found, or sign with the wallet that holds the token.",
+      );
+    }
+    if (!chosen.confirmed) {
+      throw new StepRefusedError(
+        "The auth token output you named is not confirmed yet. Wait for the step that made it to confirm, then try again.",
+      );
+    }
+    if (!holdsToken(await node.holdings(chosen.txid, chosen.vout), token)) {
+      throw new StepRefusedError(
+        `The output you named does not hold the game's auth token ${formatAlkaneId(token)}.`,
+      );
+    }
+    return chosen;
+  }
+  const looked = [...owned]
+    .sort((left, right) => Number(left.value - right.value))
+    .slice(0, searchedOutputs);
+  const holders = await Promise.all(
+    looked.map(async (utxo) =>
+      holdsToken(await node.holdings(utxo.txid, utxo.vout), token)
+        ? utxo
+        : null,
+    ),
+  );
+  const found = holders.find((utxo): utxo is OwnedOutput => utxo !== null);
+  if (found !== undefined) return found;
+  // The indexer reads confirmed blocks only, so a token in an output that is still waiting for a block cannot be seen. A wallet with
+  // outputs still waiting very likely has the step that moved the token among them.
+  throw new StepRefusedError(
+    owned.some((utxo) => !utxo.confirmed)
+      ? `The game's auth token ${formatAlkaneId(token)} was not found on this wallet's confirmed outputs, and a step it sent is still waiting for a block. Wait for it to confirm, then try again.`
+      : `None of this wallet's outputs holds the game's auth token ${formatAlkaneId(token)}. Sign with the wallet that created the game.`,
+  );
+}
+
 // What a step is paid with: the confirmed outputs of the staff wallet (`sender`), less the one that holds the auth token, which is
 // spent only as the token. The token's output is named by the caller (`extension.adminOutput`, "txid:vout") and checked three ways
 // before it is trusted: the wallet owns it, it is confirmed, and the indexer says it holds the game's auth token.
@@ -62,35 +143,11 @@ export async function stepFunding(
   if (!needsAuthToken(operation)) {
     return { ...base, admin: null, funder: funder(owned) };
   }
-  const named = intent.extension?.["adminOutput"];
-  const match = typeof named === "string" ? outpoint.exec(named) : null;
-  const found = owned.find(
-    (utxo) =>
-      match !== null &&
-      utxo.txid === match[1] &&
-      String(utxo.vout) === match[2],
-  );
-  if (game === null || found === undefined || !found.confirmed) {
-    throw new StepRefusedError(
-      "The output that holds the game's auth token is not one of the wallet's confirmed outputs.",
-    );
+  if (game === null) {
+    throw new StepRefusedError("This step needs a game, and none was named.");
   }
-  const [held, token] = await Promise.all([
-    node.holdings(found.txid, found.vout),
-    authTokenOf(node, game),
-  ]);
-  if (
-    !held.alkanes.some(
-      (alkane) =>
-        alkane.id.block === token.block &&
-        alkane.id.tx === token.tx &&
-        alkane.amount > 0n,
-    )
-  ) {
-    throw new StepRefusedError(
-      `The output does not hold the game's auth token ${formatAlkaneId(token)}.`,
-    );
-  }
+  const token = await authTokenOf(node, game);
+  const found = await tokenOutput(node, owned, token, named(intent));
   return {
     ...base,
     admin: {

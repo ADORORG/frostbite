@@ -72,7 +72,17 @@ export const claimCopy = (
 export const claimUnavailableCopy: Readonly<
   Record<GameClaimUnavailableReason | "signed-out", string>
 > = {
+  "claims-paused": "Claims are paused for this game right now.",
+  "contract-refused": "The game's contract would refuse this claim right now.",
+  "fee-too-high":
+    "Network fees are higher than this platform allows right now. Try a slower speed, or try again later.",
+  "index-behind":
+    "The network's index is behind the chain right now, so this claim cannot be checked. It clears when the index catches up; try again later.",
   "limit-reached": "You have already claimed this as often as it allows.",
+  "milestone-not-defined":
+    "This milestone has not been set up on the network yet. The game's staff need to define it before it can be claimed.",
+  "no-funds":
+    "Your wallet has no confirmed coins to pay the network fee. Add some test bitcoin, wait for it to confirm, and try again.",
   "no-wallet": "Connect a wallet to claim.",
   "not-claimable": "This milestone cannot be claimed.",
   "not-earned": "Earn this milestone first.",

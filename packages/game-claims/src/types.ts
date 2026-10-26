@@ -41,6 +41,9 @@ export interface GameClaimsDependencies {
   newId(): string;
   ports(chain: ChainRef): ClaimChainPorts | null;
   readonly repository: GameClaimRepository;
+  // Told of anything unexpected that stopped a claim from starting (what it was, never the player's address), so an operator can see why
+  // a player was only told "try again". Optional: nothing is lost when it is absent, the player is told the same.
+  report?(failure: { readonly error: unknown; readonly step: string }): void;
 }
 
 // A claim as a person or a page is told of it. The transaction to sign is given only while the wallet is still to be asked.
@@ -66,17 +69,18 @@ export type StartClaimResult =
   | {
       readonly code:
         | "chain-unavailable"
+        | "claims-paused"
+        | "contract-refused"
+        | "fee-too-high"
+        | "index-behind"
         | "limit-reached"
+        | "milestone-not-defined"
+        | "no-funds"
         | "not-claimable"
         | "not-earned"
         | "unavailable"
         | "wrong-chain";
       readonly ok: false;
-    }
-  | {
-      readonly code: "would-fail";
-      readonly ok: false;
-      readonly reason: string;
     };
 
 export type SubmitClaimResult =

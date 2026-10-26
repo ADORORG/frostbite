@@ -1,7 +1,11 @@
 import { ApiError } from "@ador/client-http";
 import type { WalletInfo } from "@ador/game-sdk/protocol";
 import type { FeeSpeed } from "@ador/shared/chain";
-import type { GameClaim, GameClaimState } from "@ador/shared/games";
+import type {
+  GameClaim,
+  GameClaimState,
+  GameClaimUnavailableReason,
+} from "@ador/shared/games";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";
@@ -173,6 +177,12 @@ export function useClaims(options: {
     feeSpeed,
     setFeeSpeed,
     message,
+    // Tells the player why a claim a game asked for could not start, in the page's own words (the game is given only a coarse reason).
+    refuse: useCallback(
+      (reason: GameClaimUnavailableReason) =>
+        setMessage(claimUnavailableCopy[reason]),
+      [],
+    ),
     reopen: useCallback((claimId: string) => setActiveId(claimId), []),
     sign: signActive,
     start,

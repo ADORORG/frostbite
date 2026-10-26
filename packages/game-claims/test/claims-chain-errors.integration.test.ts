@@ -2,6 +2,7 @@ import { gameMilestoneClaims } from "@ador/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
+import { BuildRefusedError, ChainUnavailableError } from "@ador/chain/ports";
 import {
   chainAvailable,
   chainFailure,
@@ -10,6 +11,7 @@ import {
   network,
   player,
   registerDatabase,
+  reported,
   service,
   startAndSign,
   wallet,
@@ -25,37 +27,79 @@ const stateOf = async (id: string) =>
       .where(eq(gameMilestoneClaims.id, id))
   )[0]?.state;
 
+const start = async (userId: string) =>
+  service.start({
+    gameId,
+    milestoneId: "first-win",
+    userId,
+    wallet: wallet.value,
+  });
+
 describe("starting when the chain is not behaving", () => {
-  it("says what the contract would refuse, and keeps nothing", async () => {
+  it.each([
+    ["claims are paused", "claims-paused"],
+    ["Error: unknown milestone", "milestone-not-defined"],
+    ["claim limit reached", "limit-reached"],
+    ["something the contract invented", "contract-refused"],
+  ] as const)(
+    "tells apart what the contract says (%s) and keeps nothing",
+    async (said, code) => {
+      const userId = await player();
+      chainFailure.simulate = said;
+      expect(await start(userId)).toEqual({ code, ok: false });
+      expect(await service.list(userId, gameId)).toEqual([]);
+      // A contract's refusal is an answer, not a failure to look into.
+      expect(reported).toEqual([]);
+    },
+  );
+
+  it("says the wallet has no confirmed coins, and does not report it as a failure", async () => {
     const userId = await player();
-    chainFailure.simulate = true;
-    expect(
-      await service.start({
-        gameId,
-        milestoneId: "first-win",
-        userId,
-        wallet: wallet.value,
-      }),
-    ).toEqual({
-      code: "would-fail",
-      ok: false,
-      reason: "the contract would refuse it",
-    });
+    chainFailure.build = new BuildRefusedError(
+      "insufficient-funds",
+      "The sender's confirmed balance cannot pay for the claim.",
+    );
+    expect(await start(userId)).toEqual({ code: "no-funds", ok: false });
+    expect(await service.list(userId, gameId)).toEqual([]);
+    expect(reported).toEqual([]);
+  });
+
+  it("says the index is behind the chain, whether it failed the simulation or the building, without reporting it", async () => {
+    const userId = await player();
+    chainFailure.build = new ChainUnavailableError("index behind", "behind");
+    expect(await start(userId)).toEqual({ code: "index-behind", ok: false });
+    expect(reported).toEqual([]);
     expect(await service.list(userId, gameId)).toEqual([]);
   });
 
-  it("says the chain is unavailable when the transaction cannot be built, and keeps nothing", async () => {
+  it("says the fee is above what the platform allows", async () => {
+    const userId = await player();
+    chainFailure.build = new BuildRefusedError("fee-above-limit", "too dear");
+    expect(await start(userId)).toEqual({ code: "fee-too-high", ok: false });
+    expect(reported).toEqual([]);
+  });
+
+  it("says the chain is unavailable when the transaction cannot be built for any other reason, keeps nothing, and reports why", async () => {
     const userId = await player();
     chainFailure.build = true;
-    expect(
-      await service.start({
-        gameId,
-        milestoneId: "first-win",
-        userId,
-        wallet: wallet.value,
-      }),
-    ).toEqual({ code: "chain-unavailable", ok: false });
+    expect(await start(userId)).toEqual({
+      code: "chain-unavailable",
+      ok: false,
+    });
     expect(await service.list(userId, gameId)).toEqual([]);
+    expect(reported).toEqual([
+      { error: new Error("the node is down"), step: "start" },
+    ]);
+  });
+
+  it("does not take a refusal the platform cannot act on for a fee or funds problem", async () => {
+    const userId = await player();
+    chainFailure.build = new BuildRefusedError("invalid-request", "bad");
+    expect(await start(userId)).toEqual({
+      code: "chain-unavailable",
+      ok: false,
+    });
+    expect(reported).toHaveLength(1);
   });
 });
 

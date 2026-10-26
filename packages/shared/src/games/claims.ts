@@ -35,7 +35,13 @@ export const gameClaimTransactionSchema = z
 // Why a claim cannot start (the SDK's `claimUnavailableReasons` less `signed-out`, which is the missing session; a test
 // keeps them equal).
 export const gameClaimUnavailableReasons = [
+  "claims-paused",
+  "contract-refused",
+  "fee-too-high",
+  "index-behind",
   "limit-reached",
+  "milestone-not-defined",
+  "no-funds",
   "no-wallet",
   "not-claimable",
   "not-earned",

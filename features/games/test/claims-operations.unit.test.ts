@@ -124,6 +124,12 @@ describe("starting a claim", () => {
     ["not-earned", "not-earned"],
     ["limit-reached", "limit-reached"],
     ["chain-unavailable", "unavailable"],
+    ["claims-paused", "claims-paused"],
+    ["contract-refused", "contract-refused"],
+    ["fee-too-high", "fee-too-high"],
+    ["index-behind", "index-behind"],
+    ["milestone-not-defined", "milestone-not-defined"],
+    ["no-funds", "no-funds"],
   ] as const)(
     "answers, not fails, for %s with the reason %s",
     async (code, reason) => {
@@ -134,22 +140,6 @@ describe("starting a claim", () => {
       });
     },
   );
-
-  it("answers a claim the contract would refuse as unavailable, without its reason", async () => {
-    const s = stub({
-      start: async () => ({
-        code: "would-fail",
-        ok: false,
-        reason: "the contract is paused",
-      }),
-    });
-    const result = await s.start.execute(startInput, context);
-    expect(result).toEqual({
-      ok: true,
-      value: { reason: "unavailable", status: "unavailable" },
-    });
-    expect(JSON.stringify(result)).not.toContain("paused");
-  });
 });
 
 describe("submitting, refreshing and listing", () => {
