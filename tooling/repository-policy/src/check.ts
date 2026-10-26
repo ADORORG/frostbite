@@ -1,6 +1,11 @@
 import { findBoundaryViolations } from "./boundary-policy.ts";
 import { listSourceFiles } from "./files.ts";
 import { findOversizedFiles } from "./line-policy.ts";
+import { readSentenceBaseline } from "./sentence-baseline.ts";
+import {
+  findDuplicateSentences,
+  readProductionSources,
+} from "./sentence-policy.ts";
 import { findScriptPolicyViolations } from "./script-policy.ts";
 import { discoverWorkspaces, repositoryRoot } from "./workspaces.ts";
 
@@ -11,6 +16,10 @@ const violations = [
   ...findScriptPolicyViolations(workspaces),
   ...(await findOversizedFiles(root, files)),
   ...(await findBoundaryViolations(root, files)),
+  ...findDuplicateSentences(
+    await readProductionSources(root, files),
+    await readSentenceBaseline(root),
+  ),
 ];
 
 if (violations.length > 0) {

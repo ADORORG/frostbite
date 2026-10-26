@@ -1,0 +1,21 @@
+{
+  "A connected wallet account is required.": 4,
+  "Could not refresh. Showing what was loaded earlier.": 5,
+  "How fast should it confirm?": 2,
+  "Something went wrong. Try again.": 3,
+  "The actor lacks the required capability.": 2,
+  "The contract or the sender is not valid for this chain.": 2,
+  "The idempotency key conflicts with another request.": 6,
+  "The network could not be reached. Try again.": 2,
+  "The node has no fee estimate for the target.": 2,
+  "The page cursor is not valid.": 2,
+  "The request could not reach the server. Check your connection and try again.": 3,
+  "The server had a problem. Try again in a moment.": 3,
+  "The step could not be built.": 2,
+  "The submission was not found.": 2,
+  "The verifier did not answer with an outcome.": 2,
+  "This game already has its contract.": 2,
+  "This step could not be found.": 2,
+  "What was signed is not what was shown. Nothing was sent.": 2,
+  "Your session has ended. Sign in again to continue.": 3
+}

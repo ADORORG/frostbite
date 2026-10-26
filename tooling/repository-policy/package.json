@@ -7,6 +7,7 @@
     "check": "node --experimental-strip-types src/check.ts",
     "check:coverage": "node --experimental-strip-types src/check-coverage.ts",
     "check:decisions": "node --experimental-strip-types src/check-decisions.ts",
+    "update-sentence-baseline": "node --experimental-strip-types src/update-sentence-baseline.ts",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
