@@ -1,4 +1,7 @@
-import { authorizationPolicySchema } from "@ador/shared/accounts";
+import {
+  authorizationPolicySchema,
+  manageRolesCapability,
+} from "@ador/shared/accounts";
 import { collectionReviewCapability } from "@ador/shared/collections";
 import { gameAdminCapability } from "@ador/shared/games";
 import { describe, expect, it } from "vitest";
@@ -14,7 +17,7 @@ describe("authorization policy", () => {
     expect(authorizationPolicy.platform.staff).not.toContain("creator:review");
   });
 
-  it("lets reviewers, and only reviewers, decide on collection submissions", () => {
+  it("lets reviewers and administrators, and not staff, decide on collection submissions", () => {
     expect(authorizationPolicy.platform.reviewer).toContain(
       collectionReviewCapability,
     );
@@ -23,10 +26,26 @@ describe("authorization policy", () => {
     );
   });
 
-  it("lets staff, and only staff, administer a game's rewards contract", () => {
+  it("lets staff and administrators, and not reviewers, administer a game's rewards contract", () => {
     expect(authorizationPolicy.platform.staff).toContain(gameAdminCapability);
     expect(authorizationPolicy.platform.reviewer).not.toContain(
       gameAdminCapability,
     );
+  });
+
+  it("gives an administrator everything a staff member or a reviewer may do, and the power to manage roles", () => {
+    const { admin, reviewer, staff } = authorizationPolicy.platform;
+    for (const capability of [...reviewer, ...staff]) {
+      expect(admin).toContain(capability);
+    }
+    expect(admin).toContain(manageRolesCapability);
+    // Staff and reviewers cannot manage roles: only the administrator can.
+    expect(staff).not.toContain(manageRolesCapability);
+    expect(reviewer).not.toContain(manageRolesCapability);
+  });
+
+  it("still holds the administrator to a wallet, since it can now sign game steps, and leaves reviewers free of requirements", () => {
+    expect(authorizationPolicy.requiredMethods.admin).toEqual(["wallet"]);
+    expect(authorizationPolicy.requiredMethods.staff).toEqual(["wallet"]);
   });
 });
