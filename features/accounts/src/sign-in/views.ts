@@ -14,8 +14,12 @@ export interface SignInView {
   readonly Component: ComponentType<SignInViewProps>;
   // The method's kind, as the method registry names it.
   readonly kind: string;
-  // The heading of the method's panel.
+  // A single symbol for the method's key on the picker; decoration only, so it is hidden from assistive technology.
+  readonly glyph: string;
+  // The method's name, on its key and as the heading of its panel.
   readonly label: string;
+  // One short line under the name on its key: what signing in this way involves.
+  readonly tagline: string;
 }
 
 // The views to show: those of the kinds the server offers, in the server's order. A kind offered with no view is left out (nothing

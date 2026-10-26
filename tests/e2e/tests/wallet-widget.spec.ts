@@ -71,7 +71,7 @@ test("shows the connected wallet, reconnects after a reload, and forgets it when
   await connectWallet(page, wallet);
   await expect(walletButton(page).locator("svg.avatar")).toBeVisible();
   await page.reload();
-  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
   const menu = await openWalletMenu(page);
   await expect(menu).toContainText(wallet.address);
   await expect(menu).toContainText("Connected, not signed in.");
@@ -149,7 +149,7 @@ test("shows the wallet again after a reload even when the extension is slow to a
   // While the remembered wallet is on its way the button says so; it does not say "Account" as if there were none.
   await expect(walletButton(slow)).toHaveText("Reconnecting wallet…");
   await expect(walletButton(slow)).toContainText(
-    slowWallet.address.slice(0, 8),
+    slowWallet.address.slice(0, 6),
     {
       timeout: 10_000,
     },
@@ -208,7 +208,7 @@ test("'Switch wallet' opens the chooser even though a wallet is connected", asyn
     .getByRole("button", { name: "Connect UniSat", exact: true })
     .click();
   await expect(chooser).not.toBeVisible();
-  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
 });
 
 test("moving between pages keeps the wallet connected: the app is not loaded again and the button never flickers", async ({
@@ -250,8 +250,8 @@ test("moving between pages keeps the wallet connected: the app is not loaded aga
   );
   const texts = await page.evaluate(() => Reflect.get(window, "buttonTexts"));
   expect(texts.length).toBeGreaterThan(0);
-  for (const text of texts) expect(text).toContain(wallet.address.slice(0, 8));
-  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+  for (const text of texts) expect(text).toContain(wallet.address.slice(0, 6));
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
 });
 
 test("links that are not for the app to move between still behave as links", async ({

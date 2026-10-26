@@ -52,7 +52,7 @@ export async function installFakeWallet(
 export const walletButton = (page: Page) =>
   page.locator(".wallet-widget__trigger");
 export const walletMenu = (page: Page) =>
-  page.getByRole("group", { name: "Wallet" });
+  page.getByRole("dialog", { name: "Wallet", exact: true });
 
 // Opens the wallet chooser from the header and connects the (fake) UniSat, as a player does, and waits until the
 // widget shows the connected wallet's address.
@@ -61,7 +61,7 @@ export async function connectWallet(page: Page, wallet: TestWallet) {
   await page
     .getByRole("button", { name: "Connect UniSat", exact: true })
     .click();
-  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 8));
+  await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
 }
 
 // Opens the widget's menu if it is not open.

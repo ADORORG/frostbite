@@ -1,0 +1,118 @@
+/* The left side of the sign-in page: what signing in comes to, in a few words and three steps. */
+.sign-in-intro h1 {
+  margin: 0.75rem 0 1.25rem;
+  font-family: var(--arcade-font-display);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-shadow:
+    0.2rem 0.2rem 0 var(--arcade-red),
+    0.4rem 0.4rem 0 color-mix(in srgb, var(--arcade-cyan) 45%, transparent);
+}
+.sign-in-intro .arcade-eyebrow::before {
+  margin-right: 0.5rem;
+  content: "▶";
+  animation: sign-in-blink 1.2s steps(2, jump-none) infinite;
+}
+@keyframes sign-in-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+.sign-in-intro__lead {
+  max-width: 32rem;
+  margin: 0 0 var(--arcade-space-6);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-lg);
+  line-height: 1.6;
+}
+
+/* The three steps hang on one line, like links of a chain. */
+.sign-in-steps {
+  display: grid;
+  gap: var(--arcade-space-4);
+  margin: 0 0 var(--arcade-space-6);
+  padding: 0;
+  list-style: none;
+}
+.sign-in-steps li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--arcade-space-4);
+  align-items: start;
+}
+.sign-in-steps li:not(:last-child)::after {
+  position: absolute;
+  top: 2.5rem;
+  bottom: calc(var(--arcade-space-4) * -1);
+  left: 1.1875rem;
+  width: 0.125rem;
+  background: repeating-linear-gradient(
+    var(--arcade-cyan) 0 0.375rem,
+    transparent 0.375rem 0.625rem
+  );
+  content: "";
+}
+.sign-in-steps__number {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+  box-shadow: 0 0 0.875rem
+    color-mix(in srgb, var(--arcade-cyan) 55%, transparent);
+  color: var(--arcade-cyan);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-text-sm);
+}
+.sign-in-steps strong,
+.sign-in-steps small {
+  display: block;
+}
+.sign-in-steps strong {
+  font-size: var(--arcade-text-md);
+}
+.sign-in-steps small {
+  margin-top: var(--arcade-space-1);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+  line-height: 1.5;
+}
+.sign-in-network {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: var(--arcade-space-2) var(--arcade-space-3);
+  border: 0.0625rem solid var(--arcade-border-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--arcade-ink) 70%, transparent);
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.sign-in-network__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--arcade-mint);
+  box-shadow: 0 0 0.5rem var(--arcade-mint);
+  animation: sign-in-pulse 2s ease-in-out infinite;
+}
+@keyframes sign-in-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sign-in-intro .arcade-eyebrow::before,
+  .sign-in-network__dot {
+    animation: none;
+  }
+}

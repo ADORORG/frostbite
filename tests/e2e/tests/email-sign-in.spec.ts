@@ -37,7 +37,12 @@ async function codeSentTo(address: string): Promise<string> {
 // The page's own message; the framework has a live region with the same role.
 const alertOf = (page: Page) => page.locator("p[role=alert]");
 
+// The sign-in page opens on its first key (the wallet), so the email form is shown by choosing the Email key.
+const chooseEmail = (page: Page) =>
+  page.getByRole("tab", { name: /Email/u }).click();
+
 async function askForCode(page: Page, address: string) {
+  await chooseEmail(page);
   await page.getByLabel("Email address").fill(address);
   await page.getByRole("button", { name: "Email me a code" }).click();
   await expect(
@@ -51,6 +56,7 @@ test("a signed-out visitor to a protected page signs in with an emailed code and
   const address = addressFor("return");
   await page.goto("/account");
   await expect(page).toHaveURL(/\/sign-in\?returnTo=%2Faccount/u);
+  await chooseEmail(page);
   await expect(page.getByRole("heading", { name: "Email" })).toBeVisible();
 
   await askForCode(page, address);

@@ -36,8 +36,10 @@ const views: readonly SignInView[] = [
         Sign in via wallet
       </button>
     ),
+    glyph: "*",
     kind: "wallet",
     label: "Wallet",
+    tagline: "Sign a message",
   },
 ];
 

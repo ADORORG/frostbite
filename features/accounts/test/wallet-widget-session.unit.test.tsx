@@ -154,4 +154,37 @@ describe("the wallet widget: signing in", () => {
     expect(container.textContent).toContain("Connected, not signed in.");
     expect(container.textContent).not.toContain("Your wallets");
   });
+
+  it("offers a way to the sign-in page to anyone signed out, lit while a wallet is connected and waiting to be signed with", async () => {
+    const link = () =>
+      container.querySelector<HTMLAnchorElement>(".wallet-widget__signin");
+    Object.assign(answers, {
+      "/api/v1/auth/methods": () => denied("unauthorized", 401),
+    });
+    await show();
+    await settle();
+    expect(link()?.getAttribute("href")).toBe("/sign-in");
+    expect(link()?.textContent).toBe("Sign in");
+    expect(link()?.dataset.waiting).toBeUndefined();
+    Object.assign(connection, { address, connected: true });
+    await show();
+    await settle();
+    expect(link()?.dataset.waiting).toBe("true");
+  });
+
+  it("offers no sign-in link to someone who is signed in, nor before the session has been read", async () => {
+    const link = () => container.querySelector(".wallet-widget__signin");
+    Object.assign(answers, {
+      "/api/v1/auth/methods": () => methods([address]),
+    });
+    await show();
+    // Not yet read: neither signed in nor signed out is known, so nothing is claimed either way.
+    expect(link()).toBeNull();
+    await settle();
+    expect(link()).toBeNull();
+    Object.assign(connection, { address, connected: true });
+    await show();
+    await settle();
+    expect(link()).toBeNull();
+  });
 });

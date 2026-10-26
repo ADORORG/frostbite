@@ -6,6 +6,7 @@ import {
   useWalletChooser,
   useWalletConnection,
 } from "@ador/wallet/client";
+import { signInPath } from "@ador/shared/auth/sign-in-path";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
@@ -57,6 +58,11 @@ export function WalletWidget({
   const waiting = remembered && !gaveUp && !wallet.connected;
   const signedIn =
     session.view.kind === "disconnected" && session.view.signedIn;
+  // Signed out, and sure of it: the session has been read and says no one is signed in. A connected wallet alone is not a sign-in, so
+  // the way to one is a link of its own, lit while a wallet is connected and waiting to be signed with.
+  const signedOut =
+    session.view.kind === "connected-signed-out" ||
+    (session.view.kind === "disconnected" && !session.view.signedIn);
   const hasMenu = wallet.connected || signedIn || session.methods !== null;
   const balance = useBalance({ intervalMs: balanceRefreshMs, wallet });
   const mismatch = wallet.connected && wallet.network !== network;
@@ -102,6 +108,15 @@ export function WalletWidget({
             )
           : null}
       </Popover>
+      {signedOut ? (
+        <a
+          className="wallet-widget__signin"
+          data-waiting={wallet.connected ? "true" : undefined}
+          href={signInPath}
+        >
+          Sign in
+        </a>
+      ) : null}
       <WalletChooserDialog candidates={candidates} wallet={wallet} />
     </div>
   );

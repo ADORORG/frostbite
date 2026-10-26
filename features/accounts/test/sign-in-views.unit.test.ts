@@ -4,8 +4,10 @@ import { selectSignInViews, type SignInView } from "../src/sign-in/views.ts";
 
 const view = (kind: string): SignInView => ({
   Component: () => null,
+  glyph: "*",
   kind,
   label: kind,
+  tagline: kind,
 });
 
 describe("which sign-in views the page shows", () => {
