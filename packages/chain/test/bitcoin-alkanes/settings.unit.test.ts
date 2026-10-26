@@ -123,12 +123,13 @@ describe("the services the adapter is wired to", () => {
     ).toBeUndefined();
   });
 
-  it("take fee rates from an explorer, from the operator's fixed rate, or from the node", async () => {
+  it("take fee rates from an explorer, from the operator's rate when it cannot be read, or from the node", async () => {
     const asked: string[] = [];
     const explorer = {
       ...settings,
       feeApi: {
-        format: "mempool" as const,
+        adapter: "mempool" as const,
+        fallbackSatPerVb: null,
         fetch: (url: string) => {
           asked.push(url);
           return Promise.resolve({
@@ -143,9 +144,8 @@ describe("the services the adapter is wired to", () => {
             status: 200,
           });
         },
-        kind: "explorer",
+        network: "signet" as const,
         timeoutMs: 400,
-        url: "https://fees.example.invalid/signet",
       },
     } satisfies AlkanesChainSettings;
     const chain = settings.chain;
@@ -153,18 +153,34 @@ describe("the services the adapter is wired to", () => {
       alkanesServices(value).nodes.get(chain)?.feeRate(1);
     expect(await rateOf(explorer)).toBe(9);
     expect(asked).toEqual([
-      "https://fees.example.invalid/signet/api/v1/fees/recommended",
+      "https://mempool.space/signet/api/v1/fees/recommended",
     ]);
     expect(
-      await rateOf({ ...settings, feeApi: { kind: "fixed", satPerVb: 2.5 } }),
+      await rateOf({
+        ...explorer,
+        feeApi: {
+          ...explorer.feeApi,
+          fallbackSatPerVb: 2.5,
+          fetch: () => Promise.reject(new Error("offline")),
+        },
+      }),
     ).toBe(2.5);
     // With no source it is the node that is asked; here the node is offline.
     await expect(rateOf({ ...settings, feeApi: null })).rejects.toThrow();
   });
 
-  it("stop boot on a fixed rate that cannot be one", () => {
+  it("stop boot on a fallback rate that cannot be one", () => {
     expect(() =>
-      alkanesServices({ ...settings, feeApi: { kind: "fixed", satPerVb: 0 } }),
+      alkanesServices({
+        ...settings,
+        feeApi: {
+          adapter: "mempool",
+          fallbackSatPerVb: 0,
+          fetch: () => Promise.reject(new Error("offline")),
+          network: "signet",
+          timeoutMs: 400,
+        },
+      }),
     ).toThrow("positive number");
   });
 });

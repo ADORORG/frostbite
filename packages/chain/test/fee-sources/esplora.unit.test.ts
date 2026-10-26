@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  createFeeSource,
-  probeFeeSource,
-  type GetLike,
-} from "../../src/fee-sources/index.ts";
+import { createEsploraFeeSource } from "../../src/fee-sources/esplora.ts";
+import type { GetLike } from "../../src/fee-sources/index.ts";
 import { ChainUnavailableError } from "../../src/ports.ts";
 
 // Estimates the way Esplora gives them: a rate for each target, sparse after 25. Each a different number, so a wrong pick shows.
@@ -28,10 +25,8 @@ function answering(body: unknown, status = 200): GetLike {
     });
 }
 const source = (fetch: GetLike) =>
-  createFeeSource({
+  createEsploraFeeSource({
     fetch,
-    format: "esplora",
-    kind: "explorer",
     timeoutMs: 1000,
     url: "https://explorer.example/net",
   });
@@ -122,42 +117,11 @@ describe("the Esplora fee source", () => {
     );
   });
 
-  it("is looked at when the platform starts, reading the targets it will later use", async () => {
-    const targets: number[] = [];
-    const fetch: GetLike = () =>
-      Promise.resolve({
-        json: () => Promise.resolve(estimates),
-        ok: true,
-        status: 200,
-      });
-    await expect(
-      probeFeeSource({
-        fetch,
-        format: "esplora",
-        kind: "explorer",
-        timeoutMs: 1000,
-        url: "https://x.example/net",
-      }),
-    ).resolves.toBeUndefined();
-    expect(targets).toEqual([]);
-    await expect(
-      probeFeeSource({
-        fetch: answering({ "1": 0 }),
-        format: "esplora",
-        kind: "explorer",
-        timeoutMs: 1000,
-        url: "https://x.example/net",
-      }),
-    ).rejects.toThrow("estimate for 1 blocks");
-  });
-
   it("refuses a timeout that is not a positive whole number of milliseconds", () => {
     for (const timeoutMs of [0, -5, 1.5])
       expect(() =>
-        createFeeSource({
+        createEsploraFeeSource({
           fetch: answering(estimates),
-          format: "esplora",
-          kind: "explorer",
           timeoutMs,
           url: "https://x.example",
         }),

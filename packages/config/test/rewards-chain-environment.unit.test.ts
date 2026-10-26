@@ -20,7 +20,7 @@ describe("the rewards chain environment", () => {
 
   it("reads a node with the safe defaults: the standard timeout and no templates directory", () => {
     expect(parseRewardsChainEnvironment(node)).toEqual({
-      feeSource: { kind: "default" },
+      feeSource: { adapter: "mempool", fallbackSatPerVb: null },
       maxFeeSats: 20_000n,
       rpcHeaders: {},
       rpcTimeoutMs: 15_000,
@@ -37,7 +37,7 @@ describe("the rewards chain environment", () => {
         REWARDS_TEMPLATES_DIR: " /srv/templates ",
       }),
     ).toEqual({
-      feeSource: { kind: "default" },
+      feeSource: { adapter: "mempool", fallbackSatPerVb: null },
       maxFeeSats: 20_000n,
       rpcHeaders: {},
       rpcTimeoutMs: 5000,
@@ -119,111 +119,48 @@ describe("the rewards chain environment", () => {
   });
 
   describe("the fee source", () => {
-    it("is the network's own explorer unless one of the two settings is given", () => {
-      expect(parseRewardsChainEnvironment(node)?.feeSource).toEqual({
-        kind: "default",
+    const source = (extra: NodeJS.ProcessEnv) =>
+      parseRewardsChainEnvironment({ ...node, ...extra })?.feeSource;
+
+    it("is mempool.space, with no fallback rate, unless the settings say otherwise (blank counts as unset)", () => {
+      expect(source({})).toEqual({
+        adapter: "mempool",
+        fallbackSatPerVb: null,
       });
       expect(
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_URL: "  ",
-          REWARDS_FEE_RATE_SAT_VB: " ",
-        })?.feeSource,
-      ).toEqual({ kind: "default" });
+        source({ REWARDS_FEE_API_FORMAT: "  ", REWARDS_FEE_RATE_SAT_VB: " " }),
+      ).toEqual({ adapter: "mempool", fallbackSatPerVb: null });
     });
 
-    it("can be another explorer, whose address is read as typed once trimmed", () => {
-      expect(
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_URL: " https://fees.example.org/signet ",
-        })?.feeSource,
-      ).toEqual({
-        format: "mempool",
-        kind: "explorer",
-        url: "https://fees.example.org/signet",
+    it("is the adapter named, once trimmed", () => {
+      expect(source({ REWARDS_FEE_API_FORMAT: " blockstream " })).toEqual({
+        adapter: "blockstream",
+        fallbackSatPerVb: null,
       });
     });
 
-    it("reads the explorer in the format named, trimmed; a blank format is the default", () => {
-      const withFormat = (REWARDS_FEE_API_FORMAT: string) =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_FORMAT,
-          REWARDS_FEE_API_URL: "https://fees.example.org/signet",
-        })?.feeSource;
-      expect(withFormat(" esplora ")).toEqual({
-        format: "esplora",
-        kind: "explorer",
-        url: "https://fees.example.org/signet",
-      });
-      expect(withFormat(" ")).toMatchObject({ format: "mempool" });
-    });
-
-    it("refuses a format it does not know, and a format with no explorer to apply it to", () => {
-      expect(() =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_FORMAT: "blockbook",
-          REWARDS_FEE_API_URL: "https://fees.example.org/signet",
-        }),
-      ).toThrow();
-      expect(() =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_FORMAT: "esplora",
-        }),
-      ).toThrow("needs REWARDS_FEE_API_URL");
-    });
-
-    it("can be a fixed rate, which may have a fraction", () => {
+    it("keeps the operator's rate as the fallback beside the adapter, which may have a fraction, and does not make them alternatives", () => {
       expect(
-        parseRewardsChainEnvironment({
-          ...node,
+        source({
+          REWARDS_FEE_API_FORMAT: "blockstream",
           REWARDS_FEE_RATE_SAT_VB: "2.5",
-        })?.feeSource,
-      ).toEqual({
-        kind: "fixed",
-        satPerVb: 2.5,
+        }),
+      ).toEqual({ adapter: "blockstream", fallbackSatPerVb: 2.5 });
+      expect(source({ REWARDS_FEE_RATE_SAT_VB: "1000" })).toEqual({
+        adapter: "mempool",
+        fallbackSatPerVb: 1000,
       });
     });
 
-    it("refuses both together, an address that is not a web address, and a rate that is zero, negative, not a number or implausibly large", () => {
-      expect(() =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_URL: "https://a.example.org",
-          REWARDS_FEE_RATE_SAT_VB: "2",
-        }),
-      ).toThrow("alternatives");
-      expect(() =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_URL: "ftp://a.example.org",
-        }),
-      ).toThrow();
-      expect(() =>
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_API_URL: "not a url",
-        }),
-      ).toThrow();
+    it("refuses an adapter it does not know, an address in place of one, and a rate that is zero, negative, not a number or implausibly large", () => {
+      for (const REWARDS_FEE_API_FORMAT of [
+        "blockbook",
+        "esplora",
+        "https://mempool.space/signet",
+      ])
+        expect(() => source({ REWARDS_FEE_API_FORMAT })).toThrow();
       for (const bad of ["0", "-1", "fast", "1000.01", "588235"])
-        expect(() =>
-          parseRewardsChainEnvironment({
-            ...node,
-            REWARDS_FEE_RATE_SAT_VB: bad,
-          }),
-        ).toThrow();
-      expect(
-        parseRewardsChainEnvironment({
-          ...node,
-          REWARDS_FEE_RATE_SAT_VB: "1000",
-        })?.feeSource,
-      ).toEqual({
-        kind: "fixed",
-        satPerVb: 1000,
-      });
+        expect(() => source({ REWARDS_FEE_RATE_SAT_VB: bad })).toThrow();
     });
   });
 });

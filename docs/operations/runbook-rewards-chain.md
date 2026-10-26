@@ -21,30 +21,24 @@ Game rewards page, and the platform records them when each step completes (`ador
 5. `REWARDS_TEMPLATES_DIR` (optional): the folder holding `game-rewards.wasm` and `milestone-collectible.wasm`, built with
    `contracts/templates/build.sh`. Without it staff cannot publish templates or create games, and the page says so. A file whose
    SHA-256 differs from `contracts/templates/release.json` is refused before anything is built.
-6. **Where the fee rate comes from.** Every step needs a fee rate, and the platform takes it from the network's public explorer
-   (`mempool.space/<network>`), never from the node's own estimates, which on the hosted test networks are absurd (hundreds of sat/vB
-   on signet, hundreds of thousands on testnet4). If that explorer cannot be reached from where the platform runs, a step fails with
-   "The fee source could not be reached." (a claim shows "The network could not be reached"). Two optional settings, alternatives
-   (both set stops boot):
-   - `REWARDS_FEE_API_URL`: another explorer (its address up to the network, such as `https://fees.example.org/signet`), for a
-     mirror or one of your own, and `REWARDS_FEE_API_FORMAT`: how it answers. `mempool` (the default when blank) is mempool.space's
-     own recommended fees; check with `curl <address>/api/v1/fees/recommended`, which must print `fastestFee`, `halfHourFee`,
-     `hourFee` and `economyFee`. `esplora` is the Esplora standard's estimate per confirmation target (Blockstream's Esplora,
-     electrs, mempool.space); check with `curl <address>/api/fee-estimates`, which must print a map such as `{"1": 9, "6": 5}`.
-     A format with no address is refused at start. Esplora estimates from a raw node can be far too high on signet, so look
-     at the numbers before choosing it there.
-   - `REWARDS_FEE_RATE_SAT_VB`: a fixed rate (up to 1000, a fraction is fine) used for every step and every speed. It is yours to
-     keep honest: it does not follow the network, so a rate that is too low leaves a step unconfirmed and one that is too high wastes
-     fee. Each step's total fee is still held to `REWARDS_MAX_FEE_SATS`. The local stack's startup line says when a fixed rate is in
-     use.
+6. **Where the fee rate comes from.** Every step needs a fee rate, and the platform takes it from a public explorer, never from the
+   node's own estimates, which on the hosted test networks are absurd (hundreds of sat/vB on signet, hundreds of thousands on
+   testnet4). Two optional settings:
+   - `REWARDS_FEE_API_FORMAT`: which explorer. `mempool` (the default when blank) is mempool.space's own recommended fees;
+     `blockstream` is Blockstream's Esplora, an estimate per confirmation target. Each adapter carries its own address for the
+     network (`BETA_NETWORK`), in `packages/chain/src/fee-sources/adapters.ts`; there is no address to set. Blockstream's signet
+     estimates have been far too high (about 149 sat/vB for most targets), so look at the numbers before choosing it there.
+   - `REWARDS_FEE_RATE_SAT_VB`: the fallback (up to 1000, a fraction is fine). When the chosen explorer cannot be read (unreachable,
+     an error status, or an answer that is not a fee table), this rate is used for every step and every speed, and the server logs
+     `The fee source <name> could not be read (<reason>); REWARDS_FEE_RATE_SAT_VB is used.` each time. It is yours to keep honest: it
+     does not follow the network, so a rate that is too low leaves a step unconfirmed and one that is too high wastes fee. Each
+     step's total fee is still held to `REWARDS_MAX_FEE_SATS`. Without it a step fails with "The fee source could not be reached."
+     (a claim shows "The network could not be reached"); nothing is guessed.
 
-   Neither is ever chosen automatically: when the source fails, nothing is guessed.
-
-   **Looked at when the server starts.** With `REWARDS_FEE_API_URL` set, the server asks that explorer once as it starts and reads
-   all four levels. If it cannot be reached, answers with an error status, or does not answer in the format named, the server does
-   not start and says so: `REWARDS_FEE_API_URL (host, read as <format>) is not usable: <reason>`. Fix the address, or blank the setting. The cost is
-   that an explorer that is down for a moment at start also stops the start; start again. The network's default explorer and a fixed
-   rate are not looked at (a fixed rate has nothing to ask).
+   **Looked at when the server starts.** With no fallback rate set, the server asks the chosen explorer once as it starts and reads
+   every level. If it cannot be reached or does not answer as that explorer does, the server does not start and says so:
+   `REWARDS_FEE_API_FORMAT (<name>) is not usable: <reason>`. Choose another, or set a fallback rate. With a fallback rate the server
+   starts without looking, since a step is priced either way.
 
 To move a deployment between test networks, set `BETA_NETWORK`, make `REWARDS_CHAIN_RPC_URL` (and the key) point at a node of that
 network, apply migrations (`wallet_network_testnet4` widens the wallet network checks), run the preflight, restart, and connect a

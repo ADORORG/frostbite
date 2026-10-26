@@ -33,10 +33,11 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   `extension.adminOutput` ("txid:vout") and checked against the indexer and the game's `get_auth_token`. The adapter declares only what it provides.
   Inside `src/bitcoin-alkanes/`: `node/` is the application-owned node boundary (`AlkanesNode` over JSON-RPC, a minimal protobuf
   codec for the few indexer messages used, every answer validated, the trace decoder);
-  `src/fee-sources/` is the fee adapter, one file per explorer format (`mempool.ts`, `esplora.ts`) and `fixed.ts`, chosen by the chain's
-  `feeApi` settings through the registry in `index.ts`, because the hosted nodes' own estimates are not usable on the test networks and
-  are never fallen back to. To add a provider: one adapter file, its name in `feeApiFormats` (`@ador/shared/chain`), and one entry in each
-  registry table in `index.ts`;
+  `src/fee-sources/` is the fee adapter: a parser for each explorer's answer (`mempool.ts`, `esplora.ts`), `adapters.ts` (the one table of
+  explorers, each carrying its own address for each network, chosen by `REWARDS_FEE_API_FORMAT`), `fallback.ts` (the operator's rate,
+  `fixed.ts`, taken only where the explorer cannot be read) and `index.ts` (`createFeeSource`, `probeFeeSource`), because the hosted nodes'
+  own estimates are not usable on the test networks and are never fallen back to. To add an explorer: a parser if its answer is new, its
+  name in `feeApiFormats` (`@ador/shared/chain`), and an entry in `adapters.ts` with its address for each network;
   `admin/free-address.ts` chooses a new template's address at random from widening ranges (`templateSequence`: `first`, `window`,
   `attempts`), not by counting up, so low crowded numbers and a predictable sequence are both avoided; `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,

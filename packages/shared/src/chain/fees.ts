@@ -7,12 +7,12 @@ export const feeSpeeds = ["slow", "medium", "fast", "lightning"] as const;
 export type FeeSpeed = (typeof feeSpeeds)[number];
 export const feeSpeedSchema = z.enum(feeSpeeds);
 
-// The response formats a fee explorer can be asked in. Each is one adapter in `@ador/chain` (`fee-sources`), keyed by this list, so a format
-// without an adapter cannot be configured and an adapter without a name cannot exist.
-// - `mempool`: mempool.space's recommendation by name (`GET <url>/api/v1/fees/recommended`);
-// - `esplora`: the Esplora standard's estimate for each confirmation target (`GET <url>/api/fee-estimates`), served by Blockstream's
-//   Esplora, electrs and mempool.space alike.
-export const feeApiFormats = ["mempool", "esplora"] as const;
+// The public explorers fee levels can be taken from (`REWARDS_FEE_API_FORMAT`). Each is one adapter in `@ador/chain` (`fee-sources`), keyed
+// by this list, so a name without an adapter cannot be configured and an adapter without a name cannot exist. An adapter carries its own
+// address for each network.
+// - `mempool`: mempool.space's recommendation by name;
+// - `blockstream`: Blockstream's Esplora, an estimate for each confirmation target.
+export const feeApiFormats = ["mempool", "blockstream"] as const;
 export type FeeApiFormat = (typeof feeApiFormats)[number];
 export const feeApiFormatSchema = z.enum(feeApiFormats);
 

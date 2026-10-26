@@ -7,18 +7,13 @@ const blankAsUnset = (value: string | undefined) =>
 // What the platform needs to reach the chain its games' rewards contracts are on. Only what differs between a developer's machine,
 // a preview and a deployment is here; where a template or a game's contract is on the chain is recorded when staff publish it.
 export interface RewardsChainEnvironment {
-  // Where the fee levels come from. `default`: the network's own explorer (see `configs/beta-chains.ts`). `explorer`: another explorer
-  // of the format named by `REWARDS_FEE_API_FORMAT` (mempool.space's by default), for when the default cannot be reached from where the platform runs. `fixed`: a rate the operator
-  // sets, used for every step instead of asking anyone (shown as fixed wherever it is shown; the step's total fee is still held to
-  // `maxFeeSats`).
-  readonly feeSource:
-    | { readonly kind: "default" }
-    | {
-        readonly format: FeeApiFormat;
-        readonly kind: "explorer";
-        readonly url: string;
-      }
-    | { readonly kind: "fixed"; readonly satPerVb: number };
+  // Which public explorer the fee levels are taken from (`REWARDS_FEE_API_FORMAT`; each adapter carries its own address for the network),
+  // and the rate the operator set to use for every step when it cannot be read (`REWARDS_FEE_RATE_SAT_VB`; shown as nothing special wherever
+  // it is shown; the step's total fee is still held to `maxFeeSats`).
+  readonly feeSource: {
+    readonly adapter: FeeApiFormat;
+    readonly fallbackSatPerVb: number | null;
+  };
   // The most a player's claim or a staff step may pay in fee, in satoshis.
   readonly maxFeeSats: bigint;
   // The header carrying the node's key, or empty when the node needs none. Secret.
@@ -48,7 +43,6 @@ export const rewardsChainEnvironmentSchema = z
       .default(15_000),
     REWARDS_CHAIN_RPC_URL: z.url({ protocol: /^https?$/u }),
     REWARDS_FEE_API_FORMAT: feeApiFormatSchema.optional(),
-    REWARDS_FEE_API_URL: z.url({ protocol: /^https?$/u }).optional(),
     REWARDS_FEE_RATE_SAT_VB: z.coerce
       .number()
       .positive()
@@ -57,24 +51,6 @@ export const rewardsChainEnvironmentSchema = z
     REWARDS_MAX_FEE_SATS: z.coerce.bigint().positive(),
     REWARDS_TEMPLATES_DIR: z.string().optional(),
   })
-  .refine(
-    (value) =>
-      value.REWARDS_FEE_API_URL === undefined ||
-      value.REWARDS_FEE_RATE_SAT_VB === undefined,
-    {
-      message:
-        "REWARDS_FEE_API_URL and REWARDS_FEE_RATE_SAT_VB are alternatives: set one or neither.",
-    },
-  )
-  .refine(
-    (value) =>
-      value.REWARDS_FEE_API_FORMAT === undefined ||
-      value.REWARDS_FEE_API_URL !== undefined,
-    {
-      message:
-        "REWARDS_FEE_API_FORMAT says how the explorer of REWARDS_FEE_API_URL answers, so it needs REWARDS_FEE_API_URL.",
-    },
-  )
   .refine(
     (value) =>
       (value.REWARDS_CHAIN_RPC_API_KEY === undefined) ===
@@ -102,7 +78,6 @@ export function parseRewardsChainEnvironment(
     ),
     REWARDS_CHAIN_RPC_URL: url,
     REWARDS_FEE_API_FORMAT: blankAsUnset(source.REWARDS_FEE_API_FORMAT),
-    REWARDS_FEE_API_URL: blankAsUnset(source.REWARDS_FEE_API_URL),
     REWARDS_FEE_RATE_SAT_VB: blankAsUnset(source.REWARDS_FEE_RATE_SAT_VB),
     REWARDS_MAX_FEE_SATS: blankAsUnset(source.REWARDS_MAX_FEE_SATS),
     REWARDS_TEMPLATES_DIR: blankAsUnset(source.REWARDS_TEMPLATES_DIR),
@@ -110,16 +85,10 @@ export function parseRewardsChainEnvironment(
   const keyHeader = parsed.REWARDS_CHAIN_RPC_API_KEY_HEADER;
   const key = parsed.REWARDS_CHAIN_RPC_API_KEY;
   return {
-    feeSource:
-      parsed.REWARDS_FEE_RATE_SAT_VB !== undefined
-        ? { kind: "fixed", satPerVb: parsed.REWARDS_FEE_RATE_SAT_VB }
-        : parsed.REWARDS_FEE_API_URL !== undefined
-          ? {
-              format: parsed.REWARDS_FEE_API_FORMAT ?? "mempool",
-              kind: "explorer",
-              url: parsed.REWARDS_FEE_API_URL,
-            }
-          : { kind: "default" },
+    feeSource: {
+      adapter: parsed.REWARDS_FEE_API_FORMAT ?? "mempool",
+      fallbackSatPerVb: parsed.REWARDS_FEE_RATE_SAT_VB ?? null,
+    },
     maxFeeSats: parsed.REWARDS_MAX_FEE_SATS,
     rpcHeaders:
       keyHeader === undefined || key === undefined ? {} : { [keyHeader]: key },

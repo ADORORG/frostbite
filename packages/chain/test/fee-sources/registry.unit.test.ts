@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { feeApiFormats } from "@ador/shared/chain";
+import { feeApiFormats, betaNetworks } from "@ador/shared/chain";
 
 import {
   createFeeSource,
@@ -16,131 +16,125 @@ const recommended = {
   hourFee: 5,
   minimumFee: 1,
 };
+const estimates = { "1": 9, "3": 7, "6": 5, "7": 3 };
 
-function explorer(
-  body: unknown,
-  status = 200,
-): { asked: string[]; source: FeeSourceSettings } {
+function reply(body: unknown, status = 200): ReturnType<GetLike> {
+  return Promise.resolve({
+    json: () => Promise.resolve(body),
+    ok: status >= 200 && status < 300,
+    status,
+  });
+}
+// An explorer that answers each address with its body, and records what was asked.
+function explorer(answers: (url: string) => unknown, status = 200) {
   const asked: string[] = [];
   const fetch: GetLike = (url) => {
     asked.push(url);
-    return Promise.resolve({
-      json: () => Promise.resolve(body),
-      ok: status >= 200 && status < 300,
-      status,
-    });
+    return reply(answers(url), status);
   };
-  return {
-    asked,
-    source: {
-      fetch,
-      format: "mempool",
-      kind: "explorer",
-      timeoutMs: 1000,
-      url: "https://fees.example.invalid/signet",
-    },
-  };
+  return { asked, fetch };
 }
+const settings = (
+  fetch: GetLike,
+  overrides: Partial<FeeSourceSettings> = {},
+): FeeSourceSettings => ({
+  adapter: "mempool",
+  fallbackSatPerVb: null,
+  fetch,
+  network: "signet",
+  timeoutMs: 1000,
+  ...overrides,
+});
 
-describe("looking at the fee source when the platform starts (mempool format)", () => {
-  it("passes an explorer that answers in the expected shape, after one look at its recommended-fees address", async () => {
-    const { asked, source } = explorer(recommended);
-    await expect(probeFeeSource(source)).resolves.toBeUndefined();
-    expect(asked).toEqual([
-      "https://fees.example.invalid/signet/api/v1/fees/recommended",
-    ]);
+describe("the fee adapters", () => {
+  // Written out in full, so a link changed by mistake is seen.
+  const expected = {
+    blockstream: {
+      path: "/api/fee-estimates",
+      signet: "https://blockstream.info/signet",
+      testnet4: "https://blockstream.info/testnet4",
+    },
+    mempool: {
+      path: "/api/v1/fees/recommended",
+      signet: "https://mempool.space/signet",
+      testnet4: "https://mempool.space/testnet4",
+    },
+  } as const;
+
+  it("have an entry in this table for every adapter that can be chosen", () => {
+    expect(Object.keys(expected).sort()).toEqual([...feeApiFormats].sort());
+  });
+
+  for (const adapter of feeApiFormats)
+    for (const network of betaNetworks)
+      it(`${adapter} on ${network} is read at its own address, once`, async () => {
+        const { asked, fetch } = explorer((url) =>
+          url.endsWith("fee-estimates") ? estimates : recommended,
+        );
+        const rates = await createFeeSource(
+          settings(fetch, { adapter, network }),
+        ).feeRates([1, 6]);
+        expect(asked).toEqual([
+          `${expected[adapter][network]}${expected[adapter].path}`,
+        ]);
+        expect(rates.map(({ satPerVb }) => satPerVb)).toEqual(
+          adapter === "mempool" ? [7, 5] : [9, 5],
+        );
+      });
+
+  it("is given the deployment's time limit", async () => {
+    const signals: AbortSignal[] = [];
+    const fetch: GetLike = (_url, init) => {
+      signals.push(init.signal);
+      return reply(recommended);
+    };
+    await createFeeSource(settings(fetch)).feeRates([1]);
+    expect(signals[0]).toBeInstanceOf(AbortSignal);
+    expect(() => createFeeSource(settings(fetch, { timeoutMs: 0 }))).toThrow(
+      "timeout",
+    );
+  });
+});
+
+describe("looking at the chosen explorer when the platform starts", () => {
+  it("passes an explorer that answers in its own shape, after reading every level", async () => {
+    const { asked, fetch } = explorer(() => recommended);
+    await expect(probeFeeSource(settings(fetch))).resolves.toBeUndefined();
+    expect(asked).toHaveLength(1);
   });
 
   it.each(["fastestFee", "halfHourFee", "hourFee", "economyFee"])(
-    "refuses an explorer whose %s is missing, since a step would later need it",
+    "refuses a mempool answer whose %s is missing, since a step would later need it",
     async (field) => {
       const rest = Object.fromEntries(
         Object.entries(recommended).filter(([name]) => name !== field),
       );
-      await expect(probeFeeSource(explorer(rest).source)).rejects.toThrow(
+      const { fetch } = explorer(() => rest);
+      await expect(probeFeeSource(settings(fetch))).rejects.toThrow(
         `${field} is not a positive number`,
       );
     },
   );
 
-  it("refuses an explorer that quotes a level that is not a positive number", async () => {
+  it("refuses a Blockstream answer with a bad estimate, an error status, or no connection", async () => {
+    const blockstream = { adapter: "blockstream" } as const;
     await expect(
-      probeFeeSource(explorer({ ...recommended, hourFee: 0 }).source),
-    ).rejects.toThrow("hourFee is not a positive number");
-  });
-
-  it("refuses an explorer that answers with an error status, or with something that is not a fee table", async () => {
-    await expect(probeFeeSource(explorer({}, 503).source)).rejects.toThrow(
-      "HTTP 503",
-    );
-    await expect(probeFeeSource(explorer([1, 2]).source)).rejects.toThrow();
-    await expect(probeFeeSource(explorer("<html>").source)).rejects.toThrow();
-  });
-
-  it("refuses an explorer that cannot be reached", async () => {
-    const source: FeeSourceSettings = {
-      fetch: () => Promise.reject(new Error("ENETUNREACH")),
-      format: "mempool",
-      kind: "explorer",
-      timeoutMs: 1000,
-      url: "https://fees.example.invalid/signet",
-    };
-    await expect(probeFeeSource(source)).rejects.toThrow(
-      "The fee source could not be reached.",
-    );
-  });
-
-  it("has nothing to look at for a fixed rate or for no source", async () => {
+      probeFeeSource(settings(explorer(() => ({ "1": 0 })).fetch, blockstream)),
+    ).rejects.toThrow("estimate for 1 blocks");
     await expect(
-      probeFeeSource({ kind: "fixed", satPerVb: 2 }),
-    ).resolves.toBeUndefined();
-    await expect(probeFeeSource(null)).resolves.toBeUndefined();
-  });
-});
-
-describe("the registry of fee source formats", () => {
-  const explorerOf = (
-    format: (typeof feeApiFormats)[number],
-  ): FeeSourceSettings => ({
-    fetch: () =>
-      Promise.resolve({
-        json: () => Promise.resolve({}),
-        ok: false,
-        status: 404,
-      }),
-    format,
-    kind: "explorer",
-    timeoutMs: 1000,
-    url: "https://fees.example.invalid/signet",
+      probeFeeSource(settings(explorer(() => ({}), 503).fetch, blockstream)),
+    ).rejects.toThrow("HTTP 503");
+    await expect(
+      probeFeeSource(
+        settings(() => Promise.reject(new Error("ENETUNREACH")), blockstream),
+      ),
+    ).rejects.toThrow("The fee source could not be reached.");
   });
 
-  it("has an adapter for every format that can be configured, and each is looked at on its own address", async () => {
-    const addresses: Record<string, string> = {};
-    for (const format of feeApiFormats) {
-      const asked: string[] = [];
-      const settings: FeeSourceSettings = {
-        ...explorerOf(format),
-        fetch: (url) => {
-          asked.push(url);
-          return Promise.resolve({
-            json: () => Promise.resolve({}),
-            ok: false,
-            status: 404,
-          });
-        },
-      } as FeeSourceSettings;
-      await expect(probeFeeSource(settings)).rejects.toThrow("HTTP 404");
-      addresses[format] = asked[0] ?? "";
-    }
-    expect(addresses).toEqual({
-      esplora: "https://fees.example.invalid/signet/api/fee-estimates",
-      mempool: "https://fees.example.invalid/signet/api/v1/fees/recommended",
-    });
-  });
-
-  it("makes the source the settings name: an explorer of that format, or the operator's fixed rate", async () => {
-    expect(
-      await createFeeSource({ kind: "fixed", satPerVb: 4 }).feeRates([2]),
-    ).toEqual([{ satPerVb: 4, targetBlocks: 2 }]);
+  it("looks without the fallback, so an unreadable explorer is found", async () => {
+    const { fetch } = explorer(() => ({}), 503);
+    await expect(
+      probeFeeSource(settings(fetch, { fallbackSatPerVb: 2 })),
+    ).rejects.toThrow("HTTP 503");
   });
 });

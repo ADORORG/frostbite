@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { ChainUnavailableError } from "../../src/ports.ts";
-import { createFeeSource, type GetLike } from "../../src/fee-sources/index.ts";
+import { createMempoolFeeSource } from "../../src/fee-sources/mempool.ts";
+import type { GetLike } from "../../src/fee-sources/index.ts";
 
 // Each level a different number, so a wrong mapping shows.
 const recommended = {
@@ -22,10 +23,8 @@ function answering(body: unknown, status = 200): GetLike {
 }
 
 const api = (fetch: GetLike) =>
-  createFeeSource({
+  createMempoolFeeSource({
     fetch,
-    format: "mempool",
-    kind: "explorer",
     timeoutMs: 1000,
     url: "https://explorer.example/net",
   });
@@ -49,10 +48,8 @@ describe("the mempool.space fee source", () => {
       seen.push({ signal: init.signal, url });
       return answering(recommended)(url, init);
     };
-    await createFeeSource({
+    await createMempoolFeeSource({
       fetch,
-      format: "mempool",
-      kind: "explorer",
       timeoutMs: 1000,
       url: "https://explorer.example/net//",
     }).feeRates([1, 3, 6]);
@@ -111,10 +108,8 @@ describe("the mempool.space fee source", () => {
   it("refuses a timeout that is not a positive whole number of milliseconds", () => {
     for (const timeoutMs of [0, -5, 1.5]) {
       expect(() =>
-        createFeeSource({
+        createMempoolFeeSource({
           fetch: answering(recommended),
-          format: "mempool",
-          kind: "explorer",
           timeoutMs,
           url: "https://explorer.example",
         }),

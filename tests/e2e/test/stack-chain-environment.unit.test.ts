@@ -63,39 +63,23 @@ describe("what the stack says about the chain", () => {
   describe("the fee source it names", () => {
     const base = { REWARDS_CHAIN_RPC_URL: "https://node.example/rpc" };
 
-    it("says a fixed rate is fixed and not live, with the number", () => {
-      const text = describeChain({ ...base, REWARDS_FEE_RATE_SAT_VB: " 2.5 " });
-      expect(text).toContain("FIXED at 2.5 sat/vB");
-      expect(text).toContain("not live");
-    });
-
-    it("names the other explorer's host, never a path that might carry a key", () => {
-      const text = describeChain({
-        ...base,
-        REWARDS_FEE_API_URL: "https://fees.example/signet?key=s3cret",
-      });
-      expect(text).toContain("fees.example");
-      expect(text).not.toContain("s3cret");
-      expect(describeChain({ ...base, REWARDS_FEE_API_URL: "nope" })).toContain(
-        "not a URL",
-      );
-    });
-
-    it("says the default explorer is used when neither is set, and that both together will not start", () => {
-      expect(describeChain(base)).toContain("default explorer");
+    it("names the adapter, mempool by default", () => {
+      expect(describeChain(base)).toContain("from mempool (");
       expect(
-        describeChain({
-          ...base,
-          REWARDS_FEE_API_URL: "https://fees.example/x",
-          REWARDS_FEE_RATE_SAT_VB: "3",
-        }),
-      ).toContain("will refuse to start");
+        describeChain({ ...base, REWARDS_FEE_API_FORMAT: " blockstream " }),
+      ).toContain("from blockstream (");
+    });
+
+    it("says the rate beside it is a fallback that is fixed and not live, with the number", () => {
+      const text = describeChain({ ...base, REWARDS_FEE_RATE_SAT_VB: " 2.5 " });
+      expect(text).toContain("if it cannot be read, a fixed 2.5 sat/vB");
+      expect(text).toContain("not live");
     });
 
     it("is read from the settings file along with the other chain settings", () => {
       expect(
         chainSettingsFrom(
-          "REWARDS_FEE_RATE_SAT_VB=2\nREWARDS_FEE_API_URL=\nOTHER=1",
+          "REWARDS_FEE_RATE_SAT_VB=2\nREWARDS_FEE_API_FORMAT=\nOTHER=1",
           {},
         ),
       ).toEqual({ REWARDS_FEE_RATE_SAT_VB: "2" });

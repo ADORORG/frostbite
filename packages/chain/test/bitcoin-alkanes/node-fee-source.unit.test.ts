@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import { ChainUnavailableError } from "../../src/ports.ts";
 import { createRpcNode } from "../../src/bitcoin-alkanes/node/node.ts";
 import type { JsonRpc } from "../../src/bitcoin-alkanes/node/transport.ts";
-import { createFeeSource, type GetLike } from "../../src/fee-sources/index.ts";
+import { createFixedFeeSource } from "../../src/fee-sources/fixed.ts";
+import { createMempoolFeeSource } from "../../src/fee-sources/mempool.ts";
+import type { GetLike } from "../../src/fee-sources/index.ts";
 
 // Each level a different number, so a wrong mapping shows.
 const recommended = {
@@ -25,10 +27,8 @@ function answering(body: unknown, status = 200): GetLike {
 }
 
 const api = (fetch: GetLike) =>
-  createFeeSource({
+  createMempoolFeeSource({
     fetch,
-    format: "mempool",
-    kind: "explorer",
     timeoutMs: 1000,
     url: "https://explorer.example/net",
   });
@@ -84,10 +84,7 @@ describe("a node given a fee source", () => {
 describe("a node given the operator's fixed rate", () => {
   it("replaces the node's absurd estimates and asks nobody", async () => {
     const { asked, rpc } = absurdNode();
-    const node = createRpcNode(
-      rpc,
-      createFeeSource({ kind: "fixed", satPerVb: 3 }),
-    );
+    const node = createRpcNode(rpc, createFixedFeeSource(3));
     expect(await node.feeRate(1)).toBe(3);
     expect(await node.feeRates([1, 6])).toEqual([
       { satPerVb: 3, targetBlocks: 1 },

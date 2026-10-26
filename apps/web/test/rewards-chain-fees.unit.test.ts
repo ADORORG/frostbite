@@ -9,7 +9,7 @@ import {
 } from "../../../configs/rewards-chain.ts";
 
 const environment: RewardsChainEnvironment = {
-  feeSource: { kind: "default" },
+  feeSource: { adapter: "mempool", fallbackSatPerVb: null },
   maxFeeSats: 25_000n,
   rpcHeaders: {},
   rpcTimeoutMs: 400,
@@ -61,15 +61,8 @@ function world() {
 }
 
 describe("the fee rates of the beta networks", () => {
-  it("name a public explorer for each network, up to the network", () => {
-    expect(betaChains.signet.feeApiUrl).toBe("https://mempool.space/signet");
-    expect(betaChains.testnet4.feeApiUrl).toBe(
-      "https://mempool.space/testnet4",
-    );
-  });
-
   for (const [name, beta] of Object.entries(betaChains)) {
-    it(`come from ${name}'s explorer, and the node's own estimates are not asked`, async () => {
+    it(`come from mempool.space's ${name} by default, and the node's own estimates are not asked`, async () => {
       const { explorerAsked, nodeAsked, platform } = world();
       const rewards = createRewardsChain(environment, platform, beta);
       const chain = chainRefSchema.parse(beta.chain.chainId);
@@ -77,35 +70,43 @@ describe("the fee rates of the beta networks", () => {
       const rates = await ports?.observer.feeRates(chain, [1, 25]);
       expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([3, 1]);
       expect(explorerAsked).toEqual([
-        `${beta.feeApiUrl}/api/v1/fees/recommended`,
+        `https://mempool.space/${name}/api/v1/fees/recommended`,
       ]);
       expect(nodeAsked).not.toContain("esplora_fee-estimates");
     });
   }
 
-  describe("when the operator names another explorer", () => {
+  describe("when the operator chooses Blockstream", () => {
     for (const [name, beta] of Object.entries(betaChains)) {
-      it(`${name}: are asked of that explorer and not the network's own`, async () => {
+      it(`${name}: its estimates per target are read at its own address for the network`, async () => {
         const { explorerAsked, explorerSignals, nodeAsked, platform } = world();
+        const blockstream: RewardsPlatform = {
+          ...platform,
+          get: async (address, init) => {
+            explorerAsked.push(address);
+            explorerSignals.push(init.signal);
+            return {
+              json: () => Promise.resolve({ "1": 9, "6": 5 }),
+              ok: true,
+              status: 200,
+            };
+          },
+        };
         const rewards = createRewardsChain(
           {
             ...environment,
-            feeSource: {
-              format: "mempool",
-              kind: "explorer",
-              url: "https://fees.example.invalid/mirror",
-            },
+            feeSource: { adapter: "blockstream", fallbackSatPerVb: null },
           },
-          platform,
+          blockstream,
           beta,
         );
         const chain = chainRefSchema.parse(beta.chain.chainId);
         const rates = await rewards
           ?.chain(chain)
-          ?.ports.observer.feeRates(chain, [1]);
-        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([3]);
+          ?.ports.observer.feeRates(chain, [1, 4]);
+        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([9, 5]);
         expect(explorerAsked).toEqual([
-          "https://fees.example.invalid/mirror/api/v1/fees/recommended",
+          `https://blockstream.info/${name}/api/fee-estimates`,
         ]);
         expect(nodeAsked).not.toContain("esplora_fee-estimates");
         // The explorer is given the deployment's time limit (400 ms here), not a shorter one.
@@ -115,65 +116,68 @@ describe("the fee rates of the beta networks", () => {
     }
   });
 
-  describe("when the operator names an Esplora-format explorer", () => {
+  describe("when the operator sets a fallback rate", () => {
+    const withFallback: RewardsChainEnvironment = {
+      ...environment,
+      feeSource: { adapter: "mempool", fallbackSatPerVb: 2.5 },
+    };
     for (const [name, beta] of Object.entries(betaChains)) {
-      it(`${name}: its estimates per target are read at its fee-estimates address`, async () => {
-        const { explorerAsked, platform } = world();
-        const esplora: RewardsPlatform = {
-          ...platform,
-          get: async (address, init) => {
-            explorerAsked.push(address);
-            return {
-              json: () => Promise.resolve({ "1": 9, "6": 5 }),
-              ok: true,
-              status: init.signal.aborted ? 500 : 200,
-            };
-          },
-        };
+      it(`${name}: is used for every confirmation target when the explorer cannot be read, and the operator is told`, async () => {
+        const { nodeAsked, platform } = world();
+        const told: string[] = [];
         const rewards = createRewardsChain(
+          withFallback,
           {
-            ...environment,
-            feeSource: {
-              format: "esplora",
-              kind: "explorer",
-              url: "https://fees.example.invalid/esplora",
-            },
+            ...platform,
+            get: () => Promise.reject(new Error("offline")),
+            warn: (message) => told.push(message),
           },
-          esplora,
-          beta,
-        );
-        const chain = chainRefSchema.parse(beta.chain.chainId);
-        const rates = await rewards
-          ?.chain(chain)
-          ?.ports.observer.feeRates(chain, [1, 4]);
-        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([9, 5]);
-        expect(explorerAsked).toEqual([
-          "https://fees.example.invalid/esplora/api/fee-estimates",
-        ]);
-      });
-    }
-  });
-
-  describe("when the operator sets a fixed rate", () => {
-    for (const [name, beta] of Object.entries(betaChains)) {
-      it(`${name}: is used for every confirmation target, and nobody is asked`, async () => {
-        const { explorerAsked, nodeAsked, platform } = world();
-        const rewards = createRewardsChain(
-          { ...environment, feeSource: { kind: "fixed", satPerVb: 2.5 } },
-          platform,
           beta,
         );
         const chain = chainRefSchema.parse(beta.chain.chainId);
         const rates = await rewards
           ?.chain(chain)
           ?.ports.observer.feeRates(chain, [1, 3, 25]);
-        expect(rates?.map(({ satPerVb }) => satPerVb)).toEqual([2.5, 2.5, 2.5]);
-        expect(rates?.map(({ targetBlocks }) => targetBlocks)).toEqual([
-          1, 3, 25,
+        expect(rates).toEqual([
+          { satPerVb: 2.5, targetBlocks: 1 },
+          { satPerVb: 2.5, targetBlocks: 3 },
+          { satPerVb: 2.5, targetBlocks: 25 },
         ]);
-        expect(explorerAsked).toEqual([]);
+        expect(told).toEqual([
+          "The fee source mempool could not be read (The fee source could not be reached.); REWARDS_FEE_RATE_SAT_VB is used.",
+        ]);
         expect(nodeAsked).not.toContain("esplora_fee-estimates");
       });
+
+      it(`${name}: is not used while the explorer answers`, async () => {
+        const { platform } = world();
+        const told: string[] = [];
+        const rewards = createRewardsChain(
+          withFallback,
+          { ...platform, warn: (message) => told.push(message) },
+          beta,
+        );
+        const chain = chainRefSchema.parse(beta.chain.chainId);
+        const rates = await rewards
+          ?.chain(chain)
+          ?.ports.observer.feeRates(chain, [1]);
+        expect(rates?.[0]?.satPerVb).toBe(3);
+        expect(told).toEqual([]);
+      });
     }
+
+    it("works with nobody to tell", async () => {
+      const { platform } = world();
+      const rewards = createRewardsChain(
+        withFallback,
+        { ...platform, get: () => Promise.reject(new Error("offline")) },
+        betaChains.signet,
+      );
+      const chain = chainRefSchema.parse(betaChains.signet.chain.chainId);
+      expect(
+        (await rewards?.chain(chain)?.ports.observer.feeRates(chain, [1]))?.[0]
+          ?.satPerVb,
+      ).toBe(2.5);
+    });
   });
 });

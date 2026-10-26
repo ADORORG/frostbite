@@ -15,6 +15,7 @@ const rewards = createRewardsChain(parseRewardsChainEnvironment(process.env), {
   now: () => new Date(),
   random: (length) => new Uint8Array(randomBytes(length)),
   readFile,
+  warn: (message) => console.warn(message),
 });
 
 export const rewardsChain = rewards?.chain ?? (() => null);

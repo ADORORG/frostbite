@@ -1,44 +1,42 @@
-import type { FeeApiFormat } from "@ador/shared/chain";
-
-import { createEsploraFeeSource, esploraProbeTargets } from "./esplora.ts";
-import { createFixedFeeSource } from "./fixed.ts";
-import { createMempoolFeeSource, mempoolProbeTargets } from "./mempool.ts";
-import type { ExplorerOptions, FeeSource, FeeSourceSettings } from "./types.ts";
+import { feeAdapters } from "./adapters.ts";
+import { withFallback } from "./fallback.ts";
+import type { FeeSource, FeeSourceSettings } from "./types.ts";
 
 export type {
   ExplorerOptions,
+  FeeAdapter,
   FeeSource,
   FeeSourceSettings,
   GetLike,
 } from "./types.ts";
 
-// The one place fee sources are known. A format is an adapter here, keyed by `feeApiFormats` (`@ador/shared/chain`), so a format cannot be
-// configured without an adapter, nor an adapter exist without a name. To support another explorer: add its adapter file beside these, its
-// name to `feeApiFormats`, and one entry to each of these two tables (the compiler refuses to build until both have it).
-const explorerAdapters: Readonly<
-  Record<FeeApiFormat, (options: ExplorerOptions) => FeeSource>
-> = {
-  esplora: createEsploraFeeSource,
-  mempool: createMempoolFeeSource,
-};
-// What to ask for when looking at an explorer once, so every field the platform will later read is read.
-const probeTargets: Readonly<Record<FeeApiFormat, readonly number[]>> = {
-  esplora: esploraProbeTargets,
-  mempool: mempoolProbeTargets,
-};
-
-export function createFeeSource(settings: FeeSourceSettings): FeeSource {
-  return settings.kind === "fixed"
-    ? createFixedFeeSource(settings.satPerVb)
-    : explorerAdapters[settings.format](settings);
+function explorerOf(settings: FeeSourceSettings): FeeSource {
+  const adapter = feeAdapters[settings.adapter];
+  return adapter.create({
+    fetch: settings.fetch,
+    timeoutMs: settings.timeoutMs,
+    url: adapter.links[settings.network],
+  });
 }
 
-// Looks once at the explorer the operator named, reading every level the platform will use, so a wrong address, a wrong format or an
-// answer of the wrong shape is found when the platform starts and not at someone's first step. Rejects as the adapter does. A fixed rate
-// and no source have nothing to look at.
+// The fee source the settings name: the chosen explorer, with the operator's rate taken in its place where it cannot be read.
+export function createFeeSource(settings: FeeSourceSettings): FeeSource {
+  const explorer = explorerOf(settings);
+  return settings.fallbackSatPerVb === null
+    ? explorer
+    : withFallback(
+        explorer,
+        settings.fallbackSatPerVb,
+        settings.onFallback ?? (() => {}),
+      );
+}
+
+// Looks once at the chosen explorer (without the fallback), reading every level the platform will use, so a wrong answer is found when the
+// platform starts. Rejects as the adapter does.
 export async function probeFeeSource(
-  settings: FeeSourceSettings | null,
+  settings: FeeSourceSettings,
 ): Promise<void> {
-  if (settings === null || settings.kind !== "explorer") return;
-  await createFeeSource(settings).feeRates(probeTargets[settings.format]);
+  await explorerOf(settings).feeRates(
+    feeAdapters[settings.adapter].probeTargets,
+  );
 }

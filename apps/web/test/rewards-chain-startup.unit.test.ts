@@ -8,22 +8,13 @@ import {
 } from "../../../configs/rewards-chain.ts";
 
 const base: RewardsChainEnvironment = {
-  feeSource: { kind: "default" },
+  feeSource: { adapter: "mempool", fallbackSatPerVb: null },
   maxFeeSats: 100_000n,
   rpcHeaders: {},
   rpcTimeoutMs: 400,
   rpcUrl: "https://node.example.invalid/v1/rpc",
   templatesDirectory: null,
 };
-const mirror: RewardsChainEnvironment = {
-  ...base,
-  feeSource: {
-    format: "mempool",
-    kind: "explorer",
-    url: "https://fees.example.invalid/mirror",
-  },
-};
-
 // A platform whose public fetch is the explorer, and whose node must never be asked at startup.
 function platform(
   explorer: (url: string) => Promise<unknown>,
@@ -51,51 +42,45 @@ const levels = {
 const beta = betaChains.signet;
 
 describe("what the platform looks at when it starts", () => {
-  it("passes when the explorer the operator named answers as an explorer does, after looking once", async () => {
+  it("passes when the chosen explorer answers as it should, after looking once at its address for the network", async () => {
     const asked: string[] = [];
     const rewards = createRewardsChain(
-      mirror,
+      base,
       platform(async () => levels, asked),
       beta,
     );
     await expect(rewards?.startupCheck()).resolves.toBeUndefined();
     expect(asked).toEqual([
-      "https://fees.example.invalid/mirror/api/v1/fees/recommended",
+      "https://mempool.space/signet/api/v1/fees/recommended",
     ]);
   });
 
-  it("stops, naming the setting and the host, when that explorer's answer is not the expected shape", async () => {
+  it("stops, naming the setting and the adapter, when that explorer's answer is not the expected shape", async () => {
     const rewards = createRewardsChain(
-      mirror,
+      base,
       platform(async () => ({ fastestFee: 3 })),
       beta,
     );
     await expect(rewards?.startupCheck()).rejects.toThrow(
-      "REWARDS_FEE_API_URL (fees.example.invalid, read as mempool) is not usable: The fee source's halfHourFee is not a positive number.",
+      "REWARDS_FEE_API_FORMAT (mempool) is not usable: The fee source's halfHourFee is not a positive number. Choose another, or set REWARDS_FEE_RATE_SAT_VB as a fallback.",
     );
   });
 
   it("stops, naming the setting, when that explorer cannot be reached", async () => {
     const rewards = createRewardsChain(
-      mirror,
+      base,
       platform(() => Promise.reject(new Error("ENETUNREACH"))),
       beta,
     );
     await expect(rewards?.startupCheck()).rejects.toThrow(
-      "REWARDS_FEE_API_URL (fees.example.invalid, read as mempool) is not usable: The fee source could not be reached.",
+      "REWARDS_FEE_API_FORMAT (mempool) is not usable: The fee source could not be reached.",
     );
   });
 
-  it.each([
-    ["the network's default explorer", base],
-    [
-      "a fixed rate",
-      { ...base, feeSource: { kind: "fixed", satPerVb: 2 } } as const,
-    ],
-  ])("asks nobody for %s", async (_name, environment) => {
+  it("starts without looking when a fallback rate is set, since a step is priced either way", async () => {
     const asked: string[] = [];
     const rewards = createRewardsChain(
-      environment,
+      { ...base, feeSource: { adapter: "mempool", fallbackSatPerVb: 2 } },
       platform(() => Promise.reject(new Error("must not be asked")), asked),
       beta,
     );

@@ -18,8 +18,8 @@ describe("the server's start", () => {
     checked.mockResolvedValueOnce();
     await expect(register()).resolves.toBeUndefined();
     expect(checked).toHaveBeenCalledTimes(1);
-    checked.mockRejectedValueOnce(new Error("REWARDS_FEE_API_URL is bad"));
-    await expect(register()).rejects.toThrow("REWARDS_FEE_API_URL is bad");
+    checked.mockRejectedValueOnce(new Error("REWARDS_FEE_API_FORMAT is bad"));
+    await expect(register()).rejects.toThrow("REWARDS_FEE_API_FORMAT is bad");
   });
 
   it.each(["edge", ""])(

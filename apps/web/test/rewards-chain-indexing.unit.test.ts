@@ -12,7 +12,7 @@ import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
 // The chain this deployment runs on (configs/chains.ts), whichever test network that is.
 const beta = chainRefSchema.parse(betaChain.chain.chainId);
 const environment: RewardsChainEnvironment = {
-  feeSource: { kind: "default" },
+  feeSource: { adapter: "mempool", fallbackSatPerVb: null },
   maxFeeSats: 25_000n,
   rpcHeaders: {},
   rpcTimeoutMs: 400,

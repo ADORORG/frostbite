@@ -32,6 +32,8 @@ export interface RewardsPlatform {
   readonly now: () => Date;
   readonly random: (length: number) => Uint8Array;
   readonly readFile: (path: string) => Promise<Uint8Array>;
+  // Where the operator is told of something that works but is not as set (the fee fallback being used). Absent: nobody is told.
+  readonly warn?: (message: string) => void;
 }
 
 // The six things claims and staff administration use on a chain, each reached through the registry's neutral ports.
@@ -56,9 +58,8 @@ export interface RewardsChain {
     // The most one step may pay in fees, in satoshis.
     readonly maxFeeSats: number;
   };
-  // Looks at the one outside thing the operator named that nothing else would look at until someone's first step: the explorer of
-  // `REWARDS_FEE_API_URL`. Rejects, saying which setting and why, when it cannot be reached or does not answer as an explorer does;
-  // the server then does not start. Resolves at once where no explorer was named.
+  // Looks at the fee explorer chosen, which nothing else would look at until someone's first step. Rejects, saying which setting and why,
+  // when it cannot be read and no fallback rate is set; the server then does not start.
   startupCheck(): Promise<void>;
 }
 
@@ -89,23 +90,28 @@ export function chainConfig(beta: BetaChain = betaChain): ChainConfig {
   };
 }
 
-// Where this chain's fee levels come from: the operator's fixed rate if they set one, else an explorer (their choice of address, or
-// the network's own).
+// Where this chain's fee levels come from: the adapter the operator chose (its address for the network is its own), and the operator's
+// rate in its place when it cannot be read.
 function feeSourceSettings(
   environment: RewardsChainEnvironment,
   platform: RewardsPlatform,
   beta: BetaChain,
 ): FeeSourceSettings {
   const { feeSource } = environment;
-  if (feeSource.kind === "fixed")
-    return { kind: "fixed", satPerVb: feeSource.satPerVb };
-  const named = feeSource.kind === "explorer" ? feeSource : null;
   return {
+    adapter: feeSource.adapter,
+    fallbackSatPerVb: feeSource.fallbackSatPerVb,
     fetch: platform.get,
-    format: named?.format ?? beta.feeApiFormat,
-    kind: "explorer",
+    network: beta.network,
+    ...(platform.warn === undefined
+      ? {}
+      : {
+          onFallback: (reason) =>
+            platform.warn?.(
+              `The fee source ${feeSource.adapter} could not be read (${reason}); REWARDS_FEE_RATE_SAT_VB is used.`,
+            ),
+        }),
     timeoutMs: environment.rpcTimeoutMs,
-    url: named?.url ?? beta.feeApiUrl,
   };
 }
 
