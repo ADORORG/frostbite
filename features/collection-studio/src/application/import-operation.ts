@@ -10,7 +10,12 @@ import { uuidV7Schema } from "@ador/shared/identifiers";
 
 import type { ImportRowReport } from "@ador/collections";
 import type { CollectionService } from "./dependencies.ts";
-import { commonFailures, failure, unauthenticated } from "./outcome.ts";
+import {
+  commonFailures,
+  failure,
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "./outcome.ts";
 
 // The wire shape has plain arrays; the service's report is read-only.
 const presentRows = (rows: readonly ImportRowReport[]) =>
@@ -59,11 +64,7 @@ export function createImportItemsOperation(
           revision: null,
           rows: presentRows(result.rows),
         });
-      if (result.kind === "conflict")
-        return failure(
-          "conflict",
-          "The idempotency key conflicts with another request.",
-        );
+      if (result.kind === "conflict") return idempotencyKeyConflict;
       if (result.kind === "item-limit")
         return failure(
           "conflict",

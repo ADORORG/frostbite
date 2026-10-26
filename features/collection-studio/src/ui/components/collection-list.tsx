@@ -6,6 +6,7 @@ import {
   ArcadeButton,
   ArcadeEmptyState,
   ArcadeFilterTabs,
+  LoadFailureLamp,
   StatusLamp,
 } from "@repo/ui/arcade";
 import { useState } from "react";
@@ -45,13 +46,9 @@ export function CollectionList({
       ) : null}
       {state.status === "error" ? (
         <div className="arcade-form">
-          <StatusLamp
-            label={
-              collections === null
-                ? "Your collections could not be loaded."
-                : "Could not refresh. Showing what was loaded earlier."
-            }
-            tone="unavailable"
+          <LoadFailureLamp
+            hasEarlier={collections !== null}
+            subject="Your collections"
           />
           <div className="arcade-actions">
             <ArcadeActionButton onClick={list.reload} tone="yellow">

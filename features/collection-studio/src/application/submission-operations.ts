@@ -17,6 +17,7 @@ import { uuidV7Schema } from "@ador/shared/identifiers";
 import {
   commonFailures,
   failure,
+  idempotencyKeyConflict,
   revisionConflict,
   unauthenticated,
 } from "./outcome.ts";
@@ -31,10 +32,7 @@ type Refusal = Exclude<SubmitResult, { kind: "replayed" | "submitted" }>;
 function refusal(result: Refusal) {
   switch (result.kind) {
     case "conflict":
-      return failure(
-        "conflict",
-        "The idempotency key conflicts with another request.",
-      );
+      return idempotencyKeyConflict;
     case "not-ready":
       return failure(
         "invalid_request",

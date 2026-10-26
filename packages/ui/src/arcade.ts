@@ -7,6 +7,7 @@ export {
   ShellStatusProvider,
 } from "./patterns/shell-slots.tsx";
 export { StatusLamp } from "./arcade/status-lamp.tsx";
+export { LoadFailureLamp } from "./arcade/load-failure-lamp.tsx";
 export { AccessState } from "./feedback/access-state.tsx";
 export type { StatusTone } from "./arcade/status-lamp.tsx";
 export { AppShell } from "./patterns/app-shell.tsx";

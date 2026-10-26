@@ -1,7 +1,11 @@
 import { failure } from "@ador/http/outcome";
 
 // Re-exported so the operations in this feature import their outcomes from one place.
-export { failure, unauthenticated } from "@ador/http/outcome";
+export {
+  failure,
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "@ador/http/outcome";
 
 // A save or submission based on an older view of the draft than the one stored.
 export const revisionConflict = failure(

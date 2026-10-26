@@ -22,3 +22,10 @@ export const unauthenticated = failure(
   "unauthorized",
   "Authentication is required.",
 );
+
+// The answer for a request whose idempotency key was already used for a different request. Every operation that takes a key answers it the
+// same way, so it is written once here.
+export const idempotencyKeyConflict = failure(
+  "conflict",
+  "The idempotency key conflicts with another request.",
+);

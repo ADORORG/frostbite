@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { failure, unauthenticated } from "../src/outcome.ts";
+import {
+  failure,
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "../src/outcome.ts";
 
 describe("operation failures", () => {
   it("carries the error code and message and is never ok", () => {
@@ -25,6 +29,16 @@ describe("operation failures", () => {
     expect(unauthenticated).toEqual({
       error: "unauthorized",
       message: "Authentication is required.",
+      ok: false,
+    });
+  });
+});
+
+describe("the shared idempotency conflict", () => {
+  it("is one conflict, answered the same by every operation that takes a key", () => {
+    expect(idempotencyKeyConflict).toEqual({
+      error: "conflict",
+      message: "The idempotency key conflicts with another request.",
       ok: false,
     });
   });

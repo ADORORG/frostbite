@@ -15,7 +15,12 @@ import {
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
 import type { CollectionService } from "./dependencies.ts";
-import { commonFailures, failure, unauthenticated } from "./outcome.ts";
+import {
+  commonFailures,
+  failure,
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "./outcome.ts";
 import { presentItem } from "./present.ts";
 
 type Resolve = () => Promise<CollectionService>;
@@ -47,11 +52,7 @@ export function createAddItemOperation(getService: Resolve) {
           ok: true,
           value: { item: presentItem(result.item), revision: result.revision },
         } as const;
-      if (result.kind === "conflict")
-        return failure(
-          "conflict",
-          "The idempotency key conflicts with another request.",
-        );
+      if (result.kind === "conflict") return idempotencyKeyConflict;
       if (result.kind === "item-limit")
         return failure(
           "conflict",

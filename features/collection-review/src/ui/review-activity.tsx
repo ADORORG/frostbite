@@ -5,6 +5,7 @@ import {
   ArcadeActionButton,
   ArcadeButton,
   ArcadePanel,
+  LoadFailureLamp,
   StatusLamp,
 } from "@repo/ui/arcade";
 import { useState } from "react";
@@ -36,13 +37,9 @@ export function ReviewActivity({
       ) : null}
       {state.status === "error" ? (
         <div className="arcade-form">
-          <StatusLamp
-            label={
-              loaded === null
-                ? "The activity could not be loaded."
-                : "Could not refresh. Showing what was loaded earlier."
-            }
-            tone="unavailable"
+          <LoadFailureLamp
+            hasEarlier={loaded !== null}
+            subject="The activity"
           />
           <div className="arcade-actions">
             <ArcadeActionButton onClick={activity.latest.reload} tone="yellow">

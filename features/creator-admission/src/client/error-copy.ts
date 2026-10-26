@@ -1,4 +1,4 @@
-import { ApiError, isRetryableApiError } from "@ador/client-http";
+import { describeRequestFailure } from "@ador/client-http";
 
 // What the reviewer is told, and what the page should offer, for a failed request.
 export type FailureKind =
@@ -10,44 +10,21 @@ export interface Failure {
   readonly retryable: boolean;
 }
 
-// `unknown` is what a caught value is: anything can be thrown. It is narrowed to `ApiError` here, and
-// anything else is reported as a temporary fault.
+// What the reviewer is told for a failed request. What is particular to creator applications is here; the words every request shares are in
+// `describeRequestFailure`.
 export function describeFailure(error: unknown): Failure {
-  if (!(error instanceof ApiError))
-    return {
-      kind: "temporary",
-      message: "Something went wrong. Try again.",
-      retryable: true,
-    };
-  switch (error.code) {
-    case "unauthorized":
-      return {
-        kind: "sign-in",
-        message: "Your session has ended. Sign in again to continue.",
-        retryable: false,
-      };
-    case "forbidden":
-      return {
+  return describeRequestFailure<Exclude<FailureKind, "sign-in" | "temporary">>(
+    error,
+    {
+      forbidden: {
         kind: "not-permitted",
         message: "Only reviewers can read creator applications.",
-        retryable: false,
-      };
-    case "not_found":
-      return {
+      },
+      invalid_request: { kind: "rejected" },
+      not_found: {
         kind: "not-found",
         message: "This application could not be found.",
-        retryable: false,
-      };
-    case "invalid_request":
-      return { kind: "rejected", message: error.message, retryable: false };
-    default:
-      return {
-        kind: "temporary",
-        message:
-          error.code === "network"
-            ? "The request could not reach the server. Check your connection and try again."
-            : "The server had a problem. Try again in a moment.",
-        retryable: isRetryableApiError(error),
-      };
-  }
+      },
+    },
+  );
 }

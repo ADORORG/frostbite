@@ -1,6 +1,10 @@
 import type { DecideResult, createReviewService } from "@ador/collections";
 import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import {
+  failure,
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "@ador/http/outcome";
 import {
   collectionReviewCapability,
   decodeActivityCursor,
@@ -47,10 +51,7 @@ type Refusal = Exclude<DecideResult, { kind: "decided" | "replayed" }>;
 function refusal(result: Refusal) {
   switch (result.kind) {
     case "conflict":
-      return failure(
-        "conflict",
-        "The idempotency key conflicts with another request.",
-      );
+      return idempotencyKeyConflict;
     case "forbidden":
       return failure("forbidden", "This decision is not permitted.");
     case "invalid-transition":

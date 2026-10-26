@@ -7,6 +7,7 @@ import {
   ArcadeActionButton,
   ArcadeBadge,
   ArcadeButton,
+  LoadFailureLamp,
   StatusLamp,
 } from "@repo/ui/arcade";
 
@@ -28,13 +29,9 @@ export function QueueList({
       ) : null}
       {state.status === "error" ? (
         <>
-          <StatusLamp
-            label={
-              items === null
-                ? "The submissions could not be loaded."
-                : "Could not refresh. Showing what was loaded earlier."
-            }
-            tone="unavailable"
+          <LoadFailureLamp
+            hasEarlier={items !== null}
+            subject="The submissions"
           />
           <div className="arcade-actions">
             <ArcadeActionButton onClick={list.reload} tone="yellow">

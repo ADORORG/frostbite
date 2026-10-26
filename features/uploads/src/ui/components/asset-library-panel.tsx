@@ -5,6 +5,7 @@ import {
   ArcadeEmptyState,
   ArcadeFilterTabs,
   ArcadePanel,
+  LoadFailureLamp,
   StatusLamp,
 } from "@repo/ui/arcade";
 import { useState } from "react";
@@ -39,13 +40,9 @@ export function AssetLibraryPanel({
       ) : null}
       {state.status === "error" ? (
         <div className="arcade-form">
-          <StatusLamp
-            label={
-              assets === null
-                ? "Your library could not be loaded."
-                : "Could not refresh. Showing what was loaded earlier."
-            }
-            tone="unavailable"
+          <LoadFailureLamp
+            hasEarlier={assets !== null}
+            subject="Your library"
           />
           <div className="arcade-actions">
             <ArcadeActionButton onClick={refresh} tone="yellow">

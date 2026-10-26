@@ -1,4 +1,5 @@
 import type { HttpOperation } from "@ador/http";
+import { idempotencyKeyConflict } from "@ador/http/outcome";
 import {
   createUploadIntentInputSchema,
   uploadIntentResponseSchema,
@@ -32,12 +33,7 @@ export function createUploadIntentOperation(
         idempotencyKey: context.idempotencyKey,
         userId: context.actorUserId,
       });
-      if (result.kind === "conflict")
-        return {
-          error: "conflict",
-          message: "The idempotency key conflicts with another request.",
-          ok: false,
-        } as const;
+      if (result.kind === "conflict") return idempotencyKeyConflict;
       if (result.kind === "quota-exceeded")
         return {
           error: "conflict",

@@ -20,6 +20,7 @@ import { detailOf, type OperationDependencies } from "./dependencies.ts";
 import {
   commonFailures,
   failure,
+  idempotencyKeyConflict,
   revisionConflict,
   unauthenticated,
 } from "./outcome.ts";
@@ -56,11 +57,7 @@ export function createCreateDraftOperation(
             result.aggregate,
           ),
         } as const;
-      if (result.kind === "conflict")
-        return failure(
-          "conflict",
-          "The idempotency key conflicts with another request.",
-        );
+      if (result.kind === "conflict") return idempotencyKeyConflict;
       return commonFailures[result.kind];
     },
     idempotency: "required",
