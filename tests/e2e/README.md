@@ -49,7 +49,9 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
 - **Signing in, two ways.** The shortcut: open `http://localhost:4174/dev/sign-in` and click a person (creator, second creator,
   applicant, reviewer, administrator, email-only person, staff). It sets the session (as a fresh sign-in) and lands on that person's
   page; sign out from the same page. The real thing: `http://localhost:4174/sign-in` offers a wallet, a passkey and an emailed code.
-  The stack sends no mail: ask for a code on the page, then run `pnpm mailbox` in another terminal to read it. The seeded
+  By default the stack sends no mail: ask for a code on the page, then run `pnpm mailbox` in another terminal to read it. If
+  `apps/web/.env.local` sets `MAIL_TRANSPORT` (for example `smtp`), the stack uses that file's `MAIL_*` settings and really sends; its
+  startup line says which, naming the host and never the password. The seeded
   administrator (`admin@example.test`, with a wallet) can give roles at `/admin/roles`; `candidate@example.test` is an email-only
   person to give one to.
 - The sign-in page is served by the stack's own front door (`src/stack-proxy.ts`), which passes every

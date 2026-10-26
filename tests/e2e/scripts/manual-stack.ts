@@ -11,12 +11,15 @@ import {
   formatStackGuide,
   resolveStackServer,
   stackActors,
-  captureMailEnvironment,
 } from "../src/manual-stack.ts";
 import {
   chainSettingsFrom,
   describeChain,
 } from "../src/stack-chain-environment.ts";
+import {
+  describeMail,
+  mailEnvironmentFrom,
+} from "../src/stack-mail-environment.ts";
 import {
   durableStack,
   stackSecrets,
@@ -140,6 +143,11 @@ const chainSettings = chainSettingsFrom(
   process.env,
 );
 const stackEnvironment = { ...process.env, ...chainSettings };
+const mailEnvironment = mailEnvironmentFrom(
+  await readFile(settingsFile, "utf8").catch(() => null),
+  process.env,
+  dataDirectory,
+);
 if (process.argv.includes("--fresh")) {
   if (!(await confirmWipe(process.argv.includes("--yes")))) {
     console.log("Nothing was deleted.");
@@ -188,7 +196,7 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           ["node", "--experimental-strip-types", "scripts/start-standalone.ts"],
           {
             ...stackEnvironment,
-            ...captureMailEnvironment(dataDirectory),
+            ...mailEnvironment,
             ...baseEnvironment,
             ...serviceEnvironment,
             HOSTNAME: "127.0.0.1",
@@ -208,7 +216,8 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           });
           await listen(frontDoor, Number(port));
           console.log(formatStackGuide({ baseURL }));
-          console.log(`${describeChain(stackEnvironment)}\n`);
+          console.log(`${describeChain(stackEnvironment)}`);
+          console.log(`${describeMail(mailEnvironment)}\n`);
           try {
             await untilInterrupted();
           } finally {
