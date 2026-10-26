@@ -20,6 +20,7 @@ export const collectionReviewDetailPath =
 // pages, so a static page never competes with a dynamic one.
 export const collectionReviewActivityPath = "/admin/collection-activity";
 export const collectionReviewNavigationLabel = "Collection reviews";
+export const collectionReviewActivityNavigationLabel = "Collection activity";
 
 export const collectionReviewHref = (submissionId: string) =>
   `${collectionReviewQueuePath}/${submissionId}`;

@@ -1,5 +1,6 @@
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
 import {
+  collectionReviewActivityNavigationLabel,
   collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
@@ -35,6 +36,11 @@ describe("collection review registration", () => {
           access,
           href: collectionReviewQueuePath,
           label: collectionReviewNavigationLabel,
+        },
+        {
+          access,
+          href: collectionReviewActivityPath,
+          label: collectionReviewActivityNavigationLabel,
         },
       ],
       pages: [

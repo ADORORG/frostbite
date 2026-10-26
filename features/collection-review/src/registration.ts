@@ -2,6 +2,7 @@ import { defineFeature } from "@ador/plugin-kit";
 import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { AuthorizationPolicy } from "@ador/shared/accounts";
 import {
+  collectionReviewActivityNavigationLabel,
   collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
@@ -40,6 +41,13 @@ export function createCollectionReviewFeature(
           href: collectionReviewQueuePath,
           label: collectionReviewNavigationLabel,
           order: 10,
+        },
+        {
+          access,
+          area: "admin",
+          href: collectionReviewActivityPath,
+          label: collectionReviewActivityNavigationLabel,
+          order: 20,
         },
       ],
       pages: [
