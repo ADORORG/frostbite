@@ -112,7 +112,7 @@ export function RolesPanel({
     return (
       <li className="list-row list-row--stack" key={person.userId}>
         <strong>{person.label}</strong>
-        <ul aria-label={`Roles of ${person.label}`} className="inline-items">
+        <ul aria-label={`Roles of ${person.label}`} className="item-lines">
           {platformRoles.map((role) => {
             const held = person.roles.find((entry) => entry.role === role);
             const active = held?.status === "active";

@@ -38,18 +38,25 @@
   flex-wrap: wrap;
   gap: var(--arcade-space-2);
 }
-/* A row that holds a small list of its own (a person and the roles they hold): the name, and the items beneath it. */
+/* A row that holds a small list of its own (a person and the roles they hold): the name, and the items beneath it, a line each. */
 .list-row--stack {
   flex-direction: column;
   align-items: stretch;
   gap: var(--arcade-space-1);
 }
-.inline-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--arcade-space-1) var(--arcade-space-4);
+.item-lines {
+  display: grid;
+  gap: var(--arcade-space-1);
   margin: 0;
   padding: 0;
   list-style: none;
   font-size: var(--arcade-text-sm);
+}
+/* One item to a line: what it is on the left, what can be done to it on the right. */
+.item-lines > li {
+  display: flex;
+  gap: var(--arcade-space-3);
+  align-items: center;
+  justify-content: space-between;
+  max-width: 44rem;
 }
