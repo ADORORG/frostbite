@@ -45,14 +45,15 @@ describe("linking another wallet and signing again", () => {
     const s = server({
       "/api/v1/auth/methods": () => methods([address]),
       "/api/v1/auth/wallet/link/challenge": () => challenge(),
-      "/api/v1/auth/wallet/link/verify": () => err("conflict", 409),
+      "/api/v1/auth/wallet/link/verify": () =>
+        err("conflict", 409, "wallet-on-another-account"),
     });
     const session = createWalletSession({ request: s.request });
     session.setConnection(wallet({ address: other }));
     await session.refresh();
     expect(await session.link()).toBe(false);
     expect(session.snapshot()).toMatchObject({
-      failure: "unavailable-wallet",
+      failure: "wallet-on-another-account",
       view: { kind: "not-linked" },
     });
   });
@@ -102,13 +103,18 @@ describe("removing a wallet", () => {
   it.each([
     [
       "a session that is no longer recent",
-      err("forbidden", 403),
+      err("forbidden", 403, "recent-authentication-required"),
       "recent-authentication-required",
     ],
     [
-      "the last way in, or a wallet that is not there",
-      err("conflict", 409),
-      "unavailable-wallet",
+      "the last way in",
+      err("conflict", 409, "last-sign-in-method"),
+      "last-sign-in-method",
+    ],
+    [
+      "a wallet that is not there",
+      err("not_found", 404, "wallet-missing"),
+      "wallet-missing",
     ],
   ] as const)(
     "reports %s, and leaves the account as it was",

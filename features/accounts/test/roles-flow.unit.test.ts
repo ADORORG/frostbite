@@ -2,6 +2,8 @@ import { ApiError, type Requester } from "@ador/client-http";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
+import { failed } from "../src/client/outcome.ts";
+import { apiFailure } from "./support/failures.ts";
 import {
   findPeople,
   grantRole,
@@ -27,8 +29,8 @@ function answering(outcome: ApiError | object) {
   };
   return { request, sent };
 }
-const failing = (code: ApiError["code"], message = "the server said no") =>
-  answering(new ApiError(code, 400, message));
+const failing = (code: ApiError["code"], reason?: string, message?: string) =>
+  answering(apiFailure(code, reason ?? null, message));
 
 describe("reading in the browser", () => {
   it("lists the people who hold roles", async () => {
@@ -72,25 +74,34 @@ describe("granting in the browser", () => {
   });
 
   it.each([
-    ["forbidden", "the server said no", { kind: "forbidden" }],
-    [
-      "forbidden",
-      "Recent authentication is required. Sign in again, then retry.",
-      { kind: "recent-authentication" },
-    ],
-    ["not_found", "x", { kind: "unknown-person" }],
-    ["unauthorized", "x", { kind: "signed-out" }],
-    ["network", "x", { kind: "network" }],
-    ["internal_error", "x", { kind: "network" }],
-    ["conflict", "x", { kind: "last-admin" }],
+    ["forbidden", "not-an-administrator"],
+    ["forbidden", "recent-authentication-required"],
+    ["not_found", "no-such-account"],
+    ["invalid_request", "not-a-role"],
+    ["conflict", "last-administrator"],
   ] as const)(
-    "reports a %s failure saying %j as %o",
-    async (code, message, outcome) => {
+    "reports a %s failure the server named %s as that outcome, whatever it says",
+    async (code, outcome) => {
       expect(
-        await grantRole(failing(code, message).request, userId, "staff"),
-      ).toEqual(outcome);
+        await grantRole(
+          failing(code, outcome, "words nobody matches").request,
+          userId,
+          "staff",
+        ),
+      ).toEqual(failed(outcome));
     },
   );
+
+  it.each([
+    ["unauthorized", "signed-out"],
+    ["network", "network"],
+    ["internal_error", "network"],
+    ["forbidden", "recent-authentication-required"],
+  ] as const)("reports a %s with no reason as %s", async (code, outcome) => {
+    expect(await grantRole(failing(code).request, userId, "staff")).toEqual(
+      failed(outcome),
+    );
+  });
 
   it("does not hide a failure that is not the server's", async () => {
     const request: Requester = async () => {
@@ -118,7 +129,11 @@ describe("suspending in the browser", () => {
 
   it("reports the last administrator as such", async () => {
     expect(
-      await suspendRole(failing("conflict").request, userId, "admin"),
-    ).toEqual({ kind: "last-admin" });
+      await suspendRole(
+        failing("conflict", "last-administrator").request,
+        userId,
+        "admin",
+      ),
+    ).toEqual(failed("last-administrator"));
   });
 });

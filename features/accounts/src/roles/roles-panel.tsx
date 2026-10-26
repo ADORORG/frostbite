@@ -15,7 +15,6 @@ import {
   grantRole,
   listPeople,
   suspendRole,
-  type ChangeOutcome,
   type Person,
 } from "./roles-flow.ts";
 
@@ -26,23 +25,6 @@ const roleMeaning: Record<PlatformRole, string> = {
   reviewer: "decides on submissions and applications",
   staff: "operates the platform",
 };
-const failureCopy: Record<
-  Exclude<
-    ChangeOutcome["kind"],
-    "granted" | "reinstated" | "suspended" | "unchanged"
-  >,
-  string
-> = {
-  forbidden: "Only an administrator whose role is working can change roles.",
-  "last-admin":
-    "This is the last working administrator. Make another administrator first.",
-  network: "The request could not reach the server. Try again.",
-  "recent-authentication":
-    "For safety, sign in again before changing roles, then retry.",
-  "signed-out": "You are signed out. Sign in again to continue.",
-  "unknown-person": "That account no longer exists.",
-};
-
 function describe(role: Person["roles"][number]): string {
   if (role.status === "suspended") return "suspended";
   return role.effective ? "active" : "active, not working yet";
@@ -97,12 +79,9 @@ export function RolesPanel({
       action === "grant"
         ? await grantRole(request, person.userId, role)
         : await suspendRole(request, person.userId, role);
-    if (
-      outcome.kind === "granted" ||
-      outcome.kind === "reinstated" ||
-      outcome.kind === "suspended" ||
-      outcome.kind === "unchanged"
-    ) {
+    if (outcome.kind === "failed") {
+      setMessage({ text: outcome.message, tone: "unavailable" });
+    } else {
       let listed = true;
       try {
         setPeople(await listPeople(request));
@@ -125,7 +104,7 @@ export function RolesPanel({
           : `${said}${caveat} The list could not be refreshed. Reload the page.`,
         tone: listed ? (caveat === "" ? "ready" : "attention") : "attention",
       });
-    } else setMessage({ text: failureCopy[outcome.kind], tone: "unavailable" });
+    }
     setWorking(false);
   }
 

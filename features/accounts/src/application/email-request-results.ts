@@ -1,12 +1,11 @@
 import type { RequestCodeResult } from "@ador/auth";
-import { failure, type HttpFailure } from "@ador/http/outcome";
+import type { HttpFailure } from "@ador/http/outcome";
+
+import { outcomeFailure } from "./outcomes.ts";
 
 // One answer for every way entering a code can fail (wrong, expired, used, never sent, tries spent), so it teaches a caller nothing about
 // which addresses have accounts or codes.
-export const codeNotVerified = failure(
-  "unauthorized",
-  "That code is not right, or it has expired. Check it, or ask for a new one.",
-);
+export const codeNotVerified = outcomeFailure("code-wrong");
 
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;
@@ -27,18 +26,15 @@ export function codeRequestFailure(
 ): HttpFailure {
   switch (result.reason) {
     case "invalid-destination":
-      return failure("invalid_request", "Enter a valid email address.");
+      return outcomeFailure("invalid-email");
     case "unsupported-channel":
-      return failure("not_found", "Signing in by email is not available.");
+      return outcomeFailure("email-unavailable");
     case "delivery-failed":
-      return failure(
-        "conflict",
-        "The code could not be sent. Try again in a moment.",
-      );
+      return outcomeFailure("code-not-sent");
     case "cooldown":
     case "limit":
-      return failure(
-        "conflict",
+      return outcomeFailure(
+        "code-too-soon",
         `A code was sent recently. You can ask for another in ${waitText(result.retryAfterMs)}.`,
       );
   }

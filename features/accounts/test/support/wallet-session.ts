@@ -67,4 +67,5 @@ export const signedOutServer = (extra: Record<string, Handler> = {}) =>
 export const err = (
   code: ConstructorParameters<typeof ApiError>[0],
   status: number | null = 400,
-) => new ApiError(code, status, "x");
+  reason: string | null = null,
+) => new ApiError(code, status, "x", null, reason);

@@ -11,6 +11,8 @@ import {
 import type { HttpOperation, HttpOperationResult } from "@ador/http";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
+import { outcomeFailure } from "./outcomes.ts";
+
 type Service = ReturnType<typeof createPasskeyLinkingService>;
 type MutationResult = HttpOperationResult<{ readonly changed: true }>;
 type FailureResult = Extract<MutationResult, { readonly ok: false }>;
@@ -30,17 +32,11 @@ function sessionOrFailure(
 }
 
 function mutationFailure(code: string): FailureResult {
-  return code === "recent-authentication-required"
-    ? {
-        error: "forbidden",
-        message: "Recent authentication is required.",
-        ok: false,
-      }
-    : {
-        error: "conflict",
-        message: "The passkey change could not be completed.",
-        ok: false,
-      };
+  return outcomeFailure(
+    code === "recent-authentication-required"
+      ? "recent-authentication-required"
+      : "passkey-change-failed",
+  );
 }
 
 export function createPasskeyOperations(getService: () => Service) {

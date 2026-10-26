@@ -5,7 +5,7 @@ import {
   createWalletSession,
   disconnected,
 } from "../src/client/wallet-session.ts";
-import { walletConflictMessages } from "../src/wallet-conflicts.ts";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import {
   address,
   challenge,
@@ -155,7 +155,7 @@ describe("signing in", () => {
     const s = signedOutServer();
     const session = createWalletSession({ request: s.request });
     expect(await session.signIn()).toBe(false);
-    expect(session.snapshot().failure).toBe("not-connected");
+    expect(session.snapshot().failure).toBe("wallet-not-connected");
     expect(s.calls).toEqual([]);
   });
 
@@ -178,7 +178,7 @@ describe("signing in", () => {
           throw new Error("rejected");
         },
       },
-      "refused-by-wallet",
+      "wallet-refused",
     ],
   ] as const)(
     "reports %s, and never sends a signature",
@@ -197,28 +197,35 @@ describe("signing in", () => {
   it.each([
     [
       "a signature the server will not accept",
-      err("unauthorized", 401),
-      "not-verified",
+      err("unauthorized", 401, "wallet-not-verified"),
+      "wallet-not-verified",
     ],
     [
       "a wallet that cannot be used",
-      err("conflict", 409),
-      "unavailable-wallet",
+      err("conflict", 409, "wallet-unusable"),
+      "wallet-unusable",
     ],
     [
       "a wallet already linked to a different account",
-      new ApiError("conflict", 409, walletConflictMessages.otherAccount),
+      err("conflict", 409, "wallet-on-another-account"),
       "wallet-on-another-account",
     ],
     [
       "a wallet recently removed from an account",
-      new ApiError("conflict", 409, walletConflictMessages.held),
+      err("conflict", 409, "wallet-held"),
       "wallet-held",
     ],
     [
       "a wallet that is not one of the account's",
-      new ApiError("conflict", 409, walletConflictMessages.notOnAccount),
+      err("conflict", 409, "wallet-not-on-account"),
       "wallet-not-on-account",
+    ],
+    // An answer with no reason is taken as a signature that did not verify, never read from its words.
+    ["a refusal with no reason", err("conflict", 409), "wallet-not-verified"],
+    [
+      "words that match a reason's but no reason",
+      new ApiError("conflict", 409, accountOutcomes["wallet-held"].message),
+      "wallet-not-verified",
     ],
     ["a request that never arrived", err("network", null), "network"],
   ] as const)(

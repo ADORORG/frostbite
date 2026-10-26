@@ -30,7 +30,6 @@ export function AccountSurface({
     <ConsolePage
       avatarSeed={actorUserId}
       eyebrow="Player profile"
-      footerLabel="Authenticated beta workspace"
       heading="Account"
       intro="Every way you can sign in, and your account's id. Connecting a wallet in the header never signs you in by itself; link it here, or sign in with it."
       navigation={navigation}

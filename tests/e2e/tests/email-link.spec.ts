@@ -1,3 +1,4 @@
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import { createHash, randomUUID } from "node:crypto";
 
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
@@ -149,7 +150,7 @@ test("an address another account holds cannot be added, and nothing says whose i
   await page.goto("/account");
   await addAddress(page, taken);
   await expect(
-    lampOf(page).filter({ hasText: "already linked to a different account" }),
+    lampOf(page).filter({ hasText: accountOutcomes["email-taken"].message }),
   ).toBeVisible();
   expect((await addressesOf(page)).addresses).toEqual([mine]);
   await other.close();

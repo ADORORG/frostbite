@@ -11,6 +11,16 @@ describe("operation failures", () => {
     });
   });
 
+  it("carries a reason only when one is given", () => {
+    expect(failure("conflict", "Stale.", "stale-version")).toEqual({
+      error: "conflict",
+      message: "Stale.",
+      ok: false,
+      reason: "stale-version",
+    });
+    expect(failure("conflict", "Stale.")).not.toHaveProperty("reason");
+  });
+
   it("has one shared answer for a missing session", () => {
     expect(unauthenticated).toEqual({
       error: "unauthorized",

@@ -152,6 +152,38 @@ describe("executeHttpOperation", () => {
     });
   });
 
+  it("puts the reason of a typed failure in the envelope, and leaves it out when there is none", async () => {
+    const answer = (reason?: string) =>
+      executeHttpOperation(
+        operation(async () => ({
+          error: "conflict",
+          message: "Already exists.",
+          ok: false,
+          ...(reason === undefined ? {} : { reason }),
+        })),
+        request(),
+        dependencies,
+      );
+    expect(await answer("wallet-held")).toMatchObject({
+      body: { error: { code: "conflict", reason: "wallet-held" } },
+    });
+    expect((await answer()).body).not.toHaveProperty("error.reason");
+  });
+
+  it("never lets a reason out of an internal error, which says nothing of why", async () => {
+    const response = await executeHttpOperation(
+      operation(async () => ({
+        error: "unauthorized",
+        message: "Undocumented.",
+        ok: false,
+        reason: "secret-detail",
+      })),
+      request(),
+      dependencies,
+    );
+    expect(JSON.stringify(response.body)).not.toContain("secret-detail");
+  });
+
   it("redacts application failures omitted from the operation contract", async () => {
     const response = await executeHttpOperation(
       operation(async () => ({
@@ -176,6 +208,7 @@ describe("executeHttpOperation", () => {
       error: "conflict",
       message: "database password leaked",
       ok: false,
+      reason: "database-password-leaked",
     };
     Reflect.set(unsafeFailure, "error", "internal_error");
 
@@ -191,6 +224,35 @@ describe("executeHttpOperation", () => {
       status: 500,
     });
     expect(JSON.stringify(response.body)).not.toContain("database password");
+    // An internal error says nothing of why, not even a reason.
+    expect(JSON.stringify(response.body)).not.toContain("database-password");
+  });
+
+  it("keeps a reason out of an internal error even when an operation wrongly declares and returns one", async () => {
+    const declared: TestOperation = {
+      ...operation(async () => {
+        const failure: HttpOperationResult<{ message: string }> = {
+          error: "conflict",
+          message: "hidden",
+          ok: false,
+          reason: "hidden-reason",
+        };
+        Reflect.set(failure, "error", "internal_error");
+        return failure;
+      }),
+    };
+    Reflect.set(declared, "applicationErrors", ["conflict", "internal_error"]);
+    const response = await executeHttpOperation(
+      declared,
+      request(),
+      dependencies,
+    );
+    expect(response).toMatchObject({
+      body: {
+        error: { code: "internal_error", message: "Internal server error." },
+      },
+    });
+    expect(JSON.stringify(response.body)).not.toContain("hidden");
   });
 
   it("maps invalid application output to a safe internal error", async () => {

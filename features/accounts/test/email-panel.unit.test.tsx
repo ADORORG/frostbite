@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { failed } from "../src/client/outcome.ts";
 import { renderToStaticMarkup } from "react-dom/server";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -32,7 +34,6 @@ vi.mock("@ador/wallet/client", () => ({
   }),
 }));
 
-import { emailTakenMessage } from "../src/email-conflict.ts";
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { EmailPanel } from "../src/ui/email-panel.tsx";
 
@@ -147,18 +148,18 @@ describe("the addresses", () => {
   });
 
   it.each([
-    [{ kind: "final-method" }, "only way to sign in"],
-    [{ kind: "missing" }, "not on this account any more"],
-    [{ kind: "recent-authentication" }, "sign in again"],
-    [{ kind: "signed-out" }, "signed out"],
-    [{ kind: "network" }, "could not reach the server"],
-  ])(
-    "keeps the list and says why when removal answers %o",
-    async (outcome, text) => {
-      flow.removeEmailAddress.mockResolvedValue(outcome);
+    "last-sign-in-method",
+    "email-missing",
+    "recent-authentication-required",
+    "signed-out",
+    "network",
+  ] as const)(
+    "keeps the list and says why when removal fails as %s",
+    async (outcome) => {
+      flow.removeEmailAddress.mockResolvedValue(failed(outcome));
       await mount(["a@b.co", "c@d.co"]);
       await click("Remove c@d.co");
-      expect(lamp()).toContain(text);
+      expect(lamp()).toBe(outcomeMessage(outcome));
       expect(container.textContent).toContain("c@d.co");
       expect(flow.listEmailAddresses).not.toHaveBeenCalled();
     },
@@ -204,27 +205,22 @@ describe("adding an address", () => {
   });
 
   it.each([
-    [{ kind: "invalid-email" }, "valid email"],
-    [{ kind: "recent-authentication" }, "sign in again"],
-    [{ kind: "signed-out" }, "signed out"],
-    [{ kind: "unavailable" }, "not available"],
-    [{ kind: "network" }, "could not reach the server"],
-    [
-      {
-        kind: "refused",
-        message: "A code was sent recently. Wait 30 seconds.",
-      },
-      "Wait 30 seconds",
-    ],
-  ])(
-    "stays on the address and says why when the request answers %o",
-    async (outcome, text) => {
-      flow.requestLinkCode.mockResolvedValue(outcome);
+    ["invalid-email", undefined],
+    ["recent-authentication-required", undefined],
+    ["signed-out", undefined],
+    ["email-unavailable", undefined],
+    ["network", undefined],
+    // The server knows how long to wait, so its words are shown.
+    ["code-too-soon", "A code was sent recently. Wait 30 seconds."],
+  ] as const)(
+    "stays on the address and says why when the request fails as %s",
+    async (outcome, serverWords) => {
+      flow.requestLinkCode.mockResolvedValue(failed(outcome, serverWords));
       await mount(["a@b.co"]);
       type("new@b.co");
       await submit();
       expect(input()?.type).toBe("email");
-      expect(lamp()).toContain(text);
+      expect(lamp()).toBe(outcomeMessage(outcome, serverWords ?? null));
     },
   );
 
@@ -247,20 +243,20 @@ describe("adding an address", () => {
   });
 
   it.each([
-    [{ kind: "wrong-code" }, "not right, or it has expired"],
-    [{ kind: "taken" }, emailTakenMessage],
-    [{ kind: "recent-authentication" }, "sign in again"],
-    [{ kind: "signed-out" }, "signed out"],
-    [{ kind: "network" }, "could not reach the server"],
-  ])(
-    "stays on the code and says why when entering it answers %o",
-    async (outcome, text) => {
-      flow.confirmLinkCode.mockResolvedValue(outcome);
+    "code-wrong",
+    "email-taken",
+    "recent-authentication-required",
+    "signed-out",
+    "network",
+  ] as const)(
+    "stays on the code and says why when entering it fails as %s",
+    async (outcome) => {
+      flow.confirmLinkCode.mockResolvedValue(failed(outcome));
       await mount(["a@b.co"]);
       await toCodeStep();
       type("000000");
       await submit();
-      expect(lamp()).toContain(text);
+      expect(lamp()).toBe(outcomeMessage(outcome));
       expect(input()?.autocomplete).toBe("one-time-code");
       expect(flow.listEmailAddresses).not.toHaveBeenCalled();
     },

@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 import { act } from "react";
-import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
-import { walletConflictMessages } from "../src/wallet-conflicts.ts";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 
 import {
   address,
@@ -65,14 +64,15 @@ describe("the wallet widget: signing in", () => {
     Object.assign(answers, {
       "/api/v1/auth/methods": () => denied("unauthorized", 401),
       "/api/v1/auth/wallet/challenge": challenge,
-      "/api/v1/auth/wallet/verify": () => denied("unauthorized", 401),
+      "/api/v1/auth/wallet/verify": () =>
+        denied("unauthorized", 401, "wallet-not-verified"),
     });
     await show();
     await settle();
     await openMenu();
     await click("Sign in with wallet");
     expect(container.querySelector('[role="alert"]')?.textContent).toBe(
-      "The wallet could not be verified. Try again with a fresh signature.",
+      accountOutcomes["wallet-not-verified"].message,
     );
     expect(sessionChanged).not.toHaveBeenCalled();
     expect(container.textContent).toContain("Connected, not signed in.");
@@ -87,7 +87,8 @@ describe("the wallet widget: signing in", () => {
     Object.assign(answers, {
       "/api/v1/auth/methods": () => methods([address]),
       "/api/v1/auth/wallet/link/challenge": challenge,
-      "/api/v1/auth/wallet/link/verify": () => denied("conflict", 409),
+      "/api/v1/auth/wallet/link/verify": () =>
+        denied("conflict", 409, "wallet-unusable"),
     });
     await show();
     await settle();
@@ -105,18 +106,12 @@ describe("the wallet widget: signing in", () => {
   });
 
   it.each([
-    [
-      "is already linked to a different account",
-      walletConflictMessages.otherAccount,
-    ],
-    ["was recently removed from an account", walletConflictMessages.held],
-    [
-      "is not one of the account's wallets",
-      walletConflictMessages.notOnAccount,
-    ],
+    ["is already linked to a different account", "wallet-on-another-account"],
+    ["was recently removed from an account", "wallet-held"],
+    ["is not one of the account's wallets", "wallet-not-on-account"],
   ] as const)(
-    "says why a wallet cannot be linked when it %s, in the server's words, not a vague refusal",
-    async (_why, message) => {
+    "says why a wallet cannot be linked when it %s, not a vague refusal",
+    async (_why, outcome) => {
       Object.assign(connection, {
         address: second,
         connected: true,
@@ -126,23 +121,14 @@ describe("the wallet widget: signing in", () => {
         "/api/v1/auth/methods": () => methods([address]),
         "/api/v1/auth/wallet/link/challenge": challenge,
         "/api/v1/auth/wallet/link/verify": () =>
-          json(
-            {
-              error: {
-                code: "conflict",
-                correlationId: createUuidV7(),
-                message,
-              },
-            },
-            409,
-          ),
+          denied("conflict", 409, outcome),
       });
       await show();
       await settle();
       await openMenu();
       await click("Link this wallet");
       expect(container.querySelector('[role="alert"]')?.textContent).toBe(
-        message,
+        accountOutcomes[outcome].message,
       );
       expect(container.textContent).not.toContain("cannot be used for that");
     },
@@ -164,7 +150,8 @@ describe("the wallet widget: signing in", () => {
     Object.assign(connection, { address, connected: true, provider: "xverse" });
     Object.assign(answers, {
       "/api/v1/auth/methods": () => methods([address, second]),
-      "/api/v1/auth/wallet/unlink": () => denied("forbidden", 403),
+      "/api/v1/auth/wallet/unlink": () =>
+        denied("forbidden", 403, "recent-authentication-required"),
     });
     await show();
     await settle();
@@ -182,7 +169,7 @@ describe("the wallet widget: signing in", () => {
     );
     await settle();
     expect(container.querySelector('[role="alert"]')?.textContent).toBe(
-      "To change this, sign in again with your wallet first.",
+      accountOutcomes["recent-authentication-required"].message,
     );
     expect(button("Sign again to confirm")).toBeDefined();
   });

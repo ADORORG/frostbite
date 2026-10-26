@@ -1,3 +1,4 @@
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import type { PasskeySignInService } from "@ador/auth";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
@@ -90,8 +91,9 @@ describe("finishing a passkey sign-in over HTTP", () => {
         await finish.execute({ challengeId, credential }, context),
       ).toEqual({
         error: "unauthorized",
-        message: "The passkey could not be verified. Try again.",
+        message: accountOutcomes["passkey-not-verified"].message,
         ok: false,
+        reason: "passkey-not-verified",
       });
     },
   );

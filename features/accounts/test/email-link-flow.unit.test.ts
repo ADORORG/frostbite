@@ -1,6 +1,9 @@
 import { ApiError, type Requester } from "@ador/client-http";
 import { describe, expect, it } from "vitest";
 
+import { failed } from "../src/client/outcome.ts";
+import { apiFailure } from "./support/failures.ts";
+
 import {
   confirmLinkCode,
   listEmailAddresses,
@@ -19,8 +22,8 @@ function answering(outcome: ApiError | object) {
   };
   return { request, sent };
 }
-const failing = (code: ApiError["code"], message = "the server said no") =>
-  answering(new ApiError(code, 400, message));
+const failing = (code: ApiError["code"], reason?: string, message?: string) =>
+  answering(apiFailure(code, reason ?? null, message));
 
 describe("the account's addresses in the browser", () => {
   it("reads them from the server", async () => {
@@ -45,25 +48,22 @@ describe("asking for a link code in the browser", () => {
     ]);
   });
 
-  it.each([
-    ["forbidden", { kind: "recent-authentication" }],
-    ["unauthorized", { kind: "signed-out" }],
-    ["invalid_request", { kind: "invalid-email" }],
-    ["not_found", { kind: "unavailable" }],
-    ["conflict", { kind: "refused", message: "wait 30 seconds" }],
-    [
-      "rate_limited",
-      {
-        kind: "refused",
-        message: "Too many requests. Wait a minute and try again.",
-      },
-    ],
-    ["network", { kind: "network" }],
-    ["internal_error", { kind: "network" }],
-  ] as const)("reports a %s failure as %o", async (code, outcome) => {
+  it("reports a failure as the outcome the server named, in the catalogue's words", async () => {
     expect(
-      await requestLinkCode(failing(code, "wait 30 seconds").request, "a@b.co"),
-    ).toEqual(outcome);
+      await requestLinkCode(
+        failing("conflict", "email-unavailable").request,
+        "a@b.co",
+      ),
+    ).toEqual(failed("email-unavailable"));
+  });
+
+  it("shows the server's own words when it knows how long to wait", async () => {
+    expect(
+      await requestLinkCode(
+        failing("conflict", "code-too-soon", "wait 30 seconds").request,
+        "a@b.co",
+      ),
+    ).toEqual(failed("code-too-soon", "wait 30 seconds"));
   });
 
   it("does not hide a failure that is not the server's", async () => {
@@ -90,18 +90,17 @@ describe("entering a link code in the browser", () => {
   });
 
   it.each([
-    ["forbidden", "recent-authentication"],
-    ["conflict", "taken"],
-    ["unauthorized", "wrong-code"],
-    ["rate_limited", "wrong-code"],
-    ["network", "network"],
-    ["internal_error", "network"],
-    ["invalid-response", "network"],
-    ["not_found", "signed-out"],
-  ] as const)("reports a %s failure as %s", async (code, kind) => {
+    "email-taken",
+    "code-wrong",
+    "recent-authentication-required",
+  ] as const)("reports %s as the server named it", async (outcome) => {
     expect(
-      await confirmLinkCode(failing(code).request, "a@b.co", "123456"),
-    ).toEqual({ kind });
+      await confirmLinkCode(
+        failing("conflict", outcome).request,
+        "a@b.co",
+        "123456",
+      ),
+    ).toEqual(failed(outcome));
   });
 });
 
@@ -120,16 +119,15 @@ describe("removing an address in the browser", () => {
     ]);
   });
 
-  it.each([
-    ["forbidden", "recent-authentication"],
-    ["conflict", "final-method"],
-    ["not_found", "missing"],
-    ["unauthorized", "signed-out"],
-    ["network", "network"],
-    ["internal_error", "network"],
-  ] as const)("reports a %s failure as %s", async (code, kind) => {
-    expect(await removeEmailAddress(failing(code).request, "a@b.co")).toEqual({
-      kind,
-    });
-  });
+  it.each(["last-sign-in-method", "email-missing", "signed-out"] as const)(
+    "reports %s as the server named it",
+    async (outcome) => {
+      expect(
+        await removeEmailAddress(
+          failing("conflict", outcome).request,
+          "a@b.co",
+        ),
+      ).toEqual(failed(outcome));
+    },
+  );
 });

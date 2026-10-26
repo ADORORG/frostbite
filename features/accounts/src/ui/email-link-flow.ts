@@ -4,47 +4,14 @@ import {
   emailCodeRoutes,
   emailLinkedResponseSchema,
 } from "@ador/auth";
-import { ApiError, type Requester } from "@ador/client-http";
+import type { Requester } from "@ador/client-http";
 
-// What happened when a signed-in person changed their email addresses, in their terms. `recent-authentication` means the session is too
-// old to change sign-in methods and the person must sign in again; the others are told as they are.
-export type RequestLinkOutcome =
-  | { readonly kind: "sent" }
-  | {
-      readonly kind:
-        | "invalid-email"
-        | "network"
-        | "recent-authentication"
-        | "signed-out"
-        | "unavailable";
-    }
-  // The server's own words: it knows how long the person has to wait.
-  | { readonly kind: "refused"; readonly message: string };
+import { failedFrom, type Failed } from "../client/outcome.ts";
 
-export type ConfirmLinkOutcome = {
-  readonly kind:
-    | "linked"
-    | "network"
-    | "recent-authentication"
-    | "signed-out"
-    | "taken"
-    | "wrong-code";
-};
-
-export type RemoveOutcome = {
-  readonly kind:
-    | "final-method"
-    | "missing"
-    | "network"
-    | "recent-authentication"
-    | "removed"
-    | "signed-out";
-};
-
-function failureOf(error: unknown): ApiError {
-  if (error instanceof ApiError) return error;
-  throw error;
-}
+// What happened when a signed-in person changed their email addresses: it worked, or why not, from the catalogue of outcomes.
+export type RequestLinkOutcome = { readonly kind: "sent" } | Failed;
+export type ConfirmLinkOutcome = { readonly kind: "linked" } | Failed;
+export type RemoveOutcome = { readonly kind: "removed" } | Failed;
 
 export async function listEmailAddresses(
   request: Requester,
@@ -64,26 +31,7 @@ export async function requestLinkCode(
     });
     return { kind: "sent" };
   } catch (error) {
-    const failed = failureOf(error);
-    switch (failed.code) {
-      case "forbidden":
-        return { kind: "recent-authentication" };
-      case "unauthorized":
-        return { kind: "signed-out" };
-      case "invalid_request":
-        return { kind: "invalid-email" };
-      case "not_found":
-        return { kind: "unavailable" };
-      case "conflict":
-        return { kind: "refused", message: failed.message };
-      case "rate_limited":
-        return {
-          kind: "refused",
-          message: "Too many requests. Wait a minute and try again.",
-        };
-      default:
-        return { kind: "network" };
-    }
+    return failedFrom(error);
   }
 }
 
@@ -98,21 +46,7 @@ export async function confirmLinkCode(
     });
     return { kind: "linked" };
   } catch (error) {
-    switch (failureOf(error).code) {
-      case "forbidden":
-        return { kind: "recent-authentication" };
-      case "conflict":
-        return { kind: "taken" };
-      case "network":
-      case "internal_error":
-      case "invalid-response":
-        return { kind: "network" };
-      case "rate_limited":
-      case "unauthorized":
-        return { kind: "wrong-code" };
-      default:
-        return { kind: "signed-out" };
-    }
+    return failedFrom(error);
   }
 }
 
@@ -126,17 +60,6 @@ export async function removeEmailAddress(
     });
     return { kind: "removed" };
   } catch (error) {
-    switch (failureOf(error).code) {
-      case "forbidden":
-        return { kind: "recent-authentication" };
-      case "conflict":
-        return { kind: "final-method" };
-      case "not_found":
-        return { kind: "missing" };
-      case "unauthorized":
-        return { kind: "signed-out" };
-      default:
-        return { kind: "network" };
-    }
+    return failedFrom(error);
   }
 }

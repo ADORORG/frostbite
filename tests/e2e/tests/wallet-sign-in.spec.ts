@@ -5,6 +5,7 @@ import {
   type BrowserContext,
   type Page,
 } from "@playwright/test";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import { platformSessionCookieName } from "@ador/shared/auth";
 
 import { authMethodsResponseSchema } from "@ador/auth";
@@ -118,7 +119,7 @@ test("a wallet that belongs to another account is refused, and the refusal says 
     .getByRole("button", { name: "Link this wallet" })
     .click();
   await expect(walletMenu(second.page).getByRole("alert")).toHaveText(
-    "This wallet is already linked to a different account. Sign in to that account and remove it there first, or use another wallet.",
+    accountOutcomes["wallet-on-another-account"].message,
   );
   expect(
     (await methodsOf(second.page)).body?.wallets.map(
@@ -152,7 +153,7 @@ test("a second wallet can be linked, removed, and while it is held no other acco
   await expect
     .poll(async () => (await methodsOf(second.page)).body?.wallets.length)
     .toBe(1);
-  // Held: a new account cannot be started with it, and the refusal is the ordinary one.
+  // Held: a new account cannot be started with it, and the refusal says it is held, not whose it was.
   const stranger = await openApp(browser, baseURL, w4);
   await connectWallet(stranger.page, w4);
   await openWalletMenu(stranger.page);
@@ -160,7 +161,7 @@ test("a second wallet can be linked, removed, and while it is held no other acco
     .getByRole("button", { name: "Sign in with wallet" })
     .click();
   await expect(walletMenu(stranger.page).getByRole("alert")).toHaveText(
-    "This wallet cannot be used for that.",
+    accountOutcomes["wallet-held"].message,
   );
   expect((await methodsOf(stranger.page)).status).toBe(401);
   // The account that removed it may take it back at once.

@@ -62,11 +62,10 @@ test("the administrator sees who holds roles, with each role's state", async ({
   await expect(
     people.getByRole("list", { name: "Roles of tb1qe2…taff" }),
   ).toContainText("staff (operates the platform): active");
-  // The header's Admin link goes to the first admin area this person may open: for an administrator who is not staff, this one.
-  await expect(page.getByRole("link", { name: "Admin" })).toHaveAttribute(
-    "href",
-    "/admin/roles",
-  );
+  // The header's Admin link goes to the first admin area this person may open: an administrator may open the overview, like staff.
+  await expect(
+    page.getByLabel("Primary navigation").getByRole("link", { name: "Admin" }),
+  ).toHaveAttribute("href", "/admin");
 });
 
 test("an administrator finds a person by email, gives them a role that cannot work yet, and takes it away again", async ({

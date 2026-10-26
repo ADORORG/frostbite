@@ -1,6 +1,6 @@
 import { createWalletMethodsOperations } from "../src/application/wallet-methods-operations.ts";
 import { createUuidV7 } from "@ador/shared/identifiers";
-import { walletConflictMessages } from "../src/wallet-conflicts.ts";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -82,9 +82,12 @@ describe("linking another wallet and signing again", () => {
   );
 
   it.each([
-    ["wallet-on-another-account", walletConflictMessages.otherAccount],
-    ["wallet-held", walletConflictMessages.held],
-    ["wallet-not-on-account", walletConflictMessages.notOnAccount],
+    [
+      "wallet-on-another-account",
+      accountOutcomes["wallet-on-another-account"].message,
+    ],
+    ["wallet-held", accountOutcomes["wallet-held"].message],
+    ["wallet-not-on-account", accountOutcomes["wallet-not-on-account"].message],
   ] as const)(
     "tells whoever just proved they hold a wallet's key why it cannot be used (%s), as a conflict",
     async (code, message) => {
@@ -152,7 +155,7 @@ describe("removing a wallet and listing the account's ways in", () => {
     });
   });
 
-  it("asks for a fresh signature when the session is stale, and gives one answer for the last way in and for a wallet that is not there", async () => {
+  it("asks for a fresh signature when the session is stale, and says the last way in and a wallet that is not there apart", async () => {
     const answers: unknown[] = [];
     for (const code of [
       "recent-authentication-required",
@@ -169,9 +172,21 @@ describe("removing a wallet and listing the account's ways in", () => {
         ),
       );
     }
-    expect(answers[0]).toMatchObject({ error: "forbidden", ok: false });
-    expect(answers[1]).toMatchObject({ error: "conflict", ok: false });
-    expect(answers[2]).toEqual(answers[1]);
+    expect(answers[0]).toMatchObject({
+      error: "forbidden",
+      ok: false,
+      reason: "recent-authentication-required",
+    });
+    expect(answers[1]).toMatchObject({
+      error: "conflict",
+      ok: false,
+      reason: "last-sign-in-method",
+    });
+    expect(answers[2]).toMatchObject({
+      error: "not_found",
+      ok: false,
+      reason: "wallet-missing",
+    });
   });
 
   it("lists wallets and passkeys, and says whether the session is recent enough to remove one", async () => {

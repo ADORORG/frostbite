@@ -11,8 +11,11 @@ export type HttpFailure = Extract<
 export function failure(
   error: ApplicationHttpErrorCode,
   message: string,
+  reason?: string,
 ): HttpFailure {
-  return { error, message, ok: false };
+  return reason === undefined
+    ? { error, message, ok: false }
+    : { error, message, ok: false, reason };
 }
 
 export const unauthenticated = failure(

@@ -11,7 +11,7 @@ import {
 } from "@repo/ui/arcade";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";
-import { failureCopy } from "../widget/failure-copy.ts";
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 import { networkName, shortAddress } from "../widget/format.ts";
 
 // The wallets that sign in to this account, with what to do about each: link the one connected in this browser, connect another to
@@ -41,7 +41,7 @@ export function WalletPanel({
       title="Wallets"
     >
       {failure === null ? null : (
-        <StatusLamp label={failureCopy[failure]} tone="unavailable" />
+        <StatusLamp label={outcomeMessage(failure)} tone="unavailable" />
       )}
       {methods === null ? (
         <p role="status">

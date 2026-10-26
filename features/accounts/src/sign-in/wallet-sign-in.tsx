@@ -4,7 +4,7 @@ import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
 import { useEffect, useRef } from "react";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";
-import { failureCopy } from "../widget/failure-copy.ts";
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 import { networkName, shortAddress } from "../widget/format.ts";
 import type { SignInViewProps } from "./views.ts";
 
@@ -63,7 +63,7 @@ export function WalletSignIn({ expectedNetwork, onSignedIn }: SignInViewProps) {
           </button>
         </>
       )}
-      {failure === null ? null : <p role="alert">{failureCopy[failure]}</p>}
+      {failure === null ? null : <p role="alert">{outcomeMessage(failure)}</p>}
     </div>
   );
 }

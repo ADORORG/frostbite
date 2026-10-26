@@ -62,3 +62,16 @@ logic.
 
 Run `pnpm --filter @ador/feature-accounts typecheck`, `test:unit`, `test:integration`, and
 `test:coverage`. Browser route states are covered by the shared Playwright workspace.
+
+## Outcomes: one catalogue, never matched by text
+
+Everything that can go wrong when a person signs in, links a way in or administers roles is one entry of `@ador/shared/account-outcomes`
+(`accountOutcomes`): a reason name, the status class the server answers with (none for what only the browser knows), and the sentence.
+
+- **Server:** `application/outcomes.ts` (`outcomeFailure`) builds every failure from the catalogue; the reason travels in the error
+  envelope (`error.reason`, `httpErrorReasonSchema`).
+- **Page:** `client/outcome.ts` (`failedFrom`, `outcomeOf`) turns a failed request into the catalogue's outcome by the reason, falling back to the
+  status class only for what the server could not name (no connection, a rate limit, a gone session). It never reads the message, so rewording
+  a sentence cannot change what a page does. Every flow returns `{ kind: "failed", outcome, message }`; no flow has a copy table of its own.
+- **Adding an outcome:** add one entry. A test fails if two outcomes say the same sentence, if one has no words, or if the browser-only set
+  changes. A sentence written outside the catalogue is what `repository:check` is there to catch.

@@ -1,6 +1,9 @@
 import { ApiError, type Requester } from "@ador/client-http";
 import { describe, expect, it } from "vitest";
 
+import { failed } from "../src/client/outcome.ts";
+import { apiFailure } from "./support/failures.ts";
+
 import {
   requestEmailCode,
   verifyEmailCode,
@@ -17,8 +20,8 @@ function answering(outcome: ApiError | object) {
   };
   return { request, sent };
 }
-const failing = (code: ApiError["code"], message = "the server said no") =>
-  answering(new ApiError(code, 400, message));
+const failing = (code: ApiError["code"], reason?: string, message?: string) =>
+  answering(apiFailure(code, reason ?? null, message));
 
 describe("asking for a code in the browser", () => {
   it("posts the address as typed and reports that a code was sent", async () => {
@@ -34,22 +37,29 @@ describe("asking for a code in the browser", () => {
     ]);
   });
 
-  it.each([
-    ["invalid_request", { kind: "invalid-email" }],
-    ["not_found", { kind: "unavailable" }],
-    ["conflict", { kind: "refused", message: "wait 30 seconds" }],
-    [
-      "rate_limited",
-      {
-        kind: "refused",
-        message: "Too many requests. Wait a minute and try again.",
-      },
-    ],
-    ["network", { kind: "network" }],
-    ["internal_error", { kind: "network" }],
-  ] as const)("reports a %s failure as %o", async (code, outcome) => {
-    const { request } = failing(code, "wait 30 seconds");
-    expect(await requestEmailCode(request, "ada@example.com")).toEqual(outcome);
+  it.each(["invalid-email", "email-unavailable", "code-not-sent"] as const)(
+    "reports %s as the server named it",
+    async (outcome) => {
+      const { request } = failing("conflict", outcome);
+      expect(await requestEmailCode(request, "ada@example.com")).toEqual(
+        failed(outcome),
+      );
+    },
+  );
+
+  it("shows the server's own words when it knows how long to wait, and the catalogue's for a rate limit", async () => {
+    expect(
+      await requestEmailCode(
+        failing("conflict", "code-too-soon", "wait 30 seconds").request,
+        "ada@example.com",
+      ),
+    ).toEqual(failed("code-too-soon", "wait 30 seconds"));
+    expect(
+      await requestEmailCode(
+        failing("rate_limited").request,
+        "ada@example.com",
+      ),
+    ).toEqual(failed("rate-limited"));
   });
 
   it("does not hide a failure that is not the server's", async () => {
@@ -75,17 +85,31 @@ describe("entering a code in the browser", () => {
   });
 
   it.each([
-    ["unauthorized", "wrong-code"],
-    ["invalid_request", "wrong-code"],
+    ["unauthorized", "code-wrong"],
+    ["invalid_request", "code-wrong"],
+    ["conflict", "code-wrong"],
     ["rate_limited", "rate-limited"],
     ["network", "network"],
     ["internal_error", "network"],
     ["invalid-response", "network"],
-  ] as const)("reports a %s failure as %s", async (code, kind) => {
-    const { request } = failing(code);
-    expect(await verifyEmailCode(request, "ada@example.com", "123456")).toEqual(
-      { kind },
-    );
+  ] as const)(
+    "reports a %s with no reason as %s: anything not named is a code that was not right",
+    async (code, outcome) => {
+      const { request } = failing(code);
+      expect(
+        await verifyEmailCode(request, "ada@example.com", "123456"),
+      ).toEqual(failed(outcome));
+    },
+  );
+
+  it("reports the outcome the server named over the one it would assume", async () => {
+    expect(
+      await verifyEmailCode(
+        failing("conflict", "code-not-sent").request,
+        "ada@example.com",
+        "1",
+      ),
+    ).toEqual(failed("code-not-sent"));
   });
 
   it("does not hide a failure that is not the server's", async () => {

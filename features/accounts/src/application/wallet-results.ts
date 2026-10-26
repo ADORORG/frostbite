@@ -3,50 +3,34 @@ import type {
   WalletChallengeResponse,
 } from "@ador/auth";
 import { walletAuthUriPath } from "@ador/auth";
-import { failure, type HttpFailure } from "@ador/http/outcome";
+import type { HttpFailure } from "@ador/http/outcome";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import { createUuidV7 } from "@ador/shared/identifiers";
 
-import { walletConflictMessages } from "../wallet-conflicts.ts";
+import { outcomeFailure } from "./outcomes.ts";
 import type { WalletAuthServices } from "./wallet-services.ts";
 
-// How a failed wallet step is told to the caller: as few ways as possible, so nothing says whose a conflicting
-// wallet is, whether a challenge ever existed, or which check failed.
-export const notVerified: HttpFailure = failure(
-  "unauthorized",
-  "The wallet could not be verified. Request a fresh challenge.",
-);
-export const cannotUseWallet: HttpFailure = failure(
-  "conflict",
-  "This wallet cannot be used for that.",
-);
-export const walletOnAnotherAccount: HttpFailure = failure(
-  "conflict",
-  walletConflictMessages.otherAccount,
-);
-export const walletNotOnAccount: HttpFailure = failure(
-  "conflict",
-  walletConflictMessages.notOnAccount,
-);
-export const walletHeld: HttpFailure = failure(
-  "conflict",
-  walletConflictMessages.held,
-);
-export const badWalletRequest: HttpFailure = failure(
-  "invalid_request",
-  "The wallet request is not valid.",
-);
-export const recentAuthenticationRequired: HttpFailure = failure(
-  "forbidden",
-  "Recent authentication is required.",
+// How a failed wallet step is told to the caller, from the catalogue. The reasons that say why a wallet cannot be used are given only after
+// the wallet's signature verified, so the person asking holds the wallet's key and learns nothing they could not learn by signing in with
+// it; they say whether, never whose. Everything else (expired, replayed, wrong signature, a challenge that is not this route's) is one.
+export const notVerified = outcomeFailure("wallet-not-verified");
+export const badWalletRequest = outcomeFailure("wallet-request-invalid");
+export const recentAuthenticationRequired = outcomeFailure(
+  "recent-authentication-required",
 );
 
-// A verification failure as the caller is told it: a conflict (a wallet that belongs to another account, or is held) says which; everything else (expired, replayed, wrong signature, a challenge that is not this route's) is one.
+const walletRefusals: Readonly<
+  Record<string, Parameters<typeof outcomeFailure>[0] | undefined>
+> = {
+  "identity-conflict": "wallet-unusable",
+  "wallet-held": "wallet-held",
+  "wallet-not-on-account": "wallet-not-on-account",
+  "wallet-on-another-account": "wallet-on-another-account",
+};
+
 export function verificationFailure(code: string): HttpFailure {
-  if (code === "wallet-on-another-account") return walletOnAnotherAccount;
-  if (code === "wallet-held") return walletHeld;
-  if (code === "wallet-not-on-account") return walletNotOnAccount;
-  return code === "identity-conflict" ? cannotUseWallet : notVerified;
+  const refusal = walletRefusals[code];
+  return refusal === undefined ? notVerified : outcomeFailure(refusal);
 }
 
 // Asks the wallet service for a challenge for one action. The origin and the address of the page named in the

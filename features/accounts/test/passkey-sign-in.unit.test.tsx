@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { failed } from "../src/client/outcome.ts";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -63,7 +65,7 @@ describe("the passkey sign-in view", () => {
   });
 
   it("gives the flow the browser's own prompt and its support check", async () => {
-    answering({ kind: "cancelled" });
+    answering(failed("passkey-cancelled"));
     await press();
     const [{ ask, supported }] = flow.signInWithPasskey.mock.calls[0] ?? [{}];
     expect(supported).toBe(browser.browserSupportsWebAuthn);
@@ -89,17 +91,17 @@ describe("the passkey sign-in view", () => {
   });
 
   it.each([
-    ["cancelled", "No passkey was used"],
-    ["network", "could not reach the server"],
-    ["not-verified", "could not be verified"],
-    ["unsupported", "cannot use passkeys"],
+    "passkey-cancelled",
+    "network",
+    "passkey-not-verified",
+    "passkey-unsupported",
   ] as const)(
     "tells the person plainly when it ends as %s",
-    async (kind, words) => {
-      answering({ kind });
+    async (outcome) => {
+      answering(failed(outcome));
       await press();
-      expect(container.querySelector('[role="alert"]')?.textContent).toContain(
-        words,
+      expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+        outcomeMessage(outcome),
       );
       expect(container.querySelector('[role="status"]')).toBeNull();
       expect(onSignedIn).not.toHaveBeenCalled();
@@ -117,7 +119,7 @@ describe("the passkey sign-in view", () => {
     await press();
     expect(button()?.disabled).toBe(true);
     expect(button()?.textContent).toContain("Waiting for your passkey");
-    await act(async () => finish({ kind: "cancelled" }));
+    await act(async () => finish(failed("passkey-cancelled")));
     expect(button()?.disabled).toBe(false);
   });
 });

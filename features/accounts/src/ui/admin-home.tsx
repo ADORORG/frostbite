@@ -21,7 +21,6 @@ export function AdminHome({
   return (
     <ConsolePage
       eyebrow="Platform operations"
-      footerLabel="Authenticated beta workspace"
       heading="Admin console"
       intro="Choose a staff area. Reviews are separated from broader platform authority, and nothing here publishes or deploys anything."
       navigation={navigation}

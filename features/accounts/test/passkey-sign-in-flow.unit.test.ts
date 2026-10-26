@@ -1,6 +1,8 @@
 import { ApiError, type Requester } from "@ador/client-http";
 import { describe, expect, it, vi } from "vitest";
 
+import { failed } from "../src/client/outcome.ts";
+import { apiFailure } from "./support/failures.ts";
 import { signInWithPasskey } from "../src/sign-in/passkey-sign-in-flow.ts";
 
 const challengeId = "01890f0e-7c8a-7b3a-8a3e-0123456789ab";
@@ -12,14 +14,18 @@ const options = {
 const credential = { id: "credential-one" };
 
 // A requester that answers each step from the real response schemas' own parse of a good answer, or fails it with an ApiError.
-function server(failAt?: { step: 1 | 2; code: ApiError["code"] }) {
+function server(failAt?: {
+  step: 1 | 2;
+  code: ApiError["code"];
+  reason?: string;
+}) {
   let step = 0;
   const sent: { path: string; body: object | undefined }[] = [];
   const request: Requester = async (route, schema, requestOptions) => {
     step += 1;
     sent.push({ body: requestOptions?.body, path: route.path });
     if (failAt?.step === step)
-      throw new ApiError(failAt.code, 400, "the server said no");
+      throw apiFailure(failAt.code, failAt.reason ?? null);
     const parsed = schema.safeParse(
       step === 1
         ? {
@@ -57,7 +63,7 @@ describe("signing in with a passkey in the browser", () => {
     const ask = vi.fn(async () => credential);
     expect(
       await signInWithPasskey({ ask, request, supported: () => false }),
-    ).toEqual({ kind: "unsupported" });
+    ).toEqual(failed("passkey-unsupported"));
     expect(sent).toHaveLength(0);
     expect(ask).not.toHaveBeenCalled();
   });
@@ -69,15 +75,15 @@ describe("signing in with a passkey in the browser", () => {
     });
     expect(
       await signInWithPasskey({ ask, request, supported: () => true }),
-    ).toEqual({ kind: "cancelled" });
+    ).toEqual(failed("passkey-cancelled"));
     expect(sent).toHaveLength(1);
   });
 
   it.each([
     [1, "network", "network"],
     [2, "network", "network"],
-    [1, "internal_error", "not-verified"],
-    [2, "unauthorized", "not-verified"],
+    [1, "internal_error", "network"],
+    [2, "unauthorized", "signed-out"],
   ] as const)(
     "reports a failure at step %s (%s) as %s",
     async (step, code, expected) => {
@@ -85,8 +91,27 @@ describe("signing in with a passkey in the browser", () => {
       const ask = vi.fn(async () => credential);
       expect(
         await signInWithPasskey({ ask, request, supported: () => true }),
-      ).toEqual({ kind: expected });
+      ).toEqual(failed(expected));
       expect(ask).toHaveBeenCalledTimes(step === 1 ? 0 : 1);
     },
   );
+
+  it("takes a failure the server did not name as a passkey that could not be verified, and uses the reason when it did", async () => {
+    const ask = vi.fn(async () => credential);
+    expect(
+      await signInWithPasskey({
+        ask,
+        request: server({ code: "conflict", step: 2 }).request,
+        supported: () => true,
+      }),
+    ).toEqual(failed("passkey-not-verified"));
+    expect(
+      await signInWithPasskey({
+        ask,
+        request: server({ code: "conflict", reason: "wallet-held", step: 2 })
+          .request,
+        supported: () => true,
+      }),
+    ).toEqual(failed("wallet-held"));
+  });
 });

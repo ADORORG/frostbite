@@ -7,27 +7,15 @@ import {
 } from "@simplewebauthn/browser";
 import { useState } from "react";
 
-import {
-  signInWithPasskey,
-  type PasskeySignInResult,
-} from "./passkey-sign-in-flow.ts";
+import { type Failed } from "../client/outcome.ts";
+import { signInWithPasskey } from "./passkey-sign-in-flow.ts";
 import type { SignInViewProps } from "./views.ts";
-
-const copy: Record<
-  Exclude<PasskeySignInResult["kind"], "signed-in">,
-  string
-> = {
-  cancelled: "No passkey was used. You can try again.",
-  network: "The request could not reach the server. Try again.",
-  "not-verified": "That passkey could not be verified. Try again.",
-  unsupported: "This browser cannot use passkeys.",
-};
 
 // Signing in with a passkey. "Signed in" is shown only after the server has said so, and the page moves on once.
 export function PasskeySignIn({ onSignedIn }: SignInViewProps) {
-  const [state, setState] = useState<
-    PasskeySignInResult["kind"] | "idle" | "working"
-  >("idle");
+  const [state, setState] = useState<"idle" | "signed-in" | "working" | Failed>(
+    "idle",
+  );
   async function signIn() {
     setState("working");
     const result = await signInWithPasskey({
@@ -35,7 +23,7 @@ export function PasskeySignIn({ onSignedIn }: SignInViewProps) {
       request: createRequester(sameOriginFetch),
       supported: browserSupportsWebAuthn,
     });
-    setState(result.kind);
+    setState(result.kind === "signed-in" ? "signed-in" : result);
     if (result.kind === "signed-in") onSignedIn();
   }
   return (
@@ -55,8 +43,8 @@ export function PasskeySignIn({ onSignedIn }: SignInViewProps) {
       </button>
       {state === "signed-in" ? (
         <p role="status">Signed in. Taking you back…</p>
-      ) : state === "idle" || state === "working" ? null : (
-        <p role="alert">{copy[state]}</p>
+      ) : typeof state === "string" ? null : (
+        <p role="alert">{state.message}</p>
       )}
     </div>
   );

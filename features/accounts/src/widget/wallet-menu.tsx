@@ -8,7 +8,7 @@ import type { BalanceSnapshot } from "../client/balance-store.ts";
 import type { useWalletSession } from "../client/use-wallet-session.ts";
 import { BalanceLine } from "./balance-line.tsx";
 import { CopyAddress } from "./copy-address.tsx";
-import { failureCopy } from "./failure-copy.ts";
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 import { networkName, shortAddress } from "./format.ts";
 import { MenuWallets } from "./menu-wallets.tsx";
 
@@ -71,7 +71,7 @@ export function WalletMenu({
           ]
         }
       </p>
-      {failure === null ? null : <p role="alert">{failureCopy[failure]}</p>}
+      {failure === null ? null : <p role="alert">{outcomeMessage(failure)}</p>}
       <div className="wallet-menu__actions">
         {view.kind === "connected-signed-out" ? (
           <button

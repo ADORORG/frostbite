@@ -3,18 +3,14 @@ import {
   emailCodeRoutes,
   emailCodeSignedInResponseSchema,
 } from "@ador/auth";
-import { ApiError, type Requester } from "@ador/client-http";
+import type { Requester } from "@ador/client-http";
 
-// What happened when a code was asked for, in the person's terms. None of these says whether the address has an account.
-export type RequestCodeOutcome =
-  | { readonly kind: "sent" }
-  | { readonly kind: "invalid-email" | "network" | "unavailable" }
-  // The server's own words: it knows how long the person has to wait.
-  | { readonly kind: "refused"; readonly message: string };
+import { failed, failedFrom, type Failed } from "../client/outcome.ts";
 
-export type VerifyCodeOutcome =
-  | { readonly kind: "signed-in" }
-  | { readonly kind: "network" | "rate-limited" | "wrong-code" };
+// What happened when a code was asked for, or entered: it worked, or why not, from the catalogue of outcomes. None of these says whether
+// the address has an account.
+export type RequestCodeOutcome = { readonly kind: "sent" } | Failed;
+export type VerifyCodeOutcome = { readonly kind: "signed-in" } | Failed;
 
 export async function requestEmailCode(
   request: Requester,
@@ -26,22 +22,7 @@ export async function requestEmailCode(
     });
     return { kind: "sent" };
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    switch (error.code) {
-      case "invalid_request":
-        return { kind: "invalid-email" };
-      case "not_found":
-        return { kind: "unavailable" };
-      case "conflict":
-        return { kind: "refused", message: error.message };
-      case "rate_limited":
-        return {
-          kind: "refused",
-          message: "Too many requests. Wait a minute and try again.",
-        };
-      default:
-        return { kind: "network" };
-    }
+    return failedFrom(error);
   }
 }
 
@@ -56,16 +37,9 @@ export async function verifyEmailCode(
     });
     return { kind: "signed-in" };
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    switch (error.code) {
-      case "rate_limited":
-        return { kind: "rate-limited" };
-      case "network":
-      case "internal_error":
-      case "invalid-response":
-        return { kind: "network" };
-      default:
-        return { kind: "wrong-code" };
-    }
+    // Anything the server did not name as something else is a code that was not right: that is all this step can fail on. There is no
+    // session yet to be signed out of, so an unnamed refusal is the same thing.
+    const outcome = failedFrom(error, "code-wrong");
+    return outcome.outcome === "signed-out" ? failed("code-wrong") : outcome;
   }
 }

@@ -59,9 +59,17 @@ let root: Root;
 
 export const json = (body: object, status = 200) =>
   new Response(JSON.stringify(body), { status });
-export const denied = (code: string, status: number) =>
+// A failure as the server sends it: the status class, and the reason when there is one to name (what pages choose their words by).
+export const denied = (code: string, status: number, reason?: string) =>
   json(
-    { error: { code, correlationId: createUuidV7(), message: "no" } },
+    {
+      error: {
+        code,
+        correlationId: createUuidV7(),
+        message: "no",
+        ...(reason === undefined ? {} : { reason }),
+      },
+    },
     status,
   );
 export const methods = (addresses: string[]) =>

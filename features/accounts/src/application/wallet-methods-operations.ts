@@ -18,11 +18,11 @@ import { unauthenticated } from "@ador/http/outcome";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
 import {
-  cannotUseWallet,
   issueChallenge,
   recentAuthenticationRequired,
   verificationFailure,
 } from "./wallet-results.ts";
+import { outcomeFailure } from "./outcomes.ts";
 import type { WalletAuthServices } from "./wallet-services.ts";
 
 type Changed = { readonly changed: true };
@@ -100,7 +100,7 @@ export function createWalletMethodsOperations(
   }
   const unlink: HttpOperation<WalletUnlinkRequest, Changed> = {
     access: { kind: "authenticated" },
-    applicationErrors: ["conflict", "forbidden", "unauthorized"],
+    applicationErrors: ["conflict", "forbidden", "not_found", "unauthorized"],
     execute: async (input, context): Promise<HttpOperationResult<Changed>> => {
       if (context.actorSession === null) return unauthenticated;
       const result = await getServices().methods.unlink({
@@ -116,9 +116,14 @@ export function createWalletMethodsOperations(
           ok: true,
           value: { changed: true },
         };
-      return result.code === "recent-authentication-required"
-        ? recentAuthenticationRequired
-        : cannotUseWallet;
+      switch (result.code) {
+        case "final-method":
+          return outcomeFailure("last-sign-in-method");
+        case "missing":
+          return outcomeFailure("wallet-missing");
+        case "recent-authentication-required":
+          return recentAuthenticationRequired;
+      }
     },
     idempotency: "none",
     input: "json",

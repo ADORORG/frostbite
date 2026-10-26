@@ -4,31 +4,8 @@ import { createRequester, sameOriginFetch } from "@ador/client-http";
 import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 
-import {
-  requestEmailCode,
-  verifyEmailCode,
-  type RequestCodeOutcome,
-  type VerifyCodeOutcome,
-} from "./email-sign-in-flow.ts";
+import { requestEmailCode, verifyEmailCode } from "./email-sign-in-flow.ts";
 import type { SignInViewProps } from "./views.ts";
-
-const requestCopy: Record<
-  Exclude<RequestCodeOutcome["kind"], "refused" | "sent">,
-  string
-> = {
-  "invalid-email": "Enter a valid email address.",
-  network: "The request could not reach the server. Try again.",
-  unavailable: "Signing in by email is not available right now.",
-};
-const verifyCopy: Record<
-  Exclude<VerifyCodeOutcome["kind"], "signed-in">,
-  string
-> = {
-  network: "The request could not reach the server. Try again.",
-  "rate-limited": "Too many tries. Wait a minute and try again.",
-  "wrong-code":
-    "That code is not right, or it has expired. Check it, or ask for a new one.",
-};
 
 // Signing in with a code sent by email: ask for it, then enter it. "A code was sent" is shown only after the server has said so, and the
 // page never says whether the address already has an account.
@@ -50,11 +27,7 @@ export function EmailSignIn({ onSignedIn }: SignInViewProps) {
       setCode("");
       setNotice(null);
     } else {
-      setNotice(
-        outcome.kind === "refused"
-          ? outcome.message
-          : requestCopy[outcome.kind],
-      );
+      setNotice(outcome.message);
     }
   }
 
@@ -67,7 +40,7 @@ export function EmailSignIn({ onSignedIn }: SignInViewProps) {
       setStep("signed-in");
       onSignedIn();
     } else {
-      setNotice(verifyCopy[outcome.kind]);
+      setNotice(outcome.message);
     }
   }
 

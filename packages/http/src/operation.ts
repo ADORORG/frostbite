@@ -49,6 +49,8 @@ export type HttpOperationResult<Output extends object> =
       readonly error: ApplicationHttpErrorCode;
       readonly message: string;
       readonly ok: false;
+      // Why, for a page that must tell apart failures sharing a code (see `httpErrorReasonSchema`).
+      readonly reason?: string;
     };
 
 export interface HttpOperation<Input, Output extends object> {
@@ -121,12 +123,21 @@ function errorResponse<Output extends object>(
   code: HttpErrorCode,
   message: string,
   correlationId: CorrelationId,
+  reason?: string,
 ): HttpAdapterResponse<Output> {
   const publicMessage =
     code === "internal_error" ? "Internal server error." : message;
   return {
     body: httpErrorEnvelopeSchema.parse({
-      error: { code, correlationId, message: publicMessage },
+      error: {
+        code,
+        correlationId,
+        message: publicMessage,
+        // An internal error says nothing of why.
+        ...(reason === undefined || code === "internal_error"
+          ? {}
+          : { reason }),
+      },
     }),
     effects: [],
     headers: { [correlationHeaderName]: correlationId },
@@ -227,7 +238,12 @@ export async function executeHttpOperation<Input, Output extends object>(
     if (!result.ok) {
       if (!operation.applicationErrors.includes(result.error))
         return internal({ code: result.error, kind: "undeclared-error" });
-      return errorResponse(result.error, result.message, correlationId);
+      return errorResponse(
+        result.error,
+        result.message,
+        correlationId,
+        result.reason,
+      );
     }
     const outputResult = operation.outputSchema.safeParse(result.value);
     return outputResult.success

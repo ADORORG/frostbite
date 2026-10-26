@@ -4,9 +4,11 @@ import type {
   RoleDirectory,
 } from "@ador/authorization";
 import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import { unauthenticated } from "@ador/http/outcome";
 import { manageRolesCapability } from "@ador/shared/accounts";
 import { uuidV7Schema } from "@ador/shared/identifiers";
+
+import { outcomeFailure } from "../application/outcomes.ts";
 
 import {
   roleChangeRequestSchema,
@@ -40,14 +42,10 @@ export const plainPeople = (entries: readonly DirectoryEntry[]) =>
   }));
 
 const access = { capability: manageRolesCapability, kind: "platform" } as const;
-const recentAuthenticationRequired = failure(
-  "forbidden",
-  "Recent authentication is required. Sign in again, then retry.",
+const recentAuthenticationRequired = outcomeFailure(
+  "recent-authentication-required",
 );
-const notAnAdministrator = failure(
-  "forbidden",
-  "Only an administrator whose role is working can change roles.",
-);
+const notAnAdministrator = outcomeFailure("not-an-administrator");
 
 // The role screen's operations. Who may use them is the platform's capability check; the service checks it again inside the change's
 // transaction, because a role can be suspended between the two.
@@ -117,9 +115,9 @@ export function createRoleOperations(getServices: () => RoleServices) {
         case "forbidden":
           return notAnAdministrator;
         case "invalid-role":
-          return failure("invalid_request", "That is not a platform role.");
+          return outcomeFailure("not-a-role");
         case "unknown-user":
-          return failure("not_found", "No such account.");
+          return outcomeFailure("no-such-account");
         default:
           return {
             ok: true,
@@ -158,14 +156,11 @@ export function createRoleOperations(getServices: () => RoleServices) {
         case "forbidden":
           return notAnAdministrator;
         case "invalid-role":
-          return failure("invalid_request", "That is not a platform role.");
+          return outcomeFailure("not-a-role");
         case "unknown-user":
-          return failure("not_found", "No such account.");
+          return outcomeFailure("no-such-account");
         case "last-admin":
-          return failure(
-            "conflict",
-            "This is the last working administrator. Make another administrator first.",
-          );
+          return outcomeFailure("last-administrator");
         default:
           return { ok: true, value: { outcome: result.kind } };
       }

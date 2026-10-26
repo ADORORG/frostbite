@@ -12,9 +12,9 @@ import {
   type EmailCodeVerify,
 } from "@ador/auth";
 import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import { unauthenticated } from "@ador/http/outcome";
 
-import { emailTakenMessage } from "../email-conflict.ts";
+import { outcomeFailure } from "./outcomes.ts";
 import {
   codeNotVerified,
   codeRequestFailure,
@@ -22,13 +22,12 @@ import {
 
 type Changed = { readonly changed: true };
 
-const recentAuthenticationRequired = failure(
-  "forbidden",
-  "Recent authentication is required. Sign in again, then retry.",
+const recentAuthenticationRequired = outcomeFailure(
+  "recent-authentication-required",
 );
 // The answer for an address another account holds: that it is another account's, never whose. It is given only after the code has proved
 // the caller controls the mailbox.
-const cannotUseAddress = failure("conflict", emailTakenMessage);
+const cannotUseAddress = outcomeFailure("email-taken");
 
 // The email steps of a person who is already signed in: seeing the account's addresses, asking for a code to add one, entering it, and
 // removing one. Every one acts on the session's own account, never on one the request names.
@@ -153,12 +152,9 @@ export function createEmailLinkOperations(
         };
       switch (result.reason) {
         case "final-method":
-          return failure(
-            "conflict",
-            "This is your only way to sign in. Add another one first.",
-          );
+          return outcomeFailure("last-sign-in-method");
         case "missing":
-          return failure("not_found", "That address is not on this account.");
+          return outcomeFailure("email-missing");
         case "recent-authentication-required":
           return recentAuthenticationRequired;
       }

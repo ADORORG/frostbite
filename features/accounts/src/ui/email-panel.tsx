@@ -10,49 +10,14 @@ import {
 } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 
-import { emailTakenMessage } from "../email-conflict.ts";
 import {
   confirmLinkCode,
   listEmailAddresses,
   removeEmailAddress,
   requestLinkCode,
-  type ConfirmLinkOutcome,
-  type RemoveOutcome,
-  type RequestLinkOutcome,
 } from "./email-link-flow.ts";
 
 type Tone = "attention" | "ready" | "unavailable";
-
-const signInAgain =
-  "For safety, sign in again before changing your sign-in methods, then retry.";
-const requestCopy: Record<
-  Exclude<RequestLinkOutcome["kind"], "refused" | "sent">,
-  string
-> = {
-  "invalid-email": "Enter a valid email address.",
-  network: "The request could not reach the server. Try again.",
-  "recent-authentication": signInAgain,
-  "signed-out": "You are signed out. Sign in again to continue.",
-  unavailable: "Email is not available right now.",
-};
-const confirmCopy: Record<
-  Exclude<ConfirmLinkOutcome["kind"], "linked">,
-  string
-> = {
-  network: "The request could not reach the server. Try again.",
-  "recent-authentication": signInAgain,
-  "signed-out": "You are signed out. Sign in again to continue.",
-  taken: emailTakenMessage,
-  "wrong-code":
-    "That code is not right, or it has expired. Check it, or ask for a new one.",
-};
-const removeCopy: Record<Exclude<RemoveOutcome["kind"], "removed">, string> = {
-  "final-method": "This is your only way to sign in. Add another one first.",
-  missing: "That address is not on this account any more.",
-  network: "The request could not reach the server. Try again.",
-  "recent-authentication": signInAgain,
-  "signed-out": "You are signed out. Sign in again to continue.",
-};
 
 // The email addresses that sign in to this account: add one by proving the mailbox with a code, remove one while another way in
 // remains. A change signs the other sessions out, and the page says so only after the server did it.
@@ -94,14 +59,7 @@ export function EmailPanel({
         text: "If that address can receive mail, a code is on its way.",
         tone: "attention",
       });
-    } else
-      setMessage({
-        text:
-          outcome.kind === "refused"
-            ? outcome.message
-            : requestCopy[outcome.kind],
-        tone: "unavailable",
-      });
+    } else setMessage({ text: outcome.message, tone: "unavailable" });
   }
 
   async function enter(event: FormEvent) {
@@ -119,7 +77,7 @@ export function EmailPanel({
           : "Address added, and your other sessions were signed out, but the list could not be refreshed. Reload the page.",
         tone: listed ? "ready" : "attention",
       });
-    } else setMessage({ text: confirmCopy[outcome.kind], tone: "unavailable" });
+    } else setMessage({ text: outcome.message, tone: "unavailable" });
     setWorking(false);
   }
 
@@ -134,7 +92,7 @@ export function EmailPanel({
           : "Address removed, and your other sessions were signed out, but the list could not be refreshed. Reload the page.",
         tone: listed ? "ready" : "attention",
       });
-    } else setMessage({ text: removeCopy[outcome.kind], tone: "unavailable" });
+    } else setMessage({ text: outcome.message, tone: "unavailable" });
     setWorking(false);
   }
 

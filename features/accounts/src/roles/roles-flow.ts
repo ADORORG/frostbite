@@ -1,6 +1,7 @@
-import { ApiError, type Requester } from "@ador/client-http";
+import type { Requester } from "@ador/client-http";
 import type { PlatformRole } from "@ador/shared/accounts";
 
+import { failedFrom, type Failed } from "../client/outcome.ts";
 import {
   roleGrantResponseSchema,
   rolePeopleResponseSchema,
@@ -11,21 +12,13 @@ import {
 
 export type Person = RolePeopleResponse["people"][number];
 
-// What a role change did, in the administrator's terms.
+// What a role change did, in the administrator's terms: it worked, or why not, from the catalogue of outcomes.
 export type ChangeOutcome =
   | {
       readonly kind: "granted" | "reinstated" | "unchanged" | "suspended";
       readonly effective: boolean;
     }
-  | {
-      readonly kind:
-        | "forbidden"
-        | "last-admin"
-        | "network"
-        | "recent-authentication"
-        | "signed-out"
-        | "unknown-person";
-    };
+  | Failed;
 
 export async function listPeople(
   request: Requester,
@@ -44,25 +37,6 @@ export async function findPeople(
   ).people;
 }
 
-function failureOf(error: unknown): ChangeOutcome {
-  if (!(error instanceof ApiError)) throw error;
-  switch (error.code) {
-    case "conflict":
-      return { kind: "last-admin" };
-    case "forbidden":
-      // The server uses one code for "sign in again" and "you are not an administrator"; its message says which.
-      return /recent authentication/iu.test(error.message)
-        ? { kind: "recent-authentication" }
-        : { kind: "forbidden" };
-    case "not_found":
-      return { kind: "unknown-person" };
-    case "unauthorized":
-      return { kind: "signed-out" };
-    default:
-      return { kind: "network" };
-  }
-}
-
 export async function grantRole(
   request: Requester,
   userId: string,
@@ -74,7 +48,7 @@ export async function grantRole(
     });
     return { effective: result.effective, kind: result.outcome };
   } catch (error) {
-    return failureOf(error);
+    return failedFrom(error);
   }
 }
 
@@ -93,6 +67,6 @@ export async function suspendRole(
     );
     return { effective: false, kind: result.outcome };
   } catch (error) {
-    return failureOf(error);
+    return failedFrom(error);
   }
 }

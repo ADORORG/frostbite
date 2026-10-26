@@ -15,7 +15,6 @@ export function RolesPage({
   return (
     <ConsolePage
       eyebrow="Platform administration"
-      footerLabel="Authenticated beta workspace"
       heading="Platform roles"
       intro="Give a role to a person, or take it away. Staff and administrator roles work only while the account holds a wallet. Every change is recorded with who made it."
       navigation={navigation}

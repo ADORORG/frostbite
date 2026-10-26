@@ -8,8 +8,9 @@ import {
   type AuthMethodsResponse,
 } from "@ador/auth";
 import { ApiError, type Parser, type Requester } from "@ador/client-http";
+import type { AccountOutcome } from "@ador/shared/account-outcomes";
 import type { WalletNetwork } from "@ador/wallet/contracts";
-import { walletConflictMessages } from "../wallet-conflicts.ts";
+import { outcomeOf } from "./outcome.ts";
 
 // What this module needs to know about the player's connected wallet: a narrow slice of the connection library's
 // state, so the sign-in logic does not depend on a vendor and is tested without one.
@@ -33,18 +34,8 @@ export const disconnected: WalletConnection = {
 
 type Step = "link" | "refresh" | "sign-in" | "sign-out" | "step-up" | "unlink";
 
-// Why the last action did not work, in the player's terms. None of these says whose a wallet is.
-export type Failure =
-  | "network"
-  | "not-connected"
-  | "not-verified"
-  | "recent-authentication-required"
-  | "refused-by-wallet"
-  | "unavailable-wallet"
-  | "wallet-held"
-  | "wallet-not-on-account"
-  | "wallet-on-another-account"
-  | "wallet-changed";
+// Why the last action did not work: an outcome of the catalogue, whose words the screen shows.
+export type Failure = AccountOutcome;
 
 type Account =
   | { readonly kind: "signed-in"; readonly methods: AuthMethodsResponse }
@@ -67,22 +58,12 @@ export interface WalletSessionSnapshot {
   readonly view: WalletSessionView;
 }
 
+// A wallet step fails as the server says (its reason), or as the status class alone says for what the server could not name; anything
+// else from a wallet step is a signature that did not verify. The wallet's own refusal to sign is the one thing that is not a request.
 function failureOf(error: unknown): Failure {
-  if (error instanceof ApiError) {
-    if (error.code === "conflict") {
-      if (error.message === walletConflictMessages.otherAccount)
-        return "wallet-on-another-account";
-      if (error.message === walletConflictMessages.notOnAccount)
-        return "wallet-not-on-account";
-      return error.message === walletConflictMessages.held
-        ? "wallet-held"
-        : "unavailable-wallet";
-    }
-    if (error.code === "forbidden") return "recent-authentication-required";
-    if (error.code === "network") return "network";
-    return "not-verified";
-  }
-  return "refused-by-wallet";
+  return error instanceof ApiError
+    ? outcomeOf(error, "wallet-not-verified")
+    : "wallet-refused";
 }
 
 // The player's wallet session as a small store: who is signed in, which wallet is connected, and the five things a
@@ -155,7 +136,7 @@ export function createWalletSession(dependencies: {
   ): Promise<boolean> {
     if (busy !== null) return false;
     if (!connection.connected) {
-      set({ failure: "not-connected" });
+      set({ failure: "wallet-not-connected" });
       return false;
     }
     const { address, network, provider } = connection;

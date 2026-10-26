@@ -12,7 +12,7 @@ export function ConsolePage({
   avatarSeed,
   children,
   eyebrow,
-  footerLabel,
+  footerLabel = "Authenticated beta workspace",
   heading,
   intro,
   navigation,
@@ -22,7 +22,8 @@ export function ConsolePage({
   readonly avatarSeed?: string;
   readonly children: ReactNode;
   readonly eyebrow: string;
-  readonly footerLabel: string;
+  // What the footer says; a console page is a signed-in workspace, and says so unless it has something more particular.
+  readonly footerLabel?: string;
   readonly heading: string;
   readonly intro: string;
   readonly navigation: readonly ShellNavigationItem[];

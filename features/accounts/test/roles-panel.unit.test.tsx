@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { failed } from "../src/client/outcome.ts";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -171,19 +173,19 @@ describe("changing a role", () => {
   });
 
   it.each([
-    ["forbidden", "Only an administrator"],
-    ["last-admin", "last working administrator"],
-    ["network", "could not reach the server"],
-    ["recent-authentication", "sign in again"],
-    ["signed-out", "signed out"],
-    ["unknown-person", "no longer exists"],
-  ])(
-    "keeps the list and says why when the change answers %s",
-    async (kind, text) => {
-      flow.suspendRole.mockResolvedValue({ kind });
+    "not-an-administrator",
+    "last-administrator",
+    "network",
+    "recent-authentication-required",
+    "signed-out",
+    "no-such-account",
+  ] as const)(
+    "keeps the list and says why when the change fails as %s",
+    async (outcome) => {
+      flow.suspendRole.mockResolvedValue(failed(outcome));
       await mount([ada]);
       await press("Suspend admin for ada@example.com");
-      expect(lamp()).toContain(text);
+      expect(lamp()).toBe(outcomeMessage(outcome));
       expect(
         container.querySelector(".status-lamp--unavailable"),
       ).not.toBeNull();

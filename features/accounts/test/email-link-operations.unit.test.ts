@@ -1,4 +1,4 @@
-import { emailTakenMessage } from "../src/email-conflict.ts";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import type { ContactLinkService } from "@ador/auth";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
@@ -137,21 +137,32 @@ describe("entering a link code", () => {
   });
 
   it.each([
-    ["taken", "conflict", emailTakenMessage],
-    ["recent-authentication-required", "forbidden", "Recent authentication"],
-    ["invalid", "unauthorized", "not right"],
-  ] as const)("answers %s with %s", async (reason, error, text) => {
-    const { verify } = operations({
-      confirm: async () => ({ ok: false, reason }),
-    });
-    const answered = await verify.execute(
-      { code: "123456", email: "a@b.co" },
-      signedIn,
-    );
-    expect(answered).toMatchObject({ error, ok: false });
-    expect(answered.ok ? "" : answered.message).toContain(text);
-    expect(verify.applicationErrors).toContain(error);
-  });
+    ["taken", "conflict", "email-taken"],
+    [
+      "recent-authentication-required",
+      "forbidden",
+      "recent-authentication-required",
+    ],
+    ["invalid", "unauthorized", "code-wrong"],
+  ] as const)(
+    "answers %s with %s, naming the outcome",
+    async (reason, error, outcome) => {
+      const { verify } = operations({
+        confirm: async () => ({ ok: false, reason }),
+      });
+      const answered = await verify.execute(
+        { code: "123456", email: "a@b.co" },
+        signedIn,
+      );
+      expect(answered).toMatchObject({
+        error,
+        message: accountOutcomes[outcome].message,
+        ok: false,
+        reason: outcome,
+      });
+      expect(verify.applicationErrors).toContain(error);
+    },
+  );
 });
 
 describe("removing an address", () => {
@@ -171,16 +182,27 @@ describe("removing an address", () => {
   });
 
   it.each([
-    ["final-method", "conflict", "only way"],
-    ["missing", "not_found", "not on this account"],
-    ["recent-authentication-required", "forbidden", "Recent authentication"],
-  ] as const)("answers %s with %s", async (reason, error, text) => {
-    const { unlink } = operations({
-      unlink: async () => ({ ok: false, reason }),
-    });
-    const answered = await unlink.execute({ email: "a@b.co" }, signedIn);
-    expect(answered).toMatchObject({ error, ok: false });
-    expect(answered.ok ? "" : answered.message).toContain(text);
-    expect(unlink.applicationErrors).toContain(error);
-  });
+    ["final-method", "conflict", "last-sign-in-method"],
+    ["missing", "not_found", "email-missing"],
+    [
+      "recent-authentication-required",
+      "forbidden",
+      "recent-authentication-required",
+    ],
+  ] as const)(
+    "answers %s with %s, naming the outcome",
+    async (reason, error, outcome) => {
+      const { unlink } = operations({
+        unlink: async () => ({ ok: false, reason }),
+      });
+      const answered = await unlink.execute({ email: "a@b.co" }, signedIn);
+      expect(answered).toMatchObject({
+        error,
+        message: accountOutcomes[outcome].message,
+        ok: false,
+        reason: outcome,
+      });
+      expect(unlink.applicationErrors).toContain(error);
+    },
+  );
 });

@@ -9,15 +9,12 @@ import {
   type PasskeySignInService,
 } from "@ador/auth";
 import type { HttpOperation } from "@ador/http";
-import { failure } from "@ador/http/outcome";
+import { outcomeFailure } from "./outcomes.ts";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
 // One answer for every way a passkey sign-in can fail (unknown or spent challenge, unknown credential, bad signature, a counter that
 // went backwards), so the response teaches a caller nothing about which accounts or credentials exist.
-const notVerified = failure(
-  "unauthorized",
-  "The passkey could not be verified. Try again.",
-);
+const notVerified = outcomeFailure("passkey-not-verified");
 
 // Signing in with a passkey. Both steps are open to anyone, because there is no session yet; the second one starts it, and its
 // token reaches the browser only as a cookie.

@@ -22,7 +22,7 @@ import {
 } from "./support/widget-harness.tsx";
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { WalletPanel } from "../src/ui/wallet-panel.tsx";
-import { walletConflictMessages } from "../src/wallet-conflicts.ts";
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 
 const panel = (otherWays = 0) =>
   show(<WalletPanel expectedNetwork="signet" otherWays={otherWays} />);
@@ -108,12 +108,9 @@ describe("the wallets card on the account page", () => {
   });
 
   it.each([
-    [
-      "is already linked to a different account",
-      walletConflictMessages.otherAccount,
-    ],
-    ["was recently removed from an account", walletConflictMessages.held],
-  ] as const)("says why when the wallet %s", async (_why, message) => {
+    ["is already linked to a different account", "wallet-on-another-account"],
+    ["was recently removed from an account", "wallet-held"],
+  ] as const)("says why when the wallet %s", async (_why, outcome) => {
     Object.assign(connection, {
       address: second,
       connected: true,
@@ -122,18 +119,12 @@ describe("the wallets card on the account page", () => {
     Object.assign(answers, {
       "/api/v1/auth/methods": () => methods([address]),
       "/api/v1/auth/wallet/link/challenge": challenge,
-      "/api/v1/auth/wallet/link/verify": () =>
-        json(
-          {
-            error: { code: "conflict", correlationId: createUuidV7(), message },
-          },
-          409,
-        ),
+      "/api/v1/auth/wallet/link/verify": () => denied("conflict", 409, outcome),
     });
     await panel(0);
     await settle();
     await click("Link tb1qse");
-    expect(alert()).toBe(message);
+    expect(alert()).toBe(accountOutcomes[outcome].message);
   });
 
   it("lets a wallet be removed while it is not the last way in, and withholds it, saying why, when it is", async () => {
@@ -209,12 +200,15 @@ describe("the wallets card on the account page", () => {
     Object.assign(connection, { address, connected: true, provider: "xverse" });
     Object.assign(answers, {
       "/api/v1/auth/methods": () => methods([address, second]),
-      "/api/v1/auth/wallet/unlink": () => denied("forbidden", 403),
+      "/api/v1/auth/wallet/unlink": () =>
+        denied("forbidden", 403, "recent-authentication-required"),
     });
     await panel(0);
     await settle();
     await click(`Remove ${second.slice(0, 6)}`);
-    expect(text()).toContain("sign in again with your wallet first");
+    expect(text()).toContain(
+      accountOutcomes["recent-authentication-required"].message,
+    );
     expect(button("Sign again to confirm")).toBeDefined();
   });
 

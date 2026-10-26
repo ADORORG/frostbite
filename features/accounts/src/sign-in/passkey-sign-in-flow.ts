@@ -4,14 +4,12 @@ import {
   passkeySignInBeginResponseSchema,
   type PasskeySignInBeginResponse,
 } from "@ador/auth";
-import { ApiError, type Requester } from "@ador/client-http";
+import type { Requester } from "@ador/client-http";
 
-// Why a passkey sign-in did not happen, in the person's terms. None of these says whether an account exists.
-export type PasskeySignInResult =
-  | { readonly kind: "signed-in" }
-  | {
-      readonly kind: "cancelled" | "network" | "not-verified" | "unsupported";
-    };
+import { failed, failedFrom, type Failed } from "../client/outcome.ts";
+
+// Why a passkey sign-in did not happen, from the catalogue of outcomes. None of these says whether an account exists.
+export type PasskeySignInResult = { readonly kind: "signed-in" } | Failed;
 
 // The two server steps around the browser's own prompt. The prompt (`ask`) and whether the browser has one (`supported`) are given, so
 // this runs without a browser; the page gives the real ones.
@@ -22,7 +20,7 @@ export async function signInWithPasskey(dependencies: {
   readonly request: Requester;
   readonly supported: () => boolean;
 }): Promise<PasskeySignInResult> {
-  if (!dependencies.supported()) return { kind: "unsupported" };
+  if (!dependencies.supported()) return failed("passkey-unsupported");
   let begun: PasskeySignInBeginResponse;
   try {
     begun = await dependencies.request(
@@ -38,7 +36,7 @@ export async function signInWithPasskey(dependencies: {
     credential = await dependencies.ask(begun.options);
   } catch {
     // The person closed the prompt, or the authenticator had nothing for this site.
-    return { kind: "cancelled" };
+    return failed("passkey-cancelled");
   }
   try {
     await dependencies.request(
@@ -52,8 +50,7 @@ export async function signInWithPasskey(dependencies: {
   }
 }
 
+// Anything the server did not name as something else is a passkey that could not be verified: that is all this ceremony can fail on.
 function failureOf(error: unknown): PasskeySignInResult {
-  return error instanceof ApiError && error.code === "network"
-    ? { kind: "network" }
-    : { kind: "not-verified" };
+  return failedFrom(error, "passkey-not-verified");
 }

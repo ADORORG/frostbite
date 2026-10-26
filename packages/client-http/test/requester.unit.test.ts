@@ -86,6 +86,27 @@ describe("JSON requester", () => {
     },
   );
 
+  it("keeps the reason the server named, and has none when it named none", async () => {
+    const named = requesterWith(async () =>
+      json(
+        {
+          error: {
+            code: "conflict",
+            correlationId,
+            message: "Nope.",
+            reason: "wallet-held",
+          },
+        },
+        409,
+      ),
+    );
+    expect((await failureOf(named.request(route, schema))).reason).toBe(
+      "wallet-held",
+    );
+    const unnamed = requesterWith(async () => envelope("conflict", 409));
+    expect((await failureOf(unnamed.request(route, schema))).reason).toBeNull();
+  });
+
   it("reports too many requests as an error worth retrying later", async () => {
     const { request } = requesterWith(async () =>
       envelope("rate_limited", 429),

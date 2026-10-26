@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { accountOutcomes } from "@ador/shared/account-outcomes";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -96,13 +97,14 @@ describe("signing in with a wallet on the sign-in page", () => {
     Object.assign(answers, {
       "/api/v1/auth/methods": () => denied("unauthorized", 401),
       "/api/v1/auth/wallet/challenge": challenge,
-      "/api/v1/auth/wallet/verify": () => denied("unauthorized", 401),
+      "/api/v1/auth/wallet/verify": () =>
+        denied("unauthorized", 401, "wallet-not-verified"),
     });
     await show(view());
     await settle();
     await press("Sign in with wallet");
-    expect(container.querySelector("[role=alert]")?.textContent).toContain(
-      "could not be verified",
+    expect(container.querySelector("[role=alert]")?.textContent).toBe(
+      accountOutcomes["wallet-not-verified"].message,
     );
     expect(onSignedIn).not.toHaveBeenCalled();
     expect(container.textContent).not.toContain("Signed in. Taking you back");

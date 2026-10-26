@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { failed } from "../src/client/outcome.ts";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -125,24 +127,25 @@ describe("asking for the code", () => {
   });
 
   it.each([
-    [{ kind: "invalid-email" } as const, "Enter a valid email address."],
-    [{ kind: "network" } as const, "could not reach the server"],
-    [{ kind: "unavailable" } as const, "not available right now"],
+    ["invalid-email", undefined],
+    ["network", undefined],
+    ["email-unavailable", undefined],
+    ["code-not-sent", undefined],
+    // The server knows how long to wait, so its words are shown.
     [
-      {
-        kind: "refused",
-        message:
-          "A code was sent recently. You can ask for another in 30 seconds.",
-      } as const,
-      "in 30 seconds",
+      "code-too-soon",
+      "A code was sent recently. You can ask for another in 30 seconds.",
     ],
-  ])("stays on the address and says why when %o", async (outcome, text) => {
-    requestAnswers(outcome);
-    type("ada@example.com");
-    await submit();
-    expect(input()?.type).toBe("email");
-    expect(alertText()).toContain(text);
-  });
+  ] as const)(
+    "stays on the address and says why when it is %s",
+    async (outcome, serverWords) => {
+      requestAnswers(failed(outcome, serverWords));
+      type("ada@example.com");
+      await submit();
+      expect(input()?.type).toBe("email");
+      expect(alertText()).toBe(outcomeMessage(outcome, serverWords ?? null));
+    },
+  );
 });
 
 describe("entering the code", () => {
@@ -164,19 +167,18 @@ describe("entering the code", () => {
     expect(container.querySelector("form")).toBeNull();
   });
 
-  it.each([
-    [{ kind: "wrong-code" } as const, "not right, or it has expired"],
-    [{ kind: "rate-limited" } as const, "Too many tries"],
-    [{ kind: "network" } as const, "could not reach the server"],
-  ])("stays on the code and says why when %o", async (outcome, text) => {
-    await toCodeStep();
-    verifyAnswers(outcome);
-    type("000000");
-    await submit();
-    expect(alertText()).toContain(text);
-    expect(onSignedIn).not.toHaveBeenCalled();
-    expect(input()?.autocomplete).toBe("one-time-code");
-  });
+  it.each(["code-wrong", "rate-limited", "network"] as const)(
+    "stays on the code and says why when it is %s",
+    async (outcome) => {
+      await toCodeStep();
+      verifyAnswers(failed(outcome));
+      type("000000");
+      await submit();
+      expect(alertText()).toBe(outcomeMessage(outcome));
+      expect(onSignedIn).not.toHaveBeenCalled();
+      expect(input()?.autocomplete).toBe("one-time-code");
+    },
+  );
 
   it("asks for a new code and clears the old entry when the person wants one", async () => {
     await toCodeStep();
@@ -188,7 +190,7 @@ describe("entering the code", () => {
 
   it("keeps the code step and says why when a new code is refused", async () => {
     await toCodeStep();
-    requestAnswers({ kind: "refused", message: "Wait 30 seconds." });
+    requestAnswers(failed("code-too-soon", "Wait 30 seconds."));
     await click("Send a new code");
     expect(alertText()).toBe("Wait 30 seconds.");
     expect(input()?.autocomplete).toBe("one-time-code");
@@ -196,7 +198,7 @@ describe("entering the code", () => {
 
   it("goes back to the address, forgetting the failure shown", async () => {
     await toCodeStep();
-    verifyAnswers({ kind: "wrong-code" });
+    verifyAnswers(failed("code-wrong"));
     type("000000");
     await submit();
     await click("Use a different address");

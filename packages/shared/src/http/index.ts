@@ -22,6 +22,12 @@ export const httpErrorCodeSchema = z.enum([
   "rate_limited",
   "unauthorized",
 ]);
+// A stable, machine-readable name for why a request failed, for the failures a page must tell apart (which of several conflicts it was).
+// The page chooses its words from the reason, never from the message, so rewording a message cannot change what the page does.
+export const httpErrorReasonSchema = z
+  .string()
+  .regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u)
+  .max(64);
 export const httpErrorEnvelopeSchema = z
   .object({
     error: z
@@ -29,6 +35,7 @@ export const httpErrorEnvelopeSchema = z
         code: httpErrorCodeSchema,
         correlationId: correlationIdSchema,
         message: z.string().min(1).max(256),
+        reason: httpErrorReasonSchema.optional(),
       })
       .strict(),
   })

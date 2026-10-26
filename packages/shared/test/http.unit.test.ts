@@ -52,3 +52,29 @@ describe("HTTP contracts", () => {
     ).toThrow();
   });
 });
+
+describe("a reason in the error envelope", () => {
+  it("is optional, and only a lower-case name made of words joined by hyphens", () => {
+    const envelope = (reason?: string) =>
+      httpErrorEnvelopeSchema.safeParse({
+        error: {
+          code: "conflict",
+          correlationId: "01890f0e-7c8a-7b3a-8a3e-0123456789ab",
+          message: "No.",
+          ...(reason === undefined ? {} : { reason }),
+        },
+      }).success;
+    expect(envelope()).toBe(true);
+    expect(envelope("wallet-held")).toBe(true);
+    for (const bad of [
+      "",
+      "Wallet-held",
+      "wallet held",
+      "-held",
+      "held-",
+      "a--b",
+      "x".repeat(65),
+    ])
+      expect(envelope(bad), bad).toBe(false);
+  });
+});
