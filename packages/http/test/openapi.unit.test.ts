@@ -9,7 +9,7 @@ import type { HttpOperation } from "../src/operation.ts";
 
 function operation(
   method: "DELETE" | "GET" | "PATCH" | "POST" | "PUT" = "POST",
-  input: "json" | "none" = "json",
+  input: "json" | "none" | "query" = "json",
   idempotency: "none" | "required" = "required",
   access: { readonly kind: "public" | "authenticated" } = { kind: "public" },
 ): HttpOperation<{ name?: string }, { accepted: boolean }> {
@@ -34,6 +34,62 @@ function operation(
 }
 
 describe("OpenAPI generation", () => {
+  const readOf = (inputSchema: z.ZodType<object>) =>
+    describeOpenApiOperation({
+      access: { kind: "public" },
+      applicationErrors: [],
+      execute: async () => ({ ok: true, value: { accepted: true } }),
+      idempotency: "none",
+      input: "query",
+      inputSchema,
+      method: "GET",
+      operationId: "readFixture",
+      outputSchema: z.object({ accepted: z.boolean() }).strict(),
+      path: "/api/v1/fixture",
+    });
+
+  it("lists no query parameters for a read that asks for nothing, or whose input is not a set of named fields", () => {
+    const parameters = (schema: z.ZodType<object>) =>
+      readOf(schema).operation.parameters.filter(
+        (parameter) => "in" in parameter && parameter.in === "query",
+      );
+    expect(parameters(z.object({}).strict())).toEqual([]);
+    expect(parameters(z.array(z.string()))).toEqual([]);
+  });
+
+  it("describes a read's input as query parameters, not a request body", () => {
+    const description = describeOpenApiOperation({
+      access: { kind: "public" },
+      applicationErrors: [],
+      execute: async () => ({ ok: true, value: { accepted: true } }),
+      idempotency: "none",
+      input: "query",
+      inputSchema: z
+        .object({ claimId: z.string(), note: z.string().optional() })
+        .strict(),
+      method: "GET",
+      operationId: "readFixture",
+      outputSchema: z.object({ accepted: z.boolean() }).strict(),
+      path: "/api/v1/fixture",
+    });
+    expect(description.operation).not.toHaveProperty("requestBody");
+    expect(description.operation.parameters).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          in: "query",
+          name: "claimId",
+          required: true,
+          schema: { type: "string" },
+        }),
+        expect.objectContaining({
+          in: "query",
+          name: "note",
+          required: false,
+        }),
+      ]),
+    );
+  });
+
   it("derives request, response, header, and error contracts", () => {
     const description = describeOpenApiOperation(operation());
     expect(description.method).toBe("post");

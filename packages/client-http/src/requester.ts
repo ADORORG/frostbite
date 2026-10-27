@@ -34,6 +34,8 @@ export interface Route {
 export interface RequestOptions {
   readonly body?: object;
   readonly idempotencyKey?: IdempotencyKey;
+  // What a GET asks for, sent as its query string (names and values are encoded here, so a value cannot add or end a name).
+  readonly query?: Readonly<Record<string, string>>;
   readonly signal?: AbortSignal;
 }
 
@@ -42,6 +44,11 @@ export type Requester = <Output>(
   schema: Parser<Output>,
   options?: RequestOptions,
 ) => Promise<Output>;
+
+function addressOf(path: string, query: RequestOptions["query"]): string {
+  const search = new URLSearchParams(query).toString();
+  return search === "" ? path : `${path}?${search}`;
+}
 
 // The one way the browser talks to the platform's JSON API. Every response is validated against the
 // shared contract before it is returned, so callers only ever see typed data, and every failure is an
@@ -55,7 +62,7 @@ export function createRequester(fetchImpl: FetchLike): Requester {
       headers[idempotencyHeaderName] = options.idempotencyKey;
     let response: Response;
     try {
-      response = await fetchImpl(route.path, {
+      response = await fetchImpl(addressOf(route.path, options.query), {
         ...(options.body === undefined
           ? {}
           : { body: JSON.stringify(options.body) }),

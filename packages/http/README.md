@@ -2,7 +2,7 @@
 
 Framework-neutral execution boundary for versioned HTTP operations.
 
-Operations declare method, path, idempotency policy, runtime input/output schemas, and one typed
+Operations declare method, path, how their input arrives (`json` body, `query` string of a GET, or `none`), idempotency policy, runtime input/output schemas, and one typed
 application handler. Delivery adapters supply untrusted input, selected normalized headers, and a
 correlation-ID generator. The executor validates every boundary and emits the shared safe error
 envelope without importing Next.js or Fastify.

@@ -180,7 +180,7 @@ export function createRefreshGameClaimOperation(getService: Service) {
   } satisfies HttpOperation<RefreshGameClaimInput, RefreshGameClaimResponse>;
 }
 
-// The player's claims for a game, oldest first. It is a POST because this API's GET carries no query string.
+// The player's claims for a game, oldest first. It is a POST only because it predates GET operations reading a query string (`input: "query"`); it moves to GET with the other reads.
 export function createListGameClaimsOperation(getService: Service) {
   return {
     access: { kind: "authenticated" },

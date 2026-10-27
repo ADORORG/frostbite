@@ -73,4 +73,23 @@ describe("registerHttpOperation", () => {
       status: 400,
     });
   });
+
+  it("says how its input arrives, and refuses a query string on anything but a GET", () => {
+    const declared = (method: "GET" | "POST") => ({
+      access: { kind: "public" } as const,
+      applicationErrors: [],
+      execute: async () => ({ ok: true as const, value: { accepted: true } }),
+      idempotency: "none" as const,
+      input: "query" as const,
+      inputSchema: z.object({}),
+      method,
+      operationId: "readThing",
+      outputSchema: z.object({ accepted: z.boolean() }),
+      path: "/api/v1/things" as const,
+    });
+    expect(registerHttpOperation(declared("GET")).input).toBe("query");
+    expect(() => registerHttpOperation(declared("POST"))).toThrow(
+      "readThing reads a query string, so it must be a GET",
+    );
+  });
 });

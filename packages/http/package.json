@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/operation.ts",
     "./json-body": "./src/json-body.ts",
+    "./request-input": "./src/request-input.ts",
     "./openapi": "./src/openapi.ts",
     "./outcome": "./src/outcome.ts",
     "./registered-operation": "./src/registered-operation.ts",

@@ -36,6 +36,25 @@ async function failureOf(attempt: Promise<unknown>): Promise<ApiError> {
 }
 
 describe("JSON requester", () => {
+  it("sends what a GET asks for as an encoded query string, and no body", async () => {
+    const { fetchImpl, request } = requesterWith(async () => json({ id: "a" }));
+    await request({ method: "GET", path: "/api/v1/things" }, schema, {
+      query: { name: "a&b=c d", other: "é" },
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+      "/api/v1/things?name=a%26b%3Dc+d&other=%C3%A9",
+      { headers: {}, method: "GET" },
+    );
+  });
+
+  it("leaves the address alone where there is no query, or an empty one", async () => {
+    const { fetchImpl, request } = requesterWith(async () => json({ id: "a" }));
+    await request({ method: "GET", path: "/api/v1/things" }, schema, {
+      query: {},
+    });
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe("/api/v1/things");
+  });
+
   it("sends a JSON body and the idempotency key, and returns the validated response", async () => {
     const { fetchImpl, request } = requesterWith(async () => json({ id: "a" }));
     const result = await request(route, schema, {

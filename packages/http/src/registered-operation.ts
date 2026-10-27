@@ -16,6 +16,7 @@ export type OpenApiOperationDescription = ReturnType<
 
 export interface RegisteredHttpOperation {
   readonly access: PageAccessRequirement;
+  readonly input: HttpOperation<object, object>["input"];
   readonly describe: () => OpenApiOperationDescription;
   readonly execute: (
     request: HttpAdapterRequest,
@@ -27,8 +28,14 @@ export interface RegisteredHttpOperation {
 export function registerHttpOperation<Input, Output extends object>(
   operation: HttpOperation<Input, Output>,
 ): RegisteredHttpOperation {
+  // A query string is only read from a GET; an operation that declared one elsewhere would never be given its input.
+  if (operation.input === "query" && operation.method !== "GET")
+    throw new Error(
+      `Operation ${operation.operationId} reads a query string, so it must be a GET.`,
+    );
   return Object.freeze({
     access: operation.access,
+    input: operation.input,
     describe: () => describeOpenApiOperation(operation),
     execute: (
       request: HttpAdapterRequest,

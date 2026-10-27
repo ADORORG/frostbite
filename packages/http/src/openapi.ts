@@ -114,6 +114,17 @@ function jsonRequestBody(
   };
 }
 
+// A read's query string as OpenAPI parameters: one per field of its input, required where the input says so.
+function queryParameters(schema: JsonSchema): readonly object[] {
+  const required = new Set(schema.required ?? []);
+  return Object.entries(schema.properties ?? {}).map(([name, property]) => ({
+    in: "query",
+    name,
+    required: required.has(name),
+    schema: property,
+  }));
+}
+
 export function describeOpenApiOperation<Input, Output extends object>(
   operation: HttpOperation<Input, Output>,
 ) {
@@ -159,6 +170,9 @@ export function describeOpenApiOperation<Input, Output extends object>(
       schema: z.toJSONSchema(idempotencyKeySchema),
     });
   }
+
+  if (operation.input === "query")
+    parameters.push(...queryParameters(z.toJSONSchema(operation.inputSchema)));
 
   return {
     method: methodKey(operation.method),

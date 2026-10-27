@@ -61,7 +61,9 @@ export interface HttpOperation<Input, Output extends object> {
     context: HttpOperationContext,
   ) => Promise<HttpOperationResult<Output>>;
   readonly idempotency: IdempotencyPolicy;
-  readonly input: "json" | "none";
+  // How the input arrives: in a JSON body, in the query string of a GET (`query`; a read that asks for something particular), or not
+  // at all.
+  readonly input: "json" | "none" | "query";
   readonly inputSchema: z.ZodType<Input>;
   readonly method: HttpMethod;
   readonly operationId: string;
