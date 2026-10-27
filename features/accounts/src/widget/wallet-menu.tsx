@@ -9,6 +9,10 @@ import { BalanceLine } from "./balance-line.tsx";
 import { CopyAddress } from "./copy-address.tsx";
 import { outcomeMessage } from "@ador/shared/account-outcomes";
 import type { AccountOutcome } from "@ador/shared/account-outcomes";
+import {
+  myMilestonesNavigationLabel,
+  myMilestonesPath,
+} from "@ador/shared/games";
 import { networkName, shortAddress } from "./format.ts";
 import type { SessionState } from "./session-state.ts";
 
@@ -91,6 +95,11 @@ export function WalletMenu({
         ) : null}
         {session === "signed-in" ? (
           <>
+            <li>
+              <a className="menu-link" href={myMilestonesPath}>
+                {myMilestonesNavigationLabel}
+              </a>
+            </li>
             <li>
               <a className="menu-link" href="/account">
                 Account and sign-in methods

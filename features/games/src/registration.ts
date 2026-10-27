@@ -13,7 +13,6 @@ import {
   submitGameClaimRoute,
   submitGameRunRoute,
   gamesNavigationLabel,
-  myMilestonesNavigationLabel,
   gamesPath,
   type GameManifest,
 } from "@ador/shared/games";
@@ -53,13 +52,6 @@ export function createGamesFeature(
           href: gamesPath,
           label: gamesNavigationLabel,
           order: 20,
-        },
-        {
-          access: { kind: "authenticated" },
-          area: "main",
-          href: myMilestonesPath,
-          label: myMilestonesNavigationLabel,
-          order: 21,
         },
       ],
       pages: [

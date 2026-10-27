@@ -127,11 +127,25 @@ describe("the wallet widget: the button", () => {
     expect(container.querySelector('a[href="/account"]')?.textContent).toBe(
       "Account and sign-in methods",
     );
+    expect(
+      container.querySelector('a[href="/games/milestones"]')?.textContent,
+    ).toBe("My milestones");
     await click("Disconnect wallet");
     expect(connection.disconnect).toHaveBeenCalledTimes(1);
     await click("Switch wallet");
     expect(chooser.request).toHaveBeenCalledTimes(1);
     expect(container.querySelector(".popover__panel")).toBeNull();
+  });
+});
+
+describe("the wallet widget: the milestones link", () => {
+  it("is offered to a signed-in person only, since the page lists what their account minted", async () => {
+    setSession("signed-out");
+    Object.assign(connection, { address, connected: true });
+    await show();
+    await settle();
+    await openMenu();
+    expect(container.querySelector('a[href="/games/milestones"]')).toBeNull();
   });
 });
 

@@ -103,15 +103,7 @@ describe("the games feature registration", () => {
     );
     expect(feature.manifest).toMatchObject({
       id: "games",
-      navigation: [
-        { area: "main", href: "/games", label: "Games" },
-        {
-          access: { kind: "authenticated" },
-          area: "main",
-          href: myMilestonesPath,
-          label: "My milestones",
-        },
-      ],
+      navigation: [{ area: "main", href: "/games", label: "Games" }],
       requiredProviderCapabilities: [],
       routes: [
         gameSyncRoute,
