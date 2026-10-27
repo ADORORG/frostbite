@@ -108,6 +108,7 @@ export const rewardsGame = defineGame({
 
 export const walletConfig = {
   network: "signet",
+  signingWallets: ["xverse"],
 } as const;
 
 // Never read by a page; the runs routes read it only when a run is started.

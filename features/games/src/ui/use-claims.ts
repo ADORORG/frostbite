@@ -6,10 +6,12 @@ import type {
   GameClaimState,
   GameClaimUnavailableReason,
 } from "@ador/shared/games";
+import { walletRefusedCopy } from "@ador/wallet/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";
 import {
+  claimSignerCopy,
   claimUnavailableCopy,
   isSettledClaim,
   unreachableCopy,
@@ -33,9 +35,6 @@ const submitRefusal = {
   "not-awaiting-signature": "This claim can no longer be signed.",
   "not-found": "This claim could not be found.",
 } as const;
-
-export const noSignerCopy =
-  "Your wallet cannot sign claims in this version yet, so this claim cannot go ahead.";
 
 // A player's claims for one game: loaded, started (from a button here or by the game asking), reviewed and signed, and followed
 // until they are over. The platform decides what each state means; this only shows it and tells the game when it changes.
@@ -156,7 +155,14 @@ export function useClaims(options: {
     setWorking(true);
     setMessage(null);
     try {
-      const signed = await sign(transaction);
+      let signed: ClaimTransaction | null;
+      try {
+        signed = await sign(transaction);
+      } catch (error) {
+        // The wallet was closed or declined, or what it answered could not be used: nothing was sent, and the claim can be signed again.
+        console.error("Signing a claim failed.", error);
+        return setMessage(walletRefusedCopy(error));
+      }
       if (signed === null) return setMessage("Nothing was signed.");
       const answer = await api.submit({ claimId: active.id, signed });
       if (answer.status === "submitted") upsert(answer.claim, true);
@@ -171,7 +177,13 @@ export function useClaims(options: {
   return {
     active,
     begin,
-    canSign: sign !== undefined,
+    // Why nothing can be signed, or null while something can.
+    signerNote:
+      sign !== undefined
+        ? null
+        : claimSignerCopy[
+            wallet === null ? "not-connected" : "wallet-cannot-sign"
+          ],
     claims,
     dismiss: useCallback(() => setActiveId(null), []),
     feeSpeed,

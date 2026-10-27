@@ -171,12 +171,12 @@ describe("claiming from the milestone list", () => {
 });
 
 describe("signing", () => {
-  it("says the wallet cannot sign claims yet, and does not offer a signature that cannot be made", async () => {
+  it("says the connected wallet cannot sign claims, and does not offer a signature that cannot be made", async () => {
     const api = fakeApi();
     await earned({ api, wallet });
     await click("Claim ");
     await flush();
-    expect(text()).toContain("cannot sign claims in this version yet");
+    expect(text()).toContain("wallet you connected cannot sign claims");
     expect(button("Sign with your wallet")?.hasAttribute("disabled")).toBe(
       true,
     );

@@ -1,14 +1,6 @@
 import type { WalletInfo } from "@ador/game-sdk/protocol";
 import type { WalletNetwork } from "@ador/wallet/contracts";
-import { ArcadeInfoCard } from "@repo/ui/arcade";
-
-// How many characters of an address stay visible at each end; the rest is elided so it fits the dock.
-const addressHead = 8;
-const addressTail = 6;
-export const shortAddress = (address: string) =>
-  address.length <= addressHead + addressTail
-    ? address
-    : `${address.slice(0, addressHead)}…${address.slice(-addressTail)}`;
+import { ArcadeInfoCard, shortenMiddle } from "@repo/ui/arcade";
 
 // What this game can see of the player's wallet, said as it is: the address and the network, when one is
 // connected, and nothing else. Shown only for a game that declared the wallet capability.
@@ -49,7 +41,9 @@ export function WalletCard({
       ) : (
         <>
           <p>
-            <span title={current.address}>{shortAddress(current.address)}</span>{" "}
+            <span title={current.address}>
+              {shortenMiddle(current.address)}
+            </span>{" "}
             on {current.network}
           </p>
           {current.network === expectedNetwork ? null : (

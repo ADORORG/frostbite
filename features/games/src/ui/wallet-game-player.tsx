@@ -1,7 +1,11 @@
 "use client";
 
 import { walletInfoSchema } from "@ador/game-sdk/protocol";
-import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
+import {
+  useStepWallet,
+  useWalletChooser,
+  useWalletConnection,
+} from "@ador/wallet/client";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import { useMemo, type ComponentProps } from "react";
 
@@ -18,6 +22,7 @@ export function WalletGamePlayer({
   exposeWallet = true,
   fees,
   network,
+  signingWallets,
   ...player
 }: PlayerProps & {
   // The game's milestones can be claimed: the page uses the connection to claim, without the game being told about it.
@@ -27,6 +32,8 @@ export function WalletGamePlayer({
   // How a claim's fee speed is offered, where it is.
   readonly fees?: ClaimFeeSettings;
   readonly network: WalletNetwork;
+  // The wallets the deployment lets sign a claim (a policy list, not a guess about what a wallet can do).
+  readonly signingWallets: readonly string[];
 }) {
   const {
     address,
@@ -34,6 +41,7 @@ export function WalletGamePlayer({
     network: connectedNetwork,
   } = useWalletConnection();
   const { request } = useWalletChooser();
+  const { sign } = useStepWallet(signingWallets);
   // Only an address the protocol accepts is passed on; anything else is treated as no wallet rather than sent
   // to the game in a shape it cannot read.
   const current = useMemo(() => {
@@ -49,7 +57,11 @@ export function WalletGamePlayer({
       {...player}
       claims={
         claimable
-          ? { ...(fees === undefined ? {} : { fees }), wallet: current }
+          ? {
+              ...(fees === undefined ? {} : { fees }),
+              ...(sign === undefined ? {} : { sign }),
+              wallet: current,
+            }
           : undefined
       }
       wallet={

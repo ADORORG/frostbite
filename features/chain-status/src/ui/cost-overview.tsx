@@ -28,3 +28,13 @@ export function CostOverview({
     </div>
   );
 }
+
+// The fee set apart from the rest of a review, because it is what is being agreed to: what a person reads last before signing.
+export function NetworkFee(props: Parameters<typeof CostOverview>[0]) {
+  return (
+    <div className="network-fee">
+      <span className="network-fee__label">Network fee</span>
+      <CostOverview {...props} />
+    </div>
+  );
+}

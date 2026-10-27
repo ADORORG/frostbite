@@ -46,4 +46,5 @@ export const gameWalletConfig = {
     polling: rewardsPolicy.statusPolling,
   },
   network: walletAuthConfig.network,
+  signingWallets: rewardsPolicy.signingWallets,
 } as const satisfies GameWalletConfig;

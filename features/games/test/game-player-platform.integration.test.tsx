@@ -3,7 +3,7 @@
 import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { shortAddress } from "../src/ui/wallet-card.tsx";
+import { shortenMiddle } from "@repo/ui/arcade";
 import {
   flush,
   game,
@@ -75,7 +75,7 @@ describe("the wallet a game can see", () => {
     send(target, "wallet.get", {}, "b");
     await flush();
     expect(dockLabels()).toEqual(["Milestones0/2", "WalletConnected"]);
-    expect(h.container.textContent).toContain(shortAddress(address));
+    expect(h.container.textContent).toContain(shortenMiddle(address));
     expect(h.container.textContent).toContain("on signet");
     expect(h.container.textContent).toContain("This game can see this address");
     expect(answer(reply, "b")).toMatchObject({

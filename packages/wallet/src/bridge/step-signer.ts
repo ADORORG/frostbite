@@ -47,3 +47,12 @@ export async function signWithWallet(
     );
   return { ...transaction, payload };
 }
+
+// What is said when signing with the wallet did not give a signed transaction: the wallet's own words (or the platform's, when the
+// wallet answered with something unusable) follow, so the cause is not hidden behind "did not sign".
+export const walletRefusedCopy = (error: unknown): string => {
+  const reason = error instanceof Error ? error.message.trim() : "";
+  return reason === ""
+    ? "Your wallet did not sign, so nothing was sent."
+    : `Your wallet did not give back a signed transaction, so nothing was sent. Reason: ${reason.slice(0, 300)}`;
+};

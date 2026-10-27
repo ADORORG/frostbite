@@ -33,7 +33,11 @@ The platform core is not edited to add a game.
 - A manifest that fails validation stops the platform from starting; it is not skipped.
 - Identifiers are unique and are the page address. An address that cannot be an identifier is "Invalid
   route"; a valid one with no game is "Record not published".
-- The feature performs no mint or on-chain operation, and signs nothing. For a game that declared the `wallet`
+- A claim is signed by the player's own connected wallet, from the page and never by the game: `wallet-game-player.tsx`
+  takes the signer from `useStepWallet(signingWallets)` (the same policy list staff steps use, `rewardsPolicy.signingWallets`),
+  and the review opens in a dialog (`claim-dialog.tsx`) above the dock. Without a signer the dialog says which is missing: no
+  wallet connected, or a connected wallet that cannot sign claims. The platform checks what was signed against what it built.
+- The feature performs no mint or on-chain operation of its own. For a game that declared the `wallet`
   capability it mounts the wallet connection on the game's page and passes the game only the connected wallet's
   public address and network (`wallet-game-player.tsx`); a game that did not declare it gets no wallet provider. The only persistence is the sync route (which also returns the player's random per-game id, kept on the save row), which
   stores the player's own state for a listed game and its declared milestones, never anything a request names

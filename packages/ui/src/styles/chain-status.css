@@ -95,3 +95,25 @@
     display: none;
   }
 }
+
+.network-fee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--arcade-space-2) var(--arcade-space-4);
+  padding: var(--arcade-space-3) var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-small);
+  background: color-mix(in srgb, var(--arcade-yellow) 8%, transparent);
+}
+.network-fee__label {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.network-fee .cost-overview__total {
+  font-size: var(--arcade-text-lg);
+  font-weight: 700;
+}

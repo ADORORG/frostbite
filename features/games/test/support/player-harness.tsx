@@ -2,6 +2,7 @@ import { gameChannel, protocolVersion } from "@ador/game-sdk/protocol";
 import type { AccountPort } from "@ador/game-sdk/synced-backend";
 import { act, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { installDialogShim } from "@ador/test-kit/dom";
 import { afterEach, beforeAll, beforeEach, vi } from "vitest";
 
 import { GamePlayer } from "../../src/ui/game-player.tsx";
@@ -60,6 +61,7 @@ export const harness: {
 export function registerHarness(): void {
   beforeAll(() => {
     Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+    installDialogShim();
   });
   beforeEach(() => {
     window.localStorage.clear();

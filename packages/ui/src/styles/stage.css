@@ -197,44 +197,6 @@ html[data-theatre="true"] {
   margin: 0;
   font-size: 0.875rem;
 }
-.arcade-claim {
-  display: grid;
-  gap: 0.5rem;
-  max-width: min(100%, 26rem);
-  padding: 0.75rem 1rem;
-  border: var(--arcade-border-width) solid var(--arcade-mint);
-  border-radius: var(--arcade-radius-medium);
-  background: var(--arcade-ink);
-  color: var(--arcade-text);
-  pointer-events: auto;
-}
-.arcade-claim h3,
-.arcade-claim p,
-.arcade-claim dl {
-  margin: 0;
-}
-.arcade-claim h3 {
-  font-family: var(--arcade-font-pixel);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-}
-.arcade-claim dl {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 0.125rem 0.75rem;
-  font-size: 0.875rem;
-}
-.arcade-claim dt {
-  color: var(--arcade-muted, var(--arcade-text));
-}
-.arcade-claim dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-.arcade-claim[data-state="failed"],
-.arcade-claim[data-state="expired"] {
-  border-color: var(--arcade-pink);
-}
 @media (prefers-reduced-motion: no-preference) {
   .arcade-toast:not(:empty) {
     animation: arcade-toast-in 180ms ease-out;

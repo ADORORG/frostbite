@@ -2,7 +2,7 @@ import { mount } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { costBreakdown } from "../src/domain/fee-copy.ts";
-import { CostOverview } from "../src/ui/cost-overview.tsx";
+import { CostOverview, NetworkFee } from "../src/ui/cost-overview.tsx";
 
 describe("telling what a transaction costs", () => {
   it("tells the satoshis, the rate, the speed with its wait, and the size the fee implies", () => {
@@ -66,5 +66,23 @@ describe("telling what a transaction costs", () => {
     const bare = await mount(<CostOverview asset="sim" baseUnits="9" />);
     expect(bare.textContent).toBe("9 sim");
     expect(bare.querySelector("ul")).toBeNull();
+  });
+});
+
+describe("the fee set apart for what is about to be signed", () => {
+  it("names itself the network fee and carries the whole cost overview", async () => {
+    const box = await mount(
+      <NetworkFee
+        asset="btc"
+        baseUnits="400"
+        detail={{ satPerVb: 2, speed: "medium" }}
+      />,
+    );
+    expect(box.querySelector(".network-fee__label")?.textContent).toBe(
+      "Network fee",
+    );
+    expect(
+      box.querySelector(".network-fee .cost-overview__total")?.textContent,
+    ).toBe("400 sats");
   });
 });

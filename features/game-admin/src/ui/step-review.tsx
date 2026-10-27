@@ -1,4 +1,4 @@
-import { CostOverview } from "@ador/feature-chain-status/fee-picker";
+import { NetworkFee } from "@ador/feature-chain-status/fee-picker";
 import type { GameAdminStep } from "@ador/shared/games";
 import { ActionProgress, ArcadeTextField, KeyValueList } from "@repo/ui/arcade";
 
@@ -40,7 +40,7 @@ export function StepReview({
   const explorer = useExplorerTxUrl();
   return (
     <div
-      className="step-review"
+      className="review-stack"
       data-state={step.state}
       data-testid="step-review"
     >
@@ -51,14 +51,11 @@ export function StepReview({
         working={step.state === "pending" || step.state === "confirmed"}
       />
       <KeyValueList items={stepFacts(step)} label="What this step does" />
-      <div className="step-cost">
-        <span className="step-cost__label">Network fee</span>
-        <CostOverview
-          asset={summary.fee.asset}
-          baseUnits={summary.fee.baseUnits}
-          detail={summary.feeDetail}
-        />
-      </div>
+      <NetworkFee
+        asset={summary.fee.asset}
+        baseUnits={summary.fee.baseUnits}
+        detail={summary.feeDetail}
+      />
       {step.unconfirmedSend ? (
         <p data-testid="unconfirmed-send" role="status">
           {unconfirmedSendCopy}

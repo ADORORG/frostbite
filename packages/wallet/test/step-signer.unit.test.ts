@@ -9,6 +9,7 @@ vi.mock("@ador/chain/wallet-signing", () => chain);
 import {
   signWithWallet,
   WalletRefusedError,
+  walletRefusedCopy,
   type StepTransaction,
 } from "../src/bridge/step-signer.ts";
 
@@ -99,5 +100,22 @@ describe("having the connected wallet sign a built transaction", () => {
     await expect(
       signWithWallet({ signPsbt: vi.fn(async () => "x") }, transaction),
     ).rejects.toBeInstanceOf(WalletRefusedError);
+  });
+});
+
+describe("what is said when the wallet gave nothing signed", () => {
+  it("says the wallet's own words after the plain fact, cut to a length that fits, and the plain fact alone when it gave none", () => {
+    expect(walletRefusedCopy(new Error("User rejected the request"))).toBe(
+      "Your wallet did not give back a signed transaction, so nothing was sent. Reason: User rejected the request",
+    );
+    expect(walletRefusedCopy(new Error("x".repeat(400)))).toBe(
+      `Your wallet did not give back a signed transaction, so nothing was sent. Reason: ${"x".repeat(300)}`,
+    );
+    expect(walletRefusedCopy(new Error("  "))).toBe(
+      "Your wallet did not sign, so nothing was sent.",
+    );
+    expect(walletRefusedCopy("declined")).toBe(
+      "Your wallet did not sign, so nothing was sent.",
+    );
   });
 });

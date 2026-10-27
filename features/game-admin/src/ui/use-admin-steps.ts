@@ -6,6 +6,7 @@ import type {
   ListGameAdminStepsResponse,
   ListGameAdminTemplatesResponse,
 } from "@ador/shared/games";
+import { walletRefusedCopy } from "@ador/wallet/client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { GameAdminApi } from "../client/api.ts";
@@ -15,7 +16,6 @@ import {
   recordRefusalCopy,
   startRefusalCopy,
   submitRefusalCopy,
-  walletRefusedCopy,
 } from "../domain/copy.ts";
 import { failureCopy } from "../domain/failure-copy.ts";
 import type { Starting } from "./starting.ts";

@@ -4,6 +4,7 @@ import {
   ActionProgress,
   ArcadeActionButton,
   ArcadeDialog,
+  ArcadeSignButton,
 } from "@repo/ui/arcade";
 import { useState } from "react";
 
@@ -30,15 +31,10 @@ export function StepSheet({ admin }: { readonly admin: AdminSteps }) {
       footer={
         review === null ||
         review.toSign === null ? undefined : admin.canSign ? (
-          <ArcadeActionButton
-            disabled={admin.working}
+          <ArcadeSignButton
             onClick={() => void admin.sign()}
-            tone="mint"
-          >
-            {admin.working
-              ? "Waiting for your wallet…"
-              : "Sign with your wallet"}
-          </ArcadeActionButton>
+            working={admin.working}
+          />
         ) : (
           <ArcadeActionButton
             disabled={admin.working}

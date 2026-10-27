@@ -92,6 +92,13 @@ export const claimUnavailableCopy: Readonly<
   "wrong-network": "Your wallet is on another network than this game's.",
 };
 
+// Why a claim cannot be signed here, said by what is missing: no wallet is connected, or the one that is cannot sign claims.
+export const claimSignerCopy = {
+  "not-connected": claimUnavailableCopy["no-wallet"],
+  "wallet-cannot-sign":
+    "The wallet you connected cannot sign claims here. Connect another from the wallet button in the header.",
+} as const;
+
 export const unreachableCopy =
   "The platform could not be reached. Nothing was changed.";
 

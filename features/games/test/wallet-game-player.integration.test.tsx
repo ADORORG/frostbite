@@ -13,7 +13,7 @@ import {
 } from "vitest";
 
 import { WalletGamePlayer } from "../src/ui/wallet-game-player.tsx";
-import { shortAddress } from "../src/ui/wallet-card.tsx";
+import { shortenMiddle } from "@repo/ui/arcade";
 import { game } from "./support/player-harness.tsx";
 
 // The wallet library is a vendor boundary with its own qualification; what is tested here is what the page
@@ -25,6 +25,7 @@ const state = vi.hoisted(() => ({
   requests: 0,
 }));
 vi.mock("@ador/wallet/client", () => ({
+  useStepWallet: () => ({ address: "", sign: undefined }),
   useWalletChooser: () => ({
     request: () => {
       state.requests += 1;
@@ -67,6 +68,7 @@ const show = () =>
       <WalletGamePlayer
         game={{ ...game, capabilities: ["wallet"] }}
         network="signet"
+        signingWallets={["xverse"]}
         src="/play/embedded-game/index.html"
         title="Embedded game"
       />,
@@ -87,7 +89,7 @@ describe("the stage with the player's wallet behind it", () => {
   it("shows the connected wallet's address and network", async () => {
     Object.assign(state, { address, connected: true, network: "mainnet" });
     await show();
-    expect(container.textContent).toContain(shortAddress(address));
+    expect(container.textContent).toContain(shortenMiddle(address));
     expect(container.textContent).toContain("on mainnet");
   });
 
@@ -101,6 +103,6 @@ describe("the stage with the player's wallet behind it", () => {
     Object.assign(state, { address, connected: false });
     await show();
     expect(container.textContent).toContain("No wallet is connected.");
-    expect(container.textContent).not.toContain(shortAddress(address));
+    expect(container.textContent).not.toContain(shortenMiddle(address));
   });
 });

@@ -82,3 +82,15 @@
   font-size: 0.75rem;
   text-align: right;
 }
+
+/* What a dialog says before something is signed: one thing under another, each said once. */
+.review-stack {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+.review-stack p {
+  margin: 0;
+}
+.review-stack__details summary {
+  cursor: pointer;
+}

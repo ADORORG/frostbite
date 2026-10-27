@@ -1,6 +1,7 @@
 export { ArcadePanel } from "./arcade/arcade-panel.tsx";
 export { ArcadeModal } from "./components/arcade-modal.tsx";
 export { ArcadeDialog } from "./components/arcade-dialog.tsx";
+export { ArcadeSignButton } from "./components/arcade-sign-button.tsx";
 export { Avatar } from "./components/avatar.tsx";
 export {
   ShellSlotsProvider,

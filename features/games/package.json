@@ -38,6 +38,7 @@
     "react": "19.2.8"
   },
   "devDependencies": {
+    "@ador/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

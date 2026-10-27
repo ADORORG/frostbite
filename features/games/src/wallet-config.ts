@@ -12,6 +12,8 @@ export interface GameWalletConfig {
   // costs. Absent: no choice is offered and claims use the platform's usual speed.
   readonly fees?: ClaimFeeSettings;
   readonly network: WalletNetwork;
+  // The wallets that sign a claim for a player, by provider id; the same list staff steps are signed with.
+  readonly signingWallets: readonly string[];
 }
 
 export interface ClaimFeeSettings {

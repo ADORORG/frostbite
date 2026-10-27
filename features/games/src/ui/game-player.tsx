@@ -19,7 +19,7 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";
-import { ClaimReview } from "./claim-review.tsx";
+import { ClaimDialog } from "./claim-dialog.tsx";
 import type { ClaimFeeSettings } from "../wallet-config.ts";
 import { ClaimFeesBeside } from "./claim-fees.tsx";
 import { claimsDockSection } from "./claims-card.tsx";
@@ -221,20 +221,6 @@ export function GamePlayer({
             >
               {toast}
             </div>
-            {claimUi.active === null ? null : (
-              <ClaimReview
-                canSign={claimUi.canSign}
-                claim={claimUi.active}
-                message={claimUi.message}
-                onClose={claimUi.dismiss}
-                onSign={() => void claimUi.sign()}
-                title={
-                  titles[claimUi.active.milestoneId] ??
-                  claimUi.active.milestoneId
-                }
-                working={claimUi.working}
-              />
-            )}
             {prompt ? (
               <div className="arcade-prompt" data-testid="fullscreen-prompt">
                 <p>
@@ -282,6 +268,19 @@ export function GamePlayer({
           title={title}
         />
       </ArcadeStage>
+      <ClaimDialog
+        claim={claimUi.active}
+        message={claimUi.message}
+        onClose={claimUi.dismiss}
+        onSign={() => void claimUi.sign()}
+        signerNote={claimUi.signerNote}
+        title={
+          claimUi.active === null
+            ? ""
+            : (titles[claimUi.active.milestoneId] ?? claimUi.active.milestoneId)
+        }
+        working={claimUi.working}
+      />
       <ArcadeDock label="About this game" sections={dock} />
     </>
   );
