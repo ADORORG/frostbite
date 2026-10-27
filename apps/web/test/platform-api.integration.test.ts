@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { httpErrorEnvelopeSchema } from "@ador/shared/http";
 import { platformStatusSchema } from "@ador/shared/platform";
 
+import { resolveApiOperation } from "../../../configs/api";
 import { featureRegistry } from "../../../configs/features";
 import { GET, POST } from "../src/app/api/v1/[...segments]/route.js";
 
@@ -59,6 +60,18 @@ describe("Next platform API adapter", () => {
     );
     expect(changed.status).toBe(200);
     expect(await changed.json()).toEqual(await first.clone().json());
+  });
+
+  it("resolves the minted picture at its GET address, as a kept file", async () => {
+    const path = "/api/v1/games/milestones/picture";
+    const found = await resolveApiOperation("GET", path);
+    expect(found?.route).toEqual({
+      method: "GET",
+      operationId: "getMintedPicture",
+      path,
+    });
+    expect(found?.file).toBe(true);
+    expect(found?.cache).toEqual({ kind: "max-age", seconds: 86_400 });
   });
 
   it("keeps no error answer", async () => {
