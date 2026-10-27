@@ -12,6 +12,7 @@ import {
   vi,
 } from "vitest";
 
+import { TransactionLink } from "@ador/feature-chain-status/transaction";
 import { WalletGamePlayer } from "../src/ui/wallet-game-player.tsx";
 import { game } from "./support/player-harness.tsx";
 
@@ -24,7 +25,7 @@ const signer = vi.hoisted(() => vi.fn());
 vi.mock("../src/ui/game-player.tsx", () => ({
   GamePlayer: (props: { claims?: { sign?: unknown; wallet: unknown } }) => {
     seen.claims = props.claims;
-    return null;
+    return <TransactionLink id="ab12" />;
   },
 }));
 vi.mock("@ador/wallet/client", () => ({
@@ -60,6 +61,7 @@ const show = (signingWallets: readonly string[], claimable = true) =>
     root.render(
       <WalletGamePlayer
         claimable={claimable}
+        explorerTxUrl="https://explorer.test/tx/{id}"
         game={game}
         network="signet"
         signingWallets={signingWallets}
@@ -85,5 +87,12 @@ describe("the wallet that signs a player's claims", () => {
   it("is not offered at all for a game whose milestones cannot be claimed", async () => {
     await show(["xverse"], false);
     expect(seen.claims).toBeUndefined();
+  });
+
+  it("follows a claim's transaction on the explorer the deployment names", async () => {
+    await show(["xverse"]);
+    expect(container.querySelector("a")?.href).toBe(
+      "https://explorer.test/tx/ab12",
+    );
   });
 });

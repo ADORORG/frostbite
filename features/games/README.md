@@ -35,6 +35,7 @@ The platform core is not edited to add a game.
   route"; a valid one with no game is "Record not published".
 - A claim is signed by the player's own connected wallet, from the page and never by the game: `wallet-game-player.tsx`
   takes the signer from `useStepWallet(signingWallets)` (the same policy list staff steps use, `rewardsPolicy.signingWallets`),
+  The claim dialog lists the claim's transaction once it has one, linked to the explorer named by `GameWalletConfig.explorerTxUrl` (`betaChain.explorerTxUrl`), through the shared `@ador/feature-chain-status/transaction`.
   and the review opens in a dialog (`claim-dialog.tsx`) above the dock. Without a signer the dialog says which is missing: no
   wallet connected, or a connected wallet that cannot sign claims. The platform checks what was signed against what it built.
 - The feature performs no mint or on-chain operation of its own. For a game that declared the `wallet`

@@ -124,4 +124,20 @@ describe("the claim review", () => {
     expect(dialog()?.textContent).toContain("Claimed");
     expect(dialog()?.querySelector(".spinner")).toBeNull();
   });
+
+  it("names the transaction once the claim has one, and not before the wallet has signed", async () => {
+    const api = fakeApi({
+      refresh: vi.fn(async () => ({
+        claim: claimAt("pending"),
+        status: "ok" as const,
+      })),
+    });
+    await start({ api, pollMs: 10_000, sign: async (t) => t, wallet });
+    const listing = '[aria-label="Transactions on the network"]';
+    expect(dialog()?.querySelector(listing)).toBeNull();
+    await click("Sign with your wallet");
+    const listed = dialog()?.querySelector(listing);
+    expect(listed?.textContent).toContain("Transaction");
+    expect(listed?.textContent).toContain("abc");
+  });
 });

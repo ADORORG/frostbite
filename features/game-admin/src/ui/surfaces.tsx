@@ -1,3 +1,4 @@
+import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import { gameAdminHref } from "@ador/shared/games";
 import {
@@ -12,7 +13,6 @@ import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { AdminFrame } from "./admin-frame.tsx";
 import { FeeSettingsBoundary, type FeeSettings } from "./fee-settings.tsx";
-import { ExplorerBoundary } from "./explorer.tsx";
 import { WalletGamePanel, WalletTemplatesPanel } from "./wallet-panels.tsx";
 
 type Navigation = readonly NavigationItem[];

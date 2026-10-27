@@ -1,4 +1,5 @@
 import { NetworkFee } from "@ador/feature-chain-status/fee-picker";
+import { TransactionList } from "@ador/feature-chain-status/transaction";
 import type { GameAdminStep } from "@ador/shared/games";
 import { ActionProgress, ArcadeTextField, KeyValueList } from "@repo/ui/arcade";
 
@@ -8,10 +9,8 @@ import {
   transactionRoleLabel,
   unconfirmedSendCopy,
 } from "../domain/copy.ts";
-import { explorerLink } from "../domain/explorer.ts";
 import { stepFacts } from "../domain/facts.ts";
 import { lifecycleSteps } from "../domain/lifecycle.ts";
-import { useExplorerTxUrl } from "./explorer.tsx";
 import { RecordAddress } from "./record-address.tsx";
 
 // What a step is, for the review staff sign from: where it stands (its stages, from the platform's own record), what it does and on
@@ -37,7 +36,6 @@ export function StepReview({
 }) {
   const copy = stepCopy(step);
   const { summary } = step;
-  const explorer = useExplorerTxUrl();
   return (
     <div
       className="review-stack"
@@ -62,23 +60,11 @@ export function StepReview({
         </p>
       ) : null}
       {step.transactions.length === 0 ? null : (
-        <KeyValueList
-          items={step.transactions.map(({ id, role }) => {
-            const href = explorer === null ? null : explorerLink(explorer, id);
-            return {
-              label: transactionRoleLabel[role],
-              mono: true,
-              value:
-                href === null ? (
-                  id
-                ) : (
-                  <a href={href} rel="noreferrer noopener" target="_blank">
-                    {id}
-                  </a>
-                ),
-            };
-          })}
-          label="Transactions on the network"
+        <TransactionList
+          transactions={step.transactions.map(({ id, role }) => ({
+            id,
+            label: transactionRoleLabel[role],
+          }))}
         />
       )}
       {step.createdContracts.length === 0 ? null : (

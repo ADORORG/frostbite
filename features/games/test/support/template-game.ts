@@ -108,6 +108,7 @@ export const rewardsGame = defineGame({
 
 export const walletConfig = {
   network: "signet",
+  explorerTxUrl: "https://explorer.test/tx/{id}",
   signingWallets: ["xverse"],
 } as const;
 

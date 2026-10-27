@@ -1,5 +1,6 @@
 "use client";
 
+import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
 import { walletInfoSchema } from "@ador/game-sdk/protocol";
 import {
   useStepWallet,
@@ -20,6 +21,7 @@ type PlayerProps = Omit<ComponentProps<typeof GamePlayer>, "claims" | "wallet">;
 export function WalletGamePlayer({
   claimable = false,
   exposeWallet = true,
+  explorerTxUrl,
   fees,
   network,
   signingWallets,
@@ -29,6 +31,8 @@ export function WalletGamePlayer({
   readonly claimable?: boolean;
   // The game declared the wallet capability, so it is told what is connected.
   readonly exposeWallet?: boolean;
+  // Where a claim's transaction is followed on a block explorer.
+  readonly explorerTxUrl: string;
   // How a claim's fee speed is offered, where it is.
   readonly fees?: ClaimFeeSettings;
   readonly network: WalletNetwork;
@@ -53,22 +57,24 @@ export function WalletGamePlayer({
     return parsed.success ? parsed.data : null;
   }, [address, connected, connectedNetwork]);
   return (
-    <GamePlayer
-      {...player}
-      claims={
-        claimable
-          ? {
-              ...(fees === undefined ? {} : { fees }),
-              ...(sign === undefined ? {} : { sign }),
-              wallet: current,
-            }
-          : undefined
-      }
-      wallet={
-        exposeWallet
-          ? { connect: request, current, expectedNetwork: network }
-          : undefined
-      }
-    />
+    <ExplorerBoundary txUrl={explorerTxUrl}>
+      <GamePlayer
+        {...player}
+        claims={
+          claimable
+            ? {
+                ...(fees === undefined ? {} : { fees }),
+                ...(sign === undefined ? {} : { sign }),
+                wallet: current,
+              }
+            : undefined
+        }
+        wallet={
+          exposeWallet
+            ? { connect: request, current, expectedNetwork: network }
+            : undefined
+        }
+      />
+    </ExplorerBoundary>
   );
 }

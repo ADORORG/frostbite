@@ -1,4 +1,8 @@
 import { NetworkFee } from "@ador/feature-chain-status/fee-picker";
+import {
+  TransactionList,
+  plainTransactionLabel,
+} from "@ador/feature-chain-status/transaction";
 import type { GameClaim } from "@ador/shared/games";
 import {
   ActionProgress,
@@ -64,6 +68,13 @@ export function ClaimDialog({
             baseUnits={claim.summary.fee.baseUnits}
             detail={claim.summary.feeDetail}
           />
+          {claim.transactionId === null ? null : (
+            <TransactionList
+              transactions={[
+                { id: claim.transactionId, label: plainTransactionLabel },
+              ]}
+            />
+          )}
           {message === null ? null : <p role="alert">{message}</p>}
           {claim.state === "awaiting-signature" && signerNote !== null ? (
             <p role="status">{signerNote}</p>

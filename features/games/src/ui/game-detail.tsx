@@ -101,6 +101,7 @@ export function GameDetail({
           {...player}
           claimable={game.claimable}
           exposeWallet={wantsWallet}
+          explorerTxUrl={wallet.explorerTxUrl}
           {...(wallet.fees === undefined ? {} : { fees: wallet.fees })}
           network={wallet.network}
           signingWallets={wallet.signingWallets}

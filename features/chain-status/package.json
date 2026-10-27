@@ -8,6 +8,7 @@
     "./api": "./src/client/api.ts",
     "./badge": "./src/ui/indexing-badge.tsx",
     "./fee-picker": "./src/ui/fee-picker-entry.ts",
+    "./transaction": "./src/ui/transaction-entry.ts",
     "./entrypoint": "./src/entrypoint.ts",
     "./operations": "./src/application/indexing.ts"
   },

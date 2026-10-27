@@ -1,3 +1,4 @@
+import { plainTransactionLabel } from "@ador/feature-chain-status/transaction";
 import type { ArcadeTone } from "@repo/ui/arcade";
 import type {
   GameAdminAction,
@@ -190,7 +191,7 @@ export const transactionRoleLabel: Readonly<
 > = {
   commit: "Commit transaction",
   reveal: "Reveal transaction",
-  transaction: "Transaction",
+  transaction: plainTransactionLabel,
 };
 
 // Said while a sent step has not been seen on the network: it may not have arrived, and the platform is looking again.

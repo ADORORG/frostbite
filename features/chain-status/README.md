@@ -24,6 +24,7 @@ step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/s
   when the market is unknown. The choice is the speed, never the rate: the speed travels on the intent (`feeSpeed`) and the adapter
   quotes the rate for its block target when it builds the transaction. Other features import only this subpath.
 - `<CostOverview asset baseUnits detail?>` (same entry): the cost of a built transaction, told wherever a person is about to act on the chain. A fee in satoshis (`btc`) is shown as sats, then the rate it was priced at, the speed with its wait and about how large the transaction is (fee ÷ rate); any other asset is its amount and name. `detail` is the `feeDetail` the builder put on the summary.
+- `@ador/feature-chain-status/transaction`: `<ExplorerBoundary txUrl>` (a page says once where its block explorer is, `{id}` where a transaction's id goes), `<TransactionLink id>` (the id as a link to the explorer in a new tab, or as plain text where there is no explorer or the address cannot name a transaction) and `<TransactionList transactions>` (the labelled list staff steps and player claims both show), with `plainTransactionLabel`. Staff steps and the player's claim dialog use the same ones, so a transaction is followed the same way in both.
 - The lamp itself is the shared `StatusLamp` (`@repo/ui/arcade`) in its compact form, so another status (a queue, a provider) reuses it.
 
 ## Independent readings

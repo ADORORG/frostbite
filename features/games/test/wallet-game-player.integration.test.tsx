@@ -68,6 +68,7 @@ const show = () =>
       <WalletGamePlayer
         game={{ ...game, capabilities: ["wallet"] }}
         network="signet"
+        explorerTxUrl="https://explorer.test/tx/{id}"
         signingWallets={["xverse"]}
         src="/play/embedded-game/index.html"
         title="Embedded game"

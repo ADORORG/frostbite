@@ -41,6 +41,7 @@ export const walletAuthConfig = {
 // How the games pages relate to the wallet: the network a game's wallet is expected to be on. Connecting is done
 // from the header widget on any page.
 export const gameWalletConfig = {
+  explorerTxUrl: betaChain.explorerTxUrl,
   fees: {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
     polling: rewardsPolicy.statusPolling,

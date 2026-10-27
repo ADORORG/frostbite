@@ -1,8 +1,7 @@
+import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
 import { button, click, mount, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
-import { explorerLink } from "../src/domain/explorer.ts";
-import { ExplorerBoundary } from "../src/ui/explorer.tsx";
 import { GameAdminPanel } from "../src/ui/game-admin-panel.tsx";
 import { fakeApi, step } from "./support/fake-api.ts";
 import { enterWallet } from "./support/panel.tsx";
@@ -92,15 +91,5 @@ describe("the transactions of a sent step, in the sheet it is followed in", () =
     expect(
       settled.querySelector('[data-testid="unconfirmed-send"]'),
     ).toBeNull();
-  });
-});
-
-describe("the link to a transaction", () => {
-  it("puts the id where the address says, encoded, and links nothing without a place for it", () => {
-    expect(explorerLink(template, "ab")).toBe("https://explorer.test/tx/ab");
-    expect(explorerLink(template, "a b/c")).toBe(
-      "https://explorer.test/tx/a%20b%2Fc",
-    );
-    expect(explorerLink("https://explorer.test/", "ab")).toBeNull();
   });
 });
