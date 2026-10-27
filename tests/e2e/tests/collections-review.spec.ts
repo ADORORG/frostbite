@@ -217,21 +217,22 @@ test("people without the reviewer role cannot read or decide on submissions", as
 }) => {
   await signIn(page, baseURL, creator);
   for (const path of [
-    "/api/v1/collection-reviews/queue",
-    "/api/v1/collection-reviews/read",
-    "/api/v1/collection-reviews/decide",
+    "/api/v1/collection-reviews/queue?states=submitted",
+    "/api/v1/collection-reviews/read?submissionId=0198f2a4-7b3c-7d1e-8a5f-3c2b1d0e9f8a",
   ]) {
-    const response = await post(page.request, baseURL, path, {});
+    const response = await page.request.get(path);
     expect(response.status()).toBe(403);
   }
-  const anonymous = await browser.newContext({ baseURL });
-  const refused = await post(
-    anonymous.request,
+  const decided = await post(
+    page.request,
     baseURL,
-    "/api/v1/collection-reviews/queue",
-    {
-      states: ["submitted"],
-    },
+    "/api/v1/collection-reviews/decide",
+    {},
+  );
+  expect(decided.status()).toBe(403);
+  const anonymous = await browser.newContext({ baseURL });
+  const refused = await anonymous.request.get(
+    "/api/v1/collection-reviews/queue?states=submitted",
   );
   expect(refused.status()).toBe(401);
   await anonymous.close();

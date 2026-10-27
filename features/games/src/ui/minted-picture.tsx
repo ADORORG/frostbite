@@ -1,21 +1,28 @@
 "use client";
 
-import type { MintedApi } from "../client/minted-api.ts";
-import { useMintedPicture } from "./use-minted-picture.ts";
+import { mintedPictureHref } from "@ador/shared/games";
 
-// The picture the chain serves for a minted milestone, shown through an image tag, which cannot run what a drawing holds. It draws
-// nothing until the platform has the picture, and nothing if there is none.
+import { useImageState } from "./use-image-state.ts";
+
+// The picture the chain serves for a minted milestone, shown through an image tag, which cannot run what a drawing holds, and kept by
+// the browser. It draws nothing until the picture has come, and nothing if there is none.
 export function MintedPicture({
   alt,
-  api,
   claimId,
 }: {
   readonly alt: string;
-  readonly api?: MintedApi;
   readonly claimId: string;
 }) {
-  const picture = useMintedPicture(claimId, api);
-  return picture.kind === "ready" ? (
-    <img alt={alt} className="minted-picture" src={picture.src} />
-  ) : null;
+  const src = mintedPictureHref(claimId);
+  const { onError, onLoad, state } = useImageState(src);
+  return (
+    <img
+      alt={alt}
+      className="minted-picture"
+      hidden={state !== "ready"}
+      onError={onError}
+      onLoad={onLoad}
+      src={src}
+    />
+  );
 }

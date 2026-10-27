@@ -55,10 +55,10 @@ describe("collection review registration", () => {
         ({ method, operationId }) => `${method} ${operationId}`,
       ),
     ).toEqual([
-      "POST listCollectionReviewActivity",
+      "GET listCollectionReviewActivity",
       "POST decideCollectionReview",
-      "POST listCollectionReviewQueue",
-      "POST readCollectionReviewSubmission",
+      "GET listCollectionReviewQueue",
+      "GET readCollectionReviewSubmission",
     ]);
   });
 

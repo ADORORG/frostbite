@@ -56,7 +56,7 @@ export function createUploadsApi(fetchImpl: FetchLike): UploadsApi {
       request(libraryRoute, libraryResponseSchema, options),
     listOlderAssets: (before, options = {}) =>
       request(libraryOlderRoute, libraryResponseSchema, {
-        body: { before },
+        query: { before },
         ...options,
       }),
   };

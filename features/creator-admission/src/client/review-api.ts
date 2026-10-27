@@ -38,13 +38,20 @@ export function createCreatorReviewApi(fetchImpl: FetchLike): CreatorReviewApi {
       request(
         creatorApplicationRoutes.reviewQueue,
         creatorReviewQueueResponseSchema,
-        { body: input, ...options },
+        {
+          query: {
+            group: input.group,
+            sort: input.sort,
+            ...(input.cursor === null ? {} : { cursor: input.cursor }),
+          },
+          ...options,
+        },
       ),
     read: (applicationId, options = {}) =>
       request(
         creatorApplicationRoutes.reviewRead,
         creatorReviewReadResponseSchema,
-        { body: { applicationId }, ...options },
+        { query: { applicationId }, ...options },
       ),
   };
 }

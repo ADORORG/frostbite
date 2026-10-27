@@ -44,7 +44,7 @@ describe("reviewing submissions over the real database", () => {
     const actor = await reviewer();
     const queue = await call(reviewRoutes.queue, {
       actor,
-      body: { states: ["submitted"] },
+      body: { states: "submitted" },
     });
     expect(
       reviewQueueResponseSchema
@@ -187,7 +187,7 @@ describe("reviewing submissions over the real database", () => {
     expect([bare.status, errorOf(bare.body)]).toEqual([400, "invalid_request"]);
     const queue = await call(reviewRoutes.queue, {
       actor: null,
-      body: { states: ["submitted"] },
+      body: { states: "submitted" },
     });
     const read = await call(reviewRoutes.read, {
       actor: null,

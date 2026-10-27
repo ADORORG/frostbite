@@ -52,7 +52,8 @@ export function createCreatorReviewOperations(getService: () => Service) {
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: creatorReviewQueueInputSchema,
     outputSchema: creatorReviewQueueResponseSchema,
     ...creatorApplicationRoutes.reviewQueue,
@@ -76,7 +77,8 @@ export function createCreatorReviewOperations(getService: () => Service) {
           } as const);
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: creatorReviewReadInputSchema,
     outputSchema: creatorReviewReadResponseSchema,
     ...creatorApplicationRoutes.reviewRead,

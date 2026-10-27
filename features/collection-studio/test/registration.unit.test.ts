@@ -41,11 +41,11 @@ describe("collection studio registration", () => {
       "POST createCollectionDraft",
       "POST importCollectionItems",
       "GET listCollectionDrafts",
-      "POST readCollectionDraft",
+      "GET readCollectionDraft",
       "DELETE removeCollectionItem",
       "PUT saveCollectionDraft",
       "PUT updateCollectionItem",
-      "POST listCollectionSubmissions",
+      "GET listCollectionSubmissions",
       "POST submitCollection",
     ]);
   });

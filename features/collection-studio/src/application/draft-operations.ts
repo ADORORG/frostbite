@@ -110,7 +110,8 @@ export function createReadDraftOperation(dependencies: OperationDependencies) {
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "revalidate" },
+    input: "query",
     inputSchema: readCollectionDraftInputSchema,
     outputSchema: collectionDetailSchema,
     ...collectionRoutes.read,

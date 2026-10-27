@@ -106,7 +106,7 @@ export const collectionRoutes = {
     path: "/api/v1/collection-drafts",
   },
   read: {
-    method: "POST",
+    method: "GET",
     operationId: "readCollectionDraft",
     path: "/api/v1/collection-drafts/read",
   },

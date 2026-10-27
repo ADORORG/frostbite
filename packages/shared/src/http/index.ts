@@ -65,3 +65,18 @@ export type IdempotencyKey = z.infer<typeof idempotencyKeySchema>;
 export type IdempotencyPolicy = z.infer<typeof idempotencyPolicySchema>;
 export * from "./fingerprint.ts";
 export * from "./rate-limit.ts";
+
+// A list in a query string: values separated by commas (`states=a,b`), checked as the array schema `list` says (its items, its
+// length). A query string carries text only and a name may be given once, so a list travels as one value. `queryList` writes it.
+export const commaSeparated = <
+  List extends z.ZodType<readonly string[], string[]>,
+>(
+  list: List,
+) =>
+  z
+    .string()
+    .min(1)
+    .transform((text) => text.split(","))
+    .pipe(list);
+export const queryList = (values: readonly string[]): string =>
+  values.join(",");

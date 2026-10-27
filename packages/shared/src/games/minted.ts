@@ -22,7 +22,7 @@ export const listMintedMilestonesResponseSchema = z
   .strict();
 
 export const listMintedMilestonesRoute = {
-  method: "POST",
+  method: "GET",
   operationId: "listMintedMilestones",
   path: "/api/v1/games/milestones/minted",
 } as const;
@@ -31,8 +31,9 @@ export const listMintedMilestonesRoute = {
 // through an image tag, which cannot run what a drawing holds.
 export const mintedPictureContentTypes = ["image/svg+xml"] as const;
 
-// The picture of one of the player's minted milestones, as the chain serves it for the item the claim minted. The bytes travel as
-// base64 text, because JSON cannot carry them. A picture that cannot be shown is an answer with a reason, never a broken image.
+// The picture of one of the player's minted milestones, as the chain serves it for the item the claim minted. It is a file, not a
+// JSON answer: a page shows it with an image tag pointed at `mintedPictureHref`, which a browser can keep. A picture that cannot be
+// shown is a "not found" whose `reason` says why, never a broken image.
 export const mintedPictureUnavailableReasons = [
   "chain-unavailable",
   "no-picture",
@@ -41,27 +42,21 @@ export const mintedPictureUnavailableReasons = [
 export const getMintedPictureInputSchema = z
   .object({ claimId: z.uuid() })
   .strict();
-export const getMintedPictureResponseSchema = z.discriminatedUnion("status", [
-  z
-    .object({
-      contentType: z.enum(mintedPictureContentTypes),
-      data: z.string().min(1).max(1_400_000),
-      edition: z.number().int().positive(),
-      status: z.literal("ok"),
-    })
-    .strict(),
-  z
-    .object({
-      reason: z.enum(mintedPictureUnavailableReasons),
-      status: z.literal("unavailable"),
-    })
-    .strict(),
-]);
+export const getMintedPictureFileSchema = z
+  .object({
+    bytes: z.custom<Uint8Array>((value) => value instanceof Uint8Array),
+    contentType: z.enum(mintedPictureContentTypes),
+  })
+  .strict();
 export const getMintedPictureRoute = {
-  method: "POST",
+  method: "GET",
   operationId: "getMintedPicture",
   path: "/api/v1/games/milestones/picture",
 } as const;
+
+// Where a minted milestone's picture is read: an address, so a browser can ask once and keep it.
+export const mintedPictureHref = (claimId: string) =>
+  `${getMintedPictureRoute.path}?${new URLSearchParams({ claimId }).toString()}`;
 
 // The player's own page of what they minted.
 export const myMilestonesPath = "/games/milestones";
@@ -75,6 +70,4 @@ export type ListMintedMilestonesResponse = z.infer<
   typeof listMintedMilestonesResponseSchema
 >;
 export type GetMintedPictureInput = z.infer<typeof getMintedPictureInputSchema>;
-export type GetMintedPictureResponse = z.infer<
-  typeof getMintedPictureResponseSchema
->;
+export type GetMintedPictureFile = z.infer<typeof getMintedPictureFileSchema>;

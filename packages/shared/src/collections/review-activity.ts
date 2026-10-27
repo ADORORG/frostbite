@@ -66,7 +66,7 @@ export const reviewActivityItemSchema = z
   .strict();
 
 export const reviewActivityInputSchema = z
-  .object({ cursor: activityCursorSchema.nullable() })
+  .object({ cursor: activityCursorSchema.nullable().default(null) })
   .strict();
 
 export const reviewActivityResponseSchema = z

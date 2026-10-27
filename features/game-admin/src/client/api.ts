@@ -49,7 +49,7 @@ export function createGameAdminApi(
   return {
     list: (gameId) =>
       request(gameAdminRoutes.list, listGameAdminStepsResponseSchema, {
-        body: { gameId },
+        query: { gameId },
         signal: AbortSignal.timeout(stepRequestTimeoutMs),
       }),
     record: (input) =>
@@ -74,7 +74,6 @@ export function createGameAdminApi(
       }),
     templates: () =>
       request(gameAdminRoutes.templates, listGameAdminTemplatesResponseSchema, {
-        body: {},
         signal: AbortSignal.timeout(stepRequestTimeoutMs),
       }),
   };

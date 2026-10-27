@@ -63,7 +63,7 @@ export function MyMilestones({
       ) : (
         <CoverGrid label={mintedCopy.title}>
           {mintedRows(state.minted, games, gameHref).map((row) => (
-            <MintedCard api={api} key={row.claimId} row={row} />
+            <MintedCard key={row.claimId} row={row} />
           ))}
         </CoverGrid>
       )}

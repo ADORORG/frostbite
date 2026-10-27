@@ -255,18 +255,19 @@ describe("submitting, refreshing and listing", () => {
     ).toBe(false);
   });
 
-  it("are four POST routes under one path, each with its own operation id", () => {
+  it("are four routes under one path, each with its own operation id", () => {
     const routes = [
       startGameClaimRoute,
       submitGameClaimRoute,
       refreshGameClaimRoute,
       listGameClaimsRoute,
     ];
+    // Listing is a GET; starting, submitting and refreshing change something.
     expect(routes.map(({ method }) => method)).toEqual([
       "POST",
       "POST",
       "POST",
-      "POST",
+      "GET",
     ]);
     expect(new Set(routes.map(({ path }) => path)).size).toBe(4);
     expect(new Set(routes.map(({ operationId }) => operationId)).size).toBe(4);

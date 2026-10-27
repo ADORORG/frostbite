@@ -21,10 +21,7 @@ describe("activity API client", () => {
     expect(page.nextCursor).toBe(cursorAfter(item));
     expect(fetchImpl).toHaveBeenCalledWith(
       reviewRoutes.activity.path,
-      expect.objectContaining({
-        body: JSON.stringify({ cursor: null }),
-        method: "POST",
-      }),
+      expect.objectContaining({ method: "GET" }),
     );
   });
 
@@ -34,9 +31,9 @@ describe("activity API client", () => {
       json({ items: [], nextCursor: null }),
     );
     await createReviewApi(fetchImpl).activity(cursorAfter(item));
-    expect(fetchImpl.mock.calls[0]?.[1]).toMatchObject({
-      body: JSON.stringify({ cursor: cursorAfter(item) }),
-    });
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe(
+      `${reviewRoutes.activity.path}?cursor=${cursorAfter(item)}`,
+    );
     await expect(
       createReviewApi(async () =>
         json({ items: [{ id: "x" }], nextCursor: null }),

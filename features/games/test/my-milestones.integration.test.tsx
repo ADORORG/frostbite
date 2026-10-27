@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { ApiError } from "@ador/client-http";
+import { mintedPictureHref } from "@ador/shared/games";
 import { mount, settle, textOf } from "@ador/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
@@ -21,14 +22,8 @@ const mint = {
   mintedAt: "2026-10-17T12:34:56.000Z",
   transactionId: txId,
 };
-const show = (
-  list: MintedApi["list"],
-  picture: MintedApi["picture"] = async () => ({
-    reason: "no-picture",
-    status: "unavailable",
-  }),
-) =>
-  mount(<MyMilestones api={{ list, picture }} games={games} navigation={[]} />);
+const show = (list: MintedApi["list"]) =>
+  mount(<MyMilestones api={{ list }} games={games} navigation={[]} />);
 
 describe("the player's minted milestones page", () => {
   it("holds the shape of a collection while it loads, then shows each mint as a card to its game with the day, and no transaction", async () => {
@@ -90,63 +85,38 @@ describe("the player's minted milestones page", () => {
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
   });
 
-  it("shows the picture the platform has for a mint, asked for by its claim, and none where there is none", async () => {
-    const picture = vi.fn<MintedApi["picture"]>(async () => ({
-      contentType: "image/svg+xml",
-      data: "PHN2Zz48L3N2Zz4=",
-      edition: 3,
-      status: "ok",
-    }));
-    const container = await show(async () => ({ minted: [mint] }), picture);
+  it("points each card's image at the picture's address, keeps the stand-in until it has come, and shows it then", async () => {
+    const container = await show(async () => ({ minted: [mint] }));
     await settle(() => expect(container.querySelector("img")).not.toBeNull());
-    expect(picture).toHaveBeenCalledWith(mint.claimId);
     const image = container.querySelector("img");
-    expect(image?.getAttribute("src")).toBe(
-      "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=",
-    );
+    expect(image?.getAttribute("src")).toBe(mintedPictureHref(mint.claimId));
     expect(image?.getAttribute("alt")).toBe(milestone?.title);
-  });
-
-  it("names the edition once the picture has come, and not before", async () => {
-    let answer: (
-      value: Awaited<ReturnType<MintedApi["picture"]>>,
-    ) => void = () => undefined;
-    const container = await show(
-      async () => ({ minted: [mint] }),
-      () => new Promise((resolve) => (answer = resolve)),
-    );
-    await settle(() => expect(textOf(container)).toContain(milestone?.title));
-    expect(textOf(container)).not.toContain(mintedCopy.edition(3));
+    const art = () => container.querySelector(".minted-art");
+    expect(art()?.getAttribute("data-picture")).toBe("loading");
+    expect(art()?.querySelector(".arcade-preview")).not.toBeNull();
     expect(textOf(container)).not.toContain(mintedCopy.noPicture);
-    expect(
-      container.querySelector(".minted-art")?.getAttribute("data-picture"),
-    ).toBe("loading");
-    answer({
-      contentType: "image/svg+xml",
-      data: "PHN2Zz48L3N2Zz4=",
-      edition: 3,
-      status: "ok",
-    });
+    image?.dispatchEvent(new Event("load"));
     await settle(() =>
-      expect(textOf(container)).toContain(mintedCopy.edition(3)),
+      expect(art()?.getAttribute("data-picture")).toBe("ready"),
     );
-    expect(textOf(container)).not.toContain(mintedCopy.noPicture);
+    expect(art()?.querySelector(".arcade-preview")).toBeNull();
+    expect(container.querySelector("img")).not.toBeNull();
   });
 
   it("keeps the picture's place with a stand-in that says so when the picture cannot be had, and still shows the mint", async () => {
-    const refused = await show(async () => ({ minted: [mint] }));
-    await settle(() => expect(textOf(refused)).toContain(mintedCopy.noPicture));
-    expect(textOf(refused)).toContain(milestone?.title);
-    expect(refused.querySelector("img")).toBeNull();
-    expect(refused.querySelector(".minted-art .arcade-preview")).not.toBeNull();
-    const failing = await show(
-      async () => ({ minted: [mint] }),
-      async () => {
-        throw new ApiError("network", null, "down");
-      },
+    const container = await show(async () => ({ minted: [mint] }));
+    await settle(() => expect(container.querySelector("img")).not.toBeNull());
+    container.querySelector("img")?.dispatchEvent(new Event("error"));
+    await settle(() =>
+      expect(textOf(container)).toContain(mintedCopy.noPicture),
     );
-    await settle(() => expect(textOf(failing)).toContain(mintedCopy.noPicture));
-    expect(failing.querySelector("img")).toBeNull();
-    expect(textOf(failing)).not.toContain(mintedCopy.edition(1));
+    expect(textOf(container)).toContain(milestone?.title);
+    expect(container.querySelector("img")).toBeNull();
+    expect(
+      container.querySelector(".minted-art .arcade-preview"),
+    ).not.toBeNull();
+    expect(
+      container.querySelector(".minted-art")?.getAttribute("data-picture"),
+    ).toBe("none");
   });
 });

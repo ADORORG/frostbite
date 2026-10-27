@@ -58,15 +58,14 @@ describe("collections API client", () => {
     });
   });
 
-  it("reads a draft by id with a POST body, because the API has no path parameters", async () => {
+  it("reads a draft by id, named in the query string, because the API has no path parameters", async () => {
     const read = detail();
     const { api, fetchImpl } = apiWith(async () => json(read));
     await expect(api.read(read.collection.id)).resolves.toEqual(read);
-    expect(fetchImpl).toHaveBeenCalledWith("/api/v1/collection-drafts/read", {
-      body: JSON.stringify({ collectionId: read.collection.id }),
-      headers: { "content-type": "application/json" },
-      method: "POST",
-    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+      `/api/v1/collection-drafts/read?collectionId=${read.collection.id}`,
+      { headers: {}, method: "GET" },
+    );
   });
 
   it("saves with the revision it was based on", async () => {

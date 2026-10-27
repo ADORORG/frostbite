@@ -170,7 +170,7 @@ export const refreshGameClaimRoute = {
   path: "/api/v1/games/claims/refresh",
 } as const;
 export const listGameClaimsRoute = {
-  method: "POST",
+  method: "GET",
   operationId: "listGameClaims",
   path: "/api/v1/games/claims/list",
 } as const;

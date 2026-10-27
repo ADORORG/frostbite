@@ -42,13 +42,13 @@ const call = (fetchImpl: ReturnType<typeof vi.fn<FetchLike>>) => {
 };
 
 describe("the claim routes as the page reaches them", () => {
-  it("lists a game's claims with a POST of the game", async () => {
+  it("lists a game's claims with a GET naming the game", async () => {
     const { api: claims, fetchImpl } = api({ claims: [wire] });
     expect((await claims.list("arcade")).claims).toHaveLength(1);
     const sent = call(fetchImpl);
-    expect(sent.path).toBe("/api/v1/games/claims/list");
-    expect(sent.init?.method).toBe("POST");
-    expect(sent.body).toEqual({ gameId: "arcade" });
+    expect(sent.path).toBe("/api/v1/games/claims/list?gameId=arcade");
+    expect(sent.init?.method).toBe("GET");
+    expect(sent.init?.body).toBeUndefined();
     expect(sent.init?.signal).toBeInstanceOf(AbortSignal);
   });
 

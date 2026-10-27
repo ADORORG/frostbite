@@ -14,7 +14,7 @@ function json(body: object) {
 }
 
 describe("creator review api", () => {
-  it("posts the queue request to the contract's route and returns the validated page", async () => {
+  it("asks for the queue at the contract's route and returns the validated page", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(json(queuePage([])));
     const page = await createCreatorReviewApi(fetchImpl).queue({
       cursor: "c",
@@ -23,16 +23,26 @@ describe("creator review api", () => {
     });
     expect(page.items).toEqual([]);
     const [path, init] = fetchImpl.mock.calls[0] ?? [];
-    expect(path).toBe(creatorApplicationRoutes.reviewQueue.path);
     expect(init.method).toBe(creatorApplicationRoutes.reviewQueue.method);
-    expect(JSON.parse(init.body)).toEqual({
-      cursor: "c",
+    expect(path).toBe(
+      `${creatorApplicationRoutes.reviewQueue.path}?group=all&sort=name&cursor=c`,
+    );
+    expect(init.body).toBeUndefined();
+  });
+
+  it("names no cursor for the first page", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(json(queuePage([])));
+    await createCreatorReviewApi(fetchImpl).queue({
+      cursor: null,
       group: "all",
       sort: "name",
     });
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe(
+      `${creatorApplicationRoutes.reviewQueue.path}?group=all&sort=name`,
+    );
   });
 
-  it("posts the application id to the read route", async () => {
+  it("asks for an application by its id at the read route", async () => {
     const application = detail();
     const fetchImpl = vi.fn().mockResolvedValue(json({ application }));
     const result = await createCreatorReviewApi(fetchImpl).read(
@@ -40,10 +50,10 @@ describe("creator review api", () => {
     );
     expect(result.application.applicationId).toBe(application.applicationId);
     const [path, init] = fetchImpl.mock.calls[0] ?? [];
-    expect(path).toBe(creatorApplicationRoutes.reviewRead.path);
-    expect(JSON.parse(init.body)).toEqual({
-      applicationId: application.applicationId,
-    });
+    expect(path).toBe(
+      `${creatorApplicationRoutes.reviewRead.path}?applicationId=${application.applicationId}`,
+    );
+    expect(init.method).toBe("GET");
   });
 
   it("rejects a response the shared contract does not describe", async () => {

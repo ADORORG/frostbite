@@ -14,13 +14,13 @@ const answering = (body: object, status = 200) =>
   vi.fn<FetchLike>(async () => new Response(JSON.stringify(body), { status }));
 
 describe("the minted milestones route as the page reaches it", () => {
-  it("asks with a POST of nothing, and gives back the mints", async () => {
+  it("asks with a GET of nothing, and gives back the mints", async () => {
     const fetchImpl = answering({ minted: [mint] });
     expect(await createMintedApi(fetchImpl).list()).toEqual({ minted: [mint] });
     const [path, init] = fetchImpl.mock.calls[0] ?? [];
     expect(path).toBe("/api/v1/games/milestones/minted");
-    expect(init?.method).toBe("POST");
-    expect(JSON.parse(init?.body ?? "null")).toEqual({});
+    expect(init?.method).toBe("GET");
+    expect(init?.body).toBeUndefined();
   });
 
   it("refuses an answer that is not the contract's shape, rather than listing it", async () => {
@@ -31,32 +31,5 @@ describe("the minted milestones route as the page reaches it", () => {
 
   it("throws what the requester throws when the platform refuses", async () => {
     await expect(createMintedApi(answering({}, 500)).list()).rejects.toThrow();
-  });
-
-  it("asks for a picture with a POST of the claim, and gives back what the platform says", async () => {
-    const ok = {
-      contentType: "image/svg+xml",
-      data: "PHN2Zz48L3N2Zz4=",
-      edition: 2,
-      status: "ok",
-    };
-    const fetchImpl = answering(ok);
-    expect(await createMintedApi(fetchImpl).picture(mint.claimId)).toEqual(ok);
-    const [path, init] = fetchImpl.mock.calls[0] ?? [];
-    expect(path).toBe("/api/v1/games/milestones/picture");
-    expect(JSON.parse(init?.body ?? "null")).toEqual({ claimId: mint.claimId });
-  });
-
-  it("refuses a picture of a kind the contract does not show", async () => {
-    await expect(
-      createMintedApi(
-        answering({
-          contentType: "text/html",
-          data: "eA==",
-          edition: 1,
-          status: "ok",
-        }),
-      ).picture(mint.claimId),
-    ).rejects.toThrow();
   });
 });

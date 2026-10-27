@@ -193,7 +193,7 @@ export const listGameAdminTemplatesResponseSchema = z
 
 export const gameAdminRoutes = {
   list: {
-    method: "POST",
+    method: "GET",
     operationId: "listGameAdminSteps",
     path: "/api/v1/game-admin/list",
   },
@@ -218,7 +218,7 @@ export const gameAdminRoutes = {
     path: "/api/v1/game-admin/submit",
   },
   templates: {
-    method: "POST",
+    method: "GET",
     operationId: "listGameAdminTemplates",
     path: "/api/v1/game-admin/templates",
   },

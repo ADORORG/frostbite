@@ -231,6 +231,8 @@ export function createListStepsOperation(resolve: Resolve) {
         },
       } as const;
     },
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: listGameAdminStepsInputSchema,
     outputSchema: listGameAdminStepsResponseSchema,
     ...gameAdminRoutes.list,
@@ -268,6 +270,8 @@ export function createListTemplatesOperation(resolve: Resolve) {
         },
       } as const;
     },
+    cache: { kind: "no-store" },
+    input: "none",
     inputSchema: listGameAdminTemplatesInputSchema,
     outputSchema: listGameAdminTemplatesResponseSchema,
     ...gameAdminRoutes.templates,

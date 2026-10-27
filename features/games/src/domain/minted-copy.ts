@@ -1,7 +1,6 @@
 // What the player's collection of mints says. Minting is complete only when the network's records show it, so nothing here counts a
 // claim that is still on its way.
 export const mintedCopy = {
-  edition: (edition: number) => `Edition ${String(edition)}`,
   empty:
     "You have not minted a milestone yet. Earn one in a game and claim it.",
   failed: "Your milestones could not be loaded. Try again in a moment.",

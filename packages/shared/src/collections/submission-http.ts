@@ -54,7 +54,7 @@ export const collectionSubmissionListSchema = z
 
 export const submissionRoutes = {
   list: {
-    method: "POST",
+    method: "GET",
     operationId: "listCollectionSubmissions",
     path: "/api/v1/collection-submissions/list",
   },

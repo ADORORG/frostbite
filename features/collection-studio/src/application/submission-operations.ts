@@ -118,7 +118,8 @@ export function createListSubmissionsOperation(getService: Resolve) {
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "revalidate" },
+    input: "query",
     inputSchema: listCollectionSubmissionsInputSchema,
     outputSchema: collectionSubmissionListSchema,
     ...submissionRoutes.list,

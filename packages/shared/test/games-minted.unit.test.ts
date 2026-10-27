@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   getMintedPictureInputSchema,
-  getMintedPictureResponseSchema,
+  getMintedPictureFileSchema,
+  mintedPictureHref,
   listMintedMilestonesInputSchema,
   listMintedMilestonesResponseSchema,
   mintedMilestoneSchema,
@@ -41,34 +42,34 @@ describe("a minted milestone on the wire", () => {
   });
 });
 
-describe("the picture of a minted milestone on the wire", () => {
-  const ok = {
+describe("the picture of a minted milestone", () => {
+  const file = {
+    bytes: new Uint8Array([60, 115]),
     contentType: "image/svg+xml",
-    data: "PHN2Zz48L3N2Zz4=",
-    edition: 1,
-    status: "ok",
   };
 
-  it("accepts a picture, and a reason for having none", () => {
-    expect(getMintedPictureResponseSchema.safeParse(ok).success).toBe(true);
-    expect(
-      getMintedPictureResponseSchema.safeParse({
-        reason: "no-picture",
-        status: "unavailable",
-      }).success,
-    ).toBe(true);
+  it("is a file of a kind that is shown", () => {
+    expect(getMintedPictureFileSchema.safeParse(file).success).toBe(true);
   });
 
   it.each([
     [
       "a kind of picture that is not shown",
-      { ...ok, contentType: "text/html" },
+      { ...file, contentType: "text/html" },
     ],
-    ["no bytes", { ...ok, data: "" }],
-    ["an edition of nothing", { ...ok, edition: 0 }],
-    ["an unknown reason", { reason: "gone", status: "unavailable" }],
+    ["text for bytes", { ...file, bytes: "PHN2Zz4=" }],
+    ["anything more", { ...file, edition: 1 }],
   ])("refuses %s", (_name, value) => {
-    expect(getMintedPictureResponseSchema.safeParse(value).success).toBe(false);
+    expect(getMintedPictureFileSchema.safeParse(value).success).toBe(false);
+  });
+
+  it("is read at an address that names the claim and nothing else, encoded", () => {
+    expect(mintedPictureHref(mint.claimId)).toBe(
+      `/api/v1/games/milestones/picture?claimId=${mint.claimId}`,
+    );
+    expect(mintedPictureHref("a&b=c d")).toBe(
+      "/api/v1/games/milestones/picture?claimId=a%26b%3Dc+d",
+    );
   });
 
   it("asks about a claim by its identifier only", () => {

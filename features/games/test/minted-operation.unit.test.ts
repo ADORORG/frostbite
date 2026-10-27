@@ -4,7 +4,7 @@ import type {
   MintedPictureResult,
 } from "@ador/game-claims";
 import {
-  getMintedPictureResponseSchema,
+  getMintedPictureFileSchema,
   getMintedPictureRoute,
   listMintedMilestonesResponseSchema,
   listMintedMilestonesRoute,
@@ -62,19 +62,26 @@ describe("the picture of a minted milestone", () => {
   const operationFor = (picture: GameClaimsService["picture"]) =>
     createGetMintedPictureOperation(async () => ({ picture }));
 
-  it("is an authenticated, keyless POST on its contract route", () => {
-    expect(
-      operationFor(async () => ({ code: "not-found", ok: false })),
-    ).toMatchObject({
+  it("is an authenticated GET of a file on its contract route, kept by the browser for a day", () => {
+    const operation = operationFor(async () => ({
+      code: "not-found",
+      ok: false,
+    }));
+    expect(operation).toMatchObject({
       access: { kind: "authenticated" },
+      cache: { kind: "max-age", seconds: 86_400 },
+      files: ["image/svg+xml"],
       idempotency: "none",
+      input: "query",
       ...getMintedPictureRoute,
     });
+    expect(getMintedPictureRoute.method).toBe("GET");
   });
 
-  it("is sent as base64 text with its kind and edition, for the session's player and the claim asked about", async () => {
+  it("is the bytes and their kind, for the session's player and the claim asked about", async () => {
+    const bytes = new TextEncoder().encode("<svg></svg>");
     const picture = vi.fn(async (): Promise<MintedPictureResult> => ({
-      bytes: new TextEncoder().encode("<svg></svg>"),
+      bytes,
       contentType: "image/svg+xml",
       edition: 4,
       ok: true,
@@ -83,29 +90,28 @@ describe("the picture of a minted milestone", () => {
     expect(picture).toHaveBeenCalledExactlyOnceWith(userId, mint.claimId);
     expect(answer).toEqual({
       ok: true,
-      value: {
-        contentType: "image/svg+xml",
-        data: "PHN2Zz48L3N2Zz4=",
-        edition: 4,
-        status: "ok",
-      },
+      value: { bytes, contentType: "image/svg+xml" },
     });
     expect(
-      getMintedPictureResponseSchema.safeParse(answer.ok ? answer.value : null)
+      getMintedPictureFileSchema.safeParse(answer.ok ? answer.value : null)
         .success,
     ).toBe(true);
   });
 
-  it("is an answer with its reason when there is no picture to show", async () => {
-    const answer = await operationFor(async () => ({
-      code: "no-picture",
-      ok: false,
-    })).execute(ask, context);
-    expect(answer).toEqual({
-      ok: true,
-      value: { reason: "no-picture", status: "unavailable" },
-    });
-  });
+  it.each(["chain-unavailable", "no-picture", "not-found"] as const)(
+    "is a not-found that says why (%s) when there is no picture to show",
+    async (code) => {
+      const answer = await operationFor(async () => ({
+        code,
+        ok: false,
+      })).execute(ask, context);
+      expect(answer).toMatchObject({
+        error: "not_found",
+        ok: false,
+        reason: code,
+      });
+    },
+  );
 
   it("is refused, without asking the service, when nobody is signed in", async () => {
     const picture = vi.fn(async (): Promise<MintedPictureResult> => ({

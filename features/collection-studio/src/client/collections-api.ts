@@ -129,12 +129,12 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
       request(libraryRoute, libraryResponseSchema, options),
     listSubmissions: (collectionId, options = {}) =>
       request(submissionRoutes.list, collectionSubmissionListSchema, {
-        body: { collectionId },
+        query: { collectionId },
         ...options,
       }),
     read: (collectionId, options = {}) =>
       request(collectionRoutes.read, collectionDetailSchema, {
-        body: { collectionId },
+        query: { collectionId },
         ...options,
       }),
     removeItem: (input, options = {}) =>

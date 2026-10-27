@@ -77,13 +77,14 @@ describe("list older uploaded assets operation", () => {
     expect(list).toHaveBeenCalledExactlyOnceWith(userId, cursor);
   });
 
-  it("is an authenticated POST whose input is a cursor and nothing else, and whose output is the library's", () => {
+  it("is an authenticated, revalidated GET whose input is a cursor and nothing else, and whose output is the library's", () => {
     const operation = createListOlderUploadedAssetsOperation(vi.fn());
     expect(operation).toMatchObject({
       access: { kind: "authenticated" },
       idempotency: "none",
-      input: "json",
-      method: "POST",
+      cache: { kind: "revalidate" },
+      input: "query",
+      method: "GET",
       operationId: "listOlderUploadedAssets",
       path: "/api/v1/uploads/assets/older",
     });

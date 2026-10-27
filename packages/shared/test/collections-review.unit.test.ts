@@ -222,8 +222,14 @@ describe("submission readiness", () => {
   });
 });
 
+// Reading is a GET, so a browser can keep the answer; only these two change something.
+const writes: ReadonlySet<string> = new Set([
+  "decideCollectionReview",
+  "submitCollection",
+]);
+
 describe("review and submission routes", () => {
-  it("are POST operations whose ids and paths are unique and valid manifest routes", () => {
+  it("are operations whose ids and paths are unique and valid manifest routes", () => {
     const routes = [
       ...Object.values(submissionRoutes),
       ...Object.values(reviewRoutes),
@@ -233,7 +239,7 @@ describe("review and submission routes", () => {
     );
     expect(new Set(routes.map(({ path }) => path)).size).toBe(routes.length);
     for (const route of routes) {
-      expect(route.method).toBe("POST");
+      expect(route.method).toBe(writes.has(route.operationId) ? "POST" : "GET");
       expect(routeContributionSchema.safeParse(route).success).toBe(true);
     }
   });

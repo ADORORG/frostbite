@@ -77,7 +77,7 @@ export const libraryRoute = {
 } as const;
 
 export const libraryOlderRoute = {
-  method: "POST",
+  method: "GET",
   operationId: "listOlderUploadedAssets",
   path: "/api/v1/uploads/assets/older",
 } as const;

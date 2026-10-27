@@ -35,6 +35,9 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // rest of what a visitor who is not signed in does: a few tabs, or a shared address, must not make the pill say it does not know.
     getChainFees: perMinute(120),
     getChainIndexing: perMinute(120),
+    // One request per picture on the page, a few dozen at once for a player with many mints, each a read of the chain; a browser keeps
+    // the answer for a day, so a second visit asks for none. Counted apart so they do not use up the allowance for everything else read.
+    getMintedPicture: perMinute(300),
     findPlatformRoleCandidates: perMinute(30),
     grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),
@@ -66,6 +69,6 @@ export const rateLimits = rateLimitConfigSchema.parse({
     verifyWalletStepUp: perMinute(20),
   },
   read: perMinute(600),
-  version: 1,
+  version: 2,
   write: perMinute(120),
 });

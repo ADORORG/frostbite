@@ -130,8 +130,9 @@ export async function answerImages(page: Page) {
   );
 }
 
+// Answers a read of the platform's API. A read names what it asks for in its query string, so the route matches with or without one.
 export async function answer(page: Page, route: string, body: object) {
-  await page.route(`**/api/v1/${route}`, (request) =>
+  await page.route(new RegExp(`/api/v1/${route}(\\?.*)?$`, "u"), (request) =>
     request.fulfill({
       body: JSON.stringify(body),
       contentType: "application/json",

@@ -59,7 +59,8 @@ export function createListOlderUploadedAssetsOperation(
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "revalidate" },
+    input: "query",
     inputSchema: libraryOlderInputSchema,
     outputSchema: libraryResponseSchema,
     ...libraryOlderRoute,

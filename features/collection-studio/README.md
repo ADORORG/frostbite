@@ -32,18 +32,18 @@ so.
 Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, error copy, progress),
 `src/ui/hooks`, `src/ui/components`, and the surface files that compose them.
 
-| Operation               | Route                                    | Notes                                                                                    |
-| ----------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `createCollectionDraft` | `POST /api/v1/collection-drafts`         | Idempotency key required                                                                 |
-| `listCollectionDrafts`  | `GET /api/v1/collection-drafts`          | The caller's own, newest first                                                           |
-| `readCollectionDraft`   | `POST /api/v1/collection-drafts/read`    | Detail with signed previews; POST because the HTTP layer has no path or query parameters |
-| `saveCollectionDraft`   | `PUT /api/v1/collection-drafts`          | Must name `expectedRevision`                                                             |
-| `addCollectionItem`     | `POST /api/v1/collection-drafts/items`   | Idempotency key required                                                                 |
-| `updateCollectionItem`  | `PUT /api/v1/collection-drafts/items`    |                                                                                          |
-| `removeCollectionItem`  | `DELETE /api/v1/collection-drafts/items` | Removing what is gone succeeds                                                           |
+| Operation               | Route                                              | Notes                                                                                                |
+| ----------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `createCollectionDraft` | `POST /api/v1/collection-drafts`                   | Idempotency key required                                                                             |
+| `listCollectionDrafts`  | `GET /api/v1/collection-drafts`                    | The caller's own, newest first                                                                       |
+| `readCollectionDraft`   | `GET /api/v1/collection-drafts/read?collectionId=` | Detail with signed previews; named in the query string because the HTTP layer has no path parameters |
+| `saveCollectionDraft`   | `PUT /api/v1/collection-drafts`                    | Must name `expectedRevision`                                                                         |
+| `addCollectionItem`     | `POST /api/v1/collection-drafts/items`             | Idempotency key required                                                                             |
+| `updateCollectionItem`  | `PUT /api/v1/collection-drafts/items`              |                                                                                                      |
+| `removeCollectionItem`  | `DELETE /api/v1/collection-drafts/items`           | Removing what is gone succeeds                                                                       |
 
 | `submitCollection` | `POST /api/v1/collection-submissions` | Idempotency key required; names `expectedRevision` |
-| `listCollectionSubmissions` | `POST /api/v1/collection-submissions/list` | The creator's own submissions with decisions |
+| `listCollectionSubmissions` | `GET /api/v1/collection-submissions/list?collectionId=` | The creator's own submissions with decisions |
 
 Submitting freezes the collection (see `@ador/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with its history: when it was submitted and what each decision was, with the
 reviewers' feedback (never who decided or the private notes). Refusals:

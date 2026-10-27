@@ -41,7 +41,7 @@ export function createClaimsApi(
   return {
     list: (gameId) =>
       request(listGameClaimsRoute, listGameClaimsResponseSchema, {
-        body: { gameId },
+        query: { gameId },
         signal: AbortSignal.timeout(claimRequestTimeoutMs),
       }),
     refresh: (claimId) =>

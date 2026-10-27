@@ -172,7 +172,8 @@ export const creatorReviewQueueInputSchema = z
     cursor: z
       .string()
       .regex(/^[A-Za-z0-9_-]{8,400}$/u)
-      .nullable(),
+      .nullable()
+      .default(null),
     group: z.enum(creatorReviewGroups),
     sort: z.enum(creatorReviewSorts),
   })

@@ -28,8 +28,9 @@ describe("the administration routes as the page reaches them", () => {
     const result = await createGameAdminApi(fetchImpl).list("arcade");
     expect(result.steps).toHaveLength(1);
     expect(result.contract?.address).toBe("2:7");
-    expect(asked(fetchImpl)).toEqual([
-      [gameAdminRoutes.list.path, { gameId: "arcade" }],
+    expect(fetchImpl.mock.calls[0]).toEqual([
+      `${gameAdminRoutes.list.path}?gameId=arcade`,
+      expect.objectContaining({ method: "GET" }),
     ]);
   });
 
@@ -49,7 +50,10 @@ describe("the administration routes as the page reaches them", () => {
     );
     const result = await createGameAdminApi(fetchImpl).templates();
     expect(result.published[0]?.address).toBe("4:100");
-    expect(asked(fetchImpl)).toEqual([[gameAdminRoutes.templates.path, {}]]);
+    expect(fetchImpl.mock.calls[0]).toEqual([
+      gameAdminRoutes.templates.path,
+      expect.objectContaining({ method: "GET" }),
+    ]);
   });
 
   it("starts a step, sends it signed, and looks at it, each on its own route with its own body", async () => {

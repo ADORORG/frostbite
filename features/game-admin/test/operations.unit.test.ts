@@ -16,15 +16,13 @@ import {
 } from "./support/operations-stub.ts";
 
 describe("every administration operation", () => {
-  it("is a keyless POST on its contract route that needs the administration capability", () => {
+  it("is a keyless operation on its contract route that needs the administration capability, a GET where it only reads and never kept", () => {
     const s = stub();
     for (const [operation, route] of [
       [s.start, gameAdminRoutes.start],
       [s.submit, gameAdminRoutes.submit],
       [s.refresh, gameAdminRoutes.refresh],
       [s.record, gameAdminRoutes.record],
-      [s.list, gameAdminRoutes.list],
-      [s.templates, gameAdminRoutes.templates],
     ] as const)
       expect(operation).toMatchObject({
         access: { capability: gameAdminCapability, kind: "platform" },
@@ -32,6 +30,20 @@ describe("every administration operation", () => {
         input: "json",
         ...route,
       });
+    expect(s.list).toMatchObject({
+      access: { capability: gameAdminCapability, kind: "platform" },
+      cache: { kind: "no-store" },
+      idempotency: "none",
+      input: "query",
+      ...gameAdminRoutes.list,
+    });
+    expect(s.templates).toMatchObject({
+      access: { capability: gameAdminCapability, kind: "platform" },
+      cache: { kind: "no-store" },
+      idempotency: "none",
+      input: "none",
+      ...gameAdminRoutes.templates,
+    });
   });
 
   it("answers an unauthenticated call as such, and asks the service nothing", async () => {

@@ -80,7 +80,7 @@ describe("uploads API client", () => {
     });
   });
 
-  it("asks for the page after a cursor with a POST of the cursor alone", async () => {
+  it("asks for the page after a cursor with a GET naming the cursor alone", async () => {
     const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
     const { api, fetchImpl } = apiWith(async () =>
       json({ assets: [], nextCursor: null }),
@@ -90,9 +90,9 @@ describe("uploads API client", () => {
       nextCursor: null,
     });
     const [path, init] = fetchImpl.mock.calls[0] ?? [];
-    expect(path).toBe("/api/v1/uploads/assets/older");
-    expect(init?.method).toBe("POST");
-    expect(JSON.parse(init?.body ?? "")).toEqual({ before: cursor });
+    expect(path).toBe(`/api/v1/uploads/assets/older?before=${cursor}`);
+    expect(init?.method).toBe("GET");
+    expect(init?.body).toBeUndefined();
   });
 
   it("passes the abort signal through", async () => {

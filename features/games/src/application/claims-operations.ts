@@ -193,7 +193,8 @@ export function createListGameClaimsOperation(getService: Service) {
       return { ok: true, value: { claims: claims.map(toWireClaim) } } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "revalidate" },
+    input: "query",
     inputSchema: listGameClaimsInputSchema,
     outputSchema: listGameClaimsResponseSchema,
     ...listGameClaimsRoute,

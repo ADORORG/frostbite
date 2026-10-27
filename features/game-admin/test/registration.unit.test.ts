@@ -49,12 +49,12 @@ describe("game administration registration", () => {
         ({ method, operationId }) => `${method} ${operationId}`,
       ),
     ).toEqual([
-      "POST listGameAdminSteps",
+      "GET listGameAdminSteps",
       "POST recordGameAdminContract",
       "POST refreshGameAdminStep",
       "POST startGameAdminStep",
       "POST submitGameAdminStep",
-      "POST listGameAdminTemplates",
+      "GET listGameAdminTemplates",
     ]);
   });
 

@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
-import { post } from "../src/upload-api.ts";
 import {
   closeMatrix,
   passBreadcrumb,
@@ -101,31 +100,22 @@ test("only staff reach the pages and the routes: a reviewer is turned away, and 
   await expect(
     page.getByRole("heading", { name: "Staff clearance required" }),
   ).toBeVisible();
-  const denied = await post(page.request, baseURL, "/api/v1/game-admin/list", {
-    gameId: "sdk-explorer",
-  });
+  const denied = await page.request.get(
+    "/api/v1/game-admin/list?gameId=sdk-explorer",
+  );
   expect(denied.status()).toBe(403);
-  const deniedTemplates = await post(
-    page.request,
-    baseURL,
+  const deniedTemplates = await page.request.get(
     "/api/v1/game-admin/templates",
-    {},
   );
   expect(deniedTemplates.status()).toBe(403);
 
   const visitor = await browser.newContext({ baseURL });
-  const anonymous = await post(
-    visitor.request,
-    baseURL,
-    "/api/v1/game-admin/list",
-    { gameId: "sdk-explorer" },
+  const anonymous = await visitor.request.get(
+    "/api/v1/game-admin/list?gameId=sdk-explorer",
   );
   expect(anonymous.status()).toBe(401);
-  const anonymousTemplates = await post(
-    visitor.request,
-    baseURL,
+  const anonymousTemplates = await visitor.request.get(
     "/api/v1/game-admin/templates",
-    {},
   );
   expect(anonymousTemplates.status()).toBe(401);
   await visitor.close();

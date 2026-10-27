@@ -112,7 +112,8 @@ export function createQueueOperation(getService: Resolve) {
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: reviewQueueInputSchema,
     outputSchema: reviewQueueResponseSchema,
     ...reviewRoutes.queue,
@@ -150,7 +151,8 @@ export function createReadOperation(
       } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: readReviewSubmissionInputSchema,
     outputSchema: reviewDetailResponseSchema,
     ...reviewRoutes.read,
@@ -184,7 +186,8 @@ export function createActivityOperation(getService: Resolve) {
       return { ok: true, value: presentActivity(page) } as const;
     },
     idempotency: "none",
-    input: "json",
+    cache: { kind: "no-store" },
+    input: "query",
     inputSchema: reviewActivityInputSchema,
     outputSchema: reviewActivityResponseSchema,
     ...reviewRoutes.activity,

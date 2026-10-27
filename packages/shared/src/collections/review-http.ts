@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { commaSeparated } from "../http/index.ts";
 import { creatorApplicationStateSchema } from "../creator-admission/contracts.ts";
 import { uuidV7TextSchema } from "../identifiers/uuid-v7.ts";
 import { libraryAssetSchema } from "../uploads/library-contracts.ts";
@@ -55,7 +56,9 @@ export const reviewSubmissionSchema = collectionSubmissionSchema
 
 export const reviewQueueInputSchema = z
   .object({
-    states: z.array(submissionStateSchema).min(1).max(submissionStates.length),
+    states: commaSeparated(
+      z.array(submissionStateSchema).min(1).max(submissionStates.length),
+    ),
   })
   .strict();
 export const readReviewSubmissionInputSchema = z
@@ -81,7 +84,7 @@ export const reviewDetailResponseSchema = z
 
 export const reviewRoutes = {
   activity: {
-    method: "POST",
+    method: "GET",
     operationId: "listCollectionReviewActivity",
     path: "/api/v1/collection-reviews/activity",
   },
@@ -91,12 +94,12 @@ export const reviewRoutes = {
     path: "/api/v1/collection-reviews/decide",
   },
   queue: {
-    method: "POST",
+    method: "GET",
     operationId: "listCollectionReviewQueue",
     path: "/api/v1/collection-reviews/queue",
   },
   read: {
-    method: "POST",
+    method: "GET",
     operationId: "readCollectionReviewSubmission",
     path: "/api/v1/collection-reviews/read",
   },

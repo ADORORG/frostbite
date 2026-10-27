@@ -51,12 +51,12 @@ export const creatorApplicationRoutes = Object.freeze({
     path: "/api/v1/creator-application/review",
   },
   reviewQueue: {
-    method: "POST",
+    method: "GET",
     operationId: "listCreatorApplicationReviewQueue",
     path: "/api/v1/creator-application/review-queue",
   },
   reviewRead: {
-    method: "POST",
+    method: "GET",
     operationId: "readCreatorApplicationForReview",
     path: "/api/v1/creator-application/review-read",
   },

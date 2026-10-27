@@ -271,11 +271,22 @@ describe("the staff administration contract", () => {
     }
   });
 
-  it("has six POST routes under one prefix, and a page address per game", () => {
+  it("has six routes under one prefix, and a page address per game", () => {
     const routes = Object.values(gameAdminRoutes);
-    expect(routes.map((route) => route.method)).toEqual(
-      routes.map(() => "POST"),
-    );
+    // The two reads are GETs (so they can be kept); the four steps that change something are POSTs.
+    expect(
+      Object.entries(gameAdminRoutes).map(([name, route]) => [
+        name,
+        route.method,
+      ]),
+    ).toEqual([
+      ["list", "GET"],
+      ["record", "POST"],
+      ["refresh", "POST"],
+      ["start", "POST"],
+      ["submit", "POST"],
+      ["templates", "GET"],
+    ]);
     expect(routes).toHaveLength(6);
     expect(new Set(routes.map((route) => route.path)).size).toBe(6);
     expect(

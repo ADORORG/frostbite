@@ -22,11 +22,8 @@ describe("review API client", () => {
     ]);
     expect(result.items).toHaveLength(1);
     expect(fetchImpl).toHaveBeenCalledWith(
-      reviewRoutes.queue.path,
-      expect.objectContaining({
-        body: JSON.stringify({ states: ["submitted", "under-review"] }),
-        method: "POST",
-      }),
+      `${reviewRoutes.queue.path}?states=submitted%2Cunder-review`,
+      expect.objectContaining({ method: "GET" }),
     );
   });
 
@@ -36,10 +33,8 @@ describe("review API client", () => {
     const result = await createReviewApi(fetchImpl).read(detail.submission.id);
     expect(result.previews).toHaveLength(detail.previews.length);
     expect(fetchImpl).toHaveBeenCalledWith(
-      reviewRoutes.read.path,
-      expect.objectContaining({
-        body: JSON.stringify({ submissionId: detail.submission.id }),
-      }),
+      `${reviewRoutes.read.path}?submissionId=${detail.submission.id}`,
+      expect.objectContaining({ method: "GET" }),
     );
   });
 

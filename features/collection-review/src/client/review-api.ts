@@ -12,7 +12,7 @@ import {
   type ReviewSubmissionResponse,
   type SubmissionState,
 } from "@ador/shared/collections";
-import type { IdempotencyKey } from "@ador/shared/http";
+import { queryList, type IdempotencyKey } from "@ador/shared/http";
 
 export interface CallOptions {
   readonly signal?: AbortSignal;
@@ -45,7 +45,8 @@ export function createReviewApi(fetchImpl: FetchLike): ReviewApi {
   return {
     activity: (cursor, options = {}) =>
       request(reviewRoutes.activity, reviewActivityResponseSchema, {
-        body: { cursor },
+        // The first page has no cursor to name.
+        query: cursor === null ? {} : { cursor },
         ...options,
       }),
     decide: (input, options) =>
@@ -55,12 +56,12 @@ export function createReviewApi(fetchImpl: FetchLike): ReviewApi {
       }),
     queue: (states, options = {}) =>
       request(reviewRoutes.queue, reviewQueueResponseSchema, {
-        body: { states: [...states] },
+        query: { states: queryList(states) },
         ...options,
       }),
     read: (submissionId, options = {}) =>
       request(reviewRoutes.read, reviewDetailResponseSchema, {
-        body: { submissionId },
+        query: { submissionId },
         ...options,
       }),
   };

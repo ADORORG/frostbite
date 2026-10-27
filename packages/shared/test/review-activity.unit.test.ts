@@ -106,7 +106,8 @@ describe("activity contracts", () => {
     expect(reviewActivityInputSchema.safeParse({ cursor: "bad" }).success).toBe(
       false,
     );
-    expect(reviewActivityInputSchema.safeParse({}).success).toBe(false);
+    // A GET names no cursor for the first page: leaving it out means the same as null.
+    expect(reviewActivityInputSchema.parse({})).toEqual({ cursor: null });
   });
 
   it("answers with items and the cursor of the next page, or none at the end", () => {

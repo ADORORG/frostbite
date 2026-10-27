@@ -141,7 +141,7 @@ describe("asset library contracts", () => {
         .success,
     ).toBe(false);
     expect(libraryOlderRoute).toEqual({
-      method: "POST",
+      method: "GET",
       operationId: "listOlderUploadedAssets",
       path: "/api/v1/uploads/assets/older",
     });

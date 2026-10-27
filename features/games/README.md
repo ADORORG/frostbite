@@ -13,11 +13,11 @@ page connects it to the platform through `@ador/game-sdk`.
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
 `/games/milestones` ("My milestones", signed-in players only) lists what the player has minted across games, newest first, with the
-game, the milestone, the date (UTC) and the transaction with its explorer link. It is read from `POST /api/v1/games/milestones/minted`
+game, the milestone and the day (UTC), as a wall of square collectible cards (no transaction or edition is shown). It is read from `GET /api/v1/games/milestones/minted`
 (authenticated; the player is the session, the request carries nothing), and lists only claims the network's records show
 `complete`: a claim that is waiting, delayed or failed has minted nothing. The date is when the platform recorded the claim
 complete. Each entry shows the picture the chain serves for the item the claim minted (and the dock's claim list shows it for a complete
-claim), read from `POST /api/v1/games/milestones/picture` (authenticated; a claim that is not the player's is `not-found`). The
+claim), read from `GET /api/v1/games/milestones/picture?claimId=` (authenticated; a file, `image/svg+xml`, kept privately by the browser for a day and tied to the session cookie; a claim that is not the player's, or with no picture, is a `404` that says why and is never kept). The page points an image tag at that address; a stand-in of the same size holds the place while it loads and when it fails, and says so. The
 platform learns the item's id from the network when the claim's transaction is shown included, and shows the picture only if the item
 says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the card shows no picture, and
 never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
