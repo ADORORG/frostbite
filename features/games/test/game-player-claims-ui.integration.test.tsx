@@ -141,7 +141,9 @@ describe("claiming from the milestone list", () => {
       signed: expect.objectContaining({ payload: "{}.sig" }),
     });
     await until(() => text().includes("The network's records show it"));
-    expect(text()).toContain("Claim: Claimed");
+    expect(
+      document.querySelector('[data-claim-state="complete"]')?.textContent,
+    ).toContain("Claimed");
     expect(changes(reply)).toEqual([
       "awaiting-signature",
       "pending",

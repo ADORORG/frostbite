@@ -12,6 +12,7 @@
 @import "./styles/info-card.css";
 @import "./styles/catalog.css";
 @import "./styles/dock.css";
+@import "./styles/status-card.css";
 @import "./styles/wallet-widget.css";
 @import "./styles/chain-status.css";
 @import "./styles/popover.css";

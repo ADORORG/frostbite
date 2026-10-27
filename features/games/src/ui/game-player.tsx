@@ -159,8 +159,9 @@ export function GamePlayer({
                       ? undefined
                       : {
                           message: claimUi.message,
-                          start: (id) => void claimUi.start(id),
                           latestOf: claimUi.latestOf,
+                          review: claimUi.reopen,
+                          start: (id) => void claimUi.start(id),
                         }
                   }
                   milestones={game.milestones}

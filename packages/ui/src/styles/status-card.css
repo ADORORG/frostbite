@@ -1,0 +1,73 @@
+/* A card in a list: state at a glance on top, quiet reading under it, the one action apart at the bottom. The state is a dot and a word with
+   no border, so it is never mistaken for a button (buttons are the bordered, filled shapes). */
+.status-card {
+  display: grid;
+  gap: var(--arcade-space-2);
+  padding: var(--arcade-space-3) var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-inline-start: 0.375rem solid
+    var(--status-card-accent, var(--arcade-border-strong));
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+}
+.status-card[data-tone="done"] {
+  --status-card-accent: var(--arcade-mint);
+}
+.status-card[data-tone="waiting"] {
+  --status-card-accent: var(--arcade-yellow);
+}
+.status-card[data-tone="problem"] {
+  --status-card-accent: var(--arcade-pink);
+}
+.status-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--arcade-space-1) var(--arcade-space-3);
+}
+.status-card__title {
+  font-size: var(--arcade-text-lg);
+}
+.status-card__state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--arcade-space-2);
+  color: var(--status-card-accent, var(--arcade-text-muted));
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.status-card__state::before {
+  content: "";
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: currentcolor;
+}
+.status-card__body {
+  display: grid;
+  gap: var(--arcade-space-2);
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+}
+.status-card__body p {
+  margin: 0;
+}
+.status-card__body summary {
+  color: var(--arcade-cyan);
+  cursor: pointer;
+}
+.status-card__action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  padding-block-start: var(--arcade-space-2);
+}
+ul.milestone-cards {
+  display: grid;
+  gap: var(--arcade-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -105,3 +105,19 @@ export const unreachableCopy =
 // A claim is over when it took effect or never will; the page stops asking after it.
 export const isSettledClaim = (state: GameClaimState): boolean =>
   state === "complete" || state === "failed" || state === "expired";
+
+// A claim can be started again (or for the first time) when there is none, or the last one ended without taking effect.
+export const canStartClaim = (
+  latest: Pick<GameClaim, "state"> | null,
+): boolean =>
+  latest === null || latest.state === "failed" || latest.state === "expired";
+
+// How a claim's state looks on a card: finished, under way, or needing another try.
+export const claimTone = (
+  state: GameClaimState,
+): "done" | "problem" | "waiting" =>
+  state === "complete"
+    ? "done"
+    : state === "failed" || state === "expired"
+      ? "problem"
+      : "waiting";

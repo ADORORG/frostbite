@@ -176,7 +176,9 @@ describe("a milestone claimed before", () => {
     send(target, "ready", { sdkVersion: 1 }, "a");
     send(target, "milestones.unlock", { id: milestoneId }, "b");
     await flush();
-    expect(text()).toContain("Claim: Sent");
+    const card = document.querySelector('[data-claim-state="pending"]');
+    expect(card?.textContent).toContain("Sent");
+    expect(card?.textContent).toContain("View claim");
     expect(button("Claim ")).toBeUndefined();
   });
 });
@@ -200,8 +202,9 @@ describe("a claim that is taking long", () => {
     send(target, "ready", { sdkVersion: 1 }, "a");
     send(target, "milestones.unlock", { id: milestoneId }, "b");
     await flush();
-    expect(text()).toContain("Claim: Sent, delayed");
-    expect(text()).not.toContain("Claim: Sent,\u0020waiting");
+    expect(
+      document.querySelector('[data-claim-state="pending"]')?.textContent,
+    ).toContain("Sent, delayed");
     expect(text()).not.toContain("Failed");
     expect(button("Claim ")).toBeUndefined();
     expect(document.querySelector("[data-delayed='true']")).not.toBeNull();
