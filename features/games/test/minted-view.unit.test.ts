@@ -2,7 +2,7 @@ import type { MintedMilestone } from "@ador/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { createGameCatalog } from "../src/domain/catalog.ts";
-import { mintedOn, mintedRows } from "../src/domain/minted-view.ts";
+import { mintedDay, mintedRows } from "../src/domain/minted-view.ts";
 import { chains, rewardsGame } from "./support/template-game.ts";
 
 const [game] = createGameCatalog([rewardsGame], chains).list();
@@ -16,9 +16,11 @@ const mint = (over: Partial<MintedMilestone> = {}): MintedMilestone => ({
 });
 const href = (id: string) => `/games/${id}`;
 
-describe("the date of a mint", () => {
-  it("is the day and minute in UTC", () => {
-    expect(mintedOn("2026-10-17T12:34:56.000Z")).toBe("2026-10-17 12:34 UTC");
+describe("the day of a mint", () => {
+  it("is the day in UTC, not the reader's, so a late-evening mint reads the same everywhere", () => {
+    expect(mintedDay("2026-10-17T12:34:56.000Z")).toBe("17 Oct 2026");
+    expect(mintedDay("2026-10-17T23:59:59.000Z")).toBe("17 Oct 2026");
+    expect(mintedDay("2026-10-18T00:00:00.000Z")).toBe("18 Oct 2026");
   });
 });
 
@@ -30,9 +32,9 @@ describe("a minted milestone as a row", () => {
       gameHref: `/games/${rewardsGame.id}`,
       gameTitle: rewardsGame.title,
       milestoneTitle: rewardsGame.milestones[0]?.title,
-      mintedOn: "2026-10-17 12:34 UTC",
-      transactionId: "ab".repeat(32),
+      mintedDay: "17 Oct 2026",
     });
+    expect(row).not.toHaveProperty("transactionId");
   });
 
   it("keeps the order it was given", () => {

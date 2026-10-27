@@ -15,7 +15,7 @@ export function MintedPicture({
   readonly claimId: string;
 }) {
   const picture = useMintedPicture(claimId, api);
-  return picture === null ? null : (
+  return picture.kind === "ready" ? (
     <img alt={alt} className="minted-picture" src={picture.src} />
-  );
+  ) : null;
 }

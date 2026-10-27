@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { MintedApi } from "../src/client/minted-api.ts";
 import { createGameCatalog } from "../src/domain/catalog.ts";
 import { mintedCopy } from "../src/domain/minted-copy.ts";
+import { mintedPlaceholderCount } from "../src/domain/minted-view.ts";
 import { MyMilestones } from "../src/ui/my-milestones.tsx";
 import { chains, rewardsGame } from "./support/template-game.ts";
 
@@ -27,40 +28,43 @@ const show = (
     status: "unavailable",
   }),
 ) =>
-  mount(
-    <MyMilestones
-      api={{ list, picture }}
-      explorerTxUrl="https://explorer.test/tx/{id}"
-      games={games}
-      navigation={[]}
-    />,
-  );
+  mount(<MyMilestones api={{ list, picture }} games={games} navigation={[]} />);
 
 describe("the player's minted milestones page", () => {
-  it("says it is loading until the platform answers, then lists each mint with its date and a link to its transaction", async () => {
+  it("holds the shape of a collection while it loads, then shows each mint as a card to its game with the day, and no transaction", async () => {
     let answer: (value: { minted: (typeof mint)[] }) => void = () => undefined;
     const container = await show(
       () => new Promise((resolve) => (answer = resolve)),
     );
     expect(textOf(container)).toContain(mintedCopy.loading);
+    expect(container.querySelectorAll(".minted-waiting")).toHaveLength(
+      mintedPlaceholderCount,
+    );
+    // The empty places are for the eye only: a screen reader hears the loading lamp, not a list of nothing.
+    expect(
+      container.querySelector(".minted-waiting")?.closest("ul")?.ariaHidden,
+    ).toBe("true");
     answer({ minted: [mint] });
     await settle(() => expect(textOf(container)).toContain(milestone?.title));
-    expect(textOf(container)).toContain("2026-10-17 12:34 UTC");
+    expect(container.querySelector(".minted-waiting")).toBeNull();
+    expect(textOf(container)).toContain(mintedCopy.minted("17 Oct 2026"));
+    expect(textOf(container)).toContain(rewardsGame.title);
     expect(textOf(container)).not.toContain(mintedCopy.loading);
+    expect(container.innerHTML).not.toContain(txId);
+    // A square, whatever the picture is, so a card is the same size before and after it arrives.
     expect(
-      container.querySelector<HTMLAnchorElement>(`a[href$="${txId}"]`)?.href,
-    ).toBe(`https://explorer.test/tx/${txId}`);
-    expect(
-      container.querySelector<HTMLAnchorElement>(
-        `a[href="/games/${rewardsGame.id}"]`,
-      ),
-    ).not.toBeNull();
+      container.querySelector(".cover-card")?.getAttribute("data-ratio"),
+    ).toBe("square");
+    const links = container.querySelectorAll<HTMLAnchorElement>(
+      `a[href="/games/${rewardsGame.id}"]`,
+    );
+    expect(links.length).toBeGreaterThan(0);
   });
 
   it("says nothing has been minted, rather than showing an empty list", async () => {
     const container = await show(async () => ({ minted: [] }));
     await settle(() => expect(textOf(container)).toContain(mintedCopy.empty));
-    expect(container.querySelector("ul")).toBeNull();
+    expect(container.querySelector(".cover-grid")).toBeNull();
   });
 
   it("offers sign-in, and lists nothing, when the session has ended", async () => {
@@ -103,17 +107,46 @@ describe("the player's minted milestones page", () => {
     expect(image?.getAttribute("alt")).toBe(milestone?.title);
   });
 
-  it("shows no image, and still the mint, when the picture cannot be had", async () => {
+  it("names the edition once the picture has come, and not before", async () => {
+    let answer: (
+      value: Awaited<ReturnType<MintedApi["picture"]>>,
+    ) => void = () => undefined;
+    const container = await show(
+      async () => ({ minted: [mint] }),
+      () => new Promise((resolve) => (answer = resolve)),
+    );
+    await settle(() => expect(textOf(container)).toContain(milestone?.title));
+    expect(textOf(container)).not.toContain(mintedCopy.edition(3));
+    expect(textOf(container)).not.toContain(mintedCopy.noPicture);
+    expect(
+      container.querySelector(".minted-art")?.getAttribute("data-picture"),
+    ).toBe("loading");
+    answer({
+      contentType: "image/svg+xml",
+      data: "PHN2Zz48L3N2Zz4=",
+      edition: 3,
+      status: "ok",
+    });
+    await settle(() =>
+      expect(textOf(container)).toContain(mintedCopy.edition(3)),
+    );
+    expect(textOf(container)).not.toContain(mintedCopy.noPicture);
+  });
+
+  it("keeps the picture's place with a stand-in that says so when the picture cannot be had, and still shows the mint", async () => {
     const refused = await show(async () => ({ minted: [mint] }));
-    await settle(() => expect(textOf(refused)).toContain(milestone?.title));
+    await settle(() => expect(textOf(refused)).toContain(mintedCopy.noPicture));
+    expect(textOf(refused)).toContain(milestone?.title);
     expect(refused.querySelector("img")).toBeNull();
+    expect(refused.querySelector(".minted-art .arcade-preview")).not.toBeNull();
     const failing = await show(
       async () => ({ minted: [mint] }),
       async () => {
         throw new ApiError("network", null, "down");
       },
     );
-    await settle(() => expect(textOf(failing)).toContain(milestone?.title));
+    await settle(() => expect(textOf(failing)).toContain(mintedCopy.noPicture));
     expect(failing.querySelector("img")).toBeNull();
+    expect(textOf(failing)).not.toContain(mintedCopy.edition(1));
   });
 });

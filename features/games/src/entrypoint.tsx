@@ -84,11 +84,7 @@ export function createGamesEntrypoint(
         access: { kind: "authenticated" },
         path: myMilestonesPath,
         render: ({ navigation }) => (
-          <MyMilestones
-            explorerTxUrl={wallet.explorerTxUrl}
-            games={catalog.list()}
-            navigation={navigation}
-          />
+          <MyMilestones games={catalog.list()} navigation={navigation} />
         ),
       },
       {

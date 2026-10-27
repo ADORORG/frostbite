@@ -1,0 +1,48 @@
+/* A minted milestone's art: one square, whether the picture has come, is coming or is not to be had, so the wall never jumps. */
+.minted-art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  background: var(--arcade-ink);
+}
+.minted-art > img {
+  inline-size: 100%;
+  block-size: 100%;
+  padding: var(--arcade-space-3);
+  object-fit: contain;
+}
+/* The stand-in is drawn from the name, quieter than a real picture, and says it is a stand-in. */
+.minted-art[data-picture="none"] .arcade-preview {
+  opacity: 0.55;
+}
+.minted-art__caption {
+  position: absolute;
+  inset-inline: var(--arcade-space-2);
+  bottom: var(--arcade-space-2);
+  z-index: 1;
+  color: var(--arcade-text-subtle);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-align: center;
+  text-transform: uppercase;
+}
+.minted-art[data-picture="loading"] .arcade-preview {
+  animation: minted-breathe 1.6s ease-in-out infinite;
+}
+/* An empty place in the wall while the list is asked for: the shape of a card, so the page does not change size on arrival. */
+.minted-waiting {
+  aspect-ratio: 3 / 4;
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+}
+@keyframes minted-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .minted-art[data-picture="loading"] .arcade-preview {
+    animation: none;
+  }
+}
