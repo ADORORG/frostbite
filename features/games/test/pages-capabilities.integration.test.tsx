@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 import {
   gameSyncRoute,
   listGameClaimsRoute,
+  listMintedMilestonesRoute,
+  myMilestonesPath,
   refreshGameClaimRoute,
   startGameClaimRoute,
   startGameRunRoute,
@@ -100,7 +102,15 @@ describe("the games feature registration", () => {
     );
     expect(feature.manifest).toMatchObject({
       id: "games",
-      navigation: [{ area: "main", href: "/games", label: "Games" }],
+      navigation: [
+        { area: "main", href: "/games", label: "Games" },
+        {
+          access: { kind: "authenticated" },
+          area: "main",
+          href: myMilestonesPath,
+          label: "My milestones",
+        },
+      ],
       requiredProviderCapabilities: [],
       routes: [
         gameSyncRoute,
@@ -110,8 +120,13 @@ describe("the games feature registration", () => {
         submitGameClaimRoute,
         refreshGameClaimRoute,
         listGameClaimsRoute,
+        listMintedMilestonesRoute,
       ],
     });
+    // Only a signed-in player has milestones: the page is not public, so the platform sends everyone else to sign in.
+    expect(
+      feature.manifest.pages.find(({ path }) => path === myMilestonesPath),
+    ).toMatchObject({ access: { kind: "authenticated" } });
     const entrypoint = await feature.load({
       registeredFeatureCount: 1,
       registeredFeatureIds: ["games"],

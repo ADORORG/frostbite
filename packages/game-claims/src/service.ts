@@ -19,6 +19,7 @@ import type {
   ClaimChainPorts,
   ClaimView,
   GameClaimsDependencies,
+  MintedClaim,
   RefreshClaimResult,
   StartClaimResult,
   SubmitClaimResult,
@@ -225,6 +226,23 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
 
     async list(userId: string, gameId: string): Promise<readonly ClaimView[]> {
       return viewer.many(await repository.list(userId, gameId));
+    },
+
+    // What the player has minted across games: only claims the network's records show complete.
+    async minted(userId: string): Promise<readonly MintedClaim[]> {
+      return (await repository.listComplete(userId)).flatMap((claim) =>
+        claim.transactionId === null
+          ? []
+          : [
+              {
+                claimId: claim.id,
+                gameId: claim.gameId,
+                milestoneId: claim.milestoneId,
+                mintedAt: claim.updatedAt.toISOString(),
+                transactionId: claim.transactionId,
+              },
+            ],
+      );
     },
   };
 }

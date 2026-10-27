@@ -102,3 +102,12 @@ export type SubmitClaimResult =
 export type RefreshClaimResult =
   | { readonly claim: ClaimView; readonly ok: true }
   | { readonly code: "chain-unavailable" | "not-found"; readonly ok: false };
+
+// A claim the network's records show complete, as the player's list of what they minted has it.
+export interface MintedClaim {
+  readonly claimId: string;
+  readonly gameId: string;
+  readonly milestoneId: string;
+  readonly mintedAt: string;
+  readonly transactionId: string;
+}

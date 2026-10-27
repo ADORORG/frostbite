@@ -12,6 +12,12 @@ page connects it to the platform through `@ador/game-sdk`.
 `submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
+`/games/milestones` ("My milestones", signed-in players only) lists what the player has minted across games, newest first, with the
+game, the milestone, the date (UTC) and the transaction with its explorer link. It is read from `POST /api/v1/games/milestones/minted`
+(authenticated; the player is the session, the request carries nothing), and lists only claims the network's records show
+`complete`: a claim that is waiting, delayed or failed has minted nothing. The date is when the platform recorded the claim
+complete. The collectible's picture is not shown yet: a claim does not record the id of the item it minted.
+
 ## Onboarding a game (the template)
 
 1. Copy `games/sample-game` and write the game (see `docs/product/game-onboarding.md`, the full guide).

@@ -81,6 +81,8 @@ export interface GameClaimRepository {
   ): Promise<CreateResult>;
   get(userId: string, claimId: string): Promise<StoredClaim | null>;
   list(userId: string, gameId: string): Promise<readonly StoredClaim[]>;
+  // Every claim of the player's that the network's records show complete, in any game, the most recently completed first.
+  listComplete(userId: string): Promise<readonly StoredClaim[]>;
   update(
     userId: string,
     claimId: string,

@@ -6,7 +6,7 @@ import {
   sentAtAfter,
   trackedValues,
 } from "@ador/shared/chain";
-import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 
 import {
   settledStates,
@@ -143,6 +143,20 @@ export function createDrizzleGameClaimRepository(
             ),
           )
           .orderBy(gameMilestoneClaims.createdAt)
+      ).map(toClaim),
+
+    listComplete: async (userId) =>
+      (
+        await database
+          .select()
+          .from(gameMilestoneClaims)
+          .where(
+            and(
+              eq(gameMilestoneClaims.userId, userId),
+              eq(gameMilestoneClaims.state, "complete"),
+            ),
+          )
+          .orderBy(desc(gameMilestoneClaims.updatedAt))
       ).map(toClaim),
 
     update: (userId, claimId, decide) =>

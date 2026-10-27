@@ -17,6 +17,7 @@ export type {
   ClaimChainPorts,
   ClaimView,
   GameClaimsDependencies,
+  MintedClaim,
   RefreshClaimResult,
   StartClaimResult,
   SubmitClaimResult,

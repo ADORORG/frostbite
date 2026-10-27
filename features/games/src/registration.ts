@@ -4,12 +4,15 @@ import {
   gamePagePath,
   gameSyncRoute,
   listGameClaimsRoute,
+  listMintedMilestonesRoute,
+  myMilestonesPath,
   refreshGameClaimRoute,
   startGameClaimRoute,
   startGameRunRoute,
   submitGameClaimRoute,
   submitGameRunRoute,
   gamesNavigationLabel,
+  myMilestonesNavigationLabel,
   gamesPath,
   type GameManifest,
 } from "@ador/shared/games";
@@ -34,7 +37,12 @@ export function createGamesFeature(
 ) {
   return defineFeature({
     manifest: {
-      capabilities: ["api-routes", "navigation", "public-page"],
+      capabilities: [
+        "api-routes",
+        "authenticated-page",
+        "navigation",
+        "public-page",
+      ],
       dependencies: ["accounts"],
       id: "games",
       navigation: [
@@ -45,9 +53,17 @@ export function createGamesFeature(
           label: gamesNavigationLabel,
           order: 20,
         },
+        {
+          access: { kind: "authenticated" },
+          area: "main",
+          href: myMilestonesPath,
+          label: myMilestonesNavigationLabel,
+          order: 21,
+        },
       ],
       pages: [
         { access: { kind: "public" }, path: gamesPath },
+        { access: { kind: "authenticated" }, path: myMilestonesPath },
         { access: { kind: "public" }, path: gamePagePath },
       ],
       requiredDecisionGates: [],
@@ -60,6 +76,7 @@ export function createGamesFeature(
         submitGameClaimRoute,
         refreshGameClaimRoute,
         listGameClaimsRoute,
+        listMintedMilestonesRoute,
       ],
       version: "1.0.0",
     },

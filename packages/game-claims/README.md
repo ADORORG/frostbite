@@ -19,6 +19,8 @@ to a real chain yet**: it works through the chain-neutral ports (`@ador/chain`) 
 - `refresh(userId, claimId)`: looks at the chain once and moves the claim as far as the evidence allows. Safe to call as often
   as wanted (the host's job to poll, G7c).
 - `list(userId, gameId)`.
+- `minted(userId)`: the player's claims in every game that the network's records show `complete` (claim, game, milestone, the time it
+  was recorded complete, transaction id), the most recently completed first. Nothing in another state is listed.
 
 `createDrizzleGameClaimRepository(database, { clock })` stores claims in `ador.game_milestone_claims`.
 
