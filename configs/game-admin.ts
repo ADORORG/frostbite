@@ -14,7 +14,7 @@ export const gameAdminConfig = {
   explorerTxUrl: betaChain.explorerTxUrl,
   fees: {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
-    refreshMs: rewardsPolicy.indexingRefreshMs,
+    polling: rewardsPolicy.statusPolling,
   },
   drawingLimits: {
     maxAttributeLength: 4096,

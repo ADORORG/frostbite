@@ -14,7 +14,7 @@ const config = {
     slow: { approxMinutes: 250, targetBlocks: 25 },
   },
   followed: null,
-  refreshMs: 30_000,
+  polling: { forgetAfterMs: 600_000, refreshMs: 30_000 },
   syncWindowBlocks: 100,
 };
 

@@ -1,3 +1,4 @@
+import type { StatusPolling } from "@ador/feature-chain-status/api";
 import type { AdminChainPorts, RewardsPlan } from "@ador/game-admin";
 import type { DrawingPolicy } from "@ador/milestone-art";
 import type {
@@ -26,7 +27,7 @@ export interface GameAdminConfig {
   // The speed a step is offered at first, and how often the page asks the chain what each speed costs (milliseconds).
   readonly fees: {
     readonly defaultSpeed: FeeSpeed;
-    readonly refreshMs: number;
+    readonly polling: StatusPolling;
   };
   // The chain templates are published on, the templates that may be, which a game and its collectibles are made from, and the most
   // a game's contract may be created to accept.

@@ -26,6 +26,9 @@ const defaultFeeSpeed: FeeSpeed = "slow";
 // How long one reading of the chain is shared by everyone who asks, however it is shown (see `indexingReadingMs`, `statusReadings`).
 const readingSharedMs = 15_000;
 
+// The oldest reading of the chain status that is shown anywhere: the server stops serving one this old, and a page stops showing one this old.
+const statusMaxStaleMs = 10 * 60_000;
+
 // The block target of the default speed, for what is built without a choice.
 export const defaultFeeTargetBlocks = targetBlocksOf(
   feeSpeeds,
@@ -53,9 +56,10 @@ export const rewardsPolicy = {
   indexingReadingMs: readingSharedMs,
   // What the public status (the header pill, the fee speeds) shows of the chain: one reading is shared by every visitor for `freshMs`; if
   // the node then fails or is slow, the last reading is still shown, with its age, for up to `maxStaleMs`, and then not at all.
-  statusReadings: { freshMs: readingSharedMs, maxStaleMs: 10 * 60_000 },
-  // How often a page asks again how far the indexer has read. Longer than a reading is reused, so most asks cost the node nothing.
-  indexingRefreshMs: 30_000,
+  statusReadings: { freshMs: readingSharedMs, maxStaleMs: statusMaxStaleMs },
+  // How a page follows the chain status: it asks again every `refreshMs` (longer than a reading is reused, so most asks cost the node
+  // nothing), and stops showing a reading older than `forgetAfterMs`, the same limit the server serves by.
+  statusPolling: { forgetAfterMs: statusMaxStaleMs, refreshMs: 30_000 },
   // The sync bar spans this many of the latest blocks: an indexer this far behind or more shows as 0%, one at the tip as 100%. Over the whole
   // chain's height the bar would read 100% for any lag under a few thousand blocks.
   syncWindowBlocks: 100,

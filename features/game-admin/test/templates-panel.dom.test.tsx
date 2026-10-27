@@ -198,7 +198,11 @@ describe("choosing how fast a template is published", () => {
     }));
     const container = await mount(
       <FeeSettingsBoundary
-        settings={{ api: feesApi, defaultSpeed: "slow", refreshMs: 60_000 }}
+        settings={{
+          api: feesApi,
+          defaultSpeed: "slow",
+          polling: { forgetAfterMs: 600_000, refreshMs: 60_000 },
+        }}
       >
         <TemplatesPanel api={fake} />
       </FeeSettingsBoundary>,

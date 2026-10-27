@@ -157,7 +157,11 @@ describe("the fee speed picker", () => {
 describe("asking for the fee market", () => {
   const clock = { at: Date.parse(ok.observedAt) };
   function Reading({ api }: { readonly api: ChainStatusApi }) {
-    const market = useFeeQuotes({ api, now: () => clock.at, refreshMs: 20 });
+    const market = useFeeQuotes({
+      api,
+      now: () => clock.at,
+      polling: { forgetAfterMs: 400, refreshMs: 20 },
+    });
     return (
       <p>
         {market.status === "answered"

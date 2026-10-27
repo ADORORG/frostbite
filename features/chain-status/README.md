@@ -40,7 +40,9 @@ over the whole chain's height any lag under a few thousand blocks rounds to a fu
   good reading is still served, with its own `observedAt`, for up to `maxStaleMs`, and then not at all. A refresh that fails is logged by key.
   The services' own view (`cacheIndexing`, used to judge delay) never serves anything older than its time to live.
 - **Page:** a failed ask never blanks a good answer (`holdReading`): the pill keeps the last one, says "Last read HH:MM UTC; the platform could
-  not renew it just now" once it is two refreshes old, and says it does not know once it is twenty refreshes old.
+  not renew it just now" once it is two refreshes old, and says it does not know once it is older than `polling.forgetAfterMs`. That is the platform's own limit on serving an old reading
+  (`rewardsPolicy.statusReadings.maxStaleMs`), set once in `rewardsPolicy.statusPolling` and handed to the pill, the staff signer and the
+  player's claim, so the page and the server cannot disagree.
 - **Limits:** the two routes have their own rate-limit buckets (`getChainFees`, `getChainIndexing`), not the shared anonymous one.
 
 ## Answers

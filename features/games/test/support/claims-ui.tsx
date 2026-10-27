@@ -114,7 +114,7 @@ export const fees = {
     indexing: () => Promise.reject(new Error("not used")),
   },
   defaultSpeed: "slow" as const,
-  refreshMs: 60_000,
+  polling: { forgetAfterMs: 600_000, refreshMs: 60_000 },
 };
 
 // A player whose game has earned the milestone, with the claim routes and wallet given.

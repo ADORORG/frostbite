@@ -70,7 +70,10 @@ export const config = (): GameAdminConfig => ({
   chain: () => null,
   delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60_000 },
   explorerTxUrl: "https://explorer.test/tx/{id}",
-  fees: { defaultSpeed: "slow", refreshMs: 60_000 },
+  fees: {
+    defaultSpeed: "slow",
+    polling: { forgetAfterMs: 600_000, refreshMs: 60_000 },
+  },
   drawingLimits: { maxAttributeLength: 4096, maxDepth: 8, maxElements: 200 },
   rewards: {
     chain,

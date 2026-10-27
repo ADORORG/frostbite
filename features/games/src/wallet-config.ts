@@ -1,4 +1,7 @@
-import type { ChainStatusApi } from "@ador/feature-chain-status/api";
+import type {
+  ChainStatusApi,
+  StatusPolling,
+} from "@ador/feature-chain-status/api";
 import type { FeeSpeed } from "@ador/shared/chain";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
@@ -15,5 +18,5 @@ export interface ClaimFeeSettings {
   // Where the quotes come from; the platform's own route unless a test supplies another.
   readonly api?: ChainStatusApi;
   readonly defaultSpeed: FeeSpeed;
-  readonly refreshMs: number;
+  readonly polling: StatusPolling;
 }

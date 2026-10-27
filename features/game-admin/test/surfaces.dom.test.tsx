@@ -8,7 +8,10 @@ import { info } from "./support/fixtures.ts";
 
 const navigation = [] as const;
 const signingWallets = ["xverse"] as const;
-const fees = { defaultSpeed: "slow", refreshMs: 60_000 } as const;
+const fees = {
+  defaultSpeed: "slow",
+  polling: { forgetAfterMs: 600_000, refreshMs: 60_000 },
+} as const;
 // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
 const inApp = (page: React.ReactNode) => (
   <WalletProvider network="signet">{page}</WalletProvider>

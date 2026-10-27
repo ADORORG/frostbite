@@ -12,6 +12,8 @@ import {
   type ChainIndexing,
 } from "@ador/shared/chain";
 
+export type { StatusPolling } from "../domain/freshness.ts";
+
 // How long a look at the chain's status may take; it is a lamp, so a slow answer is not worth waiting for.
 export const indexingTimeoutMs = 5_000;
 

@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ShellStatusProvider
           status={
             <IndexingBadge
-              refreshMs={chainStatusConfig.refreshMs}
+              polling={chainStatusConfig.polling}
               syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
             />
           }

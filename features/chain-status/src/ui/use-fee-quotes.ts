@@ -3,7 +3,7 @@
 import type { ChainFees } from "@ador/shared/chain";
 import { useMemo } from "react";
 
-import { holdReading } from "../domain/freshness.ts";
+import { holdReading, type StatusPolling } from "../domain/freshness.ts";
 import { createChainStatusApi, type ChainStatusApi } from "../client/api.ts";
 import { usePolled } from "./use-polled.ts";
 
@@ -22,15 +22,15 @@ export type FeeMarket =
 export function useFeeQuotes(options: {
   readonly api?: ChainStatusApi;
   readonly now?: () => number;
-  readonly refreshMs: number;
+  readonly polling: StatusPolling;
 }): FeeMarket {
-  const { api: given, now = Date.now, refreshMs } = options;
+  const { api: given, now = Date.now, polling } = options;
   const api = useMemo(() => given ?? createChainStatusApi(), [given]);
   const held = holdReading(
-    usePolled((signal) => api.fees(signal), "fees", refreshMs),
+    usePolled((signal) => api.fees(signal), "fees", polling.refreshMs),
     (fees) => (fees.state === "ok" ? fees.observedAt : null),
     now(),
-    refreshMs,
+    polling,
   );
   return held.status === "held"
     ? { fees: held.data, stale: held.stale, status: "answered" }

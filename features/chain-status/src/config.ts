@@ -1,4 +1,6 @@
 import type { Aged } from "@ador/cache";
+
+import type { StatusPolling } from "./domain/freshness.ts";
 import type {
   DelayPolicy,
   FeeRate,
@@ -27,7 +29,7 @@ export interface ChainStatusConfig {
     readonly maxFeeSats: number;
   } | null;
   // How often a page's lamp asks again, in milliseconds.
-  readonly refreshMs: number;
+  readonly polling: StatusPolling;
   // How many blocks the sync bar spans (see `syncProgress`).
   readonly syncWindowBlocks: number;
 }

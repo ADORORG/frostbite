@@ -4,7 +4,10 @@ import {
   FeeSpeedChip,
   useFeeQuotes,
 } from "@ador/feature-chain-status/fee-picker";
-import type { ChainStatusApi } from "@ador/feature-chain-status/api";
+import type {
+  ChainStatusApi,
+  StatusPolling,
+} from "@ador/feature-chain-status/api";
 import type { FeeSpeed } from "@ador/shared/chain";
 import { Avatar, ArcadeTextField, shortenMiddle } from "@repo/ui/arcade";
 import { useState } from "react";
@@ -105,7 +108,7 @@ function SignerFee({ signer }: { readonly signer: Signer }) {
   return (
     <SignerFeeChip
       api={fees.api}
-      refreshMs={fees.refreshMs}
+      polling={fees.polling}
       signer={signer}
       speed={signer.feeSpeed}
     />
@@ -114,18 +117,18 @@ function SignerFee({ signer }: { readonly signer: Signer }) {
 
 function SignerFeeChip({
   api,
-  refreshMs,
+  polling,
   signer,
   speed,
 }: {
   readonly api: ChainStatusApi | undefined;
-  readonly refreshMs: number;
+  readonly polling: StatusPolling;
   readonly signer: Signer;
   readonly speed: FeeSpeed;
 }) {
   const market = useFeeQuotes({
     ...(api === undefined ? {} : { api }),
-    refreshMs,
+    polling,
   });
   return (
     <FeeSpeedChip market={market} onChange={signer.setFeeSpeed} value={speed} />

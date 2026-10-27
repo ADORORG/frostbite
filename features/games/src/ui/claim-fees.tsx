@@ -25,7 +25,7 @@ export function ClaimFees({
 }) {
   const market = useFeeQuotes({
     ...(api === undefined ? {} : { api }),
-    refreshMs: settings.refreshMs,
+    polling: settings.polling,
   });
   return <FeeSpeedChip market={market} onChange={onChange} value={value} />;
 }

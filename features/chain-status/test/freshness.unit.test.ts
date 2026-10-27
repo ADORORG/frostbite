@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { freshnessOf, holdReading } from "../src/domain/freshness.ts";
 
-const refreshMs = 30_000;
+const polling = { forgetAfterMs: 600_000, refreshMs: 30_000 };
 const readAt = "2026-10-27T12:00:00.000Z";
 const at = (afterMs: number) => Date.parse(readAt) + afterMs;
 type Answer = { readonly readAt: string | null };
@@ -17,15 +17,25 @@ const failed = (data: Answer | null): Resource<Answer, unknown> => ({
   status: "error",
 });
 const hold = (state: Resource<Answer, unknown>, afterMs: number) =>
-  holdReading(state, (answer) => answer.readAt, at(afterMs), refreshMs);
+  holdReading(state, (answer) => answer.readAt, at(afterMs), polling);
 
 describe("how old a reading is", () => {
-  it("is current under two refreshes, old from two, and gone from twenty", () => {
-    expect(freshnessOf(readAt, at(0), refreshMs)).toBe("current");
-    expect(freshnessOf(readAt, at(59_999), refreshMs)).toBe("current");
-    expect(freshnessOf(readAt, at(60_000), refreshMs)).toBe("old");
-    expect(freshnessOf(readAt, at(599_999), refreshMs)).toBe("old");
-    expect(freshnessOf(readAt, at(600_000), refreshMs)).toBe("gone");
+  it("is gone from the limit it is given, not from a number of refreshes", () => {
+    const longer = { forgetAfterMs: 1_800_000, refreshMs: 30_000 };
+    const shorter = { forgetAfterMs: 120_000, refreshMs: 30_000 };
+    expect(freshnessOf(readAt, at(600_000), longer)).toBe("old");
+    expect(freshnessOf(readAt, at(1_799_999), longer)).toBe("old");
+    expect(freshnessOf(readAt, at(1_800_000), longer)).toBe("gone");
+    expect(freshnessOf(readAt, at(119_999), shorter)).toBe("old");
+    expect(freshnessOf(readAt, at(120_000), shorter)).toBe("gone");
+  });
+
+  it("is current under two refreshes, old from two, and gone at the limit", () => {
+    expect(freshnessOf(readAt, at(0), polling)).toBe("current");
+    expect(freshnessOf(readAt, at(59_999), polling)).toBe("current");
+    expect(freshnessOf(readAt, at(60_000), polling)).toBe("old");
+    expect(freshnessOf(readAt, at(599_999), polling)).toBe("old");
+    expect(freshnessOf(readAt, at(600_000), polling)).toBe("gone");
   });
 });
 

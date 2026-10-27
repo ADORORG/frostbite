@@ -43,7 +43,7 @@ describe("the header badge", () => {
       <IndexingBadge
         api={api}
         now={now}
-        refreshMs={60_000}
+        polling={{ forgetAfterMs: 600_000, refreshMs: 60_000 }}
         syncWindowBlocks={100}
       />,
     );
@@ -64,7 +64,7 @@ describe("the header badge", () => {
         api={apiOf(indexing)}
         now={now}
         syncWindowBlocks={100}
-        refreshMs={20}
+        polling={{ forgetAfterMs: 400, refreshMs: 20 }}
       />,
     );
     await settle(() => expect(named(container)).toContain("Chain in sync"));
@@ -81,7 +81,7 @@ describe("the header badge", () => {
         api={apiOf(indexing)}
         now={now}
         syncWindowBlocks={100}
-        refreshMs={10}
+        polling={{ forgetAfterMs: 600_000, refreshMs: 10 }}
       />,
     );
     await settle(() => expect(indexing).toHaveBeenCalledTimes(1));
@@ -99,7 +99,7 @@ describe("the header badge", () => {
         })}
         now={now}
         syncWindowBlocks={100}
-        refreshMs={60_000}
+        polling={{ forgetAfterMs: 600_000, refreshMs: 60_000 }}
       />,
     );
     await settle(() =>
@@ -116,7 +116,7 @@ describe("the header badge", () => {
         api={apiOf(indexing)}
         now={now}
         syncWindowBlocks={100}
-        refreshMs={60_000}
+        polling={{ forgetAfterMs: 600_000, refreshMs: 60_000 }}
       />,
     );
     await settle(() => expect(indexing).toHaveBeenCalled());
@@ -132,7 +132,7 @@ describe("the header badge", () => {
       <IndexingBadge
         api={apiOf(indexing)}
         now={now}
-        refreshMs={20}
+        polling={{ forgetAfterMs: 400, refreshMs: 20 }}
         syncWindowBlocks={100}
       />,
     );

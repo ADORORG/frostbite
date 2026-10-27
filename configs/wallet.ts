@@ -43,7 +43,7 @@ export const walletAuthConfig = {
 export const gameWalletConfig = {
   fees: {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
-    refreshMs: rewardsPolicy.indexingRefreshMs,
+    polling: rewardsPolicy.statusPolling,
   },
   network: walletAuthConfig.network,
 } as const satisfies GameWalletConfig;
