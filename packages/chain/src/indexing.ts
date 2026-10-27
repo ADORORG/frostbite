@@ -1,3 +1,4 @@
+import { createReadCache } from "@ador/cache";
 import {
   isDelayed,
   isWaiting,
@@ -25,51 +26,32 @@ export async function readIndexing(
   }
 }
 
-// An observer that asks the chain how far its indexer has read, and what its fee market quotes, at most once in `ttlMs`, however many ask:
-// every page shows both, so uncached each would be a request to the node per visitor. Callers that arrive while a reading is on its way
-// share it, and a failed reading is never kept, so the next caller asks again.
+// An observer that asks the chain how far its indexer has read, where its tip is and what its fee market quotes at most once in `ttlMs`,
+// however many ask: every page shows these, so uncached each would be a request to the node per visitor. Callers that arrive while a
+// reading is on its way share it, and a failed reading is never kept, so the next caller asks again. Nothing older than `ttlMs` is
+// served, because services judge a wait by it; what a public page may show of an older reading is `createStatusReadings`.
 export function cacheIndexing(
   observer: ChainObserver,
   options: { readonly now: () => Date; readonly ttlMs: number },
 ): ChainObserver {
-  const readings = new Map<
-    ChainRef,
-    { readonly at: number; readonly reading: Promise<IndexingStatus> }
-  >();
-  const tips = new Map<
-    ChainRef,
-    { readonly at: number; readonly reading: Promise<number> }
-  >();
-  const quotes = new Map<
-    string,
-    { readonly at: number; readonly reading: Promise<readonly FeeRate[]> }
-  >();
-  const reused = <Key, Value>(
-    held: Map<Key, { readonly at: number; readonly reading: Promise<Value> }>,
-    key: Key,
-    ask: () => Promise<Value>,
-  ): Promise<Value> => {
-    const now = options.now().getTime();
-    const kept = held.get(key);
-    if (kept !== undefined && now - kept.at < options.ttlMs)
-      return kept.reading;
-    const reading = ask();
-    held.set(key, { at: now, reading });
-    reading.catch(() => {
-      if (held.get(key)?.reading === reading) held.delete(key);
-    });
-    return reading;
-  };
+  const { now, ttlMs } = options;
+  const policy = { freshMs: ttlMs, maxStaleMs: ttlMs };
+  const readings = createReadCache<IndexingStatus>({ now, policy });
+  const tips = createReadCache<number>({ now, policy });
+  const quotes = createReadCache<readonly FeeRate[]>({ now, policy });
   return {
     balance: (chain, address) => observer.balance(chain, address),
-    feeRates: (chain, targets) =>
-      reused(quotes, `${chain}|${targets.join(",")}`, () =>
-        observer.feeRates(chain, targets),
-      ),
-    indexing: (chain) =>
-      reused(readings, chain, () => observer.indexing(chain)),
+    feeRates: async (chain, targets) =>
+      (
+        await quotes.read(`${chain}|${targets.join(",")}`, () =>
+          observer.feeRates(chain, targets),
+        )
+      ).value,
+    indexing: async (chain) =>
+      (await readings.read(chain, () => observer.indexing(chain))).value,
     observe: (ref) => observer.observe(ref),
-    tip: (chain) => reused(tips, chain, () => observer.tip(chain)),
+    tip: async (chain) =>
+      (await tips.read(chain, () => observer.tip(chain))).value,
   };
 }
 

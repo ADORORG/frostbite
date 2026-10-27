@@ -190,6 +190,19 @@ describe("the network pill in the header", () => {
     expect(container.querySelector("progress")).toBeNull();
   });
 
+  it("says which readings are the last good ones the platform could not renew", async () => {
+    const both = await opened(
+      pill({ indexingStale: true, market: answered(ok, true) }),
+    );
+    expect(textOf(both).match(/could not renew it just now/gu)).toHaveLength(2);
+    const none = await opened(pill());
+    expect(textOf(none)).not.toContain("could not renew");
+    const feesOnly = await opened(pill({ market: answered(ok, true) }));
+    expect(
+      textOf(feesOnly).match(/could not renew it just now/gu),
+    ).toHaveLength(1);
+  });
+
   it("keeps the network's name and block from the indexer's answer alone, when the fees are not known either", async () => {
     const container = await mount(
       pill({

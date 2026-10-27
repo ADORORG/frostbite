@@ -34,6 +34,9 @@ and capability-gated admin navigation items.
 
 ## Invariants
 
+- The balance a tab reads is kept in the browser's `localStorage` for one `balanceRefreshMs` (`@ador/cache/expiring-store`): a new page or tab
+  shows it at once, tabs take up a reading another tab shared instead of each asking, and a player's own refresh always asks the platform.
+  A wallet that is disconnected or replaced leaves nothing behind. A stored value is checked against the balance schema and its age before use.
 - After a successful sign-out the widget calls `onSignedOut` (the app refreshes the server-rendered page, which sends a private
   page's visitor to sign in); a failed sign-out does not and says why. `unknown` (the server could not read the session) is shown as
   neither signed in nor out. While a remembered wallet is reconnecting the button says so, for at most

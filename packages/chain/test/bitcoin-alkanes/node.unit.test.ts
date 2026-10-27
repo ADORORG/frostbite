@@ -122,6 +122,19 @@ describe("the chain side", () => {
     ).rejects.toThrow("not a whole number");
   });
 
+  it("reads the tip's height with one call, not the two the tip itself takes", async () => {
+    const { calls, rpc } = scriptedRpc(tipAnswers);
+    expect(await createRpcNode(rpc).tipHeight()).toBe(971738);
+    expect(calls).toEqual([
+      { method: "esplora_blocks:tip:height", params: [] },
+    ]);
+    await expect(
+      createRpcNode(
+        scriptedRpc({ ...tipAnswers, "esplora_blocks:tip:height": "7" }).rpc,
+      ).tipHeight(),
+    ).rejects.toThrow("not a whole number");
+  });
+
   it("reads the hash of the block at a height, and refuses an answer that is not one", async () => {
     const genesis =
       "00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043";

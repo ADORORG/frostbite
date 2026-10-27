@@ -8,7 +8,12 @@ import {
 } from "@repo/ui/arcade";
 import type { ChainIndexing } from "@ador/shared/chain";
 
-import { lampFor, shortChain, unreachableLamp } from "../domain/copy.ts";
+import {
+  lampFor,
+  shortChain,
+  staleNote,
+  unreachableLamp,
+} from "../domain/copy.ts";
 import { feeChoices } from "../domain/fee-choices.ts";
 import { syncProgress } from "../domain/sync.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
@@ -20,11 +25,14 @@ const clock = (iso: string) => `${iso.slice(11, 19)} UTC`;
 // platform follows no chain, and no figure is drawn that was not read: an unknown is said as unknown.
 export function NetworkPill({
   indexing,
+  indexingStale = false,
   market,
   syncWindowBlocks,
 }: {
   // `null` is the platform not being reachable.
   readonly indexing: ChainIndexing | null;
+  // The indexing answer is the last good one, which the platform could not renew.
+  readonly indexingStale?: boolean;
   readonly market: FeeMarket;
   // How many blocks the sync bar spans (see `syncProgress`).
   readonly syncWindowBlocks: number;
@@ -78,6 +86,11 @@ export function NetworkPill({
         </span>
       </div>
       <p className="network-panel__detail">{lamp.detail}</p>
+      {indexingStale && reading !== null ? (
+        <p className="network-panel__detail" role="status">
+          {staleNote(reading.observedAt)}
+        </p>
+      ) : null}
       {reading === null ? null : (
         <div className="network-panel__sync">
           <ArcadeProgress
@@ -98,6 +111,9 @@ export function NetworkPill({
             {choices.notes.map((note) => (
               <small key={note}>{note}</small>
             ))}
+            {market.status === "answered" && market.stale ? (
+              <small role="status">{staleNote(fees.observedAt)}</small>
+            ) : null}
             <small>
               {`Read ${clock(fees.observedAt)}. Rates are the chain's own quotes and move with demand; waits are estimates. You see the exact fee before you sign.`}
             </small>

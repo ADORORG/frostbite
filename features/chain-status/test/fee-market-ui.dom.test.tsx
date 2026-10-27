@@ -22,6 +22,15 @@ describe("the fee speed picker", () => {
     ...container.querySelectorAll<HTMLInputElement>("input[type=radio]"),
   ];
 
+  it("says the quotes are the last good ones when the platform could not renew them", async () => {
+    const stale = await mount(picker({ market: answered(ok, true) }));
+    expect(textOf(stale)).toContain(
+      "Last read 12:00:00 UTC; the platform could not renew it just now.",
+    );
+    const current = await mount(picker());
+    expect(textOf(current)).not.toContain("could not renew");
+  });
+
   it("tells the rates without a block when the tip could not be read, and still offers every speed", async () => {
     const withoutTip = { ...ok, tipHeight: undefined };
     const container = await mount(picker({ market: answered(withoutTip) }));
@@ -146,12 +155,13 @@ describe("the fee speed picker", () => {
 });
 
 describe("asking for the fee market", () => {
+  const clock = { at: Date.parse(ok.observedAt) };
   function Reading({ api }: { readonly api: ChainStatusApi }) {
-    const market = useFeeQuotes({ api, refreshMs: 60_000 });
+    const market = useFeeQuotes({ api, now: () => clock.at, refreshMs: 20 });
     return (
       <p>
         {market.status === "answered"
-          ? `answered ${market.fees.state}`
+          ? `answered ${market.fees.state}${market.stale ? " stale" : ""}`
           : market.status}
       </p>
     );
@@ -173,5 +183,32 @@ describe("asking for the fee market", () => {
       <Reading api={apiWith(() => Promise.reject(new Error("offline")))} />,
     );
     await settle(() => expect(textOf(container)).toBe("unreachable"));
+  });
+
+  it("keeps the last good market when a later ask fails, as stale once it is old, and says it does not know once it is too old", async () => {
+    clock.at = Date.parse(ok.observedAt);
+    const fees = vi
+      .fn<ChainStatusApi["fees"]>()
+      .mockResolvedValueOnce(ok)
+      .mockRejectedValue(new Error("offline"));
+    const container = await mount(<Reading api={apiWith(fees)} />);
+    await settle(() => expect(textOf(container)).toBe("answered ok"));
+    await settle(() => expect(fees.mock.calls.length).toBeGreaterThan(1));
+    expect(textOf(container)).toBe("answered ok");
+    clock.at += 40;
+    await settle(() => expect(textOf(container)).toBe("answered ok stale"));
+    clock.at += 400;
+    await settle(() => expect(textOf(container)).toBe("unreachable"));
+  });
+
+  it("does not call an answer old that names no time", async () => {
+    clock.at = Date.parse(ok.observedAt) + 10_000_000;
+    const fees = vi
+      .fn<ChainStatusApi["fees"]>()
+      .mockResolvedValueOnce({ chain: "Bitcoin signet", state: "unavailable" })
+      .mockRejectedValue(new Error("offline"));
+    const container = await mount(<Reading api={apiWith(fees)} />);
+    await settle(() => expect(fees.mock.calls.length).toBeGreaterThan(1));
+    expect(textOf(container)).toBe("answered unavailable");
   });
 });

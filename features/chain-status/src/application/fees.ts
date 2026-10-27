@@ -15,10 +15,7 @@ import type { ChainStatusConfig } from "../config.ts";
 // anyone. A chain that cannot be asked, or that quotes nothing for a speed, is reported as unavailable: a rate is never guessed, and a
 // stale one is never passed off as current.
 export function createFeesOperation(
-  config: Pick<
-    ChainStatusConfig,
-    "smallestStepVbytes" | "feeSpeeds" | "now"
-  > & {
+  config: Pick<ChainStatusConfig, "smallestStepVbytes" | "feeSpeeds"> & {
     readonly followed: Pick<
       NonNullable<ChainStatusConfig["followed"]>,
       "displayName" | "feeRates" | "maxFeeSats" | "tipHeight"
@@ -29,11 +26,11 @@ export function createFeesOperation(
     access: { kind: "public" },
     applicationErrors: [],
     execute: async () => {
-      const { smallestStepVbytes, feeSpeeds: policy, followed, now } = config;
+      const { smallestStepVbytes, feeSpeeds: policy, followed } = config;
       if (followed === null) return { ok: true, value: { state: "none" } };
       try {
         // The rates need only the fee market; where the tip is (not how far the indexer has read) is told when it can be.
-        const [rates, tipHeight] = await Promise.all([
+        const [{ readAt, value: rates }, tipHeight] = await Promise.all([
           followed.feeRates(
             feeSpeeds.map((speed) => targetBlocksOf(policy, speed)),
           ),
@@ -53,7 +50,7 @@ export function createFeesOperation(
           value: {
             chain: followed.displayName,
             maxFeeSats: followed.maxFeeSats,
-            observedAt: now().toISOString(),
+            observedAt: readAt.toISOString(),
             quotes,
             state: "ok",
             ...(tipHeight === null ? {} : { tipHeight }),

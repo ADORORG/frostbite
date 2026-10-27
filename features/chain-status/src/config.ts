@@ -1,3 +1,4 @@
+import type { Aged } from "@ador/cache";
 import type {
   DelayPolicy,
   FeeRate,
@@ -8,8 +9,6 @@ import type {
 // What the platform needs to tell anyone how far a chain's indexer has read: the chain it follows (none, where it follows no chain,
 // and then nothing is shown), what counts as far behind, and how often a page asks again.
 export interface ChainStatusConfig {
-  // When a reading is told to have been taken.
-  readonly now: () => Date;
   readonly delay: Pick<DelayPolicy, "maxLagBlocks">;
   // How large the smallest step is, in virtual bytes: only to tell whether any step could afford a speed (never shown as a cost).
   readonly smallestStepVbytes: number;
@@ -19,7 +18,7 @@ export interface ChainStatusConfig {
   // asked.
   readonly followed: {
     readonly displayName: string;
-    feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
+    feeRates(targets: readonly number[]): Promise<Aged<readonly FeeRate[]>>;
     indexing(): Promise<IndexingStatus>;
     // The height of the chain's tip alone, asked when the indexer cannot be, so a failing indexer does not hide the block or the fees.
     tipHeight(): Promise<number>;

@@ -21,6 +21,9 @@ const rates = [
   { satPerVb: 9, targetBlocks: 1 },
 ];
 // An everyday step of 200 vB may pay up to 1,000 sats: the usual rates are within that, the 9 sat/vB one is not.
+// When the quotes were read: the response says this, never the moment it was asked for.
+const readAt = new Date("2026-10-23T11:58:30.000Z");
+const aged = <Value>(value: Value) => ({ readAt, value });
 const limit = { smallestStepVbytes: 200, maxFeeSats: 1_000 };
 const status = {
   chain: "bip122:00000000da84f2bafbbc53dee25a72ae",
@@ -34,7 +37,7 @@ const followed = (
   > = {},
 ) => ({
   displayName: "Bitcoin testnet4",
-  feeRates: async () => rates,
+  feeRates: async () => aged(rates),
   tipHeight: async () => status.tipHeight,
   maxFeeSats: limit.maxFeeSats,
   ...over,
@@ -44,7 +47,6 @@ const answer = (value: Parameters<typeof createFeesOperation>[0]["followed"]) =>
     smallestStepVbytes: limit.smallestStepVbytes,
     feeSpeeds,
     followed: value,
-    now: () => new Date(status.observedAt),
   }).execute({}, context);
 
 describe("the chain fees route", () => {
@@ -53,7 +55,6 @@ describe("the chain fees route", () => {
       smallestStepVbytes: limit.smallestStepVbytes,
       feeSpeeds,
       followed: null,
-      now: () => new Date(status.observedAt),
     });
     expect(operation).toMatchObject({
       access: { kind: "public" },
@@ -68,7 +69,7 @@ describe("the chain fees route", () => {
   });
 
   it("quotes every speed at its policy's block target with its wait, and says where the chain is", async () => {
-    const asked = vi.fn(async () => rates);
+    const asked = vi.fn(async () => aged(rates));
     const result = await answer(followed({ feeRates: asked }));
     expect(asked).toHaveBeenCalledWith([25, 6, 3, 1]);
     expect(result).toEqual({
@@ -76,7 +77,7 @@ describe("the chain fees route", () => {
       value: {
         chain: "Bitcoin testnet4",
         maxFeeSats: 1_000,
-        observedAt: status.observedAt,
+        observedAt: readAt.toISOString(),
         quotes: [
           {
             approxMinutes: 250,
@@ -120,7 +121,9 @@ describe("the chain fees route", () => {
       { satPerVb: 588_235.294, targetBlocks: 3 },
       { satPerVb: 588_235.294, targetBlocks: 1 },
     ];
-    const result = await answer(followed({ feeRates: async () => distorted }));
+    const result = await answer(
+      followed({ feeRates: async () => aged(distorted) }),
+    );
     const quotes =
       result.ok && result.value.state === "ok" ? result.value.quotes : [];
     expect(
@@ -141,7 +144,7 @@ describe("the chain fees route", () => {
     );
     expect(result).toMatchObject({
       ok: true,
-      value: { observedAt: status.observedAt, state: "ok" },
+      value: { observedAt: readAt.toISOString(), state: "ok" },
     });
     expect(result.ok && "tipHeight" in result.value).toBe(false);
     if (result.ok) chainFeesSchema.parse(result.value);
@@ -160,7 +163,7 @@ describe("the chain fees route", () => {
       ),
     ).toEqual(unavailable);
     expect(
-      await answer(followed({ feeRates: async () => rates.slice(1) })),
+      await answer(followed({ feeRates: async () => aged(rates.slice(1)) })),
     ).toEqual(unavailable);
   });
 });

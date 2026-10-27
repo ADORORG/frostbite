@@ -1,6 +1,8 @@
 import { join } from "node:path";
 
+import type { Aged } from "@ador/cache";
 import { cacheIndexing } from "@ador/chain/indexing";
+import { createStatusReadings } from "@ador/chain/status-readings";
 import { InvalidAddressError, type AddressBalance } from "@ador/chain/ports";
 import {
   createConfiguredRegistry,
@@ -52,8 +54,9 @@ export interface RewardsChain {
     // What an address holds on the chain (see `ChainObserver.balance`).
     balance(address: string): Promise<AddressBalance>;
     readonly displayName: string;
-    // What the chain's fee market quotes for each block target.
-    feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
+    // What the chain's fee market quotes for each block target, with when it was read: a reading a failing node could not renew is
+    // served, aged, for a while.
+    feeRates(targets: readonly number[]): Promise<Aged<readonly FeeRate[]>>;
     indexing(): Promise<IndexingStatus>;
     // The height of the chain's tip alone (see `ChainStatusConfig`).
     tipHeight(): Promise<number>;
@@ -205,6 +208,19 @@ export function createRewardsChain(
   const configured = configuredChain(environment, platform, beta, feeApi);
   const registry = createConfiguredRegistry([configured]);
   const ports = portsOf(registry, platform, served);
+  // What the public status shows is read from the node itself, one reading for every visitor, and kept for a while when the node fails.
+  const status = createStatusReadings(
+    registry.port(served, "observer"),
+    served,
+    {
+      now: platform.now,
+      onRefreshFailed: (key) =>
+        platform.warn?.(
+          `The chain status could not refresh its ${key} reading; the last one is shown.`,
+        ),
+      policy: rewardsPolicy.statusReadings,
+    },
+  );
   const offered = registry.broadcastAllowed(served)
     ? { funding: feeCeiling(configured, environment.maxFeeSats), ports }
     : null;
@@ -224,9 +240,9 @@ export function createRewardsChain(
       },
       balance: (address) => ports.observer.balance(served, address),
       displayName: configured.config.displayName,
-      feeRates: (targets) => ports.observer.feeRates(served, targets),
-      indexing: () => ports.observer.indexing(served),
-      tipHeight: () => ports.observer.tip(served),
+      feeRates: status.feeRates,
+      indexing: status.indexing,
+      tipHeight: status.tipHeight,
       maxFeeSats: ceilingSats(environment.maxFeeSats),
     },
   };

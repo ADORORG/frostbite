@@ -10,6 +10,7 @@
     "./bitcoin-alkanes": "./src/bitcoin-alkanes/adapter.ts",
     "./configured": "./src/configured.ts",
     "./indexing": "./src/indexing.ts",
+    "./status-readings": "./src/status-readings.ts",
     "./ports": "./src/ports.ts",
     "./registry": "./src/registry.ts",
     "./wallet-signing": "./src/bitcoin-alkanes/wallet-signing.ts"
@@ -23,6 +24,7 @@
     "test:regtest": "vitest run --config vitest.regtest.config.ts"
   },
   "dependencies": {
+    "@ador/cache": "workspace:*",
     "@ador/shared": "workspace:*",
     "@alkanes/ts-sdk": "https://pkg.alkanes.build/dist/@alkanes/ts-sdk?v=0.1.6-669e7c0",
     "@bitcoinerlab/secp256k1": "1.2.0",

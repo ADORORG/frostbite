@@ -3,6 +3,7 @@
 import { type FeeSpeed } from "@ador/shared/chain";
 import { SegmentedChoice } from "@repo/ui/arcade";
 
+import { staleNote } from "../domain/copy.ts";
 import { speedNames } from "../domain/fee-copy.ts";
 import { feeChoices } from "../domain/fee-choices.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
@@ -74,6 +75,11 @@ export function FeeSpeedPicker({
           {note}
         </small>
       ))}
+      {market.stale ? (
+        <small className="fee-picker__note" role="status">
+          {staleNote(fees.observedAt)}
+        </small>
+      ) : null}
       <small className="fee-picker__note">
         Rates are the chain&apos;s quotes
         {fees.tipHeight === undefined

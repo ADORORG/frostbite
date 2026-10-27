@@ -23,6 +23,9 @@ assertFeeSpeedPolicy(feeSpeeds);
 // The speed a step or claim is built at when no one chose another.
 const defaultFeeSpeed: FeeSpeed = "slow";
 
+// How long one reading of the chain is shared by everyone who asks, however it is shown (see `indexingReadingMs`, `statusReadings`).
+const readingSharedMs = 15_000;
+
 // The block target of the default speed, for what is built without a choice.
 export const defaultFeeTargetBlocks = targetBlocksOf(
   feeSpeeds,
@@ -47,7 +50,10 @@ export const rewardsPolicy = {
   feeSpeeds,
   // How long one reading of the indexer is reused. Every page of the site shows it, so the node is asked at most once in this time
   // however many people are looking; a reading is never older than this.
-  indexingReadingMs: 15_000,
+  indexingReadingMs: readingSharedMs,
+  // What the public status (the header pill, the fee speeds) shows of the chain: one reading is shared by every visitor for `freshMs`; if
+  // the node then fails or is slow, the last reading is still shown, with its age, for up to `maxStaleMs`, and then not at all.
+  statusReadings: { freshMs: readingSharedMs, maxStaleMs: 10 * 60_000 },
   // How often a page asks again how far the indexer has read. Longer than a reading is reused, so most asks cost the node nothing.
   indexingRefreshMs: 30_000,
   // The sync bar spans this many of the latest blocks: an indexer this far behind or more shows as 0%, one at the tip as 100%. Over the whole

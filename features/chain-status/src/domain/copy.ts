@@ -8,6 +8,10 @@ export interface IndexingLampView {
   readonly tone: StatusTone;
 }
 
+// Said wherever a reading the platform could not renew is shown, so an old number is never taken for a current one.
+export const staleNote = (readAt: string): string =>
+  `Last read ${readAt.slice(11, 19)} UTC; the platform could not renew it just now.`;
+
 const blocks = (count: number) => `${count} block${count === 1 ? "" : "s"}`;
 
 export const unreachableLamp: IndexingLampView = {

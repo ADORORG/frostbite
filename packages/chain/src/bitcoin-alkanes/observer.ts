@@ -32,18 +32,18 @@ export function createObserver(
       servedChain(chains, chain).node.feeRates(targets),
     indexing: async (chain) => {
       const { node } = servedChain(chains, chain);
-      const [tip, indexedHeight] = await Promise.all([
-        node.tip(),
+      const [tipHeight, indexedHeight] = await Promise.all([
+        node.tipHeight(),
         node.indexedHeight(),
       ]);
       return {
         chain,
         indexedHeight,
         observedAt: options.now().toISOString(),
-        tipHeight: tip.height,
+        tipHeight,
       };
     },
-    tip: async (chain) => (await servedChain(chains, chain).node.tip()).height,
+    tip: async (chain) => servedChain(chains, chain).node.tipHeight(),
     observe: async (ref: TransactionRef): Promise<Observation> => {
       const { node } = servedChain(chains, ref.chain);
       const observedAt = options.now().toISOString();

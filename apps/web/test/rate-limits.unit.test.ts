@@ -1,3 +1,5 @@
+import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
+import { resolveRateLimit } from "@ador/shared/http";
 import { describe, expect, it } from "vitest";
 
 import { rateLimits } from "../../../configs/rate-limits";
@@ -24,6 +26,23 @@ describe("the limits on signing in", () => {
       expect(limit).toBeDefined();
       expect(limit?.limit).toBeLessThanOrEqual(20);
       expect(limit?.limit).toBeLessThan(rateLimits.anonymous.limit);
+    },
+  );
+});
+
+// Every open page asks both public chain routes about twice a minute, and so does every tab: they are counted apart from the rest of what
+// someone not signed in does, and allow more than the anonymous default, so a few tabs or a shared address do not make the status unknown.
+describe("the limits on the public chain status", () => {
+  it.each([chainFeesRoute, chainIndexingRoute])(
+    "$operationId has its own bucket, above the anonymous default",
+    ({ method, operationId }) => {
+      const resolved = resolveRateLimit(rateLimits, {
+        authenticated: false,
+        method,
+        operationId,
+      });
+      expect(resolved.bucket).toBe(operationId);
+      expect(resolved.policy.limit).toBeGreaterThan(rateLimits.anonymous.limit);
     },
   );
 });

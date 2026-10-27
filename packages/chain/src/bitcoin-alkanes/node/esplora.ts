@@ -38,6 +38,8 @@ export interface EsploraClient {
   // The transaction as the node sees it, or null when it has never heard of it.
   transaction(txid: string): Promise<NodeTransaction | null>;
   tip(): Promise<ChainTip>;
+  // The tip's height alone: one call where `tip` makes two, for what needs no hash.
+  tipHeight(): Promise<number>;
   utxos(address: string): Promise<readonly NodeUtxo[]>;
 }
 
@@ -85,6 +87,11 @@ async function feeRatesFor(
 }
 
 export function createEsploraClient(rpc: JsonRpc): EsploraClient {
+  const tipHeight = async (): Promise<number> =>
+    wholeNumberOf(
+      await rpc.call("esplora_blocks:tip:height", []),
+      "tip height",
+    );
   return {
     blockHash: async (height) => {
       const hash = textOf(
@@ -144,11 +151,9 @@ export function createEsploraClient(rpc: JsonRpc): EsploraClient {
     },
     tip: async () => ({
       hash: textOf(await rpc.call("esplora_blocks:tip:hash", []), "tip hash"),
-      height: wholeNumberOf(
-        await rpc.call("esplora_blocks:tip:height", []),
-        "tip height",
-      ),
+      height: await tipHeight(),
     }),
+    tipHeight,
     utxos: async (address) =>
       listOf(
         await rpc.call("esplora_address::utxo", [address]),

@@ -14,7 +14,7 @@ const served = (tip: number, indexed: number) =>
         network: "mainnet",
         node: fakeNode({
           indexedHeight: () => Promise.resolve(indexed),
-          tip: () => Promise.resolve({ hash: "cc".repeat(32), height: tip }),
+          tipHeight: () => Promise.resolve(tip),
         }),
       },
     ],
@@ -56,8 +56,7 @@ describe("how far the indexer has read", () => {
             network: "mainnet",
             node: fakeNode({
               indexedHeight: () => Promise.reject(new Error("indexer down")),
-              tip: () =>
-                Promise.resolve({ hash: "cc".repeat(32), height: 326_770 }),
+              tipHeight: () => Promise.resolve(326_770),
             }),
           },
         ],

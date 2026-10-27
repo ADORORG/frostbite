@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@ador/auth": "workspace:*",
+    "@ador/cache": "workspace:*",
     "@ador/authorization": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",

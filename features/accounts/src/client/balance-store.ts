@@ -1,3 +1,4 @@
+import type { ExpiringStore } from "@ador/cache/expiring-store";
 import type { Requester } from "@ador/client-http";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 
@@ -41,14 +42,20 @@ export interface BalanceSnapshot {
   readonly state: BalanceState;
 }
 
+const keyOf = (target: BalanceTarget) => `${target.network}:${target.address}`;
+
 // A wallet's balance, as a small store. It asks only while the menu is open and a wallet is connected: once when
 // it opens, then every `intervalMs`, plus whenever the player asks. A reading belongs to one wallet on one network;
 // a different wallet starts from nothing, and an answer that arrives for a wallet that has been replaced is dropped.
+// With a `cache` (readings the tabs of this browser share, kept for one interval) a reading another tab or an earlier page took
+// is shown at once and not asked for again until it is an interval old; a player's own ask always goes to the platform.
 export function createBalanceStore(dependencies: {
+  readonly cache?: ExpiringStore<BalanceReading>;
   readonly intervalMs: number;
+  readonly now?: () => Date;
   readonly request: Requester;
 }) {
-  const { intervalMs, request } = dependencies;
+  const { cache, intervalMs, now = () => new Date(), request } = dependencies;
   let target: BalanceTarget | null = null;
   let open = false;
   let reading: BalanceReading | null = null;
@@ -85,6 +92,7 @@ export function createBalanceStore(dependencies: {
         };
         reason = null;
         state = "ready";
+        cache?.write(keyOf(asking), { readAt: now(), value: reading });
       } else {
         reason = answer.reason;
         state = reading === null ? "unavailable" : "stale";
@@ -98,12 +106,28 @@ export function createBalanceStore(dependencies: {
     publish();
   }
 
+  // Takes up a reading the browser holds that is younger than an interval, instead of asking.
+  function adopt(): boolean {
+    if (target === null || cache === undefined) return false;
+    const held = cache.read(keyOf(target));
+    if (held === null) return false;
+    reading = held.value;
+    reason = null;
+    state = "ready";
+    publish();
+    return true;
+  }
+
+  function ask() {
+    if (!adopt()) void refresh();
+  }
+
   function schedule() {
     if (timer !== null) clearInterval(timer);
     timer = null;
     if (!open || target === null) return;
-    void refresh();
-    timer = setInterval(() => void refresh(), intervalMs);
+    ask();
+    timer = setInterval(ask, intervalMs);
   }
 
   return {
@@ -119,6 +143,8 @@ export function createBalanceStore(dependencies: {
         next?.network === target?.network
       )
         return;
+      // A wallet that is no longer connected leaves nothing of its balance in the browser.
+      if (target !== null) cache?.remove(keyOf(target));
       target = next;
       reading = null;
       reason = null;

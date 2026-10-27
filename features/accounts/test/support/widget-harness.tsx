@@ -102,6 +102,8 @@ beforeAll(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 });
 beforeEach(() => {
+  // The browser's storage outlives a test: a balance one test read must not be shown to the next.
+  localStorage.clear();
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);

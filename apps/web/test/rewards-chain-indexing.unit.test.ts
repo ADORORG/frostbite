@@ -98,14 +98,25 @@ describe("how far the rewards chain's indexer has read", () => {
     expect(ask()).toHaveLength(2);
   });
 
-  it("is the same cached reading the services' observer gives, so a service and the lamp never ask twice", async () => {
-    const { asked, platform } = node({ indexed: 10, tip: 12 });
+  it("keeps the last good reading for the lamp while the node fails, up to the policy's limit, but never gives a service one older than a reading lasts", async () => {
+    const { clock, down, platform } = node({ indexed: 10, tip: 12 });
     const rewards = createRewardsChain(environment, platform);
-    await rewards?.followed.indexing();
-    await rewards?.chain(beta)?.ports.observer.indexing(beta);
-    expect(
-      asked.filter((method) => method === "metashrew_height"),
-    ).toHaveLength(1);
+    const followed = rewards?.followed;
+    const services = rewards?.chain(beta)?.ports.observer;
+    expect((await followed?.indexing())?.tipHeight).toBe(12);
+    expect((await services?.indexing(beta))?.tipHeight).toBe(12);
+    down.value = true;
+    clock.now = new Date(
+      clock.now.getTime() + rewardsPolicy.statusReadings.freshMs,
+    );
+    // The lamp still has the last good reading, which says when it was read; a service does not get it.
+    const shown = await followed?.indexing();
+    expect(shown?.tipHeight).toBe(12);
+    await expect(services?.indexing(beta)).rejects.toThrow();
+    clock.now = new Date(
+      clock.now.getTime() + rewardsPolicy.statusReadings.maxStaleMs,
+    );
+    await expect(followed?.indexing()).rejects.toThrow();
   });
 
   it("rejects when the node cannot be asked, and does not remember the failure", async () => {

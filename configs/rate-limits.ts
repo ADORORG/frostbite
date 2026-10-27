@@ -31,6 +31,10 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // manual one with room to spare.
     getWalletBalance: perMinute(30),
     // Changing who holds a platform role is rare and sensitive; finding a person to change is a lookup that names one account at a time.
+    // Public and asked by every open page about every 30 seconds (and twice that when the page asks both), so they are not counted with the
+    // rest of what a visitor who is not signed in does: a few tabs, or a shared address, must not make the pill say it does not know.
+    getChainFees: perMinute(120),
+    getChainIndexing: perMinute(120),
     findPlatformRoleCandidates: perMinute(30),
     grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),

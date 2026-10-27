@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@ador/cache": "workspace:*",
     "@ador/chain": "workspace:*",
     "@ador/feature-accounts": "workspace:*",
     "@ador/feature-chain-status": "workspace:*",

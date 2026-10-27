@@ -16,8 +16,9 @@ export const ok: Extract<ChainFees, { state: "ok" }> = {
   state: "ok",
   tipHeight: 157_401,
 };
-export const answered = (fees: ChainFees): FeeMarket => ({
+export const answered = (fees: ChainFees, stale = false): FeeMarket => ({
   fees,
+  stale,
   status: "answered",
 });
 // The market testnet4 had on 2026-10-23: every target under 13 blocks quoted at 588,235 sat/vB, which no step can pay.

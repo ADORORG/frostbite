@@ -14,7 +14,6 @@ const config = {
     slow: { approxMinutes: 250, targetBlocks: 25 },
   },
   followed: null,
-  now: () => new Date(),
   refreshMs: 30_000,
   syncWindowBlocks: 100,
 };

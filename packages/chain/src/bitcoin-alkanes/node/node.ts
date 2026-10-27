@@ -50,7 +50,7 @@ export function createRpcNode(rpc: JsonRpc, fees?: FeeSource): AlkanesNode {
     trace: indexer.trace,
     view: async (target, opcode, inputs, transaction) =>
       indexer.view({
-        height: (await esplora.tip()).height,
+        height: await esplora.tipHeight(),
         inputs,
         opcode,
         target,

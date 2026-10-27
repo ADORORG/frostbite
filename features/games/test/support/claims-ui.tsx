@@ -77,7 +77,7 @@ export const fees = {
     fees: async () => ({
       chain: "Bitcoin signet",
       maxFeeSats: 500_000,
-      observedAt: "2026-10-23T12:00:00.000Z",
+      observedAt: new Date().toISOString(),
       quotes: [
         {
           approxMinutes: 250,

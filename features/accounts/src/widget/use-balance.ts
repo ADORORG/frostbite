@@ -1,10 +1,20 @@
 "use client";
 
+import { createExpiringStore } from "@ador/cache/expiring-store";
 import { createRequester, sameOriginFetch } from "@ador/client-http";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { balanceReadingSchema } from "../balance/contract.ts";
 import { createBalanceStore } from "../client/balance-store.ts";
 import type { WalletConnection } from "../client/wallet-session.ts";
+
+function browserStorage(): Storage | null {
+  try {
+    return typeof window === "undefined" ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+}
 
 // Whether the tab is showing, so a balance is not asked for in a background tab.
 function usePageVisible(): boolean {
@@ -33,6 +43,14 @@ export function useBalance(input: {
   const store = useMemo(
     () =>
       createBalanceStore({
+        cache: createExpiringStore({
+          maxAgeMs: intervalMs,
+          now: () => new Date(),
+          prefix: "ador:balance",
+          schema: balanceReadingSchema,
+          // Storage is the browser's: absent while rendering on the server, and possibly refused (a private window, blocked data).
+          storage: browserStorage(),
+        }),
         intervalMs,
         request: createRequester(sameOriginFetch),
       }),

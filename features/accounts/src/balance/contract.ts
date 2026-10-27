@@ -19,17 +19,19 @@ export const walletBalanceRequestSchema = z.strictObject({
   network: walletNetworkSchema,
 });
 
+// A number the platform got from its data source, and when. Also the shape the browser keeps between page loads.
+export const balanceReadingSchema = z.strictObject({
+  asOf: z.iso.datetime(),
+  // Waiting for its first confirmation: counted apart, because a step does not spend it and it could still be replaced.
+  pendingSats: z.int().min(0).max(maxSatoshis),
+  // Confirmed, so spendable.
+  satoshis: z.int().min(0).max(maxSatoshis),
+});
+
 // Told honestly in two states: a number the platform got from its data source, or why there is none. Never a zero
 // standing in for "unknown".
 export const walletBalanceResponseSchema = z.discriminatedUnion("status", [
-  z.strictObject({
-    asOf: z.iso.datetime(),
-    // Waiting for its first confirmation: counted apart, because a step does not spend it and it could still be replaced.
-    pendingSats: z.int().min(0).max(maxSatoshis),
-    // Confirmed, so spendable.
-    satoshis: z.int().min(0).max(maxSatoshis),
-    status: z.literal("ready"),
-  }),
+  balanceReadingSchema.extend({ status: z.literal("ready") }),
   z.strictObject({
     reason: z.enum(["not-configured", "source-failed"]),
     status: z.literal("unavailable"),

@@ -33,6 +33,16 @@ A failing indexer leaves the fees and the block number shown; `/chain/indexing` 
 never waits for the indexer. The sync bar spans the last `syncWindowBlocks` blocks (`rewardsPolicy`), so 40 blocks behind reads 60%, not 100%;
 over the whole chain's height any lag under a few thousand blocks rounds to a full bar.
 
+## Keeping readings (`@ador/cache`)
+
+- **Server:** the fee rates, the tip and the indexer's progress are read through `createStatusReadings` (`@ador/chain/status-readings`), built on
+  `@ador/cache`: one reading is shared by every visitor for `rewardsPolicy.statusReadings.freshMs`; when the node is slow or failing the last
+  good reading is still served, with its own `observedAt`, for up to `maxStaleMs`, and then not at all. A refresh that fails is logged by key.
+  The services' own view (`cacheIndexing`, used to judge delay) never serves anything older than its time to live.
+- **Page:** a failed ask never blanks a good answer (`holdReading`): the pill keeps the last one, says "Last read HH:MM UTC; the platform could
+  not renew it just now" once it is two refreshes old, and says it does not know once it is twenty refreshes old.
+- **Limits:** the two routes have their own rate-limit buckets (`getChainFees`, `getChainIndexing`), not the shared anonymous one.
+
 ## Answers
 
 `none` (no chain followed: nothing is shown), `unavailable` (a chain is followed and could not be asked: neutral, never green and never
