@@ -26,6 +26,13 @@ step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/s
 - `<CostOverview asset baseUnits detail?>` (same entry): the cost of a built transaction, told wherever a person is about to act on the chain. A fee in satoshis (`btc`) is shown as sats, then the rate it was priced at, the speed with its wait and about how large the transaction is (fee ÷ rate); any other asset is its amount and name. `detail` is the `feeDetail` the builder put on the summary.
 - The lamp itself is the shared `StatusLamp` (`@repo/ui/arcade`) in its compact form, so another status (a queue, a provider) reuses it.
 
+## Independent readings
+
+The fee rates, the chain's tip and the indexer's height are three readings, each asked on its own (`ChainObserver.feeRates`, `.tip`, `.indexing`).
+A failing indexer leaves the fees and the block number shown; `/chain/indexing` then answers `unavailable` with the `tipHeight`, and `/chain/fees`
+never waits for the indexer. The sync bar spans the last `syncWindowBlocks` blocks (`rewardsPolicy`), so 40 blocks behind reads 60%, not 100%;
+over the whole chain's height any lag under a few thousand blocks rounds to a full bar.
+
 ## Answers
 
 `none` (no chain followed: nothing is shown), `unavailable` (a chain is followed and could not be asked: neutral, never green and never

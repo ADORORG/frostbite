@@ -154,6 +154,7 @@ function ports(): ClaimChainPorts {
         chainFailure.observe
           ? Promise.reject(new Error("the node is down"))
           : observer.observe(ref),
+      tip: (...asked) => observer.tip(...asked),
     },
     rewards: {
       claimed: async (...asked) =>

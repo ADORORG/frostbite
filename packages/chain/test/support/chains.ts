@@ -58,6 +58,7 @@ export const silentObserver: ChainObserver = {
   feeRates: () => Promise.reject(new Error("not used")),
   indexing: () => Promise.reject(new Error("not used")),
   observe: () => Promise.reject(new Error("not used")),
+  tip: () => Promise.reject(new Error("not used")),
 };
 
 export function fakeAdapter(

@@ -25,6 +25,7 @@ describe("the chain indexing route through the shared HTTP boundary", () => {
       followed: {
         displayName: "Bitcoin signet",
         indexing: async () => reading(103),
+        tipHeight: () => Promise.reject(new Error("not used")),
       },
     });
     const response = await executeHttpOperation(operation, request, {
@@ -44,6 +45,7 @@ describe("the chain indexing route through the shared HTTP boundary", () => {
       followed: {
         displayName: "Bitcoin signet",
         indexing: () => Promise.reject(new Error("the node is down")),
+        tipHeight: () => Promise.reject(new Error("the node is down")),
       },
     });
     const response = await executeHttpOperation(operation, request, {

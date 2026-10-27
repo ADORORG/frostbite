@@ -10,6 +10,7 @@ import type { ChainIndexing } from "@ador/shared/chain";
 
 import { lampFor, shortChain, unreachableLamp } from "../domain/copy.ts";
 import { feeChoices } from "../domain/fee-choices.ts";
+import { syncProgress } from "../domain/sync.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
 
 const clock = (iso: string) => `${iso.slice(11, 19)} UTC`;
@@ -20,10 +21,13 @@ const clock = (iso: string) => `${iso.slice(11, 19)} UTC`;
 export function NetworkPill({
   indexing,
   market,
+  syncWindowBlocks,
 }: {
   // `null` is the platform not being reachable.
   readonly indexing: ChainIndexing | null;
   readonly market: FeeMarket;
+  // How many blocks the sync bar spans (see `syncProgress`).
+  readonly syncWindowBlocks: number;
 }) {
   if (indexing?.state === "none") return null;
   const lamp = indexing === null ? unreachableLamp : lampFor(indexing);
@@ -32,8 +36,16 @@ export function NetworkPill({
       ? market.fees
       : null;
   const reading = indexing?.state === "ok" ? indexing : null;
-  const chain = reading?.chain ?? fees?.chain ?? null;
-  const tip = reading?.tipHeight ?? fees?.tipHeight ?? null;
+  const chain =
+    reading?.chain ??
+    (indexing?.state === "unavailable" ? indexing.chain : undefined) ??
+    fees?.chain ??
+    null;
+  const tip =
+    reading?.tipHeight ??
+    (indexing?.state === "unavailable" ? indexing.tipHeight : undefined) ??
+    fees?.tipHeight ??
+    null;
   const name = chain === null ? "Chain" : shortChain(chain);
   const choices =
     fees === null
@@ -70,11 +82,7 @@ export function NetworkPill({
         <div className="network-panel__sync">
           <ArcadeProgress
             label="How far the platform has read the chain"
-            value={
-              reading.tipHeight === 0
-                ? 0
-                : reading.indexedHeight / reading.tipHeight
-            }
+            value={syncProgress(reading, syncWindowBlocks)}
           />
         </div>
       )}

@@ -48,6 +48,7 @@ describe("the chain indexing route", () => {
     const result = await answer({
       displayName: "Bitcoin signet",
       indexing: async () => reading(tip),
+      tipHeight: () => Promise.reject(new Error("not used")),
     });
     expect(result).toEqual({
       ok: true,
@@ -68,6 +69,7 @@ describe("the chain indexing route", () => {
     const followed = {
       displayName: "Bitcoin signet",
       indexing: async () => reading(110),
+      tipHeight: () => Promise.reject(new Error("not used")),
     };
     const lenient = createIndexingOperation({
       delay: { maxLagBlocks: 10 },
@@ -78,13 +80,34 @@ describe("the chain indexing route", () => {
     });
   });
 
-  it("says the chain could not be asked, and not that the indexer is in sync or behind, when the node does not answer", async () => {
+  it("says the chain could not be asked, and not that the indexer is in sync or behind, when the node does not answer at all", async () => {
     const indexing = vi.fn(() => Promise.reject(new Error("the node is down")));
-    const result = await answer({ displayName: "Bitcoin signet", indexing });
+    const result = await answer({
+      displayName: "Bitcoin signet",
+      indexing,
+      tipHeight: () => Promise.reject(new Error("the node is down")),
+    });
     expect(result).toEqual({
       ok: true,
       value: { chain: "Bitcoin signet", state: "unavailable" },
     });
     expect(indexing).toHaveBeenCalledTimes(1);
+  });
+
+  it("still tells where the chain is when only its indexer could not be asked, without saying how far the indexer has read", async () => {
+    const result = await answer({
+      displayName: "Bitcoin signet",
+      indexing: () => Promise.reject(new Error("the indexer is down")),
+      tipHeight: async () => 328_178,
+    });
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        chain: "Bitcoin signet",
+        state: "unavailable",
+        tipHeight: 328_178,
+      },
+    });
+    if (result.ok) chainIndexingSchema.parse(result.value);
   });
 });

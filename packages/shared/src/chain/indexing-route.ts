@@ -11,6 +11,8 @@ export const chainIndexingSchema = z.discriminatedUnion("state", [
     .object({
       chain: z.string().min(1).max(64),
       state: z.literal("unavailable"),
+      // The chain's tip, where only the indexer could not be asked.
+      tipHeight: z.number().int().nonnegative().optional(),
     })
     .strict(),
   z

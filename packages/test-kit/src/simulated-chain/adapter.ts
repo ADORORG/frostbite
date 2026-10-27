@@ -165,6 +165,7 @@ export function createSimulatedChain(
       });
     },
     observe: (ref) => Promise.resolve(ledger(ref.chain).observe(ref)),
+    tip: (chain) => Promise.resolve(ledger(chain).head().height),
   };
   // The simulated contract: a claim counts once its transaction is past the finality depth and has not reverted.
   // The simulated family mints no collectibles, so it truthfully has nothing to preview.

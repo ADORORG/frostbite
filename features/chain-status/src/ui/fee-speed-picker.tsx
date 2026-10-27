@@ -75,9 +75,11 @@ export function FeeSpeedPicker({
         </small>
       ))}
       <small className="fee-picker__note">
-        Rates are the chain&apos;s quotes at block{" "}
-        {fees.tipHeight.toLocaleString("en-US")} and change with demand; waits
-        are estimates, not promises.
+        Rates are the chain&apos;s quotes
+        {fees.tipHeight === undefined
+          ? ""
+          : ` at block ${fees.tipHeight.toLocaleString("en-US")}`}{" "}
+        and change with demand; waits are estimates, not promises.
       </small>
     </div>
   );

@@ -43,6 +43,7 @@ export function createObserver(
         tipHeight: tip.height,
       };
     },
+    tip: async (chain) => (await servedChain(chains, chain).node.tip()).height,
     observe: async (ref: TransactionRef): Promise<Observation> => {
       const { node } = servedChain(chains, ref.chain);
       const observedAt = options.now().toISOString();

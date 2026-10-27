@@ -13,10 +13,12 @@ import { useFeeQuotes } from "./use-fee-quotes.ts";
 export function IndexingBadge({
   api: given,
   refreshMs,
+  syncWindowBlocks,
 }: {
   // Where the status comes from; the platform's own route unless a test supplies another.
   readonly api?: ChainStatusApi;
   readonly refreshMs: number;
+  readonly syncWindowBlocks: number;
 }) {
   const api = useMemo(() => given ?? createChainStatusApi(), [given]);
   const { reload, state } = useResource(
@@ -36,6 +38,7 @@ export function IndexingBadge({
     <NetworkPill
       indexing={state.status === "ready" ? state.data : null}
       market={market}
+      syncWindowBlocks={syncWindowBlocks}
     />
   );
 }

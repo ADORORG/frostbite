@@ -36,38 +36,40 @@ export function cacheIndexing(
     ChainRef,
     { readonly at: number; readonly reading: Promise<IndexingStatus> }
   >();
+  const tips = new Map<
+    ChainRef,
+    { readonly at: number; readonly reading: Promise<number> }
+  >();
   const quotes = new Map<
     string,
-    { readonly at: number; readonly quote: Promise<readonly FeeRate[]> }
+    { readonly at: number; readonly reading: Promise<readonly FeeRate[]> }
   >();
+  const reused = <Key, Value>(
+    held: Map<Key, { readonly at: number; readonly reading: Promise<Value> }>,
+    key: Key,
+    ask: () => Promise<Value>,
+  ): Promise<Value> => {
+    const now = options.now().getTime();
+    const kept = held.get(key);
+    if (kept !== undefined && now - kept.at < options.ttlMs)
+      return kept.reading;
+    const reading = ask();
+    held.set(key, { at: now, reading });
+    reading.catch(() => {
+      if (held.get(key)?.reading === reading) held.delete(key);
+    });
+    return reading;
+  };
   return {
     balance: (chain, address) => observer.balance(chain, address),
-    feeRates: (chain, targets) => {
-      const key = `${chain}|${targets.join(",")}`;
-      const now = options.now().getTime();
-      const held = quotes.get(key);
-      if (held !== undefined && now - held.at < options.ttlMs)
-        return held.quote;
-      const quote = observer.feeRates(chain, targets);
-      quotes.set(key, { at: now, quote });
-      quote.catch(() => {
-        if (quotes.get(key)?.quote === quote) quotes.delete(key);
-      });
-      return quote;
-    },
-    indexing: (chain) => {
-      const now = options.now().getTime();
-      const held = readings.get(chain);
-      if (held !== undefined && now - held.at < options.ttlMs)
-        return held.reading;
-      const reading = observer.indexing(chain);
-      readings.set(chain, { at: now, reading });
-      reading.catch(() => {
-        if (readings.get(chain)?.reading === reading) readings.delete(chain);
-      });
-      return reading;
-    },
+    feeRates: (chain, targets) =>
+      reused(quotes, `${chain}|${targets.join(",")}`, () =>
+        observer.feeRates(chain, targets),
+      ),
+    indexing: (chain) =>
+      reused(readings, chain, () => observer.indexing(chain)),
     observe: (ref) => observer.observe(ref),
+    tip: (chain) => reused(tips, chain, () => observer.tip(chain)),
   };
 }
 

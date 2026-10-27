@@ -50,6 +50,9 @@ export const rewardsPolicy = {
   indexingReadingMs: 15_000,
   // How often a page asks again how far the indexer has read. Longer than a reading is reused, so most asks cost the node nothing.
   indexingRefreshMs: 30_000,
+  // The sync bar spans this many of the latest blocks: an indexer this far behind or more shows as 0%, one at the tip as 100%. Over the whole
+  // chain's height the bar would read 100% for any lag under a few thousand blocks.
+  syncWindowBlocks: 100,
   // How long a built transaction may be signed for. Staff sign each step by hand after reading its summary, so it is generous.
   lifetimeMs: 30 * 60 * 1000,
   // The largest collectible picture the platform will read back from a chain for display; not below the largest drawing a contract

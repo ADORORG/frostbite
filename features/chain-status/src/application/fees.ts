@@ -17,21 +17,27 @@ import type { ChainStatusConfig } from "../config.ts";
 export function createFeesOperation(
   config: Pick<
     ChainStatusConfig,
-    "smallestStepVbytes" | "feeSpeeds" | "followed"
-  >,
+    "smallestStepVbytes" | "feeSpeeds" | "now"
+  > & {
+    readonly followed: Pick<
+      NonNullable<ChainStatusConfig["followed"]>,
+      "displayName" | "feeRates" | "maxFeeSats" | "tipHeight"
+    > | null;
+  },
 ): HttpOperation<Record<string, never>, ChainFees> {
   return {
     access: { kind: "public" },
     applicationErrors: [],
     execute: async () => {
-      const { smallestStepVbytes, feeSpeeds: policy, followed } = config;
+      const { smallestStepVbytes, feeSpeeds: policy, followed, now } = config;
       if (followed === null) return { ok: true, value: { state: "none" } };
       try {
-        const [status, rates] = await Promise.all([
-          followed.indexing(),
+        // The rates need only the fee market; where the tip is (not how far the indexer has read) is told when it can be.
+        const [rates, tipHeight] = await Promise.all([
           followed.feeRates(
             feeSpeeds.map((speed) => targetBlocksOf(policy, speed)),
           ),
+          followed.tipHeight().catch(() => null),
         ]);
         const quotes = quotesFor(policy, rates, {
           smallestStepVbytes,
@@ -47,10 +53,10 @@ export function createFeesOperation(
           value: {
             chain: followed.displayName,
             maxFeeSats: followed.maxFeeSats,
-            observedAt: status.observedAt,
+            observedAt: now().toISOString(),
             quotes,
             state: "ok",
-            tipHeight: status.tipHeight,
+            ...(tipHeight === null ? {} : { tipHeight }),
           },
         };
       } catch {

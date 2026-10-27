@@ -101,7 +101,8 @@ export const chainFeesSchema = z.discriminatedUnion("state", [
       // The most any one step may pay in fees, in satoshis; the platform refuses a step above it.
       maxFeeSats: z.number().int().positive(),
       state: z.literal("ok"),
-      tipHeight: z.number().int().nonnegative(),
+      // Absent where the rates were read but the tip could not be.
+      tipHeight: z.number().int().nonnegative().optional(),
     })
     .strict(),
 ]);

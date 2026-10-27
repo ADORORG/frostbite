@@ -162,6 +162,7 @@ function ports(): AdminChainPorts {
           tipHeight: reading.indexedHeight + indexer.behind,
         };
       },
+      tip: (...asked) => observer.tip(...asked),
       observe: async (ref) => {
         const seen = await observer.observe(ref);
         if (!hideCreated.value) return seen;

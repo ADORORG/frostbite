@@ -23,7 +23,7 @@ export function lampFor(
 ): IndexingLampView {
   if (indexing.state === "unavailable")
     return {
-      detail: `The platform could not ask ${indexing.chain} how far its indexer has read. Nothing you have sent is affected; steps and claims show as complete only when the chain's records agree.`,
+      detail: `The platform could not ask ${indexing.chain} how far its indexer has read${indexing.tipHeight === undefined ? "" : `; the chain itself is at block ${indexing.tipHeight}`}. Nothing you have sent is affected; steps and claims show as complete only when the chain's records agree.`,
       label: "Chain status unknown",
       tone: "neutral",
     };

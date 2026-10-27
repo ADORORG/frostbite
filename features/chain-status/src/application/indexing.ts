@@ -16,7 +16,7 @@ export function createIndexingOperation(
   config: Pick<ChainStatusConfig, "delay"> & {
     readonly followed: Pick<
       NonNullable<ChainStatusConfig["followed"]>,
-      "displayName" | "indexing"
+      "displayName" | "indexing" | "tipHeight"
     > | null;
   },
 ): HttpOperation<Record<string, never>, ChainIndexing> {
@@ -41,9 +41,15 @@ export function createIndexingOperation(
           },
         };
       } catch {
+        // The indexer could not be asked; the chain's tip may still be, and is told on its own.
+        const tipHeight = await followed.tipHeight().catch(() => null);
         return {
           ok: true,
-          value: { chain: followed.displayName, state: "unavailable" },
+          value: {
+            chain: followed.displayName,
+            state: "unavailable",
+            ...(tipHeight === null ? {} : { tipHeight }),
+          },
         };
       }
     },

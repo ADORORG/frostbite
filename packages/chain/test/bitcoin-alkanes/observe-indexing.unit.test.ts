@@ -46,4 +46,30 @@ describe("how far the indexer has read", () => {
     );
     await expect(down.indexing(chain)).rejects.toThrow("was not expected");
   });
+
+  it("reports the chain's tip alone, even when the indexer cannot be asked", async () => {
+    const observer = createObserver(
+      new Map<typeof chain, ServedChain>([
+        [
+          chain,
+          {
+            network: "mainnet",
+            node: fakeNode({
+              indexedHeight: () => Promise.reject(new Error("indexer down")),
+              tip: () =>
+                Promise.resolve({ hash: "cc".repeat(32), height: 326_770 }),
+            }),
+          },
+        ],
+      ]),
+      options,
+    );
+    expect(await observer.tip(chain)).toBe(326_770);
+    await expect(observer.indexing(chain)).rejects.toThrow("indexer down");
+    await expect(
+      observer.tip(
+        chainRefSchema.parse("bip122:ffffffffffffffffffffffffffffffff"),
+      ),
+    ).rejects.toThrow();
+  });
 });

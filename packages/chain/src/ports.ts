@@ -121,6 +121,8 @@ export interface ChainObserver {
   observe(ref: TransactionRef): Promise<Observation>;
   // How far the chain's indexer has read against the chain's tip. Throws when the chain cannot be asked.
   indexing(chain: ChainRef): Promise<IndexingStatus>;
+  // The height of the chain's tip alone, so it can be told when the indexer cannot be asked. Throws when the chain cannot be asked.
+  tip(chain: ChainRef): Promise<number>;
   // What the chain's fee market quotes, in satoshis per virtual byte, for confirming within each of `targets` blocks. Throws when the
   // chain cannot be asked or has no quote for a target: a rate is never guessed.
   feeRates(

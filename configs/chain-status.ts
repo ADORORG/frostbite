@@ -9,5 +9,7 @@ export const chainStatusConfig = {
   smallestStepVbytes: rewardsPolicy.smallestStepVbytes,
   feeSpeeds: rewardsPolicy.feeSpeeds,
   followed: followedRewardsChain,
+  now: () => new Date(),
   refreshMs: rewardsPolicy.indexingRefreshMs,
+  syncWindowBlocks: rewardsPolicy.syncWindowBlocks,
 } satisfies ChainStatusConfig;

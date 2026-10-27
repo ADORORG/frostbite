@@ -60,7 +60,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <ClientNavigation />
         <ShellStatusProvider
-          status={<IndexingBadge refreshMs={chainStatusConfig.refreshMs} />}
+          status={
+            <IndexingBadge
+              refreshMs={chainStatusConfig.refreshMs}
+              syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
+            />
+          }
         >
           <WalletShell
             balanceRefreshMs={walletAuthConfig.balanceRefreshMs}

@@ -222,6 +222,7 @@ describe("the conformance suite refuses a broken adapter", () => {
           reads += 1;
           return { ...(await observer.observe(ref)), confirmations: reads };
         },
+        tip: observer.tip,
       },
     });
     await expect(

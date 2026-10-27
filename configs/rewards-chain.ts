@@ -55,6 +55,8 @@ export interface RewardsChain {
     // What the chain's fee market quotes for each block target.
     feeRates(targets: readonly number[]): Promise<readonly FeeRate[]>;
     indexing(): Promise<IndexingStatus>;
+    // The height of the chain's tip alone (see `ChainStatusConfig`).
+    tipHeight(): Promise<number>;
     // The most one step may pay in fees, in satoshis.
     readonly maxFeeSats: number;
   };
@@ -224,6 +226,7 @@ export function createRewardsChain(
       displayName: configured.config.displayName,
       feeRates: (targets) => ports.observer.feeRates(served, targets),
       indexing: () => ports.observer.indexing(served),
+      tipHeight: () => ports.observer.tip(served),
       maxFeeSats: ceilingSats(environment.maxFeeSats),
     },
   };

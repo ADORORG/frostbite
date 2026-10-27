@@ -16,7 +16,12 @@ const reading: Extract<ChainIndexing, { state: "ok" }> = {
   tipHeight: 157_401,
 };
 const pill = (props: Partial<Parameters<typeof NetworkPill>[0]> = {}) => (
-  <NetworkPill indexing={reading} market={answered(ok)} {...props} />
+  <NetworkPill
+    indexing={reading}
+    market={answered(ok)}
+    syncWindowBlocks={100}
+    {...props}
+  />
 );
 const trigger = (container: HTMLElement) =>
   container.querySelector<HTMLButtonElement>("button.network-pill");
@@ -47,7 +52,7 @@ describe("the network pill in the header", () => {
     expect(
       container.querySelector("progress")?.getAttribute("aria-label"),
     ).toBe("How far the platform has read the chain");
-    expect(container.querySelector("progress")?.value).toBe(100);
+    expect(container.querySelector("progress")?.value).toBe(99);
     expect(textOf(container)).toContain("What each speed costs");
     const tiles = [...container.querySelectorAll(".segmented__option")].map(
       (tile) => tile.textContent,
@@ -120,32 +125,83 @@ describe("the network pill in the header", () => {
     expect(textOf(loading)).toContain("Loading what each speed costs");
   });
 
-  it("shows an empty bar for a chain at block zero, not an error", async () => {
+  it("shows a chain at block zero as read in full, not as an error", async () => {
     const container = await opened(
       pill({
         indexing: { ...reading, indexedHeight: 0, lag: 0, tipHeight: 0 },
       }),
     );
-    expect(container.querySelector("progress")?.value).toBe(0);
-    expect(textOf(container)).toContain("0%");
+    expect(container.querySelector("progress")?.value).toBe(100);
     expect(textOf(container)).not.toContain("NaN");
   });
 
-  it("shows how far the reading has come as a share of the chain, not a rounded-up full bar", async () => {
+  it("shows the blocks left to read, so 40 behind on a chain 328,178 blocks long is not a full bar", async () => {
     const container = await opened(
       pill({
         indexing: {
           ...reading,
           health: "delayed",
-          indexedHeight: 150,
-          lag: 50,
-          tipHeight: 200,
+          indexedHeight: 328_138,
+          lag: 40,
+          tipHeight: 328_178,
         },
       }),
     );
-    expect(container.querySelector("progress")?.value).toBe(75);
-    expect(textOf(container)).toContain("read to block 150 of 200");
-    expect(textOf(container)).not.toContain("Read to block");
+    expect(container.querySelector("progress")?.value).toBe(60);
+    expect(textOf(container)).toContain("read to block 328138 of 328178");
+    expect(textOf(container)).toContain("40 blocks behind");
+  });
+
+  it("shows a full bar only for an indexer at the tip, and an empty one for an indexer a whole window behind", async () => {
+    const at = async (lag: number) =>
+      (
+        await opened(
+          pill({
+            indexing: {
+              ...reading,
+              health: "delayed",
+              indexedHeight: 1_000 - lag,
+              lag,
+              tipHeight: 1_000,
+            },
+          }),
+        )
+      ).querySelector("progress")?.value;
+    expect(await at(0)).toBe(100);
+    expect(await at(1)).toBe(99);
+    expect(await at(100)).toBe(0);
+    expect(await at(900)).toBe(0);
+  });
+
+  it("keeps the network's name and block, and the fees, when only the indexer could not be asked", async () => {
+    const container = await opened(
+      pill({
+        indexing: {
+          chain: "Bitcoin testnet4",
+          state: "unavailable",
+          tipHeight: 157_401,
+        },
+      }),
+    );
+    expect(trigger(container)?.textContent).toContain("testnet4");
+    expect(trigger(container)?.textContent).toContain("#157,401");
+    expect(textOf(container)).toContain("the chain itself is at block 157401");
+    expect(textOf(container)).toContain("Slow");
+    expect(container.querySelector("progress")).toBeNull();
+  });
+
+  it("keeps the network's name and block from the indexer's answer alone, when the fees are not known either", async () => {
+    const container = await mount(
+      pill({
+        indexing: {
+          chain: "Bitcoin testnet4",
+          state: "unavailable",
+          tipHeight: 157_401,
+        },
+        market: { status: "unreachable" },
+      }),
+    );
+    expect(trigger(container)?.textContent).toBe("testnet4#157,401");
   });
 
   it("draws nothing where the platform follows no chain", async () => {

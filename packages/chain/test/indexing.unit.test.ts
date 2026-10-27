@@ -27,6 +27,7 @@ function observerOf(indexing: ChainObserver["indexing"]): ChainObserver {
     feeRates: () => Promise.reject(new Error("not used")),
     indexing,
     observe: () => Promise.reject(new Error("not used")),
+    tip: () => Promise.reject(new Error("not used")),
   };
 }
 
@@ -154,6 +155,28 @@ describe("caching the reading", () => {
     ]);
   });
 
+  it("reads the tip on its own: reused for the time to live, never kept when it failed, and asked even while the indexer is failing", async () => {
+    const tip = vi
+      .fn<ChainObserver["tip"]>()
+      .mockRejectedValueOnce(new Error("the node is down"))
+      .mockResolvedValue(120);
+    const observer = cacheIndexing(
+      {
+        ...observerOf(() => Promise.reject(new Error("the indexer is down"))),
+        tip,
+      },
+      { now: () => clock.now, ttlMs: 1_000 },
+    );
+    await expect(observer.indexing(chain)).rejects.toThrow("indexer");
+    await expect(observer.tip(chain)).rejects.toThrow("down");
+    expect(await observer.tip(chain)).toBe(120);
+    expect(await observer.tip(chain)).toBe(120);
+    expect(tip).toHaveBeenCalledTimes(2);
+    clock.now = new Date(clock.now.getTime() + 1_000);
+    await observer.tip(chain);
+    expect(tip).toHaveBeenCalledTimes(3);
+  });
+
   it("passes observations straight through", async () => {
     const observe = vi.fn(() => Promise.reject(new Error("seen")));
     const observer = cacheIndexing(
@@ -162,6 +185,7 @@ describe("caching the reading", () => {
         feeRates: () => Promise.reject(new Error("not used")),
         indexing: async () => reading(1),
         observe,
+        tip: () => Promise.reject(new Error("not used")),
       },
       { now: () => clock.now, ttlMs: 1 },
     );
@@ -186,6 +210,7 @@ describe("judging which waits are delayed", () => {
       tipHeight: 100 + lag,
     }),
     observe: () => Promise.reject(new Error("not used")),
+    tip: () => Promise.reject(new Error("not used")),
   });
   const judgeWith = (observers: Map<typeof chain, ChainObserver>) =>
     createDelayJudge({

@@ -35,7 +35,7 @@ const followed = (
 ) => ({
   displayName: "Bitcoin testnet4",
   feeRates: async () => rates,
-  indexing: async () => status,
+  tipHeight: async () => status.tipHeight,
   maxFeeSats: limit.maxFeeSats,
   ...over,
 });
@@ -44,6 +44,7 @@ const answer = (value: Parameters<typeof createFeesOperation>[0]["followed"]) =>
     smallestStepVbytes: limit.smallestStepVbytes,
     feeSpeeds,
     followed: value,
+    now: () => new Date(status.observedAt),
   }).execute({}, context);
 
 describe("the chain fees route", () => {
@@ -52,6 +53,7 @@ describe("the chain fees route", () => {
       smallestStepVbytes: limit.smallestStepVbytes,
       feeSpeeds,
       followed: null,
+      now: () => new Date(status.observedAt),
     });
     expect(operation).toMatchObject({
       access: { kind: "public" },
@@ -131,6 +133,20 @@ describe("the chain fees route", () => {
     ]);
   });
 
+  it("still quotes every speed when the indexer, or the tip, cannot be asked: the rates need only the fee market", async () => {
+    const result = await answer(
+      followed({
+        tipHeight: () => Promise.reject(new Error("the node is down")),
+      }),
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      value: { observedAt: status.observedAt, state: "ok" },
+    });
+    expect(result.ok && "tipHeight" in result.value).toBe(false);
+    if (result.ok) chainFeesSchema.parse(result.value);
+  });
+
   it("reports the chain as unavailable, never a guessed rate, when it cannot be asked or quotes too little", async () => {
     const unavailable = {
       ok: true,
@@ -140,13 +156,6 @@ describe("the chain fees route", () => {
       await answer(
         followed({
           feeRates: () => Promise.reject(new Error("the node is down")),
-        }),
-      ),
-    ).toEqual(unavailable);
-    expect(
-      await answer(
-        followed({
-          indexing: () => Promise.reject(new Error("the node is down")),
         }),
       ),
     ).toEqual(unavailable);

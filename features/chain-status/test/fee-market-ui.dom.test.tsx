@@ -22,6 +22,14 @@ describe("the fee speed picker", () => {
     ...container.querySelectorAll<HTMLInputElement>("input[type=radio]"),
   ];
 
+  it("tells the rates without a block when the tip could not be read, and still offers every speed", async () => {
+    const withoutTip = { ...ok, tipHeight: undefined };
+    const container = await mount(picker({ market: answered(withoutTip) }));
+    expect(options(container)).toHaveLength(4);
+    expect(textOf(container)).toContain("Rates are the chain's quotes and");
+    expect(textOf(container)).not.toContain(" at block ");
+  });
+
   it("offers the four speeds in order, each with its wait and rate, and the chosen one checked", async () => {
     const container = await mount(picker({ value: "fast" }));
     expect(options(container).map((input) => input.value)).toEqual([
