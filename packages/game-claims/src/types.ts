@@ -9,6 +9,11 @@ import type {
   UnsignedTransaction,
 } from "@ador/shared/chain";
 
+import type {
+  mintedPictureContentTypes,
+  mintedPictureUnavailableReasons,
+} from "@ador/shared/games";
+
 import type { GameClaimRepository, StoredClaim } from "./repository.ts";
 
 // What the service knows of a game, and nothing game-specific: the chain it is on, the rewards contract deployed for it (none
@@ -111,3 +116,16 @@ export interface MintedClaim {
   readonly mintedAt: string;
   readonly transactionId: string;
 }
+
+// The picture of a minted milestone, or why there is none to show.
+export type MintedPictureResult =
+  | {
+      readonly bytes: Uint8Array;
+      readonly contentType: (typeof mintedPictureContentTypes)[number];
+      readonly edition: number;
+      readonly ok: true;
+    }
+  | {
+      readonly code: (typeof mintedPictureUnavailableReasons)[number];
+      readonly ok: false;
+    };

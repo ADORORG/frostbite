@@ -3,6 +3,7 @@ import type { ChainOption } from "@ador/shared/chain";
 import {
   gamePagePath,
   gameSyncRoute,
+  getMintedPictureRoute,
   listGameClaimsRoute,
   listMintedMilestonesRoute,
   myMilestonesPath,
@@ -77,6 +78,7 @@ export function createGamesFeature(
         refreshGameClaimRoute,
         listGameClaimsRoute,
         listMintedMilestonesRoute,
+        getMintedPictureRoute,
       ],
       version: "1.0.0",
     },

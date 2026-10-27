@@ -21,6 +21,9 @@ to a real chain yet**: it works through the chain-neutral ports (`@ador/chain`) 
 - `list(userId, gameId)`.
 - `minted(userId)`: the player's claims in every game that the network's records show `complete` (claim, game, milestone, the time it
   was recorded complete, transaction id), the most recently completed first. Nothing in another state is listed.
+- `picture(userId, claimId)`: the picture the chain serves for the item a complete claim of the player's minted (`collectible_id`, recorded
+  when the network first shows the transaction included). Shown only when the item's issuer is the claim's own contract (chain, family
+  and id) and its kind is one of `mintedPictureContentTypes`; otherwise `no-picture`. A chain that cannot be asked is `chain-unavailable`.
 
 `createDrizzleGameClaimRepository(database, { clock })` stores claims in `ador.game_milestone_claims`.
 

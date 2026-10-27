@@ -20,10 +20,16 @@ const mint = {
   mintedAt: "2026-10-17T12:34:56.000Z",
   transactionId: txId,
 };
-const show = (list: MintedApi["list"]) =>
+const show = (
+  list: MintedApi["list"],
+  picture: MintedApi["picture"] = async () => ({
+    reason: "no-picture",
+    status: "unavailable",
+  }),
+) =>
   mount(
     <MyMilestones
-      api={{ list }}
+      api={{ list, picture }}
       explorerTxUrl="https://explorer.test/tx/{id}"
       games={games}
       navigation={[]}
@@ -78,5 +84,36 @@ describe("the player's minted milestones page", () => {
     await settle(() => expect(textOf(container)).toContain(mintedCopy.failed));
     expect(textOf(container)).not.toContain(mintedCopy.empty);
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
+  });
+
+  it("shows the picture the platform has for a mint, asked for by its claim, and none where there is none", async () => {
+    const picture = vi.fn<MintedApi["picture"]>(async () => ({
+      contentType: "image/svg+xml",
+      data: "PHN2Zz48L3N2Zz4=",
+      edition: 3,
+      status: "ok",
+    }));
+    const container = await show(async () => ({ minted: [mint] }), picture);
+    await settle(() => expect(container.querySelector("img")).not.toBeNull());
+    expect(picture).toHaveBeenCalledWith(mint.claimId);
+    const image = container.querySelector("img");
+    expect(image?.getAttribute("src")).toBe(
+      "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=",
+    );
+    expect(image?.getAttribute("alt")).toBe(milestone?.title);
+  });
+
+  it("shows no image, and still the mint, when the picture cannot be had", async () => {
+    const refused = await show(async () => ({ minted: [mint] }));
+    await settle(() => expect(textOf(refused)).toContain(milestone?.title));
+    expect(refused.querySelector("img")).toBeNull();
+    const failing = await show(
+      async () => ({ minted: [mint] }),
+      async () => {
+        throw new ApiError("network", null, "down");
+      },
+    );
+    await settle(() => expect(textOf(failing)).toContain(milestone?.title));
+    expect(failing.querySelector("img")).toBeNull();
   });
 });

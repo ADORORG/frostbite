@@ -17,6 +17,7 @@ import type { PublicGame } from "../domain/catalog.ts";
 import { mintedCopy } from "../domain/minted-copy.ts";
 import { mintedRows } from "../domain/minted-view.ts";
 import type { MintedApi } from "../client/minted-api.ts";
+import { MintedPicture } from "./minted-picture.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 import { useMinted } from "./use-minted.ts";
 
@@ -62,6 +63,11 @@ export function MyMilestones({
                     status={{ label: row.mintedOn, tone: "done" }}
                     title={row.milestoneTitle}
                   >
+                    <MintedPicture
+                      alt={row.milestoneTitle}
+                      api={api}
+                      claimId={row.claimId}
+                    />
                     <TransactionList
                       transactions={[
                         { id: row.transactionId, label: plainTransactionLabel },

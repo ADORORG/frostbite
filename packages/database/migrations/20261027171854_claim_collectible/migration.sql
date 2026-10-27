@@ -1,0 +1,1 @@
+ALTER TABLE "ador"."game_milestone_claims" ADD COLUMN "collectible_id" text;

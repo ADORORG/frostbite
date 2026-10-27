@@ -71,3 +71,12 @@ ul.milestone-cards {
   padding: 0;
   list-style: none;
 }
+
+/* The picture the chain serves for a minted milestone: a drawing of any proportion, kept square and whole inside the card. */
+.minted-picture {
+  aspect-ratio: 1;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  inline-size: 6rem;
+  object-fit: contain;
+}

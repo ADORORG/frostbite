@@ -14,7 +14,10 @@ import {
   createStartGameClaimOperation,
   createSubmitGameClaimOperation,
 } from "./application/claims-operations.ts";
-import { createListMintedMilestonesOperation } from "./application/minted-operation.ts";
+import {
+  createGetMintedPictureOperation,
+  createListMintedMilestonesOperation,
+} from "./application/minted-operation.ts";
 import {
   createStartGameRunOperation,
   createSubmitGameRunOperation,
@@ -62,6 +65,7 @@ export function createGamesEntrypoint(
       registerHttpOperation(createRefreshGameClaimOperation(claimsService)),
       registerHttpOperation(createListGameClaimsOperation(claimsService)),
       registerHttpOperation(createListMintedMilestonesOperation(claimsService)),
+      registerHttpOperation(createGetMintedPictureOperation(claimsService)),
     ],
     pages: [
       {

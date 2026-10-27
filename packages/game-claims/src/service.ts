@@ -14,6 +14,7 @@ import {
 
 import { buildFailure, contractRefusal } from "./start-failures.ts";
 import { createClaimViewer } from "./claim-steps.ts";
+import { createPictureReader } from "./minted-picture.ts";
 import type { ClaimChange, StoredClaim } from "./repository.ts";
 import type {
   ClaimChainPorts,
@@ -29,6 +30,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
   const { clock, earned, funding, game, newId, ports, report, repository } =
     dependencies;
   const viewer = createClaimViewer(dependencies);
+  const readPicture = createPictureReader({ ports, repository });
 
   // Sends a signed claim to the network, once; asking again sends the same bytes and the network gives the same id.
   async function broadcast(
@@ -211,12 +213,18 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
         }
         if (!isObservable(claim.state)) return done(claim);
         const from = claim.state;
-        const next = afterObservation(from, await chain.observer.observe(ref));
+        const observation = await chain.observer.observe(ref);
+        const next = afterObservation(from, observation);
         if (next === null) return done(claim);
+        // The network shows what the transaction created once it is included: the first is the item the claim minted.
+        const created = observation.created?.[0];
         const moved = await repository.update(
           userId,
           claimId,
-          moveTo(from, next),
+          moveTo(
+            from,
+            created === undefined ? next : { ...next, collectibleId: created },
+          ),
         );
         return done(moved ?? claim);
       } catch {
@@ -227,6 +235,8 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
     async list(userId: string, gameId: string): Promise<readonly ClaimView[]> {
       return viewer.many(await repository.list(userId, gameId));
     },
+
+    picture: (userId: string, claimId: string) => readPicture(userId, claimId),
 
     // What the player has minted across games: only claims the network's records show complete.
     async minted(userId: string): Promise<readonly MintedClaim[]> {

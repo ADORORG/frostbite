@@ -2,6 +2,7 @@ import type { GameClaim } from "@ador/shared/games";
 import { ArcadeActionButton, ArcadeInfoCard } from "@repo/ui/arcade";
 
 import { claimCopy, showsDelayed } from "../domain/claim-copy.ts";
+import { MintedPicture } from "./minted-picture.tsx";
 
 // The player's claims for this game, with where each stands and a way back to the review of any that is not over.
 export function ClaimsCard({
@@ -27,6 +28,12 @@ export function ClaimsCard({
             >
               <strong>{titles[claim.milestoneId] ?? claim.milestoneId}</strong>{" "}
               — <span>{claimCopy(claim).label}</span>{" "}
+              {claim.state === "complete" ? (
+                <MintedPicture
+                  alt={titles[claim.milestoneId] ?? claim.milestoneId}
+                  claimId={claim.id}
+                />
+              ) : null}
               <ArcadeActionButton
                 onClick={() => onReview(claim.id)}
                 tone="cyan"

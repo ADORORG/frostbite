@@ -19,7 +19,7 @@ import {
 // A player's claim of a milestone from a game's rewards contract, as the platform tracks it: who, which game and milestone,
 // the transaction built for it (what the wallet was shown and signed), and where it is in the chain's lifecycle. At most one
 // claim per player, game and milestone is in progress at a time, which is what makes asking again return the same claim.
-// `expected_claims` is the count the chain's indexed state must show for the wallet before the claim is complete.
+// `collectible_id` is the item the claim minted, once known. `expected_claims` is the count the chain's indexed state must show for the wallet before the claim is complete.
 export const gameMilestoneClaims = platformSchema.table(
   "game_milestone_claims",
   {
@@ -31,6 +31,10 @@ export const gameMilestoneClaims = platformSchema.table(
     milestoneId: text("milestone_id").notNull(),
     walletAddress: text("wallet_address").notNull(),
     expectedClaims: integer("expected_claims").notNull(),
+    // The collectible the claim's transaction created, in the chain's own notation, learned when the network shows the transaction
+    // included; none before that. It is only an address to ask the chain about: what is served for it is checked against the game's
+    // contract before anyone is shown it.
+    collectibleId: text("collectible_id"),
     ...trackedTransactionColumns,
   },
   (table) => [

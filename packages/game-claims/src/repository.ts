@@ -22,6 +22,8 @@ export interface StoredClaim {
   // When the network first gave an id for the claim's transaction; none before it was sent.
   readonly broadcastAt: Date | null;
   readonly chain: ChainRef;
+  // The item the claim minted, in the chain's own notation, once the network has shown the transaction included; none before.
+  readonly collectibleId: string | null;
   readonly contract: ContractRef;
   readonly createdAt: Date;
   readonly expiresAt: Date;
@@ -58,6 +60,7 @@ export type NewClaim = Pick<
 
 // What a step changes about a claim. The state is always given; the rest only when the step brings it.
 export interface ClaimChange {
+  readonly collectibleId?: string;
   readonly failureReason?: string;
   readonly signedPayload?: string;
   readonly state: ClaimState;

@@ -10,6 +10,7 @@ import {
 import {
   chainRefSchema,
   type Address,
+  type CollectiblePreview,
   type TransactionIntent,
 } from "@ador/shared/chain";
 import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
@@ -90,6 +91,15 @@ export const chainFailure: {
   simulate: false,
 };
 // What the service was told stopped a claim from starting, oldest first.
+// What the chain says of the item a claim minted: the item the transaction created once it is included (the simulated chain mints
+// none), and what it serves for it. Reset before each test.
+export const collectible: {
+  created: string | null;
+  preview: (() => Promise<CollectiblePreview | null>) | null;
+} = { created: null, preview: null };
+export const item = "sim-item-1";
+export const drawing = new TextEncoder().encode("<svg></svg>");
+
 export const reported: { error: unknown; step: string }[] = [];
 
 function ports(): ClaimChainPorts {
@@ -150,10 +160,13 @@ function ports(): ClaimChainPorts {
           tipHeight: reading.indexedHeight + indexer.behind,
         };
       },
-      observe: (ref) =>
-        chainFailure.observe
-          ? Promise.reject(new Error("the node is down"))
-          : observer.observe(ref),
+      observe: async (ref) => {
+        if (chainFailure.observe) throw new Error("the node is down");
+        const seen = await observer.observe(ref);
+        return seen.status === "confirmed" && collectible.created !== null
+          ? { ...seen, created: [collectible.created] }
+          : seen;
+      },
       tip: (...asked) => observer.tip(...asked),
     },
     rewards: {
@@ -162,7 +175,10 @@ function ports(): ClaimChainPorts {
           0,
           (await rewards.claimed(...asked)) - (indexerLag.on ? 1 : 0),
         ),
-      preview: rewards.preview,
+      preview: (asked) =>
+        collectible.preview === null
+          ? rewards.preview(asked)
+          : collectible.preview(),
     },
   };
 }
@@ -246,6 +262,8 @@ export function registerDatabase(): void {
     reported.length = 0;
     chainFailure.observe = false;
     chainFailure.simulate = false;
+    collectible.created = null;
+    collectible.preview = null;
   });
   afterAll(async () => pool.end());
 }

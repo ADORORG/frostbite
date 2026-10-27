@@ -16,7 +16,11 @@ page connects it to the platform through `@ador/game-sdk`.
 game, the milestone, the date (UTC) and the transaction with its explorer link. It is read from `POST /api/v1/games/milestones/minted`
 (authenticated; the player is the session, the request carries nothing), and lists only claims the network's records show
 `complete`: a claim that is waiting, delayed or failed has minted nothing. The date is when the platform recorded the claim
-complete. The collectible's picture is not shown yet: a claim does not record the id of the item it minted.
+complete. Each entry shows the picture the chain serves for the item the claim minted (and the dock's claim list shows it for a complete
+claim), read from `POST /api/v1/games/milestones/picture` (authenticated; a claim that is not the player's is `not-found`). The
+platform learns the item's id from the network when the claim's transaction is shown included, and shows the picture only if the item
+says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the card shows no picture, and
+never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
 
 ## Onboarding a game (the template)
 

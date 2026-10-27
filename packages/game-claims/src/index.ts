@@ -18,6 +18,7 @@ export type {
   ClaimView,
   GameClaimsDependencies,
   MintedClaim,
+  MintedPictureResult,
   RefreshClaimResult,
   StartClaimResult,
   SubmitClaimResult,

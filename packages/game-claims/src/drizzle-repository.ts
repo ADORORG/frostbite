@@ -25,6 +25,7 @@ function toClaim(row: Row): StoredClaim {
   return {
     ...tracked,
     broadcastAt: row.broadcastAt,
+    collectibleId: row.collectibleId,
     createdAt: row.createdAt,
     expiresAt: row.expiresAt,
     expectedClaims: row.expectedClaims,
@@ -95,6 +96,7 @@ export function createDrizzleGameClaimRepository(
         const stored: StoredClaim = {
           ...claim,
           broadcastAt: null,
+          collectibleId: null,
           expectedClaims,
           failureReason: null,
           signedPayload: null,
@@ -182,6 +184,7 @@ export function createDrizzleGameClaimRepository(
           .update(gameMilestoneClaims)
           .set({
             broadcastAt,
+            collectibleId: change.collectibleId ?? row.collectibleId,
             failureReason: change.failureReason ?? row.failureReason,
             signedPayload: change.signedPayload ?? row.signedPayload,
             state: change.state,

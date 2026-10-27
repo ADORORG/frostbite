@@ -4,8 +4,11 @@ import {
   type FetchLike,
 } from "@ador/client-http";
 import {
+  getMintedPictureResponseSchema,
+  getMintedPictureRoute,
   listMintedMilestonesResponseSchema,
   listMintedMilestonesRoute,
+  type GetMintedPictureResponse,
   type ListMintedMilestonesResponse,
 } from "@ador/shared/games";
 
@@ -15,6 +18,7 @@ import { claimRequestTimeoutMs } from "./claims-api.ts";
 // (including no session) is thrown as the requester throws it, for the caller to say.
 export interface MintedApi {
   list(): Promise<ListMintedMilestonesResponse>;
+  picture(claimId: string): Promise<GetMintedPictureResponse>;
 }
 
 export function createMintedApi(
@@ -25,6 +29,11 @@ export function createMintedApi(
     list: () =>
       request(listMintedMilestonesRoute, listMintedMilestonesResponseSchema, {
         body: {},
+        signal: AbortSignal.timeout(claimRequestTimeoutMs),
+      }),
+    picture: (claimId) =>
+      request(getMintedPictureRoute, getMintedPictureResponseSchema, {
+        body: { claimId },
         signal: AbortSignal.timeout(claimRequestTimeoutMs),
       }),
   };
