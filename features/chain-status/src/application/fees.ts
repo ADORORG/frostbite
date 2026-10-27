@@ -67,6 +67,7 @@ export function createFeesOperation(
     input: "none",
     inputSchema: chainFeesInputSchema,
     method: chainFeesRoute.method,
+    cache: { kind: "no-store" },
     operationId: chainFeesRoute.operationId,
     outputSchema: chainFeesSchema,
     path: chainFeesRoute.path,

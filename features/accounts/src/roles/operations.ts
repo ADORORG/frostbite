@@ -65,6 +65,7 @@ export function createRoleOperations(getServices: () => RoleServices) {
     inputSchema: roleEmptyRequestSchema,
     outputSchema: rolePeopleResponseSchema,
     ...roleRoutes.list,
+    cache: { kind: "revalidate" },
   };
   const find: HttpOperation<RoleFindRequest, RolePeopleResponse> = {
     access,

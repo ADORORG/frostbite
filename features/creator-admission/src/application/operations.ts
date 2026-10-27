@@ -72,6 +72,7 @@ export function createCreatorApplicationOperations(getService: () => Service) {
     inputSchema: creatorApplicationEmptyInputSchema,
     outputSchema: creatorApplicationResponseSchema,
     ...creatorApplicationRoutes.mine,
+    cache: { kind: "revalidate" },
   };
   const saveDraft: HttpOperation<
     CreatorApplicationDraftInput,

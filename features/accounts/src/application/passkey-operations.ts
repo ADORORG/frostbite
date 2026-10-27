@@ -62,6 +62,7 @@ export function createPasskeyOperations(getService: () => Service) {
     inputSchema: passkeyEmptyInputSchema,
     outputSchema: passkeyListResponseSchema,
     ...passkeyRoutes.list,
+    cache: { kind: "revalidate" },
   };
   const begin: HttpOperation<
     Record<string, never>,

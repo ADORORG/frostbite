@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
+import { presentResponse } from "@ador/http/present";
 import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
 import {
   correlationHeaderName,
@@ -55,8 +56,18 @@ export async function executeNextOperation(
     }
   }
 
-  return Response.json(response.body, {
-    headers: response.headers,
-    status: response.status,
+  const presented = presentResponse(response, {
+    cache: operation.cache,
+    file: operation.file,
+    ifNoneMatch: request.headers.get("if-none-match") ?? undefined,
+    scope: operation.access.kind === "public" ? "public" : "private",
   });
+  // Copied into a plain buffer, which is what a response body is typed to take.
+  return new Response(
+    presented.body === null ? null : new Uint8Array(presented.body),
+    {
+      headers: presented.headers,
+      status: presented.status,
+    },
+  );
 }

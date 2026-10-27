@@ -16,9 +16,7 @@ type JsonSchema = z.core.JSONSchema.JSONSchema;
 type OpenApiMethod = "delete" | "get" | "patch" | "post" | "put";
 
 interface OpenApiResponse {
-  readonly content: {
-    readonly "application/json": { readonly schema: JsonSchema };
-  };
+  readonly content: Readonly<Record<string, { readonly schema: JsonSchema }>>;
   readonly description: string;
   readonly headers?: Readonly<Record<string, { readonly schema: JsonSchema }>>;
 }
@@ -105,6 +103,22 @@ function jsonResponse(
   };
 }
 
+// A file operation's answer: each kind of file it may send, as bytes.
+function fileResponse(
+  description: string,
+  contentTypes: readonly string[],
+): OpenApiResponse {
+  return {
+    content: Object.fromEntries(
+      contentTypes.map((type) => [
+        type,
+        { schema: { format: "binary", type: "string" } },
+      ]),
+    ),
+    description,
+  };
+}
+
 function jsonRequestBody(
   schema: JsonSchema,
 ): NonNullable<OpenApiOperationObject["requestBody"]> {
@@ -131,10 +145,12 @@ export function describeOpenApiOperation<Input, Output extends object>(
   const errorSchema = z.toJSONSchema(httpErrorEnvelopeSchema);
   const responses: Record<string, OpenApiResponse> = {
     "200": {
-      ...jsonResponse(
-        "Successful response.",
-        z.toJSONSchema(operation.outputSchema),
-      ),
+      ...(operation.files === undefined
+        ? jsonResponse(
+            "Successful response.",
+            z.toJSONSchema(operation.outputSchema),
+          )
+        : fileResponse("Successful response.", operation.files)),
       headers: {
         [correlationHeaderName]: {
           schema: z.toJSONSchema(correlationIdSchema),

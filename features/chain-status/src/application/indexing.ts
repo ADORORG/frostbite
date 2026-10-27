@@ -57,6 +57,7 @@ export function createIndexingOperation(
     input: "none",
     inputSchema: chainIndexingInputSchema,
     method: chainIndexingRoute.method,
+    cache: { kind: "no-store" },
     operationId: chainIndexingRoute.operationId,
     outputSchema: chainIndexingSchema,
     path: chainIndexingRoute.path,

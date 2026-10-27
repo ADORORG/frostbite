@@ -38,6 +38,7 @@ export function createListUploadedAssetsOperation(
     input: "none",
     inputSchema: libraryEmptyInputSchema,
     outputSchema: libraryResponseSchema,
+    cache: { kind: "revalidate" },
     ...libraryRoute,
   } satisfies HttpOperation<LibraryEmptyInput, LibraryResponse>;
 }

@@ -87,6 +87,7 @@ export function createListDraftsOperation(dependencies: OperationDependencies) {
     inputSchema: listCollectionDraftsInputSchema,
     outputSchema: collectionListResponseSchema,
     ...collectionRoutes.list,
+    cache: { kind: "revalidate" },
   } satisfies HttpOperation<ListCollectionDraftsInput, CollectionListResponse>;
 }
 

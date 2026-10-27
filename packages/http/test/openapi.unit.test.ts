@@ -48,6 +48,35 @@ describe("OpenAPI generation", () => {
       path: "/api/v1/fixture",
     });
 
+  it("describes a file operation's answer as bytes of each kind it may send", () => {
+    const description = describeOpenApiOperation({
+      ...{
+        access: { kind: "public" },
+        applicationErrors: [],
+        cache: { kind: "revalidate" },
+        idempotency: "none",
+        input: "none",
+        inputSchema: z.object({}).strict(),
+        method: "GET",
+        operationId: "readPicture",
+        path: "/api/v1/picture",
+      },
+      execute: async () => ({
+        ok: true,
+        value: { bytes: new Uint8Array(), contentType: "image/svg+xml" },
+      }),
+      files: ["image/svg+xml", "image/png"],
+      outputSchema: z.object({
+        bytes: z.instanceof(Uint8Array),
+        contentType: z.string(),
+      }),
+    });
+    expect(description.operation.responses["200"]?.content).toEqual({
+      "image/png": { schema: { format: "binary", type: "string" } },
+      "image/svg+xml": { schema: { format: "binary", type: "string" } },
+    });
+  });
+
   it("lists no query parameters for a read that asks for nothing, or whose input is not a set of named fields", () => {
     const parameters = (schema: z.ZodType<object>) =>
       readOf(schema).operation.parameters.filter(

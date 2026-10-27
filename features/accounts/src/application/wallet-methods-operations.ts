@@ -166,6 +166,7 @@ export function createWalletMethodsOperations(
     inputSchema: walletEmptyRequestSchema,
     outputSchema: authMethodsResponseSchema,
     ...walletAuthRoutes.methods,
+    cache: { kind: "revalidate" },
   };
   return [
     beginFor("link-wallet", walletAuthRoutes.beginLink),

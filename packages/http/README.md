@@ -38,3 +38,11 @@ from the end of `X-Forwarded-For`), and `createRateLimitGate`: a check by networ
 and one by person after sign-in, each against a policy resolved per operation (`@ador/shared/http`). A limiter that
 fails lets the request through and reports the error. The PostgreSQL limiter that production uses is
 `@ador/database/rate-limit`.
+
+## Caching and files
+
+Every `GET` operation states a `cache` policy (`no-store`, `revalidate` or `max-age`) and nothing else may; `registerHttpOperation`
+refuses the rest. The web adapter puts the policy on the wire with `presentResponse`: a strong `ETag` of the exact bytes, `Cache-Control`
+(`private`, with `Vary: Cookie`, unless the operation is open to everyone), and a `304` with no body for a matching `If-None-Match`.
+Errors, writes and operations that say `no-store` are never kept. An operation that answers with a file lists the media types in `files`
+and returns an `HttpFile`; it is sent with `nosniff` and a sandboxing content security policy.

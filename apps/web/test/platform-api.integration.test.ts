@@ -40,6 +40,39 @@ describe("Next platform API adapter", () => {
     });
   });
 
+  it("lets a browser keep the status and ask only whether it changed, and says nothing changed when it did not", async () => {
+    const url = "http://platform.invalid/api/v1/platform";
+    const first = await GET(new Request(url), routeContext);
+    const tag = first.headers.get("etag");
+    expect(first.headers.get("cache-control")).toBe("public, no-cache");
+    expect(first.headers.get("content-type")).toBe("application/json");
+    expect(tag).toMatch(/^"[A-Za-z0-9_-]{43}"$/u);
+    const again = await GET(
+      new Request(url, { headers: { "if-none-match": tag ?? "" } }),
+      routeContext,
+    );
+    expect(again.status).toBe(304);
+    expect(await again.text()).toBe("");
+    const changed = await GET(
+      new Request(url, { headers: { "if-none-match": '"something-else"' } }),
+      routeContext,
+    );
+    expect(changed.status).toBe(200);
+    expect(await changed.json()).toEqual(await first.clone().json());
+  });
+
+  it("keeps no error answer", async () => {
+    const response = await GET(
+      new Request("http://platform.invalid/api/v1/platform", {
+        headers: { "if-none-match": "*", "x-correlation-id": "invalid" },
+      }),
+      routeContext,
+    );
+    expect(response.status).toBe(400);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("etag")).toBeNull();
+  });
+
   it("returns the shared safe error envelope", async () => {
     const response = await GET(
       new Request("http://platform.invalid/api/v1/platform", {

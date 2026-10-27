@@ -13,6 +13,8 @@ import {
   type IdempotencyPolicy,
 } from "@ador/shared/http";
 import type { z } from "zod";
+
+import type { HttpCachePolicy } from "./cache.ts";
 import type { PageAccessRequirement } from "@ador/shared/features";
 import type { UuidV7 } from "@ador/shared/identifiers";
 
@@ -39,6 +41,13 @@ export type HttpResponseEffect =
   // Signs the browser out: the platform session cookie is removed.
   | { readonly kind: "clear-platform-session" };
 
+// What an operation that answers with a file (a picture) puts in `value`: the bytes and what they are. The operation lists the
+// kinds it may answer with in `files`, and its output schema accepts nothing else.
+export interface HttpFile {
+  readonly bytes: Uint8Array;
+  readonly contentType: string;
+}
+
 export type HttpOperationResult<Output extends object> =
   | {
       readonly effects?: readonly HttpResponseEffect[];
@@ -56,10 +65,15 @@ export type HttpOperationResult<Output extends object> =
 export interface HttpOperation<Input, Output extends object> {
   readonly access: PageAccessRequirement;
   readonly applicationErrors: readonly ApplicationHttpErrorCode[];
+  // How long a browser may keep a successful answer. Required of every GET and refused on anything else, so nothing is cached by
+  // accident and no read forgets to say.
+  readonly cache?: HttpCachePolicy;
   readonly execute: (
     input: Input,
     context: HttpOperationContext,
   ) => Promise<HttpOperationResult<Output>>;
+  // Set for an operation that answers with a file, not JSON: the media types it may answer with. Its output is then an `HttpFile`.
+  readonly files?: readonly string[];
   readonly idempotency: IdempotencyPolicy;
   // How the input arrives: in a JSON body, in the query string of a GET (`query`; a read that asks for something particular), or not
   // at all.

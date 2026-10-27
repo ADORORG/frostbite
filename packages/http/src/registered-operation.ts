@@ -1,6 +1,7 @@
 import type { RouteContribution } from "@ador/shared/features";
 import type { PageAccessRequirement } from "@ador/shared/features";
 
+import { assertCachePolicy, type HttpCachePolicy } from "./cache.ts";
 import {
   executeHttpOperation,
   type HttpAdapterRequest,
@@ -16,6 +17,8 @@ export type OpenApiOperationDescription = ReturnType<
 
 export interface RegisteredHttpOperation {
   readonly access: PageAccessRequirement;
+  readonly cache: HttpCachePolicy | undefined;
+  readonly file: boolean;
   readonly input: HttpOperation<object, object>["input"];
   readonly describe: () => OpenApiOperationDescription;
   readonly execute: (
@@ -33,8 +36,16 @@ export function registerHttpOperation<Input, Output extends object>(
     throw new Error(
       `Operation ${operation.operationId} reads a query string, so it must be a GET.`,
     );
+  // Every read says how it is kept; nothing else may (a write's answer is never kept).
+  if ((operation.method === "GET") !== (operation.cache !== undefined))
+    throw new Error(
+      `Operation ${operation.operationId}: a GET states its cache policy, and nothing else does.`,
+    );
+  if (operation.cache !== undefined) assertCachePolicy(operation.cache);
   return Object.freeze({
     access: operation.access,
+    cache: operation.cache,
+    file: operation.files !== undefined,
     input: operation.input,
     describe: () => describeOpenApiOperation(operation),
     execute: (

@@ -60,6 +60,7 @@ export function createEmailLinkOperations(
     inputSchema: emailEmptyInputSchema,
     outputSchema: emailAddressesResponseSchema,
     ...emailCodeRoutes.addresses,
+    cache: { kind: "revalidate" },
   };
   const linkRequest: HttpOperation<EmailCodeRequest, { readonly sent: true }> =
     {

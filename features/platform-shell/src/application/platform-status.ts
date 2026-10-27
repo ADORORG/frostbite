@@ -26,6 +26,7 @@ export function createPlatformStatusOperation(
     input: "none",
     inputSchema: platformStatusInputSchema,
     method: platformStatusRoute.method,
+    cache: { kind: "revalidate" },
     operationId: platformStatusRoute.operationId,
     outputSchema: platformStatusSchema,
     path: platformStatusRoute.path,
