@@ -1,3 +1,5 @@
+"use client";
+
 import type { MintedApi } from "../client/minted-api.ts";
 import { useMintedPicture } from "./use-minted-picture.ts";
 

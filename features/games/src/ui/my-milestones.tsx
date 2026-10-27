@@ -1,3 +1,5 @@
+"use client";
+
 import { signInHref } from "@ador/shared/auth/sign-in-path";
 import { gameHref, myMilestonesPath } from "@ador/shared/games";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
