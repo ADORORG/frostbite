@@ -3,7 +3,7 @@
 import { useRef, useSyncExternalStore } from "react";
 
 import type { Scene } from "../engine/index.ts";
-import { useScenes } from "./scenes-provider.tsx";
+import { useScenes } from "./provider.tsx";
 
 const never = () => () => undefined;
 

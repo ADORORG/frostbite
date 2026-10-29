@@ -1,8 +1,8 @@
 import { act } from "react";
 
 import { ScenesProvider, AnimationToggle } from "../../src/react/index.ts";
-import { blocks } from "../../src/scenes/blocks.ts";
-import { runner } from "../../src/scenes/runner.ts";
+import { blocks } from "../../src/library/blocks.ts";
+import { runner } from "../../src/library/runner.ts";
 import { installBrowser } from "./browser.ts";
 
 // A provider with a switch above a positioned box, and the small reads every scene test makes of what was rendered.

@@ -1,7 +1,7 @@
 "use client";
 
 import { sceneCopy } from "./copy.ts";
-import { useScenes } from "./scenes-provider.tsx";
+import { useScenes } from "./provider.tsx";
 
 // The switch for animation, always on the page: anything that moves for more than a few seconds must be stoppable. It says what is true
 // now (moving or not, whatever the reason), and the person's choice is remembered.

@@ -21,7 +21,7 @@ import {
   type Scheduler,
   type UserChoice,
 } from "../engine/index.ts";
-import { scenes as registered } from "../scenes/registry.ts";
+import { scenes as registered } from "../library/index.ts";
 import { browserEnvironment } from "./browser.ts";
 import {
   createChoiceStore,

@@ -9,7 +9,7 @@ import {
   stillTime,
   type Scene,
 } from "../engine/index.ts";
-import { useScenes } from "./scenes-provider.tsx";
+import { useScenes } from "./provider.tsx";
 
 // One scene on a canvas. It registers with the page's scheduler, which decides whether it moves; this only draws what it is asked for.
 // The canvas is decoration, hidden from screen readers, and the scene is made again if the scene changes.

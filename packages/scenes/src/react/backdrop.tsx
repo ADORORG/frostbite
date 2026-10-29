@@ -1,8 +1,8 @@
 "use client";
 
 import { playbackLimits } from "../engine/index.ts";
-import { SceneCanvas } from "./scene-canvas.tsx";
-import { useChosenScene } from "./use-chosen-scene.ts";
+import { SceneCanvas } from "./canvas.tsx";
+import { useChosenScene } from "./use-chosen.ts";
 
 // A section's moving background: a scene chosen at random on each visit (never the same as another backdrop on the page while there are
 // others), or the one named. It fills its parent, which must be positioned; the page puts its own scrim over it for the text. The scene

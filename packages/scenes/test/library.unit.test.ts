@@ -11,9 +11,9 @@ import {
   sceneWidth,
   type Scene,
 } from "../src/engine/index.ts";
-import { blocks } from "../src/scenes/blocks.ts";
-import { defineScenes, scenes } from "../src/scenes/registry.ts";
-import { runner } from "../src/scenes/runner.ts";
+import { blocks } from "../src/library/blocks.ts";
+import { defineScenes, scenes } from "../src/library/index.ts";
+import { runner } from "../src/library/runner.ts";
 import { recordingSurface, type Drawn } from "./support/surface.ts";
 
 const frameOf = (scene: Scene, t: number): readonly Drawn[] => {
@@ -156,11 +156,11 @@ describe("how much each part weighs", () => {
   const engineBudget = 10 * 1024;
 
   it.each(
-    readdirSync(join(here, "../src/scenes")).filter(
-      (file) => file !== "registry.ts",
+    readdirSync(join(here, "../src/library")).filter(
+      (file) => file !== "index.ts",
     ),
   )("keeps scene %s under 8 KB compressed", (file) => {
-    expect(gzipped("scenes", file)).toBeLessThan(sceneBudget);
+    expect(gzipped("library", file)).toBeLessThan(sceneBudget);
   });
 
   it("keeps the whole engine under 10 KB compressed", () => {

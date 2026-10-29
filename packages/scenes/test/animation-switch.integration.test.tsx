@@ -13,8 +13,8 @@ import { describe, expect, it, vi } from "vitest";
 import { preferenceKey } from "../src/engine/index.ts";
 import { AnimationToggle, ScenesProvider } from "../src/react/index.ts";
 import { sceneCopy } from "../src/react/copy.ts";
-import { blocks } from "../src/scenes/blocks.ts";
-import { runner } from "../src/scenes/runner.ts";
+import { blocks } from "../src/library/blocks.ts";
+import { runner } from "../src/library/runner.ts";
 import { installBrowser } from "./support/browser.ts";
 import { stage, toggle } from "./support/stage.tsx";
 

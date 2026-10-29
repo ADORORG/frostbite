@@ -10,8 +10,8 @@ import {
   SceneOverlay,
   ScenesProvider,
 } from "../src/react/index.ts";
-import { blocks } from "../src/scenes/blocks.ts";
-import { runner } from "../src/scenes/runner.ts";
+import { blocks } from "../src/library/blocks.ts";
+import { runner } from "../src/library/runner.ts";
 import { installBrowser } from "./support/browser.ts";
 import {
   canvases,

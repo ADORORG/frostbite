@@ -12,7 +12,7 @@ nowhere else. Pages import four things and know nothing else about how a scene i
   - `SceneOverlay`: a card's overlay. The scene is chosen from the card's `seed` (so a card always looks the same), or named by `sceneId`.
   - `AnimationToggle`: the always-visible on/off switch.
 - `@ador/scenes/styles.css`: the few rules that place a scene in its box. Imported once by the app.
-- `@ador/scenes/scenes`: the list of scenes (`scenes`, `defineScenes`).
+- `@ador/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`).
 - `@ador/scenes/engine`: the DOM-free parts (contract, drawing helpers, clock, picking, policy, preference, scheduler), for tooling that
   renders scenes outside a page (the video build, S5).
 
@@ -20,7 +20,7 @@ nowhere else. Pages import four things and know nothing else about how a scene i
 
 ```
 src/engine/   no DOM, no React: scene.ts (contract), draw.ts, palette.ts, clock.ts, pick.ts, policy.ts, device.ts, preference.ts, scheduler.ts
-src/scenes/   one file per scene, and registry.ts (an explicit list; nothing is found by scanning)
+src/library/  one file per scene, and index.ts (an explicit list; nothing is found by scanning)
 src/react/    the provider, the canvas, the backdrop, the overlay, the switch, and the browser stores they read
 src/styles/   scenes.css
 ```
@@ -33,7 +33,7 @@ reverse.
 A scene is `{ id, name, make() }`. `make()` does one-time work and returns `{ loopSeconds, draw(surface, t) }`. `draw` is a pure function of
 `t`, the seconds into the loop, drawn on a 160 x 90 grid with `rect`/`sprite`. A pure function can be drawn at any moment, so a still frame
 is one moment, a test can draw the whole loop, and the loop closes without a jump when every scroll speed divides the loop into whole
-repeats. Adding a scene is one file and one line in `registry.ts`.
+repeats. Adding a scene is one file and one line in `index.ts`.
 
 ## How scenes are run
 
@@ -47,7 +47,7 @@ repeats. Adding a scene is one file and one line in `registry.ts`.
 
 ## Budgets (enforced by tests)
 
-Each scene file is under 8 KB gzipped and the whole engine under 10 KB gzipped (`test/scenes.unit.test.ts`). No library, no WebAssembly, no
+Each scene file is under 8 KB gzipped and the whole engine under 10 KB gzipped (`test/library.unit.test.ts`). No library, no WebAssembly, no
 asset download; the content security policy is unchanged.
 
 ## Tests

@@ -6,7 +6,7 @@
   "exports": {
     "./engine": "./src/engine/index.ts",
     "./react": "./src/react/index.ts",
-    "./scenes": "./src/scenes/registry.ts",
+    "./library": "./src/library/index.ts",
     "./styles.css": "./src/styles/scenes.css"
   },
   "scripts": {
