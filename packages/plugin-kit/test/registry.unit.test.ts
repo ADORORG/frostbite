@@ -192,6 +192,7 @@ describe("createFeatureRegistry", () => {
                 transactionalActions: "gated",
               },
             }),
+            cache: { kind: "revalidate" },
             idempotency: "none",
             input: "none",
             inputSchema: platformStatusInputSchema,

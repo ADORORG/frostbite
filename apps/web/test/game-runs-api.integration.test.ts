@@ -79,7 +79,7 @@ describe("the size of a request body", () => {
   it("is held to a limit before it is parsed: a body past it is an invalid request, on any route", async () => {
     // An operation open to anyone, so the body is read without a session.
     const response = await post(
-      ["wallet", "balance"],
+      ["auth", "wallet", "challenge"],
       JSON.stringify({ padding: "x".repeat(1_048_576) }),
     );
     expect(response.status).toBe(400);
@@ -88,7 +88,7 @@ describe("the size of a request body", () => {
 
   it("is read by the bounded reader, never by the request's own parser", async () => {
     vi.mocked(readJsonBody).mockClear();
-    await post(["wallet", "balance"], "{}");
+    await post(["auth", "wallet", "challenge"], "{}");
     expect(readJsonBody).toHaveBeenCalledTimes(1);
   });
 });

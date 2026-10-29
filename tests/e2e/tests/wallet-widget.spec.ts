@@ -89,8 +89,8 @@ test("asks for the balance only while the menu is open, and says honestly that t
   await installFakeWallet(page, wallet);
   const balanceRequests: string[] = [];
   page.on("request", (request) => {
-    if (request.url().endsWith("/api/v1/wallet/balance"))
-      balanceRequests.push(request.postData() ?? "");
+    if (new URL(request.url()).pathname === "/api/v1/wallet/balance")
+      balanceRequests.push(request.url());
   });
   await page.goto("/");
   await connectWallet(page, wallet);

@@ -64,8 +64,10 @@ export function createBalanceOperation(dependencies: {
           };
         }
       },
+      // Changes with every block, and the widget keeps its own reading between page loads.
+      cache: { kind: "no-store" },
       idempotency: "none",
-      input: "json",
+      input: "query",
       inputSchema: walletBalanceRequestSchema,
       outputSchema: walletBalanceResponseSchema,
       ...walletBalanceRoute,

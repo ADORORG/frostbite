@@ -2,10 +2,6 @@ import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
 import { readRequestInput } from "@ador/http/request-input";
-import {
-  correlationHeaderName,
-  httpErrorEnvelopeSchema,
-} from "@ador/shared/http";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import type { ActiveSession } from "@ador/auth";
 import { parseEnvironment } from "@repo/config/env";
@@ -14,6 +10,7 @@ import {
   resolveApiOperation,
 } from "../../../../../../../configs/api";
 import { logAuthUnavailable } from "../../../../server/http/internal-error-log";
+import { refusal } from "../../../../server/http/refusal";
 import { executeNextOperation } from "../../../../server/http/next-operation";
 import { resolvePageAccess } from "../../../../server/auth/page-access";
 import { getPageAccessDependencies } from "../../../../server/auth/runtime";
@@ -35,19 +32,7 @@ async function handle(request: Request, context: RouteContext) {
     return Response.json(await getOpenApiDocument());
   }
   const operation = await resolveApiOperation(request.method, path);
-  if (!operation) {
-    const correlationId = randomUUID();
-    return Response.json(
-      httpErrorEnvelopeSchema.parse({
-        error: {
-          code: "not_found",
-          correlationId,
-          message: "Route not found.",
-        },
-      }),
-      { headers: { [correlationHeaderName]: correlationId }, status: 404 },
-    );
-  }
+  if (!operation) return refusal("not_found", "Route not found.", 404);
   // The first limit comes before any other work: a flood from one address is answered cheaply, and an operation
   // open to anyone is limited here, by address, because there is no one signed in to count against.
   const byAddress = await getRateLimitGate().byAddress({
@@ -64,22 +49,8 @@ async function handle(request: Request, context: RouteContext) {
     const canonicalOrigin = new URL(
       parseEnvironment(process.env).PUBLIC_BASE_URL,
     ).origin;
-    if (requestOrigin !== canonicalOrigin) {
-      const correlationId = randomUUID();
-      return Response.json(
-        httpErrorEnvelopeSchema.parse({
-          error: {
-            code: "forbidden",
-            correlationId,
-            message: "Mutation origin is not permitted.",
-          },
-        }),
-        {
-          headers: { [correlationHeaderName]: correlationId },
-          status: 403,
-        },
-      );
-    }
+    if (requestOrigin !== canonicalOrigin)
+      return refusal("forbidden", "Mutation origin is not permitted.", 403);
   }
   if (operation.access.kind !== "public") {
     const token = (await cookies()).get(platformSessionCookieName)?.value;
@@ -89,37 +60,22 @@ async function handle(request: Request, context: RouteContext) {
       getPageAccessDependencies,
     );
     if (access.kind !== "allowed") {
-      const correlationId = randomUUID();
-      if (access.kind === "unavailable")
+      if (access.kind === "unavailable") {
+        const correlationId = randomUUID();
         logAuthUnavailable({
           correlationId,
           operationId: operation.route.operationId,
         });
-      const code =
-        access.kind === "forbidden"
-          ? "forbidden"
-          : access.kind === "unavailable"
-            ? "internal_error"
-            : "unauthorized";
-      return Response.json(
-        httpErrorEnvelopeSchema.parse({
-          error: {
-            code,
-            correlationId,
-            message:
-              code === "forbidden"
-                ? "The actor lacks the required capability."
-                : code === "unauthorized"
-                  ? "Authentication is required."
-                  : "Authentication service unavailable.",
-          },
-        }),
-        {
-          headers: { [correlationHeaderName]: correlationId },
-          status:
-            code === "forbidden" ? 403 : code === "unauthorized" ? 401 : 503,
-        },
-      );
+        return refusal(
+          "internal_error",
+          "Authentication service unavailable.",
+          503,
+          { correlationId },
+        );
+      }
+      return access.kind === "forbidden"
+        ? refusal("forbidden", "The actor lacks the required capability.", 403)
+        : refusal("unauthorized", "Authentication is required.", 401);
     }
     actorSession = access.session;
     if (actorSession) {

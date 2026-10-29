@@ -24,7 +24,7 @@ never sees it in an address; the page saves it for the visit, clears it from the
 in (asking them to sign in if nobody is). It says "administrator" only after the server granted it, and a person missing a wallet is told
 so and can retry with the same link. `createAccountsFeature` takes the policy's `SetupRules` (lifetime, policy version, required
 methods) from the composition root. The operator makes the link with `pnpm platform:setup-link` (`tooling/platform-admin`). The route family also has
-`POST /api/v1/wallet/balance`. `balanceSource` is where the widget's balance comes from: the beta wires the rewards chain's
+`GET /api/v1/wallet/balance`. `balanceSource` is where the widget's balance comes from: the beta wires the rewards chain's
 own node (`configs/balance.ts`), and the answer keeps what is **spendable** (confirmed) apart from what is **pending** (waiting
 for its first confirmation). With no chain configured it passes `null` and the widget says "Balance unavailable: no data
 source is configured" (it never shows a number it did not get). Adding or removing it from `configs/features.ts`

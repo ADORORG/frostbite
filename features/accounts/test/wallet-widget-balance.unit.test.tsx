@@ -33,7 +33,10 @@ describe("the wallet widget: the balance", () => {
     await show();
     await settle();
     expect(asks(balancePath)).toHaveLength(1);
-    expect(asks(balancePath)[0]?.body).toEqual({ address, network: "signet" });
+    expect(asks(balancePath)[0]?.query).toEqual({
+      address,
+      network: "signet",
+    });
     // The chip is the wallet's short address and nothing longer.
     expect(chip()).toBe("tb1q9v…d45v");
     await openMenu();

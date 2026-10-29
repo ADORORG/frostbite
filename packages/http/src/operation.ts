@@ -83,6 +83,9 @@ export interface HttpOperation<Input, Output extends object> {
   readonly operationId: string;
   readonly outputSchema: z.ZodType<Output>;
   readonly path: `/api/v1/${string}`;
+  // Why an operation named like a read is not a GET: what its input is that must stay out of an address (where logs, history and
+  // caches keep it). Required of a non-GET named like a read, refused on anything else, so a read is a POST on purpose, not by habit.
+  readonly readsAsPost?: string;
 }
 
 export interface HttpAdapterRequest {

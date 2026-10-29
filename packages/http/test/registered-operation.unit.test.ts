@@ -114,11 +114,15 @@ describe("registerHttpOperation", () => {
     expect(() => registerHttpOperation(read({ cache: undefined }))).toThrow(
       "a GET states its cache policy, and nothing else does",
     );
-    expect(() => registerHttpOperation(read({ method: "POST" }))).toThrow(
-      "a GET states its cache policy",
-    );
+    expect(() =>
+      registerHttpOperation(
+        read({ method: "POST", operationId: "changeThing" }),
+      ),
+    ).toThrow("a GET states its cache policy");
     expect(
-      registerHttpOperation(read({ cache: undefined, method: "POST" })).cache,
+      registerHttpOperation(
+        read({ cache: undefined, method: "POST", operationId: "changeThing" }),
+      ).cache,
     ).toBeUndefined();
   });
 
@@ -134,4 +138,55 @@ describe("registerHttpOperation", () => {
       true,
     );
   });
+
+  it("makes a read sent as a POST say why, and nothing else say so", () => {
+    const post = (operationId: string, over: object = {}) =>
+      read({ cache: undefined, method: "POST", operationId, ...over });
+    const reason = "The search term stays out of the address.";
+    expect(() => registerHttpOperation(post("findPeople"))).toThrow(
+      "findPeople is named like a read, so it is a GET or states `readsAsPost`",
+    );
+    expect(
+      registerHttpOperation(post("findPeople", { readsAsPost: reason })).route
+        .method,
+    ).toBe("POST");
+    expect(() =>
+      registerHttpOperation(post("findPeople", { readsAsPost: "  " })),
+    ).toThrow("an empty reason");
+    expect(() =>
+      registerHttpOperation(post("grantRole", { readsAsPost: reason })),
+    ).toThrow("not a read sent as a POST");
+    expect(() => registerHttpOperation(read({ readsAsPost: reason }))).toThrow(
+      "not a read sent as a POST",
+    );
+  });
+
+  it.each([
+    "checkThing",
+    "describeThing",
+    "fetchThing",
+    "findThing",
+    "getThing",
+    "listThings",
+    "loadThing",
+    "readThing",
+    "searchThings",
+  ])("treats %s as named like a read", (operationId) => {
+    expect(() =>
+      registerHttpOperation(
+        read({ cache: undefined, method: "POST", operationId }),
+      ),
+    ).toThrow("named like a read");
+  });
+
+  it.each(["getawayCar", "listen", "reader", "readOnlyFlag".toLowerCase()])(
+    "does not take %s for a read: the verb is a whole word",
+    (operationId) => {
+      expect(
+        registerHttpOperation(
+          read({ cache: undefined, method: "POST", operationId }),
+        ).route.operationId,
+      ).toBe(operationId);
+    },
+  );
 });

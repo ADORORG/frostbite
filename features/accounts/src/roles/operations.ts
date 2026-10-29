@@ -83,6 +83,7 @@ export function createRoleOperations(getServices: () => RoleServices) {
     input: "json",
     inputSchema: roleFindRequestSchema,
     outputSchema: rolePeopleResponseSchema,
+    readsAsPost: "The search text can be an email address.",
     ...roleRoutes.find,
   };
   function recent(

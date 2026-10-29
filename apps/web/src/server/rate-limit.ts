@@ -1,16 +1,11 @@
-import { randomUUID } from "node:crypto";
-
 import { createPostgresRateLimiter } from "@ador/database/rate-limit";
 import { createRateLimitGate, type RateLimitGate } from "@ador/http/rate-limit";
-import {
-  correlationHeaderName,
-  httpErrorEnvelopeSchema,
-  type RateLimitDecision,
-} from "@ador/shared/http";
+import type { RateLimitDecision } from "@ador/shared/http";
 import { parseSecurityEnvironment } from "@repo/config/env";
 
 import { rateLimits } from "../../../../configs/rate-limits";
 import { getDatabase } from "./database";
+import { refusal } from "./http/refusal";
 
 let gate: RateLimitGate | undefined;
 
@@ -32,22 +27,7 @@ export function getRateLimitGate(): RateLimitGate {
 }
 
 // The answer to a caller over a limit: the platform's error envelope, and how long to wait.
-export function tooManyRequests(decision: RateLimitDecision): Response {
-  const correlationId = randomUUID();
-  return Response.json(
-    httpErrorEnvelopeSchema.parse({
-      error: {
-        code: "rate_limited",
-        correlationId,
-        message: "Too many requests. Try again later.",
-      },
-    }),
-    {
-      headers: {
-        [correlationHeaderName]: correlationId,
-        "retry-after": String(decision.retryAfterSeconds),
-      },
-      status: 429,
-    },
-  );
-}
+export const tooManyRequests = (decision: RateLimitDecision): Response =>
+  refusal("rate_limited", "Too many requests. Try again later.", 429, {
+    headers: { "retry-after": String(decision.retryAfterSeconds) },
+  });

@@ -90,7 +90,7 @@ describe("the balance store", () => {
     expect(r.spy).toHaveBeenCalledTimes(3);
   });
 
-  it("sends the wallet's address and network, and a manual refresh asks again at once", async () => {
+  it("asks with the wallet's address and network in the address, and a manual refresh asks again at once", async () => {
     const r = requester();
     const store = createBalanceStore({
       intervalMs: 60_000,
@@ -99,7 +99,7 @@ describe("the balance store", () => {
     store.setTarget(mine);
     store.setOpen(true);
     const calls: readonly (readonly unknown[])[] = r.spy.mock.calls;
-    expect(calls[0]?.[2]).toEqual({ body: mine });
+    expect(calls[0]?.[2]).toEqual({ query: mine });
     r.answer(ready(1));
     await flush();
     void store.refresh();

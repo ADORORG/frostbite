@@ -58,7 +58,11 @@ export const setSession = (next: SessionState) => {
 };
 export const address = "tb1q9vza2e8x573nczrlzms0wvx3gsqjx7vaxwd45v";
 export const second = "tb1qsecondwalletaddress000000000000000000";
-export const requests: { body: unknown; path: string }[] = [];
+export const requests: {
+  body: unknown;
+  path: string;
+  query: Record<string, string>;
+}[] = [];
 export const answers: Record<string, () => Response | Promise<Response>> = {};
 export let container: HTMLElement;
 let root: Root;
@@ -124,10 +128,13 @@ beforeEach(() => {
   signedOut.mockClear();
   session = "signed-out";
   chooser.request.mockClear();
-  vi.stubGlobal("fetch", async (path: string, init?: { body?: string }) => {
+  vi.stubGlobal("fetch", async (address: string, init?: { body?: string }) => {
+    // A read carries its input in the query string; scripted answers are found by the path alone.
+    const [path = address, search = ""] = address.split("?");
     requests.push({
       body: init?.body === undefined ? undefined : JSON.parse(init.body),
       path,
+      query: Object.fromEntries(new URLSearchParams(search)),
     });
     const answer = answers[path];
     if (answer === undefined) throw new Error(`Unexpected request to ${path}`);

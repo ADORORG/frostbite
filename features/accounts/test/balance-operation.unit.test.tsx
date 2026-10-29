@@ -46,6 +46,15 @@ describe("the wallet balance", () => {
     ).toBe(false);
   });
 
+  it("is a read: a GET with its input in the address, and an answer a browser does not keep", () => {
+    const operation = createBalanceOperation({ clock, source: null });
+    expect([operation.method, operation.input, operation.cache]).toEqual([
+      "GET",
+      "query",
+      { kind: "no-store" },
+    ]);
+  });
+
   it("says it is not configured, and not zero, when the platform has no data source", async () => {
     expect(await ask(null)).toEqual({
       ok: true,

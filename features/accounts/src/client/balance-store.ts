@@ -81,7 +81,7 @@ export function createBalanceStore(dependencies: {
       const answer = await request(
         walletBalanceRoute,
         walletBalanceResponseSchema,
-        { body: asking },
+        { query: { address: asking.address, network: asking.network } },
       );
       if (mine !== latest) return;
       if (answer.status === "ready") {

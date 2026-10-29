@@ -46,3 +46,7 @@ refuses the rest. The web adapter puts the policy on the wire with `presentRespo
 (`private`, with `Vary: Cookie`, unless the operation is open to everyone), and a `304` with no body for a matching `If-None-Match`.
 Errors, writes and operations that say `no-store` are never kept. An operation that answers with a file lists the media types in `files`
 and returns an `HttpFile`; it is sent with `nosniff` and a sandboxing content security policy.
+
+A non-`GET` operation named like a read (`get`, `list`, `read`, `find`, `search`, `check`, `load`, `fetch`, `describe` and a capital) is refused at
+registration unless it states `readsAsPost`, the reason its input must stay out of an address; nothing else may state one. A read is a `GET` by default,
+so adding one as a `POST` is a decision with a written reason.

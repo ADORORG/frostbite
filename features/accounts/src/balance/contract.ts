@@ -1,11 +1,10 @@
 import { walletNetworkSchema } from "@ador/shared/chain";
 import { z } from "zod";
 
-// The one route that tells the widget a wallet's balance. It is a POST because the platform's operations take their
-// input in a JSON body; it only reads. Anyone may ask (an address is public and a visitor with a connected wallet
-// has no session), so it is rate limited by caller like the other public routes.
+// The one route that tells the widget a wallet's balance. Anyone may ask (an address is public and a visitor with a
+// connected wallet has no session), so it is rate limited by caller like the other public routes.
 export const walletBalanceRoute = {
-  method: "POST",
+  method: "GET",
   operationId: "getWalletBalance",
   path: "/api/v1/wallet/balance",
 } as const;

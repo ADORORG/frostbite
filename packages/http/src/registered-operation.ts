@@ -28,6 +28,13 @@ export interface RegisteredHttpOperation {
   readonly route: RouteContribution;
 }
 
+// The first word of an operation id that says it only reads. An id is a verb and what it acts on (`listUploads`, `getMintedPicture`).
+const readVerbs =
+  /^(?:check|describe|fetch|find|get|list|load|read|search)(?=[A-Z])/u;
+
+export const isNamedLikeARead = (operationId: string): boolean =>
+  readVerbs.test(operationId);
+
 export function registerHttpOperation<Input, Output extends object>(
   operation: HttpOperation<Input, Output>,
 ): RegisteredHttpOperation {
@@ -42,6 +49,21 @@ export function registerHttpOperation<Input, Output extends object>(
       `Operation ${operation.operationId}: a GET states its cache policy, and nothing else does.`,
     );
   if (operation.cache !== undefined) assertCachePolicy(operation.cache);
+  // A read is a GET. The one reason it is not is stated, and nothing else states one.
+  const reason = operation.readsAsPost;
+  const namedAsRead = isNamedLikeARead(operation.operationId);
+  if (operation.method !== "GET" && namedAsRead && reason === undefined)
+    throw new Error(
+      `Operation ${operation.operationId} is named like a read, so it is a GET or states \`readsAsPost\`.`,
+    );
+  if (reason !== undefined && (operation.method === "GET" || !namedAsRead))
+    throw new Error(
+      `Operation ${operation.operationId} states \`readsAsPost\` but is not a read sent as a POST.`,
+    );
+  if (reason?.trim() === "")
+    throw new Error(
+      `Operation ${operation.operationId} states an empty reason in \`readsAsPost\`.`,
+    );
   return Object.freeze({
     access: operation.access,
     cache: operation.cache,
