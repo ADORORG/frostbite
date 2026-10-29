@@ -26,7 +26,7 @@ const once = (
   }) as const;
 
 export const frostRunnerGame = defineGame({
-  capabilities: ["run:submit"],
+  capabilities: ["milestone:claim", "run:submit"],
   cover: {
     alt: "A runner in a cyan suit and yellow scarf racing across ice under the northern lights, with pink spikes ahead and an icicle hanging overhead.",
     image: "cover.svg",
@@ -178,6 +178,7 @@ export const frostRunnerGame = defineGame({
   ],
   network: betaTarget.chainId,
   scene: "runner",
+  rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary:
     "An endless runner: jump spikes, slide under icicles, take the shards.",

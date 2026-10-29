@@ -26,7 +26,7 @@ const once = (
   }) as const;
 
 export const icicleDropGame = defineGame({
-  capabilities: ["run:submit"],
+  capabilities: ["milestone:claim", "run:submit"],
   cover: {
     alt: "A four by four board of glowing ice tiles in every colour, from small blue ones to a huge cyan 2048.",
     image: "cover.svg",
@@ -176,6 +176,7 @@ export const icicleDropGame = defineGame({
   ],
   network: betaTarget.chainId,
   scene: "blocks",
+  rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary:
     "A sliding ice-tile puzzle: join two of a kind and chase the big tile.",

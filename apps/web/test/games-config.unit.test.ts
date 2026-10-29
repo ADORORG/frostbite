@@ -40,7 +40,7 @@ describe("the platform's game list", () => {
   it("plays FROST·BITE on the platform itself, with no address to set, and declares four of its own marks as milestones, replay-verifiable only where the rules can decide them, and only what the platform grants", async () => {
     const [frostbite] = await gamesWith("");
     expect(frostbite?.launch).toEqual({ mode: "embedded" });
-    expect(frostbite?.capabilities).toEqual(["run:submit"]);
+    expect(frostbite?.capabilities).toEqual(["milestone:claim", "run:submit"]);
     expect(
       frostbite?.milestones.map(({ id, verification }) => [id, verification]),
     ).toEqual([
@@ -73,6 +73,21 @@ describe("the platform's game list", () => {
     const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
     expect(ids.includes("sample-game")).toBe(listed);
     expect(ids[0]).toBe("frostbite");
+  });
+
+  it("declares a rewards contract on each of the games built for players, so staff can create it, and none on the sample game", async () => {
+    const games = await gamesWith("");
+    for (const id of ["frostbite", "frost-runner", "icicle-drop"]) {
+      const game = games.find((listed) => listed.id === id);
+      expect(game?.rewards).toEqual({
+        templateId: "game-rewards",
+        templateVersion: "1.0.0",
+      });
+      expect(game?.capabilities).toContain("milestone:claim");
+    }
+    expect(
+      games.find(({ id }) => id === "sample-game")?.rewards,
+    ).toBeUndefined();
   });
 
   it("plays the sample game on the platform itself, in the frame, with the milestones its code awards", async () => {

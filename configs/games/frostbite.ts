@@ -18,7 +18,7 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // browser that knows the seed can read; SAT SNAKE hides nothing, but a program could still steer it. `first-cashout` is a simulation event no replay can decide, so it stays
 // the game's report. The digest pins the built file: a change to the rules is a change here, and a test fails until it is.
 export const frostbite = defineGame({
-  capabilities: ["run:submit"],
+  capabilities: ["milestone:claim", "run:submit"],
   cover: {
     alt: "A glacier rising over a board of ice tiles, with a few red mines hidden among them.",
     image: "cover.svg",
@@ -62,6 +62,7 @@ export const frostbite = defineGame({
     },
   ],
   network: betaTarget.chainId,
+  rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A predictive minefield game on Bitcoin.",
   title: "FROST·BITE",
