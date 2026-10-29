@@ -8,15 +8,17 @@
   </head>
   <body>
     <main>
-      <header>
-        <h1>Frost Runner</h1>
-        <p id="status">Connecting to the platform…</p>
-      </header>
-      <p class="score">
-        <span>Distance <strong id="distance">0</strong> m</span>
-        <span>Shards <strong id="shards">0</strong></span>
-        <span>Best <strong id="best">0</strong> m</span>
-      </p>
+      <div class="bar">
+        <header>
+          <h1>Frost Runner</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Distance <strong id="distance">0</strong> m</span>
+          <span>Shards <strong id="shards">0</strong></span>
+          <span>Best <strong id="best">0</strong> m</span>
+        </p>
+      </div>
       <canvas
         id="screen"
         width="160"
@@ -24,11 +26,13 @@
         role="img"
         aria-label="The game screen: a runner on the ice, with spikes to jump and icicles to slide under"
       ></canvas>
-      <p id="note" aria-live="polite"></p>
-      <div class="actions">
-        <button id="start" type="button" disabled>Start run</button>
-        <button id="jump" type="button" disabled>Jump</button>
-        <button id="slide" type="button" disabled>Slide</button>
+      <div class="foot">
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="jump" type="button" disabled>Jump</button>
+          <button id="slide" type="button" disabled>Slide</button>
+        </div>
       </div>
       <section aria-labelledby="earned-title">
         <h2 id="earned-title">Earned this run</h2>

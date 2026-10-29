@@ -7,12 +7,54 @@ body {
   color: #ece8ff;
   font-family: system-ui, sans-serif;
 }
+/* The page is the whole frame: a slim bar above, the board as large as the space allows, the controls below. */
 main {
   display: grid;
-  gap: 0.75rem;
-  max-width: 30rem;
-  margin: 0 auto;
-  padding: 1rem;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  block-size: 100dvh;
+  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+}
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.stage {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-block-size: 0;
+  border: 0.1875rem solid #3a2870;
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(circle at 30% 0%, rgb(56 232 255 / 0.12), transparent 60%),
+    #150b3a;
+  box-shadow:
+    0 0 2rem rgb(56 232 255 / 0.16),
+    inset 0 0 1.5rem rgb(0 0 0 / 0.4);
+}
+.foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.foot #note {
+  grid-column: 1 / -1;
+}
+.foot .pad {
+  grid-column: 1 / -1;
+  inline-size: min(100%, 32rem);
+  justify-self: center;
+}
+.foot #start {
+  grid-column: 1 / -1;
+  inline-size: min(100%, 32rem);
+  justify-self: center;
 }
 h1,
 h2,
@@ -44,10 +86,10 @@ h2 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
+  inline-size: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+  box-sizing: border-box;
   padding: 0.5rem;
-  border: 0.1875rem solid #3a2870;
-  border-radius: 0.75rem;
-  background: #150b3a;
   touch-action: none;
 }
 .tile {
@@ -57,7 +99,7 @@ h2 {
   border-radius: 0.5rem;
   background: #1b1046;
   color: #0c0620;
-  font-size: clamp(1rem, 6vw, 1.75rem);
+  font-size: clamp(1rem, 8cqmin, 4.5rem);
   font-weight: 800;
 }
 .tile[data-level="1"] {
@@ -100,7 +142,7 @@ h2 {
   background: #ece8ff;
 }
 #note {
-  min-block-size: 4.5rem;
+  min-block-size: 2.75rem;
   color: #b9aaec;
 }
 .pad {
@@ -170,15 +212,7 @@ button:focus-visible {
   outline-offset: 0.125rem;
 }
 
-/* The board: frosted glass over a deep well, and tiles that are lit from above like cut ice. */
-.board {
-  background:
-    radial-gradient(circle at 30% 0%, rgb(56 232 255 / 0.12), transparent 60%),
-    #150b3a;
-  box-shadow:
-    0 0 2rem rgb(56 232 255 / 0.16),
-    inset 0 0 1.5rem rgb(0 0 0 / 0.4);
-}
+/* The tiles are lit from above like cut ice. */
 .tile {
   position: relative;
   overflow: hidden;

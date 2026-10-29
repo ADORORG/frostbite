@@ -8,37 +8,58 @@
   </head>
   <body>
     <main>
-      <header>
-        <h1>Icicle Drop</h1>
-        <p id="status">Connecting to the platform…</p>
-      </header>
-      <p class="score">
-        <span>Score <strong id="score">0</strong></span>
-        <span>Moves <strong id="moves">0</strong></span>
-        <span>Best <strong id="best">0</strong></span>
-      </p>
-      <div id="board" class="board" role="img" aria-label="Board: empty"></div>
-      <p id="note" aria-live="polite"></p>
-      <div id="pad" class="pad" role="group" aria-label="Move the tiles">
-        <button type="button" data-direction="up" disabled aria-label="Up">
-          ↑
-        </button>
-        <button type="button" data-direction="left" disabled aria-label="Left">
-          ←
-        </button>
-        <button type="button" data-direction="down" disabled aria-label="Down">
-          ↓
-        </button>
-        <button
-          type="button"
-          data-direction="right"
-          disabled
-          aria-label="Right"
-        >
-          →
-        </button>
+      <div class="bar">
+        <header>
+          <h1>Icicle Drop</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Score <strong id="score">0</strong></span>
+          <span>Moves <strong id="moves">0</strong></span>
+          <span>Best <strong id="best">0</strong></span>
+        </p>
       </div>
-      <button id="start" type="button" disabled>Start run</button>
+      <div class="stage">
+        <div
+          id="board"
+          class="board"
+          role="img"
+          aria-label="Board: empty"
+        ></div>
+      </div>
+      <div class="foot">
+        <p id="note" aria-live="polite"></p>
+        <div id="pad" class="pad" role="group" aria-label="Move the tiles">
+          <button type="button" data-direction="up" disabled aria-label="Up">
+            ↑
+          </button>
+          <button
+            type="button"
+            data-direction="left"
+            disabled
+            aria-label="Left"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            data-direction="down"
+            disabled
+            aria-label="Down"
+          >
+            ↓
+          </button>
+          <button
+            type="button"
+            data-direction="right"
+            disabled
+            aria-label="Right"
+          >
+            →
+          </button>
+        </div>
+        <button id="start" type="button" disabled>Start run</button>
+      </div>
       <section aria-labelledby="earned-title">
         <h2 id="earned-title">Earned this run</h2>
         <ul id="earned" aria-label="Milestones earned this run"></ul>
