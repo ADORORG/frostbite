@@ -1,0 +1,20 @@
+/* A scene fills the box it is given, drawn small and scaled up so it stays crisp and costs the same at any size. */
+.scene-backdrop,
+.scene-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.scene-canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+/* On a card the scene is quieter than the poster under it and blends into it; the card's own fade keeps its text readable. */
+.scene-overlay {
+  opacity: 0.7;
+  mix-blend-mode: screen;
+}
