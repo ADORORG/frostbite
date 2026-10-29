@@ -43,9 +43,9 @@ let titles = new Map<string, string>();
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 
-function show(): void {
+function show(previous: readonly number[] | null = null): void {
   const state = session?.state();
-  showBoard(grid, state?.board ?? []);
+  showBoard(grid, state?.board ?? [], previous);
   score.textContent = String(state?.score ?? 0);
   moves.textContent = String(state?.moves ?? 0);
   bestOut.textContent = String(progress.best);
@@ -87,9 +87,10 @@ async function finish(finished: DropSession): Promise<void> {
 function choose(direction: Direction): void {
   const running = session;
   if (running === null || running.state().over || running.state().ended) return;
+  const before = running.state().board;
   const outcome = running.move(direction);
   if (!outcome.ok) return;
-  show();
+  show(before);
   if (running.state().over) void finish(running);
 }
 

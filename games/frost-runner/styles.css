@@ -90,3 +90,48 @@ button[hidden] {
   color: #56f5a6;
   font-size: 0.8125rem;
 }
+
+canvas {
+  box-shadow:
+    0 0 2rem rgb(56 232 255 / 0.18),
+    inset 0 0 0 0.125rem #0c0620;
+}
+
+/* Polish: a glowing title, a framed screen, and buttons that answer a hand. */
+h1 {
+  background: linear-gradient(90deg, #ece8ff, #38e8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.score span {
+  padding: 0.125rem 0.625rem;
+  border: 0.125rem solid #2a1a5e;
+  border-radius: 999px;
+  background: #12082b;
+}
+button {
+  box-shadow: 0 0.25rem 0 #0e5f74;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background 120ms ease;
+}
+button:hover:not(:disabled),
+button:focus-visible {
+  background: #271d6b;
+}
+button:active:not(:disabled) {
+  transform: translateY(0.125rem);
+  box-shadow: 0 0.125rem 0 #0e5f74;
+}
+button:focus-visible {
+  outline: 0.1875rem solid #ffd23f;
+  outline-offset: 0.125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

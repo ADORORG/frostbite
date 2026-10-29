@@ -6,6 +6,7 @@ import { attachControls } from "../src/screen/controls.ts";
 import { mostTicksAFrame, ticksIn } from "../src/screen/clock.ts";
 import { draw, screenHeight, screenWidth } from "../src/screen/draw.ts";
 import { colour } from "../src/screen/palette.ts";
+import type { RunnerState } from "../src/rules/types.ts";
 import { empty, icicle, shard, spike, withWorld } from "./support/states.ts";
 
 const frame = 1000 / ticksPerSecond;
@@ -107,14 +108,15 @@ describe("the player's hands", () => {
 });
 
 // A drawing surface that notes what is drawn on it.
+type Drawn = {
+  fill: string;
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
 function surface() {
-  const drawn: {
-    fill: string;
-    height: number;
-    width: number;
-    x: number;
-    y: number;
-  }[] = [];
+  const drawn: Drawn[] = [];
   const context = {
     fillRect(x: number, y: number, width: number, height: number) {
       drawn.push({ fill: String(context.fillStyle), height, width, x, y });
@@ -123,12 +125,19 @@ function surface() {
   };
   return { context: context as unknown as CanvasRenderingContext2D, drawn };
 }
+const painted = (state: RunnerState, best = 100) => {
+  const page = surface();
+  draw(page.context, state, best);
+  return page.drawn;
+};
+const ofColour = (list: readonly Drawn[], fill: string) =>
+  list.filter((block) => block.fill === fill);
+const top = (list: readonly Drawn[], fill: string) =>
+  Math.min(...ofColour(list, fill).map(({ y }) => y));
 
 describe("drawing the screen", () => {
   it("fills the whole screen with the sky first, and stays inside it", () => {
-    const { context, drawn } = surface();
-    draw(
-      context,
+    const drawn = painted(
       withWorld([spike(60), icicle(120)], [shard(40), shard(80, true)]),
       500,
     );
@@ -148,55 +157,110 @@ describe("drawing the screen", () => {
     }
   });
 
+  it("draws the same picture for the same state, and another as the ticks go by", () => {
+    const run = withWorld([spike(60)], [shard(40)]);
+    expect(painted(run)).toEqual(painted(run));
+    expect(painted({ ...run, tick: 37 })).not.toEqual(painted(run));
+  });
+
   it("draws each kind of thing in its own colour", () => {
-    const { context, drawn } = surface();
-    draw(context, withWorld([spike(60), icicle(120)], [shard(40)]), 500);
-    const fills = new Set(drawn.map(({ fill }) => fill));
-    for (const wanted of [colour.pink, colour.core, colour.yellow, colour.cyan])
+    const fills = new Set(
+      painted(withWorld([spike(60), icicle(120)], [shard(40)])).map(
+        ({ fill }) => fill,
+      ),
+    );
+    for (const wanted of [
+      colour.pink,
+      colour.frost,
+      colour.yellow,
+      colour.cyan,
+    ])
       expect(fills).toContain(wanted);
   });
 
-  it("draws the runner in red once it is stopped, and lower while sliding", () => {
-    const alive = surface();
-    draw(alive.context, empty(), 100);
-    const dead = surface();
-    draw(dead.context, { ...empty(), alive: false }, 100);
-    expect(alive.drawn.some(({ fill }) => fill === colour.cyan)).toBe(true);
-    expect(dead.drawn.some(({ fill }) => fill === colour.red)).toBe(true);
-    const slide = surface();
-    draw(
-      slide.context,
-      { ...empty(), action: { kind: "slide", tick: 2 } },
-      100,
-    );
-    const body = (list: ReturnType<typeof surface>["drawn"]) =>
-      list.find(({ fill }) => fill === colour.cyan);
-    expect(body(slide.drawn)?.height).toBeLessThan(
-      body(alive.drawn)?.height ?? 0,
-    );
+  it("draws the runner in red once it is stopped, with the screen flashing red, and not before", () => {
+    const alive = painted(empty());
+    const dead = painted({ ...empty(), alive: false });
+    expect(ofColour(alive, colour.cyan).length).toBeGreaterThan(0);
+    expect(ofColour(alive, colour.flash)).toEqual([]);
+    expect(ofColour(dead, colour.red).length).toBeGreaterThan(0);
+    expect(ofColour(dead, colour.flash)).toHaveLength(1);
+    expect(ofColour(dead, colour.flash)[0]).toMatchObject({
+      height: screenHeight,
+      width: screenWidth,
+    });
   });
 
-  it("raises the runner in a jump", () => {
-    const ground = surface();
-    draw(ground.context, empty(), 100);
-    const air = surface();
-    draw(air.context, { ...empty(), action: { kind: "jump", tick: 12 } }, 100);
-    const top = (list: ReturnType<typeof surface>["drawn"]) =>
-      list.find(({ fill }) => fill === colour.cyan)?.y ?? 0;
-    expect(top(air.drawn)).toBeLessThan(top(ground.drawn));
+  it("runs on two frames of legs, a tuck in the air and a low slide, each its own picture", () => {
+    const legs = (tick: number) =>
+      JSON.stringify(
+        ofColour(painted({ ...empty(), tick }), colour.deep).filter(
+          ({ y }) => y > 60,
+        ),
+      );
+    expect(legs(0)).not.toBe(legs(4));
+    expect(legs(0)).toBe(legs(8));
+    const standing = ofColour(painted(empty()), colour.cyan).length;
+    const sliding = ofColour(
+      painted({ ...empty(), action: { kind: "slide", tick: 2 } }),
+      colour.cyan,
+    ).length;
+    expect(sliding).toBeLessThan(standing);
+    const tucked = painted({ ...empty(), action: { kind: "jump", tick: 12 } });
+    expect(ofColour(tucked, colour.cyan).length).not.toBe(standing);
+  });
+
+  it("raises the runner in a jump, and lowers its shadow's size", () => {
+    expect(
+      top(
+        painted({ ...empty(), action: { kind: "jump", tick: 12 } }),
+        colour.cyan,
+      ),
+    ).toBeLessThan(top(painted(empty()), colour.cyan));
+    const shadow = (state: RunnerState) =>
+      ofColour(painted(state), colour.shadow)[0]?.width ?? 0;
+    expect(
+      shadow({ ...empty(), action: { kind: "jump", tick: 12 } }),
+    ).toBeLessThan(shadow(empty()));
+  });
+
+  it("makes a shard glint, a spike a crystal, and an icicle glint at its tip now and then", () => {
+    const frames = (tick: number) =>
+      JSON.stringify(
+        ofColour(painted({ ...withWorld([], [shard(40)]), tick }), colour.core),
+      );
+    expect(frames(0)).not.toBe(frames(6));
+    expect(
+      ofColour(painted(withWorld([spike(60)])), colour.red).length,
+    ).toBeGreaterThan(0);
+    const tip = (tick: number) =>
+      ofColour(painted({ ...withWorld([icicle(60)]), tick }), colour.core)
+        .length;
+    expect(tip(0)).toBeGreaterThan(tip(10));
   });
 
   it("shows how far along the best distance the run is, never beyond the bar", () => {
-    const run = surface();
-    draw(run.context, { ...empty(), distance: 10_000 }, 100);
-    const bar = run.drawn.filter(
-      ({ fill, y }) => fill === colour.yellow && y === 2,
-    );
-    expect(bar.at(-1)?.width).toBeLessThanOrEqual(screenWidth - 4);
-    const none = surface();
-    draw(none.context, empty(), 0);
+    const bar = (state: RunnerState, best: number) =>
+      ofColour(painted(state, best), colour.yellow).filter(
+        ({ y, height }) => y === 2 && height === 2,
+      );
     expect(
-      none.drawn.find(({ fill, y }) => fill === colour.yellow && y === 2),
-    ).toBeUndefined();
+      bar({ ...empty(), distance: 10_000 }, 100).at(-1)?.width,
+    ).toBeLessThanOrEqual(screenWidth - 4);
+    expect(bar(empty(), 0)).toEqual([]);
+  });
+
+  it("lets the world go faster the further the runner has got: streaks of speed only at speed", () => {
+    const streaks = (distance: number) =>
+      ofColour(painted({ ...empty(), distance }), colour.groundLight).length;
+    expect(streaks(40_000)).toBeGreaterThan(streaks(0));
+  });
+
+  it("moves the layers at their own speeds: far hills slower than near ones", () => {
+    const ridge = (distance: number) =>
+      JSON.stringify(
+        ofColour(painted({ ...empty(), distance }), colour.cloud).slice(0, 40),
+      );
+    expect(ridge(0)).not.toBe(ridge(4_000));
   });
 });

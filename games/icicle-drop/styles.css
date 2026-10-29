@@ -137,3 +137,107 @@ button:disabled {
   color: #56f5a6;
   font-size: 0.8125rem;
 }
+/* Polish: a glowing title, a framed board, and buttons that answer a hand. */
+h1 {
+  background: linear-gradient(90deg, #ece8ff, #38e8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.score span {
+  padding: 0.125rem 0.625rem;
+  border: 0.125rem solid #2a1a5e;
+  border-radius: 999px;
+  background: #12082b;
+}
+button {
+  box-shadow: 0 0.25rem 0 #0e5f74;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background 120ms ease;
+}
+button:hover:not(:disabled),
+button:focus-visible {
+  background: #271d6b;
+}
+button:active:not(:disabled) {
+  transform: translateY(0.125rem);
+  box-shadow: 0 0.125rem 0 #0e5f74;
+}
+button:focus-visible {
+  outline: 0.1875rem solid #ffd23f;
+  outline-offset: 0.125rem;
+}
+
+/* The board: frosted glass over a deep well, and tiles that are lit from above like cut ice. */
+.board {
+  background:
+    radial-gradient(circle at 30% 0%, rgb(56 232 255 / 0.12), transparent 60%),
+    #150b3a;
+  box-shadow:
+    0 0 2rem rgb(56 232 255 / 0.16),
+    inset 0 0 1.5rem rgb(0 0 0 / 0.4);
+}
+.tile {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0.1875rem 0 rgb(255 255 255 / 0.55),
+    inset 0 -0.25rem 0 rgb(0 0 0 / 0.22),
+    0 0.125rem 0.5rem rgb(0 0 0 / 0.35);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
+}
+.tile[data-level="0"] {
+  background: #1b1046;
+  box-shadow: inset 0 0.125rem 0.375rem rgb(0 0 0 / 0.45);
+  text-shadow: none;
+}
+.tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.4), transparent 45%);
+  pointer-events: none;
+}
+.tile[data-level="0"]::after {
+  content: none;
+}
+.tile[data-level="8"],
+.tile[data-level="9"],
+.tile[data-level="10"] {
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+}
+.tile[data-level="9"],
+.tile[data-level="10"],
+.tile[data-level="11"],
+.tile[data-level="12"] {
+  box-shadow:
+    inset 0 0.1875rem 0 rgb(255 255 255 / 0.55),
+    inset 0 -0.25rem 0 rgb(0 0 0 / 0.22),
+    0 0 0.875rem rgb(56 232 255 / 0.55);
+}
+/* A tile that has just appeared grows into place; one that is the product of a join pulses. */
+.tile[data-new="true"] {
+  animation: tile-appear 160ms ease-out;
+}
+.tile[data-merged="true"] {
+  animation: tile-merge 200ms ease-out;
+}
+@keyframes tile-appear {
+  from {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+}
+@keyframes tile-merge {
+  50% {
+    transform: scale(1.14);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

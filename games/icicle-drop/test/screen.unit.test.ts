@@ -117,6 +117,26 @@ describe("drawing the board", () => {
     expect(shown[2]?.dataset.level).toBe("0");
   });
 
+  it("marks a tile that has just appeared, and one made by a join, for the page to animate; and nothing on a fresh run", () => {
+    const grid = document.createElement("div");
+    const before = [1, 1, 3, ...Array.from({ length: 13 }, () => 0)];
+    const after = [2, 0, 3, 1, ...Array.from({ length: 12 }, () => 0)];
+    showBoard(grid, after, before);
+    const cell = (at: number) => grid.children[at] as HTMLElement;
+    expect(cell(0).dataset).toMatchObject({ merged: "true", new: "false" });
+    expect(cell(1).dataset).toMatchObject({ merged: "false", new: "false" });
+    expect(cell(2).dataset).toMatchObject({ merged: "false", new: "false" });
+    expect(cell(3).dataset).toMatchObject({ merged: "false", new: "true" });
+    showBoard(grid, after);
+    expect(
+      [...grid.children].every(
+        (c) =>
+          (c as HTMLElement).dataset.new === "false" &&
+          (c as HTMLElement).dataset.merged === "false",
+      ),
+    ).toBe(true);
+  });
+
   it("describes the board for someone who cannot see it, and caps the colour at the biggest tile it has one for", () => {
     const grid = document.createElement("div");
     showBoard(grid, [1, 0, 14, ...Array.from({ length: 13 }, () => 0)]);

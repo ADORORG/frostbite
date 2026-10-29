@@ -27,7 +27,7 @@ accepts.
 
 26, all decided by the state of a run alone (`src/rules/milestones.ts`): tiles from 64 to 4096, score, moves, pairs joined in one move,
 streaks of moves that join, and board marks (a big tile in the corner, room to spare, a full board survived, a quick 128). The words are
-in the manifest. The list is a draft for the owner to approve.
+in the manifest. The owner approved the list on 2026-10-29.
 
 ## Tests
 

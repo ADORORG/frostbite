@@ -25,7 +25,7 @@ rules changes the digest, and a test fails until the pin and `verifierVersion` a
 ## Milestones
 
 23, all decided by the state of a run alone (`src/rules/milestones.ts`): distance (100 m to 3,000 m), shards, obstacles passed, close
-calls, jumps and slides, time alive, and top speed. The words are in the manifest. The list is a draft for the owner to approve.
+calls, jumps and slides, time alive, and top speed. The words are in the manifest. The owner approved the list on 2026-10-29.
 
 ## Tests
 

@@ -9,7 +9,7 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // decided by the rules alone (`games/icicle-drop/src/rules/milestones.ts`), so each can be replay-checked: the game publishes its rules
 // as a verifier, the platform replays a run it issued a seed for, and the milestone is then held as replay-verified. That shows the run
 // followed the rules, not that a person played it. The digest pins the built file: a change to the rules is a change here, and a test
-// fails until it is. The milestone list is a draft for the owner to approve.
+// fails until it is. The owner approved the milestone list on 2026-10-29; changing a goal changes the rules (and so the digest below).
 const once = (
   id: string,
   title: string,
@@ -27,6 +27,11 @@ const once = (
 
 export const icicleDropGame = defineGame({
   capabilities: ["run:submit"],
+  cover: {
+    alt: "A four by four board of glowing ice tiles in every colour, from small blue ones to a huge cyan 2048.",
+    image: "cover.svg",
+    video: null,
+  },
   description:
     "Slide the ice tiles with the arrow keys or a swipe. Two tiles of a kind join into the next, and the board fills up fast. Build big tiles, chain your joins, and keep the board tidy. Every milestone is checked by replaying your run.",
   id: "icicle-drop",

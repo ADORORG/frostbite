@@ -9,7 +9,7 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // the rules alone (`games/frost-runner/src/rules/milestones.ts`), so each can be replay-checked: the game publishes its rules as a
 // verifier, the platform replays a run it issued a seed for, and the milestone is then held as replay-verified. That shows the run
 // followed the rules, not that a person played it. The digest pins the built file: a change to the rules is a change here, and a test
-// fails until it is. The milestone list is a draft for the owner to approve.
+// fails until it is. The owner approved the milestone list on 2026-10-29; changing a goal changes the rules (and so the digest below).
 const once = (
   id: string,
   title: string,
@@ -27,6 +27,11 @@ const once = (
 
 export const frostRunnerGame = defineGame({
   capabilities: ["run:submit"],
+  cover: {
+    alt: "A runner in a cyan suit and yellow scarf racing across ice under the northern lights, with pink spikes ahead and an icicle hanging overhead.",
+    image: "cover.svg",
+    video: null,
+  },
   description:
     "Run across the ice. Tap the top of the screen to jump the spikes and the bottom to slide under the icicles, and take the shards as you go. The world speeds up the further you get, and every milestone is checked by replaying your run.",
   id: "frost-runner",
