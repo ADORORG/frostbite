@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Frost Runner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Frost Runner</h1>
+        <p id="status">Connecting to the platform…</p>
+      </header>
+      <p class="score">
+        <span>Distance <strong id="distance">0</strong> m</span>
+        <span>Shards <strong id="shards">0</strong></span>
+        <span>Best <strong id="best">0</strong> m</span>
+      </p>
+      <canvas
+        id="screen"
+        width="160"
+        height="90"
+        role="img"
+        aria-label="The game screen: a runner on the ice, with spikes to jump and icicles to slide under"
+      ></canvas>
+      <p id="note" aria-live="polite"></p>
+      <div class="actions">
+        <button id="start" type="button" disabled>Start run</button>
+        <button id="jump" type="button" disabled>Jump</button>
+        <button id="slide" type="button" disabled>Slide</button>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>

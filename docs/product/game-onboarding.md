@@ -87,6 +87,15 @@ To choose which scene the card shows, name it: `scene: "runner"`. Left out, the 
 the card looks the same on every visit. The platform checks the name against the scenes it has (`@ador/scenes/library`) and
 refuses to start with a game that names one it does not have, rather than ignoring it.
 
+## Pieces to build on
+
+A game that plays on a seed and wants its milestones replay-checked can build on four small modules of the SDK instead of writing its
+own: `@ador/game-sdk/seeded` (the seeded generator every rule must use), `@ador/game-sdk/run-inputs` (checking a run input's fields
+and tick, and refusing with a reason), `@ador/game-sdk/run-notes` (what to tell the player about a run and what became of it), and
+`@ador/game-sdk/play` (reporting a milestone only if the manifest declares it, and starting and submitting runs). Frost Runner and
+Icicle Drop (`games/frost-runner`, `games/icicle-drop`) are two complete examples: pure seeded rules, a session that records the
+choices, a verifier with a sample run, and a manifest that pins its digest.
+
 ## Talking to the platform
 
 ```ts

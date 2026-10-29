@@ -1,0 +1,92 @@
+:root {
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: #0c0620;
+  color: #ece8ff;
+  font-family: system-ui, sans-serif;
+}
+main {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+h2 {
+  font-size: 1rem;
+}
+#status {
+  color: #b9aaec;
+  font-size: 0.875rem;
+}
+.score {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: #b9aaec;
+}
+.score strong {
+  color: #38e8ff;
+}
+canvas {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0.1875rem solid #3a2870;
+  border-radius: 0.5rem;
+  background: #0c0620;
+  image-rendering: pixelated;
+  touch-action: manipulation;
+}
+#note {
+  min-block-size: 4.5rem;
+  color: #b9aaec;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 0.125rem solid #38e8ff;
+  border-radius: 0.5rem;
+  background: #1c1450;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button[hidden] {
+  display: none;
+}
+#earned {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+#earned li {
+  padding: 0.25rem 0.625rem;
+  border: 0.125rem solid #56f5a6;
+  border-radius: 999px;
+  color: #56f5a6;
+  font-size: 0.8125rem;
+}

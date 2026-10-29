@@ -24,12 +24,14 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE, first, then the two development games while the platform runs for development, and every game passes the manifest schema", async () => {
+  it("lists FROST·BITE first, then the development games while the platform runs for development, then the games built on the SDK, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
     expect(games.map(({ id }) => id)).toEqual([
       "frostbite",
       "sample-game",
       "sdk-explorer",
+      "frost-runner",
+      "icicle-drop",
     ]);
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);

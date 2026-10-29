@@ -12,6 +12,8 @@ import { targetChains } from "./chains.ts";
 import { frostbite } from "./games/frostbite.ts";
 import { sampleGame } from "./games/sample.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
+import { frostRunnerGame } from "./games/frost-runner.ts";
+import { icicleDropGame } from "./games/icicle-drop.ts";
 // game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
@@ -30,6 +32,8 @@ export const games = defineGames([
     parseGameLaunchEnvironment(process.env),
   ),
   ...developmentGames(),
+  frostRunnerGame,
+  icicleDropGame,
   // game:new adds games above this line.
 ]);
 
