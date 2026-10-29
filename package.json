@@ -52,6 +52,7 @@
     "test:e2e": "pnpm build && pnpm --filter @repo/e2e test:e2e",
     "repository:check": "pnpm --filter @repo/repository-policy check",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
+    "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",
     "game:dev": "pnpm --filter @repo/game-tools dev",
     "game:new": "pnpm --filter @repo/game-tools new",
     "testnet:preflight": "pnpm --filter @repo/testnet-preflight preflight"

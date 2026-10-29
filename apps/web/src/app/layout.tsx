@@ -13,6 +13,7 @@ import { walletAuthConfig } from "../../../../configs/wallet";
 import { getPageAccessDependencies } from "../server/auth/runtime";
 import { readSessionState } from "../server/auth/session-state";
 import { ClientNavigation } from "./client-navigation";
+import { sceneVideoBase } from "./scene-videos";
 import { WalletShell } from "./wallet-shell";
 
 const bodyFont = Chakra_Petch({
@@ -61,7 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <ClientNavigation />
-        <ScenesProvider>
+        <ScenesProvider videoBase={sceneVideoBase}>
           <ShellStatusProvider
             status={
               <IndexingBadge

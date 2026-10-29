@@ -1,7 +1,7 @@
 "use client";
 
 import { pickStable, playbackLimits } from "../engine/index.ts";
-import { SceneCanvas } from "./canvas.tsx";
+import { SceneView } from "./scene-view.tsx";
 import { useScenes } from "./provider.tsx";
 
 // A card's overlay: a scene chosen from the card's own id, so the same card looks the same on every visit. A named scene wins. It sits
@@ -25,7 +25,7 @@ export function SceneOverlay({
       aria-hidden="true"
       className={art ? "scene-overlay scene-overlay--art" : "scene-overlay"}
     >
-      <SceneCanvas
+      <SceneView
         className="scene-canvas"
         fps={playbackLimits.overlayFps}
         force={false}

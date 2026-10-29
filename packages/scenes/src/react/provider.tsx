@@ -24,6 +24,7 @@ import {
 import { scenes as registered } from "../library/index.ts";
 import { browserEnvironment } from "./browser.ts";
 import {
+  canvasSupported,
   createChoiceStore,
   deviceFrom,
   devicePending,
@@ -32,6 +33,8 @@ import {
 } from "./browser-stores.ts";
 
 interface ScenesContext {
+  // Whether this browser can draw a scene itself. On the server, and until it is asked, yes.
+  readonly canvas: boolean;
   // Takes a scene at random that no other backdrop on the page has taken, while there are unused ones.
   readonly claimRandom: () => Scene;
   readonly choice: UserChoice | null;
@@ -39,7 +42,11 @@ interface ScenesContext {
   readonly scenes: readonly Scene[];
   readonly scheduler: Scheduler;
   readonly setChoice: (choice: UserChoice) => void;
+  // Where the app serves each scene's video files (see `videoFiles`), or nothing when it does not serve them.
+  readonly videoBase: string | null;
 }
+
+const never = () => () => undefined;
 
 const Context = createContext<ScenesContext | null>(null);
 
@@ -56,9 +63,11 @@ export function useScenes(): ScenesContext {
 export function ScenesProvider({
   children,
   list = registered,
+  videoBase = null,
 }: {
   readonly children: ReactNode;
   readonly list?: readonly Scene[];
+  readonly videoBase?: string | null;
 }) {
   const scheduler = useMemo(
     () =>
@@ -92,6 +101,12 @@ export function ScenesProvider({
     ),
   );
   const taken = useRef<number[]>([]);
+  const canvasProbe = useRef<boolean | null>(null);
+  const canvas = useSyncExternalStore(
+    never,
+    () => (canvasProbe.current ??= canvasSupported()),
+    () => true,
+  );
 
   const playback: Playback =
     device === null ? "still" : playbackFor(device, choice);
@@ -106,6 +121,7 @@ export function ScenesProvider({
 
   const value = useMemo<ScenesContext>(
     () => ({
+      canvas,
       choice,
       claimRandom: () => {
         const at = pickRandom(list.length, taken.current);
@@ -118,8 +134,9 @@ export function ScenesProvider({
       scenes: list,
       scheduler,
       setChoice: choiceStore.write,
+      videoBase,
     }),
-    [choice, choiceStore, list, playback, scheduler],
+    [canvas, choice, choiceStore, list, playback, scheduler, videoBase],
   );
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

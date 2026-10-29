@@ -62,3 +62,9 @@ export function createChoiceStore(preference: Preference) {
     },
   };
 }
+
+// Whether this browser can draw a scene at all: it has a canvas that gives a 2D drawing surface. Where it cannot (a very old browser, a
+// locked-down web view), a scene is played from its video instead, if the app serves them.
+export function canvasSupported(): boolean {
+  return document.createElement("canvas").getContext("2d") !== null;
+}

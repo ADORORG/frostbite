@@ -7,6 +7,7 @@
     "./engine": "./src/engine/index.ts",
     "./react": "./src/react/index.ts",
     "./library": "./src/library/index.ts",
+    "./video": "./src/video/index.ts",
     "./styles.css": "./src/styles/scenes.css"
   },
   "scripts": {

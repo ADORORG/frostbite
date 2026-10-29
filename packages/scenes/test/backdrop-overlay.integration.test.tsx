@@ -223,12 +223,12 @@ describe("an overlay", () => {
 });
 
 describe("failures", () => {
-  it("draws nothing, and does not fail, when the canvas has no drawing context", async () => {
+  it("draws nothing, and does not fail, when the canvas has no drawing context and there are no videos to fall back on", async () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
     const container = await mount(stage(<SceneBackdrop sceneId="runner" />));
     await frameAt(1000);
-    expect(canvases(container)).toHaveLength(1);
-    expect(browser.surfaceOf(canvases(container)[0] ?? null)).toBeUndefined();
+    expect(canvases(container)).toHaveLength(0);
+    expect(container.querySelector("video, img")).toBeNull();
   });
 
   it("is refused with a plain message when there are no scenes to take", async () => {

@@ -14,7 +14,9 @@ nowhere else. Pages import four things and know nothing else about how a scene i
 - `@ador/scenes/styles.css`: the few rules that place a scene in its box. Imported once by the app.
 - `@ador/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`).
 - `@ador/scenes/engine`: the DOM-free parts (contract, drawing helpers, clock, picking, policy, preference, scheduler), for tooling that
-  renders scenes outside a page (the video build, S5).
+  renders scenes outside a page.
+- `@ador/scenes/video`: DOM-free parts of the video fallback: `createRaster` (a surface that draws into memory), `framePlan`, `videoFiles`,
+  `videoSpec`. Used by `tooling/scene-render`, which writes the files, and by the page, which asks for them by name.
 
 ## Layout
 
@@ -22,6 +24,7 @@ nowhere else. Pages import four things and know nothing else about how a scene i
 src/engine/   no DOM, no React: scene.ts (contract), draw.ts, palette.ts, clock.ts, pick.ts, policy.ts, device.ts, preference.ts, scheduler.ts
 src/library/  one file per scene, and index.ts (an explicit list; nothing is found by scanning)
 src/react/    the provider, the canvas, the backdrop, the overlay, the switch, and the browser stores they read
+src/video/    raster.ts (in-memory surface), spec.ts (file names, frame plan)
 src/styles/   scenes.css
 ```
 
@@ -44,6 +47,14 @@ repeats. Adding a scene is one file and one line in `index.ts`.
   of memory or less (where the browser reports it) shows stills. Until the browser has been asked (the server render) nothing moves.
 - The choice is kept in `localStorage` under `scenes:animation`; a missing or failing store only means it is not remembered.
 - Scenes are decoration: canvases are `aria-hidden`. The switch is the control for anything that moves for more than a few seconds.
+
+## Where a browser cannot draw
+
+A browser with no 2D canvas plays the scene's video instead (`SceneView` chooses). Pass `videoBase` to `ScenesProvider` (the app's
+folder of rendered files, see `tooling/scene-render`). The video is silent, loops, plays only while on screen, and follows the same
+switch and device signals: while scenes are not moving it shows the still. If the video cannot load it shows the still, and if that
+cannot load it shows nothing. With no `videoBase`, a browser with no canvas shows nothing. The server always renders the canvas version,
+which is what a browser that can draw adopts.
 
 ## Budgets (enforced by tests)
 
