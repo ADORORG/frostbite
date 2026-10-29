@@ -9,22 +9,42 @@ export const homeRailLimit = 6;
 export function HomeRail({
   backdrop,
   children,
+  compact = false,
   href,
   id,
   linkLabel,
   summary,
   title,
 }: {
-  // The moving background, which fills the band; decoration only.
+  // The moving background, which fills the band; decoration only. A compact rail has none.
   readonly backdrop?: ReactNode;
-  readonly children: ReactNode;
+  readonly children?: ReactNode;
+  // A feature with nothing to show yet: a small tile (two sit side by side) with a line of words, instead of a whole band.
+  readonly compact?: boolean;
   readonly href: string;
   readonly id: string;
-  readonly linkLabel: string;
+  // Left out, there is no link, for a tile with nothing behind it.
+  readonly linkLabel?: string;
   readonly summary: string;
   readonly title: string;
 }) {
   const headingId = `${id}-title`;
+  if (compact)
+    return (
+      <section
+        aria-labelledby={headingId}
+        className="home-rail home-rail--compact"
+        id={id}
+      >
+        <h2 id={headingId}>{title}</h2>
+        <p>{summary}</p>
+        {linkLabel === undefined ? null : (
+          <a className="home-rail__link" href={href}>
+            {linkLabel}
+          </a>
+        )}
+      </section>
+    );
   return (
     <section aria-labelledby={headingId} className="home-rail" id={id}>
       {backdrop === undefined ? null : (
@@ -38,9 +58,11 @@ export function HomeRail({
             <h2 id={headingId}>{title}</h2>
             <p>{summary}</p>
           </div>
-          <a className="home-rail__link" href={href}>
-            {linkLabel}
-          </a>
+          {linkLabel === undefined ? null : (
+            <a className="home-rail__link" href={href}>
+              {linkLabel}
+            </a>
+          )}
         </header>
         {children}
       </div>

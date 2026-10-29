@@ -86,6 +86,15 @@ describe("the landing page's rail of games", () => {
     expect(scenes[1]).toBeTruthy();
   });
 
+  it("draws a lone game large, across the band, and several as equal cards", async () => {
+    const lone = await rail(make(embeddedGame));
+    expect(
+      lone.querySelector(".cover-card")?.getAttribute("data-featured"),
+    ).toBe("true");
+    const several = await rail(make(embeddedGame, coveredGame));
+    expect(several.querySelector("[data-featured]")).toBeNull();
+  });
+
   it("says so, in the catalog's own words, when there are no games", async () => {
     const container = await rail([]);
     expect(textOf(container)).toContain(noGames.title);

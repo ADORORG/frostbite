@@ -52,19 +52,18 @@ describe("the rail of collections", () => {
     expect(show([card(1, true)])).toContain("scene-backdrop");
   });
 
-  it("says there are none, in the catalog's own words", () => {
+  it("is a small tile saying there are none, in the catalog's own words, with no scene and no link to an empty list", () => {
     const markup = show([]);
-    expect(markup).toContain(noCollections.title);
-    expect(markup).toContain(homeRailCopy.link(0));
-    expect(markup).not.toContain("cover-grid");
+    expect(markup).toContain("home-rail--compact");
+    expect(markup).toContain(noCollections.body);
+    expect(markup).not.toMatch(/cover-grid|scene-backdrop|home-rail__link/u);
   });
 
-  it("says it could not read the catalog, and does not call that empty", () => {
+  it("says in the same small tile that it could not read the catalog, and does not call that empty", () => {
     const markup = show(null);
-    expect(markup).toContain(collectionsUnavailable.title);
-    expect(markup).toContain("Catalog unavailable");
-    expect(markup).toContain(homeRailCopy.link(0));
-    expect(markup).not.toContain(noCollections.title);
+    expect(markup).toContain("home-rail--compact");
+    expect(markup).toContain(collectionsUnavailable.body);
+    expect(markup).not.toContain(noCollections.body);
   });
 
   it("never says there are none in its link, and says the number once there are several", () => {

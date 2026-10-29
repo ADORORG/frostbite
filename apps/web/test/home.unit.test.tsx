@@ -24,12 +24,14 @@ describe("home release state", () => {
     expect(markup).toContain('id="launches"');
     expect(markup).toContain("Nothing is open to mint right now.");
     expect(markup).not.toMatch(/registered|gated|foundation|Catalog empty/iu);
-    // Every feature that has a part of the landing page is on it, laid out in the order they asked for.
-    const order = ["launches", "collections", "games"].map((id) =>
+    // Every feature that has a part of the landing page is on it, games first, because they are what there is to do.
+    const order = ["games", "collections", "launches"].map((id) =>
       markup.indexOf(`id="${id}"`),
     );
     expect(order.every((at) => at > 0)).toBe(true);
     expect(order).toEqual([...order].sort((a, b) => a - b));
+    // Features with nothing yet are small tiles, so the page leads with content, not with two empty bands.
+    expect(markup).toContain("home-rail--compact");
     expect(markup).toContain("scene-backdrop");
     expect(markup).not.toContain("Connect wallet");
     expect(markup).not.toContain("Buy now");

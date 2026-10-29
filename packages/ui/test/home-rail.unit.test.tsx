@@ -49,4 +49,59 @@ describe("a landing page rail", () => {
     expect(backdrop?.getAttribute("aria-hidden")).toBe("true");
     expect(backdrop?.querySelector('[data-testid="moving"]')).not.toBeNull();
   });
+
+  it("leaves out the link when there is nothing behind it", async () => {
+    const container = await show(
+      <HomeRail href="/games" id="games" summary="Soon." title="Games">
+        <p>cards</p>
+      </HomeRail>,
+    );
+    expect(container.querySelector("a")).toBeNull();
+    expect(container.textContent).toContain("Soon.");
+  });
+});
+
+describe("a compact landing page rail", () => {
+  const tile = (
+    props: { backdrop?: React.ReactNode; linkLabel?: string } = {},
+  ) => (
+    <HomeRail
+      {...props}
+      compact
+      href="/launches"
+      id="launches"
+      summary="Nothing is open."
+      title="Launches"
+    >
+      <p data-testid="inside">cards</p>
+    </HomeRail>
+  );
+
+  it("is a small named tile: a title and one line, and nothing else", async () => {
+    const container = await show(tile());
+    const section = container.querySelector("section");
+    expect(section?.className).toContain("home-rail--compact");
+    expect(section?.getAttribute("aria-labelledby")).toBe(
+      container.querySelector("h2")?.id,
+    );
+    expect(container.querySelector("h2")?.textContent).toBe("Launches");
+    expect(container.querySelector("p")?.textContent).toBe("Nothing is open.");
+    expect(container.querySelector("a")).toBeNull();
+  });
+
+  it("takes no background and no cards, because it has nothing to show", async () => {
+    const container = await show(
+      tile({ backdrop: <i data-testid="moving" /> }),
+    );
+    expect(container.querySelector(".home-rail__backdrop")).toBeNull();
+    expect(container.querySelector('[data-testid="moving"]')).toBeNull();
+    expect(container.querySelector('[data-testid="inside"]')).toBeNull();
+  });
+
+  it("links to the full list only when it is given a label", async () => {
+    const container = await show(tile({ linkLabel: "See all launches" }));
+    const link = container.querySelector("a");
+    expect(link?.getAttribute("href")).toBe("/launches");
+    expect(link?.textContent).toBe("See all launches");
+  });
 });

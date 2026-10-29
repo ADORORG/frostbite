@@ -49,7 +49,7 @@ describe("public product entrypoint", () => {
     expect(invalid).not.toContain("Frostbite");
   });
 
-  it("gives the landing page a part for launches, saying plainly that none are open, and none for creators", async () => {
+  it("gives the landing page a part for launches, a small tile saying plainly that none are open, and none for creators", async () => {
     const launches = createPublicProductEntrypoint(launchesCatalog);
     expect(launches.capabilities).toContain("home-section");
     expect(launches.homeSections?.map(({ id, order }) => [id, order])).toEqual([
@@ -59,14 +59,13 @@ describe("public product entrypoint", () => {
     const markup = renderToStaticMarkup(
       <ScenesProvider>{await section?.render()}</ScenesProvider>,
     );
+    // Nothing is open, so the part is a small tile: a title and one line, no scene, and no link to an empty list.
     expect(markup).toContain('id="launches"');
-    expect(markup).toContain("scene-backdrop");
-    expect(markup).toContain('href="/launches"');
-    expect(markup).toContain("See all launches");
-    expect(markup).toContain("No launches yet");
+    expect(markup).toContain("home-rail--compact");
     expect(markup).toContain("Nothing is open to mint right now.");
-    expect(markup).toContain("Mints open here when a launch goes live.");
-    expect(markup).not.toMatch(/Catalog empty|cover-card/u);
+    expect(markup).not.toMatch(
+      /scene-backdrop|home-rail__link|Catalog empty|cover-card/u,
+    );
     const creators = createPublicProductEntrypoint(creatorsCatalog);
     expect(creators.capabilities).not.toContain("home-section");
     expect(creators.homeSections).toEqual([]);

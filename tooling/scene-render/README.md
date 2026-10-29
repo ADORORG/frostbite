@@ -1,6 +1,6 @@
 # `@repo/scene-render`
 
-Renders the platform's scenes (`@ador/scenes`) to video files, for browsers that cannot draw them. Developer tooling: not shipped, and
+Renders the platform's scenes (`@ador/scenes`, the pickable ones and the ambient ones such as the landing page's snow) to video files, for browsers that cannot draw them. Developer tooling: not shipped, and
 nothing in the platform imports it.
 
 ## Public API

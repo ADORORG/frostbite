@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { AppShell } from "@repo/ui/arcade";
 import type { FeatureId } from "@ador/shared/features";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
@@ -32,9 +33,11 @@ export function PlatformHome({
         hasGames={hasGames}
         hasLaunches={hasLaunches}
       />
-      {sections.map(({ id, node }) => (
-        <div key={id}>{node}</div>
-      ))}
+      <div className="home-sections">
+        {sections.map(({ id, node }) => (
+          <Fragment key={id}>{node}</Fragment>
+        ))}
+      </div>
     </AppShell>
   );
 }

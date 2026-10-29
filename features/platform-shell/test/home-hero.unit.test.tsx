@@ -15,7 +15,7 @@ const hero = (over: Partial<Parameters<typeof HomeHero>[0]> = {}) =>
     </ScenesProvider>,
   );
 const playing = (container: HTMLElement) =>
-  container.querySelector(".home-hero__scene b")?.textContent;
+  container.querySelector(".home-cabinet__name")?.textContent;
 const pick = (container: HTMLElement, label: string) =>
   click(container.querySelector(`button[aria-label="${label}"]`));
 
@@ -60,6 +60,24 @@ describe("the landing page's hero", () => {
     expect(playing(container)).toBe(
       scenes[(at - 1 + scenes.length) % scenes.length]?.name,
     );
+  });
+
+  it("keeps the words and the scene apart: snow falls behind the words, and the playing scene is on a screen beside them", async () => {
+    const container = await hero();
+    const sky = container.querySelector(".home-hero__sky");
+    expect(sky?.getAttribute("aria-hidden")).toBe("true");
+    expect(
+      sky?.querySelector(".scene-backdrop")?.getAttribute("data-scene"),
+    ).toBe("snowfall");
+    const screen = container.querySelector(".home-cabinet__screen");
+    expect(screen?.getAttribute("aria-hidden")).toBe("true");
+    expect(screen?.querySelector(".scene-backdrop")).not.toBeNull();
+    // The screen plays what a person can pick, and never the page's own weather.
+    expect(screen?.querySelector("[data-scene='snowfall']")).toBeNull();
+    // The words are in neither: they sit in their own column, so no scene is ever drawn behind them.
+    const copy = container.querySelector(".home-hero__copy");
+    expect(copy?.querySelector(".scene-backdrop")).toBeNull();
+    expect(copy?.querySelector("h1")).not.toBeNull();
   });
 
   it("is a named region with a screen of decoration that screen readers skip", async () => {

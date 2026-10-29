@@ -9,10 +9,7 @@ export const productCatalogs = [
     navigationOrder: 10,
     featureId: "launches",
     // Launches have a part of the landing page; creators do not.
-    homeRail: {
-      link: "See all launches",
-      summary: "Mints open here when a launch goes live.",
-    },
+    homeRail: true,
     path: "/launches",
   },
   {
@@ -23,7 +20,7 @@ export const productCatalogs = [
     navigationArea: "footer",
     navigationOrder: 20,
     featureId: "creators",
-    homeRail: null,
+    homeRail: false,
     path: "/creators",
   },
 ] as const;
@@ -32,9 +29,9 @@ export type ProductCatalog = (typeof productCatalogs)[number];
 
 // Every catalog is a navigation entry and public pages; one that has a part of the landing page says so.
 export function capabilitiesOf(catalog: ProductCatalog) {
-  return catalog.homeRail === null
-    ? (["navigation", "public-page"] as const)
-    : (["home-section", "navigation", "public-page"] as const);
+  return catalog.homeRail
+    ? (["home-section", "navigation", "public-page"] as const)
+    : (["navigation", "public-page"] as const);
 }
 
 export const launchesCatalog = productCatalogs[0];

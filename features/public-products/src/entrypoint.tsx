@@ -18,16 +18,15 @@ export function createPublicProductEntrypoint(
 ): FeatureEntrypoint {
   return {
     capabilities: capabilitiesOf(catalog),
-    homeSections:
-      catalog.homeRail === null
-        ? []
-        : [
-            {
-              id: catalog.featureId,
-              order: homeSectionOrder.launches,
-              render: () => <ProductRail catalog={catalog} />,
-            },
-          ],
+    homeSections: !catalog.homeRail
+      ? []
+      : [
+          {
+            id: catalog.featureId,
+            order: homeSectionOrder.launches,
+            render: () => <ProductRail catalog={catalog} />,
+          },
+        ],
     id: catalog.featureId,
     pages: [
       {

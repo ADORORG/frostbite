@@ -6,7 +6,7 @@ import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 
 import { palette, sceneHeight, sceneWidth } from "../../src/engine/index.ts";
-import { defineScenes, scenes } from "../../src/library/index.ts";
+import { ambient, defineScenes, scenes } from "../../src/library/index.ts";
 import { framesOf } from "../support/frames.ts";
 import type { Drawn } from "../support/surface.ts";
 
@@ -27,7 +27,7 @@ describe("the scene list", () => {
   });
 });
 
-describe.each(scenes)("every scene: $name", (scene) => {
+describe.each([...scenes, ...ambient])("every scene: $name", (scene) => {
   const frames = framesOf(scene);
   const everyMoment = function* () {
     for (let t = 0; t < frames.loopSeconds; t += 1 / 10) yield frames.at(t);

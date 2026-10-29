@@ -12,7 +12,9 @@ nowhere else. Pages import four things and know nothing else about how a scene i
   - `SceneOverlay`: a card's overlay. The scene is chosen from the card's `seed` (so a card always looks the same), or named by `sceneId`.
   - `AnimationToggle`: the always-visible on/off switch.
 - `@ador/scenes/styles.css`: the few rules that place a scene in its box. Imported once by the app.
-- `@ador/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`).
+- `@ador/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`), and `ambient`: scenes that are weather for a page
+  (`snowfall`, behind the landing page's headline). They are held to the same tests and rendered to video like the others, but are never in
+  the list a person steps through or that is drawn from at random for a card.
 - `@ador/scenes/engine`: the DOM-free parts (contract, drawing helpers, clock, picking, policy, preference, scheduler), for tooling that
   renders scenes outside a page.
 - `@ador/scenes/video`: DOM-free parts of the video fallback: `createRaster` (a surface that draws into memory), `framePlan`, `videoFiles`,

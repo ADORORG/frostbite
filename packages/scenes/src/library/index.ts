@@ -9,6 +9,7 @@ import { racer } from "./racer.ts";
 import { runner } from "./runner.ts";
 import { shooter } from "./shooter.ts";
 import { snake } from "./snake.ts";
+import { snowfall } from "./snowfall.ts";
 import { street } from "./street.ts";
 
 // The scenes the platform has, listed here and nowhere else: adding one is one import and one line. Nothing is found by scanning, and a
@@ -33,3 +34,8 @@ export const scenes = defineScenes([
   pong,
   hopper,
 ]);
+
+// Scenes that are weather for a page, not something to pick: drawn the same way and held to the same tests, but never offered in the
+// list a person steps through or taken at random for a card.
+export const ambient = defineScenes([snowfall]);
+export { snowfall };

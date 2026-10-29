@@ -1,14 +1,15 @@
 "use client";
 
+import { snowfall } from "@ador/scenes/library";
 import { SceneStage, useChosenScene, useScenes } from "@ador/scenes/react";
 import { ArcadeButton } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import { homeCopy } from "../domain/home-copy.ts";
 
-// The first screen: an arcade attract screen. A scene plays edge to edge behind the words, a score line along the bottom says which scene
-// is playing (and lets a visitor change it). The buttons are only for what exists. The first scene is a random one, chosen after the page has
-// loaded.
+// The first screen. Snow falls over an icy range behind the words; beside them an arcade cabinet's screen plays a scene, with two buttons to
+// change it. Words and scene never share pixels, so neither has to be quiet for the other. The buttons are only for what exists. The first
+// scene is a random one, chosen after the page has loaded.
 export function HomeHero({
   hasCollections,
   hasGames,
@@ -27,57 +28,69 @@ export function HomeHero({
   };
   return (
     <section aria-label="Welcome" className="home-hero">
-      <SceneStage scene={scene} />
-      <div aria-hidden="true" className="home-hero__shade" />
-      <div aria-hidden="true" className="home-hero__crt" />
-      <div className="home-hero__body">
-        <h1>
-          {homeCopy.headline.first}
-          <span>
-            {homeCopy.headline.second}
-            <i aria-hidden="true" className="home-hero__cursor" />
-          </span>
-        </h1>
-        <p className="home-hero__lede">{homeCopy.lede}</p>
-        <div className="home-hero__actions">
-          {hasGames ? (
-            <ArcadeButton href="/games" tone="red">
-              {homeCopy.actions.arcade}
-            </ArcadeButton>
-          ) : null}
-          {hasCollections ? (
-            <ArcadeButton href="/collections" tone="cyan">
-              {homeCopy.actions.collections}
-            </ArcadeButton>
-          ) : null}
-          {hasLaunches ? (
-            <ArcadeButton href="/launches" tone="yellow">
-              {homeCopy.actions.launches}
-            </ArcadeButton>
-          ) : null}
-        </div>
+      <div aria-hidden="true" className="home-hero__sky">
+        <SceneStage scene={snowfall} />
       </div>
-      <div className="home-hero__hud">
-        <div className="home-hero__scene">
-          <span>{homeCopy.nowPlaying}</span>
-          <button
-            aria-label={homeCopy.pickPrevious}
-            className="home-hero__pick"
-            onClick={() => step(-1)}
-            type="button"
-          >
-            ◀
-          </button>
-          <b aria-live="polite">{scene?.name ?? ""}</b>
-          <button
-            aria-label={homeCopy.pickNext}
-            className="home-hero__pick"
-            onClick={() => step(1)}
-            type="button"
-          >
-            ▶
-          </button>
+      <div aria-hidden="true" className="home-hero__veil" />
+      <div className="home-hero__inner">
+        <div className="home-hero__copy">
+          <h1>
+            {homeCopy.headline.first}
+            <span>
+              {homeCopy.headline.second}
+              <i aria-hidden="true" className="home-hero__cursor" />
+            </span>
+          </h1>
+          <p className="home-hero__lede">{homeCopy.lede}</p>
+          <div className="home-hero__actions">
+            {hasGames ? (
+              <ArcadeButton href="/games" tone="red">
+                {homeCopy.actions.arcade}
+              </ArcadeButton>
+            ) : null}
+            {hasCollections ? (
+              <ArcadeButton href="/collections" tone="cyan">
+                {homeCopy.actions.collections}
+              </ArcadeButton>
+            ) : null}
+            {hasLaunches ? (
+              <ArcadeButton href="/launches" tone="yellow">
+                {homeCopy.actions.launches}
+              </ArcadeButton>
+            ) : null}
+          </div>
         </div>
+        <figure className="home-cabinet">
+          <figcaption className="home-cabinet__marquee">
+            {homeCopy.nowPlaying}
+          </figcaption>
+          <div className="home-cabinet__bezel">
+            <div aria-hidden="true" className="home-cabinet__screen">
+              <SceneStage scene={scene} />
+            </div>
+          </div>
+          <div className="home-cabinet__panel">
+            <button
+              aria-label={homeCopy.pickPrevious}
+              className="home-cabinet__pick"
+              onClick={() => step(-1)}
+              type="button"
+            >
+              ◀
+            </button>
+            <b aria-live="polite" className="home-cabinet__name">
+              {scene?.name ?? ""}
+            </b>
+            <button
+              aria-label={homeCopy.pickNext}
+              className="home-cabinet__pick"
+              onClick={() => step(1)}
+              type="button"
+            >
+              ▶
+            </button>
+          </div>
+        </figure>
       </div>
     </section>
   );

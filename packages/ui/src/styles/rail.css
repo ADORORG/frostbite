@@ -11,7 +11,7 @@
   position: absolute;
   inset: 0;
   z-index: -2;
-  opacity: 0.42;
+  opacity: 0.3;
 }
 .home-rail::after {
   content: "";
@@ -57,7 +57,63 @@
   font-size: var(--arcade-label-size);
   text-transform: uppercase;
 }
+/* The page's bands sit in one grid so two compact tiles (features with nothing yet) share a row; every full band spans the whole row. */
+.home-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.home-sections > .home-rail {
+  grid-column: 1 / -1;
+}
+.home-sections > .home-rail--compact {
+  grid-column: auto;
+}
+.home-rail--compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: center;
+  min-block-size: 6.5rem;
+  padding: 1.125rem var(--arcade-gutter);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--arcade-cyan) 7%, transparent),
+      transparent 60%
+    ),
+    var(--arcade-surface-recessed);
+}
+.home-rail--compact h2 {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: 1.125rem;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+.home-rail--compact p {
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: 0.9375rem;
+}
+.home-rail--compact + .home-rail--compact {
+  border-inline-start: 0.125rem solid var(--arcade-border-strong);
+}
+@media (max-width: 40rem) {
+  .home-sections > .home-rail--compact {
+    grid-column: 1 / -1;
+  }
+  .home-rail--compact + .home-rail--compact {
+    border-inline-start: 0;
+  }
+}
 /* Cards on the landing page are compact: more to a row, and the empty states are short. */
 .home-rail .cover-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+/* A single card (one game) takes the whole band, drawn large, instead of sitting in a corner of an empty row. */
+.home-rail .cover-grid:has(> .cover-card:only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.home-rail .cover-card[data-featured="true"]:only-child {
+  grid-column: 1 / -1;
 }

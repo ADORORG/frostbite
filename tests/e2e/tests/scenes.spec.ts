@@ -102,9 +102,11 @@ test("falls back to the scene's video in a browser that cannot draw", async ({
   });
   const page = await context.newPage();
   await page.goto("/");
-  const video = page.locator(".home-hero video");
+  const video = page.locator(".home-cabinet video");
   await expect(video).toHaveCount(1);
   await expect(video.locator("source")).toHaveCount(2);
   await expect(page.locator("canvas")).toHaveCount(0);
+  // The snow behind the words falls back too: its own video, so the page looks the same.
+  await expect(page.locator(".home-hero__sky video")).toHaveCount(1);
   await context.close();
 });

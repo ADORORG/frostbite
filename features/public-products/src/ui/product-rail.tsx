@@ -1,24 +1,18 @@
-import { SceneBackdrop } from "@ador/scenes/react";
-import { ArcadeEmptyState, HomeRail } from "@repo/ui/arcade";
+import { HomeRail } from "@repo/ui/arcade";
 
 import type { ProductCatalog } from "../domain/catalog.ts";
 
-// A product's part of the landing page. Nothing is published yet, so it says that, in the catalog's own words, over the moving
-// background; when something is published its cards go here, as the other rails' do.
+// A product's part of the landing page. Nothing is open yet, so it is a small tile that says so in the catalog's own words (two such tiles
+// share a row); when something is published its cards go here, as the other rails' do.
 export function ProductRail({ catalog }: { readonly catalog: ProductCatalog }) {
-  if (catalog.homeRail === null) return null;
+  if (!catalog.homeRail) return null;
   return (
     <HomeRail
-      backdrop={<SceneBackdrop />}
+      compact
       href={catalog.path}
       id={catalog.featureId}
-      linkLabel={catalog.homeRail.link}
-      summary={catalog.homeRail.summary}
+      summary={catalog.emptyBody}
       title={catalog.label}
-    >
-      <ArcadeEmptyState title={catalog.emptyTitle}>
-        {catalog.emptyBody}
-      </ArcadeEmptyState>
-    </HomeRail>
+    />
   );
 }

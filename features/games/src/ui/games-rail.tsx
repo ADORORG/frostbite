@@ -14,8 +14,9 @@ import { homeRailCopy } from "../domain/home-rail-copy.ts";
 import { GameCover } from "./game-cover.tsx";
 import { noGames } from "./states.tsx";
 
-// The landing page's rail of games: the first few, playable ones first, each with its picture alive, and a link to the whole list. With no
-// games it says so, in the catalog's own words.
+// The landing page's rail of games: the first few, playable ones first, each with its picture alive, and a link to the whole list. A lone game
+// (what a deployment players use has) is drawn large, across the band, so the page is not a card in a corner. With no games it says so, in
+// the catalog's own words.
 export function GamesRail({
   games,
 }: {
@@ -41,6 +42,7 @@ export function GamesRail({
         <CoverGrid label={homeRailCopy.title}>
           {shown.map((game) => (
             <CoverCard
+              featured={shown.length === 1}
               badges={
                 <ArcadeBadge tone={game.playable ? "mint" : "pink"}>
                   {game.playable ? "Playable" : "Not playable yet"}

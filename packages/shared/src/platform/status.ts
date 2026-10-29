@@ -29,6 +29,6 @@ export type PlatformStatus = z.infer<typeof platformStatusSchema>;
 // features pick numbers that collide.
 export const homeSectionOrder = Object.freeze({
   collections: 20,
-  games: 30,
-  launches: 10,
+  games: 10,
+  launches: 30,
 });
