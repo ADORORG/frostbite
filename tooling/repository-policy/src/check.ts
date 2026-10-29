@@ -7,6 +7,7 @@ import {
   readProductionSources,
 } from "./sentence-policy.ts";
 import { findScriptPolicyViolations } from "./script-policy.ts";
+import { findTemplateReleaseViolations } from "./template-release-policy.ts";
 import { discoverWorkspaces, repositoryRoot } from "./workspaces.ts";
 
 const root = repositoryRoot(import.meta.url);
@@ -20,6 +21,7 @@ const violations = [
     await readProductionSources(root, files),
     await readSentenceBaseline(root),
   ),
+  ...(await findTemplateReleaseViolations(root)),
 ];
 
 if (violations.length > 0) {

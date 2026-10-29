@@ -17,7 +17,15 @@ Secrets and settings are never in the image. They come from the platform's envir
 `.env.production.example` (web) and `apps/worker/.env.example` (worker), which mirror the typed environment definition. The build
 reads no secrets. `pnpm env:check` runs before any build or release.
 
-The image also holds the scene videos (`pnpm scenes:render` runs in the build) and the built games.
+The image also holds the scene videos (`pnpm scenes:render` runs in the build), the built games, and the two released contract templates
+(`/opt/templates`, which `REWARDS_TEMPLATES_DIR` points at by default; set it to something else to use other files, or to nothing to
+turn template publishing off).
+
+The templates are not compiled in the image. The same source builds to different bytes in a different environment (checked: Debian 12
+with clang 14 and Ubuntu 24.04 with clang 18 both differ from the released build), and a template's code hash must not change without a
+new template version. So the released `.wasm` files are kept in `contracts/templates/released/`, `repository:check` and the image build
+fail unless they equal `contracts/templates/release.json`, and the image copies them. To release a new template version, run
+`contracts/templates/build.sh --write` (it rewrites `release.json` and `released/` together) and commit both.
 
 ## Build
 
@@ -79,5 +87,4 @@ Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO c
 
 Not verified: a real Railway or Coolify deployment (the Railway config files and CI image job were written from the platform docs and
 have never run), `APP_ENV=preview` or `production` (these need https and real services), the Inngest endpoint, running more than one web
-replica, the template `.wasm` files (`REWARDS_TEMPLATES_DIR`: built apart with `contracts/templates/build.sh`, not in the image), base-image
-digest pinning, and backups, restore drill, uptime monitoring and alerts.
+replica, base-image digest pinning, and backups, restore drill, uptime monitoring and alerts.

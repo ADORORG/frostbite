@@ -4,7 +4,7 @@
 #   build.sh           builds and prints each hash
 #   build.sh --check   also fails unless the hashes equal release.json (a deployed template's code
 #                      hash must not change without a new template version)
-#   build.sh --write   builds and rewrites release.json (only when releasing a new version)
+#   build.sh --write   builds, rewrites release.json and the released/ copies of the files (only when releasing a new version)
 #
 # Also stages each as `<crate>.wasm` in target/templates, the folder REWARDS_TEMPLATES_DIR points at.
 #
@@ -43,7 +43,12 @@ done
 json="${json}\n}\n"
 
 case "$mode" in
-  --write) printf "$json" > "$manifest" ;;
+  --write)
+    printf "$json" > "$manifest"
+    # The released bytes are kept beside release.json: building again elsewhere gives other bytes (see tooling/repository-policy).
+    rm -rf released && mkdir -p released
+    for crate in "${crates[@]}"; do cp "${target_dir}/templates/${crate}.wasm" "released/${crate}.wasm"; done
+    ;;
   --check)
     if [ "$(printf "$json")" != "$(cat "$manifest")" ]; then
       echo "Code hashes differ from ${manifest}. Releasing a changed template needs a new version." >&2

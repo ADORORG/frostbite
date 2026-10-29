@@ -22,6 +22,9 @@ COPY . .
 # to the final image, so a container never downloads anything when it starts (the release step runs pnpm).
 RUN corepack install
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+# An image carries only the released contract templates: the kept copies must equal contracts/templates/release.json. (They are not rebuilt
+# here: the same source builds to different bytes in a different environment.)
+RUN pnpm --filter @repo/repository-policy check:templates
 RUN pnpm scenes:render
 # The build makes the games (prebuild) and then the standalone server. It reads no secrets: configuration is validated when the server starts.
 RUN pnpm --filter web build
@@ -36,6 +39,10 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm install --frozen-
 
 FROM base AS runtime
 ENV NODE_ENV=production
+# Where the platform reads game-rewards.wasm and milestone-collectible.wasm (the released ones, checked in the build). A deployment may set
+# the variable to something else (or to nothing, which turns template publishing off); local runs and tests point it at their own build.
+ENV REWARDS_TEMPLATES_DIR=/opt/templates
+COPY --from=build /app/contracts/templates/released /opt/templates
 COPY --from=build /opt/corepack /opt/corepack
 COPY --from=build --chown=node:node /app /app
 USER node

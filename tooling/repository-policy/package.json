@@ -6,6 +6,7 @@
   "scripts": {
     "check": "node --experimental-strip-types src/check.ts",
     "check:coverage": "node --experimental-strip-types src/check-coverage.ts",
+    "check:templates": "node --experimental-strip-types src/check-templates.ts",
     "check:decisions": "node --experimental-strip-types src/check-decisions.ts",
     "update-sentence-baseline": "node --experimental-strip-types src/update-sentence-baseline.ts",
     "lint": "eslint . --max-warnings 0",
