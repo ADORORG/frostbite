@@ -12,7 +12,7 @@ The template for a game. It uses only `@ador/game-sdk/client`; it saves nothing 
 ## Build and play
 
 `pnpm --filter web build` (or `dev`) builds every folder under `/games` into `apps/web/public/play/<id>`, which
-is served sandboxed. The platform lists this game only when `APP_ENV` is `local` or `test`
+is served sandboxed. The platform lists this game only when `APP_ENV` is `test` (the end-to-end tests play it; a person running the platform for development does not see it)
 (`configs/games/sample.ts`).
 
 ## Adding a game

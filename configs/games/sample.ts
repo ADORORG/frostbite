@@ -6,8 +6,8 @@ const [betaTarget] = targetChains;
 if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // Tap Tower, the sample game in /games/sample-game. It exists to prove the host: it is played in the isolated
-// frame, saves through the platform and unlocks milestones. It is registered only where the platform is run
-// for development or tests (see configs/games.ts), never in a deployment players use.
+// frame, saves through the platform and unlocks milestones. It is registered only in the automated tests (see
+// configs/games.ts), never when the platform is run for development or in a deployment players use.
 export const sampleGame = defineGame({
   capabilities: [],
   description:

@@ -11,7 +11,7 @@ const gamesDirectory = join(import.meta.dirname, "../../../games");
 // when every game, including the sample, is registered.
 async function registeredGames() {
   vi.resetModules();
-  vi.stubEnv("APP_ENV", "local");
+  vi.stubEnv("APP_ENV", "test");
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
   vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", "");

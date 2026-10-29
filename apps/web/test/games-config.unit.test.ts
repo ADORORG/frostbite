@@ -24,11 +24,10 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE first, then the development games while the platform runs for development, then the games built on the SDK, and every game passes the manifest schema", async () => {
+  it("lists FROST·BITE first, then SDK Explorer while the platform runs for development (the sample game only in the tests), then the games built on the SDK, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
     expect(games.map(({ id }) => id)).toEqual([
       "frostbite",
-      "sample-game",
       "sdk-explorer",
       "frost-runner",
       "icicle-drop",
@@ -67,7 +66,7 @@ describe("the platform's game list", () => {
 
   it.each([
     ["test", true],
-    ["local", true],
+    ["local", false],
     ["preview", false],
     ["production", false],
   ])("lists the sample game in %s: %s", async (appEnv, listed) => {
@@ -77,7 +76,7 @@ describe("the platform's game list", () => {
   });
 
   it("declares a rewards contract on each of the games built for players, so staff can create it, and none on the sample game", async () => {
-    const games = await gamesWith("");
+    const games = await gamesWith("", "test");
     for (const id of [
       "frostbite",
       "frost-runner",
@@ -97,7 +96,9 @@ describe("the platform's game list", () => {
   });
 
   it("plays the sample game on the platform itself, in the frame, with the milestones its code awards", async () => {
-    const sample = (await gamesWith("")).find(({ id }) => id === "sample-game");
+    const sample = (await gamesWith("", "test")).find(
+      ({ id }) => id === "sample-game",
+    );
     expect(sample?.launch).toEqual({ mode: "embedded" });
     expect(sample?.milestones.map(({ id }) => id)).toEqual([
       "first-five",
@@ -109,6 +110,7 @@ describe("the platform's game list", () => {
     await expect(
       gamesWith(
         JSON.stringify({ "sample-game": { url: "https://a.example.com" } }),
+        "test",
       ),
     ).rejects.toThrow("Launch settings name");
   });

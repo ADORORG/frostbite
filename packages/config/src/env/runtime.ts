@@ -54,6 +54,12 @@ export function developmentGamesEnabled(source: NodeJS.ProcessEnv): boolean {
   return source.APP_ENV === "local" || source.APP_ENV === "test";
 }
 
+// Whether this run is the automated tests, which alone list the sample game (the template the platform's own end-to-end tests play). A
+// person running the platform for development does not see it.
+export function testGamesEnabled(source: NodeJS.ProcessEnv): boolean {
+  return source.APP_ENV === "test";
+}
+
 export function parseGameLaunchEnvironment(
   source: NodeJS.ProcessEnv,
 ): Record<string, GameLaunchSettings> {
