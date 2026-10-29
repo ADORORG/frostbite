@@ -120,6 +120,32 @@
   }
 }
 
+/* On a phone the header must fit, not run off the screen: the menu is just its icon (its name stays for assistive technology), each button
+   stays on one line, and what still does not fit goes on a second row instead of being cut off. */
+@media (max-width: 30rem) {
+  .app-header {
+    gap: var(--arcade-space-2);
+  }
+  .app-header__tools {
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--arcade-space-1) var(--arcade-space-2);
+  }
+  .app-header__end,
+  .wallet-widget {
+    gap: var(--arcade-space-1);
+    white-space: nowrap;
+  }
+  .nav-menu__icon + span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
 /* The body: an area's sidebar beside the page, or the page alone. */
 .app-body {
   display: block;
