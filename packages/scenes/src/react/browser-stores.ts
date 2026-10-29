@@ -12,9 +12,15 @@ import {
 // has been asked.
 export const devicePending = "pending";
 
+// A browser with no media queries (the oldest, or a test page) is taken to ask for nothing.
+const noQueries = { matches: false } as const;
+
 export function deviceSnapshot(): string {
   const signals = readDeviceSignals({
-    matchMedia: window.matchMedia.bind(window),
+    matchMedia: (query) =>
+      typeof window.matchMedia === "function"
+        ? window.matchMedia(query)
+        : noQueries,
     navigator,
   });
   return `${signals.reducedMotion ? 1 : 0}${signals.saveData ? 1 : 0}${signals.lowPower ? 1 : 0}`;
@@ -31,6 +37,7 @@ export function deviceFrom(snapshot: string): DeviceSignals | null {
 
 // Reduced motion is the one signal that can change while the page is open.
 export function subscribeToDevice(onChange: () => void): () => void {
+  if (typeof window.matchMedia !== "function") return () => undefined;
   const query = window.matchMedia("(prefers-reduced-motion: reduce)");
   query.addEventListener("change", onChange);
   return () => query.removeEventListener("change", onChange);

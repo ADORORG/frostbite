@@ -23,6 +23,7 @@ import {
   storageRegistry,
   unusedStorage,
 } from "@ador/test-kit/storage-registry";
+import { ScenesProvider } from "@ador/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { createPublicCollectionsEntrypoint } from "../../src/entrypoint.tsx";
@@ -122,3 +123,13 @@ export async function pagesFor(
 }
 
 export const brokenProviders = createProviderRegistry([]);
+
+// The landing page's rail of collections, rendered to the markup a visitor receives.
+export async function railFor(
+  providers = storageRegistry(() => storage),
+): Promise<string> {
+  const [section] =
+    createPublicCollectionsEntrypoint(providers, chains).homeSections ?? [];
+  const element = await section?.render();
+  return renderToStaticMarkup(<ScenesProvider>{element}</ScenesProvider>);
+}

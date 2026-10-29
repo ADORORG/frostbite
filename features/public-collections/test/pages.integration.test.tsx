@@ -5,6 +5,7 @@ import {
   collectionThrough,
   migrate,
   pagesFor,
+  railFor,
   signedUrl,
   suspendCreator,
 } from "./support/harness.tsx";
@@ -48,6 +49,24 @@ describe("the public collection pages over the real database", () => {
       expect(index).not.toContain(secret);
       expect(detail).not.toContain(secret);
     }
+  });
+
+  it("shows the landing page rail an approved collection with its picture and a link to it, over a moving background, and none of the creator's private records", async () => {
+    const approved = await collectionThrough("approved");
+    const markup = await railFor();
+    expect(markup).toContain('id="collections"');
+    expect(markup).toContain("First light");
+    expect(markup).toContain(`href="/collections/${approved.collectionId}"`);
+    expect(markup).toContain(signedUrl(approved.coverKey));
+    expect(markup).toContain("scene-backdrop");
+    for (const secret of [
+      approved.ownerUserId,
+      approved.submissionId,
+      approved.payloadHash,
+    ])
+      expect(markup).not.toContain(secret);
+    // A collection with its own picture keeps it uncovered.
+    expect(markup).not.toContain("scene-overlay");
   });
 
   it("show nothing for a collection that is submitted or in review", async () => {

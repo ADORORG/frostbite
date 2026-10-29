@@ -40,6 +40,7 @@ export function createGamesFeature(
       capabilities: [
         "api-routes",
         "authenticated-page",
+        "home-section",
         "navigation",
         "public-page",
       ],

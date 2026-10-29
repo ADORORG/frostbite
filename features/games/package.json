@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@ador/chain": "workspace:*",
-    "@ador/feature-chain-status": "workspace:*",
     "@ador/client-http": "workspace:*",
     "@ador/database": "workspace:*",
+    "@ador/feature-chain-status": "workspace:*",
     "@ador/game-claims": "workspace:*",
     "@ador/game-runs": "workspace:*",
     "@ador/game-saves": "workspace:*",
@@ -32,6 +32,7 @@
     "@ador/game-verification": "workspace:*",
     "@ador/http": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
+    "@ador/scenes": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/wallet": "workspace:*",
     "@repo/ui": "workspace:*",

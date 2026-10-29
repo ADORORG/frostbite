@@ -2,6 +2,7 @@ import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint, FeatureLoadContext } from "@ador/plugin-kit";
 
 import { createPlatformStatusOperation } from "./application/platform-status.ts";
+import { drawSections } from "./application/draw-sections.ts";
 import { PlatformHome } from "./ui/home.tsx";
 
 export function createPlatformShellEntrypoint(
@@ -20,11 +21,12 @@ export function createPlatformShellEntrypoint(
       {
         access: { kind: "public" },
         path: "/",
-        render: ({ navigation }) => (
+        render: async ({ homeSections = [], navigation }) => (
           <PlatformHome
             navigation={navigation}
             registeredFeatureIds={context.registeredFeatureIds}
             registeredFeatures={context.registeredFeatureCount}
+            sections={await drawSections(homeSections)}
           />
         ),
       },

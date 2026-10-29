@@ -20,6 +20,7 @@
     "@ador/collections": "workspace:*",
     "@ador/feature-uploads": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
+    "@ador/scenes": "workspace:*",
     "@ador/shared": "workspace:*",
     "@ador/uploads": "workspace:*",
     "@repo/ui": "workspace:*",

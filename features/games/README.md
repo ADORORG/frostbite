@@ -12,6 +12,9 @@ page connects it to the platform through `@ador/game-sdk`.
 `submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
+The landing page's rail of games (`homeSections`, `ui/games-rail.tsx`) shows the first six, playable ones first; a game's own cover
+clip plays alone, and a game without one gets a scene chosen from its id laid over its picture (`ui/game-cover.tsx`).
+
 `/games/milestones` ("My milestones", signed-in players only) is the player's trophy case: a shelf for every game that can mint
 milestones (games with mints first, newest first), with a place for each of the game's milestones: a square picture with the name and the
 day (UTC) for a minted one (a medallion of the game cover and the milestone initials when no picture came), the rest listed by name under "still to earn", and one progress segment per milestone. A "First" ribbon marks a

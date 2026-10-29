@@ -6,6 +6,16 @@ import { PublicFrame } from "./public-frame.tsx";
 
 type Navigation = readonly NavigationItem[];
 
+// What an empty or unreadable catalog says, here and on the landing page's rail.
+export const noCollections = {
+  body: "No collection has been approved yet. Drafts and creator submissions are never shown here.",
+  title: "No collections online",
+} as const;
+export const collectionsUnavailable = {
+  body: "The catalog could not be read just now. Nothing has been removed; try again in a moment.",
+  title: "Collections are unavailable",
+} as const;
+
 // A catalog with nothing approved in it says so plainly; draft uploads and submissions are never shown.
 export function NoCollections({
   navigation,
@@ -15,11 +25,8 @@ export function NoCollections({
   return (
     <PublicFrame navigation={navigation}>
       <StatusLamp label="Catalog empty" tone="attention" />
-      <ArcadePanel eyebrow="Public catalog" title="No collections online">
-        <p>
-          No collection has been approved yet. Drafts and creator submissions
-          are never shown here.
-        </p>
+      <ArcadePanel eyebrow="Public catalog" title={noCollections.title}>
+        <p>{noCollections.body}</p>
         <ArcadeButton href="/" tone="cyan">
           Return home
         </ArcadeButton>
@@ -37,11 +44,11 @@ export function CatalogUnavailable({
   return (
     <PublicFrame navigation={navigation}>
       <StatusLamp label="Catalog unavailable" tone="unavailable" />
-      <ArcadePanel eyebrow="Public catalog" title="Collections are unavailable">
-        <p>
-          The catalog could not be read just now. Nothing has been removed; try
-          again in a moment.
-        </p>
+      <ArcadePanel
+        eyebrow="Public catalog"
+        title={collectionsUnavailable.title}
+      >
+        <p>{collectionsUnavailable.body}</p>
         <ArcadeButton href={collectionsPath} tone="cyan">
           Try again
         </ArcadeButton>

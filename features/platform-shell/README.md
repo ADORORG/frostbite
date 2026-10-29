@@ -14,6 +14,11 @@ The package exports `platformShellFeature`, a validated registration consumed by
 `@ador/feature-platform-shell/status` subpath exposes the framework-neutral `/api/v1/platform`
 operation.
 
+The home page (`/`) is a hero over a moving scene (`@ador/scenes`) followed by whatever parts the features contributed
+(`PageRenderContext.homeSections`): a rail of launches, of collections and of games today. A part that fails to draw is left out and
+reported (`home.section_failed`), so one rail cannot take the page down. The status panel states only what is true (the feature count,
+and launches as gated).
+
 Register or detach the complete feature through the single entry in `configs/features.ts`.
 
 ## Dependencies and configuration

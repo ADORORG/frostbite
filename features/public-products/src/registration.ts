@@ -1,6 +1,7 @@
 import { defineFeature } from "@ador/plugin-kit";
 
 import {
+  capabilitiesOf,
   creatorsCatalog,
   launchesCatalog,
   type ProductCatalog,
@@ -9,7 +10,7 @@ import {
 function productFeature(catalog: ProductCatalog) {
   return defineFeature({
     manifest: {
-      capabilities: ["navigation", "public-page"],
+      capabilities: capabilitiesOf(catalog),
       dependencies: [],
       navigation: [
         {

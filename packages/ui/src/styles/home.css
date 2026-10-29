@@ -154,3 +154,28 @@
     grid-column: 2;
   }
 }
+
+/* The landing page's first screen: a moving scene behind the headline, dimmed from the left so the words keep their contrast. */
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.home-hero .scene-backdrop {
+  z-index: -2;
+  opacity: 0.6;
+}
+.home-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      90deg,
+      var(--arcade-ink) 0%,
+      rgb(12 6 32 / 55%) 55%,
+      transparent 100%
+    ),
+    linear-gradient(0deg, var(--arcade-ink) 0%, transparent 40%);
+  pointer-events: none;
+}

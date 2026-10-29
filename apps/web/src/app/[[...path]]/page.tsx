@@ -23,10 +23,13 @@ export default async function FeaturePage({
   if (!match) notFound();
   const { page: contribution, params: routeParams } = match;
   const navigationContributions = platformComposition.features.listNavigation();
+  // The landing page lays out every feature's part of it; the contributions are only drawn by the page that uses them.
+  const homeSections = await platformComposition.features.listHomeSections();
   const token = (await cookies()).get(platformSessionCookieName)?.value;
   if (contribution.access.kind === "public") {
     return contribution.render({
       actorUserId: null,
+      homeSections,
       navigation: await navigationForSession(
         navigationContributions,
         routePath,
@@ -55,6 +58,7 @@ export default async function FeaturePage({
   }
   return contribution.render({
     actorUserId: access.actorUserId,
+    homeSections,
     navigation: await actorNavigation(
       navigationContributions,
       routePath,

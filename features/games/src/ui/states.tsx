@@ -4,6 +4,12 @@ import { ArcadeButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 
 import { GamesFrame } from "./games-frame.tsx";
 
+// What an empty catalog says, here and on the landing page's rail.
+export const noGames = {
+  body: "No game is registered. Planned integrations are not presented as playable releases.",
+  title: "No games online",
+} as const;
+
 export function NoGames({
   navigation,
 }: {
@@ -12,11 +18,8 @@ export function NoGames({
   return (
     <GamesFrame navigation={navigation}>
       <StatusLamp label="Catalog empty" tone="attention" />
-      <ArcadePanel eyebrow="Public catalog" title="No games online">
-        <p>
-          No game is registered. Planned integrations are not presented as
-          playable releases.
-        </p>
+      <ArcadePanel eyebrow="Public catalog" title={noGames.title}>
+        <p>{noGames.body}</p>
         <ArcadeButton href="/" tone="cyan">
           Return home
         </ArcadeButton>

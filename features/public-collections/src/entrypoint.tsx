@@ -4,11 +4,14 @@ import type { ProviderRegistry } from "@ador/plugin-kit/providers";
 import type { ChainOption } from "@ador/shared/chain";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 
+import { homeSectionOrder } from "@ador/shared/platform";
+
 import type { PublicCatalog } from "./application/catalog.ts";
 import { collectionPagePath, collectionsPath } from "./paths.ts";
 import { createCatalogResolver } from "./runtime.ts";
 import { CollectionDetail } from "./ui/collection-detail.tsx";
 import { CollectionIndex } from "./ui/collection-index.tsx";
+import { CollectionsRail } from "./ui/collections-rail.tsx";
 import {
   CatalogUnavailable,
   CollectionNotPublished,
@@ -60,8 +63,20 @@ export function createPublicCollectionsEntrypoint(
     }
   }
 
+  // The landing page's rail. A catalog that cannot be read is said to be unavailable, not shown as empty.
+  async function rail() {
+    try {
+      return <CollectionsRail cards={await (await getCatalog()).index()} />;
+    } catch {
+      return <CollectionsRail cards={null} />;
+    }
+  }
+
   return {
-    capabilities: ["navigation", "public-page"],
+    capabilities: ["home-section", "navigation", "public-page"],
+    homeSections: [
+      { id: "collections", order: homeSectionOrder.collections, render: rail },
+    ],
     id: "collections",
     pages: [
       {

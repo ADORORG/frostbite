@@ -24,3 +24,11 @@ export const platformStatusSchema = z
 
 export type PlatformStatusInput = z.infer<typeof platformStatusInputSchema>;
 export type PlatformStatus = z.infer<typeof platformStatusSchema>;
+
+// Where each feature's part of the landing page sits, lowest first. One place, so the order of the page is read in one glance and no two
+// features pick numbers that collide.
+export const homeSectionOrder = Object.freeze({
+  collections: 20,
+  games: 30,
+  launches: 10,
+});

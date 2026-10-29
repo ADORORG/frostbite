@@ -1,23 +1,36 @@
+import { ScenesProvider } from "@ador/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { createPlatformShellEntrypoint } from "../src/entrypoint.js";
 import { PlatformHome } from "../src/ui/home.js";
 
-describe("PlatformHome", () => {
-  it("renders truthful status and the injected feature count", async () => {
-    const markup = renderToStaticMarkup(
+const home = (props: Partial<Parameters<typeof PlatformHome>[0]> = {}) =>
+  renderToStaticMarkup(
+    <ScenesProvider>
       <PlatformHome
-        navigation={[
-          { area: "footer", href: "/launches", label: "Launches" },
-          { area: "main", href: "/games", label: "Games" },
-        ]}
-        registeredFeatureIds={["platform-shell", "launches", "games"]}
-        registeredFeatures={3}
-      />,
-    );
+        navigation={[]}
+        registeredFeatureIds={["platform-shell"]}
+        registeredFeatures={1}
+        {...props}
+      />
+    </ScenesProvider>,
+  );
+
+describe("PlatformHome", () => {
+  it("renders truthful status and the injected feature count, over a moving background", async () => {
+    const markup = home({
+      navigation: [
+        { area: "footer", href: "/launches", label: "Launches" },
+        { area: "main", href: "/games", label: "Games" },
+      ],
+      registeredFeatureIds: ["platform-shell", "launches", "games"],
+      registeredFeatures: 3,
+    });
     expect(markup).toContain("3 REGISTERED");
-    expect(markup).toContain("No live sale is configured");
+    expect(markup).toContain("GATED");
+    expect(markup).toContain("Launch your legacy. Mint the future.");
+    expect(markup).toContain("scene-backdrop");
     expect(markup).not.toContain("Connect wallet");
 
     const [page] =
@@ -28,45 +41,96 @@ describe("PlatformHome", () => {
     expect(page?.path).toBe("/");
     expect(
       renderToStaticMarkup(
-        await page?.render({ actorUserId: null, navigation: [], params: {} }),
+        <ScenesProvider>
+          {await page?.render({
+            actorUserId: null,
+            homeSections: [],
+            navigation: [],
+            params: {},
+          })}
+        </ScenesProvider>,
       ),
     ).toContain("3 REGISTERED");
   });
 
-  it.each([
-    {
-      absentHref: "/games",
-      absentId: "games",
-      absentLabel: "01 PLANNED",
-      present: "launches",
-    },
-    {
-      absentHref: "/launches",
-      absentId: "launches",
-      absentLabel: "GATED",
-      present: "games",
-    },
-  ] as const)(
-    "removes every surface owned by detached $absentId",
-    (testCase) => {
-      const markup = renderToStaticMarkup(
-        <PlatformHome
-          navigation={[
+  it("draws the sections its page is given, in the page it serves", async () => {
+    const [page] =
+      createPlatformShellEntrypoint({
+        registeredFeatureCount: 2,
+        registeredFeatureIds: ["platform-shell", "games"],
+      }).pages ?? [];
+    const markup = renderToStaticMarkup(
+      <ScenesProvider>
+        {await page?.render({
+          actorUserId: null,
+          homeSections: [
             {
-              area: "main",
-              href: `/${testCase.present}`,
-              label: testCase.present,
+              id: "games",
+              order: 1,
+              render: () => <p id="drawn-games">games</p>,
             },
-          ]}
-          registeredFeatureIds={["platform-shell", testCase.present]}
-          registeredFeatures={2}
-        />,
-      );
+            {
+              id: "late",
+              order: 2,
+              render: async () => <p id="drawn-late">late</p>,
+            },
+          ],
+          navigation: [],
+          params: {},
+        })}
+      </ScenesProvider>,
+    );
+    expect(markup).toContain('id="drawn-games"');
+    expect(markup).toContain('id="drawn-late"');
+  });
 
+  it("claims nothing about games or networks it does not know: no stale counts", () => {
+    const markup = home({
+      registeredFeatureIds: ["platform-shell", "games"],
+      registeredFeatures: 2,
+    });
+    expect(markup).not.toContain("PLANNED");
+    expect(markup).not.toContain("UNSET");
+    expect(markup).not.toContain("GATED");
+  });
+
+  it("lays out the parts the features supplied, in the order given, each in place", () => {
+    const markup = home({
+      sections: [
+        { id: "games", node: <section id="games-rail">games</section> },
+        {
+          id: "collections",
+          node: <section id="collections-rail">collections</section>,
+        },
+      ],
+    });
+    expect(markup.indexOf("games-rail")).toBeGreaterThan(
+      markup.indexOf("Launch your legacy"),
+    );
+    expect(markup.indexOf("games-rail")).toBeLessThan(
+      markup.indexOf("collections-rail"),
+    );
+  });
+
+  it.each([
+    { absentHref: "/games", present: "launches" },
+    { absentHref: "/launches", present: "games" },
+  ] as const)(
+    "removes every link owned by a detached feature (not $present)",
+    (testCase) => {
+      const markup = home({
+        navigation: [
+          {
+            area: "main",
+            href: `/${testCase.present}`,
+            label: testCase.present,
+          },
+        ],
+        registeredFeatureIds: ["platform-shell", testCase.present],
+        registeredFeatures: 2,
+      });
       expect(markup).toContain(`href="/${testCase.present}"`);
       expect(markup).not.toContain(`href="${testCase.absentHref}"`);
-      expect(markup).not.toContain(`id="${testCase.absentId}"`);
-      expect(markup).not.toContain(testCase.absentLabel);
     },
   );
 });

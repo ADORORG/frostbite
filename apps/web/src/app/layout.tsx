@@ -3,8 +3,10 @@ import { cookies, headers } from "next/headers";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import { IndexingBadge } from "@ador/feature-chain-status/badge";
+import { AnimationToggle, ScenesProvider } from "@ador/scenes/react";
 import { ShellStatusProvider } from "@repo/ui/arcade";
 import "@repo/ui/styles.css";
+import "@ador/scenes/styles.css";
 import "./globals.css";
 import { chainStatusConfig } from "../../../../configs/chain-status";
 import { walletAuthConfig } from "../../../../configs/wallet";
@@ -59,24 +61,29 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <ClientNavigation />
-        <ShellStatusProvider
-          status={
-            <IndexingBadge
-              polling={chainStatusConfig.polling}
-              syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
-            />
-          }
-        >
-          <WalletShell
-            balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
-            candidates={walletAuthConfig.candidates}
-            network={walletAuthConfig.network}
-            reconnectWaitMs={walletAuthConfig.reconnectWaitMs}
-            session={session}
+        <ScenesProvider>
+          <ShellStatusProvider
+            status={
+              <>
+                <IndexingBadge
+                  polling={chainStatusConfig.polling}
+                  syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
+                />
+                <AnimationToggle />
+              </>
+            }
           >
-            {children}
-          </WalletShell>
-        </ShellStatusProvider>
+            <WalletShell
+              balanceRefreshMs={walletAuthConfig.balanceRefreshMs}
+              candidates={walletAuthConfig.candidates}
+              network={walletAuthConfig.network}
+              reconnectWaitMs={walletAuthConfig.reconnectWaitMs}
+              session={session}
+            >
+              {children}
+            </WalletShell>
+          </ShellStatusProvider>
+        </ScenesProvider>
       </body>
     </html>
   );

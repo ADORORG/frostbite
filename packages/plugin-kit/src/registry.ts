@@ -9,7 +9,10 @@ import {
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
 import type { ReactNode } from "react";
+import { collectHomeSections, type HomeSection } from "./home-sections.ts";
 import type { NavigationItem } from "./navigation.ts";
+
+export type { HomeSection } from "./home-sections.ts";
 
 export interface FeaturePageContribution {
   readonly access: PageAccessRequirement;
@@ -21,6 +24,8 @@ export interface FeaturePageContribution {
 
 export interface PageRenderContext {
   readonly actorUserId: UuidV7 | null;
+  // Every feature's parts of the landing page; only the landing page reads them, and a page rendered without them has none.
+  readonly homeSections?: readonly HomeSection[];
   readonly navigation: readonly NavigationItem[];
   readonly params: Readonly<Record<string, string>>;
 }
@@ -37,6 +42,7 @@ export interface FeatureLoadContext {
 
 export interface FeatureEntrypoint {
   readonly capabilities: readonly FeatureCapability[];
+  readonly homeSections?: readonly HomeSection[];
   readonly id: FeatureId;
   readonly version: string;
   readonly operations?: readonly RegisteredHttpOperation[];
@@ -51,6 +57,8 @@ export interface FeatureRegistration {
 export interface FeatureRegistry {
   has(id: FeatureId): boolean;
   list(): readonly FeatureManifest[];
+  // Every feature's parts of the landing page, in the order they are shown.
+  listHomeSections(): Promise<readonly HomeSection[]>;
   listNavigation(): readonly NavigationContribution[];
   load(id: FeatureId): Promise<FeatureEntrypoint>;
   loadAll(): Promise<readonly FeatureEntrypoint[]>;
@@ -142,6 +150,13 @@ function assertRuntimeContributions(
   const actualPages = (entrypoint.pages ?? []).map(describePage).sort();
   if (expectedPages.join("\n") !== actualPages.join("\n")) {
     throw new Error("Loaded feature pages do not match its manifest.");
+  }
+  // A feature offers the landing page something exactly when it says it does.
+  if (
+    manifest.capabilities.includes("home-section") !==
+    (entrypoint.homeSections ?? []).length > 0
+  ) {
+    throw new Error("Loaded feature home sections do not match its manifest.");
   }
 }
 
@@ -244,6 +259,7 @@ export function createFeatureRegistry(
   return {
     has: (id) => registrations.has(id),
     list: () => [...registrations.values()].map(({ manifest }) => manifest),
+    listHomeSections: async () => collectHomeSections(await loadAll()),
     listNavigation: () =>
       Object.freeze(
         [...registrations.values()].flatMap(({ manifest }) =>

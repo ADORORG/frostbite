@@ -38,6 +38,9 @@ side effects.
 - Routes are static until the shared HTTP contract defines typed path-parameter validation.
 - Page paths are declared in manifests, globally unique at boot, and match loaded entrypoints.
 - Navigation is manifest-owned and immutable; detaching a feature removes its links with its pages.
+- A feature may contribute a part of the landing page (`homeSections`: an id, an order, and a `render`). It declares the `home-section`
+  capability exactly when it contributes one (the registry refuses a mismatch), ids are unique, `listHomeSections()` returns them lowest
+  order first, and the shell lays them out knowing nothing of what they show. Where each sits is `homeSectionOrder` in `@ador/shared/platform`.
 
 Removing the single registration entry from `configs/features.ts` removes that feature's pages and
 operations. Runtime filesystem discovery and feature-specific app routes are intentionally absent.

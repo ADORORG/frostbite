@@ -39,6 +39,7 @@
     "@ador/http": "workspace:*",
     "@ador/object-storage": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
+    "@ador/scenes": "workspace:*",
     "@ador/shared": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/ui": "workspace:*",

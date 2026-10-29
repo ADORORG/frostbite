@@ -1,16 +1,33 @@
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
 
-import { parseProductSlug, type ProductCatalog } from "./domain/catalog.ts";
+import { homeSectionOrder } from "@ador/shared/platform";
+
+import {
+  capabilitiesOf,
+  parseProductSlug,
+  type ProductCatalog,
+} from "./domain/catalog.ts";
 import {
   ProductDetailUnavailable,
   ProductIndex,
 } from "./ui/product-surface.tsx";
+import { ProductRail } from "./ui/product-rail.tsx";
 
 export function createPublicProductEntrypoint(
   catalog: ProductCatalog,
 ): FeatureEntrypoint {
   return {
-    capabilities: ["navigation", "public-page"],
+    capabilities: capabilitiesOf(catalog),
+    homeSections:
+      catalog.homeRail === null
+        ? []
+        : [
+            {
+              id: catalog.featureId,
+              order: homeSectionOrder.launches,
+              render: () => <ProductRail catalog={catalog} />,
+            },
+          ],
     id: catalog.featureId,
     pages: [
       {

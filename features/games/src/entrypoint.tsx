@@ -1,6 +1,7 @@
 import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
 import type { ChainOption } from "@ador/shared/chain";
+import { homeSectionOrder } from "@ador/shared/platform";
 import {
   gamePagePath,
   gamesPath,
@@ -31,6 +32,7 @@ import { createGameRunsResolver } from "./runs-runtime.ts";
 import { createGameSyncResolver } from "./runtime.ts";
 import { GameDetail } from "./ui/game-detail.tsx";
 import { GamesIndex } from "./ui/games-index.tsx";
+import { GamesRail } from "./ui/games-rail.tsx";
 import { MyMilestones } from "./ui/my-milestones.tsx";
 import type { GameWalletConfig } from "./wallet-config.ts";
 import { GameNotFound, NoGames } from "./ui/states.tsx";
@@ -50,6 +52,7 @@ export function createGamesEntrypoint(
     capabilities: [
       "api-routes",
       "authenticated-page",
+      "home-section",
       "navigation",
       "public-page",
     ],
@@ -66,6 +69,13 @@ export function createGamesEntrypoint(
       registerHttpOperation(createListGameClaimsOperation(claimsService)),
       registerHttpOperation(createListMintedMilestonesOperation(claimsService)),
       registerHttpOperation(createGetMintedPictureOperation(claimsService)),
+    ],
+    homeSections: [
+      {
+        id: "games",
+        order: homeSectionOrder.games,
+        render: () => <GamesRail games={catalog.list()} />,
+      },
     ],
     pages: [
       {

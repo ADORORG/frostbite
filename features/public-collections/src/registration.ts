@@ -16,7 +16,7 @@ export function createPublicCollectionsFeature(
 ) {
   return defineFeature({
     manifest: {
-      capabilities: ["navigation", "public-page"],
+      capabilities: ["home-section", "navigation", "public-page"],
       dependencies: ["collection-review"],
       id: "collections",
       navigation: [

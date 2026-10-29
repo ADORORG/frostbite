@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     "@ador/feature-platform-shell",
     "@ador/http",
     "@ador/plugin-kit",
+    "@ador/scenes",
     "@ador/shared",
     "@repo/ui",
   ],

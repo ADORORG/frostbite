@@ -12,7 +12,7 @@ describe("public collections registration", () => {
     );
     const access = { kind: "public" };
     expect(manifest).toMatchObject({
-      capabilities: ["navigation", "public-page"],
+      capabilities: ["home-section", "navigation", "public-page"],
       dependencies: ["collection-review"],
       id: "collections",
       navigation: [{ access, href: "/collections", label: "Collections" }],

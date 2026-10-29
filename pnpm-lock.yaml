@@ -171,6 +171,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@ador/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -803,6 +806,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@ador/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -867,6 +873,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@ador/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -922,6 +931,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@ador/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -986,6 +998,9 @@ importers:
       '@ador/plugin-kit':
         specifier: workspace:*
         version: link:../../packages/plugin-kit
+      '@ador/scenes':
+        specifier: workspace:*
+        version: link:../../packages/scenes
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui

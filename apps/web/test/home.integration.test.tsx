@@ -1,3 +1,4 @@
+import { ScenesProvider } from "@ador/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -14,13 +15,16 @@ describe("home navigation", () => {
       params: Promise.resolve({}),
       searchParams: Promise.resolve({}),
     });
-    const markup = renderToStaticMarkup(page);
+    const markup = renderToStaticMarkup(
+      <ScenesProvider>{page}</ScenesProvider>,
+    );
 
     expect(markup).toContain('href="/launches"');
     expect(markup).toContain('id="launches"');
     expect(markup).toContain('href="/games"');
     expect(markup).toContain('id="games"');
-    expect(markup).toContain("Frostbite");
+    // The rail shows the registered games by their own titles.
+    expect(markup).toContain("FROST·BITE");
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/creators"');
     // Signing in is the wallet widget's job (the layout supplies it), not a page or a link of its own.

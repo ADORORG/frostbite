@@ -99,3 +99,13 @@ describe("the animation switch", () => {
     quiet.mockRestore();
   });
 });
+
+describe("a browser with no media queries", () => {
+  it("is taken to ask for nothing: animation is on, and the page still works", async () => {
+    vi.stubGlobal("matchMedia", undefined);
+    const container = await mount(stage(null));
+    expect(textOf(container)).toBe(sceneCopy.switchOn);
+    await act(async () => undefined);
+    expect(textOf(container)).toBe(sceneCopy.switchOn);
+  });
+});

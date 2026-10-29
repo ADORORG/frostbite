@@ -12,6 +12,7 @@ export const featureCapabilitySchema = z.enum([
   "navigation",
   "public-page",
   "authenticated-page",
+  "home-section",
   "scheduled-workflows",
   "studio-page",
 ]);

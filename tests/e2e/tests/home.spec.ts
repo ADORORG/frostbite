@@ -9,7 +9,8 @@ test("shows only honest foundation-stage launchpad controls", async ({
   await expect(
     page.getByRole("heading", { name: /launch your legacy/i }),
   ).toBeVisible();
-  await expect(page.getByText("No live sale is configured")).toBeVisible();
+  // Nothing is published, and the launches rail says so rather than showing a sale.
+  await expect(page.getByText("No launch is published")).toBeVisible();
   await expect(page.getByRole("link", { name: /connect wallet/i })).toHaveCount(
     0,
   );

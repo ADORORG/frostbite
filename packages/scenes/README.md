@@ -72,4 +72,5 @@ moment and the first must look the same. It also holds them to the palette, to a
 
 ## Not here yet
 
-The pages that use it (S3, S4), the video fallback (S5) and the phone/performance checks (S6).
+The overlays on the full listing pages (S4), the video fallback (S5) and the phone/performance checks (S6). In use today: the landing
+page's hero and rails, with the switch in the header of every page.
