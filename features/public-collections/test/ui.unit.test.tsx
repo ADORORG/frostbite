@@ -1,3 +1,4 @@
+import { ScenesProvider } from "@ador/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -14,6 +15,10 @@ import {
 } from "../src/ui/states.tsx";
 import { chains, previewsFor, summary, version } from "./support/fixtures.ts";
 
+// Cards put a scene where a collection has no picture, so everything is drawn inside the scenes' provider.
+const show = (element: React.ReactElement) =>
+  renderToStaticMarkup(<ScenesProvider>{element}</ScenesProvider>);
+
 const navigation = [
   { area: "main", href: "/collections", label: "Collections" },
 ] as const;
@@ -21,7 +26,7 @@ const navigation = [
 describe("collection index", () => {
   it("lists each approved collection with a link that names it, its chain, and its counts", () => {
     const row = summary({ name: "Second light" });
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionIndex
         cards={[presentCard(row, [], chains)]}
         navigation={navigation}
@@ -32,12 +37,14 @@ describe("collection index", () => {
     expect(markup).toContain("View Second light");
     expect(markup).toContain("Bitcoin signet");
     expect(markup).toContain("1 of 2 items");
-    expect(markup).toContain("Preview unavailable");
+    // A collection with no picture shows a scene as its picture, not a note about a missing preview.
+    expect(markup).toContain("scene-overlay--art");
+    expect(markup).not.toContain("Preview unavailable");
   });
 
   it("says approval is not a launch, and shows the cover when it is available", () => {
     const row = summary();
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionIndex
         cards={[
           presentCard(
@@ -82,7 +89,7 @@ describe("a chain that has no configured name", () => {
   };
 
   it("is shown shortened on the card with the whole id in its title, and a configured name is shown whole", () => {
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionIndex
         cards={[card, { ...card, chainLabel: "Bitcoin signet", id: "c2" }]}
         navigation={navigation}
@@ -95,8 +102,8 @@ describe("a chain that has no configured name", () => {
     expect(markup).not.toContain('title="Bitcoin signet"…');
   });
 
-  it("opens the wall on its first collection, drawn larger, and no other", () => {
-    const markup = renderToStaticMarkup(
+  it("keeps every card the same compact size: none is drawn larger, none is square", () => {
+    const markup = show(
       <CollectionIndex
         cards={[
           card,
@@ -106,20 +113,15 @@ describe("a chain that has no configured name", () => {
         navigation={navigation}
       />,
     );
-    expect(markup.match(/data-featured="true"/gu)).toHaveLength(1);
-    expect(markup.indexOf('data-featured="true"')).toBeLessThan(
-      markup.indexOf("Second"),
-    );
-    expect(markup.indexOf("Odd chain")).toBeGreaterThan(
-      markup.indexOf('data-featured="true"'),
-    );
-    expect(markup).toContain('data-ratio="square"');
+    expect(markup).not.toContain("data-featured");
+    expect(markup).not.toContain('data-ratio="square"');
+    expect(markup.match(/class="cover-card"/gu)).toHaveLength(3);
   });
 
   it("is shortened the same way on the collection's own page", () => {
     const approved = version();
     const base = presentCollection(approved, previewsFor(approved), chains);
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionDetail
         collection={{ ...base, chainLabel: id }}
         navigation={navigation}
@@ -133,7 +135,7 @@ describe("a chain that has no configured name", () => {
 describe("collection detail", () => {
   it("shows the approved version in full, with the approval stated honestly", () => {
     const approved = version();
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionDetail
         collection={presentCollection(approved, previewsFor(approved), chains)}
         navigation={navigation}
@@ -173,7 +175,7 @@ describe("collection detail", () => {
       [],
       chains,
     );
-    const markup = renderToStaticMarkup(
+    const markup = show(
       <CollectionDetail collection={bare} navigation={navigation} />,
     );
     expect(markup).not.toContain("Provenance");
@@ -198,37 +200,31 @@ describe("collection detail", () => {
       chains,
     );
     expect(
-      renderToStaticMarkup(
-        <CollectionDetail collection={bare} navigation={navigation} />,
-      ),
+      show(<CollectionDetail collection={bare} navigation={navigation} />),
     ).not.toContain("The first light");
   });
 });
 
 describe("states", () => {
   it("says the catalog is empty, and that drafts are never shown", () => {
-    const markup = renderToStaticMarkup(
-      <NoCollections navigation={navigation} />,
-    );
+    const markup = show(<NoCollections navigation={navigation} />);
     expect(markup).toContain("Catalog empty");
     expect(markup).toContain("No collections online");
     expect(markup).toContain("never shown here");
   });
 
   it("says the catalog could not be read, rather than looking empty", () => {
-    const markup = renderToStaticMarkup(
-      <CatalogUnavailable navigation={navigation} />,
-    );
+    const markup = show(<CatalogUnavailable navigation={navigation} />);
     expect(markup).toContain("Catalog unavailable");
     expect(markup).not.toContain("Catalog empty");
     expect(markup).toContain("Nothing has been removed");
   });
 
   it("reports an invalid address and an unpublished one in different words, never revealing which exist", () => {
-    const invalid = renderToStaticMarkup(
+    const invalid = show(
       <CollectionNotPublished navigation={navigation} valid={false} />,
     );
-    const missing = renderToStaticMarkup(
+    const missing = show(
       <CollectionNotPublished navigation={navigation} valid />,
     );
     expect(invalid).toContain("Invalid identifier");

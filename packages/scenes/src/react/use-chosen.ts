@@ -7,17 +7,18 @@ import { useScenes } from "./provider.tsx";
 
 const never = () => () => undefined;
 
-// The scene a backdrop shows: the one named, or one taken at random once per backdrop and kept. On the server, and in the first render
-// of the browser, there is none, so the markup matches what the server sent; the choice arrives right after, with no flash.
+// The scene a backdrop shows: the one named (which can change), or one taken at random once and kept. On the server, and in the first
+// render of the browser, there is none, so the markup matches what the server sent; the choice arrives right after, with no flash.
 export function useChosenScene(sceneId: string | undefined): Scene | null {
   const { claimRandom, scenes } = useScenes();
-  const chosen = useRef<Scene | null>(null);
+  const random = useRef<Scene | null>(null);
   return useSyncExternalStore(
     never,
     () => {
-      chosen.current ??=
-        scenes.find(({ id }) => id === sceneId) ?? claimRandom();
-      return chosen.current;
+      const named = scenes.find(({ id }) => id === sceneId);
+      if (named !== undefined) return named;
+      random.current ??= claimRandom();
+      return random.current;
     },
     () => null,
   );

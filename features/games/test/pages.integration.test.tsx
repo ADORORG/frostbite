@@ -1,3 +1,4 @@
+import { ScenesProvider } from "@ador/scenes/react";
 import { WalletProvider } from "@ador/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -27,15 +28,17 @@ async function render(
     claimsConfig,
   ).pages?.find((candidate) => candidate.path === path);
   if (page === undefined) throw new Error(`No page ${path}`);
-  // The app's layout provides the wallet connection above every page; a page rendered alone needs the same.
+  // The app's layout provides the wallet connection and the moving scenes above every page; a page rendered alone needs the same.
   return renderToStaticMarkup(
-    <WalletProvider network="signet">
-      {await page.render({
-        actorUserId: null,
-        navigation: [],
-        params: slug === undefined ? {} : { slug },
-      })}
-    </WalletProvider>,
+    <ScenesProvider>
+      <WalletProvider network="signet">
+        {await page.render({
+          actorUserId: null,
+          navigation: [],
+          params: slug === undefined ? {} : { slug },
+        })}
+      </WalletProvider>
+    </ScenesProvider>,
   );
 }
 

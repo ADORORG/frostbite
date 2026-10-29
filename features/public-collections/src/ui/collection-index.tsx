@@ -8,7 +8,7 @@ import {
 
 import type { PublicCard } from "../application/public-model.ts";
 import { collectionHref } from "../paths.ts";
-import { CollectionPicture } from "./collection-picture.tsx";
+import { CollectionCardPicture } from "./collection-card-picture.tsx";
 import { PublicFrame } from "./public-frame.tsx";
 
 // The approved collections, newest approval first, as a wall of covers.
@@ -27,7 +27,7 @@ export function CollectionIndex({
         </h2>
       </header>
       <CoverGrid label="Approved collections">
-        {cards.map((card, index) => (
+        {cards.map((card) => (
           <CoverCard
             badges={
               <>
@@ -42,12 +42,10 @@ export function CollectionIndex({
               </>
             }
             cta="View collection"
-            featured={index === 0}
             href={collectionHref(card.id)}
             key={card.id}
             label={`View ${card.name}`}
-            media={<CollectionPicture image={card.cover} name={card.name} />}
-            ratio="square"
+            media={<CollectionCardPicture card={card} />}
             summary={card.description}
             title={card.name}
           />

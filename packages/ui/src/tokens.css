@@ -19,6 +19,8 @@
   --arcade-font-display: var(--font-bungee), Impact, sans-serif;
   --arcade-font-pixel: var(--font-press-start), ui-monospace, monospace;
   --arcade-content-width: 74rem;
+  /* The space left and right of full-width pages (the header, the footer, the walls and the landing page): fluid, never a fixed column. */
+  --arcade-gutter: clamp(1rem, 3.5vw, 3.5rem);
   /* The height of the sticky site header, so a bar can stick just below it. */
   --arcade-header-height: 3.75rem;
   --arcade-dock-height: 2.75rem;

@@ -114,6 +114,26 @@ describe("a preview", () => {
     );
   });
 
+  it("leaves out the initials when the stand-in is asked to be plain, so something else can be the picture", async () => {
+    motion(false);
+    const container = await mount(null, null);
+    await act(() =>
+      root?.render(
+        <ArcadePreview
+          alt=""
+          image={null}
+          name="Frost"
+          standIn="plain"
+          video={null}
+        />,
+      ),
+    );
+    expect(container.querySelector(".arcade-preview")).not.toBeNull();
+    expect(
+      container.querySelector(".arcade-preview__stand-in")?.textContent,
+    ).toBe("");
+  });
+
   it("starts without a clip on the server, which cannot know the person's preference", () => {
     const markup = renderToStaticMarkup(
       <ArcadePreview alt="x" image="/i.png" name="Frost" video="/v.mp4" />,

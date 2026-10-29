@@ -25,8 +25,7 @@
   align-items: center;
   gap: var(--arcade-space-4);
   min-height: var(--arcade-header-height);
-  padding: var(--arcade-space-2)
-    max(var(--arcade-space-4), calc((100vw - var(--arcade-content-width)) / 2));
+  padding: var(--arcade-space-2) var(--arcade-gutter);
   border-bottom: var(--arcade-border-width) solid var(--arcade-border);
   background: color-mix(in srgb, var(--arcade-surface) 94%, transparent);
   backdrop-filter: blur(0.75rem);
@@ -59,7 +58,7 @@
 .app-footer {
   justify-content: space-between;
   gap: 1rem;
-  padding: 2rem max(1.25rem, calc((100vw - var(--arcade-content-width)) / 2));
+  padding: 2rem var(--arcade-gutter);
   border-top: var(--arcade-border-width) solid var(--arcade-border);
   background: var(--arcade-ink);
   color: var(--arcade-text-subtle);

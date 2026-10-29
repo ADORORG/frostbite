@@ -24,7 +24,7 @@ describe("home release state", () => {
     // No launch is published, and the launches rail says so rather than showing a sale.
     expect(markup).toContain('id="launches"');
     expect(markup).toContain("No launch is published");
-    expect(markup).toContain("GATED");
+    expect(markup).toContain("Gated");
     // Every feature that has a part of the landing page is on it, laid out in the order they asked for.
     const order = ["launches", "collections", "games"].map((id) =>
       markup.indexOf(`id="${id}"`),
@@ -33,7 +33,7 @@ describe("home release state", () => {
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(markup).toContain("scene-backdrop");
     // The count is the registry's own, so adding a feature does not break this test.
-    expect(markup).toContain(`${featureRegistry.list().length} REGISTERED`);
+    expect(markup).toContain(`${featureRegistry.list().length} registered`);
     expect(markup).not.toContain("Connect wallet");
     expect(markup).not.toContain("Buy now");
   });

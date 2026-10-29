@@ -4,8 +4,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3rem)
-    max(1.25rem, calc((100vw - var(--arcade-content-width)) / 2));
+  padding: clamp(1.5rem, 4vw, 3rem) var(--arcade-gutter);
   min-height: calc(100vh - 12rem);
 }
 /* A floor of grid lines under everything, receding like the start of a level. */
@@ -64,8 +63,7 @@
 }
 .arcade-ticker {
   overflow: hidden;
-  margin: calc(-1 * clamp(1.5rem, 4vw, 3rem))
-    calc(-1 * max(1.25rem, (100vw - var(--arcade-content-width)) / 2)) 0;
+  margin: calc(-1 * clamp(1.5rem, 4vw, 3rem)) calc(-1 * var(--arcade-gutter)) 0;
   border-block: var(--arcade-border-width) solid var(--arcade-border);
   background: var(--arcade-ink);
 }

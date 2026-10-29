@@ -12,7 +12,7 @@ export function AnimationToggle() {
     <button
       aria-label={sceneCopy.switchLabel}
       aria-pressed={moving}
-      className="arcade-button arcade-button--cyan scene-switch"
+      className="scene-switch"
       onClick={() => setChoice(moving ? "off" : "on")}
       type="button"
     >

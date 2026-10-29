@@ -1,69 +1,63 @@
-/* A band of the landing page: a title row, then cards, over a moving background that is dimmed so the words stay readable. */
+/* A band of the landing page: a title row, then cards, over a moving background. The scene is meant to be seen; a scrim fades it only at the
+   top and bottom of the band, so the title row and the next band stay readable. */
 .home-rail {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  margin-block: clamp(2rem, 5vw, 4rem);
-  border-block: 0.125rem solid var(--arcade-border-strong);
+  border-bottom: 0.125rem solid var(--arcade-border-strong);
   background: var(--arcade-surface);
 }
 .home-rail__backdrop {
   position: absolute;
   inset: 0;
   z-index: -2;
-  opacity: 0.32;
+  opacity: 0.42;
 }
-/* The scrim: darker toward the title row and the edges, so text keeps its contrast whichever frame is showing. */
 .home-rail::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  background:
-    linear-gradient(
-      180deg,
-      var(--arcade-surface) 0%,
-      transparent 35%,
-      transparent 70%,
-      var(--arcade-surface) 100%
-    ),
-    linear-gradient(
-      90deg,
-      var(--arcade-surface) 0%,
-      transparent 18%,
-      transparent 82%,
-      var(--arcade-surface) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--arcade-surface) 0%,
+    transparent 28%,
+    transparent 78%,
+    var(--arcade-surface) 100%
+  );
   pointer-events: none;
 }
 .home-rail__body {
-  width: min(100%, var(--arcade-content-width));
-  margin-inline: auto;
-  padding: clamp(1.5rem, 4vw, 2.5rem) 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem) var(--arcade-gutter);
 }
 .home-rail__head {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
-  gap: 0.75rem 1.5rem;
-  margin-block-end: 1.25rem;
+  gap: 0.5rem 1.5rem;
+  margin-block-end: 1rem;
 }
 .home-rail__head h2 {
   margin: 0;
   font-family: var(--arcade-font-display);
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(1.125rem, 0.8rem + 1.4vw, 1.75rem);
   font-weight: 400;
   text-transform: uppercase;
 }
 .home-rail__head p {
   max-width: 36rem;
-  margin: 0.25rem 0 0;
+  margin: 0.125rem 0 0;
   color: var(--arcade-text-muted);
+  font-size: 0.9375rem;
 }
 .home-rail__link {
   color: var(--arcade-cyan);
   font-family: var(--arcade-font-pixel);
   font-size: var(--arcade-label-size);
   text-transform: uppercase;
+}
+/* Cards on the landing page are compact: more to a row, and the empty states are short. */
+.home-rail .cover-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
 }

@@ -57,11 +57,15 @@ export function ArcadePreview({
   alt,
   image,
   name,
+  standIn = "initials",
   video,
 }: {
   readonly alt: string;
   readonly image: string | null;
   readonly name: string;
+  // What a missing picture is drawn as: the name's initials on its colours, or just the colours (for a card whose picture is
+  // something else, such as a scene, and which must not look like a placeholder).
+  readonly standIn?: "initials" | "plain";
   readonly video: string | null;
 }) {
   const reduced = usePrefersReducedMotion();
@@ -76,7 +80,7 @@ export function ArcadePreview({
           aria-hidden="true"
           className={`arcade-preview__stand-in arcade-preview__stand-in--${String(standInTone(name))}`}
         >
-          {standInInitials(name)}
+          {standIn === "plain" ? null : standInInitials(name)}
         </div>
       ) : (
         <img alt={alt} decoding="async" loading="lazy" src={image} />

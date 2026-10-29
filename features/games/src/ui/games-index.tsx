@@ -2,13 +2,13 @@ import { gameHref } from "@ador/shared/games";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
 import {
   ArcadeBadge,
-  ArcadePreview,
   ArcadeTicker,
   CoverCard,
   CoverGrid,
 } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";
+import { GameCover } from "./game-cover.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 
 const milestoneCount = (count: number) =>
@@ -55,14 +55,7 @@ export function GamesIndex({
             key={game.id}
             label={`View ${game.title}`}
             rank={index + 1}
-            media={
-              <ArcadePreview
-                alt={game.cover?.alt ?? ""}
-                image={game.cover?.image ?? null}
-                name={game.title}
-                video={game.cover?.video ?? null}
-              />
-            }
+            media={<GameCover game={game} />}
             summary={game.summary}
             title={game.title}
           />

@@ -19,8 +19,42 @@
   mix-blend-mode: screen;
 }
 
-/* The switch lives in the header on every page, so it is small. */
+/* A card whose picture is the scene: full strength, no blending. */
+.scene-overlay--art {
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+/* The switch: a tiny pill in the bottom-right corner of every page, out of the way and always there. */
 .scene-switch {
-  padding: 0.25rem 0.625rem;
-  font-size: var(--arcade-text-xs);
+  position: fixed;
+  right: max(0.625rem, env(safe-area-inset-right, 0px));
+  bottom: max(0.625rem, env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  padding: 0.1875rem 0.5rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--arcade-ink) 88%, transparent);
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.5rem;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.scene-switch::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  margin-inline-end: 0.375rem;
+  background: var(--arcade-text-subtle);
+}
+.scene-switch[aria-pressed="true"]::before {
+  background: var(--arcade-mint);
+}
+.scene-switch:hover,
+.scene-switch:focus-visible {
+  color: var(--arcade-text);
+  border-color: var(--arcade-cyan);
 }

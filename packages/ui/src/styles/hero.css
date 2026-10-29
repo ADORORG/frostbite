@@ -1,0 +1,155 @@
+/* The landing page's first screen: an arcade attract screen. A scene fills it edge to edge, scanlines and a vignette make it a screen, the
+   words sit low and left over a shade, and a score line along the bottom says what is playing and how the platform is doing. */
+.home-hero {
+  position: relative;
+  display: grid;
+  align-content: end;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: clamp(24rem, 58vh, 38rem);
+  border-bottom: 0.25rem solid var(--arcade-border-strong);
+  background: var(--arcade-ink);
+}
+.home-hero .scene-backdrop {
+  z-index: -4;
+}
+.home-hero__shade,
+.home-hero__crt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.home-hero__shade {
+  z-index: -3;
+  background:
+    linear-gradient(
+      90deg,
+      rgb(12 6 32 / 92%) 0%,
+      rgb(12 6 32 / 55%) 45%,
+      transparent 85%
+    ),
+    linear-gradient(0deg, rgb(12 6 32 / 85%) 0%, transparent 45%);
+}
+.home-hero__crt {
+  z-index: -2;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 26%) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(ellipse at 55% 40%, transparent 50%, rgb(0 0 0 / 65%) 100%);
+}
+.home-hero__body {
+  max-width: 48rem;
+  padding: clamp(2.5rem, 9vh, 5.5rem) var(--arcade-gutter)
+    clamp(1rem, 3vh, 1.75rem);
+}
+.home-hero h1 {
+  margin: 0.9rem 0 0.75rem;
+  font-family: var(--arcade-font-pixel);
+  font-size: clamp(1rem, 0.5rem + 2.2vw, 2rem);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: 0.1875rem 0.1875rem 0 var(--arcade-red);
+}
+.home-hero h1 span {
+  display: block;
+  color: var(--arcade-cyan);
+  text-shadow: 0.1875rem 0.1875rem 0 var(--arcade-pink);
+}
+.home-hero__cursor {
+  display: inline-block;
+  inline-size: 0.55em;
+  block-size: 0.9em;
+  margin-inline-start: 0.25em;
+  background: var(--arcade-cyan);
+  vertical-align: -0.1em;
+  animation: home-blink 1s steps(2, start) infinite;
+}
+@keyframes home-blink {
+  to {
+    visibility: hidden;
+  }
+}
+.home-hero__lede {
+  max-width: 34rem;
+  margin: 0 0 1.25rem;
+  color: var(--arcade-text-muted);
+  font-size: clamp(0.875rem, 0.8rem + 0.4vw, 1.0625rem);
+  line-height: 1.6;
+}
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+.home-hero__hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 0.5rem var(--arcade-gutter);
+  border-top: 0.125rem solid var(--arcade-border-strong);
+  background: color-mix(in srgb, var(--arcade-ink) 80%, transparent);
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.5625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.home-hero__scene,
+.home-hero__stats {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-hero__stats {
+  gap: 1.5rem;
+}
+/* A wide, short screen shows a band of the scene; the action is near the bottom of every scene, so the band is taken from there. */
+.home-hero .scene-canvas {
+  object-position: 50% 82%;
+}
+.home-hero__stats > div {
+  display: flex;
+  gap: 0.5rem;
+}
+.home-hero__stats dt,
+.home-hero__stats dd {
+  margin: 0;
+}
+.home-hero__scene b {
+  min-inline-size: 11ch;
+  color: var(--arcade-yellow);
+  font-weight: 400;
+}
+.home-hero__stats b {
+  color: var(--arcade-cyan);
+  font-weight: 400;
+}
+.home-hero__pick {
+  padding: 0.125rem 0.5rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  background: transparent;
+  color: var(--arcade-text);
+  font: inherit;
+  cursor: pointer;
+}
+.home-hero__pick:hover,
+.home-hero__pick:focus-visible {
+  border-color: var(--arcade-cyan);
+  color: var(--arcade-cyan);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__cursor {
+    animation: none;
+  }
+}

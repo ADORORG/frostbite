@@ -69,6 +69,13 @@ describe("the landing page's rail of games", () => {
     expect(overlays).toEqual([true, false]);
   });
 
+  it("gives a game with no picture the scene at full strength, and never initials", async () => {
+    const container = await rail(make(embeddedGame));
+    const card = container.querySelector(".cover-card");
+    expect(card?.querySelector(".scene-overlay--art")).not.toBeNull();
+    expect(card?.querySelector(".arcade-preview")?.textContent).toBe("");
+  });
+
   it("says so, in the catalog's own words, when there are no games", async () => {
     const container = await rail([]);
     expect(textOf(container)).toContain(noGames.title);
@@ -79,7 +86,9 @@ describe("the landing page's rail of games", () => {
     );
   });
 
-  it("says a single game in the singular", () => {
-    expect(homeRailCopy.link(1)).toBe("See the game");
+  it("names the count only when there is more than one game, never a zero or a singular", () => {
+    expect(homeRailCopy.link(0)).toBe("See all games");
+    expect(homeRailCopy.link(1)).toBe("See all games");
+    expect(homeRailCopy.link(2)).toBe("See all 2 games");
   });
 });

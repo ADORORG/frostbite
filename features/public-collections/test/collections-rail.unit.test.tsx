@@ -44,7 +44,7 @@ describe("the rail of collections", () => {
     expect(show([card(1, true)])).not.toContain("scene-overlay");
     expect(show([card(1, false)])).toContain("scene-overlay");
     expect(
-      show([card(1, false), card(2, true)]).match(/scene-overlay/gu),
+      show([card(1, false), card(2, true)]).match(/class="scene-overlay/gu),
     ).toHaveLength(1);
   });
 
@@ -63,11 +63,27 @@ describe("the rail of collections", () => {
     const markup = show(null);
     expect(markup).toContain(collectionsUnavailable.title);
     expect(markup).toContain("Catalog unavailable");
-    expect(markup).toContain(homeRailCopy.linkUnknown);
+    expect(markup).toContain(homeRailCopy.link(0));
     expect(markup).not.toContain(noCollections.title);
   });
 
-  it("says one collection in the singular", () => {
-    expect(homeRailCopy.link(1)).toBe("See the collection");
+  it("never says there are none in its link, and says the number once there are several", () => {
+    expect(homeRailCopy.link(0)).toBe("See all collections");
+    expect(homeRailCopy.link(1)).toBe("See all collections");
+    expect(homeRailCopy.link(9)).toBe("See all 9 collections");
+  });
+
+  it("uses a scene at full strength as the picture of a collection that has none, with no initials and no missing-preview note", () => {
+    const markup = show([card(1, false)]);
+    expect(markup).toContain("scene-overlay--art");
+    expect(markup).not.toContain("Preview unavailable");
+    expect(markup).not.toMatch(/arcade-preview__stand-in[^>]*>[A-Z]{1,2}</u);
+    expect(show([card(1, true)])).not.toContain("scene-overlay");
+  });
+
+  it("draws every card wide and compact", () => {
+    const markup = show([card(1, true), card(2, false)]);
+    expect(markup).not.toContain('data-ratio="square"');
+    expect(markup).not.toContain("data-featured");
   });
 });

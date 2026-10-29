@@ -27,9 +27,10 @@ describe("PlatformHome", () => {
       registeredFeatureIds: ["platform-shell", "launches", "games"],
       registeredFeatures: 3,
     });
-    expect(markup).toContain("3 REGISTERED");
-    expect(markup).toContain("GATED");
-    expect(markup).toContain("Launch your legacy. Mint the future.");
+    expect(markup).toContain("3 registered");
+    expect(markup).toContain("Gated");
+    expect(markup).toContain("Launch your legacy.");
+    expect(markup).toContain("Mint the future.");
     expect(markup).toContain("scene-backdrop");
     expect(markup).not.toContain("Connect wallet");
 
@@ -50,7 +51,7 @@ describe("PlatformHome", () => {
           })}
         </ScenesProvider>,
       ),
-    ).toContain("3 REGISTERED");
+    ).toContain("3 registered");
   });
 
   it("draws the sections its page is given, in the page it serves", async () => {
@@ -91,7 +92,7 @@ describe("PlatformHome", () => {
     });
     expect(markup).not.toContain("PLANNED");
     expect(markup).not.toContain("UNSET");
-    expect(markup).not.toContain("GATED");
+    expect(markup).not.toContain("Gated");
   });
 
   it("lays out the parts the features supplied, in the order given, each in place", () => {

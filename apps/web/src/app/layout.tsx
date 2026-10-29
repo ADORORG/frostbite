@@ -64,13 +64,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ScenesProvider>
           <ShellStatusProvider
             status={
-              <>
-                <IndexingBadge
-                  polling={chainStatusConfig.polling}
-                  syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
-                />
-                <AnimationToggle />
-              </>
+              <IndexingBadge
+                polling={chainStatusConfig.polling}
+                syncWindowBlocks={chainStatusConfig.syncWindowBlocks}
+              />
             }
           >
             <WalletShell
@@ -83,6 +80,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               {children}
             </WalletShell>
           </ShellStatusProvider>
+          <AnimationToggle />
         </ScenesProvider>
       </body>
     </html>
