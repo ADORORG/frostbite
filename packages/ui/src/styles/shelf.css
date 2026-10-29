@@ -1,0 +1,142 @@
+/* The trophy case on "My milestones": the collection in a few facts, then a shelf for each game. */
+.shelf-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2) var(--arcade-space-5);
+  margin: 0 0 var(--arcade-space-5);
+  padding: 0;
+  color: var(--arcade-text-muted);
+  list-style: none;
+}
+.shelf-summary strong {
+  color: var(--arcade-text);
+}
+.shelf {
+  margin-block-end: var(--arcade-space-6);
+}
+.shelf__head {
+  display: grid;
+  grid-template-columns: auto 1fr minmax(8rem, 14rem);
+  align-items: center;
+  gap: var(--arcade-space-3);
+  margin-block-end: var(--arcade-space-3);
+}
+.shelf__head h3 {
+  margin: 0;
+}
+.shelf__head p {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+.shelf__cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+}
+@media (max-width: 40rem) {
+  .shelf__head {
+    grid-template-columns: auto 1fr;
+  }
+  .shelf__head .arcade-progress {
+    grid-column: 1 / -1;
+  }
+}
+/* The shelf itself: small square pieces, as many to a row as fit, resting on a line. */
+.shelf__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--arcade-space-3);
+  margin: 0;
+  padding: 0 0 var(--arcade-space-3);
+  border-block-end: 0.25rem solid var(--arcade-border-strong);
+  list-style: none;
+}
+.trophy {
+  min-inline-size: 0;
+}
+.trophy__button {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  background: none;
+  cursor: pointer;
+}
+.trophy__art {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+}
+/* A soft light under the piece, so it looks displayed. */
+.trophy:not(.trophy--missing) .trophy__art {
+  box-shadow: 0 0.75rem 1rem -0.5rem var(--arcade-cyan);
+}
+.trophy__button:hover .trophy__art,
+.trophy__button:focus-visible .trophy__art {
+  border-color: var(--arcade-cyan);
+}
+.trophy__button:focus-visible {
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.25rem;
+}
+.trophy__strip {
+  display: grid;
+  gap: 0.125rem;
+  padding-block: var(--arcade-space-2);
+}
+.trophy__strip strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trophy__strip small {
+  color: var(--arcade-text-subtle);
+}
+.trophy__ribbon {
+  position: absolute;
+  inset-block-start: var(--arcade-space-2);
+  inset-inline-start: var(--arcade-space-2);
+  z-index: 2;
+  padding: 0.125rem var(--arcade-space-2);
+  color: var(--arcade-ink);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  background: var(--arcade-cyan);
+}
+.trophy__ribbon[data-ribbon="latest"] {
+  background: var(--arcade-red);
+  color: var(--arcade-text);
+}
+/* A milestone not minted yet: only its outline, dim and dashed. */
+.trophy--missing .trophy__art {
+  border-style: dashed;
+  background: var(--arcade-surface-recessed);
+}
+.trophy--missing {
+  opacity: 0.6;
+}
+.trophy-detail {
+  display: grid;
+  gap: var(--arcade-space-3);
+}
+.trophy-detail__art {
+  position: relative;
+  inline-size: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  overflow: hidden;
+}

@@ -12,14 +12,18 @@ page connects it to the platform through `@ador/game-sdk`.
 `submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
-`/games/milestones` ("My milestones", signed-in players only) lists what the player has minted across games, newest first, with the
-game, the milestone and the day (UTC), as a wall of square collectible cards (no transaction or edition is shown). It is read from `GET /api/v1/games/milestones/minted`
+`/games/milestones` ("My milestones", signed-in players only) is the player's trophy case: a shelf for every game that can mint
+milestones (games with mints first, newest first), with a place for each of the game's milestones: a square picture with the name and the
+day (UTC) for a minted one, an outline marked "not minted yet" for the rest, and a progress meter per game. A "First" ribbon marks a
+game's earliest mint and "Latest" the newest of all. A header gives the counts and dates. Pressing a piece opens its picture, what the
+milestone is, the day and its transaction on the explorer; the cards show no transaction. Sharing the shelf waits for a public page
+(M2, #133). It is read from `GET /api/v1/games/milestones/minted`
 (authenticated; the player is the session, the request carries nothing), and lists only claims the network's records show
 `complete`: a claim that is waiting, delayed or failed has minted nothing. The date is when the platform recorded the claim
 complete. Each entry shows the picture the chain serves for the item the claim minted (and the dock's claim list shows it for a complete
 claim), read from `GET /api/v1/games/milestones/picture?claimId=` (authenticated; a file, `image/svg+xml`, kept privately by the browser for a day and tied to the session cookie; a claim that is not the player's, or with no picture, is a `404` that says why and is never kept). The page points an image tag at that address; a stand-in of the same size holds the place while it loads and when it fails, and says so. The
 platform learns the item's id from the network when the claim's transaction is shown included, and shows the picture only if the item
-says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the card shows no picture, and
+says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the piece shows no picture, and
 never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
 
 ## Onboarding a game (the template)
