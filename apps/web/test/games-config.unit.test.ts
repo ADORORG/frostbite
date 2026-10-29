@@ -32,6 +32,7 @@ describe("the platform's game list", () => {
       "sdk-explorer",
       "frost-runner",
       "icicle-drop",
+      "tower-stack",
     ]);
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
@@ -77,7 +78,12 @@ describe("the platform's game list", () => {
 
   it("declares a rewards contract on each of the games built for players, so staff can create it, and none on the sample game", async () => {
     const games = await gamesWith("");
-    for (const id of ["frostbite", "frost-runner", "icicle-drop"]) {
+    for (const id of [
+      "frostbite",
+      "frost-runner",
+      "icicle-drop",
+      "tower-stack",
+    ]) {
       const game = games.find((listed) => listed.id === id);
       expect(game?.rewards).toEqual({
         templateId: "game-rewards",

@@ -14,6 +14,7 @@ import { sampleGame } from "./games/sample.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 import { frostRunnerGame } from "./games/frost-runner.ts";
 import { icicleDropGame } from "./games/icicle-drop.ts";
+import { towerStackGame } from "./games/tower-stack.ts";
 // game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
@@ -34,6 +35,7 @@ export const games = defineGames([
   ...developmentGames(),
   frostRunnerGame,
   icicleDropGame,
+  towerStackGame,
   // game:new adds games above this line.
 ]);
 

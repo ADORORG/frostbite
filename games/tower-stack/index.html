@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tower Stacker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="bar">
+        <header>
+          <h1>Tower Stacker</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Height <strong id="height">0</strong></span>
+          <span>Streak <strong id="streak">0</strong></span>
+          <span>Best <strong id="best">0</strong></span>
+        </p>
+      </div>
+      <canvas
+        id="screen"
+        width="160"
+        height="90"
+        role="img"
+        aria-label="The game screen: a tower of ice blocks, with one more sliding over it to be dropped"
+      ></canvas>
+      <div class="foot">
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="drop" type="button" disabled>Drop</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
