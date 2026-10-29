@@ -1,3 +1,4 @@
+import { scenes } from "@ador/scenes/library";
 import { requiredCapability } from "@ador/game-sdk/protocol";
 import type { ChainOption } from "@ador/shared/chain";
 import {
@@ -21,6 +22,8 @@ export const gameCapabilityLabels: Readonly<Record<GameCapability, string>> = {
   "transaction:request": "Ask the player to sign a transaction",
   wallet: "See the address of the wallet the player connected",
 };
+
+const sceneIds: ReadonlySet<string> = new Set(scenes.map(({ id }) => id));
 
 const hostGranted: ReadonlySet<string> = new Set(
   Object.values(requiredCapability),
@@ -66,6 +69,8 @@ export interface PublicGame {
   readonly playable: boolean;
   // Where to play, or null when the game is registered but has no play address configured.
   readonly playUrl: string | null;
+  // The scene the game asked for on its card (by id), or null when it left the choice to the platform.
+  readonly scene: string | null;
   readonly summary: string;
   readonly title: string;
   readonly version: string;
@@ -84,6 +89,12 @@ export function createGameCatalog(
   games: readonly GameManifest[],
   chains: readonly ChainOption[],
 ): GameCatalog {
+  for (const { id, scene } of games) {
+    if (scene !== undefined && !sceneIds.has(scene))
+      throw new Error(
+        `Game "${id}" names a scene the platform does not have: "${scene}".`,
+      );
+  }
   const presented = games.map((game): PublicGame => ({
     capabilities: game.capabilities.map((capability) => ({
       available: game.launch.mode === "embedded" && hostGranted.has(capability),
@@ -114,6 +125,7 @@ export function createGameCatalog(
     playable:
       game.launch.mode === "embedded" || gamePlayAddress(game.launch) !== null,
     playUrl: gamePlayAddress(game.launch),
+    scene: game.scene ?? null,
     summary: game.summary,
     title: game.title,
     version: game.version,

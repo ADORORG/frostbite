@@ -46,6 +46,7 @@ describe("the game catalog", () => {
       networkLabel: "Bitcoin signet",
       playable: true,
       playUrl: "https://play.example.test/template",
+      scene: null,
       summary: "Shows what a registered game looks like.",
       title: "Template game",
       version: "0.3.0",
@@ -140,6 +141,26 @@ describe("the game catalog", () => {
     expect(catalog.isValidSlug("Missing")).toBe(false);
     expect(catalog.isValidSlug(undefined)).toBe(false);
     expect(catalog.isValidSlug("../admin")).toBe(false);
+  });
+});
+
+describe("the scene on a game's card", () => {
+  it("is null when the manifest leaves it to the platform, and the manifest's own when it names one", () => {
+    const named = { ...embeddedGame, id: "named-scene", scene: "runner" };
+    const catalog = createGameCatalog([embeddedGame, named], chains);
+    expect(catalog.find("embedded-game")?.scene).toBeNull();
+    expect(catalog.find("named-scene")?.scene).toBe("runner");
+  });
+
+  it("is refused, naming the game, when it is not a scene the platform has", () => {
+    expect(() =>
+      createGameCatalog(
+        [{ ...embeddedGame, id: "odd-scene", scene: "no-such-scene" }],
+        chains,
+      ),
+    ).toThrow(
+      'Game "odd-scene" names a scene the platform does not have: "no-such-scene".',
+    );
   });
 });
 

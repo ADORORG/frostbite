@@ -198,6 +198,34 @@ describe("the declarations digest", () => {
     expect(() => gameManifestHash({ ...manifest(), title: "" })).toThrow();
   });
 
+  describe("a scene for the card", () => {
+    it("is named by a scene's id, is optional, and is part of what the manifest hashes to", () => {
+      expect(
+        gameManifestSchema.safeParse({ ...manifest(), scene: "runner" })
+          .success,
+      ).toBe(true);
+      expect(gameManifestSchema.safeParse(manifest()).success).toBe(true);
+      expect(gameManifestHash({ ...manifest(), scene: "runner" })).not.toBe(
+        gameManifestHash(manifest()),
+      );
+    });
+
+    it.each(["Runner", "road hopper", "1runner", "", "a".repeat(33), "run/er"])(
+      "refuses %j, which cannot be a scene's id",
+      (scene) => {
+        expect(
+          gameManifestSchema.safeParse({ ...manifest(), scene }).success,
+        ).toBe(false);
+      },
+    );
+
+    it("refuses something that is not text", () => {
+      expect(
+        gameManifestSchema.safeParse({ ...manifest(), scene: 7 }).success,
+      ).toBe(false);
+    });
+  });
+
   describe("a cover", () => {
     const embedded = { launch: { mode: "embedded" } } as const;
     const cover = {

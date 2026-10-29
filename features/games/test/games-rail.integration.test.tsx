@@ -76,6 +76,16 @@ describe("the landing page's rail of games", () => {
     expect(card?.querySelector(".arcade-preview")?.textContent).toBe("");
   });
 
+  it("shows the scene a game names on its card, and one chosen from its id when it names none", async () => {
+    const named = defineGame({ ...embeddedGame, id: "named", scene: "runner" });
+    const container = await rail(make(named, clone("plain")));
+    const scenes = [...container.querySelectorAll(".cover-card")].map((card) =>
+      card.querySelector(".scene-overlay")?.getAttribute("data-scene"),
+    );
+    expect(scenes[0]).toBe("runner");
+    expect(scenes[1]).toBeTruthy();
+  });
+
   it("says so, in the catalog's own words, when there are no games", async () => {
     const container = await rail([]);
     expect(textOf(container)).toContain(noGames.title);

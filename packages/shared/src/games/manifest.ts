@@ -158,6 +158,12 @@ export const gameManifestSchema = z
       ),
     // The chain the game's own on-chain actions happen on.
     network: chainRefTextSchema,
+    // The platform's moving scene shown on the game's card (by the scene's id). Left out, one is chosen from the game's id. The platform
+    // checks the id against the scenes it has when it builds its catalog, so a name it does not know is refused there, not ignored.
+    scene: z
+      .string()
+      .regex(/^[a-z][a-z0-9-]{0,31}$/u)
+      .optional(),
     schemaVersion: z.literal(gameManifestSchemaVersion),
     summary: z.string().trim().min(1).max(gameManifestLimits.summary),
     title: z.string().trim().min(1).max(gameManifestLimits.title),

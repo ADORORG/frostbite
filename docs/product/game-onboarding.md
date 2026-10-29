@@ -80,8 +80,12 @@ says what it shows, and `video` is a short silent clip (`mp4` or `webm`) in the 
 is always shown; the clip plays over it, muted and looping, only when the visitor has not asked for less motion, and
 falls back to the picture if it cannot play. Names are file names only (no folder, no address), so a cover always
 comes from the platform's own address, and only a game the platform plays itself may have one. A game with no cover
-gets a stand-in drawn from its title. Conformance fails if a named file is missing from `assets/`. Use 16:9; the
-list crops to fit.
+gets a moving scene as its picture (never initials), and a game with a picture but no clip gets a scene laid over the
+picture. Conformance fails if a named file is missing from `assets/`. Use 16:9; the list crops to fit.
+
+To choose which scene the card shows, name it: `scene: "runner"`. Left out, the platform picks one from the game's id, so
+the card looks the same on every visit. The platform checks the name against the scenes it has (`@ador/scenes/library`) and
+refuses to start with a game that names one it does not have, rather than ignoring it.
 
 ## Talking to the platform
 

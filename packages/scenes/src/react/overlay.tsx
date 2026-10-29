@@ -23,6 +23,7 @@ export function SceneOverlay({
   return scene === undefined ? null : (
     <div
       aria-hidden="true"
+      data-scene={scene.id}
       className={art ? "scene-overlay scene-overlay--art" : "scene-overlay"}
     >
       <SceneView
