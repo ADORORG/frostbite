@@ -29,12 +29,7 @@ export function SignInPage({
   readonly offered: readonly string[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Sign in"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className="sign-in-page">
         <div className="sign-in-intro">
           <p className="arcade-eyebrow">Player login</p>

@@ -17,8 +17,6 @@ export function GamesFrame({
 }) {
   return (
     <AppShell
-      brand="Adorbitals"
-      footerLabel="Public discovery"
       homeHref="/"
       immersive={variant === "stage"}
       navigation={navigation}

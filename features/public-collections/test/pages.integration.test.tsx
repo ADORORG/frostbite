@@ -16,8 +16,8 @@ describe("the public collection pages over the real database", () => {
   it("say the catalog is empty before anything is approved", async () => {
     const pages = await pagesFor();
     const markup = await pages.render("index");
-    expect(markup).toContain("Catalog empty");
-    expect(markup).toContain("No collections online");
+    expect(markup).toContain("No collections yet");
+    expect(markup).not.toContain("Catalog empty");
   });
 
   it("show an approved collection, its frozen version with signed images, and nothing private", async () => {

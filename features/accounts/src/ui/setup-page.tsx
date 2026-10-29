@@ -18,7 +18,6 @@ export function SetupPage({
   return (
     <PageFrame
       eyebrow="Platform"
-      footerLabel="Setup"
       heading="First-time setup"
       intro="Finish setting up the platform with the single-use link its operator made."
       navigation={navigation}

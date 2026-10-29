@@ -11,7 +11,7 @@ async function gamesWith(launches: string, appEnv = "local") {
   vi.resetModules();
   vi.stubEnv("APP_ENV", appEnv);
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Adorbitals");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", launches);
   return (await import("../../../configs/games.ts")).games;
 }

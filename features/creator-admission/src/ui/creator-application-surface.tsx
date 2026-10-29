@@ -19,7 +19,6 @@ export function CreatorApplicationSurface({
   return (
     <PageFrame
       eyebrow="Creator admission"
-      footerLabel="Creator admission beta"
       heading="Apply to create"
       intro="Admission is separate from project publication, deployment, launch, mint, and game permissions."
       navigation={navigation}

@@ -7,7 +7,7 @@ import { inngestWorkflowProvider } from "../src/registration.ts";
 
 const environment = {
   APP_ENV: "local",
-  INNGEST_APP_ID: "adorbitals",
+  INNGEST_APP_ID: "frostbit",
   INNGEST_BASE_URL: "http://localhost:8288",
   INNGEST_DEV: "true",
   INNGEST_EVENT_KEY: "event-key",

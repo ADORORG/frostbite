@@ -13,7 +13,7 @@ async function registeredGames() {
   vi.resetModules();
   vi.stubEnv("APP_ENV", "local");
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Adorbitals");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", "");
   return (await import("../../../configs/games.ts")).games;
 }

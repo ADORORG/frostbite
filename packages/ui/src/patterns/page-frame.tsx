@@ -8,25 +8,18 @@ import { AppShell, type ShellNavigationItem } from "./app-shell.tsx";
 export function PageFrame({
   children,
   eyebrow,
-  footerLabel,
   heading,
   intro,
   navigation,
 }: {
   readonly children: ReactNode;
   readonly eyebrow: string;
-  readonly footerLabel: string;
   readonly heading: string;
   readonly intro: string;
   readonly navigation: readonly ShellNavigationItem[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel={footerLabel}
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className="arcade-section arcade-section--raised">
         <p className="arcade-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>

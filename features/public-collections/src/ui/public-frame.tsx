@@ -14,12 +14,7 @@ export function PublicFrame({
   readonly variant?: "catalog" | "wall";
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Public discovery"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className={`arcade-section arcade-section--${variant}`}>
         {children}
       </section>

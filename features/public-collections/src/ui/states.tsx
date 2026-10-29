@@ -8,15 +8,15 @@ type Navigation = readonly NavigationItem[];
 
 // What an empty or unreadable catalog says, here and on the landing page's rail.
 export const noCollections = {
-  body: "No collection has been approved yet. Drafts and creator submissions are never shown here.",
-  title: "No collections online",
+  body: "Collections from creators will show up here.",
+  title: "No collections yet",
 } as const;
 export const collectionsUnavailable = {
   body: "The catalog could not be read just now. Nothing has been removed; try again in a moment.",
   title: "Collections are unavailable",
 } as const;
 
-// A catalog with nothing approved in it says so plainly; draft uploads and submissions are never shown.
+// A catalog with nothing in it says so plainly.
 export function NoCollections({
   navigation,
 }: {
@@ -24,8 +24,7 @@ export function NoCollections({
 }) {
   return (
     <PublicFrame navigation={navigation}>
-      <StatusLamp label="Catalog empty" tone="attention" />
-      <ArcadePanel eyebrow="Public catalog" title={noCollections.title}>
+      <ArcadePanel title={noCollections.title}>
         <p>{noCollections.body}</p>
         <ArcadeButton href="/" tone="cyan">
           Return home

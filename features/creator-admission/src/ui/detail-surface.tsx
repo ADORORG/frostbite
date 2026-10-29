@@ -15,7 +15,6 @@ export function ReviewDetailSurface({
   return (
     <PageFrame
       eyebrow="Admin"
-      footerLabel="Creator admission beta"
       heading="Review an application"
       intro="This is the version the applicant sent. Editing their draft later does not change it."
       navigation={navigation}

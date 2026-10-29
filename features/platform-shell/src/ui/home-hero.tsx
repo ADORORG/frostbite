@@ -1,24 +1,22 @@
 "use client";
 
 import { SceneStage, useChosenScene, useScenes } from "@ador/scenes/react";
-import { ArcadeButton, StatusLamp } from "@repo/ui/arcade";
+import { ArcadeButton } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import { homeCopy } from "../domain/home-copy.ts";
 
 // The first screen: an arcade attract screen. A scene plays edge to edge behind the words, a score line along the bottom says which scene
-// is playing (and lets a visitor change it) and how the platform is doing. Only what is true is on it: the number of registered features,
-// and launches as gated when that feature exists. The first scene is a random one, chosen after the page has loaded.
+// is playing (and lets a visitor change it). The buttons are only for what exists. The first scene is a random one, chosen after the page has
+// loaded.
 export function HomeHero({
   hasCollections,
   hasGames,
   hasLaunches,
-  registeredFeatures,
 }: {
   readonly hasCollections: boolean;
   readonly hasGames: boolean;
   readonly hasLaunches: boolean;
-  readonly registeredFeatures: number;
 }) {
   const { scenes } = useScenes();
   const [picked, setPicked] = useState<string | undefined>(undefined);
@@ -33,7 +31,6 @@ export function HomeHero({
       <div aria-hidden="true" className="home-hero__shade" />
       <div aria-hidden="true" className="home-hero__crt" />
       <div className="home-hero__body">
-        <StatusLamp label={homeCopy.eyebrow} tone="attention" />
         <h1>
           {homeCopy.headline.first}
           <span>
@@ -81,22 +78,6 @@ export function HomeHero({
             ▶
           </button>
         </div>
-        <dl className="home-hero__stats">
-          <div>
-            <dt>{homeCopy.status.featuresLabel}</dt>{" "}
-            <dd>
-              <b>{homeCopy.status.features(registeredFeatures)}</b>
-            </dd>
-          </div>
-          {hasLaunches ? (
-            <div>
-              <dt>{homeCopy.status.launchesLabel}</dt>{" "}
-              <dd>
-                <b>{homeCopy.status.launchesGated}</b>
-              </dd>
-            </div>
-          ) : null}
-        </dl>
       </div>
     </section>
   );

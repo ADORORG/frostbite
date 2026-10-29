@@ -11,13 +11,7 @@ import { HomeHero } from "../src/ui/home-hero.tsx";
 const hero = (over: Partial<Parameters<typeof HomeHero>[0]> = {}) =>
   mount(
     <ScenesProvider>
-      <HomeHero
-        hasCollections
-        hasGames
-        hasLaunches
-        registeredFeatures={5}
-        {...over}
-      />
+      <HomeHero hasCollections hasGames hasLaunches {...over} />
     </ScenesProvider>,
   );
 const playing = (container: HTMLElement) =>
@@ -34,9 +28,9 @@ describe("the landing page's hero", () => {
     expect(container.querySelector("h1")?.textContent).toContain(
       homeCopy.headline.second,
     );
-    expect(textOf(container)).toContain(homeCopy.eyebrow);
-    expect(textOf(container)).toContain(homeCopy.status.features(5));
-    expect(textOf(container)).toContain(homeCopy.status.launchesGated);
+    // Nothing about the build, the feature count or what is gated: a visitor is told what to do, not how the platform is doing.
+    expect(textOf(container)).toContain(homeCopy.lede);
+    expect(textOf(container)).not.toMatch(/registered|gated|foundation/iu);
   });
 
   it("links only to what is registered", async () => {
@@ -50,7 +44,6 @@ describe("the landing page's hero", () => {
       hasLaunches: false,
     });
     expect(none.querySelectorAll("a")).toHaveLength(0);
-    expect(textOf(none)).not.toContain(homeCopy.status.launchesLabel);
   });
 
   it("plays one scene, names it, and steps to the next and the one before, round the whole list", async () => {

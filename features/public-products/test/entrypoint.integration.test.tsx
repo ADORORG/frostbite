@@ -20,8 +20,8 @@ describe("public product entrypoint", () => {
     const markup = renderToStaticMarkup(
       await page?.render({ actorUserId: null, navigation: [], params: {} }),
     );
-    expect(markup).toContain("No launches online");
-    expect(markup).toContain("No launch is published");
+    expect(markup).toContain("No launches yet");
+    expect(markup).toContain("Nothing is open to mint right now.");
     expect(markup).not.toContain("Mint now");
   });
 
@@ -49,7 +49,7 @@ describe("public product entrypoint", () => {
     expect(invalid).not.toContain("Frostbite");
   });
 
-  it("gives the landing page a part for launches, saying honestly that none are published, and none for creators", async () => {
+  it("gives the landing page a part for launches, saying plainly that none are open, and none for creators", async () => {
     const launches = createPublicProductEntrypoint(launchesCatalog);
     expect(launches.capabilities).toContain("home-section");
     expect(launches.homeSections?.map(({ id, order }) => [id, order])).toEqual([
@@ -63,9 +63,10 @@ describe("public product entrypoint", () => {
     expect(markup).toContain("scene-backdrop");
     expect(markup).toContain('href="/launches"');
     expect(markup).toContain("See all launches");
-    expect(markup).toContain("No launches online");
-    expect(markup).toContain("No launch is published");
-    expect(markup).not.toContain("cover-card");
+    expect(markup).toContain("No launches yet");
+    expect(markup).toContain("Nothing is open to mint right now.");
+    expect(markup).toContain("Mints open here when a launch goes live.");
+    expect(markup).not.toMatch(/Catalog empty|cover-card/u);
     const creators = createPublicProductEntrypoint(creatorsCatalog);
     expect(creators.capabilities).not.toContain("home-section");
     expect(creators.homeSections).toEqual([]);

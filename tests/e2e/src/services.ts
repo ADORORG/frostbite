@@ -49,7 +49,7 @@ export function storageEnvironment(
 
 export function inngestEnvironment(hostPort: number): NodeJS.ProcessEnv {
   return {
-    INNGEST_APP_ID: "adorbitals-e2e",
+    INNGEST_APP_ID: "frostbit-e2e",
     INNGEST_BASE_URL: `http://127.0.0.1:${hostPort}`,
     // Signature verification stays on: the flow exercises the signed endpoint like production.
     INNGEST_DEV: "false",

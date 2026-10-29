@@ -1,7 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ConsoleCard, ConsolePage, ConsoleRow } from "../src/arcade.ts";
+import {
+  ConsoleCard,
+  ConsolePage,
+  ConsoleRow,
+  productName,
+} from "../src/arcade.ts";
 
 const page = (props: Partial<Parameters<typeof ConsolePage>[0]> = {}) =>
   renderToStaticMarkup(
@@ -33,12 +38,8 @@ describe("the console page", () => {
     expect(page()).not.toContain("console-hero__picture");
   });
 
-  it("says it is a signed-in workspace in the footer unless the page has something more particular", () => {
-    expect(page()).toContain("Authenticated beta workspace");
-    expect(page({ footerLabel: "Staff" })).not.toContain(
-      "Authenticated beta workspace",
-    );
-    expect(page({ footerLabel: "Staff" })).toContain("Staff");
+  it("names the platform in the footer", () => {
+    expect(page()).toContain(`<span>${productName}</span>`);
   });
 });
 

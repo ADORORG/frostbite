@@ -18,7 +18,6 @@ export function AdminFrame({
   return (
     <PageFrame
       eyebrow="Admin"
-      footerLabel="Game rewards"
       heading={heading}
       intro={intro}
       navigation={navigation}

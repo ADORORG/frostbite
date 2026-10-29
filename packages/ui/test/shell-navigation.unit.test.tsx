@@ -7,12 +7,7 @@ import type { ShellNavigationItem } from "../src/patterns/navigation-model.ts";
 
 function render(navigation: readonly ShellNavigationItem[]) {
   return renderToStaticMarkup(
-    <AppShell
-      brand="Test"
-      footerLabel="Footer"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <h1>Page</h1>
     </AppShell>,
   );

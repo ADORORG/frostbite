@@ -1,6 +1,6 @@
 # `@repo/ui`
 
-Shared Adorbitals design-system package. It owns semantic visual tokens, accessible primitives,
+Shared Frostbit design-system package. It owns semantic visual tokens, accessible primitives,
 arcade components, and platform patterns derived from the immutable standalone arcade reference.
 
 ## Public API

@@ -18,7 +18,6 @@ export function StudioFrame({
   return (
     <PageFrame
       eyebrow="Studio"
-      footerLabel="Collections beta"
       heading={heading}
       intro={intro}
       navigation={navigation}

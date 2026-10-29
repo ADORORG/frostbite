@@ -8,7 +8,7 @@ import {
 const validEnvironment = {
   APP_ENV: "test",
   PUBLIC_BASE_URL: "http://127.0.0.1:3000",
-  NEXT_PUBLIC_APP_NAME: "Adorbitals",
+  NEXT_PUBLIC_APP_NAME: "Frostbit",
 };
 
 describe("parseEnvironment", () => {

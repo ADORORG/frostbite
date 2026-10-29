@@ -9,7 +9,7 @@ import { GET, PUT } from "../src/app/api/v1/[...segments]/route.ts";
 
 beforeAll(() => {
   process.env.APP_ENV = "test";
-  process.env.NEXT_PUBLIC_APP_NAME = "Adorbitals test";
+  process.env.NEXT_PUBLIC_APP_NAME = "Frostbit test";
   process.env.PUBLIC_BASE_URL = "https://launch.example";
 });
 

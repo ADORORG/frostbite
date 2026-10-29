@@ -16,15 +16,9 @@ export function ProductIndex({
   readonly navigation: readonly NavigationItem[];
 }) {
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Public discovery"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className="arcade-section arcade-section--catalog">
-        <StatusLamp label="Catalog empty" tone="attention" />
-        <ArcadePanel eyebrow="Public catalog" title={catalog.emptyTitle}>
+        <ArcadePanel title={catalog.emptyTitle}>
           <p>{catalog.emptyBody}</p>
           <ArcadeButton href="/" tone="cyan">
             Return home
@@ -46,12 +40,7 @@ export function ProductDetailUnavailable({
 }) {
   const valid = slug !== null;
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Public discovery"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className="arcade-section arcade-section--catalog">
         <StatusLamp
           label={valid ? "Record not published" : "Invalid identifier"}

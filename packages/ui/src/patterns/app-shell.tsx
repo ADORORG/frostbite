@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { productName } from "../brand.ts";
+import { BrandMark } from "../components/brand-mark.tsx";
 import { AccountMenu } from "./account-menu.tsx";
 import { AreaSidebar } from "./area-sidebar.tsx";
 import { Breadcrumbs } from "./breadcrumbs.tsx";
@@ -17,9 +19,7 @@ export type {
 } from "./navigation-model.ts";
 
 interface AppShellProps {
-  readonly brand: string;
   readonly children: ReactNode;
-  readonly footerLabel: string;
   readonly homeHref: string;
   // A page that is one thing to look at or play (a game) gives up the room around it, so that thing gets it.
   readonly immersive?: boolean;
@@ -40,9 +40,7 @@ function NavLink({ item }: { readonly item: ShellNavigationItem }) {
 }
 
 export function AppShell({
-  brand,
   children,
-  footerLabel,
   homeHref,
   immersive = false,
   navigation,
@@ -63,9 +61,13 @@ export function AppShell({
         Skip to main content
       </a>
       <header className="app-header">
-        <a className="app-brand" href={homeHref} aria-label={`${brand} home`}>
-          <span className="app-brand__orbit" aria-hidden="true" />
-          <span>{brand}</span>
+        <a
+          className="app-brand"
+          href={homeHref}
+          aria-label={`${productName} home`}
+        >
+          <BrandMark />
+          <span>{productName}</span>
         </a>
         <nav className="app-navigation" aria-label="Primary navigation">
           {model.main.map((item) => (
@@ -100,7 +102,7 @@ export function AppShell({
         </main>
       </div>
       <footer className="app-footer">
-        <span>{footerLabel}</span>
+        <span>{productName}</span>
         <nav aria-label="More">
           {model.footer.map((item) => (
             <a href={item.href} key={item.href}>

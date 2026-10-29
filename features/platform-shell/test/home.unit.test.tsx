@@ -2,6 +2,7 @@ import { ScenesProvider } from "@ador/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { homeCopy } from "../src/domain/home-copy.ts";
 import { createPlatformShellEntrypoint } from "../src/entrypoint.js";
 import { PlatformHome } from "../src/ui/home.js";
 
@@ -11,26 +12,23 @@ const home = (props: Partial<Parameters<typeof PlatformHome>[0]> = {}) =>
       <PlatformHome
         navigation={[]}
         registeredFeatureIds={["platform-shell"]}
-        registeredFeatures={1}
         {...props}
       />
     </ScenesProvider>,
   );
 
 describe("PlatformHome", () => {
-  it("renders truthful status and the injected feature count, over a moving background", async () => {
+  it("says what the platform is for, over a moving background, with nothing about how it is built", async () => {
     const markup = home({
       navigation: [
         { area: "footer", href: "/launches", label: "Launches" },
         { area: "main", href: "/games", label: "Games" },
       ],
       registeredFeatureIds: ["platform-shell", "launches", "games"],
-      registeredFeatures: 3,
     });
-    expect(markup).toContain("3 registered");
-    expect(markup).toContain("Gated");
-    expect(markup).toContain("Launch your legacy.");
-    expect(markup).toContain("Mint the future.");
+    expect(markup).toContain(homeCopy.headline.first);
+    expect(markup).toContain(homeCopy.headline.second);
+    expect(markup).not.toMatch(/registered|gated|foundation/iu);
     expect(markup).toContain("scene-backdrop");
     expect(markup).not.toContain("Connect wallet");
 
@@ -51,7 +49,7 @@ describe("PlatformHome", () => {
           })}
         </ScenesProvider>,
       ),
-    ).toContain("3 registered");
+    ).toContain(homeCopy.headline.first);
   });
 
   it("draws the sections its page is given, in the page it serves", async () => {
@@ -88,7 +86,6 @@ describe("PlatformHome", () => {
   it("claims nothing about games or networks it does not know: no stale counts", () => {
     const markup = home({
       registeredFeatureIds: ["platform-shell", "games"],
-      registeredFeatures: 2,
     });
     expect(markup).not.toContain("PLANNED");
     expect(markup).not.toContain("UNSET");
@@ -128,7 +125,6 @@ describe("PlatformHome", () => {
           },
         ],
         registeredFeatureIds: ["platform-shell", testCase.present],
-        registeredFeatures: 2,
       });
       expect(markup).toContain(`href="/${testCase.present}"`);
       expect(markup).not.toContain(`href="${testCase.absentHref}"`);

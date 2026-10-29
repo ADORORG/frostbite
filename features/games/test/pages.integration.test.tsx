@@ -43,11 +43,11 @@ async function render(
 }
 
 describe("the games index", () => {
-  it("says plainly that no game is registered", async () => {
+  it("says plainly that there are no games yet, without lamps or jargon", async () => {
     const markup = await render([], "/games");
-    expect(markup).toContain("No games online");
-    expect(markup).toContain("not presented as playable");
-    expect(markup).not.toContain("registered, ");
+    expect(markup).toContain("No games yet");
+    expect(markup).toContain("Games will show up here.");
+    expect(markup).not.toMatch(/Catalog empty|Public catalog|registered/u);
   });
 
   it("lists each game with whether it can be played, and a link to it", async () => {

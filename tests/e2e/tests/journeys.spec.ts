@@ -73,7 +73,7 @@ test("a visitor follows the public catalogs and finds the way to connect", async
   await expect(page).toHaveURL(/\/launches$/u);
   await more(page).getByRole("link", { name: "Creators", exact: true }).click();
   await expect(page).toHaveURL(/\/creators$/u);
-  await page.getByRole("link", { name: "Adorbitals home" }).click();
+  await page.getByRole("link", { name: "Frostbit home" }).click();
   await expect(page).toHaveURL(/\/$/u);
   await expect(page.getByRole("link", { name: "Studio" })).toHaveCount(0);
 });

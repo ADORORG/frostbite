@@ -21,7 +21,6 @@ export function AdminHome({
   return (
     <PageFrame
       eyebrow="Admin"
-      footerLabel="Admin"
       heading="Admin console"
       intro="Choose a staff area. Reviews are separated from broader platform authority, and nothing here publishes or deploys anything."
       navigation={navigation}

@@ -13,7 +13,6 @@ export function ReviewQueueSurface({
   return (
     <PageFrame
       eyebrow="Admin"
-      footerLabel="Creator admission beta"
       heading="Creator reviews"
       intro="Applications to become a creator. Admission is separate from project publication, deployment, launch, mint, and game permissions."
       navigation={navigation}

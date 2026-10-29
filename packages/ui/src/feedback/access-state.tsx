@@ -43,12 +43,7 @@ export function AccessState({
 }) {
   const content = states[state];
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Protected platform route"
-      homeHref="/"
-      navigation={navigation}
-    >
+    <AppShell homeHref="/" navigation={navigation}>
       <section className="arcade-section arcade-section--raised">
         <StatusLamp label={content.label} tone={content.tone} />
         <ArcadePanel eyebrow="Route access" title={content.title}>

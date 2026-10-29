@@ -1,9 +1,8 @@
 export const productCatalogs = [
   {
     detailNoun: "launch",
-    emptyBody:
-      "No launch is published. Mint controls will appear only when verified launch state is available.",
-    emptyTitle: "No launches online",
+    emptyBody: "Nothing is open to mint right now.",
+    emptyTitle: "No launches yet",
     label: "Launches",
     // Empty until a launch is published, so the link stays quiet in the footer.
     navigationArea: "footer",
@@ -12,15 +11,14 @@ export const productCatalogs = [
     // Launches have a part of the landing page; creators do not.
     homeRail: {
       link: "See all launches",
-      summary: "Launches appear here once they are published.",
+      summary: "Mints open here when a launch goes live.",
     },
     path: "/launches",
   },
   {
     detailNoun: "creator",
-    emptyBody:
-      "No creator profile is published. Applications remain private until staff approval and publication.",
-    emptyTitle: "No creators online",
+    emptyBody: "Creator profiles will show up here.",
+    emptyTitle: "No creators yet",
     label: "Creators",
     navigationArea: "footer",
     navigationOrder: 20,

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { renderCodeEmail } from "../src/contacts/code-email.ts";
 
 const input = {
-  appName: "Adorbitals",
+  appName: "Frostbit",
   code: "493762",
   minutes: 10,
   to: "ada@example.com",
@@ -12,14 +12,14 @@ const input = {
 describe("the sign-in code email", () => {
   it("has a plain-text version that says the code, the lifetime, what to do if unasked, and what is never asked for", () => {
     const { text, subject, to } = renderCodeEmail(input);
-    expect(subject).toBe("493762 is your Adorbitals sign-in code");
+    expect(subject).toBe("493762 is your Frostbit sign-in code");
     expect(to).toBe("ada@example.com");
     // The phrase the browser tests and people read the code from.
-    expect(text).toContain("Your Adorbitals sign-in code is 493762.");
+    expect(text).toContain("Your Frostbit sign-in code is 493762.");
     expect(text).toContain("works once and expires in 10 minutes");
     expect(text).toContain("nobody can sign in without the code");
     expect(text).toContain(
-      "Adorbitals will never ask you for this code, a seed phrase or a private key.",
+      "Frostbit will never ask you for this code, a seed phrase or a private key.",
     );
     expect(text).toContain("someone entered this address");
   });
@@ -35,7 +35,7 @@ describe("the sign-in code email", () => {
     expect(html).toContain("&#9654; Player login");
     // The pre-header a mail list shows beside the subject.
     expect(html).toMatch(
-      /display:none[^>]*>Your Adorbitals sign-in code is 493762/u,
+      /display:none[^>]*>Your Frostbit sign-in code is 493762/u,
     );
   });
 

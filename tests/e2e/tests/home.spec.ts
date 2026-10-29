@@ -7,10 +7,12 @@ test("shows only honest foundation-stage launchpad controls", async ({
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: /launch your legacy/i }),
+    page.getByRole("heading", { name: /play\. earn\./i }),
   ).toBeVisible();
-  // Nothing is published, and the launches rail says so rather than showing a sale.
-  await expect(page.getByText("No launch is published")).toBeVisible();
+  // Nothing is open, and the launches rail says so rather than showing a sale.
+  await expect(
+    page.getByText("Nothing is open to mint right now."),
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: /connect wallet/i })).toHaveCount(
     0,
   );
@@ -39,7 +41,7 @@ test("navigates to the games catalog, which lists FROST·BITE as playable on the
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Enter arcade" }).click();
+  await page.getByRole("link", { name: "Play now" }).click();
 
   await expect(page).toHaveURL(/\/games$/);
   await expect(page.getByRole("heading", { name: "Games" })).toBeVisible();
@@ -118,7 +120,7 @@ test("serves every public catalog and validates detail identifiers", async ({
 }) => {
   for (const path of ["launches", "creators"]) {
     await page.goto(`/${path}`);
-    await expect(page.getByText("Catalog empty")).toBeVisible();
+    await expect(page.getByText(/^No (launches|creators) yet$/u)).toBeVisible();
   }
   // Collections lists whatever has been approved (the seeded public collection at least).
   await page.goto("/collections");

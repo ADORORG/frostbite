@@ -41,8 +41,8 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
               name: new RegExp(`^${label}`, "u"),
               level: 2,
             })
-            .or(page.getByText("Catalog empty"))
-        : page.getByText("Catalog empty"),
+            .or(page.getByText(/^No (collections|games) yet$/u))
+        : page.getByText(/^No (launches|creators) yet$/u),
     ).toBeVisible();
   }
 });

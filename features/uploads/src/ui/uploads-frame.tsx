@@ -18,7 +18,6 @@ export function UploadsFrame({
   return (
     <PageFrame
       eyebrow="Studio"
-      footerLabel="Uploads beta"
       heading={heading}
       intro={intro}
       navigation={navigation}

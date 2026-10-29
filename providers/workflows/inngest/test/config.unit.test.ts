@@ -6,7 +6,7 @@ import { parseInngestEnvironment } from "../src/config.ts";
 
 const valid = {
   APP_ENV: "local",
-  INNGEST_APP_ID: "adorbitals",
+  INNGEST_APP_ID: "frostbit",
   INNGEST_BASE_URL: "http://localhost:8288",
   INNGEST_DEV: "true",
   INNGEST_EVENT_KEY: "event-key",
@@ -16,7 +16,7 @@ const valid = {
 describe("Inngest environment", () => {
   it("parses a development configuration", () => {
     expect(parseInngestEnvironment(valid)).toEqual({
-      appId: "adorbitals",
+      appId: "frostbit",
       baseUrl: "http://localhost:8288",
       dev: true,
       eventKey: "event-key",
@@ -27,11 +27,11 @@ describe("Inngest environment", () => {
   it("treats a blank base URL as Inngest Cloud and trims values", () => {
     const config = parseInngestEnvironment({
       ...valid,
-      INNGEST_APP_ID: "  adorbitals  ",
+      INNGEST_APP_ID: "  frostbit  ",
       INNGEST_BASE_URL: "   ",
       INNGEST_DEV: "false",
     });
-    expect(config).toMatchObject({ appId: "adorbitals", dev: false });
+    expect(config).toMatchObject({ appId: "frostbit", dev: false });
     expect(config.baseUrl).toBeUndefined();
     expect(
       parseInngestEnvironment({ ...valid, INNGEST_BASE_URL: undefined })

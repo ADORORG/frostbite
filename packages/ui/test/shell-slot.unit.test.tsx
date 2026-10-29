@@ -9,8 +9,6 @@ import {
 
 const shell = (
   <AppShell
-    brand="Test arcade"
-    footerLabel="Test foundation"
     homeHref="#top"
     navigation={[{ area: "main", href: "#launches", label: "Launches" }]}
   >

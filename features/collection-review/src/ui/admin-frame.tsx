@@ -18,7 +18,6 @@ export function AdminFrame({
   return (
     <PageFrame
       eyebrow="Admin"
-      footerLabel="Collection reviews"
       heading={heading}
       intro={intro}
       navigation={navigation}

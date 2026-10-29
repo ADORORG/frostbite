@@ -238,7 +238,7 @@ test("moving between pages keeps the wallet connected: the app is not loaded aga
   await expect(page).toHaveURL(/\/games$/u);
   await bar.getByRole("link", { name: "Collections", exact: true }).click();
   await expect(page).toHaveURL(/\/collections$/u);
-  await page.getByRole("link", { name: "Adorbitals home" }).click();
+  await page.getByRole("link", { name: "Frostbit home" }).click();
   await expect(page).toHaveURL(/\/$/u);
   await page.goBack();
   await expect(page).toHaveURL(/\/collections$/u);

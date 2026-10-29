@@ -25,7 +25,6 @@ export function createPlatformShellEntrypoint(
           <PlatformHome
             navigation={navigation}
             registeredFeatureIds={context.registeredFeatureIds}
-            registeredFeatures={context.registeredFeatureCount}
             sections={await drawSections(homeSections)}
           />
         ),

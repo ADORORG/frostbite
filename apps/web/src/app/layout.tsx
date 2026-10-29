@@ -4,7 +4,7 @@ import { platformSessionCookieName } from "@ador/shared/auth";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import { IndexingBadge } from "@ador/feature-chain-status/badge";
 import { AnimationToggle, ScenesProvider } from "@ador/scenes/react";
-import { ShellStatusProvider } from "@repo/ui/arcade";
+import { productName, ShellStatusProvider } from "@repo/ui/arcade";
 import "@repo/ui/styles.css";
 import "@ador/scenes/styles.css";
 import "./globals.css";
@@ -33,8 +33,9 @@ const pixelFont = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "Adorbitals — Launch on Bitcoin",
-  description: "A self-custodial launchpad and arcade for Bitcoin Alkanes.",
+  title: `${productName} — Play, earn, collect on Bitcoin`,
+  description:
+    "A browser arcade on Bitcoin: play games, earn milestones, collect.",
 };
 
 // Tells the validation library, before any of its code runs, not to compile schemas at run time. Compiling

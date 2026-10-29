@@ -266,7 +266,7 @@ export function applicationEnvironment(
     DATABASE_SSL_MODE: "disable",
     DATABASE_STATEMENT_TIMEOUT_MS: "5000",
     DATABASE_URL: databaseUrl,
-    NEXT_PUBLIC_APP_NAME: "Adorbitals E2E",
+    NEXT_PUBLIC_APP_NAME: "Frostbit E2E",
     PASSKEY_CHALLENGE_TIMEOUT_MS: "300000",
     PASSKEY_RECENT_AUTH_WINDOW_MS: "600000",
     PUBLIC_BASE_URL: baseURL,

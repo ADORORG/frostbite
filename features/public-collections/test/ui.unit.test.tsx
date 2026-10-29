@@ -206,11 +206,11 @@ describe("collection detail", () => {
 });
 
 describe("states", () => {
-  it("says the catalog is empty, and that drafts are never shown", () => {
+  it("says there are no collections yet, and nothing about drafts or the catalog", () => {
     const markup = show(<NoCollections navigation={navigation} />);
-    expect(markup).toContain("Catalog empty");
-    expect(markup).toContain("No collections online");
-    expect(markup).toContain("never shown here");
+    expect(markup).toContain("No collections yet");
+    expect(markup).toContain("Collections from creators will show up here.");
+    expect(markup).not.toMatch(/Catalog empty|Public catalog|draft/iu);
   });
 
   it("says the catalog could not be read, rather than looking empty", () => {

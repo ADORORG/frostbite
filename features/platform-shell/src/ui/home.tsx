@@ -16,29 +16,21 @@ export interface HomeSectionView {
 export function PlatformHome({
   navigation,
   registeredFeatureIds,
-  registeredFeatures,
   sections = [],
 }: {
   readonly navigation: readonly NavigationItem[];
   readonly registeredFeatureIds: readonly FeatureId[];
-  readonly registeredFeatures: number;
   readonly sections?: readonly HomeSectionView[];
 }) {
   const hasLaunches = registeredFeatureIds.includes("launches");
   const hasGames = registeredFeatureIds.includes("games");
 
   return (
-    <AppShell
-      brand="Adorbitals"
-      footerLabel="Adorbitals beta foundation"
-      homeHref="#top"
-      navigation={navigation}
-    >
+    <AppShell homeHref="#top" navigation={navigation}>
       <HomeHero
         hasCollections={registeredFeatureIds.includes("collections")}
         hasGames={hasGames}
         hasLaunches={hasLaunches}
-        registeredFeatures={registeredFeatures}
       />
       {sections.map(({ id, node }) => (
         <div key={id}>{node}</div>

@@ -7,8 +7,6 @@ import { ArcadeStage } from "../src/patterns/stage.tsx";
 const shell = (immersive?: boolean) =>
   renderToStaticMarkup(
     <AppShell
-      brand="Test"
-      footerLabel="Footer"
       homeHref="/"
       navigation={[]}
       {...(immersive === undefined ? {} : { immersive })}

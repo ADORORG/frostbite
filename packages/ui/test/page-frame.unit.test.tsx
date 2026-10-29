@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { productName } from "../src/brand.ts";
 import { PageFrame } from "../src/patterns/page-frame.tsx";
 
 const render = () =>
   renderToStaticMarkup(
     <PageFrame
       eyebrow="Elsewhere"
-      footerLabel="Things beta"
       heading="Things"
       intro="What this page is for."
       navigation={[
@@ -30,9 +30,11 @@ describe("page frame", () => {
     );
   });
 
-  it("sits in the platform shell, with the footer label and the navigation given, and no strip of notices above the header", () => {
+  it("sits in the platform shell, with the platform's name in the footer and the navigation given, and no strip of notices above the header", () => {
     const markup = render();
-    expect(markup).toContain("Things beta");
+    expect(markup).toContain(
+      `<footer class="app-footer"><span>${productName}</span>`,
+    );
     expect(markup).not.toContain("arcade-marquee");
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain("Skip to main content");

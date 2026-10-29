@@ -1,5 +1,5 @@
 import { SceneBackdrop } from "@ador/scenes/react";
-import { ArcadeEmptyState, HomeRail, StatusLamp } from "@repo/ui/arcade";
+import { ArcadeEmptyState, HomeRail } from "@repo/ui/arcade";
 
 import type { ProductCatalog } from "../domain/catalog.ts";
 
@@ -16,7 +16,6 @@ export function ProductRail({ catalog }: { readonly catalog: ProductCatalog }) {
       summary={catalog.homeRail.summary}
       title={catalog.label}
     >
-      <StatusLamp label="Catalog empty" tone="attention" />
       <ArcadeEmptyState title={catalog.emptyTitle}>
         {catalog.emptyBody}
       </ArcadeEmptyState>
