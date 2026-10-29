@@ -17,7 +17,7 @@ export const mintedCopy = {
   mintedProgress: (earned: number, total: number) =>
     `${String(earned)} of ${String(total)} minted`,
   stillToEarn: (count: number) => `${String(count)} still to earn`,
-  standIn: "No picture came with this mint; this is a stand-in.",
+  standIn: "No picture",
   openGame: "Open game",
   piecesCount: (pieces: number) =>
     pieces === 1 ? "1 milestone" : `${String(pieces)} milestones`,
