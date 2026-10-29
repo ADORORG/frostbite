@@ -4,8 +4,8 @@ Purpose: everything that must exist outside this repository before a preview or 
 deployment of the Launchpad Beta can work. Local development needs none of this: `pnpm stack`
 starts the local stack (see `tests/e2e/README.md`).
 
-Status: **no deployment pipeline or platform configuration exists yet (task W8).** This list is
-the manual procedure until it does. Nothing below has been exercised against real services.
+Status: **the container image, Railway configuration files, release step and smoke test exist (`docs/operations/deployment.md`, task D1) but have not run on a real platform.** This list
+is the manual procedure for what lives outside the repository. Nothing below has been exercised against real services.
 
 Preview and production are separate environments. Never share a database, bucket, Inngest app, or
 secret between them. The two committed templates (`.env.preview.example`, `.env.production.example`)

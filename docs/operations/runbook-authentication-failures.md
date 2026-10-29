@@ -78,13 +78,13 @@ method by hand.
 
 ## Symptom: wallet sign-in or linking fails
 
-| Code                 | Meaning                                                             | Action                                                                                   |
-| -------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `challenge-expired`  | 60 seconds passed (or the clock is wrong)                           | Retry; if constant, check server clock drift                                             |
+| Code                 | Meaning                                                             | Action                                                                          |
+| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `challenge-expired`  | 60 seconds passed (or the clock is wrong)                           | Retry; if constant, check server clock drift                                    |
 | `challenge-invalid`  | Unknown challenge, wrong origin/domain/network, or attempts used up | Retry from a fresh challenge; confirm the wallet network matches `BETA_NETWORK` |
-| `challenge-replayed` | The challenge was already used                                      | Expected after a double submit; retry fresh                                              |
-| `signature-invalid`  | The wallet's signature did not verify                               | Wallet-specific; see the wallet conformance records before blaming the server            |
-| `identity-conflict`  | The address belongs to a different account                          | Do not merge accounts by hand; escalate                                                  |
+| `challenge-replayed` | The challenge was already used                                      | Expected after a double submit; retry fresh                                     |
+| `signature-invalid`  | The wallet's signature did not verify                               | Wallet-specific; see the wallet conformance records before blaming the server   |
+| `identity-conflict`  | The address belongs to a different account                          | Do not merge accounts by hand; escalate                                         |
 
 The person is told only "The wallet could not be verified. Request a fresh challenge." for all of these but `identity-conflict`, which reads
 "This wallet cannot be used for that." (it also covers a wallet that was just removed from another account and is still held). The

@@ -1,0 +1,28 @@
+{
+  "name": "@repo/deploy-smoke",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "smoke": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts --project unit",
+    "test:integration": "vitest run --config vitest.config.ts --project integration",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+  },
+  "dependencies": {
+    "@ador/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@types/node": "26.4.0",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "tsx": "^4.23.13",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

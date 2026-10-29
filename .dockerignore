@@ -1,0 +1,19 @@
+# Nothing generated, local or secret goes into the build context: the image is built from the committed sources.
+.git
+**/node_modules
+**/.next
+**/coverage
+**/playwright-report
+**/test-results
+**/.turbo
+.stack-data
+# Rust build output (gigabytes) stays out. The contract sources and `contracts/templates/release.json` stay in: the web build imports that
+# file. The template .wasm files are built apart and found through REWARDS_TEMPLATES_DIR (docs/operations/deployment.md).
+**/target
+tests/e2e/screenshots
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+apps/web/public/play
+apps/web/public/scenes
