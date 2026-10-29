@@ -8,3 +8,11 @@ export const stillFraction = 0.55;
 
 export const stillTime = (loopSeconds: number): number =>
   loopSeconds * stillFraction;
+
+// How far something moving at `speed` a second has gone along a track that repeats every `repeat` pixels. A scene closes without a jump
+// when its speed times its loop is a whole number of repeats, which the closing test holds every scene to.
+export const scroll = (
+  seconds: number,
+  speed: number,
+  repeat: number,
+): number => (seconds * speed) % repeat;

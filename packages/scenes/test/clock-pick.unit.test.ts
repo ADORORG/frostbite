@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   loopTime,
+  scroll,
   pickRandom,
   pickStable,
   stillFraction,
@@ -20,6 +21,14 @@ describe("loop time", () => {
     expect(stillTime(20)).toBe(20 * stillFraction);
     expect(stillFraction).toBeGreaterThan(0.3);
     expect(stillFraction).toBeLessThan(0.9);
+  });
+});
+
+describe("scrolling", () => {
+  it("goes at its speed and starts over every repeat, so a whole number of repeats closes a loop", () => {
+    expect(scroll(1, 8, 160)).toBe(8);
+    expect(scroll(20, 8, 160)).toBe(0);
+    expect(scroll(21, 8, 160)).toBe(8);
   });
 });
 

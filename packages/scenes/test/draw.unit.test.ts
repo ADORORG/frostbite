@@ -47,6 +47,25 @@ describe("drawing on the pixel grid", () => {
     ]);
   });
 
+  it("draws each unbroken run of a row as one rectangle", () => {
+    const surface = recordingSurface();
+    sprite(surface, ["###.##", "#....#"], 0, 0, "#fff");
+    expect(
+      surface.drawn.map(({ height, width, x, y }) => [x, y, width, height]),
+    ).toEqual([
+      [0, 0, 3, 1],
+      [4, 0, 2, 1],
+      [0, 1, 1, 1],
+      [5, 1, 1, 1],
+    ]);
+    const mirrored = recordingSurface();
+    sprite(mirrored, ["###.##"], 0, 0, "#fff", true);
+    expect(mirrored.drawn.map(({ width, x }) => [x, width])).toEqual([
+      [0, 2],
+      [3, 3],
+    ]);
+  });
+
   it("eases between 0 and 1 and holds at the ends", () => {
     expect(ease(-1)).toBe(0);
     expect(ease(0)).toBe(0);

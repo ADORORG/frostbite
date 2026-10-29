@@ -1,3 +1,4 @@
+import { palette } from "./palette.ts";
 import type { Surface } from "./scene.ts";
 import { sceneHeight, sceneWidth } from "./scene.ts";
 
@@ -19,7 +20,8 @@ export function rect(
   surface.fillRect(Math.round(x), Math.round(y), width, height);
 }
 
-// A picture drawn from rows of text: each `#` is one pixel. Small art costs a few lines and no file.
+// A picture drawn from rows of text: each `#` is one pixel. Small art costs a few lines and no file, and each unbroken run of pixels in a
+// row is one rectangle, so a picture costs a few calls, not one for every pixel.
 export function sprite(
   surface: Surface,
   rows: readonly string[],
@@ -30,11 +32,22 @@ export function sprite(
 ): void {
   surface.fillStyle = colour;
   rows.forEach((row, line) => {
-    for (let column = 0; column < row.length; column += 1) {
-      if (row[column] !== "#") continue;
-      const at = flip ? row.length - 1 - column : column;
-      if (seen(x + at, y + line, 1, 1))
-        surface.fillRect(Math.round(x + at), Math.round(y + line), 1, 1);
+    const cells = flip ? [...row].reverse() : [...row];
+    let start = -1;
+    for (let column = 0; column <= cells.length; column += 1) {
+      const filled = cells[column] === "#";
+      if (filled && start < 0) start = column;
+      if (!filled && start >= 0) {
+        const length = column - start;
+        if (seen(x + start, y + line, length, 1))
+          surface.fillRect(
+            Math.round(x + start),
+            Math.round(y + line),
+            length,
+            1,
+          );
+        start = -1;
+      }
     }
   });
 }
@@ -69,7 +82,7 @@ export function stars(
       random() * Math.min(height, sceneHeight),
       1,
       1,
-      at % 3 === 0 ? "#9d8cff" : "#5b4aa8",
+      at % 3 === 0 ? palette.starBright : palette.starDim,
     );
   }
 }

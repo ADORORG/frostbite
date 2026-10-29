@@ -57,6 +57,19 @@ across its whole loop (finite numbers, nothing off screen, same picture every ti
 size budgets. The integration tests run the React parts in jsdom with a stepped frame loop, recording canvases, a controllable
 intersection observer, and stubbed media queries.
 
+## The scenes
+
+Falling blocks (a self-solving puzzle), Block builder, Space shooter, Bird hunt, Night street, Brick breaker, Side runner, Retro racer,
+Snake, Pong duel and Road hopper. Eleven scenes and the engine together are about 17.7 KB minified, 8.2 KB compressed. All art is generic
+and original; nothing is drawn from a known game.
+
+## Every scene closes without a seam
+
+A scene may not fade out or snap back at the end of its loop. Scrolling things move at a speed that divides the loop into whole repeats;
+things that are used up (invaders, bricks, puzzle rows) come back during the loop; anything that happens at an instant (a stride, a stripe, a
+step) is offset so it does not fall exactly on the moment the loop closes. One test over the whole list holds every scene to this: the last
+moment and the first must look the same. It also holds them to the palette, to a draw-call budget per frame, and to the size budgets.
+
 ## Not here yet
 
-The other six scenes (S2), the pages that use it (S3, S4), the video fallback (S5) and the phone/performance checks (S6).
+The pages that use it (S3, S4), the video fallback (S5) and the phone/performance checks (S6).

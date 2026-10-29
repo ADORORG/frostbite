@@ -1,4 +1,4 @@
-export { loopTime, stillFraction, stillTime } from "./clock.ts";
+export { loopTime, scroll, stillFraction, stillTime } from "./clock.ts";
 export { readDeviceSignals, type DeviceSource } from "./device.ts";
 export { ease, rect, seededRandom, sprite, stars } from "./draw.ts";
 export { palette } from "./palette.ts";

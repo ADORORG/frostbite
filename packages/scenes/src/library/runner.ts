@@ -48,17 +48,24 @@ export const runner: Scene = {
           for (let line = 0; line < 22; line += 1) {
             const across = left + line;
             const length = 44 - line * 2;
-            rect(surface, across, ground - 22 + line, length, 1, "#3a2a78");
+            rect(surface, across, ground - 22 + line, length, 1, palette.ridge);
           }
         }
       }
       const cloudShift = (t * cloudSpeed) % cloudRepeat;
       for (let repeat = -1; repeat <= 2; repeat += 1) {
         const left = repeat * cloudRepeat - cloudShift + 20;
-        rect(surface, left, 18, 16, 3, "#4a3a98");
-        rect(surface, left + 4, 15, 8, 3, "#4a3a98");
+        rect(surface, left, 18, 16, 3, palette.cloud);
+        rect(surface, left + 4, 15, 8, 3, palette.cloud);
       }
-      rect(surface, 0, ground, sceneWidth, sceneHeight - ground, "#0f0a2a");
+      rect(
+        surface,
+        0,
+        ground,
+        sceneWidth,
+        sceneHeight - ground,
+        palette.ground,
+      );
       rect(surface, 0, ground, sceneWidth, 2, palette.green);
       for (
         let x = -((t * scrollSpeed) % stripeRepeat);
@@ -72,7 +79,7 @@ export const runner: Scene = {
         const x = obstacleHitColumn + (reach - t) * scrollSpeed;
         if (x > -8 && x < sceneWidth) {
           rect(surface, x, ground - 8, 8, 8, palette.red);
-          rect(surface, x, ground - 8, 8, 1, "rgb(255 255 255 / 40%)");
+          rect(surface, x, ground - 8, 8, 1, palette.shine);
         }
         for (let coin = 0; coin < 3; coin += 1) {
           const coinX = x - 12 + coin * 12;
