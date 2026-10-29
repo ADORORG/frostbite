@@ -34,7 +34,7 @@ describe("the rail of collections", () => {
   it("shows no more than the rail holds, and says how many there are in all", () => {
     const cards = Array.from({ length: 9 }, (_, at) => card(at + 1, true));
     const markup = show(cards);
-    expect(markup.match(/class="cover-card"/gu)).toHaveLength(6);
+    expect(markup.match(/class="home-shelf__tile"/gu)).toHaveLength(6);
     expect(markup).toContain(homeRailCopy.link(9));
     expect(markup).toContain("Collection 6");
     expect(markup).not.toContain("Collection 7");
@@ -48,8 +48,20 @@ describe("the rail of collections", () => {
     ).toHaveLength(1);
   });
 
-  it("sits over a moving background", () => {
-    expect(show([card(1, true)])).toContain("scene-backdrop");
+  it("is a slim row of small tiles: a name and the item count on each, with no description, no call to action and no moving background", () => {
+    const markup = show([card(1, true), card(2, false)]);
+    expect(markup).toContain("home-shelf");
+    expect(markup).toContain(homeRailCopy.items(1, 1000));
+    expect(markup).toContain("Collection 2");
+    expect(markup).not.toMatch(
+      /cover-grid|cover-card|scene-backdrop|About 1|View collection</u,
+    );
+  });
+
+  it("makes each tile one link to its collection, named for it", () => {
+    const markup = show([card(1, true)]);
+    expect(markup).toContain('aria-label="View Collection 1"');
+    expect(markup).toContain(`/collections/${card(1, true).id}`);
   });
 
   it("is a small tile saying there are none, in the catalog's own words, with no scene and no link to an empty list", () => {
@@ -78,11 +90,5 @@ describe("the rail of collections", () => {
     expect(markup).not.toContain("Preview unavailable");
     expect(markup).not.toMatch(/arcade-preview__stand-in[^>]*>[A-Z]{1,2}</u);
     expect(show([card(1, true)])).not.toContain("scene-overlay");
-  });
-
-  it("draws every card wide and compact", () => {
-    const markup = show([card(1, true), card(2, false)]);
-    expect(markup).not.toContain('data-ratio="square"');
-    expect(markup).not.toContain("data-featured");
   });
 });

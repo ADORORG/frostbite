@@ -102,7 +102,7 @@ test("falls back to the scene's video in a browser that cannot draw", async ({
   });
   const page = await context.newPage();
   await page.goto("/");
-  const video = page.locator(".home-cabinet video");
+  const video = page.locator(".home-window video");
   await expect(video).toHaveCount(1);
   await expect(video.locator("source")).toHaveCount(2);
   await expect(page.locator("canvas")).toHaveCount(0);

@@ -61,6 +61,7 @@ export { SectionBlock, Tile, TileGrid } from "./components/section-block.tsx";
 export { shortenMiddle } from "./components/shorten-middle.ts";
 export { CoverCard, CoverGrid } from "./patterns/cover-grid.tsx";
 export { HomeRail, homeRailLimit } from "./patterns/home-rail.tsx";
+export { HomeShelf, ShelfTile } from "./patterns/home-shelf.tsx";
 export {
   standInInitials,
   standInTone,

@@ -7,8 +7,7 @@ import { useState } from "react";
 
 import { homeCopy } from "../domain/home-copy.ts";
 
-// The first screen. Snow falls over an icy range behind the words; beside them an arcade cabinet's screen plays a scene, with two buttons to
-// change it. Words and scene never share pixels, so neither has to be quiet for the other. The buttons are only for what exists. The first
+// The first screen. Snow falls over an icy range behind the words; beside them a small window plays a scene, with two buttons to change it. Words and scene never share pixels, so neither has to be quiet for the other. The buttons are only for what exists. The first
 // scene is a random one, chosen after the page has loaded.
 export function HomeHero({
   hasCollections,
@@ -60,30 +59,25 @@ export function HomeHero({
             ) : null}
           </div>
         </div>
-        <figure className="home-cabinet">
-          <figcaption className="home-cabinet__marquee">
-            {homeCopy.nowPlaying}
-          </figcaption>
-          <div className="home-cabinet__bezel">
-            <div aria-hidden="true" className="home-cabinet__screen">
-              <SceneStage scene={scene} />
-            </div>
+        <figure className="home-window">
+          <div aria-hidden="true" className="home-window__screen">
+            <SceneStage scene={scene} />
           </div>
-          <div className="home-cabinet__panel">
+          <div className="home-window__bar">
             <button
               aria-label={homeCopy.pickPrevious}
-              className="home-cabinet__pick"
+              className="home-window__pick"
               onClick={() => step(-1)}
               type="button"
             >
               ◀
             </button>
-            <b aria-live="polite" className="home-cabinet__name">
+            <b aria-live="polite" className="home-window__name">
               {scene?.name ?? ""}
             </b>
             <button
               aria-label={homeCopy.pickNext}
-              className="home-cabinet__pick"
+              className="home-window__pick"
               onClick={() => step(1)}
               type="button"
             >

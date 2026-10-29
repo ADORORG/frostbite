@@ -15,7 +15,7 @@ const hero = (over: Partial<Parameters<typeof HomeHero>[0]> = {}) =>
     </ScenesProvider>,
   );
 const playing = (container: HTMLElement) =>
-  container.querySelector(".home-cabinet__name")?.textContent;
+  container.querySelector(".home-window__name")?.textContent;
 const pick = (container: HTMLElement, label: string) =>
   click(container.querySelector(`button[aria-label="${label}"]`));
 
@@ -62,14 +62,14 @@ describe("the landing page's hero", () => {
     );
   });
 
-  it("keeps the words and the scene apart: snow falls behind the words, and the playing scene is on a screen beside them", async () => {
+  it("keeps the words and the scene apart: snow falls behind the words, and the playing scene is in a small window beside them", async () => {
     const container = await hero();
     const sky = container.querySelector(".home-hero__sky");
     expect(sky?.getAttribute("aria-hidden")).toBe("true");
     expect(
       sky?.querySelector(".scene-backdrop")?.getAttribute("data-scene"),
     ).toBe("snowfall");
-    const screen = container.querySelector(".home-cabinet__screen");
+    const screen = container.querySelector(".home-window__screen");
     expect(screen?.getAttribute("aria-hidden")).toBe("true");
     expect(screen?.querySelector(".scene-backdrop")).not.toBeNull();
     // The screen plays what a person can pick, and never the page's own weather.

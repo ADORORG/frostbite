@@ -51,14 +51,14 @@ describe("the public collection pages over the real database", () => {
     }
   });
 
-  it("shows the landing page rail an approved collection with its picture and a link to it, over a moving background, and none of the creator's private records", async () => {
+  it("shows the landing page rail an approved collection with its picture and a link to it, as a small tile, and none of the creator's private records", async () => {
     const approved = await collectionThrough("approved");
     const markup = await railFor();
     expect(markup).toContain('id="collections"');
     expect(markup).toContain("First light");
     expect(markup).toContain(`href="/collections/${approved.collectionId}"`);
     expect(markup).toContain(signedUrl(approved.coverKey));
-    expect(markup).toContain("scene-backdrop");
+    expect(markup).toContain("home-shelf__tile");
     for (const secret of [
       approved.ownerUserId,
       approved.submissionId,
