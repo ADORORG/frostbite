@@ -26,7 +26,12 @@ export function TrophyDialog({
       {open === null || piece === undefined ? null : (
         <div className="trophy-detail">
           <div className="trophy-detail__art">
-            <MintedArt claimId={piece.claimId} name={piece.title} />
+            <MintedArt
+              claimId={piece.claimId}
+              cover={open.shelf.cover?.image ?? null}
+              explain
+              name={piece.title}
+            />
           </div>
           {piece.description === "" ? null : <p>{piece.description}</p>}
           <KeyValueList

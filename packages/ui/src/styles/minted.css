@@ -11,9 +11,48 @@
   padding: var(--arcade-space-3);
   object-fit: contain;
 }
-/* The stand-in is drawn from the name, quieter than a real picture, and says it is a stand-in. */
-.minted-art[data-picture="none"] .arcade-preview {
-  opacity: 0.55;
+/* A mint with no picture: the game's cover dimmed and blurred behind a round badge of the milestone's initials and a check. */
+.medallion {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+}
+.medallion__cover {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  filter: blur(0.5rem) brightness(0.4) saturate(0.8);
+  transform: scale(1.2);
+}
+.medallion__badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 46%;
+  aspect-ratio: 1;
+  margin-block-end: 12%;
+  border: 0.25rem solid currentColor;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 45%);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.25rem, 16cqw, 4rem);
+}
+.medallion__check {
+  position: absolute;
+  inset-block-start: 14%;
+  inset-inline-end: 14%;
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  aspect-ratio: 1;
+  border: 0.125rem solid currentColor;
+  border-radius: 50%;
+  background: var(--arcade-ink);
+  font-size: 0.875rem;
 }
 .minted-art__caption {
   position: absolute;
@@ -26,7 +65,7 @@
   text-align: center;
   text-transform: uppercase;
 }
-.minted-art[data-picture="loading"] .arcade-preview {
+.minted-art[data-picture="loading"] .medallion {
   animation: minted-breathe 1.6s ease-in-out infinite;
 }
 /* An empty place in the wall while the list is asked for: the shape of a card, so the page does not change size on arrival. */
@@ -42,7 +81,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .minted-art[data-picture="loading"] .arcade-preview {
+  .minted-art[data-picture="loading"] .medallion {
     animation: none;
   }
 }

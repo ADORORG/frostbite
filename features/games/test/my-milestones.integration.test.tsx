@@ -2,6 +2,7 @@
 
 import { ApiError } from "@ador/client-http";
 import { mintedPictureHref, defineGame } from "@ador/shared/games";
+import { standInInitials } from "@repo/ui/arcade";
 import {
   click,
   installDialogShim,
@@ -16,14 +17,15 @@ import { createGameCatalog } from "../src/domain/catalog.ts";
 import { mintedCopy } from "../src/domain/minted-copy.ts";
 import { mintedPlaceholderCount } from "../src/domain/minted-view.ts";
 import { MyMilestones } from "../src/ui/my-milestones.tsx";
-import { chains, rewardsGame } from "./support/template-game.ts";
+import { chains, coveredGame, rewardsGame } from "./support/template-game.ts";
 
 const other = defineGame({
   ...rewardsGame,
   id: "other-game",
   title: "Other game",
 });
-const games = createGameCatalog([rewardsGame, other], chains).list();
+const covered = defineGame({ ...rewardsGame, cover: coveredGame.cover });
+const games = createGameCatalog([covered, other], chains).list();
 installDialogShim();
 const txId = "ab".repeat(32);
 const milestone = rewardsGame.milestones[0];
@@ -84,23 +86,37 @@ describe("the player's minted milestones page", () => {
       `${mintedCopy.piecesCount(1)} ${mintedCopy.gamesCount(1)}${mintedCopy.firstMinted("17 Oct 2026")}${mintedCopy.latestMinted(milestone?.title ?? "", "17 Oct 2026")}`,
     );
     expect(textOf(container)).toContain(mintedCopy.mintedProgress(1, 2));
-    expect(container.querySelector("progress")?.getAttribute("value")).toBe(
-      "50",
-    );
+    // One segment for each milestone of the game, one of them lit.
+    const segments = [
+      ...(container.querySelector(".shelf__segments")?.children ?? []),
+    ];
+    expect(segments.map((segment) => segment.getAttribute("data-on"))).toEqual([
+      "true",
+      "false",
+    ]);
   });
 
-  it("shows an outline, and no picture, for every milestone not minted, and a shelf for a game with none minted", async () => {
+  it("folds what is still to earn away once something is minted, and shows it when nothing is", async () => {
     const container = await show(async () => ({ minted: [mint] }));
     await settle(() =>
       expect(container.querySelector(".shelf")).not.toBeNull(),
     );
-    const outline = container.querySelectorAll(".trophy--missing");
-    expect(outline.length).toBeGreaterThan(0);
-    expect(textOf(outline[0] as HTMLElement)).toContain(second?.title);
-    expect(textOf(outline[0] as HTMLElement)).toContain(mintedCopy.notMinted);
-    expect(outline[0]?.querySelector("img, button")).toBeNull();
-    // The other game that can mint milestones has its own shelf, all outlines.
+    const [mine, untouched] = [
+      ...container.querySelectorAll<HTMLDetailsElement>(".shelf__locked"),
+    ];
+    expect(mine?.open).toBe(false);
+    expect(textOf(mine as HTMLElement)).toContain(mintedCopy.stillToEarn(1));
+    expect(textOf(mine as HTMLElement)).toContain(second?.title);
+    expect(textOf(mine as HTMLElement)).not.toContain(milestone?.title);
+    // The other game that can mint milestones has its own shelf: nothing minted, so everything it offers is in view.
     expect(container.querySelectorAll(".shelf")).toHaveLength(2);
+    expect(untouched?.open).toBe(true);
+    // No row of pieces for a game with none.
+    const rows = container.querySelectorAll(".shelf__row");
+    expect(rows).toHaveLength(1);
+    expect(textOf(untouched as HTMLElement)).toContain(
+      mintedCopy.stillToEarn(2),
+    );
     expect(textOf(container)).toContain(mintedCopy.mintedProgress(0, 2));
   });
 
@@ -122,7 +138,7 @@ describe("the player's minted milestones page", () => {
         `a[href="https://explorer.test/tx/${txId}"]`,
       ),
     ).not.toBeNull();
-    expect(dialog.querySelector("img")?.getAttribute("src")).toBe(
+    expect(dialog.querySelector(".minted-art > img")?.getAttribute("src")).toBe(
       mintedPictureHref(mint.claimId),
     );
     click(
@@ -159,6 +175,26 @@ describe("the player's minted milestones page", () => {
         (ribbon) => ribbon.textContent,
       ),
     ).toEqual([mintedCopy.ribbon.latest, mintedCopy.ribbon.first]);
+  });
+
+  it("draws no still-to-earn fold, and a full meter, for a game with every milestone minted", async () => {
+    const both = rewardsGame.milestones.map((item, at) => ({
+      ...mint,
+      claimId: `0198f2a4-7b3c-7d1e-8a5f-3c2b1d0e9f0${String(at)}`,
+      milestoneId: item.id,
+    }));
+    const container = await show(async () => ({ minted: both }));
+    await settle(() =>
+      expect(container.querySelectorAll(".trophy__button")).toHaveLength(2),
+    );
+    const shelf = container.querySelector(".shelf") as HTMLElement;
+    expect(shelf.querySelector(".shelf__locked")).toBeNull();
+    expect(textOf(shelf)).toContain(mintedCopy.mintedProgress(2, 2));
+    expect(
+      [...shelf.querySelectorAll(".shelf__segments span")].every(
+        (segment) => segment.getAttribute("data-on") === "true",
+      ),
+    ).toBe(true);
   });
 
   it("ribbons the first mint of a game", async () => {
@@ -198,38 +234,55 @@ describe("the player's minted milestones page", () => {
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
   });
 
-  it("points each card's image at the picture's address, keeps the stand-in until it has come, and shows it then", async () => {
+  it("points each piece's image at the picture's address, holds a medallion in its place until it has come, and shows the picture then", async () => {
     const container = await show(async () => ({ minted: [mint] }));
     await settle(() => expect(container.querySelector("img")).not.toBeNull());
-    const image = container.querySelector(".shelf img");
+    const image = container.querySelector(".shelf .minted-art > img");
     expect(image?.getAttribute("src")).toBe(mintedPictureHref(mint.claimId));
     expect(image?.getAttribute("alt")).toBe(milestone?.title);
     const art = () => container.querySelector(".minted-art");
     expect(art()?.getAttribute("data-picture")).toBe("loading");
-    expect(art()?.querySelector(".arcade-preview")).not.toBeNull();
-    expect(textOf(container)).not.toContain(mintedCopy.noPicture);
+    expect(art()?.querySelector(".medallion")).not.toBeNull();
     image?.dispatchEvent(new Event("load"));
     await settle(() =>
       expect(art()?.getAttribute("data-picture")).toBe("ready"),
     );
-    expect(art()?.querySelector(".arcade-preview")).toBeNull();
-    expect(container.querySelector("img")).not.toBeNull();
+    expect(art()?.querySelector(".medallion")).toBeNull();
+    expect(art()?.querySelector("img")).not.toBeNull();
   });
 
-  it("keeps the picture's place with a stand-in that says so when the picture cannot be had, and still shows the mint", async () => {
+  it("keeps a mint without a picture a trophy: the medallion with the game's cover and the milestone's initials, no error on the piece, and the dialog says it is a stand-in", async () => {
     const container = await show(async () => ({ minted: [mint] }));
     await settle(() => expect(container.querySelector("img")).not.toBeNull());
-    container.querySelector("img")?.dispatchEvent(new Event("error"));
+    container
+      .querySelector(".shelf .minted-art > img")
+      ?.dispatchEvent(new Event("error"));
     await settle(() =>
-      expect(textOf(container)).toContain(mintedCopy.noPicture),
+      expect(
+        container.querySelector(".minted-art")?.getAttribute("data-picture"),
+      ).toBe("none"),
     );
+    expect(container.querySelector(".minted-art > img")).toBeNull();
+    const medallion = container.querySelector(".medallion");
+    expect(medallion?.querySelector(".medallion__badge")?.textContent).toBe(
+      standInInitials(milestone?.title ?? ""),
+    );
+    expect(
+      medallion?.querySelector(".medallion__cover")?.getAttribute("src"),
+    ).toBe(games[0]?.cover?.image);
     expect(textOf(container)).toContain(milestone?.title);
-    expect(container.querySelector("img")).toBeNull();
-    expect(
-      container.querySelector(".minted-art .arcade-preview"),
-    ).not.toBeNull();
-    expect(
-      container.querySelector(".minted-art")?.getAttribute("data-picture"),
-    ).toBe("none");
+    // Nothing on the piece calls it a failure; only the detail view explains.
+    expect(textOf(container)).not.toContain(mintedCopy.standIn);
+    // The detail view asks for the picture itself (the browser answers from what it kept) and explains the stand-in once told there is none.
+    click(piece(container));
+    const dialog = () => container.querySelector("dialog") as HTMLElement;
+    await settle(() =>
+      expect(dialog().querySelector(".minted-art > img")).not.toBeNull(),
+    );
+    expect(textOf(dialog())).not.toContain(mintedCopy.standIn);
+    dialog()
+      .querySelector(".minted-art > img")
+      ?.dispatchEvent(new Event("error"));
+    await settle(() => expect(textOf(dialog())).toContain(mintedCopy.standIn));
   });
 });

@@ -16,12 +16,11 @@ export const mintedCopy = {
   minted: (day: string) => `Minted ${day}`,
   mintedProgress: (earned: number, total: number) =>
     `${String(earned)} of ${String(total)} minted`,
-  noPicture: "Picture not available",
-  notMinted: "Not minted yet",
+  stillToEarn: (count: number) => `${String(count)} still to earn`,
+  standIn: "No picture came with this mint; this is a stand-in.",
   openGame: "Open game",
   piecesCount: (pieces: number) =>
     pieces === 1 ? "1 milestone" : `${String(pieces)} milestones`,
-  progressLabel: (game: string) => `${game}: milestones minted`,
   ribbon: { first: "First", latest: "Latest" },
   shelfTitle: (game: string) => `${game} shelf`,
   signedOut: "Sign in to see the milestones you have minted.",

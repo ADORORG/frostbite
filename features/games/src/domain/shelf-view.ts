@@ -17,14 +17,11 @@ export interface ShelfPiece {
   readonly transactionId: string;
 }
 
-// A place on a game's shelf: a piece that was minted, or the outline of a milestone the player has not minted yet.
-export type ShelfSlot =
-  | { readonly kind: "minted"; readonly piece: ShelfPiece }
-  | {
-      readonly kind: "missing";
-      readonly milestoneId: string;
-      readonly title: string;
-    };
+// A milestone of the game the player has not minted yet.
+export interface ShelfMissing {
+  readonly milestoneId: string;
+  readonly title: string;
+}
 
 export interface Shelf {
   readonly cover: PublicCover | null;
@@ -33,7 +30,10 @@ export interface Shelf {
   readonly gameHref: string;
   readonly gameId: string;
   readonly gameTitle: string;
-  readonly slots: readonly ShelfSlot[];
+  // What is still to earn, in the game's order.
+  readonly missing: readonly ShelfMissing[];
+  // The pieces on display, in the game's order of milestones (a repeatable one shows each of its mints).
+  readonly pieces: readonly ShelfPiece[];
   readonly total: number;
 }
 
@@ -49,7 +49,7 @@ const byNewest = (a: MintedMilestone, b: MintedMilestone) =>
 
 // The player's shelves: a shelf for every game that can mint milestones, and one for any game they hold a mint of (a withdrawn game
 // keeps its identifier as a name, so a mint is never hidden). Games with mints come first, newest mint first; the rest follow in the
-// catalog's order. A repeatable milestone shows each of its mints; one never minted shows as an outline.
+// catalog's order. A repeatable milestone shows each of its mints; one never minted is listed as still to earn.
 export function shelves(
   minted: readonly MintedMilestone[],
   games: readonly PublicGame[],
@@ -79,13 +79,10 @@ export function shelves(
         ...mine.map((m) => m.milestoneId),
       ]),
     ];
-    const slots = ids.flatMap((milestoneId): readonly ShelfSlot[] => {
-      const title = titles.get(milestoneId) ?? milestoneId;
-      const pieces = mine.filter((item) => item.milestoneId === milestoneId);
-      if (pieces.length === 0) return [{ kind: "missing", milestoneId, title }];
-      return pieces.map((item) => ({
-        kind: "minted",
-        piece: {
+    const pieces = ids.flatMap((milestoneId): readonly ShelfPiece[] =>
+      mine
+        .filter((item) => item.milestoneId === milestoneId)
+        .map((item) => ({
           claimId: item.claimId,
           description: descriptions.get(milestoneId) ?? "",
           milestoneId,
@@ -97,18 +94,25 @@ export function shelves(
               : item.claimId === firstClaim
                 ? "first"
                 : null,
-          title,
+          title: titles.get(milestoneId) ?? milestoneId,
           transactionId: item.transactionId,
-        },
+        })),
+    );
+    const mintedIds = new Set(mine.map(({ milestoneId }) => milestoneId));
+    const missing = ids
+      .filter((milestoneId) => !mintedIds.has(milestoneId))
+      .map((milestoneId) => ({
+        milestoneId,
+        title: titles.get(milestoneId) ?? milestoneId,
       }));
-    });
     return {
       cover: game?.cover ?? null,
-      earned: new Set(mine.map(({ milestoneId }) => milestoneId)).size,
+      earned: mintedIds.size,
       gameHref: hrefOf(gameId),
       gameId,
       gameTitle: game?.title ?? gameId,
-      slots,
+      missing,
+      pieces,
       total: ids.length,
     };
   });

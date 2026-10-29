@@ -41,14 +41,14 @@
   .shelf__head {
     grid-template-columns: auto 1fr;
   }
-  .shelf__head .arcade-progress {
+  .shelf__head .shelf__segments {
     grid-column: 1 / -1;
   }
 }
 /* The shelf itself: small square pieces, as many to a row as fit, resting on a line. */
 .shelf__row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: var(--arcade-space-3);
   margin: 0;
   padding: 0 0 var(--arcade-space-3);
@@ -70,6 +70,7 @@
   cursor: pointer;
 }
 .trophy__art {
+  container-type: inline-size;
   position: relative;
   display: block;
   overflow: hidden;
@@ -90,10 +91,16 @@
   outline: 0.1875rem solid var(--arcade-focus);
   outline-offset: 0.25rem;
 }
+/* The name and day lie over the foot of the picture, on a fade, so the piece is one thing and its card needs no more room. */
 .trophy__strip {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
   display: grid;
   gap: 0.125rem;
-  padding-block: var(--arcade-space-2);
+  padding: var(--arcade-space-5) var(--arcade-space-3) var(--arcade-space-2);
+  background: linear-gradient(transparent, rgb(0 0 0 / 85%));
 }
 .trophy__strip strong {
   overflow: hidden;
@@ -101,7 +108,7 @@
   white-space: nowrap;
 }
 .trophy__strip small {
-  color: var(--arcade-text-subtle);
+  color: var(--arcade-text-muted);
 }
 .trophy__ribbon {
   position: absolute;
@@ -119,13 +126,41 @@
   background: var(--arcade-red);
   color: var(--arcade-text);
 }
-/* A milestone not minted yet: only its outline, dim and dashed. */
-.trophy--missing .trophy__art {
-  border-style: dashed;
-  background: var(--arcade-surface-recessed);
+/* What is still to earn: names only, folded away unless it is all there is. */
+.shelf__locked {
+  margin-block-start: var(--arcade-space-3);
+  color: var(--arcade-text-muted);
 }
-.trophy--missing {
-  opacity: 0.6;
+.shelf__locked summary {
+  cursor: pointer;
+}
+.shelf__locked ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  margin: var(--arcade-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.shelf__locked li {
+  padding: 0.125rem var(--arcade-space-3);
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: 999px;
+  font-size: var(--arcade-text-xs);
+}
+/* One segment for each milestone of the game, lit when it is minted. */
+.shelf__segments {
+  display: grid;
+  gap: 0.25rem;
+  block-size: 0.625rem;
+}
+.shelf__segments span {
+  background: var(--arcade-surface-recessed);
+  border: 0.0625rem solid var(--arcade-border-strong);
+}
+.shelf__segments span[data-on="true"] {
+  background: var(--arcade-cyan);
+  border-color: var(--arcade-cyan);
 }
 .trophy-detail {
   display: grid;

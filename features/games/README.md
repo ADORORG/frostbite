@@ -14,7 +14,7 @@ page connects it to the platform through `@ador/game-sdk`.
 
 `/games/milestones` ("My milestones", signed-in players only) is the player's trophy case: a shelf for every game that can mint
 milestones (games with mints first, newest first), with a place for each of the game's milestones: a square picture with the name and the
-day (UTC) for a minted one, an outline marked "not minted yet" for the rest, and a progress meter per game. A "First" ribbon marks a
+day (UTC) for a minted one (a medallion of the game cover and the milestone initials when no picture came), the rest listed by name under "still to earn", and one progress segment per milestone. A "First" ribbon marks a
 game's earliest mint and "Latest" the newest of all. A header gives the counts and dates. Pressing a piece opens its picture, what the
 milestone is, the day and its transaction on the explorer; the cards show no transaction. Sharing the shelf waits for a public page
 (M2, #133). It is read from `GET /api/v1/games/milestones/minted`

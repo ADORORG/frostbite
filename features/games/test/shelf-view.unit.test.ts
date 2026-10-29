@@ -25,17 +25,17 @@ const mint = (over: Partial<MintedMilestone> = {}): MintedMilestone => ({
 });
 
 describe("the shelves", () => {
-  it("has a shelf for every game that can mint milestones, with an outline for each milestone not minted, and none for a game that cannot", () => {
+  it("has a shelf for every game that can mint milestones, listing each milestone not minted as still to earn, and none for a game that cannot", () => {
     const result = shelves([], games, href);
     expect(result.map(({ gameId }) => gameId)).toEqual([
       rewardsGame.id,
       other.id,
     ]);
     expect(result[0]).toMatchObject({ earned: 0, total: 2 });
-    expect(result[0]?.slots.map(({ kind }) => kind)).toEqual([
-      "missing",
-      "missing",
-    ]);
+    expect(result[0]?.pieces).toEqual([]);
+    expect(result[0]?.missing.map(({ milestoneId }) => milestoneId)).toEqual(
+      rewardsGame.milestones.map(({ id }) => id),
+    );
     expect(result[0]?.gameHref).toBe(`/games/${rewardsGame.id}`);
   });
 
@@ -60,26 +60,24 @@ describe("the shelves", () => {
     const [shelf] = shelves([b, a], games, href);
     expect(shelf?.earned).toBe(1);
     expect(shelf?.total).toBe(2);
-    expect(shelf?.slots.map((slot) => slot.kind)).toEqual([
-      "minted",
-      "minted",
-      "missing",
+    expect(shelf?.pieces.map(({ claimId }) => claimId)).toEqual([
+      b.claimId,
+      a.claimId,
     ]);
-    expect(shelf?.slots[2]).toMatchObject({ milestoneId: second?.id });
+    expect(shelf?.missing).toEqual([
+      { milestoneId: second?.id, title: second?.title },
+    ]);
   });
 
   it("carries what the detail view needs and the day in UTC", () => {
     const item = mint({ mintedAt: "2026-10-17T23:59:00.000Z" });
     const [shelf] = shelves([item], games, href);
-    expect(shelf?.slots[0]).toMatchObject({
-      kind: "minted",
-      piece: {
-        claimId: item.claimId,
-        description: first?.description,
-        mintedDay: "17 Oct 2026",
-        title: first?.title,
-        transactionId: item.transactionId,
-      },
+    expect(shelf?.pieces[0]).toMatchObject({
+      claimId: item.claimId,
+      description: first?.description,
+      mintedDay: "17 Oct 2026",
+      title: first?.title,
+      transactionId: item.transactionId,
     });
   });
 
@@ -92,8 +90,7 @@ describe("the shelves", () => {
     });
     const ribbons = (claimIds: string[]) =>
       shelves([oldest, middle, newest], games, href)
-        .flatMap(({ slots }) => slots)
-        .flatMap((slot) => (slot.kind === "minted" ? [slot.piece] : []))
+        .flatMap(({ pieces }) => pieces)
         .filter(({ claimId }) => claimIds.includes(claimId))
         .map(({ ribbon }) => ribbon);
     expect(ribbons([oldest.claimId])).toEqual(["first"]);
@@ -103,7 +100,7 @@ describe("the shelves", () => {
 
   it("calls a lone mint the first, not the latest: there is nothing to tell it from", () => {
     const [shelf] = shelves([mint()], games, href);
-    expect(shelf?.slots[0]).toMatchObject({ piece: { ribbon: "first" } });
+    expect(shelf?.pieces[0]).toMatchObject({ ribbon: "first" });
   });
 
   it("keeps a mint of a withdrawn game or milestone under its identifier instead of hiding it", () => {
@@ -114,14 +111,10 @@ describe("the shelves", () => {
     );
     const gone = result.find(({ gameId }) => gameId === "withdrawn");
     expect(gone).toMatchObject({ earned: 1, gameTitle: "withdrawn", total: 1 });
-    expect(gone?.slots[0]).toMatchObject({ piece: { title: first?.id } });
+    expect(gone?.pieces[0]).toMatchObject({ title: first?.id });
     const renamed = result.find(({ gameId }) => gameId === rewardsGame.id);
     expect(renamed).toMatchObject({ earned: 1, total: 3 });
-    expect(
-      renamed?.slots.some(
-        (slot) => slot.kind === "minted" && slot.piece.title === "retired",
-      ),
-    ).toBe(true);
+    expect(renamed?.pieces.some(({ title }) => title === "retired")).toBe(true);
   });
 });
 
