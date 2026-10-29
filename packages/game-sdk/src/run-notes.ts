@@ -50,8 +50,8 @@ export function submitNote(state: SubmitState | null): string {
   const { result } = state;
   if (result.status === "verified")
     return result.earned.length === 0
-      ? "The platform replayed this run and it followed the rules. It earned no milestone."
-      : `The platform replayed this run and it followed the rules: ${result.earned.join(", ")} replay-checked. That shows the run was legal, not that a person played it.`;
+      ? "The platform checked this run. It earned no milestone."
+      : `The platform checked this run. Earned: ${result.earned.join(", ")}.`;
   if (result.status === "rejected")
     return `The platform did not accept this run (${result.reason}). Milestones earned here are your own claim.`;
   return `${refusals[result.reason] ?? "The platform refused this run."} Milestones earned here are your own claim.`;

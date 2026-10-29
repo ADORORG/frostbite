@@ -71,17 +71,15 @@ describe("a run on the platform's seed", () => {
     const [id, sent] = runs.submit.mock.calls[0] ?? [];
     expect(id).toBe(runId);
     expect(sent).toMatchObject({ gameId: "frostbite", seed: platformSeed });
-    expect(note()).toBe(
-      "The platform replayed this run and it followed the rules: first-win replay-checked. That shows the run was legal, not that a person played it.",
-    );
+    expect(note()).toBe("The platform checked this run. Earned: first-win.");
   });
 
-  it("says a run that earned nothing followed the rules and earned no milestone", async () => {
+  it("says a run that earned nothing was checked and earned no milestone", async () => {
     const { withRuns } = platform(async () => started);
     await startRun(withRuns);
     await clickButton("End run");
     expect(note()).toBe(
-      "The platform replayed this run and it followed the rules. It earned no milestone.",
+      "The platform checked this run. It earned no milestone.",
     );
   });
 

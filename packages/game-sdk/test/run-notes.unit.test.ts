@@ -47,9 +47,12 @@ describe("what a finished run's record is said to be", () => {
         kind: "settled",
         result: { earned, status: "verified" } as never,
       });
-    expect(verified([])).toContain("earned no milestone");
-    expect(verified(["a", "b"])).toContain("a, b replay-checked");
-    expect(verified(["a"])).toContain("not that a person played it");
+    expect(verified([])).toBe(
+      "The platform checked this run. It earned no milestone.",
+    );
+    expect(verified(["a", "b"])).toBe(
+      "The platform checked this run. Earned: a, b.",
+    );
     const rejected = submitNote({
       kind: "settled",
       result: { reason: "illegal move", status: "rejected" } as never,

@@ -138,7 +138,7 @@ describe("the ice-field cabinet in the bundled game", () => {
       seed: 4_000_000_000,
     });
     expect(document.querySelector(".if-note")?.textContent).toContain(
-      "The platform replayed this run and it followed the rules.",
+      "The platform checked this run.",
     );
   });
 

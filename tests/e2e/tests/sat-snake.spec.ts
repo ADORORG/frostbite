@@ -53,7 +53,7 @@ test("signed out, it is played on its own seed and the record is not sent anywhe
   expect(errors).toEqual([]);
 });
 
-test("signed in, the platform replays a run of steering and says it followed the rules", async ({
+test("signed in, the platform replays a run of steering and says it was checked", async ({
   baseURL,
   page,
 }) => {
@@ -75,7 +75,7 @@ test("signed in, the platform replays a run of steering and says it followed the
 
   await expect(game.locator(".if-record")).toContainText("3 steps");
   await expect(game.locator(".if-note")).toContainText(
-    "The platform replayed this run and it followed the rules. It earned no milestone.",
+    "The platform checked this run. It earned no milestone.",
   );
   expect(violations).toEqual([]);
   expect(errors).toEqual([]);

@@ -49,7 +49,7 @@ describe("a SAT SNAKE run on the platform's seed", () => {
     expect(JSON.parse(recordText())).toMatchObject({ seed: platformSeed });
   });
 
-  it("sends the record for the run it was given, and calls it replay-checked only when the platform says so", async () => {
+  it("sends the record for the run it was given, and calls it checked only when the platform says so", async () => {
     const { runs, withRuns } = platform(
       async () => started,
       async () => ({ earned: ["snake-ten"], status: "verified" }),
@@ -65,7 +65,7 @@ describe("a SAT SNAKE run on the platform's seed", () => {
       seed: platformSeed,
       verifier: "frostbite",
     });
-    expect(note()).toContain("snake-ten replay-checked");
+    expect(note()).toContain("Earned: snake-ten.");
   });
 
   it("says so when the platform rejects the record, and keeps the milestone as the player's own claim", async () => {
