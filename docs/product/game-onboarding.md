@@ -260,7 +260,7 @@ platform plays itself are loaded today**; a game hosted elsewhere stays self-rep
 - `pnpm --filter web dev` (or `build`) builds every folder under `/games` into the git-ignored
   `apps/web/public/play/<id>`. Open `/games/<id>`: the game is playable on that page.
 - A listed game with `launch: embedded` is shown only where it is playable. The sample game is registered only
-  when `APP_ENV` is `local` or `test`; a real game is registered for every environment.
+  when `APP_ENV` is `test`; a real game is registered for every environment.
 - `pnpm game:dev <id>` opens a local test page for the game: it frames the game in the same sandbox, builds it again on each
   reload, and lets you sign the player in and out, connect a fake wallet (and change its network), send the tab-hidden and
   full-screen events, take a claim through its states, and read a log of every call. Outside this repository, the SDK's
