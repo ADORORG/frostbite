@@ -25,6 +25,7 @@
     "./local-backend": "./src/local-backend.ts",
     "./pause": "./src/pause.ts",
     "./guide": "./src/guide.ts",
+    "./guide-layer": "./src/guide-layer.ts",
     "./pixels": "./src/pixels.ts",
     "./play": "./src/play.ts",
     "./policy": "./src/policy.ts",
@@ -157,6 +158,10 @@
       "./guide": {
         "types": "./dist/guide.d.ts",
         "default": "./dist/guide.js"
+      },
+      "./guide-layer": {
+        "types": "./dist/guide-layer.d.ts",
+        "default": "./dist/guide-layer.js"
       },
       "./pixels": {
         "types": "./dist/pixels.d.ts",

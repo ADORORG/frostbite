@@ -42,3 +42,29 @@ export async function measureLayout(page: Page): Promise<GameLayout> {
   // The script above is this module's own, and returns exactly this shape.
   return page.evaluate<GameLayout>(measure);
 }
+
+// The first-screen card a canvas game lays over its screen (a canvas of its own, hidden from readers): whether it is shown, how wide it is in
+// page units and in its own pixels, and how wide the screen under it is.
+export interface Card {
+  readonly cssWidth: number;
+  readonly pixelWidth: number;
+  readonly screenWidth: number;
+  readonly shown: boolean;
+}
+
+const cardScript = `(() => {
+  const card = document.querySelector('canvas[aria-hidden="true"]');
+  const screen = document.querySelector("canvas#screen");
+  if (!card || !screen) return null;
+  return {
+    cssWidth: Math.round(card.getBoundingClientRect().width),
+    pixelWidth: card.width,
+    screenWidth: Math.round(screen.getBoundingClientRect().width),
+    shown: getComputedStyle(card).display !== "none",
+  };
+})()`;
+
+export async function measureCard(page: Page): Promise<Card | null> {
+  // The script above is this module's own, and returns exactly this shape or null.
+  return page.evaluate<Card | null>(cardScript);
+}

@@ -7,7 +7,12 @@ import { chromium, devices, type Browser } from "@playwright/test";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { serveGame } from "../src/game-hosting.ts";
-import { measureLayout, type GameLayout } from "../src/game-layout.ts";
+import {
+  measureCard,
+  measureLayout,
+  type Card,
+  type GameLayout,
+} from "../src/game-layout.ts";
 
 // Every game is built, served and measured in a browser, at a phone's two sizes of frame and at two desktop sizes.
 //  - On a phone the page must not scroll, and the screen must take the frame.
@@ -111,4 +116,40 @@ describe("on a desktop", () => {
     const saved: unknown = JSON.parse(await readFile(fixture, "utf8"));
     expect(found).toEqual(saved);
   }, 180_000);
+});
+
+// The games that draw a small screen (160x90 or 256x144) and scale it up lay a sharp card over it for the first screen's writing.
+const smallScreens = ["bro-maria", "frost-runner", "tower-stack"];
+
+describe("the first screen's writing", () => {
+  it("is on a canvas of its own with a pixel for every pixel of the display, over the screen, before a run", async () => {
+    const found: Record<string, Card | null> = {};
+    for (const name of smallScreens) {
+      const hosted = await serveGame(join(outRoot, name));
+      const context = await browser.newContext({
+        ...devices["iPhone 13"],
+        viewport: { height: 520, width: 390 },
+      });
+      try {
+        const page = await context.newPage();
+        await page.goto(hosted.url, { waitUntil: "load" });
+        // Alone, with no platform to answer, a game draws its first screen when asking the platform gives up.
+        await page
+          .locator('canvas[aria-hidden="true"]')
+          .waitFor({ state: "visible", timeout: 20_000 });
+        found[name] = await measureCard(page);
+      } finally {
+        await context.close();
+        await hosted.close();
+      }
+    }
+    for (const name of smallScreens) {
+      const card = found[name];
+      expect(card, name).not.toBeNull();
+      expect(card?.shown, name).toBe(true);
+      expect(card?.cssWidth, name).toBe(card?.screenWidth);
+      // The iPhone 13 has three display pixels to a page pixel.
+      expect(card?.pixelWidth, name).toBe((card?.cssWidth ?? 0) * 3);
+    }
+  }, 120_000);
 });
