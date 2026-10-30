@@ -46,10 +46,22 @@ export const broMariaGame = defineGame({
       "You ran ten tiles in.",
     ),
     once(
+      "tile-25",
+      "Twenty-five tiles",
+      "Get 25 tiles into the level.",
+      "Twenty-five tiles in.",
+    ),
+    once(
       "quarter-way",
       "A quarter of the way",
       "Reach a quarter of the way through the level.",
       "A quarter of the level behind you.",
+    ),
+    once(
+      "tile-75",
+      "Seventy-five tiles",
+      "Get 75 tiles into the level.",
+      "Seventy-five tiles in.",
     ),
     once(
       "halfway",
@@ -58,10 +70,22 @@ export const broMariaGame = defineGame({
       "You lit the halfway lantern.",
     ),
     once(
+      "tile-125",
+      "One twenty-five",
+      "Get 125 tiles into the level.",
+      "A hundred and twenty-five tiles in.",
+    ),
+    once(
       "three-quarters",
       "Three quarters",
       "Reach three quarters of the way through the level.",
       "Three quarters of the level behind you.",
+    ),
+    once(
+      "tile-175",
+      "One seventy-five",
+      "Get 175 tiles into the level.",
+      "A hundred and seventy-five tiles in.",
     ),
     once(
       "finish",
@@ -70,6 +94,12 @@ export const broMariaGame = defineGame({
       "You reached the end of the level.",
     ),
     once("first-coin", "First shard", "Take 1 shard.", "You took a shard."),
+    once(
+      "coins-5",
+      "Five shards",
+      "Take 5 shards in one run.",
+      "Five shards in one run.",
+    ),
     once(
       "coins-10",
       "Ten shards",
@@ -83,10 +113,22 @@ export const broMariaGame = defineGame({
       "Twenty-five shards in one run.",
     ),
     once(
+      "coins-40",
+      "Forty shards",
+      "Take 40 shards in one run.",
+      "Forty shards in one run.",
+    ),
+    once(
       "coins-50",
       "Fifty shards",
       "Take 50 shards in one run.",
       "Fifty shards in one run.",
+    ),
+    once(
+      "coins-65",
+      "Sixty-five shards",
+      "Take 65 shards in one run.",
+      "Sixty-five shards in one run.",
     ),
     once(
       "first-stomp",
@@ -95,16 +137,40 @@ export const broMariaGame = defineGame({
       "You stomped a slime.",
     ),
     once(
+      "stomps-3",
+      "Three stomps",
+      "Stomp 3 slimes in one run.",
+      "Three slimes stomped in one run.",
+    ),
+    once(
       "stomps-5",
       "Five stomps",
       "Stomp 5 slimes in one run.",
       "Five slimes stomped in one run.",
     ),
     once(
+      "stomps-8",
+      "Eight stomps",
+      "Stomp 8 slimes in one run.",
+      "Eight slimes stomped in one run.",
+    ),
+    once(
       "stomps-10",
       "Ten stomps",
       "Stomp 10 slimes in one run.",
       "Ten slimes stomped in one run.",
+    ),
+    once(
+      "exterminator",
+      "Exterminator",
+      "Stomp every slime in the level.",
+      "Not a slime left.",
+    ),
+    once(
+      "combo-2",
+      "Double stomp",
+      "Stomp 2 slimes in a row without touching the ground.",
+      "Two stomps in one bounce.",
     ),
     once(
       "combo-3",
@@ -119,10 +185,22 @@ export const broMariaGame = defineGame({
       "You bumped a crate.",
     ),
     once(
+      "crates-3",
+      "Three crates",
+      "Bump 3 crates in one run.",
+      "Three crates bumped in one run.",
+    ),
+    once(
       "crates-5",
       "Five crates",
       "Bump 5 crates in one run.",
       "Five crates bumped in one run.",
+    ),
+    once(
+      "crates-8",
+      "Eight crates",
+      "Bump 8 crates in one run.",
+      "Eight crates bumped in one run.",
     ),
     once(
       "untouched",
@@ -131,10 +209,40 @@ export const broMariaGame = defineGame({
       "A clean run: no hits, no falls.",
     ),
     once(
+      "pit-proof",
+      "Pit-proof",
+      "Finish the level without falling into a pit.",
+      "Not one fall.",
+    ),
+    once(
+      "second-wind",
+      "Second wind",
+      "Finish the level after being hit or falling at least once.",
+      "You came back and finished.",
+    ),
+    once(
+      "last-life",
+      "Last life",
+      "Finish the level with one life left.",
+      "Made it with your last life.",
+    ),
+    once(
+      "speed-60",
+      "One minute",
+      "Finish the level in 60 seconds or less.",
+      "Across the level in a minute.",
+    ),
+    once(
       "speedrun",
       "Speedrun",
       "Finish the level in 45 seconds or less.",
       "Across the level in forty-five seconds.",
+    ),
+    once(
+      "lightning",
+      "Lightning",
+      "Finish the level in 42.5 seconds or less.",
+      "Barely a pause on the way across.",
     ),
     once(
       "pacifist",
@@ -149,10 +257,22 @@ export const broMariaGame = defineGame({
       "Every shard in the level.",
     ),
     once(
-      "last-life",
-      "Last life",
-      "Finish the level with one life left.",
-      "Made it with your last life.",
+      "all-rounder",
+      "All-rounder",
+      "Finish the level with 25 shards, 5 stomps and 3 crates.",
+      "A little of everything, and the end.",
+    ),
+    once(
+      "tasting-menu",
+      "Tasting menu",
+      "Take 10 shards, stomp a slime and bump a crate in one run.",
+      "A bit of everything.",
+    ),
+    once(
+      "clean-start",
+      "Clean start",
+      "Reach 100 tiles without being hit or falling.",
+      "A hundred tiles, no mistakes.",
     ),
   ],
   network: betaTarget.chainId,
@@ -165,7 +285,7 @@ export const broMariaGame = defineGame({
     replay: {
       id: "bro-maria",
       sha256:
-        "0c10358e785ef2852cce90d37fb85ada8fd21ae7cb9307f24ae4260ad36d240a",
+        "cd2932899f957a9dfdd5b15321e2fa3381b5b3d5dbc555e451086ee2a42246bd",
       version: 1,
     },
   },

@@ -53,4 +53,7 @@ export const invulnerableTicks = 90;
 export const hitKnock = 40;
 
 // The marks that are earned by how a level was played (`milestones.ts` holds the places and the counts).
+export const speed60Ticks = 3_600;
 export const speedrunTicks = 2_700;
+// Only just over the time it takes to run across the level without stopping.
+export const lightningTicks = 2_550;

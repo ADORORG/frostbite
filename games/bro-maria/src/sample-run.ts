@@ -3,7 +3,7 @@ import type { RunRecord } from "@ador/game-sdk/run-record";
 import { gameId, verifierId, verifierVersion } from "./rules/constants.ts";
 
 // One legal run the verifier is shown with: a hero that holds right the whole way and jumps over each pit, step, urchin and slime as it comes,
-// across a whole level in about forty seconds on one seed. It earns thirteen of the milestones the rules can decide (a stomp on the way is luck). It is a plain record,
+// across a whole level in about forty seconds on one seed. It earns twenty-five of the milestones the rules can decide. It is a plain record,
 // not one built with the SDK's recorder, so the published verifier carries only the rules and not the recorder's schema library.
 // Each choice is the tick, whether the control was pressed (1) or let go of (0), and which control.
 const choices = [
@@ -39,18 +39,30 @@ export function sampleRun(): RunRecord {
   return {
     claims: [
       "first-steps",
+      "tile-25",
       "quarter-way",
+      "tile-75",
       "halfway",
+      "tile-125",
       "three-quarters",
+      "tile-175",
       "finish",
       "first-coin",
+      "coins-5",
       "coins-10",
       "coins-25",
+      "coins-40",
       "coins-50",
       "first-stomp",
+      "stomps-3",
       "stomps-5",
+      "combo-2",
       "untouched",
+      "pit-proof",
+      "speed-60",
       "speedrun",
+      "lightning",
+      "clean-start",
     ],
     config: {},
     gameId,

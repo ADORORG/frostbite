@@ -33,9 +33,11 @@ changes the digest, and a test fails until the pin and `verifierVersion` are upd
 
 ## Milestones
 
-20, all decided by the state of a run alone (`src/rules/milestones.ts`): how far you got (four places and the end), shards (1, 10, 25, 50),
-stomps (1, 5, 10, and three in one bounce), crates (1, 5), and five ways to finish (untouched, within 45 seconds, without a stomp, with every
-shard, with the last life). The words are in the manifest. The list is a draft for the owner to approve.
+40, all decided by the state of a run alone (`src/rules/milestones.ts`): how far you got (nine places, the end among them), shards (7 steps up to
+65), slimes (stomps from 1 to 10, every slime in the level, and two or three in one bounce), crates (1 to 8), and the ways to finish (clean,
+without a fall, after a setback, on the last life, within 60, 45 or 42.5 seconds, without a stomp, with every shard, with a bit of everything)
+plus two for a good start. Every level has enough shards, slimes and crates for each to be possible. Three are for near-perfect play and no
+bot reaches them (every slime, no stomp, every shard). The words are in the manifest. The list is a draft for the owner to approve.
 
 ## Fairness
 
