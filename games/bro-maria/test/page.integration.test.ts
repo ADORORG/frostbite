@@ -74,7 +74,7 @@ describe("Bro Maria's keys, pause and sound", () => {
     expect(jumps(audio)).toBe(1);
   });
 
-  it("holds the controls while keys are down, and the time runs while they are", async () => {
+  it("holds the controls while keys are down", async () => {
     const { press, release, started, text } = await driver();
     press("Enter");
     await settle(100);
@@ -82,11 +82,11 @@ describe("Bro Maria's keys, pause and sound", () => {
     await settle(300);
     release("KeyD");
     expect(started()).toBe(true);
-    expect(Number(text("time"))).toBeLessThanOrEqual(120);
+    expect(text("stage")).toBe("1");
     expect(text("lives")).toBe("3");
   });
 
-  it("pauses on P: the page says so, the time stands still, and it carries on after", async () => {
+  it("pauses on P: the page says so, and it carries on after", async () => {
     const { audio, press, text } = await driver();
     press("Enter");
     await settle(300);
@@ -94,9 +94,7 @@ describe("Bro Maria's keys, pause and sound", () => {
     expect(text("pause")).toBe("Resume");
     expect(text("note")).toContain("Paused");
     expect(audio.state).toBe("suspended");
-    const frozen = text("time");
-    await settle(1_200);
-    expect(text("time")).toBe(frozen);
+    await settle(300);
     press("KeyP");
     expect(text("pause")).toBe("Pause");
     expect(text("note")).not.toContain("Paused");

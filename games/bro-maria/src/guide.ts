@@ -5,7 +5,7 @@ export const guide: Guide = {
   lines: [
     "ARROWS OR A D: RUN   SPACE OR UP: JUMP",
     "LAND ON SLIMES, BUMP CRATES, GRAB COINS",
-    "REACH THE LANTERN AT THE FAR END",
+    "CLEAR SIX STAGES, EACH HARDER - LANTERNS KEEP YOUR PLACE",
   ],
   start: "ENTER TO START",
   title: "BRO MARIA",

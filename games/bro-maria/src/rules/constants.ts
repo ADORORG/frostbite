@@ -3,10 +3,12 @@
 // every engine plays a run out the same way.
 export const gameId = "bro-maria";
 export const verifierId = "bro-maria";
-export const verifierVersion = 1;
+export const verifierVersion = 2;
 
-// The longest a run may last (two minutes), and so a bound on the work one replay does.
-export const maxTicks = 7_200;
+// A run is `stages` levels one after another, each laid out from the run's seed and its number, harder as they go. The longest a run may last
+// is eight minutes (four minutes and a half a stage is far more than the fastest need), and so a bound on the work one replay does.
+export const stages = 6;
+export const maxTicks = 28_800;
 export const ticksPerSecond = 60;
 
 export const pixel = 16;
@@ -40,6 +42,7 @@ export const bounceHeld = 70;
 
 export const slimeWidth = 14 * pixel;
 export const slimeHeight = 10 * pixel;
+// A slime walks at this speed on the first stage and one more on each stage after.
 export const slimeSpeed = 6;
 export const urchinWidth = 12 * pixel;
 export const urchinHeight = 10 * pixel;
@@ -48,12 +51,16 @@ export const coinSize = 8 * pixel;
 export const stompDepth = 6 * pixel;
 
 export const startLives = 3;
+// A life is won by clearing each of these stages, to at most `maxLives` at once.
+export const lifeStages = [2, 4] as const;
+export const maxLives = 5;
+// The name of a stage is shown over the screen for this long after it starts.
+export const bannerTicks = 120;
 // After a hit the hero cannot be hit again for this long, and a hit throws it up at this speed.
 export const invulnerableTicks = 90;
 export const hitKnock = 40;
 
-// The marks that are earned by how a level was played (`milestones.ts` holds the places and the counts).
-export const speed60Ticks = 3_600;
-export const speedrunTicks = 2_700;
-// Only just over the time it takes to run across the level without stopping.
+// The marks that are earned by how a stage was played (`milestones.ts` holds the places and the counts): the time one stage was cleared in.
+export const swiftTicks = 3_000;
+// Only just over the time it takes to run across a stage without stopping.
 export const lightningTicks = 2_550;

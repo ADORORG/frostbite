@@ -98,9 +98,15 @@ describe("the sounds of what changed", () => {
     expect(
       worldSounds({ ...base, checkpoint: true }, { ...base, checkpoint: true }),
     ).toEqual([]);
-    expect(worldSounds(base, { ...base, finishTick: 5 })).toEqual(["finish"]);
+    expect(worldSounds(base, { ...base, stagesCleared: 1 })).toEqual(["stage"]);
     expect(
-      worldSounds({ ...base, finishTick: 5 }, { ...base, finishTick: 5 }),
+      worldSounds(base, { ...base, finishTick: 5, stagesCleared: 6 }),
+    ).toEqual(["finish"]);
+    expect(
+      worldSounds(
+        { ...base, finishTick: 5, stagesCleared: 6 },
+        { ...base, finishTick: 5, stagesCleared: 6 },
+      ),
     ).toEqual([]);
   });
 
@@ -139,6 +145,7 @@ describe("Bro Maria's sound", () => {
       "hit",
       "jump",
       "milestone",
+      "stage",
       "start",
       "stomp",
     ]);

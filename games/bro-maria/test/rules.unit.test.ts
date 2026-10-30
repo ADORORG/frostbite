@@ -5,7 +5,7 @@ import { maxTicks } from "../src/rules/constants.ts";
 import { broRules } from "../src/rules/index.ts";
 import { startRun } from "../src/rules/state.ts";
 import { advanceTo } from "../src/rules/tick.ts";
-import { play } from "./support/bot.ts";
+import { sampleRun } from "../src/sample-run.ts";
 
 const begin = () => {
   const started = broRules.init(5, {});
@@ -152,18 +152,9 @@ describe("the end of a run", () => {
 
 describe("replaying a played run", () => {
   it("gives the state the player had, and the marks it earned, from the record alone", () => {
-    const { inputs, state } = play(31_337);
-    const outcome = replayRecord(broRules, {
-      claims: [],
-      config: {},
-      gameId: "bro-maria",
-      inputs: [...inputs],
-      schemaVersion: 1,
-      seed: 31_337,
-      verifier: "bro-maria",
-      verifierVersion: 1,
-    });
-    expect(outcome).toEqual({ earned: broRules.earned(state), ok: true });
-    expect(broRules.earned(state)).toContain("finish");
+    const record = sampleRun();
+    const outcome = replayRecord(broRules, record);
+    expect(outcome).toEqual({ earned: record.claims, ok: true });
+    expect(record.claims).toContain("finish");
   });
 });

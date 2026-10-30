@@ -95,6 +95,7 @@ export const effects = {
   ],
   die: commonEffects.lose,
   finish: commonEffects.win,
+  stage: commonEffects.good,
   hit: [tone("sawtooth", 400, 150, 0.25, 0.35), tone("noise", 0, 0, 0.12, 0.2)],
   jump: [tone("square", 260, 640, 0.16, 0.28)],
   milestone: commonEffects.win,

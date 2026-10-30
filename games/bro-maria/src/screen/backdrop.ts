@@ -1,15 +1,19 @@
-import { colour } from "./palette.ts";
+import { colour, themes } from "./palette.ts";
 import { block, wrap } from "@ador/game-sdk/pixels";
 
 // The sky and the mountains behind the level, which scroll more slowly than the ground, and the snow that falls in front of it.
+export const themeOf = (stage: number): (typeof themes)[number] =>
+  themes[stage - 1] ?? themes[0];
+
 export function sky(
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
+  stage = 1,
 ): void {
   const gradient = context.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, colour.skyHigh);
-  gradient.addColorStop(1, colour.skyLow);
+  gradient.addColorStop(0, themeOf(stage)[0]);
+  gradient.addColorStop(1, themeOf(stage)[1]);
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
 }
@@ -42,9 +46,11 @@ export function mountains(
   context: CanvasRenderingContext2D,
   camera: number,
   width: number,
+  stage = 1,
 ): void {
-  ridge(context, colour.mountainFar, camera * 0.15, 96, 44, 120, width);
-  ridge(context, colour.mountain, camera * 0.3, 112, 30, 80, width);
+  const [, , near, far] = themeOf(stage);
+  ridge(context, far, camera * 0.15, 96, 44, 120, width);
+  ridge(context, near, camera * 0.3, 112, 30, 80, width);
 }
 
 export function snow(

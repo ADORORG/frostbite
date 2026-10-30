@@ -21,7 +21,7 @@ export function worldSounds(
   if (after.deaths > before.deaths) heard.push("die");
   else if (after.hits > before.hits) heard.push("hit");
   if (after.checkpoint && !before.checkpoint) heard.push("checkpoint");
-  if (after.finishTick !== null && before.finishTick === null)
-    heard.push("finish");
+  if (after.stagesCleared > before.stagesCleared)
+    heard.push(after.finishTick === null ? "stage" : "finish");
   return heard;
 }

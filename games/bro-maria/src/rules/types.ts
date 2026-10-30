@@ -30,6 +30,9 @@ export interface Level {
   readonly ground: readonly number[];
   readonly goalX: number;
   readonly patrols: readonly Patrol[];
+  // How fast the slimes of this stage walk, and which stage it is (1 to `stages`).
+  readonly slimeSpeed: number;
+  readonly stage: number;
   // Floating tiles (platforms and crates) as `column * 64 + row`.
   readonly solid: ReadonlySet<number>;
   readonly urchins: readonly Urchin[];
@@ -63,14 +66,20 @@ export interface State {
   // Stomps in a row without touching the ground, and the most there have been.
   readonly bestCombo: number;
   readonly checkpoint: boolean;
+  // The shards taken on the stages cleared so far (`coinsTaken` is the stage being played).
+  readonly coinsBanked: number;
   readonly coinsTaken: readonly boolean[];
   readonly combo: number;
   readonly controls: Controls;
+  readonly cleanStages: number;
   readonly crates: number;
   readonly cratesUsed: readonly boolean[];
   readonly deaths: number;
   readonly ended: boolean;
   readonly farthest: number;
+  // The fewest ticks a stage was cleared in (`maxTicks` until one has been).
+  readonly fastest: number;
+  // Set when the last stage is cleared.
   readonly finishTick: number | null;
   readonly hero: Hero;
   readonly hits: number;
@@ -78,7 +87,15 @@ export interface State {
   readonly level: Level;
   readonly lives: number;
   readonly over: boolean;
+  readonly perfectStages: number;
+  readonly seed: number;
   readonly slimes: readonly Slime[];
+  readonly stage: number;
+  // The hits and falls the run had, and the tick it was, when the stage began.
+  readonly stageLosses: number;
+  readonly stageStart: number;
+  // Stages cleared, the one just cleared included.
+  readonly stagesCleared: number;
   readonly stomps: number;
   readonly tick: number;
 }

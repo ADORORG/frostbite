@@ -7,8 +7,16 @@ export interface Drawn {
   readonly y: number;
 }
 
+export interface Written {
+  readonly fill: string;
+  readonly text: string;
+  readonly x: number;
+  readonly y: number;
+}
+
 export function surface() {
   const drawn: Drawn[] = [];
+  const written: Written[] = [];
   const stops: string[] = [];
   const context = {
     createLinearGradient: () => ({
@@ -18,11 +26,18 @@ export function surface() {
       drawn.push({ fill: String(context.fillStyle), height, width, x, y });
     },
     fillStyle: "" as string | object,
+    fillText(text: string, x: number, y: number) {
+      written.push({ fill: String(context.fillStyle), text, x, y });
+    },
+    font: "",
+    textAlign: "",
+    textBaseline: "",
   };
   return {
     context: context as unknown as CanvasRenderingContext2D,
     drawn,
     stops,
+    written,
   };
 }
 

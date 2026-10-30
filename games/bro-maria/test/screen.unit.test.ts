@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  bannerTicks,
   groundRow,
   invulnerableTicks,
   levelTiles,
@@ -13,7 +14,7 @@ import {
   screenHeight,
   screenWidth,
 } from "../src/screen/draw.ts";
-import { colour } from "../src/screen/palette.ts";
+import { colour, themes } from "../src/screen/palette.ts";
 import { ofColour, surface } from "./support/canvas.ts";
 import { flatLevel, onFlat, withHero } from "./support/states.ts";
 
@@ -37,7 +38,7 @@ describe("where the view is", () => {
 describe("drawing the screen", () => {
   it("paints the sky from top to bottom first, and then every picture inside the world", () => {
     const { drawn, stops } = painted();
-    expect(stops).toEqual([colour.skyHigh, colour.skyLow]);
+    expect(stops).toEqual([themes[0][0], themes[0][1]]);
     expect(drawn.length).toBeGreaterThan(100);
     for (const block of drawn) {
       expect(
@@ -157,5 +158,38 @@ describe("drawing the screen", () => {
     expect(blink(0)).toBe(1);
     expect(blink(4)).toBeGreaterThan(1);
     expect(playerHeight).toBe(224);
+  });
+});
+
+describe("the stage on the screen", () => {
+  it("is named in the corner all the time, and large for a moment as a stage after the first begins", () => {
+    const at = (stage: number, since: number) => {
+      const page = surface();
+      draw(page.context, {
+        ...onFlat(),
+        stage,
+        stageStart: 100,
+        tick: 100 + since,
+      });
+      return page.written
+        .filter(({ fill }) => fill !== colour.deep)
+        .map(({ text }) => text);
+    };
+    expect(at(1, 0)).toEqual(["STAGE 1/6"]);
+    expect(at(3, 0)).toEqual(["STAGE 3/6", "STAGE 3"]);
+    expect(at(3, bannerTicks - 1)).toEqual(["STAGE 3/6", "STAGE 3"]);
+    expect(at(3, bannerTicks)).toEqual(["STAGE 3/6"]);
+  });
+
+  it("paints each stage in a sky and mountains of its own", () => {
+    const skies = [1, 2, 3, 4, 5, 6].map((stage) => {
+      const page = surface();
+      draw(page.context, { ...onFlat(), stage });
+      return page.stops.join();
+    });
+    expect(new Set(skies).size).toBe(6);
+    const page = surface();
+    draw(page.context, { ...onFlat(), stage: 99 });
+    expect(page.stops).toEqual([themes[0][0], themes[0][1]]);
   });
 });

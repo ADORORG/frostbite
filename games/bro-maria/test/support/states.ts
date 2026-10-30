@@ -15,7 +15,9 @@ export const flatLevel = (over: Partial<Level> = {}): Level => ({
   goalX: (levelTiles - 4) * tile,
   ground: Array.from({ length: levelTiles }, () => groundRow),
   patrols: [],
+  slimeSpeed: 6,
   solid: new Set<number>(),
+  stage: 1,
   urchins: [],
   ...over,
 });

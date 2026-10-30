@@ -1,3 +1,4 @@
+import { banner } from "./banner.ts";
 import { block, sprite } from "@ador/game-sdk/pixels";
 
 import {
@@ -199,8 +200,8 @@ function hero(
 
 export function draw(context: CanvasRenderingContext2D, state: State): void {
   const camera = cameraOf(state);
-  sky(context, screenWidth, screenHeight);
-  mountains(context, camera, screenWidth);
+  sky(context, screenWidth, screenHeight, state.stage);
+  mountains(context, camera, screenWidth, state.stage);
   ground(context, state, camera);
   crates(context, state, camera);
   lanterns(context, state, camera);
@@ -208,4 +209,5 @@ export function draw(context: CanvasRenderingContext2D, state: State): void {
   creatures(context, state, camera);
   hero(context, state, camera);
   snow(context, state.tick, screenWidth, screenHeight);
+  banner(context, state, screenWidth);
 }

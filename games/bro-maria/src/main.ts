@@ -19,7 +19,7 @@ import {
   withSound,
   type Progress,
 } from "./progress.ts";
-import { maxTicks, ticksPerSecond } from "./rules/constants.ts";
+import { stages, ticksPerSecond } from "./rules/constants.ts";
 import { coinsTaken } from "./rules/milestones.ts";
 import { scoreOf } from "./score.ts";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
@@ -46,7 +46,8 @@ const screen = element("screen", "canvas");
 const scoreOut = element("score", "strong");
 const coinsOut = element("coins", "strong");
 const livesOut = element("lives", "strong");
-const timeOut = element("time", "strong");
+const stageOut = element("stage", "strong");
+const stagesOut = element("stages", "span");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
@@ -84,9 +85,7 @@ function show(): void {
   scoreOut.textContent = String(state === undefined ? 0 : scoreOf(state));
   coinsOut.textContent = String(state === undefined ? 0 : coinsTaken(state));
   livesOut.textContent = String(state?.lives ?? 3);
-  timeOut.textContent = String(
-    Math.ceil((maxTicks - (state?.tick ?? 0)) / ticksPerSecond),
-  );
+  stageOut.textContent = String(state?.stage ?? 1);
   if (context === null) return;
   draw(context, state ?? waiting.state());
   if (session === null) drawGuide(context, screenWidth, screenHeight, guide);
@@ -166,7 +165,7 @@ const begin = (): Promise<void> =>
     runId = ready?.runId ?? null;
     note.textContent = startNote(
       started ?? null,
-      "Run with the arrow keys or A and D, jump with space or up. Land on slimes, grab coins, bump crates, reach the far lantern.",
+      "Run with the arrow keys or A and D, jump with space or up. Six stages, each harder: reach the lantern at the end of each.",
     );
     session = createRunSession({
       onEarned: (id) => {
@@ -204,6 +203,7 @@ async function connect(): Promise<void> {
   show();
 }
 
+stagesOut.textContent = String(stages);
 screen.width = screenWidth;
 screen.height = screenHeight;
 // The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.

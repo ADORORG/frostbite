@@ -43,14 +43,28 @@ export interface Plan {
 }
 
 export function play(seed: number, plan: Plan = {}): Played {
-  const { hop = false, idle = false, limit = maxTicks } = plan;
   const started = broRules.init(seed, {});
   if (!started.ok) throw new Error(started.reason);
-  let state = started.state;
+  return playFrom(started.state, plan);
+}
+
+// The same player, from a state it is given (the start of a stage, to play one stage on its own), until `stop` says so.
+export function playFrom(
+  from: State,
+  plan: Plan = {},
+  stop: (state: State) => boolean = () => false,
+): Played {
+  const { hop = false, idle = false, limit = maxTicks } = plan;
+  let state = from;
   const inputs: RunInput[] = [];
   const held = { jump: false, right: false };
   let pressedAt = -10;
-  while (state.tick < limit && !state.over && state.finishTick === null) {
+  while (
+    state.tick < limit &&
+    !state.over &&
+    state.finishTick === null &&
+    !stop(state)
+  ) {
     // A jump is held until the hero lands, then let go of, so the next press is a new one.
     const want = {
       jump:

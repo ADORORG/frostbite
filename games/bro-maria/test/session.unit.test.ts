@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { maxTicks } from "../src/rules/constants.ts";
 import { broRules } from "../src/rules/index.ts";
 import { createRunSession } from "../src/session.ts";
-import { play } from "./support/bot.ts";
+import { sampleRun } from "../src/sample-run.ts";
 
 const sessionOn = (seed = 12, onEarned?: (id: string) => void) =>
   createRunSession({ onEarned, seed });
@@ -62,8 +62,28 @@ describe("a run as it is played", () => {
     for (let tick = 0; tick < maxTicks + 5; tick += 1) idle.tick();
     expect(idle.state().tick).toBe(maxTicks);
     expect(idle.state().ended).toBe(true);
-    const { state } = play(7919);
-    expect(state.finishTick).not.toBeNull();
+    // ...or, with all six stages cleared, the run closes itself too.
+    const won = sessionOn(20_261_030);
+    const inputs = sampleRun().inputs;
+    let at = 0;
+    for (let tick = 0; tick <= maxTicks && !won.state().ended; tick += 1) {
+      for (
+        let next = inputs[at];
+        next !== undefined &&
+        next.type !== "end" &&
+        (next.data as { tick: number }).tick === tick;
+        next = inputs[at]
+      ) {
+        won.hold(
+          next.type as "jump" | "right",
+          (next.data as { on: number }).on === 1,
+        );
+        at += 1;
+      }
+      won.tick();
+    }
+    expect(won.state().finishTick).not.toBeNull();
+    expect(won.state().ended).toBe(true);
   });
 
   it("tells once about each mark as it is earned, and the record replays to the same marks", () => {

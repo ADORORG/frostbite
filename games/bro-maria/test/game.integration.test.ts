@@ -32,7 +32,8 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
     for (const button of window.document.querySelectorAll("#pad button"))
       expect(button.hasAttribute("disabled")).toBe(false);
     expect(byId(window, "lives")?.textContent).toBe("3");
-    expect(Number(byId(window, "time")?.textContent)).toBeLessThanOrEqual(120);
+    expect(byId(window, "stage")?.textContent).toBe("1");
+    expect(byId(window, "stages")?.textContent).toBe("6");
   });
 
   it("runs until the last life is lost, then says what the platform could not check and keeps the best", async () => {

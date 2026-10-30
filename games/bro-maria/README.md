@@ -53,3 +53,11 @@ the time it takes to run across, while a hero that only runs never does.
 ## Ownership
 
 Platform games team.
+
+## Stages
+
+A run is six stages, one after another, each laid out from the run's seed and its number (`src/rules/level.ts`, `layout.ts`). Stage one is the plain level (flat runs, pits, steps, platforms, crates, single urchins and slimes). Each stage after is harder: slimes walk faster (6, 7, 9, 11, 13, 15; the hero runs at 20) and are closer together, and the mix of stretches gains urchin pairs, a pit with an urchin beyond it, an urchin with a pair of slimes behind it, a two-tile climb and pits three tiles apart, until the easy stretches are gone. A stage has its own lantern. The hero has three lives for the whole run, a life is won on clearing stage two and stage four (to at most five), and a hit or a fall costs one. The run is at most eight minutes.
+
+The forty milestones are for the whole run (shards, stomps, crates), stages cleared, and how stages were played (clean stages, fastest stage, a stage with every shard). The verifier is version 2.
+
+Measured (`test/support/planner.ts`, `test/fairness.unit.test.ts`): a player who tries each jump on a copy of the game before making it clears every stage of every seed tried without a hit or a fall, and all six in a row with five lives; a plain player who holds right and jumps at what is close loses more lives stage by stage and finishes about one run in six. Nobody has played it as a person.

@@ -1,76 +1,70 @@
 import {
-  levelTiles,
   lightningTicks,
-  speed60Ticks,
-  speedrunTicks,
+  maxLives,
+  stages,
+  swiftTicks,
   tile,
 } from "./constants.ts";
 import type { State } from "./types.ts";
 
-// The marks a run earns, each decided by the state of the run alone. The words are in the manifest (`configs/games/bro-maria.ts`).
-// The list is a draft for the owner to approve. Every level is laid out to have enough of everything (shards, slimes, crates) for every
-// mark to be possible on every seed (`level.ts`).
+// The marks a run earns, each decided by the state of the run alone. The words are in the manifest (`configs/games/bro-maria.ts`). The list is
+// a draft for the owner to approve. A run is `stages` stages, so the counts (shards, slimes, crates) are for the whole run, and the marks about
+// how a stage was played count the stages that were played that way. Every stage is laid out to have enough of everything (shards, slimes,
+// crates) for every mark to be possible on every seed (`level.ts`).
 export const coinsTaken = (state: State): number =>
-  state.coinsTaken.filter(Boolean).length;
+  state.coinsBanked + state.coinsTaken.filter(Boolean).length;
 
 const finished = (state: State): boolean => state.finishTick !== null;
-const finishedWithin = (state: State, ticks: number): boolean =>
-  state.finishTick !== null && state.finishTick <= ticks;
-const clean = (state: State): boolean => state.hits === 0 && state.deaths === 0;
 
 const marks: readonly (readonly [string, (state: State) => boolean])[] = [
   // How far
-  ["first-steps", (s) => s.farthest >= 10],
-  ["tile-25", (s) => s.farthest >= 25],
-  ["quarter-way", (s) => s.farthest >= levelTiles / 4],
-  ["tile-75", (s) => s.farthest >= 75],
-  ["halfway", (s) => s.checkpoint],
-  ["tile-125", (s) => s.farthest >= 125],
-  ["three-quarters", (s) => s.farthest >= (levelTiles * 3) / 4],
-  ["tile-175", (s) => s.farthest >= 175],
+  ["first-steps", (s) => s.stage > 1 || s.farthest >= 10],
+  ["tile-100", (s) => s.stage > 1 || s.farthest >= 100],
+  ["halfway", (s) => s.stage > 1 || s.checkpoint],
+  ["stage-2", (s) => s.stagesCleared >= 1],
+  ["stage-3", (s) => s.stagesCleared >= 2],
+  ["stage-4", (s) => s.stagesCleared >= 3],
+  ["stage-5", (s) => s.stagesCleared >= 4],
+  ["stage-6", (s) => s.stagesCleared >= 5],
   ["finish", finished],
   // Shards
   ["first-coin", (s) => coinsTaken(s) >= 1],
-  ["coins-5", (s) => coinsTaken(s) >= 5],
   ["coins-10", (s) => coinsTaken(s) >= 10],
   ["coins-25", (s) => coinsTaken(s) >= 25],
-  ["coins-40", (s) => coinsTaken(s) >= 40],
   ["coins-50", (s) => coinsTaken(s) >= 50],
-  ["coins-65", (s) => coinsTaken(s) >= 65],
+  ["coins-100", (s) => coinsTaken(s) >= 100],
+  ["coins-175", (s) => coinsTaken(s) >= 175],
+  ["coins-250", (s) => coinsTaken(s) >= 250],
   // Slimes
   ["first-stomp", (s) => s.stomps >= 1],
-  ["stomps-3", (s) => s.stomps >= 3],
   ["stomps-5", (s) => s.stomps >= 5],
-  ["stomps-8", (s) => s.stomps >= 8],
   ["stomps-10", (s) => s.stomps >= 10],
-  ["exterminator", (s) => s.stomps >= s.level.patrols.length],
+  ["stomps-20", (s) => s.stomps >= 20],
+  ["stomps-40", (s) => s.stomps >= 40],
+  ["stomps-70", (s) => s.stomps >= 70],
+  ["stomps-100", (s) => s.stomps >= 100],
   ["combo-2", (s) => s.bestCombo >= 2],
   ["combo-3", (s) => s.bestCombo >= 3],
   // Crates
   ["first-crate", (s) => s.crates >= 1],
-  ["crates-3", (s) => s.crates >= 3],
   ["crates-5", (s) => s.crates >= 5],
-  ["crates-8", (s) => s.crates >= 8],
-  // How a level was finished
-  ["untouched", (s) => finished(s) && clean(s)],
+  ["crates-12", (s) => s.crates >= 12],
+  ["crates-24", (s) => s.crates >= 24],
+  // How the stages were played
+  ["clean-stage", (s) => s.cleanStages >= 1],
+  ["clean-stages-3", (s) => s.cleanStages >= 3],
+  ["flawless", (s) => finished(s) && s.cleanStages >= stages],
   ["pit-proof", (s) => finished(s) && s.deaths === 0],
-  ["second-wind", (s) => finished(s) && s.deaths + s.hits >= 1],
   ["last-life", (s) => finished(s) && s.lives === 1],
-  ["speed-60", (s) => finishedWithin(s, speed60Ticks)],
-  ["speedrun", (s) => finishedWithin(s, speedrunTicks)],
-  ["lightning", (s) => finishedWithin(s, lightningTicks)],
-  ["pacifist", (s) => finished(s) && s.stomps === 0],
-  ["collector", (s) => finished(s) && coinsTaken(s) === s.coinsTaken.length],
-  [
-    "all-rounder",
-    (s) => finished(s) && coinsTaken(s) >= 25 && s.stomps >= 5 && s.crates >= 3,
-  ],
-  // A little of everything, and a good start
+  ["five-lives", (s) => s.lives >= maxLives],
+  ["swift", (s) => s.fastest <= swiftTicks],
+  ["lightning", (s) => s.fastest <= lightningTicks],
+  ["collector", (s) => s.perfectStages >= 1],
+  ["collector-3", (s) => s.perfectStages >= 3],
   [
     "tasting-menu",
     (s) => coinsTaken(s) >= 10 && s.stomps >= 1 && s.crates >= 1,
   ],
-  ["clean-start", (s) => s.farthest >= 100 && clean(s)],
 ];
 
 export const milestoneIds = marks.map(([id]) => id);

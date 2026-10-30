@@ -3,20 +3,22 @@ import {
   bounceHeld,
   coinSize,
   hitKnock,
-  groundRow,
   invulnerableTicks,
+  lifeStages,
+  maxLives,
   playerHeight,
   playerWidth,
   rows,
   slimeHeight,
-  slimeSpeed,
   slimeWidth,
+  stages,
   stompDepth,
   tile,
   urchinHeight,
   urchinWidth,
 } from "./constants.ts";
 import { moveHero } from "./hero.ts";
+import { freshStage, startHero } from "./state.ts";
 import type { Hero, Slime, State } from "./types.ts";
 
 const touching = (
@@ -35,7 +37,7 @@ const walk = (state: State): readonly Slime[] =>
   state.slimes.map((slime, at) => {
     const patrol = state.level.patrols[at];
     if (!slime.alive || patrol === undefined) return slime;
-    const x = slime.x + slime.dir * slimeSpeed;
+    const x = slime.x + slime.dir * state.level.slimeSpeed;
     if (x <= patrol.minX) return { ...slime, dir: 1, x: patrol.minX };
     if (x >= patrol.maxX) return { ...slime, dir: -1, x: patrol.maxX };
     return { ...slime, x };
@@ -56,17 +58,37 @@ function lose(state: State, hero: Hero, fell: boolean): State {
   if (!fell)
     return { ...common, hero: { ...hero, grounded: false, vy: -hitKnock } };
   const column = state.checkpoint ? state.level.checkpointX : 2 * tile;
+  return { ...common, hero: { ...startHero(), x: column } };
+}
+
+// The stage the hero has just reached the goal of is counted (its time, its shards, whether it cost nothing), and, unless it was the last, the
+// next begins: a new level, the hero back at the start, and a life won on some stages.
+function cleared(state: State): State {
+  const taken = state.coinsTaken.filter(Boolean).length;
+  const took = state.tick - state.stageStart;
+  const counted: State = {
+    ...state,
+    cleanStages:
+      state.cleanStages +
+      (state.hits + state.deaths === state.stageLosses ? 1 : 0),
+    coinsBanked: state.coinsBanked + taken,
+    fastest: Math.min(state.fastest, took),
+    perfectStages:
+      state.perfectStages + (taken === state.coinsTaken.length ? 1 : 0),
+    stagesCleared: state.stagesCleared + 1,
+  };
+  if (state.stage >= stages) return { ...counted, finishTick: state.tick };
+  const stage = state.stage + 1;
   return {
-    ...common,
-    hero: {
-      buffer: 0,
-      coyote: 0,
-      grounded: true,
-      vx: 0,
-      vy: 0,
-      x: column,
-      y: groundRow * tile - playerHeight,
-    },
+    ...counted,
+    ...freshStage(state.seed, stage),
+    invulnerable: invulnerableTicks,
+    lives: lifeStages.some((won) => won === state.stage)
+      ? Math.min(maxLives, state.lives + 1)
+      : state.lives,
+    stage,
+    stageLosses: state.hits + state.deaths,
+    stageStart: state.tick,
   };
 }
 
@@ -136,13 +158,14 @@ export function tickOnce(state: State): State {
       hurt = true;
   if (hurt && next.invulnerable === 0) next = lose(next, next.hero, false);
   const tileColumn = Math.floor(next.hero.x / tile);
-  return {
+  const here: State = {
     ...next,
     checkpoint: next.checkpoint || next.hero.x >= level.checkpointX,
     farthest: Math.max(next.farthest, tileColumn),
-    finishTick:
-      next.hero.x + playerWidth >= level.goalX && !next.over ? next.tick : null,
   };
+  return here.hero.x + playerWidth >= level.goalX && !here.over
+    ? cleared(here)
+    : here;
 }
 
 // Plays the world on to `tick`: the same ticks the screen would have, with the controls as they were held.
