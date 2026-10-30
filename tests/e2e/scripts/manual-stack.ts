@@ -9,6 +9,7 @@ import { startDurableS3Runtime } from "@ador/test-kit/s3-durable";
 
 import {
   formatStackGuide,
+  resolveStackHost,
   resolveStackServer,
   stackActors,
 } from "../src/manual-stack.ts";
@@ -116,10 +117,10 @@ function freePort(): Promise<number> {
   });
 }
 
-function listen(server: Server, port: number): Promise<void> {
+function listen(server: Server, port: number, host: string): Promise<void> {
   return new Promise((resolveListen, reject) => {
     server.on("error", reject);
-    server.listen(port, "127.0.0.1", resolveListen);
+    server.listen(port, host, resolveListen);
   });
 }
 
@@ -218,7 +219,8 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
             startSession: ({ token }) => reviveSession(sessions, token),
             upstreamPort,
           });
-          await listen(frontDoor, Number(port));
+          const host = resolveStackHost();
+          await listen(frontDoor, Number(port), host);
           console.log(formatStackGuide({ baseURL }));
           console.log(`${describeChain(stackEnvironment)}`);
           console.log(`${describeMail(mailEnvironment)}\n`);

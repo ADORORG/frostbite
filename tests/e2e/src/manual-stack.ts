@@ -32,6 +32,17 @@ export function resolveStackServer(
   );
 }
 
+// The address the front door listens on. Loopback by default, because the stack's sign-in picker lets anyone who reaches it become any of
+// the people below; `STACK_HOST=0.0.0.0` (with `STACK_BASE_URL` set to this machine's address) opens it to the local network, for a phone.
+export const defaultStackHost = "127.0.0.1";
+
+export function resolveStackHost(
+  environment: NodeJS.ProcessEnv = process.env,
+): string {
+  const host = environment.STACK_HOST?.trim();
+  return host === undefined || host === "" ? defaultStackHost : host;
+}
+
 export interface StackActor {
   readonly goal: string;
   readonly id: string;
@@ -42,7 +53,7 @@ export interface StackActor {
 }
 
 // The people worth being, in the order a tour makes sense. Their sessions are fixed fixture tokens in a
-// throwaway database on this machine only; the server is bound to the loopback address.
+// throwaway database on this machine only; the front door is bound to the loopback address unless STACK_HOST opens it.
 export const stackActors: readonly StackActor[] = [
   {
     id: "creator",

@@ -59,7 +59,11 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   session cookie is secure, so use Chrome or Firefox on `localhost`.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
-- Everything is disposable and local: the server binds the loopback address, the session tokens are fixed
+- To open the stack on a phone on the same network, run `STACK_HOST=0.0.0.0 STACK_BASE_URL=http://<this machine's address>:4174 pnpm stack`
+  (the address is the one in `hostname -I`). Games and pages work; sign-in does not, because the session cookie is
+  `Secure` and a browser keeps it only over HTTPS or on `localhost`. Open the port in the firewall if one is on. The
+  sign-in picker lets anyone who reaches it become any seeded person, so use it only on a network you trust.
+- Everything is disposable and local: the server binds the loopback address (unless `STACK_HOST` is set), the session tokens are fixed
   fixtures of a throwaway database and storage is MinIO (never real R2). The only real thing is the rewards
   chain above, when one is set. Never run it on a shared host.
 - Docker is required (as for the integration tests).
