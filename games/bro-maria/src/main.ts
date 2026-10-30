@@ -1,3 +1,4 @@
+import { drawGuide } from "@ador/game-sdk/guide";
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
@@ -23,6 +24,7 @@ import { coinsTaken } from "./rules/milestones.ts";
 import { scoreOf } from "./score.ts";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachHands } from "./screen/controls.ts";
+import { guide } from "./guide.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
@@ -74,6 +76,9 @@ const sound = setUpSound({
   track,
 });
 
+// What the screen shows before a first run: the start of the level, with the guide over it. It is never played and never recorded.
+const waiting = createRunSession({ seed: 1 });
+
 function show(): void {
   const state = session?.state();
   scoreOut.textContent = String(state === undefined ? 0 : scoreOf(state));
@@ -82,7 +87,9 @@ function show(): void {
   timeOut.textContent = String(
     Math.ceil((maxTicks - (state?.tick ?? 0)) / ticksPerSecond),
   );
-  if (context !== null && state !== undefined) draw(context, state);
+  if (context === null) return;
+  draw(context, state ?? waiting.state());
+  if (session === null) drawGuide(context, screenWidth, screenHeight, guide);
 }
 
 function listEarned(ids: readonly string[]): void {

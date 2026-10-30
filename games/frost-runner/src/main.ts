@@ -1,3 +1,4 @@
+import { drawGuide } from "@ador/game-sdk/guide";
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
@@ -22,6 +23,7 @@ import {
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachControls } from "./screen/controls.ts";
 import { ticksPerSecond } from "./rules/constants.ts";
+import { guide } from "./guide.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
@@ -73,13 +75,17 @@ const sound = setUpSound({
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 
+// What the screen shows before a first run: the first stretch of the course, with the guide over it. It is never played and never recorded.
+const waiting = createRunSession({ seed: 1 });
+
 function show(): void {
   const state = session?.state();
   distance.textContent = String(state === undefined ? 0 : metres(state));
   shards.textContent = String(state?.shardsTaken ?? 0);
   bestOut.textContent = String(progress.best);
-  if (context !== null && state !== undefined)
-    draw(context, state, progress.best);
+  if (context === null) return;
+  draw(context, state ?? waiting.state(), progress.best);
+  if (session === null) drawGuide(context, screenWidth, screenHeight, guide);
 }
 
 function listEarned(ids: readonly string[]): void {

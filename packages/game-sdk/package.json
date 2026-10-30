@@ -23,6 +23,7 @@
     "./host": "./src/host.ts",
     "./local-backend": "./src/local-backend.ts",
     "./pause": "./src/pause.ts",
+    "./guide": "./src/guide.ts",
     "./pixels": "./src/pixels.ts",
     "./play": "./src/play.ts",
     "./policy": "./src/policy.ts",
@@ -150,6 +151,10 @@
       "./pause": {
         "types": "./dist/pause.d.ts",
         "default": "./dist/pause.js"
+      },
+      "./guide": {
+        "types": "./dist/guide.d.ts",
+        "default": "./dist/guide.js"
       },
       "./pixels": {
         "types": "./dist/pixels.d.ts",

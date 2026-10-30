@@ -1,3 +1,4 @@
+import { fillGuide } from "@ador/game-sdk/guide";
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
@@ -20,6 +21,7 @@ import {
 } from "./progress.ts";
 import { attachControls } from "./screen/controls.ts";
 import { showBoard } from "./screen/board-view.ts";
+import { guide } from "./guide.ts";
 import { createDropSession, type DropSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the network.
@@ -86,7 +88,11 @@ function show(previous: readonly number[] | null = null): void {
   );
 }
 
+const guideBox = element("guide", "div");
+fillGuide(guideBox, guide);
+
 function setRunning(running: boolean): void {
+  if (running) guideBox.hidden = true;
   startButton.textContent = session === null ? "Start run" : "New run";
   for (const button of pad.querySelectorAll("button"))
     button.disabled = !running;

@@ -1,3 +1,4 @@
+import { drawGuide } from "@ador/game-sdk/guide";
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
@@ -23,6 +24,7 @@ import { cameraTarget, easeCamera } from "./screen/camera.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { screenHeight, screenWidth } from "./screen/layout.ts";
+import { guide } from "./guide.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
@@ -95,6 +97,7 @@ function show(after = 0): void {
     slabs: shown.slabs(),
     state,
   });
+  if (session === null) drawGuide(context, screenWidth, screenHeight, guide);
 }
 
 function listEarned(ids: readonly string[]): void {
