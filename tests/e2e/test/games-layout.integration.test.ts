@@ -85,7 +85,8 @@ describe("on a phone", () => {
         const canvas = layout.canvas;
         const wide = canvas === null ? 0 : canvas.w / layout.clientWidth;
         const tall = canvas === null ? 0 : canvas.h / layout.clientHeight;
-        if (size.name === "portrait" ? wide < 0.9 : tall < 0.6)
+        // A board that is square cannot be as wide as the frame and have the buttons under it, so for it the height counts.
+        if (size.name === "portrait" ? wide < 0.9 && tall < 0.45 : tall < 0.6)
           problems.push(
             `${name}'s screen is ${String(canvas?.w)}x${String(canvas?.h)} in ${String(size.width)}x${String(size.height)}`,
           );

@@ -1,4 +1,5 @@
 @import "@ador/game-sdk/audio/panel.css";
+@import "@ador/game-sdk/phone.css";
 @import "./guide.css";
 
 :root {
