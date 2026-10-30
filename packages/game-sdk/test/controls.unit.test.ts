@@ -3,7 +3,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { attachKeys, standardKeys, type Phase } from "../src/controls.ts";
-import { createPause } from "../src/pause.ts";
+import { createPause, pauseCopy } from "../src/pause.ts";
 
 afterEach(() => document.body.replaceChildren());
 
@@ -201,5 +201,12 @@ describe("pausing", () => {
     pause.toggle();
     pause.toggle();
     expect(told).toEqual(["a", "b", "b"]);
+  });
+});
+
+describe("the words for pausing", () => {
+  it("name the button for each state and say how to carry on", () => {
+    expect(pauseCopy.pause).not.toBe(pauseCopy.resume);
+    expect(pauseCopy.paused).toContain("P");
   });
 });

@@ -1,7 +1,7 @@
 import { createSound } from "../../src/audio/engine.ts";
 import { defaultSound } from "../../src/audio/settings.ts";
 import type { Track } from "../../src/audio/tracks.ts";
-import { FakeContext, manualTimer } from "./fake-audio.ts";
+import { FakeContext, manualTimer } from "../../src/audio/fake.ts";
 
 export const song: Track = {
   name: "song",

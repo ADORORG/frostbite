@@ -56,6 +56,12 @@ the account and (later) minting; the game owns only its rules and its drawing.
   stopped from scrolling the page or pressing a focused button. `./pause`: `createPause()` is the one place a game, its screen and its
   sound agree whether it is paused. Pausing adds no input and no tick, so a paused run replays like any other; a game restarts its clock
   from now on resume.
+- `./run-loop`: `createRunLoop({ frame, pause, ticksPerSecond, page })` is the loop of a real-time game. `launch(prepare)` starts a run (never a second
+  one while one is going or being prepared), the loop turns the clock into whole ticks and asks for one animation frame at a time, a pause
+  stops the clock and a resume starts it again from now (the time paused is not counted), and a hidden tab pauses a run that is going.
+  `active()` is true while a run is going and not paused, which is when the player's choices count.
+- `./audio/fake`: a stand-in for the browser's audio for a game's own tests (`installFakeAudio(window)` returns a context that notes each
+  tone asked of it), so a test can hear that a game made a sound without a speaker.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 

@@ -6,10 +6,10 @@ import type {
   NoiseSourceLike,
   OscillatorLike,
   ParamLike,
-} from "../../src/audio/context.ts";
-import type { Timer } from "../../src/audio/engine.ts";
+} from "./context.ts";
+import type { Timer } from "./engine.ts";
 
-// A stand-in for the browser's audio that writes down what was asked of it.
+// A stand-in for the browser's audio that writes down what was asked of it, for the tests of a game and of the SDK itself.
 export interface Started {
   readonly at: number;
   readonly from: number;
@@ -119,4 +119,20 @@ export function manualTimer(): Timer & { fire(): void; stopped: boolean } {
     stopped: false,
   };
   return timer;
+}
+
+// Puts the fake where a page looks for the browser's audio, with a clock that runs in real time so music is scheduled as it would be.
+export function installFakeAudio(target: object): FakeContext {
+  const context = new FakeContext();
+  const began = performance.now();
+  Object.defineProperty(context, "currentTime", {
+    get: () => (performance.now() - began) / 1000,
+  });
+  Object.defineProperty(target, "AudioContext", {
+    configurable: true,
+    value: function FakeAudioContext() {
+      return context;
+    },
+  });
+  return context;
 }

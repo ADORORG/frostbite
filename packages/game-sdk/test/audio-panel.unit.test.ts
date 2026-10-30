@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { createSound } from "../src/audio/engine.ts";
 import { mountSoundPanel, panelCopy } from "../src/audio/panel.ts";
 import { defaultSound } from "../src/audio/settings.ts";
-import { FakeContext, manualTimer } from "./support/fake-audio.ts";
+import { FakeContext, manualTimer } from "../src/audio/fake.ts";
 
 afterEach(() => document.body.replaceChildren());
 

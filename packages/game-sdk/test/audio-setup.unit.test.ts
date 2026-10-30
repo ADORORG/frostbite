@@ -7,7 +7,7 @@ import { setUpSound } from "../src/audio/setup.ts";
 import { defaultSound } from "../src/audio/settings.ts";
 import type { Track } from "../src/audio/tracks.ts";
 import { createPause } from "../src/pause.ts";
-import { FakeContext } from "./support/fake-audio.ts";
+import { FakeContext, installFakeAudio } from "../src/audio/fake.ts";
 
 const track: Track = {
   name: "t",
@@ -132,5 +132,16 @@ describe("a game's sound, set up in one call", () => {
     });
     document.dispatchEvent(new Event("visibilitychange"));
     expect(context.state).toBe("running");
+  });
+});
+
+describe("the fake audio a game's test installs", () => {
+  it("is what a page gets for its AudioContext, with a clock that moves", async () => {
+    const target = {};
+    const installed = installFakeAudio(target);
+    expect(Reflect.get(target, "AudioContext")).toBeTypeOf("function");
+    const first = installed.currentTime;
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    expect(installed.currentTime).toBeGreaterThan(first);
   });
 });

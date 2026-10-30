@@ -1,3 +1,10 @@
+// The words a game uses for pausing, so every game says it the same way.
+export const pauseCopy = {
+  pause: "Pause",
+  paused: "Paused. Press P or the button to carry on.",
+  resume: "Resume",
+} as const;
+
 // Whether a game is paused, kept in one place so the screen, the sound and the clock agree. Pausing changes nothing in a run's rules:
 // no ticks pass and no inputs are recorded, so a paused run replays exactly like one that was not. A game that keeps time must start
 // its clock again from "now" when it resumes, or the time spent paused would count.
