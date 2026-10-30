@@ -124,7 +124,7 @@ Every game on the platform behaves the same way, and the SDK has the pieces so a
 - **Tests without a speaker** (`@ador/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
   test can check that a game made a sound, stopped its music, or stayed quiet while paused.
 
-Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker and Bro Maria use all of it. FROST·BITE's two replayable cabinets use the sound and the
+Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker, Bro Maria and Snowball Dash use all of it. FROST·BITE's two replayable cabinets use the sound and the
 Enter key (SAT SNAKE also pauses); the rest of FROST·BITE keeps its own audio.
 
 ## Talking to the platform
