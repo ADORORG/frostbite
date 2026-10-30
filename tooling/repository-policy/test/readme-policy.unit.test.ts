@@ -78,15 +78,24 @@ describe("the README policy", () => {
     ).toEqual(["pkg's README.md has no Ownership section."]);
   });
 
-  it("counts a README of exactly the minimum length as long enough", async () => {
-    const lines = Array.from({ length: minimumReadmeLines - 3 }, () => "text");
-    const exact = `# t\n${lines.join("\n")}\n## Ownership\n\ntest\n`.split(
-      "\n",
-    );
-    expect(exact.length).toBeGreaterThanOrEqual(minimumReadmeLines);
-    const short = exact.slice(0, minimumReadmeLines - 1).join("\n");
-    expect(await findReadmeViolations([await workspaceWith(short)])).toContain(
+  it("counts a README of exactly the minimum length as long enough, and one line fewer as too short", async () => {
+    const withLines = (count: number): string =>
+      [
+        "## Ownership",
+        "test",
+        ...Array.from({ length: count - 2 }, () => "text"),
+      ].join("\n");
+    expect(
+      await findReadmeViolations([
+        await workspaceWith(withLines(minimumReadmeLines)),
+      ]),
+    ).toEqual([]);
+    expect(
+      await findReadmeViolations([
+        await workspaceWith(withLines(minimumReadmeLines - 1)),
+      ]),
+    ).toEqual([
       `pkg's README.md is under ${String(minimumReadmeLines)} lines.`,
-    );
+    ]);
   });
 });
