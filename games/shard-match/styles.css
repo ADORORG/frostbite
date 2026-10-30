@@ -235,3 +235,9 @@ button:focus-visible {
     transition: none !important;
   }
 }
+
+/* The tall screen (a phone held upright) is a little taller than it is wide: the biggest such box that fits what is left of the page. */
+canvas[data-shape="tall"] {
+  inline-size: min(100cqw, 100cqh * 90 / 108);
+  aspect-ratio: 90 / 108;
+}

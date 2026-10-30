@@ -58,8 +58,7 @@
   body main > section h2 {
     display: none;
   }
-  body main .score,
-  body main .meter {
+  body main .score {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
@@ -67,6 +66,16 @@
     min-inline-size: 0;
     overflow: hidden;
     font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  /* A line of words and numbers, not a row of parts, so it stays one line of text. */
+  body main .meter {
+    display: block;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: 0.75rem;
+    text-align: start;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
   body main #status {
@@ -163,11 +172,14 @@
   body main > section {
     display: none;
   }
-  body main .score,
-  body main .meter {
+  body main .score {
     display: flex;
     flex-wrap: wrap;
     gap: 0 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  body main .meter {
     font-size: 0.75rem;
     line-height: 1.2;
   }

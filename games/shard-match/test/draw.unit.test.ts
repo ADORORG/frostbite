@@ -23,6 +23,7 @@ const view = (phase: View["phase"], more: Partial<View> = {}): View => ({
   hint: [],
   newBest: false,
   phase,
+  shape: "wide",
   toast: null,
   ...more,
 });

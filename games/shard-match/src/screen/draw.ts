@@ -2,7 +2,8 @@ import { block } from "@ador/game-sdk/pixels";
 
 import { cells } from "../rules/constants.ts";
 import type { MatchState } from "../rules/state.ts";
-import { banner, cards, praise, side } from "./hud.ts";
+import { cards } from "./cards.ts";
+import { banner, praise, side, strip } from "./hud.ts";
 import {
   boardX,
   boardY,
@@ -10,8 +11,7 @@ import {
   cell,
   cellX,
   cellY,
-  screenHeight,
-  screenWidth,
+  sizeOf,
 } from "./layout.ts";
 import { colour } from "./palette.ts";
 import { placeOf } from "./particles.ts";
@@ -43,7 +43,8 @@ export function draw(
 ): void {
   context.setTransform(canvasScale, 0, 0, canvasScale, 0, 0);
   context.imageSmoothingEnabled = false;
-  block(context, colour.back, 0, 0, screenWidth, screenHeight);
+  const size = sizeOf(view.shape);
+  block(context, colour.back, 0, 0, size.width, size.height);
   context.save();
   context.translate(scene?.shake ?? 0, 0);
   block(
@@ -92,7 +93,7 @@ export function draw(
       frame(context, colour.grab, cellX(view.grab), cellY(view.grab), cell);
   }
   context.restore();
-  side(context, state, view, scene);
+  (view.shape === "tall" ? strip : side)(context, state, view, scene);
   if (scene !== null) {
     praise(context, scene);
     if (scene.banner) banner(context, state.level - 1, bonus);

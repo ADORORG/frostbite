@@ -78,6 +78,10 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   chain above, when one is set. Never run it on a shared host.
 - Docker is required (as for the integration tests).
 
+## Games layout guard
+
+`test/games-layout.integration.test.ts` builds every game, serves it and measures it in a browser. On a phone (390x520 upright, 750x198 on its side, the frames the platform gives a game on an iPhone 13) no game may scroll and its screen must take the frame. On a desktop (1280x800, 1440x900) every named part of every game must be where `fixtures/games-desktop-layout.json` says, so a change made for phones cannot move anything there. Change the desktop on purpose with `UPDATE_GAME_LAYOUT=1 pnpm test:integration` and review the diff of the fixture.
+
 ## Verification
 
 `typecheck`, `test:unit`, `test:integration`, `test:coverage` cover `src/`; the scripts are exercised by

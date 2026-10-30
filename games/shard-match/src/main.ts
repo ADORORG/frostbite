@@ -25,7 +25,8 @@ import { neighbour } from "./rules/board.ts";
 import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
-import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
+import { draw } from "./screen/draw.ts";
+import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
 import type { View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
@@ -60,6 +61,7 @@ let view: View = {
   hint: [],
   newBest: false,
   phase: "ready",
+  shape: "wide",
   toast: null,
 };
 
@@ -278,17 +280,17 @@ async function connect(): Promise<void> {
   show();
 }
 
-screen.width = screenWidth * canvasScale;
-screen.height = screenHeight * canvasScale;
-setText(totalOut, String(milestoneIds.length));
-attachControls(screen, {
-  grab,
-  move,
-  pause: togglePause,
-  start: startFromKey,
-  swap,
-  tap,
+watchShape(phoneMedia(), (shape) => {
+  view = { ...view, shape };
+  fitCanvas(screen, shape);
+  show();
 });
+setText(totalOut, String(milestoneIds.length));
+attachControls(
+  screen,
+  { grab, move, pause: togglePause, start: startFromKey, swap, tap },
+  () => view.shape,
+);
 pauseButton.addEventListener("click", togglePause);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);

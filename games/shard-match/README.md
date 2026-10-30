@@ -37,6 +37,10 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
   DELICIOUS! DIVINE!, BOMB!, STAR!) rise over the board. A new swap made while one is still playing ends that playback at once. None of it is read by
   the rules: the rules play a swap in one go, and the screen plays the same steps (`src/screen/trace.ts`) back.
 
+## The tall screen
+
+On a phone held upright (`(max-width: 46rem) and (orientation: portrait)`, the same query the SDK's phone stylesheet uses) the screen is 90x108 instead of 160x90: the board is in the same place and the writing is in rows under it (`screen/hud.ts` `strip`), with shorter lines on the cards that say Start, not Enter (`screen/cards.ts`). `screen/shape.ts` watches the query and fits the canvas; touches are read by the size of the shape shown.
+
 ## Milestones
 
 Forty, all decided by the state of a run alone (`src/rules/milestones.ts`): the first swap, and ladders of score (1,000 to 300,000), levels

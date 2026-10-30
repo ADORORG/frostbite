@@ -2,7 +2,7 @@ import { block } from "@ador/game-sdk/pixels";
 
 import { frostFor, goalOf, type MatchState } from "../rules/state.ts";
 import { praiseFrames, type Scene } from "./scene.ts";
-import { screenHeight, screenWidth, sideX } from "./layout.ts";
+import { screenWidth, sideX } from "./layout.ts";
 import { colour, frostColour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -121,57 +121,56 @@ export function banner(
     );
 }
 
-function card(
-  context: CanvasRenderingContext2D,
-  lines: readonly (readonly [string, string, number])[],
-): void {
-  context.globalAlpha = 0.84;
-  block(context, colour.back, 0, 0, screenWidth, screenHeight);
-  context.globalAlpha = 1;
-  lines.forEach(([text, fill, size], index) => {
-    write(
-      context,
-      text,
-      screenWidth / 2,
-      20 + index * 12,
-      fill,
-      size,
-      "center",
-    );
-  });
-}
-
-export function cards(
+// On the tall screen the same news is in rows under the board: the level and the swaps left, what the goal is (or the latest news) and the score,
+// and the bar of how far along the goal is.
+export function strip(
   context: CanvasRenderingContext2D,
   state: MatchState,
   view: View,
+  scene: Scene | null,
 ): void {
-  if (view.phase === "ready")
-    card(context, [
-      ["SHARD MATCH", colour.grab, 10],
-      ["SWAP TWO SHARDS: LINE UP THREE OR MORE", colour.text, 5],
-      ["REACH EACH LEVEL'S GOAL IN THE SWAPS GIVEN", colour.cursor, 5],
-      ["BREAK ALL THE FROST ON THE ICE LEVELS", colour.text, 5],
-      ["4 MAKE A BOMB, 5 A STAR - CHAINS PAY MORE", colour.grab, 5],
-      ["ENTER TO START", colour.textDim, 5],
-    ]);
-  if (view.phase === "over")
-    card(context, [
-      [
-        state.cause === "spent" ? "WHAT A RUN!" : "OUT OF SWAPS",
-        colour.danger,
-        8,
-      ],
-      [
-        `LEVELS ${String(state.levelsCleared)}   SCORE ${String(state.score)}`,
-        colour.text,
-        6,
-      ],
-      [
-        view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-        colour.grab,
-        6,
-      ],
-      ["ENTER TO PLAY AGAIN", colour.cursor, 5],
-    ]);
+  const goal = goalOf(state.level);
+  const frost = goal.kind !== "score";
+  const moves = scene?.moves ?? state.moves;
+  const width = 80;
+  write(context, `LEVEL ${String(state.level)}`, 5, 88, colour.text, 7);
+  write(
+    context,
+    `SWAPS ${String(moves)}`,
+    85,
+    88,
+    moves <= 3 ? colour.danger : colour.grab,
+    7,
+    "right",
+  );
+  const news = view.phase === "running" ? view.toast : null;
+  write(
+    context,
+    news ??
+      (goal.kind === "score"
+        ? `GOAL ${String(goal.target)}`
+        : `FROST ${String(state.frost.filter(Boolean).length)} LEFT`),
+    5,
+    97,
+    news === null ? (frost ? frostColour : colour.textDim) : colour.cursor,
+    5,
+  );
+  write(
+    context,
+    `SCORE ${String(scene?.score ?? state.score)}`,
+    85,
+    97,
+    colour.text,
+    5,
+    "right",
+  );
+  block(context, colour.panelLine, 5, 103, width, 3);
+  block(
+    context,
+    frost ? frostColour : colour.cursor,
+    5,
+    103,
+    Math.floor(width * progressOf(state)),
+    3,
+  );
 }
