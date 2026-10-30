@@ -33,6 +33,7 @@ describe("the platform's game list", () => {
       "icicle-drop",
       "tower-stack",
       "bro-maria",
+      "snowball-dash",
     ]);
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);

@@ -1,0 +1,163 @@
+@import "@ador/game-sdk/audio/panel.css";
+
+:root {
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: #0c0620;
+  color: #ece8ff;
+  font-family: system-ui, sans-serif;
+}
+/* The page is the whole frame: a slim bar above, the screen filling what is left, the controls below. */
+main {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  block-size: 100dvh;
+  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+}
+.bar,
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.foot #note {
+  flex: 1 1 14rem;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+h2 {
+  font-size: 1rem;
+}
+#status {
+  color: #b9aaec;
+  font-size: 0.875rem;
+}
+.score {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  color: #b9aaec;
+}
+.score strong {
+  color: #38e8ff;
+}
+canvas {
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  object-fit: contain;
+  border: 0.1875rem solid #3a2870;
+  border-radius: 0.5rem;
+  /* Where the picture does not reach (a window wider than 16:9) the sky and the ground carry on. */
+  background: linear-gradient(#0c0620, #2a1a63 77%, #e6f2ff 77%);
+  image-rendering: pixelated;
+  touch-action: manipulation;
+}
+/* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves. */
+#note {
+  block-size: 3rem;
+  overflow-y: auto;
+  color: #b9aaec;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+button {
+  min-height: 2.75rem;
+  min-inline-size: 5.5rem;
+  padding: 0.5rem 1.25rem;
+  border: 0.125rem solid #38e8ff;
+  border-radius: 0.5rem;
+  background: #1c1450;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* A button that is not offered keeps its place, so the one beside it does not slide into it. */
+button[hidden] {
+  display: inline-block;
+  visibility: hidden;
+}
+#earned {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  block-size: 2.25rem;
+  gap: 0.375rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+#earned li {
+  padding: 0.25rem 0.625rem;
+  border: 0.125rem solid #56f5a6;
+  border-radius: 999px;
+  color: #56f5a6;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+canvas {
+  box-shadow:
+    0 0 2rem rgb(56 232 255 / 0.18),
+    inset 0 0 0 0.125rem #0c0620;
+}
+
+/* Polish: a glowing title, a framed screen, and buttons that answer a hand. */
+h1 {
+  background: linear-gradient(90deg, #ece8ff, #38e8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.score span {
+  padding: 0.125rem 0.625rem;
+  border: 0.125rem solid #2a1a5e;
+  border-radius: 999px;
+  background: #12082b;
+}
+button {
+  box-shadow: 0 0.25rem 0 #0e5f74;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background 120ms ease;
+}
+button:hover:not(:disabled),
+button:focus-visible {
+  background: #271d6b;
+}
+button:active:not(:disabled) {
+  transform: translateY(0.125rem);
+  box-shadow: 0 0.125rem 0 #0e5f74;
+}
+button:focus-visible {
+  outline: 0.1875rem solid #ffd23f;
+  outline-offset: 0.125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

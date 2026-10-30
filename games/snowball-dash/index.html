@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Snowball Dash</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="bar">
+        <header>
+          <h1>Snowball Dash</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Distance <strong id="distance">0</strong> m</span>
+          <span>Rocks <strong id="rocks">0</strong></span>
+          <span>Best <strong id="best">0</strong> m</span>
+        </p>
+      </div>
+      <canvas
+        id="screen"
+        width="160"
+        height="90"
+        role="img"
+        aria-label="The game screen: a snowball rolling down a snowy slope towards rocks it must hop over"
+      ></canvas>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+          <button id="hop" type="button" disabled>Hop</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>

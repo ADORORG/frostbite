@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0c0620" />
+      <stop offset="1" stop-color="#2a1a63" />
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)" />
+  <g fill="#9d8cff">
+    <rect x="160" y="90" width="8" height="8" />
+    <rect x="420" y="190" width="8" height="8" />
+    <rect x="760" y="70" width="8" height="8" />
+    <rect x="1100" y="150" width="8" height="8" />
+    <rect x="1380" y="80" width="8" height="8" />
+    <rect x="1480" y="260" width="8" height="8" />
+  </g>
+  <polygon points="0,560 380,470 820,520 1200,430 1600,500 1600,900 0,900" fill="#3a2a78" />
+  <polygon points="0,640 1600,720 1600,900 0,900" fill="#e6f2ff" />
+  <polygon points="0,680 1600,760 1600,775 0,695" fill="#a8dcff" />
+  <g>
+    <polygon points="1020,716 1050,660 1120,650 1160,720" fill="#6b5f9e" />
+    <polygon points="1020,716 1050,660 1120,650 1090,668" fill="#e6f2ff" />
+    <polygon points="1300,745 1330,690 1400,682 1440,750" fill="#6b5f9e" />
+    <polygon points="1300,745 1330,690 1400,682 1370,700" fill="#e6f2ff" />
+  </g>
+  <ellipse cx="640" cy="580" rx="90" ry="14" fill="#000" opacity="0.3" />
+  <path d="M520 560 L420 575 M530 590 L400 610 M540 530 L440 530" stroke="#38e8ff" stroke-width="8" stroke-linecap="round" opacity="0.6" />
+  <circle cx="640" cy="470" r="110" fill="#f4f9ff" />
+  <path d="M540 520 A110 110 0 0 0 750 520 A130 110 0 0 1 540 520 Z" fill="#a8dcff" />
+  <circle cx="610" cy="435" r="14" fill="#38e8ff" />
+  <text x="800" y="230" font-family="system-ui, sans-serif" font-size="150" font-weight="800" fill="#ece8ff" letter-spacing="6">SNOWBALL DASH</text>
+</svg>
