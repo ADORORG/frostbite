@@ -19,7 +19,9 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 ## Behaviour every game has
 
 - **Enter** starts or restarts (never throws away a run that is going). **P** pauses and resumes. Space pauses only if it is not the
-  game's main action. Use `attachKeys(window, standardKeys, handlers)`.
+  game's main action. Use `attachKeys(window, standardKeys, handlers)`. When the game's own action key is Enter (or Space), let the
+  same key start a run when none is going and act during one, as Tower Stacker and Snowball Dash do: that keeps both "Enter never
+  throws a run away" and a one-button game true. Map extra keys by spreading `standardKeys`: `{ ...standardKeys, Space: "hop" }`.
 - A visible **Pause** button, and a **sound panel** at the bottom left of the foot (`#sound`), never floating over the game.
 - **Sound**: `setUpSound({ container, effects, pause, save, track })`. Import the panel stylesheet. The panel says "Sound starts when
   you press a key" until the browser allows audio, and says so when there is no audio. Keep `SoundSettings` beside progress and
@@ -29,8 +31,10 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 - **A layout that does not move**: nothing under the player's thumb moves during a run. A button that is not offered keeps its place
   (`visibility: hidden`, not `display: none`); buttons have a fixed minimum width; the note, the earned list and the score row have
   heights that never grow; scores do not wrap.
-- **Touch**: for a game that needs more than one key, add on-screen buttons that appear on `@media (pointer: coarse)`, with
-  `disabled` while no run is going.
+- **Touch**: a one-button game takes a tap on the canvas (and may have an on-screen button). A game that needs more than one key adds
+  on-screen buttons that appear on `@media (pointer: coarse)`, with `disabled` while no run is going.
+- **Styles**: copy the stylesheet of the closest finished game and change its colours; it already has the steady layout, the sound
+  panel's place, the `visibility` rule for hidden buttons and the touch rules. Do not write a layout from nothing.
 - **Plays without the platform**: a failed `ready()` or `run.start()` shows a note and the game still starts on a seed of its own
   (its milestones are then self-reported).
 

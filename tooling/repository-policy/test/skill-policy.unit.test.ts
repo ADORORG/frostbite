@@ -126,6 +126,14 @@ describe("the skill policy", () => {
     ]);
   });
 
+  it("does not look for a path that has a placeholder in it", async () => {
+    await put(
+      "skills/demo/references/one.md",
+      "Write `configs/games/<id>.ts` for your game.\n",
+    );
+    expect(await findSkillViolations(root)).toEqual([]);
+  });
+
   it("requires the root scripts a file runs to exist, and lets pnpm's own commands through", async () => {
     await put(
       "skills/demo/references/one.md",

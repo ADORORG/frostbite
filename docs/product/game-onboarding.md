@@ -29,7 +29,7 @@ A game is a folder of reviewed source plus one manifest:
    folder, rename the package, write the manifest, add the two registry lines.)
 2. **Write the game** in `src/` (see "What the folder holds").
 3. **Edit the manifest** in `configs/games/<id>.ts`: `launch: { mode: "embedded" }`, and the milestones, whose ids
-   must be ones the game's code unlocks. Nothing else in the platform is edited.
+   must be ones the game's code unlocks. Add the id to the ordered list in `apps/web/test/games-config.unit.test.ts` too (`game:new` does not yet). Pin the verifier digest last, with `apps/web/test/games-verifiers.unit.test.ts`. Nothing else in the platform is edited.
 4. **Open a pull request.** The checks in "Checks every game passes" must pass.
 
 ```ts

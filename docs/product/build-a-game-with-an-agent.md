@@ -7,11 +7,11 @@ here is made, tested and submitted. You describe the game; the agent builds it t
 
 Pick the route that fits where you are. All three put the same folder in your project.
 
-| You have                                    | Run                                                                                                                | Needs                |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------- |
-| The SDK installed                           | `npx ador-game-skill install` (the command is the SDK's `bin` named `ador-game-skill`)                             | The SDK package      |
-| A public GitHub repository for the platform | `npx skills add <link to skills/build-a-game>`, add `-a claude-code` to choose the agent and `-g` for all projects | Node; no npm publish |
-| A checkout of the repository                | `ador-game-skill install --from skills/build-a-game`                                                               | The checkout         |
+| You have                                    | Run                                                                                                                       | Needs                |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| The SDK installed                           | `npx ador-game-skill install` (the command is the SDK's `bin` named `ador-game-skill`)                                    | The SDK package      |
+| A public GitHub repository for the platform | `npx skills add <link to skills/build-a-game>`, add `-a claude-code` to choose the agent and `-g` for all projects        | Node; no npm publish |
+| A checkout of the repository                | `node --experimental-strip-types packages/game-sdk/src/skill/bin.ts install --from skills/build-a-game` (no build needed) | The checkout         |
 
 `npx skills` (plural) is the open skills installer. `npx skill` (singular) is a different tool that installs into another product's
 folder; do not use it. `doctor` checks that the installed copy matches the SDK; `update` refreshes it; a copy you edited is kept

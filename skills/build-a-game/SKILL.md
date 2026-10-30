@@ -13,9 +13,12 @@ Read the references as you reach each step. Do not read them all first.
 
 ## Names you must look up, not guess
 
-The SDK's package name changes if the platform is renamed. Wherever these files write `<sdk>`, use the `name` in the SDK's
-`package.json` (in a project that installed it: `node_modules/<sdk>/package.json`; in the platform's repository: `packages/game-sdk`).
-Run `<sdk-bin> skill doctor` if you are unsure the skill matches the SDK you have.
+The SDK's package name changes if the platform is renamed. Wherever these files write `<sdk>` (as in `<sdk>/run-record`), write the
+SDK's real package name in your code. Find it in the `sdk` field of `.installed.json`, beside this file, or in the SDK's own
+`package.json` (in a project that installed it: `node_modules/<sdk>/package.json`; in the platform's repository:
+`packages/game-sdk`). The same goes for the test kit and the package scope of a game (copy a sibling game's `package.json`).
+To check this skill matches the SDK you have, run the SDK's skill command (the entry in its `package.json` `bin` that ends in
+`-skill`) with `doctor`.
 
 ## Steps
 
@@ -24,14 +27,22 @@ Run `<sdk-bin> skill doctor` if you are unsure the skill matches the SDK you hav
    anything they forbid.
 2. **Agree the game with the person.** Ask only what you cannot decide: title, how it is controlled (keyboard, touch, both), how a run
    ends, and 10 to 40 milestones, each one a thing the rules can decide (a score, a count, a time, a clear). A milestone that depends
-   on anything the rules cannot see cannot be replay-checked.
-3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. Outside it, copy
-   the structure in `references/game-pattern.md`. Never start from an empty folder.
+   on anything the rules cannot see cannot be replay-checked. Two milestones must never be earned by the same event (for example "300
+   metres" and "top speed", when top speed is reached at 300 metres): list the tick each is first earned on the sample run and check
+   they differ in meaning, not only in name.
+   If nobody can be asked, choose sensible defaults, write the title, summary and milestone list down as a **draft for the owner to
+   approve**, and say so in the manifest comment and in your report. The owner approves a game's words and milestones; you do not.
+3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. This gives a minimal
+   starter (a tap counter with `src/game.ts`), not the finished pattern: delete its `src/game.ts` and test, and build the layers in
+   `references/game-pattern.md`, copying the shape of the closest finished game (`references/worked-example.md`). Never start from an
+   empty folder. Outside the repository, copy that structure by hand.
 4. **Write the rules first, apart from the screen.** Pure and seeded: the same seed and inputs always give the same run. No clock,
    no `Math.random`, no I/O. See `references/game-pattern.md` and `references/milestones-and-verification.md`.
 5. **Add the screen, sound, keys, pause and a steady layout** with the SDK's pieces, never your own copies. See
    `references/game-pattern.md` and `references/sdk-cheatsheet.md`.
-6. **Write the manifest** and the milestones. See `references/milestones-and-verification.md`.
+6. **Write the manifest** and the milestones. A new game is registered in three places: its manifest `configs/games/<id>.ts`, the
+   list in `configs/games.ts` (both done by `game:new`), and the ordered list of ids in `apps/web/test/games-config.unit.test.ts`
+   (which `game:new` does not touch: add the id yourself). See `references/milestones-and-verification.md`.
 7. **Test, run, check.** See `references/test-and-launch.md`. Do not call the game finished until every command listed there has
    run and you have reported what each printed.
 8. **Hand over.** Summarise what was built, what was run and its output, what was not verified (how it looks and sounds, touch on a

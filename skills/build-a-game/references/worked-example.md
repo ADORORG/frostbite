@@ -1,23 +1,30 @@
 # A finished game: where each part lives
 
-These paths are in the platform's repository. Open the file when you need the real thing. `games/bro-maria` is a platformer; it has
-every part a game can have.
+These paths are in the platform's repository. Open the file when you need the real thing. Pick the closest game and copy its shape.
 
-| Part                                               | File                                                                                          |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Rules as a pure state machine                      | `games/bro-maria/src/rules/index.ts` (the `GameVerifier`), `tick.ts`, `hero.ts`, `collide.ts` |
-| Level generated from the seed                      | `src/rules/level.ts`                                                                          |
-| Milestones decided by the rules                    | `src/rules/milestones.ts`                                                                     |
-| One run as the player plays it                     | `src/session.ts`                                                                              |
-| Screen drawn from a state                          | `src/screen/draw.ts`, `sprites.ts`, `backdrop.ts`, `palette.ts`                               |
-| Touch and keyboard controls                        | `src/screen/controls.ts`                                                                      |
-| Music and effects as data                          | `src/audio.ts`, `src/feedback.ts`                                                             |
-| What is saved and how it is validated              | `src/progress.ts`                                                                             |
-| The page: joins everything to the platform         | `src/main.ts`, `index.html`, `styles.css`                                                     |
-| The verifier the platform replays                  | `src/replay.ts`, `src/sample-run.ts`                                                          |
-| The manifest and its pinned digest                 | `configs/games/bro-maria.ts`, registered in `configs/games.ts`                                |
-| A bot that plays the game in tests                 | `test/support/bot.ts`                                                                         |
-| Page tests (Enter, pause, sound, platform failure) | `test/page.integration.test.ts`, `test/support/page.ts`                                       |
+| You are building                                   | Closest game                                                   |
+| -------------------------------------------------- | -------------------------------------------------------------- |
+| One-button or tap game, real time, a seeded course | `games/frost-runner`, `games/icicle-drop`, `games/tower-stack` |
+| Several keys, a scrolling level, touch buttons     | `games/bro-maria`                                              |
+| Several replayable cabinets under one verifier     | `games/frostbite` (SAT SNAKE and the ice field)                |
 
-Three smaller games show the same pattern on a one-button input: `games/frost-runner`, `games/icicle-drop`, `games/tower-stack`.
-For a game with several replayable cabinets under one verifier, read `games/frostbite` (SAT SNAKE and the ice field).
+## The parts, in `games/frost-runner`
+
+| Part                                               | File                                                                                  |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Rules as a pure state machine (the `GameVerifier`) | `src/rules/index.ts`, with `constants.ts`, `types.ts` and the tick function beside it |
+| One run as the player plays it                     | `src/session.ts`                                                                      |
+| Screen drawn from a state                          | `src/screen/`                                                                         |
+| Keys and touch                                     | `src/screen/controls.ts`                                                              |
+| Music and effects as data                          | `src/audio.ts`, `src/feedback.ts`                                                     |
+| What is saved and how it is validated              | `src/progress.ts`                                                                     |
+| The page: joins everything to the platform         | `src/main.ts`, `index.html`, `styles.css`                                             |
+| The verifier the platform replays                  | `src/replay.ts`, `src/sample-run.ts`                                                  |
+| The manifest and its pinned digest                 | `configs/games/frost-runner.ts`, listed in `configs/games.ts`                         |
+| A bot that plays the game in tests                 | `test/support/bot.ts`                                                                 |
+| Proof the hardest milestones can be met            | `test/fairness.unit.test.ts`                                                          |
+| Page tests (keys, pause, sound, platform failure)  | `test/page.integration.test.ts`, `test/support/page.ts`                               |
+| Project config                                     | `package.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`              |
+
+`games/bro-maria` has the same parts for a platformer: rules in `src/rules/` (`level.ts` generates the level from the seed), a screen
+in `src/screen/`, touch buttons in `src/screen/controls.ts`.

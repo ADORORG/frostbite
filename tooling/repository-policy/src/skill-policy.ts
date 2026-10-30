@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // The AI skills the repository ships (`skills/<name>/`) are read by an agent that cannot ask what a line meant, so what they say must stay
 // true: the front matter is what an agent loads, every reference is linked from SKILL.md and exists, every repository path and root script
-// they name exists, and none of them hard-codes the platform's name (the SDK's package name is looked up, so a rename cannot leave a skill stale).
+// they name exists (a path with a `<placeholder>` in it is a pattern, not a file), and none of them hard-codes the platform's name (the SDK's package name is looked up, so a rename cannot leave a skill stale).
 export const maximumSkillLines = 500;
 export const maximumDescription = 1024;
 const pnpmBuiltins = new Set(["add", "dlx", "exec", "install", "run"]);
@@ -114,7 +114,11 @@ export async function findSkillViolations(
           `${name} names the platform ("${brand}"); say <sdk> and look the name up.`,
         );
       for (const [, path] of text.matchAll(repositoryPath))
-        if (path !== undefined && !(await exists(resolve(root, path))))
+        if (
+          path !== undefined &&
+          !path.includes("<") &&
+          !(await exists(resolve(root, path)))
+        )
           violations.push(`${name} names ${path}, which does not exist.`);
       for (const [, script] of text.matchAll(rootScript))
         if (

@@ -50,3 +50,29 @@ const stop = client.on("lifecycle.changed", ({ state }) => {}); // "paused" when
   player's own wallet in the platform's page; the game never sees a wallet, signature or transaction.
 - Events: `wallet.changed`, `claim.changed`, `lifecycle.changed`, `fullscreen.changed`, `player.changed`.
 - A method or event that exists never changes shape; new abilities are new methods.
+
+## Signatures the rules need
+
+Rules are a `GameVerifier<State>` (`<sdk>/run-record`): `{ id, version, init(seed, config), step(state, input), earned(state) }`.
+`init` and `step` return `Stepped<State>`: `{ ok: true, state }` or `{ ok: false, reason }`. They refuse; they never throw.
+`RunInput` is `{ type: string, data?: JsonValue }`.
+
+```ts
+// <sdk>/seeded: whole-number arithmetic on 32 bits, the same on every engine
+startState(seed: number): number                          // a non-zero generator state
+stepInt(state: number, below: number): { state: number; value: number }   // a whole number in [0, below)
+stepSeed(state: number): { state: number; value: number } // value in [0, 1)
+seeded(seed: number): () => number                        // a closure, for code that keeps no state value
+
+// <sdk>/run-inputs: check an input before acting on it
+refuse(reason: string): { ok: false; reason: string }
+fieldsOf(data, names: readonly string[]): Record<string, JsonValue> | string  // exactly these keys, or why not
+tickNamed(value, now: number, last: number): number | string  // a whole tick from `now` to `last`, or why not
+withFields(data, names, act: (fields) => Stepped<State>): Stepped<State>      // fieldsOf then act
+
+// <sdk>/run-record
+createRunRecorder({ config, gameId, seed, verifier, verifierVersion })  // .input(type, data), .finish(claims) -> RunRecord
+```
+
+A real-time game keeps no clock in its rules: each input names the `tick` it happened on, `step` replays the ticks since the last
+input (`advanceTo`), then applies the input. Keep `maxTicks` as the bound on the work one replay does.

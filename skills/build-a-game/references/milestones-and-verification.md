@@ -42,11 +42,16 @@ To make milestones `replay-verified` (only for milestones earned once, with no t
    Inputs are `{ type, data }`; refuse an input with a reason (`refuse`) instead of throwing. Take the tick of each input from the input
    and replay the ticks between. A run is closed with an `end` input; a run that is not closed is not counted past its last choice.
 2. `src/replay.ts`: `export default rules; export const sample = sampleRun;` where `sampleRun` is one legal, plain record
-   (not built with the recorder) that shows what the rules accept.
+   (not built with the recorder) that shows what the rules accept. Make it with a bot: a test helper (`test/support/bot.ts` in the
+   finished games) plays a seed with a simple strategy through the session, a throwaway test prints the record's inputs, and you
+   paste them in as literals. Check that the sample earns exactly the milestones its `claims` list names. A test that a careful bot
+   reaches the hardest milestones (`test/fairness.unit.test.ts` in the finished games) proves the goals can be met by a legal run.
 3. The SDK's build emits `verifier.js` and `verifier.json` beside the game. In the manifest add the `run:submit` capability,
    `verification: { replay: { id, sha256, version } }` with the digest from `verifier.json`, and `verification: "replay-verified"`
-   on each milestone the rules decide. A test prints the digest to pin when it does not match: **a change to the rules is a change to
-   the manifest**.
+   on each milestone the rules decide. The test that pins it is `apps/web/test/games-verifiers.unit.test.ts` (run it from
+   `apps/web` with `npx vitest run --project unit test/games-verifiers.unit.test.ts`): while the manifest's digest is a placeholder or
+   out of date it fails and prints `pin <digest>`. **Pin last.** A change to anything the verifier bundles (the rules, the constants,
+   the sample) changes the digest, so every time you touch the rules, run it again and re-pin.
 4. In the page: `play.runs.start()` for a seed (signed-in players get one; others get `unavailable` and play on a seed of their own,
    self-reported), record the run, `play.runs.submit(runId, record)` at the end. The answer is `verified`, `rejected` or `refused`.
 
