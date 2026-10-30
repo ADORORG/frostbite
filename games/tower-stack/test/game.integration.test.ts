@@ -1,80 +1,9 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-import { bundleGameScript } from "@ador/game-sdk/build";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
-import type { JsonValue } from "@ador/game-sdk/protocol";
-import {
-  runGameInSimulatedHost,
-  type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { milestoneIds } from "../src/rules/milestones.ts";
+import { byId, closeGame, play, settle } from "./support/page.ts";
 
-const root = join(import.meta.dirname, "..");
-const milestone = (id: string) => ({
-  claimPolicy: "once" as const,
-  criteria: id,
-  description: id,
-  id,
-  title: id,
-});
-const manifest = { id: "tower-stack", milestones: milestoneIds.map(milestone) };
-const settle = (ms = 60) => new Promise((resolve) => setTimeout(resolve, ms));
-
-let running: SimulatedGame | undefined;
-afterEach(() => running?.close());
-
-async function play(saved?: { best: number }) {
-  const stored: {
-    progress: JsonValue | null;
-    unlocked: Record<string, string>;
-  } = {
-    progress: saved ?? null,
-    unlocked: {},
-  };
-  const html = await readFile(join(root, "index.html"), "utf8");
-  const script = await bundleGameScript(join(root, "src/main.ts"));
-  running = runGameInSimulatedHost({
-    backend: {
-      counters: async () => ({}),
-      identity: async () => ({ id: "sample-player-0001", kind: "local" }),
-      loadProgress: async () => stored.progress,
-      reportProgress: async () => ({
-        current: 0,
-        newlyUnlocked: false,
-        unlockedAt: null,
-      }),
-      milestones: async () => ({}),
-      player: () => ({ signedIn: false, walletConnected: false }),
-      saveProgress: async (value) => void (stored.progress = value),
-      unlock: async (id, now) => {
-        const already = stored.unlocked[id];
-        stored.unlocked[id] ??= now.toISOString();
-        return {
-          alreadyUnlocked: already !== undefined,
-          count: 1,
-          counted: false,
-          unlockedAt: stored.unlocked[id] ?? "",
-        };
-      },
-    },
-    game: manifest,
-    html,
-    policy: {
-      ...defaultGameHostPolicy,
-      saveCallsPerMinute: 600,
-      unlockCallsPerMinute: 600,
-    },
-    script,
-  });
-  return { stored, window: running.window };
-}
-
-type GameWindow = Awaited<ReturnType<typeof play>>["window"];
-const byId = (window: GameWindow, id: string) =>
-  window.document.getElementById(id);
+afterEach(closeGame);
 
 describe("Tower Stacker, bundled and run against a simulated platform", () => {
   it("connects, and lets the player start only once it has", async () => {
@@ -111,45 +40,25 @@ describe("Tower Stacker, bundled and run against a simulated platform", () => {
     expect(start?.textContent).toBe("Run again");
     expect(start?.hasAttribute("hidden")).toBe(false);
     expect(byId(window, "note")?.textContent).toContain("your own claim");
-    expect(stored.progress).toEqual({ best: expect.any(Number) });
+    expect(stored.progress).toEqual({
+      best: expect.any(Number),
+      sound: defaultSound,
+    });
     expect(Number(byId(window, "height")?.textContent)).toBeGreaterThan(0);
   }, 40_000);
 
   it("says so when the platform does not answer, and can still be played", async () => {
-    const html = await readFile(join(root, "index.html"), "utf8");
-    const script = await bundleGameScript(join(root, "src/main.ts"));
-    running = runGameInSimulatedHost({
-      backend: {
-        counters: async () => ({}),
-        identity: async () => ({ id: "sample-player-0001", kind: "local" }),
-        reportProgress: async () => ({
-          current: 0,
-          newlyUnlocked: false,
-          unlockedAt: null,
-        }),
-        loadProgress: async () => {
-          throw new Error("down");
-        },
-        milestones: async () => ({}),
-        player: () => ({ signedIn: false, walletConnected: false }),
-        saveProgress: async () => undefined,
-        unlock: async () => ({
-          alreadyUnlocked: false,
-          count: 1,
-          counted: false,
-          unlockedAt: "",
-        }),
+    const { window } = await play(undefined, {
+      loadProgress: async () => {
+        throw new Error("down");
       },
-      game: manifest,
-      html,
-      script,
     });
     await settle();
-    expect(running.window.document.getElementById("status")?.textContent).toBe(
+    expect(window.document.getElementById("status")?.textContent).toBe(
       "The platform said: unavailable",
     );
     expect(
-      running.window.document.getElementById("start")?.hasAttribute("disabled"),
+      window.document.getElementById("start")?.hasAttribute("disabled"),
     ).toBe(false);
   });
 });

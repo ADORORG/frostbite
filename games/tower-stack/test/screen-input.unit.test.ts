@@ -1,19 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ticksPerSecond } from "../src/rules/constants.ts";
 import { cameraTarget, easeCamera } from "../src/screen/camera.ts";
-import { mostTicksAFrame, ticksIn } from "../src/screen/clock.ts";
 import { attachControls } from "../src/screen/controls.ts";
 import { rowsInView, slabHeight } from "../src/screen/layout.ts";
-
-describe("turning time into ticks", () => {
-  it("runs at the rate of the rules, a tick for each thirtieth of a second, and cuts a long pause short", () => {
-    const frame = 1000 / ticksPerSecond;
-    expect(ticksIn(0, frame * 2.5).ticks).toBe(2);
-    expect(ticksIn(0, 60_000)).toEqual({ carried: 0, ticks: mostTicksAFrame });
-  });
-});
 
 describe("the view rising with the tower", () => {
   it("stays put until the tower is as high as the view, then rises a block for each block", () => {
@@ -40,8 +30,10 @@ describe("the player's hands", () => {
     const target = document.createElement("div");
     document.body.append(target);
     const drop = vi.fn();
-    stops.push(attachControls(target, { drop }));
-    return { drop, target };
+    const pause = vi.fn();
+    const start = vi.fn();
+    stops.push(attachControls(target, { drop, pause, start }));
+    return { drop, pause, start, target };
   };
   const press = (code: string, repeat = false) => {
     const event = new KeyboardEvent("keydown", {
@@ -53,7 +45,7 @@ describe("the player's hands", () => {
     return event;
   };
 
-  it.each(["Space", "Enter", "ArrowDown", "KeyS"])(
+  it.each(["Space", "ArrowDown", "KeyS"])(
     "drops on %s, and the page does not scroll",
     (code) => {
       const { drop } = setup();
@@ -61,6 +53,17 @@ describe("the player's hands", () => {
       expect(drop).toHaveBeenCalledTimes(1);
     },
   );
+
+  it("starts on Enter and pauses on P, and neither drops the block", () => {
+    const { drop, pause, start } = setup();
+    expect(press("Enter").defaultPrevented).toBe(true);
+    press("NumpadEnter");
+    press("KeyP");
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+    expect(start).toHaveBeenCalledTimes(2);
+    expect(pause).toHaveBeenCalledTimes(1);
+    expect(drop).not.toHaveBeenCalled();
+  });
 
   it("ignores a held key, and a key that is not for the game", () => {
     const { drop } = setup();

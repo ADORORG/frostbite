@@ -1,28 +1,35 @@
-// What the player's hands can do: one key or one touch, anywhere on the screen, drops the block.
+import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+
+// What the player's hands can do: drop the block, and the keys every game shares (Enter starts, P pauses). Space drops here, since the
+// drop is what the hand is on; Enter drops too once a run is going, which the page decides.
 export interface Controls {
   readonly drop: () => void;
+  readonly pause: () => void;
+  readonly start: () => void;
 }
 
-const dropKeys = new Set(["Space", "Enter", "ArrowDown", "KeyS"]);
+const keys = {
+  ...standardKeys,
+  ArrowDown: "drop",
+  KeyS: "drop",
+  Space: "drop",
+} as const;
 
 // Keys on the page, and touches on the screen. Returns a function that stops listening.
 export function attachControls(
   target: HTMLElement,
   controls: Controls,
 ): () => void {
-  const onKey = (event: KeyboardEvent): void => {
-    if (event.repeat || !dropKeys.has(event.code)) return;
-    controls.drop();
-    event.preventDefault();
-  };
+  const stopKeys = attachKeys(window, keys, (action, phase) => {
+    if (phase === "down") controls[action]();
+  });
   const onPointer = (event: PointerEvent): void => {
     controls.drop();
     event.preventDefault();
   };
-  window.addEventListener("keydown", onKey);
   target.addEventListener("pointerdown", onPointer);
   return () => {
-    window.removeEventListener("keydown", onKey);
+    stopKeys();
     target.removeEventListener("pointerdown", onPointer);
   };
 }

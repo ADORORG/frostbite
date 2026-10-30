@@ -1,14 +1,25 @@
+import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
+import { createPause, pauseCopy } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import { createRunLoop } from "@ador/game-sdk/run-loop";
 import {
   startNote,
   submitNote,
   type SubmitState,
 } from "@ador/game-sdk/run-notes";
 
-import { freshProgress, restore, withBest, type Progress } from "./progress.ts";
+import { effects, perfectSound, track } from "./audio.ts";
+import { dropSounds, tempoScale, type DropSound } from "./feedback.ts";
+import { ticksPerSecond } from "./rules/constants.ts";
+import {
+  freshProgress,
+  restore,
+  withBest,
+  withSound,
+  type Progress,
+} from "./progress.ts";
 import { cameraTarget, easeCamera } from "./screen/camera.ts";
-import { ticksIn } from "./screen/clock.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { screenHeight, screenWidth } from "./screen/layout.ts";
@@ -36,6 +47,7 @@ const bestOut = element("best", "strong");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const dropButton = element("drop", "button");
+const pauseButton = element("pause", "button");
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -45,12 +57,25 @@ let session: RunSession | null = null;
 const waiting = createRunSession({ seed: 1 });
 let runId: string | null = null;
 let titles = new Map<string, string>();
-let carried = 0;
-let last = 0;
 let camera = 0;
+let heldNote = "";
 // Frames drawn after a run ends, so the block that missed can be seen falling away; a new run ends them.
 let falling = 0;
 const fallFrames = 45;
+
+const pause = createPause();
+const saveProgress = (): void =>
+  void client.progress.save({ best: progress.best, sound: progress.sound });
+const sound = setUpSound({
+  container: element("sound", "div"),
+  effects,
+  pause,
+  save: (settings) => {
+    progress = withSound(progress, settings);
+    saveProgress();
+  },
+  track,
+});
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 
@@ -86,7 +111,37 @@ function listEarned(ids: readonly string[]): void {
 function setRunning(running: boolean): void {
   startButton.hidden = running;
   dropButton.disabled = !running;
+  pauseButton.disabled = !running;
 }
+
+function hear(heard: DropSound): void {
+  if (heard.kind === "perfect") sound.play(perfectSound(heard.streak));
+  else sound.sfx(heard.kind);
+}
+
+pause.subscribe((paused) => {
+  pauseButton.textContent = paused ? pauseCopy.resume : pauseCopy.pause;
+  if (paused) {
+    heldNote = note.textContent;
+    note.textContent = pauseCopy.paused;
+  } else note.textContent = heldNote;
+});
+
+const loop = createRunLoop({
+  frame(ticks) {
+    const running = session;
+    if (running === null) return false;
+    for (let at = 0; at < ticks && !running.state().ended; at += 1)
+      running.tick();
+    show();
+    if (!running.state().ended) return true;
+    void finish(running);
+    return false;
+  },
+  page: document,
+  pause,
+  ticksPerSecond,
+});
 
 function fall(token: number, frames: number): void {
   if (token !== falling) return;
@@ -96,11 +151,12 @@ function fall(token: number, frames: number): void {
 
 async function finish(finished: RunSession): Promise<void> {
   setRunning(false);
+  sound.music(false);
   falling += 1;
   fall(falling, 0);
   const record = finished.record();
   progress = withBest(progress, finished.state().height);
-  void client.progress.save({ best: progress.best });
+  saveProgress();
   startButton.textContent = "Run again";
   if (runId === null || play === null) {
     note.textContent = submitNote(null);
@@ -115,53 +171,58 @@ async function finish(finished: RunSession): Promise<void> {
   note.textContent = submitNote(settled);
 }
 
-function frame(now: number): void {
-  const running = session;
-  if (running === null) return;
-  const step = ticksIn(carried, now - last);
-  carried = step.carried;
-  last = now;
-  for (let at = 0; at < step.ticks && !running.state().ended; at += 1)
-    running.tick();
-  show();
-  if (running.state().ended) void finish(running);
-  else requestAnimationFrame(frame);
-}
-
 function drop(): void {
   const running = session;
-  if (running === null || running.state().ended) return;
+  if (running === null || !loop.active()) return;
+  const before = running.state();
   running.drop();
+  const after = running.state();
+  for (const heard of dropSounds(before, after)) hear(heard);
+  sound.tempo(tempoScale(after.height));
   listEarned(running.earned());
   show();
-  if (running.state().ended) void finish(running);
+  if (after.ended) {
+    loop.stop();
+    void finish(running);
+  }
 }
 
-async function begin(): Promise<void> {
-  const started = await play?.runs.start().catch(() => null);
-  const ready = started?.status === "started" ? started : null;
-  runId = ready?.runId ?? null;
-  note.textContent = startNote(
-    started ?? null,
-    "Tap the screen (or press space) to drop the block. Land it on the tower: what hangs over is cut off.",
-  );
-  session = createRunSession({
-    onEarned: (id) => play?.report(id),
-    seed: ready?.seed ?? localSeed(),
+const begin = (): Promise<void> =>
+  loop.launch(async () => {
+    const started = await play?.runs.start().catch(() => null);
+    const ready = started?.status === "started" ? started : null;
+    runId = ready?.runId ?? null;
+    note.textContent = startNote(
+      started ?? null,
+      "Tap the screen (or press space) to drop the block. Land it on the tower: what hangs over is cut off.",
+    );
+    session = createRunSession({
+      onEarned: (id) => {
+        sound.sfx("milestone");
+        play?.report(id);
+      },
+      seed: ready?.seed ?? localSeed(),
+    });
+    listEarned([]);
+    setRunning(true);
+    falling += 1;
+    camera = 0;
+    sound.tempo(1);
+    sound.sfx("start");
+    sound.music(true);
   });
-  listEarned([]);
-  setRunning(true);
-  falling += 1;
-  carried = 0;
-  camera = 0;
-  last = performance.now();
-  requestAnimationFrame(frame);
+
+// Enter starts a run, and drops the block once one is going, as it always has.
+function enter(): void {
+  if (loop.running()) drop();
+  else if (!startButton.disabled) void begin();
 }
 
 async function connect(): Promise<void> {
   try {
     await client.ready();
     progress = restore(await client.progress.load());
+    sound.apply(progress.sound);
     play = await connectToPlatform(client);
     titles = new Map(
       (await client.milestones.list().catch(() => [])).map(({ id, title }) => [
@@ -182,8 +243,16 @@ async function connect(): Promise<void> {
 
 screen.width = screenWidth;
 screen.height = screenHeight;
-attachControls(screen, { drop });
+attachControls(screen, {
+  drop,
+  pause: () => void (loop.running() && pause.toggle()),
+  start: enter,
+});
 dropButton.addEventListener("click", drop);
+pauseButton.addEventListener(
+  "click",
+  () => void (loop.running() && pause.toggle()),
+);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 void connect();
