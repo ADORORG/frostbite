@@ -17,6 +17,7 @@ import { icicleDropGame } from "./games/icicle-drop.ts";
 import { towerStackGame } from "./games/tower-stack.ts";
 import { snowballDashGame } from "./games/snowball-dash.ts";
 import { lanternMazeGame } from "./games/lantern-maze.ts";
+import { shardMatchGame } from "./games/shard-match.ts";
 // game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
@@ -39,6 +40,7 @@ export const games = defineGames([
   broMariaGame,
   snowballDashGame,
   lanternMazeGame,
+  shardMatchGame,
   // game:new adds games above this line.
 ]);
 

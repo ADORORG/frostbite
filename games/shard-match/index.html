@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shard Match</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="bar">
+        <h1>Shard Match</h1>
+        <p id="status">Connecting to the platform…</p>
+        <p class="meter">
+          Milestones <strong id="count">0</strong> of <span id="total">40</span>
+        </p>
+      </div>
+      <div class="stage">
+        <canvas
+          id="screen"
+          width="640"
+          height="360"
+          role="img"
+          aria-label="The game screen: a board of eight by eight coloured shards. Swap two neighbouring shards to line up three or more of a kind; four make a bomb and five a star"
+        ></canvas>
+      </div>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
