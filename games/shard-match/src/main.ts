@@ -1,15 +1,17 @@
 import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
+import { createGameClient } from "@ador/game-sdk/client";
+import { createPause } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+import { startNote } from "@ador/game-sdk/run-notes";
 
 import { effects, track } from "./audio.ts";
-import { swapSounds, tempoFor, toastFor } from "./feedback.ts";
+import { tempoFor, toastFor } from "./feedback.ts";
+import { followPause, loadTitles, refusalNote, submitRun } from "./submit.ts";
+import { boxes, listEarned, setText } from "./dom.ts";
+import { hintFor, watchIdle } from "./hint.ts";
+import { createPlayback } from "./playback.ts";
+import { traceOf } from "./screen/trace.ts";
+import { buildTimeline } from "./screen/timeline.ts";
 import {
   freshProgress,
   restore,
@@ -17,7 +19,6 @@ import {
   withSound,
   type Progress,
 } from "./progress.ts";
-import { createFlash } from "./flash.ts";
 import { arrow, tapped, toggled, type Next } from "./picking.ts";
 import { type Direction } from "./rules/constants.ts";
 import { neighbour } from "./rules/board.ts";
@@ -30,30 +31,16 @@ import { createMatchSession, type MatchSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the network.
 // The rules, the session and the screen are in their own modules; this only joins them to the page and the platform.
-function element<Tag extends keyof HTMLElementTagNameMap>(
-  id: string,
-  tag: Tag,
-) {
-  const found = document.getElementById(id);
-  if (found === null || found.tagName.toLowerCase() !== tag)
-    throw new Error(`Missing #${id}`);
-  return found as HTMLElementTagNameMap[Tag];
-}
-
-// Writes text only if it differs, so a box that has not changed is not touched.
-function setText(box: HTMLElement, text: string): void {
-  if (box.textContent !== text) box.textContent = text;
-}
-
 const client = createGameClient();
-const status = element("status", "p");
-const note = element("note", "p");
-const screen = element("screen", "canvas");
-const countOut = element("count", "strong");
-const totalOut = element("total", "span");
-const earnedList = element("earned", "ul");
-const startButton = element("start", "button");
-const pauseButton = element("pause", "button");
+const page = boxes();
+const {
+  count: countOut,
+  earned: earnedList,
+  note,
+  pause: pauseButton,
+  screen,
+} = page;
+const { start: startButton, status, total: totalOut } = page;
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -62,15 +49,15 @@ let session: MatchSession | null = null;
 let runId: string | null = null;
 let titles = new Map<string, string>();
 let starting = false;
-let heldNote = "";
 let earnedCount = 0;
+let lastInput = Date.now();
 // The idle screen's board.
 let backdrop = startRun(1);
 let view: View = {
   best: 0,
   cursor: 0,
-  flash: [],
   grab: -1,
+  hint: [],
   newBest: false,
   phase: "ready",
   toast: null,
@@ -81,7 +68,7 @@ const pause = createPause();
 const saveProgress = (): void =>
   void client.progress.save({ best: progress.best, sound: progress.sound });
 const sound = setUpSound({
-  container: element("sound", "div"),
+  container: page.sound,
   effects,
   pause,
   save: (settings) => {
@@ -93,18 +80,44 @@ const sound = setUpSound({
 
 const going = (): boolean => session !== null && !session.state().ended;
 
-function show(): void {
-  if (context !== null) draw(context, session?.state() ?? backdrop, view);
+// What the writing on the screen says while a swap plays back: the state before it until its steps are done, and after it then.
+function shown() {
+  const current = session?.state() ?? backdrop;
+  const playing = playback.timeline();
+  if (playing === null) return current;
+  return playing.cues.some((cue) => cue.praise === "LEVEL CLEAR!")
+    ? playing.after
+    : playing.before;
 }
+
+function show(): void {
+  if (context === null) return;
+  const playing = playback.timeline();
+  const bonus =
+    playing === null
+      ? 0
+      : playing.after.score - playing.before.score - playing.after.lastGain;
+  draw(context, shown(), view, playback.scene(), bonus);
+}
+
+// The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).
+const playback = createPlayback({
+  cue: (cue) => {
+    if (cue.sound !== undefined) sound.sfx(cue.sound);
+  },
+  done: () => {
+    const running = session;
+    show();
+    if (running !== null && running.state().ended) void finish(running);
+  },
+  draw: () => show(),
+  paused: () => pause.paused(),
+  schedule: (callback) => void setTimeout(callback, 16),
+});
 
 function addEarned(id: string): void {
   earnedCount += 1;
-  setText(countOut, String(earnedCount));
-  const item = document.createElement("li");
-  item.dataset.milestone = id;
-  item.textContent = titles.get(id) ?? id;
-  earnedList.append(item);
-  earnedList.scrollTop = earnedList.scrollHeight;
+  listEarned(page, id, titles.get(id), earnedCount);
 }
 
 function setRunning(running: boolean): void {
@@ -112,15 +125,7 @@ function setRunning(running: boolean): void {
   pauseButton.disabled = !running;
 }
 
-pause.subscribe((paused) => {
-  pauseButton.textContent = paused ? pauseCopy.resume : pauseCopy.pause;
-  if (paused) {
-    heldNote = note.textContent;
-    setText(note, pauseCopy.paused);
-    return;
-  }
-  setText(note, heldNote);
-});
+followPause(pause, pauseButton, note);
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && going()) pause.set(true);
 });
@@ -141,30 +146,17 @@ async function finish(finished: MatchSession): Promise<void> {
   saveProgress();
   show();
   startButton.textContent = "Play again";
-  if (runId === null || play === null) {
-    setText(note, submitNote(null));
-    return;
-  }
-  const sent = runId;
-  setText(note, submitNote({ kind: "pending" }));
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  setText(note, submitNote(settled));
+  await submitRun(play, runId, record, (text) => setText(note, text));
 }
-
-const flash = createFlash(() => {
-  view = { ...view, flash: [] };
-  show();
-});
 
 function swap(cell: number, direction: number): void {
   const running = session;
   if (running === null || !going() || pause.paused()) return;
+  // A swap made while another is still playing back ends that playback at once.
+  playback.finish();
   const before = running.state();
   const outcome = running.swap(cell, direction);
-  view = { ...view, grab: -1 };
+  view = { ...view, grab: -1, hint: [] };
   if (!outcome.ok) {
     view = { ...view, toast: "NO LINE" };
     sound.sfx("shuffle");
@@ -172,21 +164,26 @@ function swap(cell: number, direction: number): void {
     return;
   }
   const after = running.state();
-  for (const name of swapSounds(before, after)) sound.sfx(name);
   sound.tempo(tempoFor(after.moves));
   view = {
     ...view,
     cursor: neighbour(cell, direction),
-    flash: after.lastCleared,
     toast: toastFor(after),
   };
-  flash.show();
-  show();
-  if (after.ended) void finish(running);
+  playback.start(
+    buildTimeline(
+      before,
+      after,
+      cell,
+      direction,
+      traceOf(before, cell, direction),
+    ),
+  );
 }
 
 // A hand movement: the next place of the cursor and the shard held, and the swap it asks for, if any.
 function act(next: Next): void {
+  lastInput = Date.now();
   view = { ...view, ...next.picking };
   if (next.swap === null) show();
   else swap(next.swap.cell, next.swap.direction);
@@ -201,6 +198,17 @@ const grab = (): void => {
 const tap = (cell: number): void => {
   if (live()) act(tapped(view, cell));
 };
+
+// After a while without a move the screen points at one.
+watchIdle({
+  lastInput: () => lastInput,
+  quiet: () => going() && !playback.active() && !pause.paused(),
+  shown: () => view.hint.length > 0,
+  show: () => {
+    view = { ...view, hint: hintFor(session?.state() ?? backdrop) };
+    show();
+  },
+});
 
 async function begin(): Promise<void> {
   if (starting) return;
@@ -231,8 +239,8 @@ async function begin(): Promise<void> {
   view = {
     ...view,
     cursor: 0,
-    flash: [],
     grab: -1,
+    hint: [],
     newBest: false,
     phase: "running",
     toast: null,
@@ -261,20 +269,10 @@ async function connect(): Promise<void> {
     sound.apply(progress.sound);
     view = { ...view, best: progress.best };
     play = await connectToPlatform(client);
-    titles = new Map(
-      (await client.milestones.list().catch(() => [])).map(({ id, title }) => [
-        id,
-        title,
-      ]),
-    );
+    titles = await loadTitles(client);
     setText(status, "Connected.");
   } catch (error) {
-    setText(
-      status,
-      error instanceof GameHostError
-        ? `The platform said: ${error.code}`
-        : "Could not connect to the platform. You can still play.",
-    );
+    setText(status, refusalNote(error));
   }
   startButton.disabled = false;
   show();

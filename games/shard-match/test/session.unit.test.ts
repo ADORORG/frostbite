@@ -5,7 +5,7 @@ import { matchRules } from "../src/rules/index.ts";
 import { legalMoves } from "../src/rules/moves.ts";
 import { sampleRun } from "../src/sample-run.ts";
 import { createMatchSession } from "../src/session.ts";
-import { greedyPlayer, play } from "./support/bots.ts";
+import { greedyPlayer, play, randomPlayer } from "./support/bots.ts";
 
 describe("a session", () => {
   it("records the swaps the rules accept, and refuses one that makes no line without recording it", () => {
@@ -51,7 +51,7 @@ describe("a session", () => {
     expect(session.record().inputs).toEqual(first.inputs);
     expect(first.inputs).toEqual([{ type: "end" }]);
     const over = createMatchSession({ seed: 3 });
-    for (const { cell, to } of play(3, greedyPlayer).swaps) over.swap(cell, to);
+    for (const { cell, to } of play(3, randomPlayer).swaps) over.swap(cell, to);
     expect(over.state().cause).toBe("out");
     expect(over.record().inputs.at(-1)).not.toEqual({ type: "end" });
   });

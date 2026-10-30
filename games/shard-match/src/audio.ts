@@ -70,6 +70,7 @@ export const effects = {
   match4: match(988),
   milestone: commonEffects.win,
   shuffle: [tone("square", 200, 800, 0.2, 0.2)],
+  swap: [tone("triangle", 330, 440, 0.05, 0.18)],
   special: [tone("square", 880, 1760, 0.18, 0.24)],
   start: commonEffects.start,
 } as const;

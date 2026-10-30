@@ -56,7 +56,16 @@ const gains = (state: MatchState): Option[] =>
     const after = take(state, { cell, to });
     return after === null
       ? []
-      : [{ after, gain: after.score - state.score, move: { cell, to } }];
+      : [
+          {
+            after,
+            gain:
+              after.score -
+              state.score +
+              200 * (after.frostBroken - state.frostBroken),
+            move: { cell, to },
+          },
+        ];
   });
 
 export const randomPlayer: Choose = (state, pick) => {

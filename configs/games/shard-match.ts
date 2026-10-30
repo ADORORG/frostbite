@@ -49,7 +49,7 @@ export const shardMatchGame = defineGame({
     video: null,
   },
   description:
-    "Swap two neighbouring shards to line up three or more. Lines clear, shards fall, and a line made by the fall is a chain that scores more at every step. Four in a line makes a bomb, five a star, and a long chain buys more swaps; the run ends when you are out. Forty milestones, from your first swap to a seven-step chain and a three-hundred-thousand point run, are each checked by replaying your run.",
+    "Swap two neighbouring shards to line up three or more, and watch the board pop, fall and chain. Every level gives you a handful of swaps: odd levels ask for a score, even levels freeze cells that only a match can break. Four in a line makes a bomb, five a star, long chains buy swaps, and the swaps you have left when a level is cleared are paid out. The goals grow and the swaps shrink until you run out. Forty milestones, from your first swap to sixteen levels, a seven-step chain and a three-hundred-thousand point run, are each checked by replaying your run.",
   id: "shard-match",
   launch: { mode: "embedded" },
   milestones: [
@@ -68,10 +68,10 @@ export const shardMatchGame = defineGame({
         `You scored ${n.toLocaleString("en-US")} points.`,
       ],
     ),
-    ...rungs("level", [2, 4, 6, 9, 13, 18], (n) => [
-      `Level ${String(n)}`,
-      `Reach level ${String(n)} in one run.`,
-      `You reached level ${String(n)}.`,
+    ...rungs("levels", [1, 3, 5, 8, 12, 16], (n) => [
+      many(n, "level", "levels"),
+      `Clear ${many(n, "level", "levels")} in one run.`,
+      `You cleared ${many(n, "level", "levels")}.`,
     ]),
     ...rungs("chain", [2, 3, 4, 5, 7], (n) => [
       `${String(n)}-step chain`,
@@ -98,7 +98,7 @@ export const shardMatchGame = defineGame({
       `Set off ${many(n, "bomb", "bombs")} in one run.`,
       `You set off ${many(n, "bomb", "bombs")}.`,
     ]),
-    ...rungs("shards", [50, 200, 600, 1_500], (n) => [
+    ...rungs("shards", [50, 200, 600], (n) => [
       many(n, "shard", "shards"),
       `Clear ${many(n, "shard", "shards")} in one run.`,
       `You cleared ${many(n, "shard", "shards")}.`,
@@ -108,10 +108,10 @@ export const shardMatchGame = defineGame({
       `Score ${n.toLocaleString("en-US")} points with one swap.`,
       `One swap was worth ${n.toLocaleString("en-US")} points.`,
     ]),
-    ...rungs("swaps", [40, 150], (n) => [
-      `${many(n, "swap", "swaps")}`,
-      `Make ${many(n, "swap", "swaps")} in one run.`,
-      `You made ${many(n, "swap", "swaps")}.`,
+    ...rungs("frost", [25, 100, 300], (n) => [
+      `${String(n)} frost broken`,
+      `Break ${String(n)} frosted cells in one run.`,
+      `You broke ${String(n)} frosted cells.`,
     ]),
   ],
   network: betaTarget.chainId,
@@ -123,8 +123,8 @@ export const shardMatchGame = defineGame({
     replay: {
       id: "shard-match",
       sha256:
-        "3fd2dcaa4c84f9cf0eacb282fece695dd0954cad93f195c984258449a4338f97",
-      version: 1,
+        "5eda6f42a9810025efbe11ec69bdf8d6edc0415bed7982f171bd61ab7c53a0f2",
+      version: 2,
     },
   },
   version: "0.1.0",
