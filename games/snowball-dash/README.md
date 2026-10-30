@@ -35,7 +35,7 @@ together with `verifierVersion` and the game's `version`. Nothing here carries a
 
 ## Milestones
 
-Ten, all decided by the state of a run alone (`src/rules/milestones.ts`): first hop, 5 and 15 rocks passed, 100 m and 300 m rolled,
+Ten, all decided by the state of a run alone (`src/rules/milestones.ts`): first hop, 5 and 15 rocks passed, 100 m and 500 m rolled,
 one and five close shaves (a rock cleared by at most 2 units), top speed, the foot of the slope, and a tidy run (the foot reached
 with no more hops than rocks). The words are in the manifest. `test/fairness.unit.test.ts` shows a careful bot reaches the foot on
 every tested seed and that a late-hopping bot earns all ten.

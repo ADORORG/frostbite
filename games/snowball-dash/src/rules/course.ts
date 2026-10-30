@@ -31,6 +31,13 @@ export function layRocks(seed: number): readonly number[] {
   return rocks;
 }
 
+// Rocks are laid from `firstRockAt` at gaps of at most `minGap + gapVariety - 1`, so every slope has at least this many, whatever its
+// seed. A milestone may ask for no more rocks than this.
+export const guaranteedRocks =
+  Math.floor(
+    (courseUnits - finishClearance - firstRockAt) / (minGap + gapVariety - 1),
+  ) + 1;
+
 export const startSnowball = (seed: number): SnowballState => ({
   air: 0,
   alive: true,

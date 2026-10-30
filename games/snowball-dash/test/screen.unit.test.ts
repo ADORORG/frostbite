@@ -42,6 +42,16 @@ describe("the player's hands", () => {
     expect(controls.pause).toHaveBeenCalledTimes(1);
   });
 
+  it("acts when a key goes down, not when it is let go", () => {
+    const { controls } = setup();
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyP" }));
+    expect(controls.hop).not.toHaveBeenCalled();
+    expect(controls.start).not.toHaveBeenCalled();
+    expect(controls.pause).not.toHaveBeenCalled();
+  });
+
   it("holds a key down without repeating, and ignores keys it does not know and shortcuts", () => {
     const { controls } = setup();
     expect(press("Space", true).defaultPrevented).toBe(true);

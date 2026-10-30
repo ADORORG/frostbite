@@ -17,6 +17,16 @@ describe("the slope", () => {
     expect(layRocks(7)).not.toEqual(layRocks(8));
   });
 
+  it("lays a rock as far as the edge of the clear stretch before the finish, and never beyond it", () => {
+    const edge = courseUnits - finishClearance;
+    const furthest = Math.max(
+      ...Array.from({ length: 30_000 }, (_, seed) =>
+        Math.max(...layRocks(seed)),
+      ),
+    );
+    expect(furthest).toBe(edge);
+  });
+
   it("starts with a clear stretch, keeps every gap wide enough to land and hop again, and leaves the finish clear", () => {
     for (const seed of [0, 1, 2, 20_261_030, 4_294_967_295]) {
       const rocks = layRocks(seed);

@@ -28,10 +28,10 @@ describe("a run as the player plays it", () => {
 
   it("announces each milestone once, as it is earned", () => {
     const heard: string[] = [];
-    const session = playWithLead(20_261_030, 14, (id) => heard.push(id));
+    const session = playWithLead(20_261_030, 13, (id) => heard.push(id));
     expect(heard).toEqual([...new Set(heard)]);
     expect([...heard].sort()).toEqual([...session.earned()].sort());
-    expect(heard).toHaveLength(10);
+    expect(heard).toHaveLength(39);
   });
 
   it("closes a run that is still going when its record is asked for, once", () => {

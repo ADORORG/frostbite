@@ -17,22 +17,42 @@ describe("the game is playable and every milestone can be earned", () => {
     }
   });
 
-  it("ends a run that does nothing at the first rock, with only what that has earned", () => {
+  it("ends a run that does nothing at the first rock, with only the first 25 metres it rolled", () => {
     for (const seed of seeds) {
       const bot = playWithLead(seed, 0);
       expect(bot.state().alive).toBe(false);
       expect(bot.state().cleared).toBe(0);
-      expect(bot.earned()).toEqual([]);
+      expect(bot.earned()).toEqual(["metres-25"]);
     }
   });
 
-  it("lets a perfect run earn all ten, on every seed, by hopping late enough to cut each rock fine", () => {
+  it("lets a run that cuts every rock fine earn all but one of the forty, on every seed", () => {
     for (const seed of seeds) {
       const earned = [13, 14, 15, 16].map((lead) =>
         playWithLead(seed, lead).earned(),
       );
       expect(
-        earned.some((ids) => ids.length === milestoneIds.length),
+        earned.some((ids) => ids.length === milestoneIds.length - 1),
+        `seed ${String(seed)}`,
+      ).toBe(true);
+    }
+  });
+
+  it("lets a run with room to spare at every rock earn the comfortable run, on every seed", () => {
+    for (const seed of seeds) {
+      const earned = playWithLead(seed, 40).earned();
+      expect(earned, `seed ${String(seed)}`).toContain("comfortable-run");
+      expect(earned).not.toContain("close-shave");
+    }
+  });
+
+  it("lets a run cut at least eight rocks fine on every seed, so the razor finish can be earned", () => {
+    for (const seed of seeds) {
+      const earned = [13, 14, 15, 16, 17].map((lead) =>
+        playWithLead(seed, lead).earned(),
+      );
+      expect(
+        earned.some((ids) => ids.includes("razor-finish")),
         `seed ${String(seed)}`,
       ).toBe(true);
     }
@@ -47,7 +67,7 @@ describe("the game is playable and every milestone can be earned", () => {
 });
 
 describe("the sample run the verifier is shown", () => {
-  it("replays, and earns exactly the milestones it claims: all ten", () => {
+  it("replays, and earns exactly the milestones it claims: thirty-nine of the forty", () => {
     const record = sampleRun();
     const made = snowballRules.init(record.seed, record.config);
     if (!made.ok) throw new Error(made.reason);
@@ -58,6 +78,8 @@ describe("the sample run the verifier is shown", () => {
       state = stepped.state;
     }
     expect(snowballRules.earned(state)).toEqual(record.claims);
-    expect(record.claims).toEqual(milestoneIds);
+    expect(record.claims).toEqual(
+      milestoneIds.filter((id) => id !== "comfortable-run"),
+    );
   });
 });

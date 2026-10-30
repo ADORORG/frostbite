@@ -59,4 +59,28 @@ describe("the replay verifiers games publish", () => {
       ).toBe(true);
     }
   });
+
+  // The rules decide milestones by id and the manifest holds their words. If the two lists drift, a milestone the rules award is never
+  // reported (the platform refuses an id the manifest lacks), or the manifest names one nothing can earn.
+  it("decide exactly the milestones the manifest names, for every game that lists them in src/rules/milestones.ts", async () => {
+    const games = await registeredGames();
+    let checked = 0;
+    for (const game of games) {
+      const file = join(gamesDirectory, game.id, "src/rules/milestones.ts");
+      if (!(await exists(file))) continue;
+      const rules: unknown = await import(/* @vite-ignore */ file);
+      if (
+        typeof rules !== "object" ||
+        rules === null ||
+        !("milestoneIds" in rules) ||
+        !Array.isArray(rules.milestoneIds)
+      )
+        continue;
+      checked += 1;
+      expect([...rules.milestoneIds].sort(), game.id).toEqual(
+        game.milestones.map(({ id }) => id).sort(),
+      );
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
 });
