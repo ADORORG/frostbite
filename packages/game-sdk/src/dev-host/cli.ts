@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 
+import { argumentProblem } from "../arguments.ts";
 import { devGameSchema } from "./config.ts";
 import { startDevHost, type DevHost } from "./server.ts";
 
@@ -21,9 +22,7 @@ export async function run(
     });
   } catch (error) {
     // An option it does not know, or one given with no value: said, with how to use it, instead of a stack trace.
-    console.error(
-      `${error instanceof Error ? error.message : "The arguments are not valid."}\n${usage}`,
-    );
+    console.error(argumentProblem(error, usage));
     return { code: 2, host: null };
   }
   const { positionals, values } = parsed;

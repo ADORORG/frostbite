@@ -21,6 +21,13 @@ ends in `.`, `?` or `!`) is written in more than one place in production source 
 once and share it. Duplicates that existed when the check was added are in `sentence-baseline.json`; the check refuses a baseline that allows
 more copies than there are, so it can only shrink. After removing a duplicate, run `pnpm --filter @repo/repository-policy update-sentence-baseline`.
 
+## Skills stay true
+
+`src/skill-policy.ts` checks every `skills/<name>/` folder: SKILL.md exists, names itself the folder's name, has a description of up to
+1,024 characters and is at most 500 lines; every `references/` file is linked from SKILL.md and every link exists; every repository path
+and root `pnpm` script a skill names exists; and no file names the platform (the SDK's package scope), so a rename cannot leave a skill
+stale. The guide for people is `docs/product/build-a-game-with-an-agent.md`.
+
 ## Ownership
 
 Platform engineering.

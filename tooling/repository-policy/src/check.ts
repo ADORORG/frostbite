@@ -8,6 +8,7 @@ import {
   readProductionSources,
 } from "./sentence-policy.ts";
 import { findScriptPolicyViolations } from "./script-policy.ts";
+import { findSkillViolations } from "./skill-policy.ts";
 import { findTemplateReleaseViolations } from "./template-release-policy.ts";
 import { discoverWorkspaces, repositoryRoot } from "./workspaces.ts";
 
@@ -17,6 +18,7 @@ const files = await listSourceFiles(root);
 const violations = [
   ...findScriptPolicyViolations(workspaces),
   ...(await findReadmeViolations(workspaces)),
+  ...(await findSkillViolations(root)),
   ...(await findOversizedFiles(root, files)),
   ...(await findBoundaryViolations(root, files)),
   ...findDuplicateSentences(

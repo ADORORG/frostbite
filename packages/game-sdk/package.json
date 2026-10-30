@@ -43,7 +43,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
-    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css')\"",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
     "prepack": "pnpm run build:package"
   },
   "dependencies": {
@@ -66,7 +66,8 @@
   "license": "UNLICENSED",
   "sideEffects": false,
   "bin": {
-    "ador-game-dev": "./dist/dev-host/bin.js"
+    "ador-game-dev": "./dist/dev-host/bin.js",
+    "ador-game-skill": "./dist/skill/bin.js"
   },
   "files": [
     "dist",

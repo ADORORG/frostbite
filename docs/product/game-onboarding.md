@@ -5,6 +5,8 @@ Status: ADR-018 Amendment 1 (client-only games) is accepted. This describes what
 do **not** exist yet; the last section says what each needs.
 The template is `tooling/game-tools/template` (a small starter game). Start from it with `pnpm game:new`; do not start from nothing.
 
+A coding agent can do the steps below for you: see `docs/product/build-a-game-with-an-agent.md` for the skill and how to install it.
+
 ## What a game is
 
 A game is a folder of reviewed source plus one manifest:

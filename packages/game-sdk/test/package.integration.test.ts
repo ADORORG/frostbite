@@ -67,7 +67,10 @@ describe("the published package", () => {
   });
 
   it("gives the command that opens the local test page, built where the package says", async () => {
-    expect(manifest.bin).toEqual({ "ador-game-dev": "./dist/dev-host/bin.js" });
+    expect(manifest.bin).toEqual({
+      "ador-game-dev": "./dist/dev-host/bin.js",
+      "ador-game-skill": "./dist/skill/bin.js",
+    });
     const built = new Set(await readdir(out, { recursive: true }));
     expect(built.has("dev-host/bin.js")).toBe(true);
     expect(built.has("dev-host/client.js")).toBe(true);
@@ -76,6 +79,19 @@ describe("the published package", () => {
         "#!/usr/bin/env node\n",
       ),
     ).toBe(true);
+  });
+
+  it("gives the command that installs the skill, and copies the skill in beside it when the package is built", async () => {
+    expect(
+      (await readFile(join(out, "skill/bin.js"), "utf8")).startsWith(
+        "#!/usr/bin/env node\n",
+      ),
+    ).toBe(true);
+    // The skill's source is a folder of the repository; the build copies it to where the command looks for it (`skill/files`).
+    expect(manifest.scripts["build:package"]).toContain(
+      "cpSync('../../skills/build-a-game','dist/skill/files'",
+    );
+    await readFile(join(root, "../../skills/build-a-game/SKILL.md"), "utf8");
   });
 
   it("keeps esbuild optional, because only the build tool and the test page need it", () => {

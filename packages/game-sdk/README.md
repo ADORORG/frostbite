@@ -78,6 +78,19 @@ panel is made up**: it shows how a game answers each case, not what the platform
 minted, no failure or slow answer is injected). It needs `esbuild`, the same optional peer as the build.
 `import { startDevHost } from "@ador/game-sdk/dev-host"` starts the same page from code, for a test.
 
+## The build-a-game skill
+
+The package ships an AI skill (`skills/build-a-game/` in the repository; the package build copies it to `dist/skill/files`) that takes
+an agent from an idea to a game that passes the platform's checks. `ador-game-skill install [--dir <project>] [--no-agents]` copies it
+to `<project>/.claude/skills/build-a-game/` and writes a marked block into `AGENTS.md` that points an agent at it (what the project
+wrote around the block is untouched). `update` refreshes it when a newer SDK ships a newer skill; a copy someone edited is kept unless
+`--force` replaces it. `doctor` exits 0 only when the installed copy is the one this SDK ships and `AGENTS.md` points at it. Inside the
+repository `--from skills/build-a-game` stands in for the packaged copy. The skill never names the platform: it says `<sdk>` and tells
+the agent to read the name from this package's `package.json`, so renaming the package cannot leave it stale
+(`tooling/repository-policy/src/skill-policy.ts` checks that, and that every path and script it names exists).
+Without this package: `npx skills add <the repository's GitHub link to skills/build-a-game>` (the open `skills` installer; not
+`npx skill`, a different tool) installs the same folder, and needs no npm publish.
+
 ## Installing it outside this repository
 
 The package builds to plain JavaScript with declarations (`pnpm --filter @ador/game-sdk build:package`) and is packed
