@@ -4,8 +4,11 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.375rem;
-  /* Its size does not change with what it says, so nothing beside it moves. */
-  min-inline-size: 11rem;
+  /* Its size does not change with what it says (the hint below has room for two lines, and the panel is as wide as it always is), so
+     nothing beside it moves when the hint comes and goes. */
+  box-sizing: border-box;
+  inline-size: 18rem;
+  max-inline-size: 100%;
 }
 .sound-panel button {
   min-block-size: 2.75rem;
@@ -35,7 +38,7 @@
 }
 .sound-panel__hint {
   flex-basis: 100%;
-  min-block-size: 1rem;
+  min-block-size: 2.25rem;
   font-size: 0.75rem;
   opacity: 0.8;
 }
