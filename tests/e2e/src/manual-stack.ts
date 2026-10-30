@@ -43,6 +43,19 @@ export function resolveStackHost(
   return host === undefined || host === "" ? defaultStackHost : host;
 }
 
+// Files holding a certificate and its key (`STACK_TLS_CERT`, `STACK_TLS_KEY`), to serve HTTPS. Both or neither; one alone is a mistake worth
+// stopping for.
+export function resolveStackTls(
+  environment: NodeJS.ProcessEnv = process.env,
+): { readonly cert: string; readonly key: string } | null {
+  const cert = environment.STACK_TLS_CERT?.trim() ?? "";
+  const key = environment.STACK_TLS_KEY?.trim() ?? "";
+  if (cert === "" && key === "") return null;
+  if (cert === "" || key === "")
+    throw new Error("STACK_TLS_CERT and STACK_TLS_KEY must be set together.");
+  return { cert, key };
+}
+
 export interface StackActor {
   readonly goal: string;
   readonly id: string;

@@ -213,9 +213,18 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           await waitUntilServing(`http://127.0.0.1:${upstreamPort}`, server);
           // The people use the stack's address; the front door serves the test sign-in and passes the rest on.
           const sessions = createDatabaseClient(sessionPool);
+          const tlsFiles = resolveStackTls();
           const frontDoor = createStackProxy({
             actors: stackActors,
             origin: baseURL,
+            ...(tlsFiles === null
+              ? {}
+              : {
+                  tls: {
+                    cert: await readFile(tlsFiles.cert, "utf8"),
+                    key: await readFile(tlsFiles.key, "utf8"),
+                  },
+                }),
             startSession: ({ token }) => reviveSession(sessions, token),
             upstreamPort,
           });

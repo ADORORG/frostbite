@@ -6,6 +6,7 @@ import {
   captureMailEnvironment,
   resolveStackHost,
   resolveStackServer,
+  resolveStackTls,
   stackActors,
   stackPages,
 } from "../src/manual-stack.ts";
@@ -33,6 +34,21 @@ describe("manual stack host", () => {
     expect(resolveStackHost({})).toBe("127.0.0.1");
     expect(resolveStackHost({ STACK_HOST: "  " })).toBe("127.0.0.1");
     expect(resolveStackHost({ STACK_HOST: "0.0.0.0" })).toBe("0.0.0.0");
+  });
+});
+
+describe("manual stack tls", () => {
+  it("is off unless a certificate and a key are both named, and refuses one without the other", () => {
+    expect(resolveStackTls({})).toBeNull();
+    expect(
+      resolveStackTls({ STACK_TLS_CERT: " a.pem ", STACK_TLS_KEY: "b.pem" }),
+    ).toEqual({ cert: "a.pem", key: "b.pem" });
+    expect(() => resolveStackTls({ STACK_TLS_CERT: "a.pem" })).toThrow(
+      "together",
+    );
+    expect(() => resolveStackTls({ STACK_TLS_KEY: "b.pem" })).toThrow(
+      "together",
+    );
   });
 });
 

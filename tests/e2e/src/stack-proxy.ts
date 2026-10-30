@@ -6,6 +6,8 @@ import {
   type ServerResponse,
 } from "node:http";
 
+import { createServer as createSecureServer } from "node:https";
+
 import type { StackActor } from "./manual-stack.ts";
 import {
   renderPicker,
@@ -27,6 +29,9 @@ export interface StackProxyOptions {
   readonly origin: string;
   // Makes the person's session usable again before the cookie is handed out. Signing out in the web app revokes the session row, and
   // the stack's sessions are fixed tokens, so without this a person could never sign in again after signing out.
+  // A certificate and key, to serve HTTPS. Browsers give a page the secure-context APIs (`crypto.subtle`, `crypto.randomUUID`, which the web
+  // app's code uses) and keep `Secure` cookies only over HTTPS or on localhost, so a phone reaching the stack by its address needs this.
+  readonly tls?: { readonly cert: string; readonly key: string };
   readonly startSession?: (actor: StackActor) => Promise<void>;
   readonly upstreamPort: number;
 }
@@ -74,7 +79,7 @@ function forward(
 }
 
 export function createStackProxy(options: StackProxyOptions): Server {
-  return createServer((request, response) => {
+  const handle = (request: IncomingMessage, response: ServerResponse): void => {
     const path = new URL(request.url ?? "/", options.origin).pathname;
     if (request.method === "GET" && path === signInPath)
       return send(response, renderPicker(options.actors));
@@ -106,5 +111,8 @@ export function createStackProxy(options: StackProxyOptions): Server {
       return;
     }
     forward(request, response, options.upstreamPort);
-  });
+  };
+  return options.tls === undefined
+    ? createServer(handle)
+    : createSecureServer(options.tls, handle);
 }
