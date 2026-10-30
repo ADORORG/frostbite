@@ -9,6 +9,7 @@ import {
 } from "@ador/shared/games";
 
 import { targetChains } from "./chains.ts";
+import { broMariaGame } from "./games/bro-maria.ts";
 import { frostbite } from "./games/frostbite.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 import { frostRunnerGame } from "./games/frost-runner.ts";
@@ -33,6 +34,7 @@ export const games = defineGames([
   frostRunnerGame,
   icicleDropGame,
   towerStackGame,
+  broMariaGame,
   // game:new adds games above this line.
 ]);
 

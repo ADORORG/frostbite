@@ -1,0 +1,32 @@
+// A drawing surface that notes what is drawn on it, for the tests of the screen.
+export interface Drawn {
+  readonly fill: string;
+  readonly height: number;
+  readonly width: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+export function surface() {
+  const drawn: Drawn[] = [];
+  const stops: string[] = [];
+  const context = {
+    createLinearGradient: () => ({
+      addColorStop: (_at: number, fill: string) => void stops.push(fill),
+    }),
+    fillRect(x: number, y: number, width: number, height: number) {
+      drawn.push({ fill: String(context.fillStyle), height, width, x, y });
+    },
+    fillStyle: "" as string | object,
+  };
+  return {
+    context: context as unknown as CanvasRenderingContext2D,
+    drawn,
+    stops,
+  };
+}
+
+export const ofColour = (
+  list: readonly Drawn[],
+  fill: string,
+): readonly Drawn[] => list.filter((block) => block.fill === fill);

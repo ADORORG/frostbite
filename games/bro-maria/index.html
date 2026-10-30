@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bro Maria</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="bar">
+        <header>
+          <h1>Bro Maria</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Score <strong id="score">0</strong></span>
+          <span>Coins <strong id="coins">0</strong></span>
+          <span>Lives <strong id="lives">3</strong></span>
+          <span>Time <strong id="time">120</strong></span>
+        </p>
+      </div>
+      <canvas
+        id="screen"
+        width="256"
+        height="144"
+        role="img"
+        aria-label="The game screen: a hero in a red parka running across icy ground, with coins to take, slimes to jump on and pits to jump over"
+      ></canvas>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+        </div>
+      </div>
+      <div id="pad" class="pad" role="group" aria-label="Touch controls">
+        <button type="button" data-hold="left" disabled aria-label="Run left">
+          ◀
+        </button>
+        <button type="button" data-hold="right" disabled aria-label="Run right">
+          ▶
+        </button>
+        <button type="button" data-hold="jump" disabled aria-label="Jump">
+          Jump
+        </button>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>

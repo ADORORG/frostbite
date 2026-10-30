@@ -32,6 +32,7 @@ describe("the platform's game list", () => {
       "frost-runner",
       "icicle-drop",
       "tower-stack",
+      "bro-maria",
     ]);
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
@@ -82,6 +83,7 @@ describe("the platform's game list", () => {
       "frost-runner",
       "icicle-drop",
       "tower-stack",
+      "bro-maria",
     ]) {
       const game = games.find((listed) => listed.id === id);
       expect(game?.rewards).toEqual({
