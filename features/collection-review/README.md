@@ -60,3 +60,7 @@ move, a creator who is no longer approved, or an idempotency conflict is 409.
 
 Run `env:check`, `typecheck`, `test:unit`, `test:integration`, `test:coverage`, or the browser checks
 (`tests/e2e`, `collections-review*.spec.ts`). Platform engineering owns this feature.
+
+## Ownership
+
+Platform front end.

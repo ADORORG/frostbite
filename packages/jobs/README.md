@@ -25,3 +25,7 @@ retried. `@ador/jobs/provider-service` defines the typed workflow capabilities a
 `@ador/jobs/drain-loop` runs any bounded pass until stopped (immediately again after work, an idle delay
 after none, a backoff after a failure) and `@ador/jobs/relay-loop` applies it to the relay. `@ador/jobs/policy` holds the typed, overridable
 defaults for retries, media concurrency, relay batching, polling, and the slow maintenance loop.
+
+## Ownership
+
+Platform engineering.

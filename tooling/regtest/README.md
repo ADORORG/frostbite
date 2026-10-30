@@ -41,3 +41,7 @@ it owns, which is what a wallet does for a step). Point `REWARDS_CHAIN_RPC_URL` 
 
 The gateway lists an address's unspent outputs from Core's set, so an output still in the mempool is not listed: mine a block
 between steps that spend each other's outputs. State lives in `.regtest/` (ignored by git).
+
+## Ownership
+
+Platform engineering.

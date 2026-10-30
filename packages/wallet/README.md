@@ -70,3 +70,7 @@ version/fixture drift all fail closed.
 Physical runs record only environment metadata, fixture identity, time, and outcome. Never record
 wallet addresses, keys, signatures, PSBT contents, balances, extension profiles, or seed material.
 No individual provider is currently advertised; that requires the separate W2-10B physical gate.
+
+## Ownership
+
+Platform engineering.

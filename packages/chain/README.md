@@ -100,3 +100,7 @@ addresses of the game and collectible templates and how large a drawing the new 
 4 (`{3, n}` publishes at `{4, n}`), so any other address is refused. A confirmed step's observation lists the contracts its trace created
 (`created`, `decodeTraceCreated`): for a game made from its template, the game first and then its auth token. The fixture is the
 indexer's own recording of a creation (`contracts/templates/abi/trace-vectors.json`, `creation`).
+
+## Ownership
+
+Platform engineering.

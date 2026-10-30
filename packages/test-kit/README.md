@@ -45,3 +45,7 @@ Shared, test-only helpers. Production code never imports this package.
 
 Docker is required for the integration tests. Run `typecheck`, `test:unit`, `test:integration`, or
 `test:coverage`. Platform engineering owns this package.
+
+## Ownership
+
+Platform engineering.

@@ -37,3 +37,7 @@ DKIM), or messages are filtered as spam.
 ## Tests
 
 `pnpm --filter @ador/mail test:unit`, `test:integration` (real files, and a real SMTP server on a local port), `test:coverage`.
+
+## Ownership
+
+Platform engineering.

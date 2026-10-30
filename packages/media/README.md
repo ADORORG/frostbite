@@ -50,3 +50,7 @@ vocabulary come from `@ador/shared/uploads`; nothing is configured here.
 every-prefix truncation of each format, every-byte corruption of a PNG, and boundary limits.
 `test:integration` feeds adversarial files (bomb headers, polyglots, spoofed types, out-of-scope formats) through the public
 API under the real default policy. Platform engineering owns this package.
+
+## Ownership
+
+Platform engineering.

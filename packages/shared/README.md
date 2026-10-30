@@ -54,3 +54,7 @@ sorted-pair convention are protocol behavior and are locked by Rust/TypeScript f
 
 Run `pnpm --filter @ador/shared typecheck`, `test:unit`, `test:integration`, or `test:coverage`.
 The platform engineering owner maintains this package.
+
+## Ownership
+
+Platform engineering.

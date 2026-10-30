@@ -16,3 +16,7 @@ It is registered only where the platform runs for development or tests (`configs
 `src/probes.ts` is the list of calls and how a result is described; `src/main.ts` is the page.
 
 Test commands: `pnpm --filter @game/sdk-explorer test:unit`, `test:integration`, `test:coverage`.
+
+## Ownership
+
+Platform games team.

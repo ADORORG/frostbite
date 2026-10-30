@@ -15,6 +15,13 @@ src/main.ts    joins the page to the platform (progress, milestones, runs)
 src/replay.ts  the verifier the platform replays runs with (rules + one sample run)
 ```
 
+## Keys, sound and pause
+
+Space, down or S (or a tap) drop the block; Enter starts a run and then drops the block, as it always has; P pauses (Space drops here, so it cannot
+pause), and a hidden tab pauses. A thud for a trimmed block, a chime that climbs with the streak of perfect drops, a tumble for the miss, and music that
+quickens a fiftieth per block up to one and a half times (`src/audio.ts`, `src/feedback.ts`). The page keeps its controls and screen where they are
+through a run (`tests/e2e/tests/tower-stack-layout.spec.ts`). None of this is in the rules, so it does not change the digest.
+
 ## How runs are checked
 
 The rules know only ticks (thirty a second) and whole numbers; the same seed and drops always play out the same way. Nothing moves

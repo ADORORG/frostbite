@@ -39,3 +39,7 @@ Issuing runs, storing a verdict, the verified level on the milestone record and 
 the claim path: `@ador/game-runs`, `@ador/game-saves` and `@ador/feature-games` (see `docs/product/run-record.md`).
 
 Run `typecheck`, `test:unit`, `test:integration` and `test:coverage` from this workspace.
+
+## Ownership
+
+Platform games team.

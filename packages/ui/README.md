@@ -56,3 +56,7 @@ Operational ownership: platform design-system maintainers.
 ## Menus, tiles and progress
 
 `Popover` (a panel that opens under a button; a sheet on a phone), `DetailsMenu` (the same with no script, for navigation), `SegmentedChoice`/`ChoiceTiles`, `KeyValueList`, `ActionProgress`/`Spinner`, `StatusDot`, `SectionBlock`/`Tile`/`TileGrid`, and `shortenMiddle`. Use these instead of writing a new menu, a new list of facts or a new spinner.
+
+## Ownership
+
+Platform engineering.

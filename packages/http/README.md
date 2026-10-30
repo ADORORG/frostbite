@@ -50,3 +50,7 @@ and returns an `HttpFile`; it is sent with `nosniff` and a sandboxing content se
 A non-`GET` operation named like a read (`get`, `list`, `read`, `find`, `search`, `check`, `load`, `fetch`, `describe` and a capital) is refused at
 registration unless it states `readsAsPost`, the reason its input must stay out of an address; nothing else may state one. A read is a `GET` by default,
 so adding one as a `POST` is a decision with a written reason.
+
+## Ownership
+
+Platform engineering.

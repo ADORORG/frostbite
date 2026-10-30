@@ -49,3 +49,7 @@ operations. Runtime filesystem discovery and feature-specific app routes are int
 
 Run `pnpm --filter @ador/plugin-kit typecheck`, `test:unit`, `test:integration`, or
 `test:coverage`. Platform engineering owns the registry contract.
+
+## Ownership
+
+Platform engineering.

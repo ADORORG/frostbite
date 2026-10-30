@@ -103,3 +103,7 @@ tests cover another user's completion, release, library, and identical idempoten
 
 Configuration comes from the validated shared upload policy. Run `env:check`, `typecheck`,
 `test:unit`, `test:integration`, or `test:coverage`. Platform engineering owns this package.
+
+## Ownership
+
+Platform engineering.

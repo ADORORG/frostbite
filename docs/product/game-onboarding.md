@@ -97,6 +97,34 @@ and tick, and refusing with a reason), `@ador/game-sdk/run-notes` (what to tell 
 (`games/frost-runner`, `games/icicle-drop`, `games/tower-stack`) are three complete examples: pure seeded rules, a session that records the
 choices, a verifier with a sample run, and a manifest that pins its digest.
 
+### Sound, keys, pause and a steady layout
+
+Every game on the platform behaves the same way, and the SDK has the pieces so a game does not write them again:
+
+- **Sound** (`@ador/game-sdk/audio`): music and effects are data (a `Track` of looping note voices, an `Effect` of gliding tones or noise) that the
+  SDK plays with the browser's audio, so there are no sound files. `setUpSound` (`@ador/game-sdk/audio/setup`) makes the sound, puts the player's
+  panel in a place the game gives it (bottom left of the foot, never floating over the game), silences a paused game and a hidden tab, and hands
+  back `sfx(name)`, `play(effect)`, `music(on)` and `tempo(scale)`. Import `@ador/game-sdk/audio/panel.css` in the game's stylesheet. A browser
+  keeps a page silent until the player has pressed something, so the panel says "Sound starts when you press a key" until then, and says so when
+  the browser has no audio. The frame has no storage, so the game keeps `SoundSettings` beside its own progress and reads it back with
+  `parseSound`; it is saved whenever the player changes it.
+- **Keys** (`@ador/game-sdk/controls`): `attachKeys(window, keys, on)` with `standardKeys` gives Enter (and the numpad Enter) as `start` and P as
+  `pause`; a game adds its own and may take Space for pause only if Space is not its main action. Held keys do not repeat, Ctrl/Alt/Meta shortcuts
+  and typing in a field are left to the browser. Enter must never throw away a run that is going.
+- **Pause and the loop** (`@ador/game-sdk/pause`, `@ador/game-sdk/run-loop`): `createPause` is the one place the screen, the sound and the clock agree
+  on whether the game is paused; `createRunLoop` runs a real-time game in whole ticks, asks for one animation frame at a time, stops the clock on a
+  pause (the time paused is not counted), pauses a hidden tab, and refuses a second start while one is going. Pausing adds no input and no tick, so a
+  paused run replays like any other.
+- **A layout that does not move**: nothing under the player's thumb may move during a run. A button that is not offered keeps its place
+  (`visibility`, not `display: none`), buttons have a fixed minimum width so a changing label does not shift their neighbours, and the note, the
+  earned list and the score row have heights that never grow. `tests/e2e/tests/tower-stack-layout.spec.ts` compares the boxes through a run; copy it
+  for a new game.
+- **Tests without a speaker** (`@ador/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
+  test can check that a game made a sound, stopped its music, or stayed quiet while paused.
+
+Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker and Bro Maria use all of it. FROST·BITE's two replayable cabinets use the sound and the
+Enter key (SAT SNAKE also pauses); the rest of FROST·BITE keeps its own audio.
+
 ## Talking to the platform
 
 ```ts

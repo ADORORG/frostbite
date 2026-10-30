@@ -81,3 +81,7 @@ writing (`dryRun`). Adding is a separate step, one request, all rows or none.
 - A file holds up to `collectionLimits.importRows` items. Each item gets the import's idempotency key plus its
   place in the file, so the same import sent twice adds nothing twice (`POST
 /api/v1/collection-drafts/items/import`).
+
+## Ownership
+
+Platform front end.

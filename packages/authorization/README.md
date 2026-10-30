@@ -53,3 +53,7 @@ pnpm --filter @ador/authorization test:unit
 pnpm --filter @ador/authorization test:integration
 pnpm --filter @ador/authorization test:coverage
 ```
+
+## Ownership
+
+Platform engineering.

@@ -48,3 +48,7 @@ files), `@repo/eslint-config` (plain JavaScript), and this package (defines the 
 returned configuration as data; mutation proof is in `references/shared-vitest-config-task-record.md`.
 
 Owner: the repository maintainers. A new option needs two workspaces that use it; otherwise the workspace keeps its own file.
+
+## Ownership
+
+Platform engineering.

@@ -22,3 +22,7 @@ React only. No environment configuration.
 
 Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. Platform engineering owns this
 package.
+
+## Ownership
+
+Platform front end.

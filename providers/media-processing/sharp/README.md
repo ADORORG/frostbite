@@ -45,3 +45,7 @@ a TypeScript file run with Node type stripping; a bundled deployment must ship i
 `test:unit` (fake launcher and scheduler, reply table, protocol, image processing), `test:integration`
 (real worker, misbehaving worker scripts, registry resolution), `test:coverage`. Platform engineering
 owns this provider.
+
+## Ownership
+
+Platform engineering.

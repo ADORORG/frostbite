@@ -27,3 +27,7 @@ environment values or provider SDKs.
 
 Run the local `typecheck`, `test:unit`, `test:integration`, and `test:coverage` scripts. Browser
 route, accessibility, responsive, reduced-motion, and visual behavior is covered by Playwright.
+
+## Ownership
+
+Platform front end.

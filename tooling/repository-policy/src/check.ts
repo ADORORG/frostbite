@@ -1,6 +1,7 @@
 import { findBoundaryViolations } from "./boundary-policy.ts";
 import { listSourceFiles } from "./files.ts";
 import { findOversizedFiles } from "./line-policy.ts";
+import { findReadmeViolations } from "./readme-policy.ts";
 import { readSentenceBaseline } from "./sentence-baseline.ts";
 import {
   findDuplicateSentences,
@@ -15,6 +16,7 @@ const workspaces = await discoverWorkspaces(root);
 const files = await listSourceFiles(root);
 const violations = [
   ...findScriptPolicyViolations(workspaces),
+  ...(await findReadmeViolations(workspaces)),
   ...(await findOversizedFiles(root, files)),
   ...(await findBoundaryViolations(root, files)),
   ...findDuplicateSentences(

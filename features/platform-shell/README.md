@@ -37,3 +37,7 @@ the accepted extraction target.
 
 Run `pnpm --filter @ador/feature-platform-shell typecheck`, `test:unit`, `test:integration`, or
 `test:coverage`. Platform engineering owns this foundation feature.
+
+## Ownership
+
+Platform front end.

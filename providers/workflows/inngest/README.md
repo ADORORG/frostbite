@@ -42,3 +42,7 @@ signature rejection, and registration. `test:integration` runs the real self-hos
 signing enforced (through `@ador/test-kit`): a signed sync, a completed run, duplicate event ids producing
 one run, retries and exhaustion, permanent failure without retry, the concurrency bound, a wrong event
 key, and unsigned and forged requests. Platform engineering owns this provider.
+
+## Ownership
+
+Platform engineering.

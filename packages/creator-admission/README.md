@@ -22,3 +22,7 @@ Owns creator application drafts, immutable review snapshots, lifecycle transitio
 Run `pnpm env:check`, `pnpm typecheck`, `pnpm test:unit`, `pnpm test:integration`, and `pnpm test:coverage` from this package.
 
 The platform team owns policy configuration, migrations, and operational review access.
+
+## Ownership
+
+Platform engineering.

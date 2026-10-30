@@ -79,3 +79,7 @@ finished transfer is never repeated. The server remains authoritative for type, 
 Tests: `test:unit` runs node tests (`*.unit.test.ts`) and jsdom component tests (`*.dom.test.tsx`).
 Browser coverage lives in `tests/e2e` (`uploads.spec.ts` on real services, `uploads-quality.spec.ts`
 across viewports).
+
+## Ownership
+
+Platform front end.

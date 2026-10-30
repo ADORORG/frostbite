@@ -73,3 +73,7 @@ in `configs/games.ts`) before the manifests reach the feature.
 
 `typecheck`, `test:unit`, `test:integration`, `test:coverage`. Browser, accessibility, responsive,
 reduced-motion and visual behavior is covered by Playwright.
+
+## Ownership
+
+Platform games team.

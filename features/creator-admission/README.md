@@ -18,3 +18,7 @@ Run `pnpm env:check`, `pnpm typecheck`, `pnpm test:unit`, `pnpm test:integration
 - `/admin/creator-applications/[applicationId]` — one application: the version sent, the decisions the state allows, and its history (private notes included; staff only).
 - Operations: `mine`, `saveDraft`, `submit`, `review`, `reviewQueue`, `reviewRead`. The queue and read are `creator:review` and also refuse a missing actor; a cursor the list did not produce is refused with `invalid_request`.
 - Browser code (`src/client`, `src/ui/hooks`) reaches the API only through `createCreatorReviewApi`, which validates every response against the shared schema; services are injectable for tests.
+
+## Ownership
+
+Platform front end.

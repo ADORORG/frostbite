@@ -81,3 +81,7 @@ Everything that can go wrong when a person signs in, links a way in or administe
   a sentence cannot change what a page does. Every flow returns `{ kind: "failed", outcome, message }`; no flow has a copy table of its own.
 - **Adding an outcome:** add one entry. A test fails if two outcomes say the same sentence, if one has no words, or if the browser-only set
   changes. A sentence written outside the catalogue is what `repository:check` is there to catch.
+
+## Ownership
+
+Platform front end.

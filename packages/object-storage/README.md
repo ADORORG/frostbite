@@ -19,3 +19,7 @@ and URLs cannot cross this boundary. Platform engineering owns this package.
 
 This package depends only on Zod and has no environment configuration. Provider adapters own their
 configuration. Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage` locally.
+
+## Ownership
+
+Platform engineering.

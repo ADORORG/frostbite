@@ -55,3 +55,7 @@ the container.
 processed asset, abandoned-upload cleanup (including a storage outage and a later run), recovery after a provider outage, a lost delivery acknowledgement, a rejected upload,
 persistent storage failure, the HTTP surface, and the real process. Platform engineering owns this
 service.
+
+## Ownership
+
+Platform operations.

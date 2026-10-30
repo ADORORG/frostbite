@@ -46,3 +46,7 @@ build. Shared domain logic belongs in a domain-specific package rather than in t
 - `src/server/rate-limit.ts` is the rate limit gate used by the API route: by address first (needs
   `TRUSTED_PROXY_HOPS` to match the proxies in front of the app), then by person; the policy is
   `configs/rate-limits.ts`; counts are in the database.
+
+## Ownership
+
+Platform front end.

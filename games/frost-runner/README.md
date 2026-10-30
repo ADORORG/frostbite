@@ -14,6 +14,13 @@ src/main.ts    joins the page to the platform (progress, milestones, runs)
 src/replay.ts  the verifier the platform replays runs with (rules + one sample run)
 ```
 
+## Keys, sound and pause
+
+Up, W or space jump and down, S or shift slide (or touch the top or bottom of the screen); Enter starts a run, P pauses, and a hidden tab pauses.
+The music is a running loop and each action, shard and hit has an effect (`src/audio.ts`, played by the SDK's sound engine, with the panel at the
+bottom left). The sound settings are kept beside the best distance. The page runs on the SDK's run loop (`createRunLoop`), so pausing stops the clock;
+`src/feedback.ts` says which sounds a tick's changes deserve. None of this is in the rules, so it does not change the verifier's digest.
+
 ## How runs are checked
 
 The rules know only ticks (thirty a second) and whole numbers; the same seed and choices always play out the same way. The platform

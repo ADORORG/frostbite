@@ -74,3 +74,7 @@ pnpm --filter @ador/database test:coverage
 transaction that completes the step that made it (`@ador/database/game-contracts`: `ContractStore` to read, `writeRecording` to write). A
 record is never updated: the tables refuse a second record for a template or game, and two at one address. `ador.game_admin_steps`
 is the evidence each points to, and may not be deleted while a record does.
+
+## Ownership
+
+Platform engineering.

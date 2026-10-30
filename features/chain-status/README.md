@@ -72,3 +72,7 @@ variables, tables or provider code.
 
 - `NetworkPill` (via `@ador/feature-chain-status/badge`) is the chain in the header: a light, the network's name and its latest block; opened, how far the platform has read the chain and the four fee speeds as tiles. Nothing is drawn where no chain is followed, and an unknown is shown as unknown.
 - `FeeSpeedChip` (`@ador/feature-chain-status/fee-picker`) is the speed chosen as one small control that opens the tiles (`FeeSpeedPicker`). A speed marked `withinLimit: false` by the server is never offered. Staff pages and the player's claim use it.
+
+## Ownership
+
+Platform front end.

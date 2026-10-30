@@ -20,3 +20,7 @@ until sign-in moves to the neutral address codec (ADR-017). Everything else uses
 ends in `.`, `?` or `!`) is written in more than one place in production source (`features/*/src`, `packages/*/src`, `apps/web/src`). Write it
 once and share it. Duplicates that existed when the check was added are in `sentence-baseline.json`; the check refuses a baseline that allows
 more copies than there are, so it can only shrink. After removing a duplicate, run `pnpm --filter @repo/repository-policy update-sentence-baseline`.
+
+## Ownership
+
+Platform engineering.

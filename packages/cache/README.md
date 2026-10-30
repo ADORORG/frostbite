@@ -27,3 +27,7 @@ its own time-to-live, single-flight or stale-while-error logic.
 ## Verification
 
 `pnpm --filter @ador/cache typecheck test:unit test:integration test:coverage`. Platform engineering owns it.
+
+## Ownership
+
+Platform engineering.

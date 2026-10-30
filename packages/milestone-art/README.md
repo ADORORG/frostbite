@@ -33,3 +33,7 @@ links, scripts, styles, animation, `foreignObject`, comments, CDATA, doctypes, p
 
 No runtime dependencies. `pnpm --filter @ador/milestone-art test:unit | test:integration | test:coverage`. Platform engineering owns
 this package; contract engineering owns the vector file.
+
+## Ownership
+
+Platform front end.

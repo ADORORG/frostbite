@@ -68,3 +68,7 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
 
 `typecheck`, `test:unit`, `test:integration`, `test:coverage` cover `src/`; the scripts are exercised by
 running them. Platform engineering owns this workspace.
+
+## Ownership
+
+Platform engineering.

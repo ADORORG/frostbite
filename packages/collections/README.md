@@ -113,3 +113,7 @@ and a database client. Limits are the shared engineering bounds in `@ador/shared
 `pnpm test:unit` (service rules against a recording repository), `pnpm test:integration` (the adapter
 against real PostgreSQL migrations, including concurrency), and `pnpm test:coverage`. Platform
 engineering owns this package.
+
+## Ownership
+
+Platform engineering.

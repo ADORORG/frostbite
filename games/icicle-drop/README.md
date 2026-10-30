@@ -14,6 +14,12 @@ src/main.ts    joins the page to the platform (progress, milestones, runs)
 src/replay.ts  the verifier the platform replays runs with (rules + one sample run)
 ```
 
+## Keys, sound and pause
+
+Arrows or WASD (or a swipe) slide the tiles; Enter starts a run (and never throws away one that is going: the button says "New run"), and P or
+Space pause, which blocks moves. A join chimes higher the bigger the biggest tile; the music is a calm loop (`src/audio.ts`, `src/feedback.ts`), and the
+panel is at the bottom left. The sound settings are kept beside the best score. None of this is in the rules, so it does not change the digest.
+
 ## How runs are checked
 
 A new tile comes from a seeded generator, so the same seed and moves always play out the same way. The platform gives a run its seed,

@@ -25,3 +25,7 @@ Depends on `@ador/shared` (routes, error envelope). No environment configuration
 ## Verification
 
 Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. Platform engineering owns this package.
+
+## Ownership
+
+Platform engineering.
