@@ -9,7 +9,9 @@ import { startDurableS3Runtime } from "@ador/test-kit/s3-durable";
 
 import {
   formatStackGuide,
+  resolveStackHost,
   resolveStackServer,
+  resolveStackTls,
   stackActors,
 } from "../src/manual-stack.ts";
 import {
@@ -116,10 +118,10 @@ function freePort(): Promise<number> {
   });
 }
 
-function listen(server: Server, port: number): Promise<void> {
+function listen(server: Server, port: number, host: string): Promise<void> {
   return new Promise((resolveListen, reject) => {
     server.on("error", reject);
-    server.listen(port, "127.0.0.1", resolveListen);
+    server.listen(port, host, resolveListen);
   });
 }
 
@@ -159,8 +161,17 @@ if (process.argv.includes("--fresh")) {
   await wipeStack(dataDirectory);
   console.log("The stack's database and storage were deleted.");
 }
-await build(stackEnvironment);
 const { baseURL, port } = resolveStackServer();
+// Paths are read from the repository root, where the person runs the command (pnpm runs the script from this workspace).
+const tlsFiles = resolveStackTls();
+const tls =
+  tlsFiles === null
+    ? null
+    : {
+        cert: await readFile(resolve(repositoryRoot, tlsFiles.cert), "utf8"),
+        key: await readFile(resolve(repositoryRoot, tlsFiles.key), "utf8"),
+      };
+await build(stackEnvironment);
 const secrets = await stackSecrets(dataDirectory);
 await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
   console.log(
@@ -215,10 +226,12 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           const frontDoor = createStackProxy({
             actors: stackActors,
             origin: baseURL,
+            ...(tls === null ? {} : { tls }),
             startSession: ({ token }) => reviveSession(sessions, token),
             upstreamPort,
           });
-          await listen(frontDoor, Number(port));
+          const host = resolveStackHost();
+          await listen(frontDoor, Number(port), host);
           console.log(formatStackGuide({ baseURL }));
           console.log(`${describeChain(stackEnvironment)}`);
           console.log(`${describeMail(mailEnvironment)}\n`);

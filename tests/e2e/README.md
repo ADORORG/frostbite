@@ -59,7 +59,21 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   session cookie is secure, so use Chrome or Firefox on `localhost`.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
-- Everything is disposable and local: the server binds the loopback address, the session tokens are fixed
+- To open the stack on a phone on the same network, serve it over HTTPS: a page on a plain `http://<address>` is not a secure
+  context, so `crypto.subtle` is missing and the web app fails on load. Make a throwaway certificate for the machine's address
+  (`hostname -I`) and start the stack with it:
+
+  ```
+  openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=<address>" -addext "subjectAltName=IP:<address>" \
+    -keyout .stack-data/lan-key.pem -out .stack-data/lan-cert.pem
+  STACK_HOST=0.0.0.0 STACK_BASE_URL=https://<address>:4174 \
+    STACK_TLS_CERT=.stack-data/lan-cert.pem STACK_TLS_KEY=.stack-data/lan-key.pem pnpm stack
+  ```
+
+  The phone warns about the certificate once; accept it. HTTPS also lets the `Secure` session cookie be kept, so sign-in works.
+  The sign-in picker lets anyone who reaches it become any seeded person, so use it only on a network you trust.
+
+- Everything is disposable and local: the server binds the loopback address (unless `STACK_HOST` is set), the session tokens are fixed
   fixtures of a throwaway database and storage is MinIO (never real R2). The only real thing is the rewards
   chain above, when one is set. Never run it on a shared host.
 - Docker is required (as for the integration tests).

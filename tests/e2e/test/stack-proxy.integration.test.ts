@@ -1,4 +1,9 @@
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createServer, request as httpRequest, type Server } from "node:http";
+import { request as httpsRequest } from "node:https";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { afterEach, describe, expect, it } from "vitest";
@@ -208,5 +213,62 @@ describe("the stack front door", () => {
     const response = await fetch(`${base}/`);
     expect(response.status).toBe(502);
     expect(await response.text()).toContain("not answering");
+  });
+});
+
+describe("the front door over HTTPS", () => {
+  it("serves the sign-in page with a certificate, and passes other requests on", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "stack-tls-"));
+    try {
+      const cert = join(directory, "cert.pem");
+      const key = join(directory, "key.pem");
+      execFileSync(
+        "openssl",
+        ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1"].concat([
+          "-subj",
+          "/CN=localhost",
+          "-keyout",
+          key,
+          "-out",
+          cert,
+        ]),
+        { stdio: "ignore" },
+      );
+      const upstream = await start(echoUpstream());
+      const port = await start(
+        createStackProxy({
+          actors: stackActors,
+          origin: "https://localhost:4174",
+          tls: {
+            cert: readFileSync(cert, "utf8"),
+            key: readFileSync(key, "utf8"),
+          },
+          upstreamPort: upstream,
+        }),
+      );
+      const get = (path: string) =>
+        new Promise<{ body: string; status: number }>((resolve, reject) =>
+          httpsRequest(
+            { host: "127.0.0.1", path, port, rejectUnauthorized: false },
+            (answer) => {
+              let body = "";
+              answer.on("data", (chunk: Buffer) => (body += String(chunk)));
+              answer.on("end", () =>
+                resolve({ body, status: answer.statusCode ?? 0 }),
+              );
+            },
+          )
+            .on("error", reject)
+            .end(),
+        );
+      const picker = await get("/dev/sign-in");
+      expect(picker.status).toBe(200);
+      expect(picker.body).toContain("Creator (approved)");
+      const passed = await get("/anything");
+      expect(passed.status).toBe(201);
+      expect(passed.body).toContain('"url":"/anything"');
+    } finally {
+      rmSync(directory, { force: true, recursive: true });
+    }
   });
 });
