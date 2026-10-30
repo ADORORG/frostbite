@@ -37,6 +37,14 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./build`: `checkGameHtml`, `bundleGameScript`, `bundleGameStyles`, `buildGame(s)`: turns `/games/<id>` into
   `public/play/<id>`. `styles.css` is bundled with what it imports; fonts and images it names are published beside it
   under hashed names; a stylesheet that loads from another address fails the build.
+- `./audio`: `createSound({ context: () => new AudioContext(), settings, onChange })` plays a game's music and effects from
+  data, with no sound files: a `Track` (`./audio/tracks`: a tempo and voices of looping notes) and an `Effect`
+  (`./audio/effects`: tones that glide between two pitches, or noise; `commonEffects` has click, start, good, win, lose). Browsers keep a page silent
+  until the player acts, so nothing plays before `unlock()` is called from a press or key, and `state()` says
+  `audible: false` until it is (and `available: false` where there is no audio). `pause()`/`resume()` follow the game,
+  `followVisibility` silences a hidden tab, `setTempoScale` speeds the music with the game. `./audio/settings` holds the
+  player's choices (music, effects, volume): the frame has no storage, so a game keeps `SoundSettings` beside its
+  progress and reads it back with `parseSound`.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 

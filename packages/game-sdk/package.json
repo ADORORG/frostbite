@@ -5,6 +5,10 @@
   "type": "module",
   "exports": {
     "./attach": "./src/attach.ts",
+    "./audio": "./src/audio/engine.ts",
+    "./audio/effects": "./src/audio/effects.ts",
+    "./audio/settings": "./src/audio/settings.ts",
+    "./audio/tracks": "./src/audio/tracks.ts",
     "./build": "./src/build.ts",
     "./cabinets": "./src/cabinets.ts",
     "./client": "./src/client.ts",
@@ -69,6 +73,22 @@
       "./attach": {
         "types": "./dist/attach.d.ts",
         "default": "./dist/attach.js"
+      },
+      "./audio": {
+        "types": "./dist/audio/engine.d.ts",
+        "default": "./dist/audio/engine.js"
+      },
+      "./audio/effects": {
+        "types": "./dist/audio/effects.d.ts",
+        "default": "./dist/audio/effects.js"
+      },
+      "./audio/settings": {
+        "types": "./dist/audio/settings.d.ts",
+        "default": "./dist/audio/settings.js"
+      },
+      "./audio/tracks": {
+        "types": "./dist/audio/tracks.d.ts",
+        "default": "./dist/audio/tracks.js"
       },
       "./build": {
         "types": "./dist/build.d.ts",
