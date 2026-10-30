@@ -17,6 +17,8 @@ export interface GameSoundOptions<Name extends string> {
 }
 
 export interface GameSound<Name extends string> {
+  // For a game that can go away (a cabinet that closes): stops the music and the timer, and takes the panel off the page.
+  readonly close: () => void;
   // Takes the settings the game read back from its save.
   readonly apply: (saved: unknown) => void;
   readonly music: (playing: boolean) => void;
@@ -45,6 +47,10 @@ export function setUpSound<Name extends string>(
     apply(saved) {
       sound.configure(parseSound(saved), false);
       panel.refresh();
+    },
+    close() {
+      sound.close();
+      panel.unmount();
     },
     music(playing) {
       if (playing) sound.playMusic(options.track);

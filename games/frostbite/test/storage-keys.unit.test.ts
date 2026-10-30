@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { persistedKeys } from "../src/platform/storage-keys.ts";
+import { persistedKeys, soundKey } from "../src/platform/storage-keys.ts";
 
 const legacy = join(import.meta.dirname, "../src/legacy");
 // Keys the game writes that are meant to last only as long as the page: its telemetry log.
@@ -26,7 +26,10 @@ describe("the keys the game stores", () => {
       ))
         found.add(match[1] ?? "");
     }
-    expect([...found].sort()).toEqual([...persistedKeys, ...visitOnly].sort());
+    // The cabinets write the sound key, not the original page, so it is not among the keys found in the page's files.
+    expect([...found, soundKey].sort()).toEqual(
+      [...persistedKeys, ...visitOnly].sort(),
+    );
   });
 
   it("keeps the saved ones few, so the save stays far under the platform's limit", () => {

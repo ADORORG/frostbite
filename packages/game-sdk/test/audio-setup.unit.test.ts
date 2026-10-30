@@ -124,6 +124,17 @@ describe("a game's sound, set up in one call", () => {
     expect(context.state).toBe("running");
   });
 
+  it("takes the panel away and stops everything when it is closed", async () => {
+    const { container, game } = setup();
+    await game.sound.unlock();
+    game.music(true);
+    const count = context.oscillators.length;
+    game.close();
+    expect(container.querySelector(".sound-panel")).toBeNull();
+    context.currentTime = 5;
+    expect(context.oscillators).toHaveLength(count);
+  });
+
   it("goes quiet while the tab is hidden", async () => {
     const { game } = setup();
     await game.sound.unlock();

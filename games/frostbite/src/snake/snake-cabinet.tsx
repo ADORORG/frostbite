@@ -1,4 +1,5 @@
 import * as React from "react";
+import { pauseCopy } from "@ador/game-sdk/pause";
 import type { RunRecord } from "@ador/game-sdk/run-record";
 import { useEffect, useReducer, useRef, useState } from "react";
 
@@ -6,7 +7,9 @@ import type { CabinetHost } from "../cabinet/host.ts";
 import { markOf } from "../cabinet/marks.ts";
 import { RecordView } from "../cabinet/record-view.tsx";
 import { randomSeed } from "../cabinet/seed.ts";
+import { useCabinetSound } from "../cabinet/use-cabinet-sound.ts";
 import { usePlatformRun } from "../cabinet/use-platform-run.ts";
+import { effects, track } from "./audio.ts";
 import { SnakeGrid } from "./grid.tsx";
 import { directionOfKey } from "./keys.ts";
 import { SnakePad } from "./pad.tsx";
@@ -36,6 +39,7 @@ export function SatSnake({
   const [session, setSession] = useState<SnakeSession | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
   const platformRun = usePlatformRun(host.runs);
+  const sound = useCabinetSound(open, track, effects);
   const [, redraw] = useReducer((count: number) => count + 1, 0);
   const launcher = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
@@ -43,8 +47,14 @@ export function SatSnake({
     if (open) panel.current?.focus();
   }, [open]);
 
+  // A run is finished once, however many timer turns see that it has ended before the screen is drawn again.
+  const closing = useRef<SnakeSession | null>(null);
   const finish = (finished: SnakeSession) => {
+    if (closing.current === finished) return;
+    closing.current = finished;
     const closed = finished.record();
+    sound.music(false);
+    if (!finished.state().alive) sound.sfx("lose");
     setRecord(closed);
     setPhase("ended");
     setMessage(
@@ -54,15 +64,17 @@ export function SatSnake({
   };
 
   useEffect(() => {
-    if (phase !== "playing" || session === null) return;
+    if (phase !== "playing" || session === null || sound.paused) return;
     const timer = setInterval(() => {
+      const length = session.state().snake.length;
       session.tick();
+      if (session.state().snake.length > length) sound.sfx("eat");
       redraw();
       if (session.state().ended) finish(session);
     }, tickMs);
     return () => clearInterval(timer);
     // The timer belongs to the run; `finish` only reads the session and sets state.
-  }, [phase, session, tickMs]);
+  }, [phase, session, tickMs, sound.paused]);
 
   const close = () => {
     setOpen(false);
@@ -77,13 +89,19 @@ export function SatSnake({
       }),
     );
     setRecord(null);
+    sound.pause.set(false);
+    sound.sfx("start");
+    sound.music(true);
     setPhase("playing");
     setMessage(note);
+    // The button that was pressed is gone, and the keys need somewhere to land.
+    panel.current?.focus();
   };
   const turn = (direction: Direction) => {
-    if (session === null || phase !== "playing") return;
+    if (session === null || phase !== "playing" || sound.paused) return;
     const outcome = session.turn(direction);
-    if (!outcome.ok) setMessage(outcome.reason);
+    if (outcome.ok) sound.sfx("turn");
+    else setMessage(outcome.reason);
     redraw();
   };
   const state = session?.state();
@@ -107,6 +125,22 @@ export function SatSnake({
           id="sat-snake-panel"
           onKeyDown={(event) => {
             if (event.key === "Escape") return close();
+            // Enter starts a run from the panel itself (a button with the focus is pressed by Enter already); P and Space pause.
+            if (event.key === "Enter" && event.target === event.currentTarget) {
+              event.preventDefault();
+              if (phase !== "playing") void start();
+              return;
+            }
+            if (
+              phase === "playing" &&
+              (event.key === "p" ||
+                event.key === "P" ||
+                (event.key === " " && event.target === event.currentTarget))
+            ) {
+              event.preventDefault();
+              sound.pause.toggle();
+              return;
+            }
             const direction = directionOfKey(event.key);
             if (direction === undefined) return;
             event.preventDefault();
@@ -159,13 +193,20 @@ export function SatSnake({
                 <SnakePad onTurn={turn} />
                 <button
                   className="if-button if-button--quiet"
+                  onClick={sound.pause.toggle}
+                  type="button"
+                >
+                  {sound.paused ? pauseCopy.resume : pauseCopy.pause}
+                </button>
+                <button
+                  className="if-button if-button--quiet"
                   onClick={() => session !== null && finish(session)}
                   type="button"
                 >
                   End run
                 </button>
                 <p aria-live="polite" className="if-status" role="status">
-                  {message}
+                  {sound.paused ? pauseCopy.paused : message}
                 </p>
               </div>
             </div>
@@ -182,6 +223,7 @@ export function SatSnake({
               {message}
             </p>
           )}
+          <div className="if-sound" ref={sound.container} />
         </section>
       ) : null}
     </>

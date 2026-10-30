@@ -51,3 +51,7 @@ platform), `test:coverage`; the real-browser tests are `tests/e2e/tests/frostbit
 ## Ownership
 
 The games platform owner.
+
+## Sound and keys in the cabinets
+
+The two replayable cabinets (SAT SNAKE and the ice field) play music and effects through `@ador/game-sdk/audio`, with the shared sound panel at the foot of each cabinet. The player's choice is kept under `frostbite.sound.v1` in the game's own storage, which the platform saves. Enter starts a run from the cabinet (or starts another once one has ended) and never throws away a run that is going; in SAT SNAKE P and Space pause the snake. The original game keeps its own audio and keys (`src/legacy/audio.jsx`), which were not changed.

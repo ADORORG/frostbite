@@ -1,3 +1,5 @@
+@import "@ador/game-sdk/audio/panel.css";
+
 /* The ice-field cabinet. Classes only: the frame's policy allows no inline styles. Colours are the game's own tokens. */
 /* The launchers sit in one row (see cabinet/dock.ts), so each takes the room its words need and none can lie over another. */
 .cabinet-dock {
@@ -192,4 +194,10 @@
   .if-board {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+/* The sound controls sit at the foot of the panel, at the left, in a place of their own. */
+.if-sound {
+  margin-top: 12px;
+  color: var(--frost);
 }

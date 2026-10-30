@@ -8,7 +8,9 @@ import type { CabinetHost } from "../cabinet/host.ts";
 import { markOf } from "../cabinet/marks.ts";
 import { RecordView } from "../cabinet/record-view.tsx";
 import { randomSeed } from "../cabinet/seed.ts";
+import { useCabinetSound } from "../cabinet/use-cabinet-sound.ts";
 import { usePlatformRun } from "../cabinet/use-platform-run.ts";
+import { effects, track } from "./audio.ts";
 import { neighbourMines } from "./neighbours.ts";
 import { createIceFieldSession, type IceFieldSession } from "./session.ts";
 
@@ -32,6 +34,7 @@ export function IceField({
   const [session, setSession] = useState<IceFieldSession | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
   const platformRun = usePlatformRun(host.runs);
+  const sound = useCabinetSound(open, track, effects);
   // The session changes inside itself; the screen is drawn again after each input.
   const [, redraw] = useReducer((count: number) => count + 1, 0);
   const launcher = useRef<HTMLButtonElement>(null);
@@ -56,8 +59,12 @@ export function IceField({
         seed,
       }),
     );
+    sound.sfx("start");
+    sound.music(true);
     setPhase("playing");
     setMessage(note);
+    // The button that was pressed is gone, and the keys need somewhere to land.
+    panel.current?.focus();
   };
   const state = session?.state();
   const nextCost = session?.nextGlacierCost() ?? null;
@@ -66,6 +73,7 @@ export function IceField({
     if (session === null) return;
     const outcome = session.pick(tile);
     const { board } = session.state();
+    if (outcome.ok) sound.sfx(board.busted ? "lose" : "safe");
     setMessage(
       !outcome.ok
         ? outcome.reason
@@ -79,6 +87,7 @@ export function IceField({
     const outcome = session?.settle();
     if (outcome === undefined) return;
     const result = outcome.ok ? outcome.settled : undefined;
+    if (result?.result === "won") sound.sfx("win");
     setMessage(
       !outcome.ok
         ? outcome.reason
@@ -93,6 +102,7 @@ export function IceField({
   const build = () => {
     const outcome = session?.buildGlacier();
     if (outcome === undefined) return;
+    if (outcome.ok) sound.sfx("build");
     setMessage(
       outcome.ok
         ? `Glacier tier ${String(session?.state().glacierTier)} built.`
@@ -103,6 +113,7 @@ export function IceField({
   const end = () => {
     if (session === null) return;
     const finished = session.record();
+    sound.music(false);
     setRecord(finished);
     setPhase("ended");
     setMessage("");
@@ -128,6 +139,11 @@ export function IceField({
           id="ice-field-panel"
           onKeyDown={(event) => {
             if (event.key === "Escape") close();
+            // Enter starts a run from the panel itself (a button with the focus is pressed by Enter already).
+            if (event.key === "Enter" && event.target === event.currentTarget) {
+              event.preventDefault();
+              if (phase !== "playing") void start();
+            }
           }}
           ref={panel}
           role="dialog"
@@ -190,6 +206,7 @@ export function IceField({
               {message}
             </p>
           )}
+          <div className="if-sound" ref={sound.container} />
         </section>
       ) : null}
     </>
