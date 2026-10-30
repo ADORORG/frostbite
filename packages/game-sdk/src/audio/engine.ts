@@ -182,10 +182,11 @@ export function createSound(options: SoundOptions) {
       stopPump = null;
       track = null;
     },
-    configure(next: Partial<SoundSettings>): SoundSettings {
+    // `notify: false` is for settings that were just read back from a save: there is nothing new to save.
+    configure(next: Partial<SoundSettings>, notify = true): SoundSettings {
       settings = { ...settings, ...next };
       levels();
-      options.onChange?.(settings);
+      if (notify) options.onChange?.(settings);
       return settings;
     },
     effect(effect: Effect): void {

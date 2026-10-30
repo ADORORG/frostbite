@@ -34,7 +34,7 @@ export function mountSoundPanel(
   container: HTMLElement,
   sound: Sound,
   options: PanelOptions = {},
-): () => void {
+): { readonly refresh: () => void; readonly unmount: () => void } {
   const group = document.createElement("div");
   group.className = "sound-panel";
   group.setAttribute("role", "group");
@@ -96,10 +96,13 @@ export function mountSoundPanel(
     },
   );
   refresh();
-  return () => {
-    window.removeEventListener("pointerdown", unlock);
-    window.removeEventListener("keydown", unlock);
-    detachKeys();
-    group.remove();
+  return {
+    refresh,
+    unmount() {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+      detachKeys();
+      group.remove();
+    },
   };
 }

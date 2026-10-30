@@ -19,12 +19,12 @@ function setup(settings = defaultSound) {
   const container = document.createElement("div");
   document.body.append(container);
   const saved: number[] = [];
-  const unmount = mountSoundPanel(container, sound, {
+  const { refresh, unmount } = mountSoundPanel(container, sound, {
     onChange: () => saved.push(saved.length),
   });
   const pick = (key: string) =>
     container.querySelector<HTMLButtonElement>(`[data-sound="${key}"]`);
-  return { container, context, pick, saved, sound, unmount };
+  return { container, context, pick, refresh, saved, sound, unmount };
 }
 
 const keyDown = (code: string) =>
@@ -149,6 +149,14 @@ describe("the sound panel", () => {
     expect(sound.state().settings.music).toBe(true);
     window.dispatchEvent(new Event("pointerdown"));
     expect(sound.state().unlocked).toBe(false);
+  });
+
+  it("shows settings applied from outside once it is told to look again", () => {
+    const { pick, refresh, sound } = setup();
+    sound.configure({ music: false }, false);
+    expect(pick("music")?.textContent).toBe("Music on");
+    refresh();
+    expect(pick("music")?.textContent).toBe("Music off");
   });
 
   it("works without a save callback", () => {

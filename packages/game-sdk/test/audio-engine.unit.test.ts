@@ -109,6 +109,13 @@ describe("effects", () => {
     expect(sound.state().settings.effects).toBe(true);
   });
 
+  it("do not tell the game to save what it just read back from a save", async () => {
+    const { changes, sound } = setup();
+    sound.configure({ music: false }, false);
+    expect(changes).toHaveLength(0);
+    expect(sound.state().settings.music).toBe(false);
+  });
+
   it("change the volume with the player's choice", async () => {
     const { context, sound } = setup();
     await sound.unlock();
