@@ -20,6 +20,8 @@ export interface GameSound<Name extends string> {
   // Takes the settings the game read back from its save.
   readonly apply: (saved: unknown) => void;
   readonly music: (playing: boolean) => void;
+  // An effect made on the spot, for one that depends on the moment (a pitch that follows the score).
+  readonly play: (effect: Effect) => void;
   // A sound effect by the game's own name for it.
   readonly sfx: (name: Name) => void;
   readonly sound: Sound;
@@ -48,6 +50,7 @@ export function setUpSound<Name extends string>(
       if (playing) sound.playMusic(options.track);
       else sound.stopMusic();
     },
+    play: (effect) => sound.effect(effect),
     sfx: (name) => sound.effect(options.effects[name]),
     sound,
     tempo: (scale) => sound.setTempoScale(scale),

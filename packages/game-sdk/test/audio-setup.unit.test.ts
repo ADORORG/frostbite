@@ -79,6 +79,13 @@ describe("a game's sound, set up in one call", () => {
     expect(context.oscillators).toHaveLength(1);
   });
 
+  it("plays an effect made on the spot", async () => {
+    const { game } = setup();
+    await game.sound.unlock();
+    game.play([tone("sine", 500, 900, 0.1)]);
+    expect(context.oscillators[0]?.frequency.calls[0]).toEqual(["set", 500, 0]);
+  });
+
   it("starts and stops the music", async () => {
     const { game } = setup();
     await game.sound.unlock();

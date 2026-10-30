@@ -29,8 +29,10 @@ describe("the player's hands", () => {
   const setup = () => {
     const board = document.createElement("div");
     const choose = vi.fn();
-    stops.push(attachControls(board, choose));
-    return { board, choose };
+    const start = vi.fn();
+    const pause = vi.fn();
+    stops.push(attachControls(board, { move: choose, pause, start }));
+    return { board, choose, pause, start };
   };
   const press = (code: string, repeat = false) => {
     const event = new KeyboardEvent("keydown", {
@@ -76,6 +78,19 @@ describe("the player's hands", () => {
     expect(choose).toHaveBeenCalledTimes(pairs.length);
   });
 
+  it("starts on Enter and pauses on P and on Space, on the press and not the release", () => {
+    const { choose, pause, start } = setup();
+    press("Enter");
+    press("NumpadEnter");
+    press("KeyP");
+    press("Space");
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+    expect(start).toHaveBeenCalledTimes(2);
+    expect(pause).toHaveBeenCalledTimes(2);
+    expect(choose).not.toHaveBeenCalled();
+  });
+
   it("moves on a swipe across the board, and not on a touch that hardly moved or that began elsewhere", () => {
     const { board, choose } = setup();
     drag(board, [10, 10], [90, 12]);
@@ -91,7 +106,11 @@ describe("the player's hands", () => {
   it("stops listening when told to", () => {
     const board = document.createElement("div");
     const choose = vi.fn();
-    const stop = attachControls(board, choose);
+    const stop = attachControls(board, {
+      move: choose,
+      pause: vi.fn(),
+      start: vi.fn(),
+    });
     stop();
     press("ArrowLeft");
     drag(board, [0, 0], [90, 0]);

@@ -1,6 +1,16 @@
+import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+
 import type { Direction } from "../rules/constants.ts";
 
-const keys: Readonly<Record<string, Direction>> = {
+// What the player's hands can do: move the tiles, start a run (Enter) and pause (P or Space, since Space has no other use here).
+export interface Controls {
+  readonly move: (direction: Direction) => void;
+  readonly pause: () => void;
+  readonly start: () => void;
+}
+
+const keys = {
+  ...standardKeys,
   ArrowDown: "down",
   ArrowLeft: "left",
   ArrowRight: "right",
@@ -9,7 +19,8 @@ const keys: Readonly<Record<string, Direction>> = {
   KeyD: "right",
   KeyS: "down",
   KeyW: "up",
-};
+  Space: "pause",
+} as const;
 
 // The shortest drag that is a swipe, in pixels.
 export const swipeDistance = 24;
@@ -24,14 +35,13 @@ export function swipeDirection(dx: number, dy: number): Direction | null {
 // Arrow keys and WASD on the page, and swipes on the board. Returns a function that stops listening.
 export function attachControls(
   board: HTMLElement,
-  choose: (direction: Direction) => void,
+  controls: Controls,
 ): () => void {
-  const onKey = (event: KeyboardEvent): void => {
-    const direction = keys[event.code];
-    if (direction === undefined || event.repeat) return;
-    event.preventDefault();
-    choose(direction);
-  };
+  const stopKeys = attachKeys(window, keys, (action, phase) => {
+    if (phase !== "down") return;
+    if (action === "start" || action === "pause") controls[action]();
+    else controls.move(action);
+  });
   let from: { x: number; y: number } | null = null;
   const onDown = (event: PointerEvent): void => {
     from = { x: event.clientX, y: event.clientY };
@@ -43,13 +53,12 @@ export function attachControls(
       event.clientY - from.y,
     );
     from = null;
-    if (direction !== null) choose(direction);
+    if (direction !== null) controls.move(direction);
   };
-  window.addEventListener("keydown", onKey);
   board.addEventListener("pointerdown", onDown);
   board.addEventListener("pointerup", onUp);
   return () => {
-    window.removeEventListener("keydown", onKey);
+    stopKeys();
     board.removeEventListener("pointerdown", onDown);
     board.removeEventListener("pointerup", onUp);
   };
