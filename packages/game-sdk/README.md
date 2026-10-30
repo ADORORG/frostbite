@@ -45,6 +45,12 @@ the account and (later) minting; the game owns only its rules and its drawing.
   `followVisibility` silences a hidden tab, `setTempoScale` speeds the music with the game. `./audio/settings` holds the
   player's choices (music, effects, volume): the frame has no storage, so a game keeps `SoundSettings` beside its
   progress and reads it back with `parseSound`.
+- `./controls`: `attachKeys(window, keys, on)` gives every game the same keys. `standardKeys` is Enter (and the numpad Enter) for
+  `start` and P for `pause`; a game adds its own (`{ ...standardKeys, Space: "pause", ArrowLeft: "left" }`) or takes Enter or P for
+  something else. Held keys do not repeat, Ctrl/Alt/Meta shortcuts and typing in a field are left to the browser, and a handled key is
+  stopped from scrolling the page or pressing a focused button. `./pause`: `createPause()` is the one place a game, its screen and its
+  sound agree whether it is paused. Pausing adds no input and no tick, so a paused run replays like any other; a game restarts its clock
+  from now on resume.
 - The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
