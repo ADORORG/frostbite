@@ -31,7 +31,9 @@ adapters as domain tables are accepted; it never exports database rows as HTTP c
 
 - Requires standard PostgreSQL 18; no Railway or Supabase SDK is imported.
 - Production changes use reviewed generated migrations. Schema push is not exposed.
-- Migrations run as an explicit deployment step, never on application startup.
+- Migrations run when the web container starts, before it serves (the image's command), and can be run by hand with `migration:apply`.
+  Every run takes a PostgreSQL advisory lock (`src/migrations/lock.ts`) on its own connection, so processes migrating at once take
+  turns; a waiter that is not served within `migrationLockWaitMs` fails. The worker and application code never migrate.
 - Outbox rows preserve event identity across at-least-once delivery attempts. Concurrent relays use
   PostgreSQL row locks and expiring leases; stale workers cannot acknowledge another lease.
 - `DATABASE_MIGRATION_URL` falls back to `DATABASE_URL` only when it is absent or blank.

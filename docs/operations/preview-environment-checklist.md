@@ -24,11 +24,11 @@ client bundle.
 - [ ] Set `DATABASE_POOL_MAX`, `DATABASE_ACQUIRE_TIMEOUT_MS`, `DATABASE_IDLE_TIMEOUT_MS`,
       `DATABASE_STATEMENT_TIMEOUT_MS`. Keep pool size × service count below the database connection limit.
 - [ ] Enable automated backups and confirm a restore works before real users arrive.
-- [ ] Do not rely on someone remembering to run migrations. Configure the platform's **pre-deploy
-      (release) command** on the web service to run
-      `pnpm --filter @ador/database migration:apply`. A failed migration then blocks the deploy and the
-      old version keeps serving. Migrations never run on application startup (ADR-009), so only one
-      step applies them. Configure it on one service only (web), not the worker.
+- [ ] Do not rely on someone remembering to run migrations. The web image applies pending migrations when
+      it starts, before it serves, under a database lock (`deployment.md`). A failed migration stops the
+      container, so the old version keeps serving. Do not also set a pre-deploy command, and do not
+      migrate from the worker. The migration role (`DATABASE_MIGRATION_URL`, else `DATABASE_URL`) must be
+      allowed to change the schema.
 - [ ] Until the readiness check (task W8-06) exists, after each deploy confirm no migration is pending.
 - [ ] Confirm `pnpm db:check` passes against the schema.
 

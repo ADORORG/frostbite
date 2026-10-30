@@ -7,11 +7,11 @@ and what is not is stated in "Status" at the end; read that before relying on an
 
 One container image, built once (`deploy/Dockerfile`), run three ways. What a container does is chosen by its start command:
 
-| Role    | Start command                                        | Health check     | Notes                                                      |
-| ------- | ---------------------------------------------------- | ---------------- | ---------------------------------------------------------- |
-| web     | the image's default (`node ...standalone/server.js`) | `GET /api/ready` | Public UI, studio, `/api/v1`. One replica until qualified. |
-| worker  | `pnpm --filter worker start`                         | `GET /ready`     | Outbox relay, cleanup, the signed Inngest endpoint.        |
-| release | `pnpm --filter @ador/database migration:apply`       | exits 0 or fails | Runs once per release, before the new web starts.          |
+| Role    | Start command                                                               | Health check     | Notes                                                                                                   |
+| ------- | --------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
+| web     | the image's default: `migration:apply`, then `node ...standalone/server.js` | `GET /api/ready` | Public UI, studio, `/api/v1`. Applies pending migrations before it serves. One replica until qualified. |
+| worker  | `pnpm --filter worker start`                                                | `GET /ready`     | Outbox relay, cleanup, the signed Inngest endpoint. Never migrates.                                     |
+| release | `pnpm --filter @ador/database migration:apply`                              | exits 0 or fails | Optional: the same migration by hand or as a platform's own step.                                       |
 
 Secrets and settings are never in the image. They come from the platform's environment at run time; the keys are the ones in
 `.env.production.example` (web) and `apps/worker/.env.example` (worker), which mirror the typed environment definition. The build
@@ -39,10 +39,13 @@ server, then drops dev dependencies. Build once and promote the same image throu
 ## Release order
 
 1. Build the image from the commit that passed CI.
-2. **Migrate** (release step). On Railway this is the web service's pre-deploy command (`deploy/railway/web.json`); elsewhere
-   run the `release` command against the new image with the migration database URL. A failed migration stops the release and the old
-   version keeps serving. Migrations never run when the application starts (ADR-009), and only the web service runs them.
-3. Start the new web and worker. Traffic moves only when `/api/ready` answers 200.
+2. **Migrate.** The web container applies the pending migrations when it starts, before it serves (the image's command), with
+   `DATABASE_MIGRATION_URL` when set, else `DATABASE_URL`. A failed migration stops the container, so the platform does not move
+   traffic and the old version keeps serving. Every run first takes a PostgreSQL advisory lock (`packages/database/src/migrations/lock.ts`),
+   so containers starting together take turns and the later ones find nothing left; one that waits longer than ten minutes fails.
+   Only the web service migrates; the worker never does. The migration role needs the right to change the schema.
+3. Start the new web and worker. Traffic moves only when `/api/ready` answers 200. Start the worker after the web is healthy on a
+   release that changes the schema.
 4. **Smoke test** the deployed address: `pnpm --filter @repo/deploy-smoke smoke https://<host>`. Any failed check means the
    release is not accepted: roll back.
 5. Watch `/api/ready` and the logs.
@@ -62,11 +65,27 @@ games page. It refuses http addresses except `localhost`, and exits non-zero on 
 
 Two services from the same repository, each with its config file path set to `deploy/railway/web.json` and
 `deploy/railway/worker.json`, plus Railway PostgreSQL. Set the variables from the environment templates on each service. The
-config files set the Dockerfile, the web pre-deploy migration, the health check paths and restart policy.
+config files set the Dockerfile, the health check paths and restart policy. The web service needs no pre-deploy command: the image migrates.
 
 Open item: Railway documents config-as-code as deprecated in favour of Infrastructure as Code (legacy files work until
 2026-12-01, per the Railway docs read on 2026-10-29). The IaC reference does not describe a Dockerfile or pre-deploy setting, so
 these files should be moved once it does; until then they, and the dashboard settings they stand for, are the record.
+
+## Coolify
+
+Written from the Coolify docs; not run on Coolify yet.
+
+- **Web:** a Dockerfile application with the Dockerfile at `deploy/Dockerfile` and the build context at the repository root. Port 3000,
+  health check path `/api/ready`. Leave the pre-deployment command empty: Coolify runs it in the old container and skips it on the first
+  deploy, which is why the image migrates itself. Give it one replica.
+- **Database:** Coolify's PostgreSQL, or any other. `DATABASE_SSL_MODE` must match what the server offers (`verify-full` needs TLS with a
+  certificate the container trusts).
+- **Worker:** a second application from the same repository and Dockerfile whose command is `pnpm --filter worker start` (health check
+  `/ready`). Check that Coolify lets a Dockerfile application override the command (custom Docker options, or a separate Dockerfile that
+  only sets `CMD`); if it cannot, the image has no other way to start as the worker.
+- **Environment:** the keys in `.env.production.example` (web) and `apps/worker/.env.example` (worker), as Coolify environment variables
+  at run time. `PUBLIC_BASE_URL` is the exact https origin; `TRUSTED_PROXY_HOPS` counts Coolify's proxy (probably 1).
+- The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).
 
 ## Checklist before the first real deployment
 
@@ -84,6 +103,9 @@ Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO c
   object storage stopped, `/api/ready` answered 503 and the smoke test failed and exited 1.
 - Worker: `pnpm --filter worker start` from the same image answered `/health` and `/ready` with 200.
 - A container needs no network access to start: the package manager is in the image, nothing is downloaded at run time.
+
+Added after: the migration moved to the start of the web container, under a lock. Verified against throwaway Postgres: four migrations
+started at once finish with each recorded once, and the same test fails without the lock. Not run: the image itself with the new command.
 
 Not verified: a real Railway or Coolify deployment (the Railway config files and CI image job were written from the platform docs and
 have never run), `APP_ENV=preview` or `production` (these need https and real services), the Inngest endpoint, running more than one web

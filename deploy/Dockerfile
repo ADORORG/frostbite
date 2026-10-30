@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 #
 # One image for every service (ADR-009: build once, promote the same artifact). What a container does is chosen by its start command:
-#   web      node apps/web/.next/standalone/apps/web/server.js      (the default)
+#   web      applies the pending migrations, then node apps/web/.next/standalone/apps/web/server.js   (the default)
 #   worker   pnpm --filter worker start
-#   release  pnpm --filter @ador/database migration:apply
+#   release  pnpm --filter @ador/database migration:apply   (by hand, or a platform that wants a separate step)
 # See docs/operations/deployment.md. Secrets are never in the image: they come from the platform's environment at run time.
 
 ARG NODE_VERSION=24.11.1
@@ -49,4 +49,6 @@ USER node
 EXPOSE 3000
 # Next.js reads HOSTNAME to choose the address it listens on; the platform's router reaches the container on all of them.
 ENV HOSTNAME=0.0.0.0 PORT=3000
-CMD ["node", "apps/web/.next/standalone/apps/web/server.js"]
+# The web container migrates before it serves: a migration that fails stops the container, so the previous version keeps serving. The
+# migration takes a database lock, so several web containers starting together migrate once. The worker overrides this command.
+CMD ["sh", "-c", "pnpm --filter @ador/database migration:apply && exec node apps/web/.next/standalone/apps/web/server.js"]

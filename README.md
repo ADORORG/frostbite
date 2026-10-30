@@ -54,8 +54,8 @@ pnpm format:check
 pnpm repository:check
 ```
 
-Database migrations are never applied during application startup. Deployment automation must run
-`pnpm --filter @ador/database migration:apply` as an explicit pre-deploy step.
+The web container applies pending database migrations when it starts, before it serves (the image's default command), under a database
+lock so containers starting together migrate once. The worker never migrates. Locally, run `pnpm --filter @ador/database migration:apply`.
 
 `pnpm stack` starts the whole product locally (database, storage, worker, web) with seeded users, keeping its data between runs, for
 manual testing in a browser; see [`tests/e2e/README.md`](tests/e2e/README.md).
