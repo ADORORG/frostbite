@@ -31,6 +31,13 @@ describe("the published package", () => {
     );
     const built = new Set(await readdir(out, { recursive: true }));
     for (const [, target] of entries) {
+      if (typeof target === "string") {
+        // A stylesheet is not compiled: the build script copies it from the same place in `src`.
+        const source = target.replace("./dist/", "src/");
+        await readFile(join(root, source), "utf8");
+        expect(manifest.scripts["build:package"]).toContain(source);
+        continue;
+      }
       expect(built.has(target.default.replace("./dist/", ""))).toBe(true);
       expect(built.has(target.types.replace("./dist/", ""))).toBe(true);
     }

@@ -45,6 +45,11 @@ the account and (later) minting; the game owns only its rules and its drawing.
   `followVisibility` silences a hidden tab, `setTempoScale` speeds the music with the game. `./audio/settings` holds the
   player's choices (music, effects, volume): the frame has no storage, so a game keeps `SoundSettings` beside its
   progress and reads it back with `parseSound`.
+- `./audio/panel`: `mountSoundPanel(container, sound, { onChange })` draws the controls every game carries, in the place the game gives
+  it (bottom left of the foot, never floating over the game): music and effects each on or off, a volume, M and N as shortcuts, and a
+  line that says "Sound starts when you press a key" until a press has unlocked it, or that the browser cannot play sound. Every
+  press wakes a suspended context. Style it with `@import "@ador/game-sdk/audio/panel.css";`. `onChange` is where the game saves
+  the settings.
 - `./controls`: `attachKeys(window, keys, on)` gives every game the same keys. `standardKeys` is Enter (and the numpad Enter) for
   `start` and P for `pause`; a game adds its own (`{ ...standardKeys, Space: "pause", ArrowLeft: "left" }`) or takes Enter or P for
   something else. Held keys do not repeat, Ctrl/Alt/Meta shortcuts and typing in a field are left to the browser, and a handled key is

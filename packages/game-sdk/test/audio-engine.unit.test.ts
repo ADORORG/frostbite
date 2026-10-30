@@ -19,6 +19,7 @@ describe("sound before the player has acted", () => {
       audible: false,
       available: true,
       settings: defaultSound,
+      unlocked: false,
     });
   });
 
@@ -56,7 +57,7 @@ describe("unlocking", () => {
     expect(music?.outputs).toEqual([master]);
     expect(effects?.outputs).toEqual([master]);
     expect(context.calls).toEqual(["resume"]);
-    expect(sound.state().audible).toBe(true);
+    expect(sound.state()).toMatchObject({ audible: true, unlocked: true });
   });
 });
 

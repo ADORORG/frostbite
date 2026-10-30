@@ -6,6 +6,8 @@
   "exports": {
     "./attach": "./src/attach.ts",
     "./audio": "./src/audio/engine.ts",
+    "./audio/panel": "./src/audio/panel.ts",
+    "./audio/panel.css": "./src/audio/panel.css",
     "./audio/effects": "./src/audio/effects.ts",
     "./audio/settings": "./src/audio/settings.ts",
     "./audio/tracks": "./src/audio/tracks.ts",
@@ -38,7 +40,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
-    "build:package": "rm -rf dist && tsc -p tsconfig.build.json",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css')\"",
     "prepack": "pnpm run build:package"
   },
   "dependencies": {
@@ -80,6 +82,11 @@
         "types": "./dist/audio/engine.d.ts",
         "default": "./dist/audio/engine.js"
       },
+      "./audio/panel": {
+        "types": "./dist/audio/panel.d.ts",
+        "default": "./dist/audio/panel.js"
+      },
+      "./audio/panel.css": "./dist/audio/panel.css",
       "./audio/effects": {
         "types": "./dist/audio/effects.d.ts",
         "default": "./dist/audio/effects.js"

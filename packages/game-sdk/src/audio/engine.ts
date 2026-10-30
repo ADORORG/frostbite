@@ -30,6 +30,8 @@ export interface SoundState {
   // The browser has no audio at all, or refused one.
   readonly available: boolean;
   readonly settings: SoundSettings;
+  // The player has acted and the browser handed over a context; before that nothing can play.
+  readonly unlocked: boolean;
 }
 
 // Music is scheduled a little ahead of the clock so a busy page does not make it stutter.
@@ -220,6 +222,7 @@ export function createSound(options: SoundOptions) {
         audible: context !== null && context.state === "running",
         available: !failed,
         settings,
+        unlocked: context !== null,
       };
     },
     stopMusic(): void {
