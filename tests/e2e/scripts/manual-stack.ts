@@ -11,6 +11,7 @@ import {
   formatStackGuide,
   resolveStackHost,
   resolveStackServer,
+  resolveStackTls,
   stackActors,
 } from "../src/manual-stack.ts";
 import {
@@ -160,8 +161,17 @@ if (process.argv.includes("--fresh")) {
   await wipeStack(dataDirectory);
   console.log("The stack's database and storage were deleted.");
 }
-await build(stackEnvironment);
 const { baseURL, port } = resolveStackServer();
+// Paths are read from the repository root, where the person runs the command (pnpm runs the script from this workspace).
+const tlsFiles = resolveStackTls();
+const tls =
+  tlsFiles === null
+    ? null
+    : {
+        cert: await readFile(resolve(repositoryRoot, tlsFiles.cert), "utf8"),
+        key: await readFile(resolve(repositoryRoot, tlsFiles.key), "utf8"),
+      };
+await build(stackEnvironment);
 const secrets = await stackSecrets(dataDirectory);
 await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
   console.log(
@@ -213,18 +223,10 @@ await withDurablePostgres({ directory: dataDirectory }, async (databaseUrl) => {
           await waitUntilServing(`http://127.0.0.1:${upstreamPort}`, server);
           // The people use the stack's address; the front door serves the test sign-in and passes the rest on.
           const sessions = createDatabaseClient(sessionPool);
-          const tlsFiles = resolveStackTls();
           const frontDoor = createStackProxy({
             actors: stackActors,
             origin: baseURL,
-            ...(tlsFiles === null
-              ? {}
-              : {
-                  tls: {
-                    cert: await readFile(tlsFiles.cert, "utf8"),
-                    key: await readFile(tlsFiles.key, "utf8"),
-                  },
-                }),
+            ...(tls === null ? {} : { tls }),
             startSession: ({ token }) => reviveSession(sessions, token),
             upstreamPort,
           });
