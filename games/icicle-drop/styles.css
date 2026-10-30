@@ -12,6 +12,8 @@ body {
 /* The page is the whole frame: a slim bar above, the board as large as the space allows, the controls below. */
 main {
   display: grid;
+  /* One column that may be narrower than what is in it: a long row of earned milestones scrolls inside its box and never widens the page. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   gap: 0.5rem;
   block-size: 100dvh;
