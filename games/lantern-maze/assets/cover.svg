@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd23f" stop-opacity="0.9" />
+      <stop offset="0.45" stop-color="#ff9f43" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#ff9f43" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="#05020f" />
+  <g fill="#8a6a3c" opacity="0.55">
+    <rect x="560" y="300" width="160" height="160" />
+    <rect x="720" y="300" width="160" height="160" />
+    <rect x="720" y="460" width="160" height="160" />
+    <rect x="880" y="460" width="160" height="160" />
+    <rect x="880" y="620" width="160" height="160" />
+    <rect x="400" y="300" width="160" height="160" opacity="0.5" />
+  </g>
+  <g stroke="#9d8cff" stroke-width="10" stroke-linecap="square" fill="none">
+    <path d="M560 300 H880 M560 300 V460 M560 460 H720 M720 620 H880 M880 780 H1040 M1040 460 V780 M880 300 V460 M400 300 V460" />
+  </g>
+  <circle cx="800" cy="540" r="330" fill="url(#glow)" />
+  <rect x="768" y="508" width="64" height="64" fill="#ffd23f" />
+  <rect x="784" y="524" width="32" height="32" fill="#fff2b0" />
+  <g transform="translate(940 690)">
+    <rect x="0" y="0" width="56" height="56" fill="#ffd23f" />
+    <rect x="56" y="16" width="36" height="12" fill="#ffd23f" />
+    <rect x="16" y="16" width="14" height="14" fill="#05020f" />
+  </g>
+  <g transform="translate(600 340)">
+    <rect x="10" y="0" width="30" height="12" fill="#ffd9a8" />
+    <rect x="0" y="12" width="50" height="50" fill="#ff9f43" />
+  </g>
+  <rect x="1040" y="340" width="96" height="120" fill="#9d8cff" />
+  <rect x="1056" y="356" width="64" height="88" fill="#05020f" />
+  <rect x="1080" y="392" width="16" height="16" fill="#9d8cff" />
+</svg>
