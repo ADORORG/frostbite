@@ -11,7 +11,7 @@ import {
 const quiet = { effects: false, music: false, volume: 0.2 };
 
 describe("what the platform hands back", () => {
-  it("is the saved best when it is a whole number of metres, and a fresh game otherwise", () => {
+  it("is the saved best when it is a whole number of points, and a fresh game otherwise", () => {
     expect(restore({ best: 120 })).toEqual({ best: 120, sound: defaultSound });
     expect(restore({ best: 0 })).toEqual({ best: 0, sound: defaultSound });
     for (const bad of [

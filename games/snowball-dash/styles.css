@@ -12,23 +12,85 @@ body {
 /* The page is the whole frame: a slim bar above, the screen filling what is left, the controls below. */
 main {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   gap: 0.5rem;
   block-size: 100dvh;
   box-sizing: border-box;
   padding: 0.5rem 0.75rem;
 }
-.bar,
-.foot {
-  display: flex;
-  flex-wrap: wrap;
+.bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+/* The foot has fixed columns, so the sound panel, the note and the buttons keep their places whatever they say. */
+.foot {
+  display: grid;
+  grid-template-columns: 18rem minmax(0, 1fr) auto;
+  align-items: start;
   gap: 0.5rem 1rem;
 }
-.foot #note {
-  flex: 1 1 14rem;
+/* On a narrow page each part has a row of its own, and the buttons share one: still fixed, so nothing moves while a run is played. */
+@media (max-width: 46rem) {
+  .bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  #status {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .foot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  #note {
+    block-size: 6.5rem;
+  }
 }
+/* A short, wide window (a phone on its side) gives the screen the whole left and puts what is written in a column on the right. */
+@media (orientation: landscape) and (max-height: 32rem) {
+  main {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  .bar {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  #status {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .stage {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+  }
+  .foot {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+  .actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  #note {
+    block-size: 4.5rem;
+  }
+  section {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  main > section h2 {
+    display: none;
+  }
+}
+
 h1,
 h2,
 p {
@@ -45,31 +107,47 @@ h2 {
 #status {
   color: #b9aaec;
   font-size: 0.875rem;
+  flex: 1 1 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.score {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
+/* The bar's parts never change width, so what is written in it cannot make the screen below shrink. */
+.meter {
+  flex: none;
+  min-inline-size: 11ch;
   color: #b9aaec;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
 }
-.score strong {
+.meter strong {
   color: #38e8ff;
 }
-canvas {
-  inline-size: 100%;
-  block-size: 100%;
+/* The screen is the biggest 16:9 box that fits what is left of the page, centred: no bars at its sides, and it never changes with what is
+   written around it. */
+.stage {
+  container-type: size;
+  display: grid;
+  place-items: center;
   min-block-size: 0;
-  object-fit: contain;
+}
+canvas {
+  inline-size: min(100cqw, 100cqh * 16 / 9);
+  aspect-ratio: 16 / 9;
   border: 0.1875rem solid #3a2870;
   border-radius: 0.5rem;
-  /* Where the picture does not reach (a window wider than 16:9) the sky and the ground carry on. */
-  background: linear-gradient(#0c0620, #2a1a63 77%, #e6f2ff 77%);
+  box-sizing: border-box;
+  background: #0c0620;
   image-rendering: pixelated;
-  touch-action: manipulation;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 /* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves. */
 #note {
-  block-size: 3rem;
+  block-size: 4.5rem;
   overflow-y: auto;
   color: #b9aaec;
 }
@@ -80,7 +158,7 @@ canvas {
 }
 button {
   min-height: 2.75rem;
-  min-inline-size: 5.5rem;
+  min-inline-size: 7.5rem;
   padding: 0.5rem 1.25rem;
   border: 0.125rem solid #38e8ff;
   border-radius: 0.5rem;
@@ -100,9 +178,10 @@ button[hidden] {
 }
 #earned {
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  block-size: 2.25rem;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow-y: auto;
+  block-size: 3.5rem;
   gap: 0.375rem;
   margin: 0.25rem 0 0;
   padding: 0;
@@ -129,12 +208,6 @@ h1 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-.score span {
-  padding: 0.125rem 0.625rem;
-  border: 0.125rem solid #2a1a5e;
-  border-radius: 999px;
-  background: #12082b;
 }
 button {
   box-shadow: 0 0.25rem 0 #0e5f74;

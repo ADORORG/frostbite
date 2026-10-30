@@ -2,11 +2,11 @@
 
 These paths are in the platform's repository. Open the file when you need the real thing. Pick the closest game and copy its shape.
 
-| You are building                                   | Closest game                                                                                                                               |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| One-button or tap game, real time, a seeded course | `games/frost-runner`, `games/icicle-drop`, `games/tower-stack`, `games/snowball-dash` (written by an agent from this skill, then reviewed) |
-| Several keys, a scrolling level, touch buttons     | `games/bro-maria`                                                                                                                          |
-| Several replayable cabinets under one verifier     | `games/frostbite` (SAT SNAKE and the ice field)                                                                                            |
+| You are building                                   | Closest game                                                                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One-button or tap game, real time, a seeded course | `games/frost-runner`, `games/icicle-drop`, `games/tower-stack`, `games/snowball-dash` (first drafted by an agent from this skill, then rebuilt after playing it) |
+| Several keys, a scrolling level, touch buttons     | `games/bro-maria`                                                                                                                                                |
+| Several replayable cabinets under one verifier     | `games/frostbite` (SAT SNAKE and the ice field)                                                                                                                  |
 
 ## The parts, in `games/frost-runner`
 

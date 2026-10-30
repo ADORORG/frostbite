@@ -1,145 +1,87 @@
 import { describe, expect, it } from "vitest";
 
-import { speedStepUnits, topSpeedBonus } from "../src/rules/constants.ts";
-import { guaranteedRocks, layRocks } from "../src/rules/course.ts";
 import {
-  closeCallMilestones,
   earnedBy,
-  markId,
-  marks,
-  metres,
+  idOf,
+  ladders,
   milestoneIds,
-  rockMilestones,
-  topSpeedMark,
+  type Ladder,
 } from "../src/rules/milestones.ts";
-import type { SnowballState } from "../src/rules/types.ts";
-import { withRocks } from "./support/states.ts";
+import type { RunState } from "../src/rules/types.ts";
+import { bare } from "./support/states.ts";
 
-const has = (over: Partial<SnowballState>, id: string): boolean =>
-  earnedBy(withRocks([], over)).includes(id);
+// What each ladder reads, set to a number on an otherwise empty run.
+const set: Record<string, (n: number) => Partial<RunState>> = {
+  airtime: (n) => ({ longest: n }),
+  boulders: (n) => ({ cleared: { boulder: n, pit: 0, rock: 0, spikes: 0 } }),
+  clears: (n) => ({ cleared: { boulder: 0, pit: 0, rock: n, spikes: 0 } }),
+  close: (n) => ({ closeCalls: n }),
+  height: (n) => ({ peak: n }),
+  metres: (n) => ({ distance: n * 160 }),
+  pits: (n) => ({ cleared: { boulder: 0, pit: n, rock: 0, spikes: 0 } }),
+  score: (n) => ({ score: n }),
+  shards: (n) => ({ shardsTaken: n }),
+  spikes: (n) => ({ cleared: { boulder: 0, pit: 0, rock: 0, spikes: n } }),
+  streak: (n) => ({ bestStreak: n }),
+};
 
-// Each milestone, with the least that earns it: just below does not, and exactly at it does.
-const table: readonly (readonly [
-  string,
-  (n: number) => Partial<SnowballState>,
-  number,
-])[] = [
-  ["first-hop", (n) => ({ hops: n }), 1],
-  ...rockMilestones.map(
-    ([id, at]) =>
-      [id, (n: number) => ({ cleared: n }), at] as [
-        string,
-        (n: number) => Partial<SnowballState>,
-        number,
-      ],
-  ),
-  ...marks
-    .filter((mark) => mark !== topSpeedMark)
-    .map(
-      (mark) =>
-        [markId(mark), (n: number) => ({ distance: n }), mark * 10] as [
-          string,
-          (n: number) => Partial<SnowballState>,
-          number,
-        ],
+const has = (changes: Partial<RunState>, id: string): boolean =>
+  earnedBy(bare(changes)).includes(id);
+
+describe("the milestones", () => {
+  it("are forty, each with its own id, and a fresh run has earned none", () => {
+    expect(milestoneIds).toHaveLength(40);
+    expect(new Set(milestoneIds).size).toBe(40);
+    expect(earnedBy(bare())).toEqual([]);
+  });
+
+  it("are the first hop and ten ladders, and the ladders go up", () => {
+    expect(ladders.map(({ prefix }) => prefix).sort()).toEqual(
+      Object.keys(set).sort(),
+    );
+    for (const { steps } of ladders)
+      expect([...steps].sort((a, b) => a - b)).toEqual(steps);
+    expect(has({ hops: 1 }, "first-hop")).toBe(true);
+    expect(has({ hops: 0 }, "first-hop")).toBe(false);
+  });
+
+  const rungs = ladders.flatMap((ladder: Ladder) =>
+    ladder.steps.map(
+      (step) => [idOf(ladder.prefix, step), ladder.prefix, step] as const,
     ),
-  ["full-speed", (n) => ({ distance: n }), speedStepUnits * topSpeedBonus],
-  ...closeCallMilestones.map(
-    ([id, at]) =>
-      [id, (n: number) => ({ closeCalls: n }), at] as [
-        string,
-        (n: number) => Partial<SnowballState>,
-        number,
-      ],
-  ),
-];
+  );
 
-describe("every milestone", () => {
-  it.each(table)(
-    "%s is earned at its threshold and not below",
-    (id, make, at) => {
-      expect(has(make(at - 1), id)).toBe(false);
-      expect(has(make(at), id)).toBe(true);
-      expect(has(make(at + 1), id)).toBe(true);
+  it.each(rungs)(
+    "%s is earned at its step and not below",
+    (id, prefix, step) => {
+      const make = set[prefix];
+      if (make === undefined) throw new Error(prefix);
+      expect(has(make(step - 1), id)).toBe(false);
+      expect(has(make(step), id)).toBe(true);
+      expect(has(make(step + 1), id)).toBe(true);
     },
   );
 
-  it("is covered: the table holds every milestone that stands on one number", () => {
-    const rest = milestoneIds.filter(
-      (id) => !table.some(([named]) => named === id),
+  it("are earned in the order the list gives them, and a rung earns every rung below it", () => {
+    const state = bare({ score: 6_000, distance: 800 * 160 });
+    expect(earnedBy(state)).toEqual(
+      milestoneIds.filter((id) =>
+        [
+          "score-500",
+          "score-1500",
+          "score-3000",
+          "score-6000",
+          "metres-100",
+          "metres-250",
+          "metres-500",
+          "metres-800",
+        ].includes(id),
+      ),
     );
-    expect(rest).toEqual([
-      "foot-of-the-slope",
-      "tidy-run",
-      "comfortable-run",
-      "sharp-finish",
-      "razor-finish",
-    ]);
   });
 
-  it("reaching the foot needs the run to have finished", () => {
-    expect(has({ finished: false, hops: 0 }, "foot-of-the-slope")).toBe(false);
-    expect(has({ finished: true }, "foot-of-the-slope")).toBe(true);
-  });
-
-  it("a tidy run needs the foot reached with no more hops than rocks", () => {
-    const rocks = [1, 2, 3];
-    const tidy = (finished: boolean, hops: number) =>
-      earnedBy(withRocks(rocks, { finished, hops })).includes("tidy-run");
-    expect(tidy(true, 3)).toBe(true);
-    expect(tidy(true, 4)).toBe(false);
-    expect(tidy(false, 3)).toBe(false);
-  });
-
-  it("a comfortable run needs the foot reached without a close call", () => {
-    const comfortable = (finished: boolean, closeCalls: number) =>
-      has({ closeCalls, finished }, "comfortable-run");
-    expect(comfortable(true, 0)).toBe(true);
-    expect(comfortable(true, 1)).toBe(false);
-    expect(comfortable(false, 0)).toBe(false);
-  });
-
-  it("a sharp finish needs five close calls and the foot, a razor finish eight", () => {
-    for (const [id, least] of [
-      ["sharp-finish", 5],
-      ["razor-finish", 8],
-    ] as const) {
-      expect(has({ closeCalls: least - 1, finished: true }, id)).toBe(false);
-      expect(has({ closeCalls: least, finished: true }, id)).toBe(true);
-      expect(has({ closeCalls: least, finished: false }, id)).toBe(false);
-    }
-  });
-
-  it("has forty, each with its own id, and a fresh run has none", () => {
-    expect(milestoneIds).toHaveLength(40);
-    expect(new Set(milestoneIds).size).toBe(40);
-    expect(earnedBy(withRocks([]))).toEqual([]);
-  });
-
-  it("puts the top speed at the 300 metre mark, so no second milestone is earned at that moment", () => {
-    expect(topSpeedMark).toBe(300);
-    expect(markId(topSpeedMark)).toBe("full-speed");
-    expect(markId(325)).toBe("metres-325");
-    expect(milestoneIds).not.toContain("metres-300");
-  });
-
-  it("counts whole metres, ten units to a metre", () => {
-    expect(metres(withRocks([], { distance: 99 }))).toBe(9);
-    expect(metres(withRocks([], { distance: 100 }))).toBe(10);
-  });
-});
-
-describe("the rocks a slope is certain to have", () => {
-  it("is what the layout gives at its sparsest, and no slope has fewer", () => {
-    const fewest = Math.min(
-      ...Array.from({ length: 3_000 }, (_, seed) => layRocks(seed).length),
-    );
-    expect(fewest).toBeGreaterThanOrEqual(guaranteedRocks);
-    expect(guaranteedRocks).toBe(14);
-  });
-
-  it("is enough for every rock milestone, so none is out of reach on an unlucky slope", () => {
-    for (const [, count] of rockMilestones)
-      expect(count).toBeLessThanOrEqual(guaranteedRocks);
+  it("make an id from the ladder's name and the step", () => {
+    expect(idOf("score", 500)).toBe("score-500");
+    expect(idOf("metres", 1_200)).toBe("metres-1200");
   });
 });

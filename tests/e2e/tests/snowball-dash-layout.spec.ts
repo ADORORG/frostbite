@@ -1,9 +1,18 @@
 import { expect, test, type FrameLocator } from "@playwright/test";
 
-// Snowball Dash is played against the clock, so nothing under the player's thumb may move while it runs: the controls, the screen
-// and the lists keep the same boxes before a run, during it, and after it ends with a note on the screen.
+// Snowball Dash is played against the clock, so nothing under the player's thumb may move while it runs: the screen, the controls, the note
+// and the list of what was earned keep the same boxes before a run, during it (as milestones are earned and listed), and after it ends.
 const frameSelector = '[data-testid="game-frame"]';
-const watched = ["#hop", "#start", "#screen", "#note", "#earned"] as const;
+const watched = [
+  "#screen",
+  "#start",
+  "#pause",
+  "#note",
+  "#earned",
+  "#sound",
+  ".bar",
+  ".foot",
+] as const;
 
 async function boxes(game: FrameLocator) {
   const found: Record<
@@ -18,19 +27,30 @@ async function boxes(game: FrameLocator) {
   return found;
 }
 
-test("the controls and the screen stay where they are through a whole run", async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/games/snowball-dash");
-  const game = page.frameLocator(frameSelector);
-  await expect(game.locator("#status")).toHaveText("Connected.");
-  const before = await boxes(game);
-  await game.locator("#start").click();
-  await expect(game.locator("#hop")).toBeEnabled();
-  expect(await boxes(game)).toEqual(before);
-  // Never hop: the snowball meets the first rock and the run ends.
-  await expect(game.locator("#start")).toBeVisible({ timeout: 15_000 });
-  await expect(game.locator("#note")).not.toHaveText("");
-  expect(await boxes(game)).toEqual(before);
-});
+for (const size of [
+  { height: 720, name: "desktop", width: 1100 },
+  { height: 780, name: "phone", width: 390 },
+] as const)
+  test(`the screen and the controls stay where they are through a whole run (${size.name})`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ height: size.height, width: size.width });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/games/snowball-dash");
+    const game = page.frameLocator(frameSelector);
+    await expect(game.locator("#status")).toHaveText("Connected.");
+    const before = await boxes(game);
+    await game.locator("#start").click();
+    await expect(game.locator("#pause")).toBeEnabled();
+    expect(await boxes(game)).toEqual(before);
+    // One hop earns the first milestone, which is listed: the list gains an item and nothing around it moves.
+    await page.keyboard.down("Space");
+    await page.waitForTimeout(200);
+    await page.keyboard.up("Space");
+    await expect(game.locator("#earned li").first()).toBeVisible();
+    expect(await boxes(game)).toEqual(before);
+    // Hop no more: the snowball meets the first rock and the run ends with the card on the screen.
+    await expect(game.locator("#start")).toBeVisible({ timeout: 15_000 });
+    await expect(game.locator("#note")).not.toHaveText("");
+    expect(await boxes(game)).toEqual(before);
+  });

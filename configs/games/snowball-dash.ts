@@ -5,7 +5,8 @@ import { targetChains } from "../chains.ts";
 const [betaTarget] = targetChains;
 if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
-// SNOWBALL DASH: a one-button game. A snowball rolls down a 600 metre slope and the player hops it over the rocks. Every milestone is
+// SNOWBALL DASH: a one-button game. A snowball rolls down an endless slope, faster and faster, and the player hops it over rocks, boulders,
+// spikes and crevasses: a tap is a short hop, a hold a high one. Shards are worth taking, and cutting an obstacle fine builds a multiplier. Every milestone is
 // decided by the rules alone (`games/snowball-dash/src/rules/milestones.ts`), so each can be replay-checked: the game publishes its rules
 // as a verifier, the platform replays a run it issued a seed for, and the milestone is then held as replay-verified. That shows the run
 // followed the rules, not that a person played it. The digest pins the built file: a change to the rules is a change here, and a test
@@ -26,24 +27,26 @@ const once = (
   }) as const;
 
 // The ladders. Their ids are the ones in `games/snowball-dash/src/rules/milestones.ts`, which holds the numbers: a test fails if the two
-// lists of ids differ. A mark is every 25 metres; the 300 metre mark is the top speed, earned as "full-speed".
-const rocks = [
-  ["first-rock", "First rock", "1 rock"],
-  ["three-rocks", "Three rocks", "3 rocks"],
-  ["rock-hopper", "Rock hopper", "5 rocks"],
-  ["eight-rocks", "Eight rocks", "8 rocks"],
-  ["ten-rocks", "Ten rocks", "10 rocks"],
-  ["twelve-rocks", "A dozen rocks", "12 rocks"],
-  ["rock-master", "Rock master", "14 rocks"],
+// lists of ids differ. Each rung is earned within one run.
+const rung = (
+  prefix: string,
+  step: number,
+  title: string,
+  criteria: string,
+  description: string,
+) => once(`${prefix}-${String(step)}`, title, criteria, description);
+const words = (count: number, one: string, many: string) =>
+  `${String(count)} ${count === 1 ? one : many}`;
+const score = [500, 1_500, 3_000, 6_000, 12_000, 25_000, 50_000, 100_000];
+const metres = [100, 250, 500, 800, 1_200, 2_000];
+const shards = [10, 25, 50, 100, 200];
+const clears = [10, 25, 50, 100];
+const kinds = [
+  ["boulders", "boulder", "boulders"],
+  ["pits", "crevasse", "crevasses"],
+  ["spikes", "row of spikes", "rows of spikes"],
 ] as const;
-const closeCalls = [
-  ["close-shave", "Close shave", "1 rock"],
-  ["three-close", "Three close shaves", "3 rocks"],
-  ["daredevil", "Daredevil", "5 rocks"],
-  ["eight-close", "Eight close shaves", "8 rocks"],
-] as const;
-const topSpeedMark = 300;
-const marks = Array.from({ length: 23 }, (_, index) => (index + 1) * 25);
+const streaks = [2, 4, 6];
 
 export const snowballDashGame = defineGame({
   capabilities: ["run:submit"],
@@ -53,84 +56,129 @@ export const snowballDashGame = defineGame({
     video: null,
   },
   description:
-    "Roll down the slope. Press Enter or Space, or tap, to hop the snowball over the rocks. A run ends when you hit a rock or reach the foot of the slope. Forty milestones, from your first hop to a run that cuts eight rocks fine, are each checked by replaying your run.",
+    "An endless slope, getting faster. Tap to hop, hold to go higher: clear rocks, boulders, spikes and crevasses, grab the shards, and cut things fine to build a score multiplier. A run ends when you hit something or fall in. Forty milestones, from your first hop to a six-in-a-row streak and a hundred thousand point run, are each checked by replaying your run.",
   id: "snowball-dash",
   launch: { mode: "embedded" },
   milestones: [
     once("first-hop", "First hop", "Hop once.", "You made your first hop."),
-    ...rocks.map(([id, title, count]) =>
-      once(
-        id,
-        title,
-        `Pass ${count} without hitting one.`,
-        `You passed ${count}.`,
+    ...score.map((step) =>
+      rung(
+        "score",
+        step,
+        `${step.toLocaleString("en-US")} points`,
+        `Score ${step.toLocaleString("en-US")} points in one run.`,
+        `You scored ${step.toLocaleString("en-US")} points.`,
       ),
     ),
-    ...marks.map((metres) =>
-      metres === topSpeedMark
-        ? once(
-            "full-speed",
-            "Full speed",
-            `Reach the top speed (${metres} metres down).`,
-            "You rolled as fast as the slope allows.",
-          )
-        : once(
-            `metres-${metres}`,
-            `${metres} metres`,
-            `Roll ${metres} metres.`,
-            `You rolled ${metres} metres.`,
-          ),
-    ),
-    ...closeCalls.map(([id, title, count]) =>
-      once(
-        id,
-        title,
-        `Clear ${count} by no more than 2 units each in one run.`,
-        `You only just cleared ${count}.`,
+    ...metres.map((step) =>
+      rung(
+        "metres",
+        step,
+        `${step.toLocaleString("en-US")} metres`,
+        `Roll ${step.toLocaleString("en-US")} metres in one run.`,
+        `You rolled ${step.toLocaleString("en-US")} metres.`,
       ),
     ),
-    once(
-      "foot-of-the-slope",
-      "Foot of the slope",
-      "Reach the end of the 600 metre slope.",
-      "You rolled all the way down.",
+    rung(
+      "height",
+      120,
+      "Spring",
+      "Hold the button for a hop at least 40% as high as the highest.",
+      "You made a good hop.",
     ),
-    once(
-      "tidy-run",
-      "Tidy run",
-      "Reach the end having hopped no more often than there are rocks.",
-      "You reached the end without a wasted hop.",
+    rung(
+      "height",
+      200,
+      "Leap",
+      "Hold the button for a hop at least 70% as high as the highest.",
+      "You made a high leap.",
     ),
-    once(
-      "comfortable-run",
-      "Smooth roll",
-      "Reach the end without a single close shave.",
-      "You rolled down with room to spare at every rock.",
+    rung(
+      "height",
+      270,
+      "Full leap",
+      "Hold the button all the way to the top of a hop.",
+      "You hopped as high as a snowball can.",
     ),
-    once(
-      "sharp-finish",
-      "Sharp finish",
-      "Reach the end having cleared 5 or more rocks by no more than 2 units.",
-      "You reached the end living on the edge.",
+    rung(
+      "airtime",
+      24,
+      "Hang time",
+      "Stay in the air for two fifths of a second in one hop.",
+      "You hung in the air.",
     ),
-    once(
-      "razor-finish",
-      "Razor's edge",
-      "Reach the end having cleared 8 or more rocks by no more than 2 units.",
-      "You reached the end by a hair, again and again.",
+    rung(
+      "airtime",
+      36,
+      "Long jump",
+      "Stay in the air for three fifths of a second in one hop.",
+      "You made a long jump.",
+    ),
+    rung(
+      "airtime",
+      48,
+      "Flight",
+      "Stay in the air for four fifths of a second in one hop.",
+      "You flew.",
+    ),
+    ...shards.map((step) =>
+      rung(
+        "shards",
+        step,
+        words(step, "shard", "shards"),
+        `Collect ${words(step, "shard", "shards")} in one run.`,
+        `You collected ${words(step, "shard", "shards")}.`,
+      ),
+    ),
+    ...clears.map((step) =>
+      rung(
+        "clears",
+        step,
+        `${String(step)} obstacles`,
+        `Clear ${String(step)} obstacles in one run.`,
+        `You cleared ${String(step)} obstacles.`,
+      ),
+    ),
+    ...kinds.flatMap(([prefix, one, many]) =>
+      [10, 25].map((step) =>
+        rung(
+          prefix,
+          step,
+          words(step, one, many),
+          `Clear ${words(step, one, many)} in one run.`,
+          `You cleared ${words(step, one, many)}.`,
+        ),
+      ),
+    ),
+    ...streaks.map((step) =>
+      rung(
+        "streak",
+        step,
+        `${String(step)} in a row`,
+        `Make ${String(step)} close calls in a row.`,
+        `You cut ${String(step)} obstacles fine, one after another.`,
+      ),
+    ),
+    rung(
+      "close",
+      25,
+      "Living dangerously",
+      "Make 25 close calls in one run.",
+      "You cut twenty-five obstacles fine.",
     ),
   ],
   network: betaTarget.chainId,
   scene: "runner",
   schemaVersion: 1,
-  summary: "Hop a rolling snowball over the rocks, all the way down the slope.",
+  summary:
+    "Hop a snowball down an endless slope. Tap to hop, hold to go higher.",
   title: "Snowball Dash",
   verification: {
     replay: {
       id: "snowball-dash",
       sha256:
-        "41ff9e05dca5ebaae0c94da951f2366cab391fbc2196487ddec159ecdd835014",
-      version: 1,
+        "c0e3c5ed90418a446117d8f40cf18ee8b989138552113506bc2d01cace738992",
+      version: 2,
     },
   },
   version: "0.1.0",

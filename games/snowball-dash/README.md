@@ -1,50 +1,56 @@
 # Snowball Dash
 
-A one-button game for the platform's arcade. A snowball rolls down a 600 metre slope and speeds up as it goes; press Enter or Space
-(or tap the screen) to hop it over the rocks. A run ends when the snowball hits a rock or reaches the foot of the slope. It is
-client-only: no server, no network, nothing stored by the game itself (the platform keeps progress and milestones).
+An endless one-button runner for the platform. A snowball rolls down a slope that never ends and gets faster as it goes; the player hops
+it over rocks, boulders, rows of ice spikes and crevasses. A tap is a short hop and holding the button is a high one, so every obstacle
+asks for a different length of press. Shards are worth taking, and cutting an obstacle fine (a close call) builds a score multiplier, so
+the safe line and the high-scoring line are not the same line. A run ends when the snowball hits something or falls in.
 
-## Layout
+## Public API
 
-```
-src/rules/     the rules, as a pure seeded state machine (a GameVerifier): constants, course, tick, milestones, index
-src/session.ts one run as a player plays it: ticks, hops, and the run record they make
-src/screen/    drawing the state, and the keys and touches
-src/audio.ts   the music and effects, as data; src/feedback.ts says which effect a change of state deserves
-src/progress.ts what is saved (the best distance and the sound settings) and how it is validated
-src/main.ts    joins the page to the platform (progress, milestones, runs)
-src/replay.ts  the verifier the platform replays runs with (rules + one sample run)
-```
+Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the platform; everything else is a module of its own.
 
-## Keys, sound and pause
+| Module                               | Purpose                                                                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/rules/`                         | The rules, as a pure seeded state machine (`snowballRules`, a `GameVerifier`): physics, the course and its patterns, scoring, the forty milestones. 60 ticks a second, whole numbers only. |
+| `src/session.ts`                     | One run as the player plays it: ticks the rules, records each press and release into a run record.                                                                                         |
+| `src/screen/`                        | Draws a state on a canvas (sky, hills, snow, obstacles, shards, the snowball, the writing). Draws and decides nothing.                                                                     |
+| `src/audio.ts`, `src/feedback.ts`    | The music and effects as data, and which effect each change of state makes. The music speeds up with the level.                                                                            |
+| `src/progress.ts`                    | What is saved (the best score and the sound settings) and how what the platform hands back is validated.                                                                                   |
+| `src/replay.ts`, `src/sample-run.ts` | What the platform replays: the rules and one legal run. Its digest is pinned in `configs/games/snowball-dash.ts`.                                                                          |
 
-Enter, Space, the up arrow or a touch hops. Enter starts a run when none is going and hops during one, so it never throws a run
-away. P (or the Pause button) pauses and resumes, and a hidden tab pauses; Space is the main action and so never pauses. The music
-is a looping groove and each hop, landing, crash and milestone has an effect, played by the SDK's sound engine with the panel at the
-bottom left. The sound settings are kept beside the best distance. The page runs on the SDK's run loop, so pausing stops the clock.
-None of the sound or the screen is in the rules, so it does not change the verifier's digest.
+## How it plays
 
-## How runs are checked
-
-The rules know only ticks (thirty a second) and whole numbers; the same seed and hops always play out the same way. The platform
-gives a run its seed, the game records only the hops with the tick each was made on, and on `run.submit` the platform replays the
-record with the published verifier. A milestone the replay earns is held as replay-verified, which shows the run followed the
-rules, not that a person played it. The verifier's SHA-256 is pinned in `configs/games/snowball-dash.ts`; changing the rules
-changes the digest, and `apps/web/test/games-verifiers.unit.test.ts` fails (printing the new digest) until the pin is updated
-together with `verifierVersion` and the game's `version`. Nothing here carries a reward: the manifest declares no `rewards`.
+- **Keys:** Space, the up arrow, Enter or a touch on the screen are all the one button. With no run going it starts one (that press is not a
+  hop). P pauses. Release the button early and the climb is cut short.
+- **The slope:** one level every 75 metres; each level is one tick-unit faster, up to a top speed at level 9. Patterns get harder with the
+  level (rock, boulder, crevasse, twin rocks, spikes, then combinations up to a four-part gauntlet). Every pattern leaves room to land and hop
+  again; the lookahead player in `test/support/planner.ts` proves it (below).
+- **Score:** a point a metre, ten for a clear, twenty-five times the multiplier for a close call, ten times the multiplier for a shard. The
+  multiplier is one more than the streak of close calls, up to ten; a plain clear ends the streak.
 
 ## Milestones
 
-Ten, all decided by the state of a run alone (`src/rules/milestones.ts`): first hop, 5 and 15 rocks passed, 100 m and 500 m rolled,
-one and five close shaves (a rock cleared by at most 2 units), top speed, the foot of the slope, and a tidy run (the foot reached
-with no more hops than rocks). The words are in the manifest. `test/fairness.unit.test.ts` shows a careful bot reaches the foot on
-every tested seed and that a late-hopping bot earns all ten.
+Forty, all decided by the state of a run alone (`src/rules/milestones.ts`): the first hop, and ladders of score (500 to 100,000), distance (100 m
+to 2,000 m), hop height, hop length, shards, obstacles cleared (all, then boulders, crevasses and spikes), close calls in a row and close calls
+in all. The early rungs come in the first minutes and the top ones take many runs. The words are in the manifest; a test fails if the manifest
+and the rules name different ones. **The list is a draft for the owner to approve.** Nobody has played the game to calibrate the thresholds:
+they come from the player in `test/support/planner.ts`, which earns all forty on every seed over a full 6 minute 40 second run, so the top
+rung is the full length of a perfect run.
+
+## Invariants
+
+- The same seed and choices play out the same way on every engine (no clock, no `Math.random`, whole numbers).
+- Everything that changes while a run is played is drawn on the canvas or written into a box of fixed size; the page is touched only when
+  something has changed, never once a frame, and no list is rebuilt. The layout (the screen, the sound panel, the note, the buttons and the
+  earned list) never moves, which was measured in a real browser at desktop, phone and phone-on-its-side sizes.
+- A run records at most `maxChoices` (1,100) choices, so its record is always inside the platform's size limit.
 
 ## Tests
 
-`pnpm --filter @game/snowball-dash test:unit`, `test:integration` (bundles the page and runs it against a simulated platform),
-`test:coverage`. `test/support/bot.ts` is a player that hops when the next rock is within a chosen distance.
+`pnpm --filter @game/snowball-dash test:unit`, `test:integration` (the bundled page against a simulated platform, and the slow fairness
+tests that play whole runs through the rules), `test:coverage` (above 90%), `typecheck`, `lint`. The layout over a whole run in a browser:
+`tests/e2e/tests/snowball-dash-layout.spec.ts`.
 
 ## Ownership
 
-Platform games team.
+Games team.

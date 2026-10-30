@@ -1,25 +1,26 @@
 import { createRunRecorder, type RunRecord } from "@ador/game-sdk/run-record";
 
 import { gameId, verifierId, verifierVersion } from "./rules/constants.ts";
-import { startSnowball } from "./rules/course.ts";
 import { snowballRules } from "./rules/index.ts";
+import { startRun } from "./rules/state.ts";
 import { over, tickOnce } from "./rules/tick.ts";
-import type { SnowballState } from "./rules/types.ts";
+import type { RunState } from "./rules/types.ts";
 
 export type Outcome =
   { readonly ok: true } | { readonly ok: false; readonly reason: string };
 
-// One run as the player plays it. The screen calls `tick` on its timer and `hop` when the player chooses; the rules decide what is
-// legal, and the choices they accept (with the tick they were made on) are written into a run record. Only choices are recorded,
-// never the ticks between them, which the rules replay. There is no screen and no clock in this module.
+// One run as the player plays it. The screen calls `tick` on its timer and `hold` when the button goes down or up; the rules decide what is
+// legal, and the choices they accept (with the tick they were made on) are written into a run record. Only choices are recorded, never the
+// ticks between them, which the rules replay. There is no screen and no clock in this module.
 export interface RunSession {
   // The milestones the run has earned so far.
   earned(): readonly string[];
-  hop(): Outcome;
+  // Presses (`on`) or lets go of the button. The button already in that state changes nothing and is not recorded.
+  hold(on: boolean): Outcome;
   // Closes the run if it is still going and returns its record.
   record(): RunRecord;
-  state(): SnowballState;
-  // One tick. A run that ends (a rock is hit, or the foot is reached) is closed.
+  state(): RunState;
+  // One tick. A run that ends (a rock is hit, a crevasse fallen into, or the longest a run may be) is closed.
   tick(): void;
 }
 
@@ -29,10 +30,10 @@ export interface RunSessionOptions {
   readonly seed: number;
 }
 
-const refusal: Outcome = { ok: false, reason: "the run has ended" };
+const finished: Outcome = { ok: false, reason: "the run has ended" };
 
 export function createRunSession(options: RunSessionOptions): RunSession {
-  let state = startSnowball(options.seed);
+  let state = startRun(options.seed);
   const announced = new Set<string>();
   const recorder = createRunRecorder({
     config: {},
@@ -50,8 +51,10 @@ export function createRunSession(options: RunSessionOptions): RunSession {
     }
   }
 
-  function apply(type: "end" | "hop"): Outcome {
-    const data = { tick: state.tick };
+  function apply(
+    type: "end" | "hop",
+    data: { on?: number; tick: number },
+  ): Outcome {
     const stepped = snowballRules.step(state, { data, type });
     if (!stepped.ok) return stepped;
     state = stepped.state;
@@ -59,11 +62,17 @@ export function createRunSession(options: RunSessionOptions): RunSession {
     return { ok: true };
   }
 
-  const close = (): Outcome => (state.ended ? { ok: true } : apply("end"));
+  const close = (): Outcome =>
+    state.ended ? { ok: true } : apply("end", { tick: state.tick });
 
   return {
     earned: () => snowballRules.earned(state),
-    hop: () => (over(state) ? refusal : apply("hop")),
+    hold(on) {
+      if (over(state)) return finished;
+      if (state.holding === on) return { ok: true };
+      // The choice that is the last a record may hold ends the run itself: the rules replay that, so no closing choice is recorded.
+      return apply("hop", { on: Number(on), tick: state.tick });
+    },
     record() {
       close();
       return recorder.finish(snowballRules.earned(state));
