@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE first, then SDK Explorer while the platform runs for development (the sample game only in the tests), then the games built on the SDK, and every game passes the manifest schema", async () => {
+  it("lists FROST·BITE first, then SDK Explorer while the platform runs for development, then the games built on the SDK, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
     expect(games.map(({ id }) => id)).toEqual([
       "frostbite",
@@ -66,17 +66,17 @@ describe("the platform's game list", () => {
 
   it.each([
     ["test", true],
-    ["local", false],
+    ["local", true],
     ["preview", false],
     ["production", false],
-  ])("lists the sample game in %s: %s", async (appEnv, listed) => {
+  ])("lists SDK Explorer in %s: %s", async (appEnv, listed) => {
     const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
-    expect(ids.includes("sample-game")).toBe(listed);
+    expect(ids.includes("sdk-explorer")).toBe(listed);
     expect(ids[0]).toBe("frostbite");
   });
 
-  it("declares a rewards contract on each of the games built for players, so staff can create it, and none on the sample game", async () => {
-    const games = await gamesWith("", "test");
+  it("declares a rewards contract on each of the games built for players, so staff can create it", async () => {
+    const games = await gamesWith("");
     for (const id of [
       "frostbite",
       "frost-runner",
@@ -90,27 +90,12 @@ describe("the platform's game list", () => {
       });
       expect(game?.capabilities).toContain("milestone:claim");
     }
-    expect(
-      games.find(({ id }) => id === "sample-game")?.rewards,
-    ).toBeUndefined();
-  });
-
-  it("plays the sample game on the platform itself, in the frame, with the milestones its code awards", async () => {
-    const sample = (await gamesWith("", "test")).find(
-      ({ id }) => id === "sample-game",
-    );
-    expect(sample?.launch).toEqual({ mode: "embedded" });
-    expect(sample?.milestones.map(({ id }) => id)).toEqual([
-      "first-five",
-      "ten-taps",
-    ]);
   });
 
   it("refuses a launch setting for a game the platform plays itself", async () => {
     await expect(
       gamesWith(
-        JSON.stringify({ "sample-game": { url: "https://a.example.com" } }),
-        "test",
+        JSON.stringify({ "sdk-explorer": { url: "https://a.example.com" } }),
       ),
     ).rejects.toThrow("Launch settings name");
   });

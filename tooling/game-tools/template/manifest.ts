@@ -5,14 +5,13 @@ import { targetChains } from "../chains.ts";
 const [betaTarget] = targetChains;
 if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
-// Tap Tower, the sample game in /games/sample-game. It exists to prove the host: it is played in the isolated
-// frame, saves through the platform and unlocks milestones. It is registered only in the automated tests (see
-// configs/games.ts), never when the platform is run for development or in a deployment players use.
-export const sampleGame = defineGame({
+// The starter game's manifest, the template `pnpm game:new` copies (see tooling/game-tools). It is never registered itself: a new game gets
+// its own copy, with its own id and title, and one line in configs/games.ts.
+export const starterGame = defineGame({
   capabilities: [],
   description:
     "Tap to score. Reaching 5 and 10 taps unlocks a milestone, which the platform remembers for you.",
-  id: "sample-game",
+  id: "starter-game",
   launch: { mode: "embedded" },
   milestones: [
     {
@@ -33,6 +32,6 @@ export const sampleGame = defineGame({
   network: betaTarget.chainId,
   schemaVersion: 1,
   summary: "A tiny tapping game that shows how a game talks to the platform.",
-  title: "Tap Tower",
+  title: "Starter Game",
   version: "0.1.0",
 });

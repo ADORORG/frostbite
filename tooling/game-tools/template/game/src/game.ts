@@ -19,7 +19,7 @@ export const tap = (state: GameState): GameState => ({
   score: state.score + 1,
 });
 
-// The milestones this game declares (see configs/games/sample.ts) and the score that earns each.
+// The milestones this game declares (see tooling/game-tools/template/manifest.ts) and the score that earns each.
 export const milestoneThresholds = [
   { id: "first-five", score: 5 },
   { id: "ten-taps", score: 10 },

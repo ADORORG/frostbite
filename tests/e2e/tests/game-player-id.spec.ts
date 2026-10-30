@@ -84,7 +84,7 @@ test("a signed-in player is given the account's id, the same in every browser, a
   const otherGame = syncGameStateResponseSchema.parse(
     await (
       await first.page.request.post(syncPath, {
-        data: { gameId: "sample-game", state: empty },
+        data: { gameId: "frost-runner", state: empty },
         headers: { origin: new URL(baseURL ?? "").origin },
       })
     ).json(),

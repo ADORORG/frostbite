@@ -4,7 +4,7 @@ Developer tooling for games. Not shipped, and nothing in the platform imports it
 
 ## Public API
 
-- `pnpm game:new <id> [--title "My Game"]` makes a new game from the template (`games/sample-game`) and
+- `pnpm game:new <id> [--title "My Game"]` makes a new game from the template (`tooling/game-tools/template`) and
   registers it: a folder `games/<id>` (package `@game/<id>`), a manifest `configs/games/<id>.ts`, and one import
   and one list entry in `configs/games.ts` above the `game:new` markers. The new game already passes the
   platform's conformance check; the author then replaces the rules, the page and the milestones.

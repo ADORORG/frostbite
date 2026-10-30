@@ -1,6 +1,6 @@
-# Tap Tower (sample game)
+# Starter Game (template)
 
-The template for a game. It uses only `@ador/game-sdk/client`; it saves nothing itself and calls no address.
+The template `pnpm game:new <id>` copies into `games/<id>`; it is not a game of the platform and is never listed. It uses only `@ador/game-sdk/client`; it saves nothing itself and calls no address.
 
 ## Layout
 
@@ -12,8 +12,7 @@ The template for a game. It uses only `@ador/game-sdk/client`; it saves nothing 
 ## Build and play
 
 `pnpm --filter web build` (or `dev`) builds every folder under `/games` into `apps/web/public/play/<id>`, which
-is served sandboxed. The platform lists this game only when `APP_ENV` is `test` (the end-to-end tests play it; a person running the platform for development does not see it)
-(`configs/games/sample.ts`).
+is served sandboxed. A game made from this template is listed once its manifest is registered in `configs/games.ts`.
 
 ## Adding a game
 

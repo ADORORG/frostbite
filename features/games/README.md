@@ -31,7 +31,7 @@ never a broken one. It is drawn through an image tag, which cannot run what a dr
 
 ## Onboarding a game (the template)
 
-1. Copy `games/sample-game` and write the game (see `docs/product/game-onboarding.md`, the full guide).
+1. Run `pnpm game:new <id>` (it copies the starter in `tooling/game-tools/template`) and write the game (see `docs/product/game-onboarding.md`, the full guide).
 2. Write its manifest with `defineGame` (`launch: { mode: "embedded" }`) in `configs/games/`.
 3. Add it to the list in `configs/games.ts`: `defineGames([frostbite, yourGame])`.
 4. Run the tests: the catalog, the detail page and the manifest checks pick it up with no other change.

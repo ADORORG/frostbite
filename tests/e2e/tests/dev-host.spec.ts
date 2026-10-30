@@ -3,24 +3,24 @@ import { join } from "node:path";
 import { startDevHost, type DevHost } from "@ador/game-sdk/dev-host";
 import { expect, test } from "@playwright/test";
 
-// The local test page a builder opens, in a real browser, with the repository's own sample game: the game runs in a sandboxed
+// The local test page a builder opens, in a real browser, with the repository's SDK explorer: the game runs in a sandboxed
 // frame, the real host answers it, and the page's panel drives the platform's side (sign-in, wallet, events). Desktop only: it
 // is a developer's page, not part of the site.
 let host: DevHost;
 
 test.beforeAll(async () => {
   host = await startDevHost({
-    directory: join(import.meta.dirname, "../../../games/sample-game"),
+    directory: join(import.meta.dirname, "../../../games/sdk-explorer"),
     game: {
       capabilities: [],
-      id: "sample-game",
+      id: "sdk-explorer",
       milestones: [
         {
           claimPolicy: "once",
-          criteria: "Score 5 taps.",
-          description: "Five taps in one run.",
-          id: "first-five",
-          title: "First five",
+          criteria: "Press milestones.unlock.",
+          description: "You made a call to the platform and it answered.",
+          id: "first-call",
+          title: "First call",
         },
       ],
     },
@@ -47,14 +47,18 @@ test("runs the game in a sandboxed frame, answers it through the real host, and 
   expect(await page.locator("iframe").getAttribute("sandbox")).toBe(
     "allow-scripts",
   );
-  for (let tap = 0; tap < 5; tap += 1) await game.locator("#tap").click();
-  await expect(game.locator('[data-milestone="first-five"]')).toBeVisible();
+  await game.locator("#milestones-unlock").click();
+  await expect(game.locator("#log li").first()).toContainText(
+    '"status":"unlocked"',
+  );
   const log = page.locator("#dev-log");
   await expect(log).toContainText("→ milestones.unlock");
   await expect(log).toContainText("← milestones.unlock");
-  // The frame is as isolated here as on the platform: the game's own safety probe finds nothing it can reach.
-  await game.locator("#probe").click();
-  await expect(game.locator("#probe-result")).not.toBeEmpty();
+  // The frame is as isolated here as on the platform: the game's own sandbox check finds nothing it can reach.
+  await game.locator("#sandbox").click();
+  await expect(game.locator("#log li").first()).toHaveText(
+    'sandbox check → {"cookie":"blocked","fetch":"blocked","localStorage":"blocked"}',
+  );
   expect(errors).toEqual([]);
 });
 
@@ -63,13 +67,15 @@ test("serves the game's files with the platform's headers, so a page that would 
 }) => {
   // The game is built when the page is loaded, so the page is asked for first.
   await request.get(`${host.url}/`);
-  const response = await request.get(`${host.url}/play/sample-game/index.html`);
+  const response = await request.get(
+    `${host.url}/play/sdk-explorer/index.html`,
+  );
   expect(response.headers()["content-security-policy"]).toContain(
     "connect-src 'none'",
   );
   expect(
     (
-      await request.get(`${host.url}/play/sample-game/../../../etc/passwd`)
+      await request.get(`${host.url}/play/sdk-explorer/../../../etc/passwd`)
     ).status(),
   ).toBe(404);
 });

@@ -3,7 +3,7 @@
 Status: ADR-018 Amendment 1 (client-only games) is accepted. This describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
 (isolated frame, SDK, local and account saving, milestones as self-reported). Minting and the replay-verified level
 do **not** exist yet; the last section says what each needs.
-The template is `games/sample-game` (Tap Tower). Start from it with `pnpm game:new`; do not start from nothing.
+The template is `tooling/game-tools/template` (a small starter game). Start from it with `pnpm game:new`; do not start from nothing.
 
 ## What a game is
 
@@ -20,7 +20,7 @@ A game is a folder of reviewed source plus one manifest:
 
 ## Add a game in four steps
 
-1. **Run `pnpm game:new <id> [--title "My Game"]`, then `pnpm install`.** It copies `games/sample-game` to
+1. **Run `pnpm game:new <id> [--title "My Game"]`, then `pnpm install`.** It copies `tooling/game-tools/template/game` to
    `games/<id>` (package `@game/<id>`), writes `configs/games/<id>.ts` and adds the game's import and list entry
    to `configs/games.ts`, above the `game:new` markers. `<id>` is lower-case words joined by hyphens; it is the
    page address and every record's key. The new game already passes the conformance check. (By hand: copy the
@@ -259,14 +259,14 @@ platform plays itself are loaded today**; a game hosted elsewhere stays self-rep
   in jsdom against a simulated host with storage and network blocked, so a game that reaches outside fails.
 - `pnpm --filter web dev` (or `build`) builds every folder under `/games` into the git-ignored
   `apps/web/public/play/<id>`. Open `/games/<id>`: the game is playable on that page.
-- A listed game with `launch: embedded` is shown only where it is playable. The sample game is registered only
-  when `APP_ENV` is `test`; a real game is registered for every environment.
+- A listed game with `launch: embedded` is shown only where it is playable. SDK Explorer is registered only
+  when `APP_ENV` is `local` or `test`; a real game is registered for every environment.
 - `pnpm game:dev <id>` opens a local test page for the game: it frames the game in the same sandbox, builds it again on each
   reload, and lets you sign the player in and out, connect a fake wallet (and change its network), send the tab-hidden and
   full-screen events, take a claim through its states, and read a log of every call. Outside this repository, the SDK's
   `ador-game-dev <folder>` does the same from a `game.json` of the game's id, capabilities and milestones. What the page does is
   made up; the platform's own rules decide what players get.
-- `pnpm test:e2e -- tests/game-host.spec.ts` plays the sample game in a real browser through reload.
+- `pnpm test:e2e -- tests/game-host.spec.ts` plays SDK Explorer in a real browser through reload.
 
 ## Checks every game passes
 

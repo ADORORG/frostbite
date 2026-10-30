@@ -8,10 +8,10 @@ const gamesDirectory = join(import.meta.dirname, "../../../games");
 
 // Every game the platform plays itself is checked here, the same way, so a game cannot be listed without
 // passing and no game has to remember to ask. The list is read as the platform runs for development, which is
-// when every game, including the sample, is registered.
+// when every game, including SDK Explorer, is registered.
 async function registeredGames() {
   vi.resetModules();
-  vi.stubEnv("APP_ENV", "test");
+  vi.stubEnv("APP_ENV", "local");
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
   vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", "");

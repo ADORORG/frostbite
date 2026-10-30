@@ -9,7 +9,7 @@ const fullscreenElement = () =>
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/games/sample-game");
+  await page.goto("/games/sdk-explorer");
   await expect(page.getByText("Connected to the platform")).toBeVisible();
 });
 
@@ -30,7 +30,9 @@ test("the game's frame goes full screen from the button, keeps working, and the 
     "This browser does not allow full screen.",
   );
   const game = page.frameLocator(frameSelector);
-  await expect(game.locator("#status")).toHaveText("Connected. Tap to score.");
+  await expect(game.locator("#status")).toHaveText(
+    "Connected. Call anything below.",
+  );
   // Hidden on a touch screen, where there is no Escape key to press.
   await expect(
     page.getByText("Press Esc to leave full screen."),
@@ -39,11 +41,16 @@ test("the game's frame goes full screen from the button, keeps working, and the 
   await page.keyboard.press("Enter");
   await expect.poll(() => page.evaluate(fullscreenElement)).toBe("game-frame");
   // The game is playable while it fills the screen.
-  await game.locator("#tap").click();
-  await expect(game.locator("#score")).toHaveText("1");
+  await game.locator("#progress-save").click();
+  await expect(game.locator("#log li").first()).toHaveText(
+    'progress.save → {"saved":{"calls":1}}',
+  );
   // Leaving is the browser's: the frame covers the page, so the page has nothing to click.
   await page.evaluate(() => document.exitFullscreen());
   await expect.poll(() => page.evaluate(fullscreenElement)).toBeNull();
   await expect(page.getByRole("button", { name: "Full screen" })).toBeVisible();
-  await expect(game.locator("#score")).toHaveText("1");
+  // The host's exit event may land after the save, so the line is looked for rather than taken as the newest.
+  await expect(
+    game.locator("#log li", { hasText: "progress.save" }),
+  ).toHaveText('progress.save → {"saved":{"calls":1}}');
 });

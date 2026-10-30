@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import { devGameOf } from "./dev-games.ts";
 
 // `pnpm game:dev <id> [--port 5173]`: opens the local test page for a registered game (the folder under `games/` and its manifest
-// in `configs/games`). It is a development tool: the sample games are registered for it whatever the environment says.
+// in `configs/games`). It is a development tool: the games that exist to check the platform (SDK Explorer) are registered for it whatever the environment says.
 const { positionals, values } = parseArgs({
   allowPositionals: true,
   options: { port: { type: "string" } },

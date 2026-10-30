@@ -2,6 +2,7 @@ import { createGameClient } from "@ador/game-sdk/client";
 import { eventNames, type JsonValue } from "@ador/game-sdk/protocol";
 
 import { attempt, describeEvent, describeOutcome, probes } from "./probes.ts";
+import { checkSandbox, pageActions } from "./sandbox.ts";
 
 // The page of the explorer: a button for every call the SDK has, a log of what each returned, and a list of
 // what the platform told the game on its own. It keeps nothing itself.
@@ -43,6 +44,24 @@ for (const probe of probes) {
   item.append(button);
   buttons.append(item);
 }
+
+// Not a call to the platform but a check on the frame: it tries what a game must not be able to do and says what happened.
+const sandbox = document.createElement("li");
+const sandboxButton = document.createElement("button");
+sandboxButton.type = "button";
+sandboxButton.id = "sandbox";
+sandboxButton.textContent = "sandbox check";
+sandboxButton.disabled = true;
+sandboxButton.addEventListener("click", () => {
+  void checkSandbox(pageActions).then((verdicts) =>
+    write(
+      describeOutcome("sandbox check", { kind: "result", value: verdicts }),
+      "call",
+    ),
+  );
+});
+sandbox.append(sandboxButton);
+buttons.append(sandbox);
 
 for (const name of eventNames)
   client.on(name, (data) =>

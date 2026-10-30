@@ -201,7 +201,7 @@ test.describe("a phone held sideways", () => {
   });
 
   test("is offered full screen, and can decline", async ({ page }) => {
-    await page.goto("/games/sample-game");
+    await page.goto("/games/sdk-explorer");
     await expect(page.getByText("Connected to the platform")).toBeVisible();
     const supported = await page.evaluate(() => document.fullscreenEnabled);
     test.skip(!supported, "This browser does not allow full screen.");
@@ -212,7 +212,7 @@ test.describe("a phone held sideways", () => {
   });
 
   test("takes the game full screen from the offer", async ({ page }) => {
-    await page.goto("/games/sample-game");
+    await page.goto("/games/sdk-explorer");
     await expect(page.getByText("Connected to the platform")).toBeVisible();
     const supported = await page.evaluate(() => document.fullscreenEnabled);
     test.skip(!supported, "This browser does not allow full screen.");
@@ -234,7 +234,7 @@ test("a computer is not offered the phone prompt", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "One check is enough.");
-  await page.goto("/games/sample-game");
+  await page.goto("/games/sdk-explorer");
   await expect(page.getByText("Connected to the platform")).toBeVisible();
   await expect(page.getByTestId("fullscreen-prompt")).toHaveCount(0);
 });

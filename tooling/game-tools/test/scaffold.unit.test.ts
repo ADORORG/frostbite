@@ -23,18 +23,18 @@ import {
 // A template small enough to read at a glance: one game folder, its manifest, and a registry with the two anchors.
 let root = "";
 let paths: ScaffoldPaths;
-const registryText = `import { sampleGame } from "./games/sample.ts";
+const registryText = `import { starterGame } from "./games/starter.ts";
 // game:new adds imports above this line.
 
 export const games = [
-  sampleGame,
+  starterGame,
   // game:new adds games above this line.
 ];
 `;
 const manifestText = `import { defineGame } from "@ador/shared/games";
 
-// Tap Tower, the template. Its comment is about the sample game.
-export const sampleGame = defineGame({ id: "sample-game", title: "Tap Tower" });
+// Starter Game, the template. Its comment is about the template.
+export const starterGame = defineGame({ id: "starter-game", title: "Starter Game" });
 `;
 const exists = (path: string) =>
   stat(path).then(
@@ -49,8 +49,8 @@ beforeEach(async () => {
     gamesDirectory: join(root, "games"),
     manifestDirectory: join(root, "configs/games"),
     registryFile: join(root, "configs/games.ts"),
-    templateDirectory: join(root, "games/sample-game"),
-    templateManifestFile: join(root, "configs/games/sample.ts"),
+    templateDirectory: join(root, "games/starter-game"),
+    templateManifestFile: join(root, "configs/games/starter.ts"),
   };
   await mkdir(join(paths.templateDirectory, "src"), { recursive: true });
   await mkdir(join(paths.templateDirectory, "node_modules/dep"), {
@@ -60,9 +60,9 @@ beforeEach(async () => {
   await mkdir(paths.manifestDirectory, { recursive: true });
   await writeFile(
     join(paths.templateDirectory, "src/game.ts"),
-    'export const name = "sample-game"; // Tap Tower, sampleGame, sample-game\n',
+    'export const name = "starter-game"; // Starter Game, starterGame, starter-game\n',
   );
-  await writeFile(join(paths.templateDirectory, "logo.png"), "sample-game");
+  await writeFile(join(paths.templateDirectory, "logo.png"), "starter-game");
   await writeFile(join(paths.templateDirectory, "node_modules/dep/x.ts"), "x");
   await writeFile(join(paths.templateDirectory, "dist/out.js"), "x");
   await writeFile(paths.templateManifestFile, manifestText);
@@ -91,13 +91,13 @@ describe("refusing before writing anything", () => {
     "refuses %j as an id",
     async (id) => {
       expect(await failure(id)).toBeInstanceOf(ScaffoldError);
-      expect(await readdir(paths.gamesDirectory)).toEqual(["sample-game"]);
+      expect(await readdir(paths.gamesDirectory)).toEqual(["starter-game"]);
     },
   );
 
   it("refuses the template's own id", async () => {
-    expect(await failure("sample-game")).toMatchObject({
-      message: '"sample-game" is the template itself.',
+    expect(await failure("starter-game")).toMatchObject({
+      message: '"starter-game" is the template itself.',
     });
   });
 
@@ -133,14 +133,14 @@ describe("refusing before writing anything", () => {
   it("refuses a game whose export name is already registered", async () => {
     await writeFile(
       paths.registryFile,
-      registryText.replace("sampleGame,", "newGameGame,"),
+      registryText.replace("starterGame,", "newGameGame,"),
     );
     expect(await failure("new-game")).toMatchObject({
       message: "A game named newGameGame is already registered.",
     });
     await writeFile(
       paths.registryFile,
-      registryText.replace("{ sampleGame }", "{ newGameGame }"),
+      registryText.replace("{ starterGame }", "{ newGameGame }"),
     );
     expect(await failure("new-game")).toBeInstanceOf(ScaffoldError);
   });
@@ -160,10 +160,10 @@ describe("making a game", () => {
     expect(await exists(join(folder, "node_modules"))).toBe(false);
     expect(await exists(join(folder, "dist"))).toBe(false);
     // Files that are not text are copied as they are.
-    expect(await read("games/new-game/logo.png")).toBe("sample-game");
+    expect(await read("games/new-game/logo.png")).toBe("starter-game");
     // The template itself is untouched.
-    expect(await read("games/sample-game/src/game.ts")).toContain(
-      "sample-game",
+    expect(await read("games/starter-game/src/game.ts")).toContain(
+      "starter-game",
     );
   });
 
@@ -179,7 +179,7 @@ describe("making a game", () => {
     await scaffoldGame({ id: "new-game", paths, title: "Brand New" });
     const manifest = await read("configs/games/new-game.ts");
     expect(manifest).toContain("// Brand New, started from the template.");
-    expect(manifest).not.toContain("Its comment is about the sample game");
+    expect(manifest).not.toContain("Its comment is about the template");
     expect(manifest).toContain(
       'export const newGameGame = defineGame({ id: "new-game", title: "Brand New" });',
     );
@@ -197,7 +197,7 @@ describe("making a game", () => {
     expect(registry).toContain(
       "newGameGame,\n  // game:new adds games above this line.",
     );
-    expect(registry).toContain("  sampleGame,\n  newGameGame,");
+    expect(registry).toContain("  starterGame,\n  newGameGame,");
   });
 
   it("makes a second game after the first, and refuses the first again", async () => {

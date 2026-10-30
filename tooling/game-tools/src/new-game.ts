@@ -22,8 +22,11 @@ try {
       gamesDirectory: join(root, "games"),
       manifestDirectory: join(root, "configs/games"),
       registryFile: join(root, "configs/games.ts"),
-      templateDirectory: join(root, "games/sample-game"),
-      templateManifestFile: join(root, "configs/games/sample.ts"),
+      templateDirectory: join(root, "tooling/game-tools/template/game"),
+      templateManifestFile: join(
+        root,
+        "tooling/game-tools/template/manifest.ts",
+      ),
     },
     ...(values.title === undefined ? {} : { title: values.title }),
   });

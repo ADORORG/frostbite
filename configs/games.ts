@@ -1,6 +1,5 @@
 import {
   developmentGamesEnabled,
-  testGamesEnabled,
   parseGameLaunchEnvironment,
 } from "@repo/config/env";
 import {
@@ -11,20 +10,15 @@ import {
 
 import { targetChains } from "./chains.ts";
 import { frostbite } from "./games/frostbite.ts";
-import { sampleGame } from "./games/sample.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 import { frostRunnerGame } from "./games/frost-runner.ts";
 import { icicleDropGame } from "./games/icicle-drop.ts";
 import { towerStackGame } from "./games/tower-stack.ts";
 // game:new adds imports above this line.
 
-// Games that exist to check the platform: SDK Explorer is listed where the platform is run for development or tests, and the sample game
-// (the template, which the end-to-end tests play) only in the tests.
+// Games that exist to check the platform, listed only where it is run for development or tests.
 function developmentGames(): GameManifest[] {
-  return [
-    ...(developmentGamesEnabled(process.env) ? [sdkExplorerGame] : []),
-    ...(testGamesEnabled(process.env) ? [sampleGame] : []),
-  ];
+  return developmentGamesEnabled(process.env) ? [sdkExplorerGame] : [];
 }
 
 // The games the platform lists: one line per game. A game is added here and nowhere else; the catalog and the

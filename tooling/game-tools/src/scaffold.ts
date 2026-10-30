@@ -16,17 +16,17 @@ export interface ScaffoldPaths {
   readonly manifestDirectory: string;
   // `configs/games.ts`, the one place games are registered.
   readonly registryFile: string;
-  // The game to copy: `games/sample-game`, and its manifest, `configs/games/sample.ts`.
+  // The game to copy (`tooling/game-tools/template/game`) and its manifest (`tooling/game-tools/template/manifest.ts`).
   readonly templateDirectory: string;
   readonly templateManifestFile: string;
   // `games`, where the new folder is made.
   readonly gamesDirectory: string;
 }
 
-// The sample game's identifiers, replaced in everything copied from it.
-const templateId = "sample-game";
-const templateTitle = "Tap Tower";
-const templateExport = "sampleGame";
+// The template's identifiers, replaced in everything copied from it.
+const templateId = "starter-game";
+const templateTitle = "Starter Game";
+const templateExport = "starterGame";
 const importAnchor = "// game:new adds imports above this line.";
 const gameAnchor = "// game:new adds games above this line.";
 // Never copied: what a build, a test run or an install leaves in a game's folder.
@@ -120,10 +120,10 @@ export async function scaffoldGame(options: {
     await writeFile(file, rename(await readFile(file, "utf8")));
   await writeFile(
     join(folder, "README.md"),
-    `# ${title}\n\nStarted from the template (\`games/${templateId}\`). Replace the rules in \`src/game.ts\`, the page\nin \`index.html\` and \`src/main.ts\`, and the milestones in \`configs/games/${id.data}.ts\`, then see\n\`docs/product/game-onboarding.md\`.\n\nTest commands: \`pnpm --filter @game/${id.data} test:unit\`, \`test:integration\`, \`test:coverage\`.\n`,
+    `# ${title}\n\nStarted from the template (\`tooling/game-tools/template\`). Replace the rules in \`src/game.ts\`, the page\nin \`index.html\` and \`src/main.ts\`, and the milestones in \`configs/games/${id.data}.ts\`, then see\n\`docs/product/game-onboarding.md\`.\n\nTest commands: \`pnpm --filter @game/${id.data} test:unit\`, \`test:integration\`, \`test:coverage\`.\n`,
   );
   await mkdir(paths.manifestDirectory, { recursive: true });
-  // The template's own comment is about the sample game, so it is replaced, not renamed.
+  // The template's own comment is about the template, so it is replaced, not renamed.
   const manifestBody = templateManifest.slice(
     templateManifest.indexOf("export const"),
   );

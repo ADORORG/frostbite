@@ -19,7 +19,7 @@ const milestone = (id: string, title: string) => ({
   title,
 });
 const manifest = {
-  id: "tap-tower",
+  id: "starter-game",
   milestones: [
     milestone("first-five", "First five"),
     milestone("ten-taps", "Ten taps"),
@@ -82,7 +82,7 @@ async function play(saved?: { score: number }) {
   return { stored, window: running.window };
 }
 
-describe("Tap Tower, bundled and run against a simulated platform", () => {
+describe("Starter Game, bundled and run against a simulated platform", () => {
   it("connects, and lets the player tap only once it has", async () => {
     const { window } = await play();
     await settle();

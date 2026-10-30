@@ -72,9 +72,18 @@ describe("the SDK explorer, bundled and run against a simulated platform", () =>
       "Connected. Call anything below.",
     );
     const buttons = [...document.querySelectorAll("#probes button")];
-    expect(buttons).toHaveLength(15);
+    // A button for each of the 15 calls, and the sandbox check.
+    expect(buttons).toHaveLength(16);
     expect(buttons.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,
+    );
+  });
+
+  it("checks the frame's isolation and says what happened to each thing a game must not do", async () => {
+    const { lines, press } = await open([]);
+    await press("sandbox");
+    expect(lines()[0]).toMatch(
+      /^sandbox check → \{"cookie":"(?:allowed|blocked)","fetch":"(?:allowed|blocked)","localStorage":"(?:allowed|blocked)"\}$/u,
     );
   });
 

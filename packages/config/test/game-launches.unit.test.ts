@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   developmentGamesEnabled,
-  testGamesEnabled,
   parseGameLaunchEnvironment,
 } from "../src/env/runtime.ts";
 
@@ -141,18 +140,5 @@ describe("development games", () => {
     ["", false],
   ])("are listed in %j: %s", (APP_ENV, listed) => {
     expect(developmentGamesEnabled({ APP_ENV })).toBe(listed);
-  });
-});
-
-describe("the sample game", () => {
-  it.each([
-    ["test", true],
-    ["local", false],
-    ["preview", false],
-    ["production", false],
-    [undefined, false],
-    ["Test", false],
-  ])("is listed only in the tests: %j is %s", (APP_ENV, listed) => {
-    expect(testGamesEnabled({ APP_ENV })).toBe(listed);
   });
 });

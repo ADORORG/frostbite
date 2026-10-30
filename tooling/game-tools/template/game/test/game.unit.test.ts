@@ -8,7 +8,7 @@ import {
   tap,
 } from "../src/game.ts";
 
-describe("the rules of Tap Tower", () => {
+describe("the rules of Starter Game", () => {
   it("scores one for each tap", () => {
     expect(tap(tap(startState))).toEqual({ score: 2 });
   });

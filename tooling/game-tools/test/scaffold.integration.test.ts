@@ -8,7 +8,9 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { join } from "node:path";
+import { promisify } from "node:util";
 
 import { gameManifestSchema } from "@ador/shared/games";
 import { checkGameConformance } from "@ador/test-kit/game-conformance";
@@ -21,6 +23,8 @@ import {
   titleOf,
 } from "../src/scaffold.ts";
 
+const run = promisify(execFile);
+const vitest = join(import.meta.dirname, "../node_modules/.bin/vitest");
 const repository = join(import.meta.dirname, "../../..");
 const skipped = new Set(["node_modules", "coverage", ".turbo"]);
 let workspace = "";
@@ -28,30 +32,25 @@ const paths = () => ({
   gamesDirectory: join(workspace, "games"),
   manifestDirectory: join(workspace, "configs/games"),
   registryFile: join(workspace, "configs/games.ts"),
-  templateDirectory: join(workspace, "games/sample-game"),
-  templateManifestFile: join(workspace, "configs/games/sample.ts"),
+  templateDirectory: join(workspace, "template/game"),
+  templateManifestFile: join(workspace, "template/manifest.ts"),
 });
 
 // A copy of the parts of the repository a new game touches, inside this package so the game's imports resolve.
 beforeEach(async () => {
   workspace = await mkdtemp(join(import.meta.dirname, "..", ".tmp-"));
   await cp(
-    join(repository, "games/sample-game"),
-    join(workspace, "games/sample-game"),
+    join(repository, "tooling/game-tools/template"),
+    join(workspace, "template"),
     {
       filter: (source) => !skipped.has(source.split("/").pop() ?? ""),
       recursive: true,
     },
   );
-  await mkdir(join(workspace, "games/sample-game/coverage"));
-  await writeFile(join(workspace, "games/sample-game/coverage/x.json"), "{}");
+  await mkdir(join(workspace, "template/game/coverage"));
+  await writeFile(join(workspace, "template/game/coverage/x.json"), "{}");
   await mkdir(join(workspace, "configs/games"), { recursive: true });
-  for (const file of [
-    "games.ts",
-    "chains.ts",
-    "beta-chains.ts",
-    "games/sample.ts",
-  ])
+  for (const file of ["games.ts", "chains.ts", "beta-chains.ts"])
     await cp(
       join(repository, "configs", file),
       join(workspace, "configs", file),
@@ -87,7 +86,9 @@ describe("making a new game from the template", () => {
       "<title>River Run</title>",
     );
     expect(await read("games/river-run/README.md")).toContain("# River Run");
-    expect(await read("games/river-run/README.md")).not.toContain("Tap Tower");
+    expect(await read("games/river-run/README.md")).not.toContain(
+      "Starter Game",
+    );
   });
 
   it("writes a manifest that passes the platform's checks, and a game that conforms to the interface", async () => {
@@ -110,7 +111,7 @@ describe("making a new game from the template", () => {
       }),
     ).toEqual([]);
     const text = await read("configs/games/river-run.ts");
-    expect(text).not.toContain("sample");
+    expect(text).not.toContain("starter");
     expect(text).toContain("started from the template");
   });
 
@@ -154,7 +155,7 @@ describe("making a new game from the template", () => {
       ["the id is not a slug", "River Run", /not a game id/u],
       ["the id has path parts", "../x", /not a game id/u],
       ["the id is too short", "a", /not a game id/u],
-      ["the id is the template's", "sample-game", /template itself/u],
+      ["the id is the template's", "starter-game", /template itself/u],
     ])("%s", async (_name, id, message) => {
       const before = await read("configs/games.ts");
       await expect(scaffoldGame({ id, paths: paths() })).rejects.toThrow(
@@ -219,4 +220,20 @@ describe("the names made from an id", () => {
     expect(titleOf("river-run")).toBe("River Run");
     expect(titleOf("go")).toBe("Go");
   });
+
+  // The template is not a game of the platform and no workspace runs its tests, so they are run here, on a game made from it: a template
+  // whose own tests fail would hand every new author a broken start.
+  it.each(["unit", "integration"])(
+    "makes a game whose own %s tests pass",
+    async (project) => {
+      await scaffoldGame({ id: "river-run", paths: paths() });
+      const { stdout } = await run(
+        vitest,
+        ["run", "--config", "vitest.config.ts", "--project", project],
+        { cwd: join(workspace, "games/river-run") },
+      );
+      expect(stdout).toMatch(/Tests\s+\d+ passed/u);
+    },
+    60_000,
+  );
 });
