@@ -1,16 +1,27 @@
+import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
+import { createPause, pauseCopy } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import { createRunLoop } from "@ador/game-sdk/run-loop";
 import {
   startNote,
   submitNote,
   type SubmitState,
 } from "@ador/game-sdk/run-notes";
 
+import { effects, track } from "./audio.ts";
+import { worldSounds } from "./feedback.ts";
 import { metres } from "./rules/milestones.ts";
-import { freshProgress, restore, withBest, type Progress } from "./progress.ts";
+import {
+  freshProgress,
+  restore,
+  withBest,
+  withSound,
+  type Progress,
+} from "./progress.ts";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachControls } from "./screen/controls.ts";
-import { ticksIn } from "./screen/clock.ts";
+import { ticksPerSecond } from "./rules/constants.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
@@ -36,6 +47,7 @@ const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const jumpButton = element("jump", "button");
 const slideButton = element("slide", "button");
+const pauseButton = element("pause", "button");
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -43,8 +55,21 @@ let progress: Progress = freshProgress;
 let session: RunSession | null = null;
 let runId: string | null = null;
 let titles = new Map<string, string>();
-let carried = 0;
-let last = 0;
+let heldNote = "";
+
+const pause = createPause();
+const saveProgress = (): void =>
+  void client.progress.save({ best: progress.best, sound: progress.sound });
+const sound = setUpSound({
+  container: element("sound", "div"),
+  effects,
+  pause,
+  save: (settings) => {
+    progress = withSound(progress, settings);
+    saveProgress();
+  },
+  track,
+});
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 
@@ -72,13 +97,53 @@ function setRunning(running: boolean): void {
   startButton.hidden = running;
   jumpButton.disabled = !running;
   slideButton.disabled = !running;
+  pauseButton.disabled = !running;
 }
+
+const loop = createRunLoop({
+  frame(ticks) {
+    const current = session;
+    if (current === null) return false;
+    const before = current.state();
+    for (let at = 0; at < ticks && !current.state().ended; at += 1)
+      current.tick();
+    for (const name of worldSounds(before, current.state())) sound.sfx(name);
+    listEarned(current.earned());
+    show();
+    if (!current.state().ended) return true;
+    void finish(current);
+    return false;
+  },
+  page: document,
+  pause,
+  ticksPerSecond,
+});
+
+function act(move: "jump" | "slide"): void {
+  if (loop.active() && session?.[move]().ok === true) sound.sfx(move);
+}
+
+function togglePause(): void {
+  if (loop.running()) pause.toggle();
+}
+
+pause.subscribe((paused) => {
+  pauseButton.textContent = paused ? pauseCopy.resume : pauseCopy.pause;
+  if (paused) {
+    heldNote = note.textContent;
+    note.textContent = pauseCopy.paused;
+    return;
+  }
+  note.textContent = heldNote;
+});
 
 async function finish(finished: RunSession): Promise<void> {
   setRunning(false);
+  sound.music(false);
+  sound.sfx("hit");
   const record = finished.record();
   progress = withBest(progress, metres(finished.state()));
-  void client.progress.save({ best: progress.best });
+  saveProgress();
   show();
   startButton.textContent = "Run again";
   if (runId === null || play === null) {
@@ -94,43 +159,33 @@ async function finish(finished: RunSession): Promise<void> {
   note.textContent = submitNote(settled);
 }
 
-function frame(now: number): void {
-  const running = session;
-  if (running === null) return;
-  const step = ticksIn(carried, now - last);
-  carried = step.carried;
-  last = now;
-  for (let at = 0; at < step.ticks && !running.state().ended; at += 1)
-    running.tick();
-  listEarned(running.earned());
-  show();
-  if (running.state().ended) void finish(running);
-  else requestAnimationFrame(frame);
-}
-
-async function begin(): Promise<void> {
-  const started = await play?.runs.start().catch(() => null);
-  const ready = started?.status === "started" ? started : null;
-  runId = ready?.runId ?? null;
-  note.textContent = startNote(
-    started ?? null,
-    "Tap the top of the screen (or press space) to jump, the bottom (or the down key) to slide.",
-  );
-  session = createRunSession({
-    onEarned: (id) => play?.report(id),
-    seed: ready?.seed ?? localSeed(),
+const begin = (): Promise<void> =>
+  loop.launch(async () => {
+    const started = await play?.runs.start().catch(() => null);
+    const ready = started?.status === "started" ? started : null;
+    runId = ready?.runId ?? null;
+    note.textContent = startNote(
+      started ?? null,
+      "Tap the top of the screen (or press space) to jump, the bottom (or the down key) to slide.",
+    );
+    session = createRunSession({
+      onEarned: (id) => {
+        sound.sfx("milestone");
+        play?.report(id);
+      },
+      seed: ready?.seed ?? localSeed(),
+    });
+    listEarned([]);
+    setRunning(true);
+    sound.sfx("start");
+    sound.music(true);
   });
-  listEarned([]);
-  setRunning(true);
-  carried = 0;
-  last = performance.now();
-  requestAnimationFrame(frame);
-}
 
 async function connect(): Promise<void> {
   try {
     await client.ready();
     progress = restore(await client.progress.load());
+    sound.apply(progress.sound);
     play = await connectToPlatform(client);
     titles = new Map(
       (await client.milestones.list().catch(() => [])).map(({ id, title }) => [
@@ -152,11 +207,14 @@ async function connect(): Promise<void> {
 screen.width = screenWidth;
 screen.height = screenHeight;
 attachControls(screen, {
-  jump: () => void session?.jump(),
-  slide: () => void session?.slide(),
+  jump: () => act("jump"),
+  pause: togglePause,
+  slide: () => act("slide"),
+  start: () => void (!startButton.disabled && begin()),
 });
-jumpButton.addEventListener("click", () => void session?.jump());
-slideButton.addEventListener("click", () => void session?.slide());
+jumpButton.addEventListener("click", () => act("jump"));
+slideButton.addEventListener("click", () => act("slide"));
+pauseButton.addEventListener("click", togglePause);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 void connect();

@@ -1,3 +1,5 @@
+@import "@ador/game-sdk/audio/panel.css";
+
 :root {
   color-scheme: dark;
 }
@@ -46,8 +48,8 @@ h2 {
 }
 .score {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
   color: #b9aaec;
 }
 .score strong {
@@ -65,8 +67,10 @@ canvas {
   image-rendering: pixelated;
   touch-action: manipulation;
 }
+/* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves. */
 #note {
-  min-block-size: 2.75rem;
+  block-size: 3rem;
+  overflow-y: auto;
   color: #b9aaec;
 }
 .actions {
@@ -76,6 +80,7 @@ canvas {
 }
 button {
   min-height: 2.75rem;
+  min-inline-size: 5.5rem;
   padding: 0.5rem 1.25rem;
   border: 0.125rem solid #38e8ff;
   border-radius: 0.5rem;
@@ -88,12 +93,16 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* A button that is not offered keeps its place, so the one beside it does not slide into it. */
 button[hidden] {
-  display: none;
+  display: inline-block;
+  visibility: hidden;
 }
 #earned {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  block-size: 2.25rem;
   gap: 0.375rem;
   margin: 0.25rem 0 0;
   padding: 0;
@@ -105,6 +114,7 @@ button[hidden] {
   border-radius: 999px;
   color: #56f5a6;
   font-size: 0.8125rem;
+  white-space: nowrap;
 }
 
 canvas {

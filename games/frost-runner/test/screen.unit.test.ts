@@ -1,29 +1,17 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ticksPerSecond } from "../src/rules/constants.ts";
 import { attachControls } from "../src/screen/controls.ts";
-import { mostTicksAFrame, ticksIn } from "../src/screen/clock.ts";
 import { draw, screenHeight, screenWidth } from "../src/screen/draw.ts";
 import { colour } from "../src/screen/palette.ts";
 import type { RunnerState } from "../src/rules/types.ts";
 import { empty, icicle, shard, spike, withWorld } from "./support/states.ts";
 
-const frame = 1000 / ticksPerSecond;
-
-describe("turning time into ticks", () => {
-  it("gives a whole tick for each thirtieth of a second and keeps the rest for the next frame", () => {
-    expect(ticksIn(0, frame * 2.5).ticks).toBe(2);
-    const second = ticksIn(ticksIn(0, frame * 2.5).carried, frame * 0.6);
-    expect(second.ticks).toBe(1);
-    expect(ticksIn(0, 5).ticks).toBe(0);
-    expect(ticksIn(0, 5).carried).toBeCloseTo(5);
-  });
-
-  it("ignores time running backwards, and cuts a long pause short instead of running the runner into a wall", () => {
-    expect(ticksIn(0, -50)).toEqual({ carried: 0, ticks: 0 });
-    expect(ticksIn(0, 60_000)).toEqual({ carried: 0, ticks: mostTicksAFrame });
-  });
+const actions = () => ({
+  jump: vi.fn(),
+  pause: vi.fn(),
+  slide: vi.fn(),
+  start: vi.fn(),
 });
 
 describe("the player's hands", () => {
@@ -46,7 +34,7 @@ describe("the player's hands", () => {
       y: 0,
       toJSON: () => ({}),
     });
-    const controls = { jump: vi.fn(), slide: vi.fn() };
+    const controls = actions();
     stops.push(attachControls(target, controls));
     return { controls, target };
   }
@@ -78,6 +66,24 @@ describe("the player's hands", () => {
     expect(controls.slide).toHaveBeenCalledTimes(4);
   });
 
+  it("starts on Enter and pauses on P, and leaves Space to the jump", () => {
+    const { controls } = setup();
+    press("Enter");
+    press("NumpadEnter");
+    press("KeyP");
+    expect(controls.start).toHaveBeenCalledTimes(2);
+    expect(controls.pause).toHaveBeenCalledTimes(1);
+    expect(controls.jump).not.toHaveBeenCalled();
+  });
+
+  it("acts when a key goes down, not when it comes up", () => {
+    const { controls } = setup();
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+    expect(controls.start).not.toHaveBeenCalled();
+    expect(controls.jump).not.toHaveBeenCalled();
+  });
+
   it("takes over only the keys it uses, and not a key that is held down", () => {
     const { controls } = setup();
     expect(press("KeyQ").defaultPrevented).toBe(false);
@@ -98,7 +104,7 @@ describe("the player's hands", () => {
 
   it("stops listening when told to", () => {
     const target = document.createElement("div");
-    const controls = { jump: vi.fn(), slide: vi.fn() };
+    const controls = actions();
     const stop = attachControls(target, controls);
     stop();
     press("Space");
