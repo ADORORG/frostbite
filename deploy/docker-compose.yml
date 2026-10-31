@@ -1,0 +1,95 @@
+# Web and worker as one Coolify application (docs/operations/deployment.md, "Prebuilt image"): both run the one image that
+# .github/workflows/publish-image.yml pushes, so Coolify builds nothing. Create a Docker Compose application from this file, give each
+# service its domain under Domains (web `https://<host>:3000`, worker `https://<worker host>:3000`, which Inngest calls at /api/inngest),
+# and paste the environment (.env.production.example) once in the Developer view. The image holds no secrets.
+#
+# The list is the keys of .env.production.example, in its order, less REWARDS_TEMPLATES_DIR: the image sets it, and an empty value from
+# here would switch template publishing off. A key marked required in packages/config's definitions blocks the deploy while it is empty.
+x-environment: &environment
+  APP_ENV: ${APP_ENV:?}
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?}
+  NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:?}
+  DATABASE_URL: ${DATABASE_URL:?}
+  DATABASE_MIGRATION_URL: ${DATABASE_MIGRATION_URL:-}
+  DATABASE_SSL_MODE: ${DATABASE_SSL_MODE:?}
+  DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:?}
+  DATABASE_ACQUIRE_TIMEOUT_MS: ${DATABASE_ACQUIRE_TIMEOUT_MS:?}
+  DATABASE_IDLE_TIMEOUT_MS: ${DATABASE_IDLE_TIMEOUT_MS:?}
+  DATABASE_STATEMENT_TIMEOUT_MS: ${DATABASE_STATEMENT_TIMEOUT_MS:?}
+  R2_ENDPOINT: ${R2_ENDPOINT:?}
+  R2_REGION: ${R2_REGION:?}
+  R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?}
+  R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?}
+  R2_PRIVATE_BUCKET: ${R2_PRIVATE_BUCKET:?}
+  R2_PUBLIC_BUCKET: ${R2_PUBLIC_BUCKET:?}
+  INNGEST_APP_ID: ${INNGEST_APP_ID:?}
+  INNGEST_DEV: ${INNGEST_DEV:?}
+  INNGEST_BASE_URL: ${INNGEST_BASE_URL:-}
+  INNGEST_EVENT_KEY: ${INNGEST_EVENT_KEY:?}
+  INNGEST_SIGNING_KEY: ${INNGEST_SIGNING_KEY:?}
+  AUTH_SESSION_IDLE_TIMEOUT_MS: ${AUTH_SESSION_IDLE_TIMEOUT_MS:?}
+  AUTH_SESSION_ABSOLUTE_TIMEOUT_MS: ${AUTH_SESSION_ABSOLUTE_TIMEOUT_MS:?}
+  PASSKEY_CHALLENGE_TIMEOUT_MS: ${PASSKEY_CHALLENGE_TIMEOUT_MS:?}
+  PASSKEY_RECENT_AUTH_WINDOW_MS: ${PASSKEY_RECENT_AUTH_WINDOW_MS:?}
+  GAME_LAUNCHES: ${GAME_LAUNCHES:-}
+  SECURITY_CSP_MODE: ${SECURITY_CSP_MODE:-}
+  TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-}
+  BETA_NETWORK: ${BETA_NETWORK:-}
+  REWARDS_CHAIN_RPC_URL: ${REWARDS_CHAIN_RPC_URL:-}
+  REWARDS_CHAIN_RPC_API_KEY: ${REWARDS_CHAIN_RPC_API_KEY:-}
+  REWARDS_CHAIN_RPC_API_KEY_HEADER: ${REWARDS_CHAIN_RPC_API_KEY_HEADER:-}
+  REWARDS_CHAIN_RPC_TIMEOUT_MS: ${REWARDS_CHAIN_RPC_TIMEOUT_MS:-}
+  REWARDS_MAX_FEE_SATS: ${REWARDS_MAX_FEE_SATS:-}
+  MAIL_TRANSPORT: ${MAIL_TRANSPORT:-}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
+  MAIL_SMTP_HOST: ${MAIL_SMTP_HOST:-}
+  MAIL_SMTP_PORT: ${MAIL_SMTP_PORT:-}
+  MAIL_SMTP_ENCRYPTION: ${MAIL_SMTP_ENCRYPTION:-}
+  MAIL_SMTP_USER: ${MAIL_SMTP_USER:-}
+  MAIL_SMTP_PASSWORD: ${MAIL_SMTP_PASSWORD:-}
+  MAIL_TIMEOUT_MS: ${MAIL_TIMEOUT_MS:-}
+  MAIL_CAPTURE_DIRECTORY: ${MAIL_CAPTURE_DIRECTORY:-}
+  REWARDS_FEE_API_FORMAT: ${REWARDS_FEE_API_FORMAT:-}
+  REWARDS_FEE_RATE_SAT_VB: ${REWARDS_FEE_RATE_SAT_VB:-}
+
+x-healthcheck:
+  &healthcheck # /api/ready on web, /ready on the worker (the worker's port is also PORT, 3000 in the image); the image has node and no curl.
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 120s
+
+services:
+  web:
+    image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
+    # The image's own command: apply the pending migrations under a database lock, then serve.
+    restart: unless-stopped
+    environment: *environment
+    healthcheck:
+      <<: *healthcheck
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/ready').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+
+  worker:
+    image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
+    command: ["pnpm", "--filter", "worker", "start"]
+    restart: unless-stopped
+    environment: *environment
+    # Starts only once web is healthy, that is once the migrations have been applied; a failed migration leaves the worker down.
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/ready').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]

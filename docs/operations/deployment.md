@@ -75,15 +75,14 @@ these files should be moved once it does; until then they, and the dashboard set
 
 Written from the Coolify docs; not run on Coolify yet.
 
-- **Web:** a Dockerfile application with the Dockerfile at `deploy/Dockerfile` and the build context at the repository root. Port 3000,
-  health check path `/api/ready`. Leave the pre-deployment command empty: Coolify runs it in the old container and skips it on the first
-  deploy, which is why the image migrates itself. Give it one replica.
+- **Web and worker:** one Docker Compose application from `deploy/docker-compose.yml` (see "Prebuilt image" below). Web: port 3000, health
+  check `/api/ready`, one replica. Leave Coolify's pre-deployment command empty: it runs in the old container and is skipped on the first
+  deploy, which is why the image migrates itself.
 - **Database:** Coolify's PostgreSQL, or any other. `DATABASE_SSL_MODE` must match what the server offers (`verify-full` needs TLS with a
   certificate the container trusts).
-- **Worker:** a second application from the same image as web, with the start command `pnpm --filter worker start` (or, when Coolify
-  builds it, the build target `worker`); health check `/ready`. With Inngest Cloud it needs a public https domain, because Inngest calls
-  `https://<worker domain>/api/inngest` (register that URL as the app in the Inngest dashboard; requests are verified with
-  `INNGEST_SIGNING_KEY`). It needs the same database and storage variables as web plus `apps/worker/.env.example`'s keys. One replica.
+- **Worker:** the second service of the same compose file, with the start command `pnpm --filter worker start` and health check `/ready`.
+  With Inngest Cloud it needs a public https domain, because Inngest calls `https://<worker domain>/api/inngest` (register that URL as the
+  app in the Inngest dashboard; requests are verified with `INNGEST_SIGNING_KEY`). One replica.
 - **Environment:** the keys in `.env.production.example` (web) and `apps/worker/.env.example` (worker), as Coolify environment variables
   at run time. `PUBLIC_BASE_URL` is the exact https origin; `TRUSTED_PROXY_HOPS` counts Coolify's proxy (probably 1).
 - The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).
@@ -94,10 +93,15 @@ Building the image needs several GB of memory, which a 4 GB server does not have
 builds `deploy/Dockerfile` once on GitHub and pushes `ghcr.io/<owner>/<repo>` (lower case) tagged with the branch (`dev`, `main`) and
 `sha-<short commit>`, for `linux/amd64`. Then in Coolify:
 
-1. Make both applications of type Docker Image, with that image and tag. If the package is private, add a registry login for `ghcr.io` in
-   Coolify with a token that can read packages.
-2. Web: no start command (the image's default). Worker: the start command `pnpm --filter worker start`.
-3. Environment variables stay in Coolify, set at run time and never as build arguments. The image holds no secrets.
+1. If the package is private, add a registry login for `ghcr.io` on the Coolify server, with a token that can read packages.
+2. Create one Docker Compose application from `deploy/docker-compose.yml` (a Git source on this repository, or the file pasted in). It
+   runs `web` (the image's default command) and `worker` (`pnpm --filter worker start`) from the one image, `IMAGE` in the environment
+   (default `ghcr.io/adororg/frostbite:dev`; set a `sha-` tag to pin a version). The worker starts only once web is healthy, that is after
+   the migrations.
+3. Under Domains give `web` its host with the port (`https://<host>:3000`) and `worker` its own (`https://<worker host>:3000`).
+4. Paste the environment once in the Developer view, from `.env.production.example`. A key the config requires blocks the deploy while it
+   is empty. The values stay in Coolify at run time; the image holds no secrets. Do not set `REWARDS_TEMPLATES_DIR`: the image sets it.
+5. Deploy. A new version is the same single redeploy, with a new `IMAGE` tag if you pin one.
 
 The workflow does not run the Verify checks: merge to `dev` or `main` only what Verify has passed. Deploy a `sha-` tag, not `dev`, when you
 want a version you can roll back to.
