@@ -55,3 +55,25 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Deploys the image just pushed. It does nothing until the repository has the secrets COOLIFY_URL (the https address of Coolify) and
+      # COOLIFY_TOKEN (an API token allowed to deploy) and the variables COOLIFY_APP_UUID and COOLIFY_DEPLOY_BRANCH (the branch whose
+      # image that application runs), so a fork or a branch that is not deployed only publishes.
+      - name: Ask Coolify to deploy the new image
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_APP_UUID: ${{ vars.COOLIFY_APP_UUID }}
+          COOLIFY_DEPLOY_BRANCH: ${{ vars.COOLIFY_DEPLOY_BRANCH }}
+        run: |
+          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_APP_UUID" ] || [ "$GITHUB_REF_NAME" != "$COOLIFY_DEPLOY_BRANCH" ]; then
+            echo "Not deploying: Coolify is not configured for the branch $GITHUB_REF_NAME. The image is published."
+            exit 0
+          fi
+          case "$COOLIFY_URL" in
+            https://*) ;;
+            *) echo "::error::COOLIFY_URL must start with https:// so the token is not sent in the clear."; exit 1 ;;
+          esac
+          curl --fail-with-body --silent --show-error --max-time 60 \
+            --header "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            "${COOLIFY_URL%/}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}&force=false"

@@ -109,6 +109,20 @@ builds `deploy/Dockerfile` once on GitHub and pushes `ghcr.io/<owner>/<repo>` (l
    is empty. The values stay in Coolify at run time; the image holds no secrets. Do not set `REWARDS_TEMPLATES_DIR`: the image sets it.
 5. Deploy. A new version is the same single redeploy, with a new `IMAGE` tag if you pin one.
 
+### Deploy on every push
+
+After the image is pushed, `publish-image.yml` calls Coolify's deploy API for the application, so a push to the deployed branch redeploys it. The
+compose file sets `pull_policy: always`, because the `dev` tag keeps its name while its content changes. In the repository settings:
+
+- Secret `COOLIFY_URL`: the **https** address of Coolify (the step refuses anything else, so the token is never sent in the clear).
+- Secret `COOLIFY_TOKEN`: a Coolify API token (Keys & Tokens, API tokens) allowed to deploy; the API must be enabled in Coolify's settings.
+- Variable `COOLIFY_APP_UUID`: the compose application's UUID (in its address in Coolify).
+- Variable `COOLIFY_DEPLOY_BRANCH`: the branch whose image the application runs (`dev`).
+
+With any of these missing, or on another branch, the image is published and nothing is deployed. Coolify's own GitHub webhook is not used: it
+fires on the push, before the image exists. The deploy does not wait for the Verify checks (they run on pull requests and on `main`), so a
+broken commit on the deployed branch is deployed.
+
 The workflow does not run the Verify checks: merge to `dev` or `main` only what Verify has passed. Deploy a `sha-` tag, not `dev`, when you
 want a version you can roll back to.
 
