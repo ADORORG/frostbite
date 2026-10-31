@@ -85,6 +85,11 @@ Written from the Coolify docs; not run on Coolify yet.
   app in the Inngest dashboard; requests are verified with `INNGEST_SIGNING_KEY`). One replica.
 - **Environment:** the keys in `.env.production.example` (web) and `apps/worker/.env.example` (worker), as Coolify environment variables
   at run time. `PUBLIC_BASE_URL` is the exact https origin; `TRUSTED_PROXY_HOPS` counts Coolify's proxy (probably 1).
+- **Things that stopped the first Coolify deploy** (all met on a real deployment): the compose application needs _Connect to Predefined
+  Network_ on, or the web container cannot resolve Coolify's Postgres by name (`EAI_AGAIN`, the migration fails, the container restarts);
+  `INNGEST_DEV` must be set to `false`; the R2 API token must be _Object Read & Write_ on both buckets (a token scoped to other buckets
+  gives `403` on the readiness probe, shown only as "the object-storage provider request failed"); comments inside the compose YAML blocks
+  can be rejected by Coolify's parser; a 4 GB server needs swap to survive a build, which the prebuilt image avoids.
 - The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).
 
 ### Prebuilt image
