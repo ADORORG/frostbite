@@ -80,9 +80,10 @@ Written from the Coolify docs; not run on Coolify yet.
   deploy, which is why the image migrates itself. Give it one replica.
 - **Database:** Coolify's PostgreSQL, or any other. `DATABASE_SSL_MODE` must match what the server offers (`verify-full` needs TLS with a
   certificate the container trusts).
-- **Worker:** a second application from the same repository and Dockerfile whose command is `pnpm --filter worker start` (health check
-  `/ready`). Check that Coolify lets a Dockerfile application override the command (custom Docker options, or a separate Dockerfile that
-  only sets `CMD`); if it cannot, the image has no other way to start as the worker.
+- **Worker:** a second application from the same repository and Dockerfile with the build target `worker` (Coolify's Dockerfile
+  "target stage" field), whose `CMD` is `pnpm --filter worker start`; health check `/ready`, no public domain needed. If the field is
+  not there, set the start command to `pnpm --filter worker start` instead. It needs the same database and storage variables as the web
+  application plus `apps/worker/.env.example`'s keys. Give it one replica.
 - **Environment:** the keys in `.env.production.example` (web) and `apps/worker/.env.example` (worker), as Coolify environment variables
   at run time. `PUBLIC_BASE_URL` is the exact https origin; `TRUSTED_PROXY_HOPS` counts Coolify's proxy (probably 1).
 - The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).

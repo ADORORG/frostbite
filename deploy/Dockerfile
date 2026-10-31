@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
 #
-# One image for every service (ADR-009: build once, promote the same artifact). What a container does is chosen by its start command:
-#   web      applies the pending migrations, then node apps/web/.next/standalone/apps/web/server.js   (the default)
-#   worker   pnpm --filter worker start
+# One image for every service (ADR-009: build once, promote the same artifact). What a container does is chosen by the build
+# target or the start command:
+#   web      applies the pending migrations, then node apps/web/.next/standalone/apps/web/server.js   (target `web`, the default)
+#   worker   pnpm --filter worker start                                                                (target `worker`)
 #   release  pnpm --filter @ador/database migration:apply   (by hand, or a platform that wants a separate step)
 # See docs/operations/deployment.md. Secrets are never in the image: they come from the platform's environment at run time.
 
@@ -49,6 +50,13 @@ USER node
 EXPOSE 3000
 # Next.js reads HOSTNAME to choose the address it listens on; the platform's router reaches the container on all of them.
 ENV HOSTNAME=0.0.0.0 PORT=3000
+# What a container does is chosen by the build target, so a platform that cannot override the start command (it only picks a Dockerfile and
+# a target) still gets the right process. `web` is last, so it is what a build without a target makes. A start command given by the
+# platform overrides either CMD.
+FROM runtime AS worker
+CMD ["pnpm", "--filter", "worker", "start"]
+
 # The web container migrates before it serves: a migration that fails stops the container, so the previous version keeps serving. The
-# migration takes a database lock, so several web containers starting together migrate once. The worker overrides this command.
+# migration takes a database lock, so several web containers starting together migrate once. The worker never migrates.
+FROM runtime AS web
 CMD ["sh", "-c", "pnpm --filter @ador/database migration:apply && exec node apps/web/.next/standalone/apps/web/server.js"]
