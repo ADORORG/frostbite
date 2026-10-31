@@ -1,6 +1,6 @@
-# The Well
+# frostbit
 
-The Well is a modular Bitcoin Alkanes launchpad and game arcade. This repository is the shared
+The frostbit is a modular Bitcoin Alkanes launchpad and game arcade. This repository is the shared
 Turborepo foundation for the web application, feature plugins, reusable UI, runtime-neutral
 contracts, configuration, and provider-neutral PostgreSQL infrastructure.
 
