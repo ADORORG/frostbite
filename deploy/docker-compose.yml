@@ -5,6 +5,11 @@
 #
 # The list is the keys of .env.production.example, in its order, less REWARDS_TEMPLATES_DIR: the image sets it, and an empty value from
 # here would switch template publishing off. A key marked required in packages/config's definitions blocks the deploy while it is empty.
+# Notes. web runs the image's own command: apply the pending migrations under a database lock, then serve. worker starts only once web is
+# healthy, that is once the migrations have been applied, so a failed migration leaves it down. The health checks call /api/ready on web
+# and /ready on the worker (its port is also PORT, 3000 in the image) with node, because the image has no curl. A Docker Compose
+# application has no Domains field of its own: the SERVICE_URL_<SERVICE>_<PORT> variables create one for each service.
+# Comments are kept out of the YAML blocks below because Coolify's parser rejects some placements.
 x-environment: &environment
   APP_ENV: ${APP_ENV:?}
   PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?}
@@ -52,8 +57,7 @@ x-environment: &environment
   REWARDS_FEE_API_FORMAT: ${REWARDS_FEE_API_FORMAT:-}
   REWARDS_FEE_RATE_SAT_VB: ${REWARDS_FEE_RATE_SAT_VB:-}
 
-x-healthcheck:
-  &healthcheck # /api/ready on web, /ready on the worker (the worker's port is also PORT, 3000 in the image); the image has node and no curl.
+x-healthcheck: &healthcheck
   interval: 15s
   timeout: 5s
   retries: 5
@@ -62,11 +66,9 @@ x-healthcheck:
 services:
   web:
     image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
-    # The image's own command: apply the pending migrations under a database lock, then serve.
     restart: unless-stopped
     environment:
       <<: *environment
-      # A Docker Compose application has no Domains field of its own: this variable (name = service and port) gives the service one.
       SERVICE_URL_WEB_3000: /
     healthcheck:
       <<: *healthcheck
@@ -85,7 +87,6 @@ services:
     environment:
       <<: *environment
       SERVICE_URL_WORKER_3000: /
-    # Starts only once web is healthy, that is once the migrations have been applied; a failed migration leaves the worker down.
     depends_on:
       web:
         condition: service_healthy
