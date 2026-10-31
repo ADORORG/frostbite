@@ -1,6 +1,6 @@
 # Web and worker as one Coolify application (docs/operations/deployment.md, "Prebuilt image"): both run the one image that
 # .github/workflows/publish-image.yml pushes, so Coolify builds nothing. Create a Docker Compose application from this file, give each
-# service its domain under Domains (web `https://<host>:3000`, worker `https://<worker host>:3000`, which Inngest calls at /api/inngest),
+# service its domain (the SERVICE_URL_* variables below create them; the worker's is what Inngest calls, at /api/inngest),
 # and paste the environment (.env.production.example) once in the Developer view. The image holds no secrets.
 #
 # The list is the keys of .env.production.example, in its order, less REWARDS_TEMPLATES_DIR: the image sets it, and an empty value from
@@ -64,7 +64,10 @@ services:
     image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
     # The image's own command: apply the pending migrations under a database lock, then serve.
     restart: unless-stopped
-    environment: *environment
+    environment:
+      <<: *environment
+      # A Docker Compose application has no Domains field of its own: this variable (name = service and port) gives the service one.
+      SERVICE_URL_WEB_3000: /
     healthcheck:
       <<: *healthcheck
       test:
@@ -79,7 +82,9 @@ services:
     image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
     command: ["pnpm", "--filter", "worker", "start"]
     restart: unless-stopped
-    environment: *environment
+    environment:
+      <<: *environment
+      SERVICE_URL_WORKER_3000: /
     # Starts only once web is healthy, that is once the migrations have been applied; a failed migration leaves the worker down.
     depends_on:
       web:

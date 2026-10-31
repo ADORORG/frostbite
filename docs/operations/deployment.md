@@ -98,7 +98,8 @@ builds `deploy/Dockerfile` once on GitHub and pushes `ghcr.io/<owner>/<repo>` (l
    runs `web` (the image's default command) and `worker` (`pnpm --filter worker start`) from the one image, `IMAGE` in the environment
    (default `ghcr.io/adororg/frostbite:dev`; set a `sha-` tag to pin a version). The worker starts only once web is healthy, that is after
    the migrations.
-3. Under Domains give `web` its host with the port (`https://<host>:3000`) and `worker` its own (`https://<worker host>:3000`).
+3. A Docker Compose application has no Domains field of its own: the `SERVICE_URL_WEB_3000` and `SERVICE_URL_WORKER_3000` variables in the file
+   give each service one (port 3000). Set each service's real host there, and for the worker use the host you register with Inngest.
 4. Paste the environment once in the Developer view, from `.env.production.example`. A key the config requires blocks the deploy while it
    is empty. The values stay in Coolify at run time; the image holds no secrets. Do not set `REWARDS_TEMPLATES_DIR`: the image sets it.
 5. Deploy. A new version is the same single redeploy, with a new `IMAGE` tag if you pin one.
