@@ -36,6 +36,10 @@ jobs:
       - name: Install Rust coverage tool
         run: cargo install cargo-llvm-cov --version 0.6.21 --locked
 
+      # The contract tests run in WebAssembly under wasm-bindgen-test-runner; its version must equal the wasm-bindgen in contracts/Cargo.lock.
+      - name: Install the WebAssembly test runner
+        run: cargo install wasm-bindgen-cli --version 0.2.100 --locked
+
       - name: Install Rust WebAssembly target
         run: rustup target add wasm32-unknown-unknown
 
