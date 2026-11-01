@@ -39,6 +39,10 @@ jobs:
       - name: Install Rust WebAssembly target
         run: rustup target add wasm32-unknown-unknown
 
+      # The contract templates build a dependency (metashrew-support) whose build script runs protoc.
+      - name: Install the protobuf compiler
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends protobuf-compiler
+
       - name: Verify environment contracts
         run: pnpm env:check
 
