@@ -9,6 +9,8 @@ import {
 } from "./support/runtime-harness.ts";
 
 const harness = useRealRuntime();
+// How long a media step takes in the concurrency test: long enough that runs the busy runtime starts a moment apart still overlap.
+const mediaStepMs = 3_000;
 
 describe("pipeline runs on the real Inngest runtime", () => {
   it("validates then processes a published event, as a completed run", async () => {
@@ -88,10 +90,15 @@ describe("pipeline runs on the real Inngest runtime", () => {
     });
     const event = harness.envelope("asset-exhausted");
     await harness.publisher().publish(event);
+    // Waits for the last attempt itself, not for a quiet spell: the runtime's back-off between attempts can outlast any fixed quiet time
+    // on a busy machine. The quiet spell after it then shows there is no attempt beyond the configured retries.
     await waitFor(
-      () => (harness.callsFor("asset-exhausted").length > 0 ? true : undefined),
-      30_000,
-      "the first call",
+      () =>
+        harness.callsFor("asset-exhausted").length >= retries + 1
+          ? true
+          : undefined,
+      60_000,
+      "every configured attempt",
     );
     await harness.quiet("asset-exhausted");
     expect(harness.callsFor("asset-exhausted")).toEqual(
@@ -106,7 +113,7 @@ describe("pipeline runs on the real Inngest runtime", () => {
     const slow = async <Status>(status: Status): Promise<Status> => {
       active += 1;
       peak = Math.max(peak, active);
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, mediaStepMs));
       active -= 1;
       return status;
     };
@@ -124,5 +131,5 @@ describe("pipeline runs on the real Inngest runtime", () => {
       await harness.api().waitForStatus(event.eventId, "Completed");
     expect(peak).toBeGreaterThan(1);
     expect(peak).toBeLessThanOrEqual(maxConcurrentMediaRuns);
-  }, 120_000);
+  }, 180_000);
 });
