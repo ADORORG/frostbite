@@ -14,9 +14,11 @@ import {
 import {
   arenaX,
   eggSize,
+  heroHeight,
   heroWidth,
   tile,
 } from "../src/rules/hills/constants.ts";
+import { startHero } from "../src/rules/hills/state.ts";
 import type { Boss, Ghost } from "../src/rules/hills/types.ts";
 import {
   begun,
@@ -183,5 +185,31 @@ describe("what Glitchy touches in the fight", () => {
     });
     const over = { ...boss, beaten: 3 };
     expect(fireAtBoss(over, balls, 4).boss).toBe(over);
+  });
+});
+
+describe("the forcefield in DeFu's fight", () => {
+  it("send a guard home that the forcefield bumps, in DeFu's fight", () => {
+    const hero = { ...startHero(), x: 155 * tile };
+    const boss = {
+      beaten: -1,
+      freed: [],
+      ghosts: [],
+      guards: [{ dir: -1 as const, x: 155 * tile }],
+      launched: -1,
+      rng: 1,
+      rocket: null,
+      started: 0,
+      strike: null,
+    };
+    const bottom = hero.y + heroHeight;
+    expect(meetBoss(boss, hero, bottom, 0, 2, 5, true)).toMatchObject({
+      cheered: 1,
+      hurt: false,
+    });
+    expect(meetBoss(boss, hero, bottom, 0, 2, 5)).toMatchObject({
+      cheered: 0,
+      hurt: true,
+    });
   });
 });

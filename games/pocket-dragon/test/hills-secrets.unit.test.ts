@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { meetBoss } from "../src/rules/hills/boss-meet.ts";
 import { solidAt } from "../src/rules/hills/collide.ts";
 import {
   flapSpeed,
@@ -210,30 +209,6 @@ describe("the new power-ups and obstacles", () => {
       120,
     );
     expect(unshielded.heartsLost).toBeGreaterThan(0);
-  });
-
-  it("send a guard home that the forcefield bumps, in DeFu's fight", () => {
-    const hero = { ...startHero(), x: 155 * tile };
-    const boss = {
-      beaten: -1,
-      freed: [],
-      ghosts: [],
-      guards: [{ dir: -1 as const, x: 155 * tile }],
-      launched: -1,
-      rng: 1,
-      rocket: null,
-      started: 0,
-      strike: null,
-    };
-    const bottom = hero.y + heroHeight;
-    expect(meetBoss(boss, hero, bottom, 0, 2, 5, true)).toMatchObject({
-      cheered: 1,
-      hurt: false,
-    });
-    expect(meetBoss(boss, hero, bottom, 0, 2, 5)).toMatchObject({
-      cheered: 0,
-      hurt: true,
-    });
   });
 
   it("puff steam that hurts only while a vent puffs, and roll boulders to and fro that bump from the side and bounce from on top", () => {
