@@ -108,9 +108,7 @@ test("asks for the balance once the wallet is connected, not again on opening th
     "Balance unavailable: no data source is configured.",
   );
   // No figure stands in for the missing balance.
-  await expect(menu.locator(".wallet-balance")).not.toContainText(
-    /BTC|sats/u,
-  );
+  await expect(menu.locator(".wallet-balance")).not.toContainText(/BTC|sats/u);
   // Opening the menu does not ask again; the refresh button does.
   expect(balanceRequests).toHaveLength(1);
   await menu.getByRole("button", { name: "Refresh balance" }).click();
