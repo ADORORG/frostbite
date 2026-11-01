@@ -225,12 +225,14 @@ describe("the end of each stage", () => {
         const level = generateHills(seed, stage);
         expect(
           level.ground
-            .slice(levelTiles - arenaTiles - 4)
+            .slice(levelTiles - arenaTiles - 4, levelTiles)
             .every((row) => row === groundRow),
         ).toBe(true);
-        expect(level.patrols.every((patrol) => patrol.maxX < arenaX)).toBe(
-          true,
-        );
+        expect(
+          level.patrols
+            .filter((patrol) => patrol.maxX < levelTiles * tile)
+            .every((patrol) => patrol.maxX < arenaX),
+        ).toBe(true);
         expect(level.thorns.every((thorn) => thorn.x < arenaX)).toBe(true);
         expect(level.ice.every((cell) => cell.column * tile < arenaX)).toBe(
           true,

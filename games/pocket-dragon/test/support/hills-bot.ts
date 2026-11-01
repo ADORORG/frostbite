@@ -10,7 +10,8 @@ import { arenaChoice, eggToFetch, hit } from "./hills-arena.ts";
 
 // A player who sees what is coming, for Egg Hills: every tick it tries, on a copy of the run played through the real rules, running on
 // and each of several jumps, and does what keeps Glitchy safe over the next `horizon` ticks while getting furthest (a golden egg, a
-// cheered gloomling and an egg count for something too). It breathes fire at ice ahead. It stands for a good player: a stage it clears
+// cheered gloomling and an egg count for something too), or waits when nothing else is safe (a steam vent puffing ahead). It breathes
+// fire at ice ahead. It stands for a good player: a stage it clears
 // without losing a heart is a stage that can be cleared that way, and the inputs it makes are a legal run to replay.
 const horizon = 70;
 const holds = [7, 12, 18, 25, 33, 42] as const;
@@ -56,6 +57,20 @@ function score(from: HillsState, ticks: number): number | null {
     300 * (now.cheers - from.cheers) +
     60 * (eggsCaught(now) - eggsCaught(from))
   );
+}
+
+// A steam vent just ahead: it is waited out when running on would get Glitchy hurt and standing still would not.
+const ventAhead = ({ hero, level }: HillsState): boolean =>
+  level.vents.some((vent) => vent.x > hero.x && vent.x - hero.x < 3 * tile);
+
+// Running on (or standing still) gets Glitchy hurt within the horizon.
+function hurtsAhead(from: HillsState, running = true): boolean {
+  let now = running ? from : pressOn(from, "right", false);
+  for (let at = 0; at < horizon; at += 1) {
+    now = tickHills(now);
+    if (hit(now, from)) return true;
+  }
+  return false;
 }
 
 // Ice ahead in the band Glitchy breathes along, close enough to melt.
@@ -144,7 +159,8 @@ export function planHills(
       (state.hero.grounded || state.hero.coyote > 0) &&
       !state.controls.jump
     ) {
-      let best = { score: score(state, 0) ?? -1, ticks: 0 };
+      const run = score(state, 0);
+      let best = { score: run ?? -1, ticks: 0 };
       for (const ticks of holds) {
         const tried = score(state, ticks);
         if (tried !== null && tried > best.score + 200)
@@ -153,7 +169,13 @@ export function planHills(
       if (best.ticks > 0) {
         press("jump", true);
         releaseAt = state.tick + best.ticks;
-      }
+      } else if (
+        run === null &&
+        ventAhead(state) &&
+        hurtsAhead(state) &&
+        !hurtsAhead(state, false)
+      )
+        press("right", false);
     }
     state = tickHills(state);
   }

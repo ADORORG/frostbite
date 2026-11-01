@@ -72,7 +72,8 @@ function settle(before: Boss, boss: Boss, tick: number): Boss {
     : { ...boss, freed };
 }
 
-// What Glitchy touched this tick. `bottom` is where its feet were before it moved; `falling`, how fast it was coming down.
+// What Glitchy touched this tick. `bottom` is where its feet were before it moved; `falling`, how fast it was coming down. With the
+// forcefield up (`shielded`), a guard bumped into is sent home too.
 export function meetBoss(
   boss: Boss,
   hero: Hero,
@@ -80,6 +81,7 @@ export function meetBoss(
   falling: number,
   stage: number,
   tick: number,
+  shielded = false,
 ): Met {
   if (boss.started < 0)
     return { boss, bounced: false, caught: 0, cheered: 0, hurt: false };
@@ -113,8 +115,8 @@ export function meetBoss(
     if (!on(guard.x, guardY, guardWidth, guardHeight)) return true;
     const stomped = stomps(guardY);
     if (stomped) bounced = true;
-    else hurt = true;
-    return !stomped;
+    else if (!shielded) hurt = true;
+    return !stomped && !shielded;
   });
   if (
     striking(boss.strike, tick, stage) &&

@@ -77,3 +77,34 @@ export const plasmaCatch = 6 * pixel;
 export const featherBoost = 10;
 export const shieldTicks = 60;
 export const charmSize = 12 * pixel;
+
+// The secret areas: past the end of the stage, behind walls, two more stretches of world reached only by their doors. A burrow in the
+// ground leads (press down on it) into an underground tunnel that comes out at the nest; a swirl cloud high over a spring mushroom leads
+// into a sky of cloud steps that comes down again a little farther on. A column whose ground is row 0 is a wall from top to bottom.
+export const secretTiles = 26;
+export const tunnelStart = levelTiles + 1;
+export const skyStart = tunnelStart + secretTiles + 1;
+export const worldTiles = skyStart + secretTiles + 1;
+export const wallRow = 0;
+// Nothing goes higher than two tiles over the top of the screen.
+export const ceilingRow = -2;
+// Wings: for this long a press of jump in the air flaps Glitchy up. The forcefield: for this long nothing can hurt Glitchy, and a
+// gloomling bumped into is cheered up.
+export const wingTicks = 600;
+export const flapSpeed = 46;
+export const forceTicks = 600;
+export const pickupSize = 12 * pixel;
+// A spring mushroom throws Glitchy about five tiles up, however the jump is held.
+export const springSpeed = 104;
+export const springWidth = 12 * pixel;
+export const springHeight = 6 * pixel;
+// A steam vent puffs for `ventOn` ticks out of every `ventEvery`, three tiles high.
+export const ventEvery = 150;
+export const ventOn = 50;
+export const ventWidth = 10 * pixel;
+export const ventHeight = 3 * tile;
+// A rolling boulder rolls to and fro on its stretch; land on top of it to bounce off, touch its side and it bumps.
+export const rollerSize = 14 * pixel;
+export const rollerSpeed = 10;
+// A door into or out of a secret area is this big.
+export const doorSize = 16 * pixel;

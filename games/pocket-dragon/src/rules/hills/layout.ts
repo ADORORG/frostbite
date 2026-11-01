@@ -6,13 +6,13 @@ import {
   eggSize,
   gloomHeight,
   groundRow,
-  levelTiles,
+  worldTiles,
   pitRow,
   thornHeight,
   thornWidth,
   tile,
 } from "./constants.ts";
-import type { Cell, Patrol, Spot } from "./types.ts";
+import type { Cell, Patrol, Roller, Spot, Vent } from "./types.ts";
 
 // A stage of Egg Hills as it is laid out, stretch by stretch. Every stretch can be crossed by a dragon who jumps at the right moment:
 // a pit is one or two tiles with three flat tiles either side, a hill is one tile up, a ledge leaves room to walk under it, a thorn bush
@@ -20,17 +20,24 @@ import type { Cell, Patrol, Spot } from "./types.ts";
 // of the layout, the column it starts at and the ground's row, and gives how many columns it took.
 export class Layout {
   readonly ground: number[] = Array.from(
-    { length: levelTiles },
+    { length: worldTiles },
     () => groundRow,
   );
   readonly solid = new Set<number>();
   readonly eggs: Spot[] = [];
   readonly ice: Cell[] = [];
   readonly patrols: Patrol[] = [];
+  readonly rollers: Roller[] = [];
+  readonly springs: Spot[] = [];
   readonly thorns: Spot[] = [];
+  readonly vents: Vent[] = [];
   berry: Spot | null = null;
+  burrow: Spot | null = null;
   charm: Spot | null = null;
+  cloudGate: Spot | null = null;
   golden: Spot | null = null;
+  skyExit = 0;
+  wings: Spot | null = null;
   state: number;
   constructor(seed: number) {
     this.state = startState(seed);

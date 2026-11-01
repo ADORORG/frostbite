@@ -1,6 +1,7 @@
 import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
 import type { Track } from "@ador/game-sdk/audio/tracks";
 
+import { moreEffects } from "./audio-more.ts";
 import type { ChapterId } from "./rules/constants.ts";
 
 // The game's sound, as data: a tune for each chapter (a bouncy one for the hills, a hushed one for the woods, a march for the castle)
@@ -170,6 +171,7 @@ export const tracks: Readonly<Record<ChapterId, Track>> = {
 };
 
 export const effects = {
+  ...moreEffects,
   berry: [
     tone("square", 400, 900, 0.18, 0.3),
     tone("sine", 900, 1200, 0.12, 0.25, 0.15),

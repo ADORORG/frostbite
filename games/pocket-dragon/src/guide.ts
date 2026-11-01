@@ -16,9 +16,9 @@ export const guides: Readonly<Record<PlayId, Guide>> = {
   },
   hills: {
     lines: [
-      "ARROWS OR A D: RUN   SPACE OR UP: JUMP",
-      "EAT THE FIRE BERRY, THEN F OR X: BREATHE FIRE",
-      "BEAT DEFU'S GHOST DRAGONS TO OPEN THE PORTAL",
+      "ARROWS: RUN   SPACE OR UP: JUMP   DOWN: DIG IN",
+      "F: FIRE   WINGS: JUMP IN THE AIR TO FLY",
+      "FIND THE SECRET TUNNEL AND SKY, BEAT DEFU",
     ],
     start: "ENTER TO PRACTISE LEVEL 1",
     title: "EGG HILLS",
@@ -47,7 +47,7 @@ export const instructions: Readonly<Record<PlayId, string>> = {
   castle:
     "Arrows walk, space talks and picks up, F breathes fire. Help four friends join your guild. In a challenge: 1 to 5 shows, Q quick cheer, E evade, C charm.",
   hills:
-    "Arrows or A and D run, space or up jumps, F breathes fire. Beat DeFu's ghost dragons to unseal each portal; dodge the spots she marks in red.",
+    "Arrows or A and D run, space or up jumps, F breathes fire, down digs into a burrow. Take the wings to fly and the bubble for a forcefield, bounce a spring into the sky, and beat DeFu's ghost dragons to unseal each portal.",
   quest:
     "The whole quest in one run: Egg Hills, then the Guild and the Castle, then the Whispering Woods. Your hearts carry from level to level, and the clock never stops.",
   woods:

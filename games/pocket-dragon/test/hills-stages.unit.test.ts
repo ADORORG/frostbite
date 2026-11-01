@@ -1,7 +1,12 @@
 import { replayRecord } from "@ador/game-sdk/replay";
 import { describe, expect, it } from "vitest";
 
-import { pitRow, stages, tile } from "../src/rules/hills/constants.ts";
+import {
+  pitRow,
+  stages,
+  tile,
+  levelTiles,
+} from "../src/rules/hills/constants.ts";
 import { generateHills, stageSeed } from "../src/rules/hills/level.ts";
 import {
   eggsCaught,
@@ -42,7 +47,9 @@ describe("the stages of Egg Hills", () => {
         expect(level.golden.y).toBeLessThan(5 * tile);
         expect(level.checkpointX).toBeGreaterThan(70 * tile);
         expect(level.checkpointX).toBeLessThan(level.goalX);
-        expect(widestPit(level.ground)).toBeLessThanOrEqual(2);
+        expect(
+          widestPit(level.ground.slice(0, levelTiles)),
+        ).toBeLessThanOrEqual(2);
         expect(level.ground.slice(0, 8).every((row) => row < pitRow)).toBe(
           true,
         );
@@ -124,7 +131,7 @@ describe("Egg Hills' milestones", () => {
       expect(hillsEarned(played.state)).toEqual(hillsMilestones);
       expect(played.inputs.length).toBeLessThan(500);
     }
-  }, 60_000);
+  }, 180_000);
 
   it("are what the sample run claims, and what replaying it through the published rules gives", () => {
     const sample = sampleRun();

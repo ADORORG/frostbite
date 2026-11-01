@@ -2,7 +2,8 @@ import type { EffectName } from "./audio.ts";
 import { evadeMove, quickMove } from "./rules/castle/battle.ts";
 import type { CastleState } from "./rules/castle/types.ts";
 import { striking } from "./rules/hills/boss.ts";
-import { jumpSpeed } from "./rules/hills/constants.ts";
+import { flapSpeed, jumpSpeed } from "./rules/hills/constants.ts";
+import { sectionOf } from "./rules/hills/secrets.ts";
 import { eggsCaught, plasmaGathered } from "./rules/hills/milestones.ts";
 import type { Boss, HillsState } from "./rules/hills/types.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./rules/woods/tick.ts";
@@ -62,6 +63,18 @@ export function hillsSounds(
   if (after.meltedCount > before.meltedCount) heard.push("melt");
   if (cheered) heard.push("cheer");
   if (after.heartsLost > before.heartsLost) heard.push("hit");
+  if (after.hero.sprung && !before.hero.sprung) heard.push("spring");
+  if (
+    after.wings > 0 &&
+    after.hero.vy === -flapSpeed &&
+    before.hero.vy !== -flapSpeed
+  )
+    heard.push("flap");
+  if (after.wingsTaken && !before.wingsTaken) heard.push("wings");
+  if (after.forceTaken && !before.forceTaken) heard.push("shield");
+  if (after.secretsFound > before.secretsFound) heard.push("secret");
+  else if (sectionOf(after.hero.x) !== sectionOf(before.hero.x))
+    heard.push("whoosh");
   if (after.stagesCleared > before.stagesCleared)
     heard.push(after.finishTick === null ? "stage" : "finish");
   if (fifths(plasmaGathered(before), plasmaGathered(after)))

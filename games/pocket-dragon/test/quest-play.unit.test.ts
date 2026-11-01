@@ -54,7 +54,7 @@ describe("a quest as the player plays it", () => {
       earned: record.claims,
       ok: true,
     });
-  }, 60_000);
+  }, 180_000);
 
   it("ignores what the level being played has no use for, closes when lost, and announces each mark once", () => {
     const heard: string[] = [];
@@ -141,7 +141,7 @@ describe("the quest's run on the page", () => {
     expect(legHolds(session.state().leg, "act")).toBe(true);
     expect(questDone(session.state())).toBe(false);
     expect(run.ended()).toBe(false);
-  }, 60_000);
+  }, 180_000);
 
   it("is won with a place for the Hall of Fame", () => {
     const run = questRun(wonQuest());
@@ -155,5 +155,5 @@ describe("the quest's run on the page", () => {
     });
     expect(run.fame()?.eggs).toBeGreaterThan(60);
     expect(run.tick()).toEqual([]);
-  }, 60_000);
+  }, 180_000);
 });

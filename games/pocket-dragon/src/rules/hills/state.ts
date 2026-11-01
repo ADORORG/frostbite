@@ -10,6 +10,7 @@ export const startHero = (): Hero => ({
   coyote: 0,
   facing: 1,
   grounded: true,
+  sprung: false,
   vx: 0,
   vy: 0,
   x: 2 * tile,
@@ -26,6 +27,7 @@ export function freshStage(seed: number, stage: number) {
     checkpoint: false,
     eggsTaken: level.eggs.map(() => false),
     fireballs: [],
+    forceTaken: false,
     glooms: level.patrols.map((patrol) => ({
       alive: true,
       cheered: -1,
@@ -37,6 +39,9 @@ export function freshStage(seed: number, stage: number) {
     level,
     melted: level.ice.map(() => false),
     plasma: freshPlasma(level.motes),
+    skyFound: false,
+    tunnelFound: false,
+    wingsTaken: false,
   };
 }
 
@@ -46,12 +51,19 @@ export function startHills(seed: number): HillsState {
     breaths: 0,
     charms: 0,
     cheers: 0,
-    controls: { fire: false, jump: false, left: false, right: false },
+    controls: {
+      down: false,
+      fire: false,
+      jump: false,
+      left: false,
+      right: false,
+    },
     eggsBanked: 0,
     ended: false,
     feather: false,
     finishTick: null,
     fireCooldown: 0,
+    forcefield: 0,
     freedCaught: 0,
     goldens: 0,
     guardsCheered: 0,
@@ -63,11 +75,13 @@ export function startHills(seed: number): HillsState {
     meltedCount: 0,
     over: false,
     plasmaBanked: 0,
+    secretsFound: 0,
     seed,
     shield: false,
     stage: 1,
     stageStart: 0,
     stagesCleared: 0,
     tick: 0,
+    wings: 0,
   };
 }

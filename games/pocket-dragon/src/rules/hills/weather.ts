@@ -3,7 +3,9 @@ import {
   featherBoost,
   gustTicks,
   jumpSpeed,
+  levelTiles,
   rainAccel,
+  tile,
   windPush,
 } from "./constants.ts";
 import type { Feel } from "./hero.ts";
@@ -18,8 +20,12 @@ export function windOf(state: HillsState): number {
 }
 
 // The weather and the charms, as Glitchy feels them this tick: rain makes the grass slippery, the feather charm makes jumps stronger.
-export const feelOf = (state: HillsState): Feel => ({
-  accel: state.level.weather === "rain" ? rainAccel : accel,
-  jump: jumpSpeed + (state.feather ? featherBoost : 0),
-  push: windOf(state),
-});
+// The weather is only out on the stage itself: the tunnel and the sky are calm.
+export function feelOf(state: HillsState): Feel {
+  const out = state.hero.x < levelTiles * tile;
+  return {
+    accel: out && state.level.weather === "rain" ? rainAccel : accel,
+    jump: jumpSpeed + (state.feather ? featherBoost : 0),
+    push: out ? windOf(state) : 0,
+  };
+}

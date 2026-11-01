@@ -1,6 +1,7 @@
 import {
   accel,
   bufferTicks,
+  flapSpeed,
   coyoteTicks,
   gravity,
   jumpSpeed,
@@ -50,7 +51,7 @@ export function moveHero(
     coyote = 0;
     buffer = 0;
   }
-  if (!controls.jump && vy < -shortHop) vy = -shortHop;
+  if (!controls.jump && !before.sprung && vy < -shortHop) vy = -shortHop;
   vy = Math.min(vy + gravity, maxFall);
   const falling = vy;
   const across = moveAlongX(level, melted, before.x, before.y, vx + feel.push);
@@ -65,6 +66,7 @@ export function moveHero(
       coyote: grounded ? coyoteTicks : Math.max(0, coyote - 1),
       facing: direction === 0 ? before.facing : direction > 0 ? 1 : -1,
       grounded,
+      sprung: before.sprung && !grounded,
       vx,
       vy,
       x: across.x,
@@ -77,4 +79,11 @@ export function moveHero(
 export const pressJump = (hero: Hero): Hero => ({
   ...hero,
   buffer: bufferTicks + 1,
+});
+
+// With wings, jump pressed in the air flaps Glitchy up.
+export const flap = (hero: Hero): Hero => ({
+  ...hero,
+  sprung: false,
+  vy: -flapSpeed,
 });

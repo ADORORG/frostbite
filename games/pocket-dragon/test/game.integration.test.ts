@@ -161,6 +161,7 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
       ...game.window.document.querySelectorAll("#pad button"),
     ].filter((button) => !button.hasAttribute("hidden"));
     expect(offered.map((button) => button.getAttribute("data-hold"))).toEqual([
+      "down",
       "left",
       "right",
       "act",

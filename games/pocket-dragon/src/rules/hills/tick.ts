@@ -7,8 +7,6 @@ import {
   bounceHeld,
   charmSize,
   eggSize,
-  gloomHeight,
-  gloomWidth,
   heartStages,
   heroHeight,
   heroWidth,
@@ -22,17 +20,16 @@ import {
   rows,
   shieldTicks,
   stages,
-  stompDepth,
-  thornHeight,
-  thornWidth,
   tile,
 } from "./constants.ts";
 import { touching } from "./collide.ts";
 import { fly } from "./fire.ts";
 import { moveHero } from "./hero.ts";
-import { feelOf } from "./weather.ts";
+import { doors, pickUp, sectionOf, sprung } from "./secrets.ts";
 import { freshStage, startHero } from "./state.ts";
+import { cheer, touchHero } from "./touch.ts";
 import type { Gloom, Hero, HillsState, Spot } from "./types.ts";
+import { feelOf } from "./weather.ts";
 
 const heroOn = (hero: Hero, spot: Spot, size: number): boolean =>
   touching(hero.x, hero.y, heroWidth, heroHeight, spot.x, spot.y, size, size);
@@ -46,15 +43,6 @@ const walk = (state: HillsState): readonly Gloom[] =>
     if (x >= patrol.maxX) return { ...gloom, dir: -1, x: patrol.maxX };
     return { ...gloom, x };
   });
-
-const cheer = (
-  glooms: readonly Gloom[],
-  at: number,
-  tick: number,
-): readonly Gloom[] =>
-  glooms.map((gloom, index) =>
-    index === at ? { ...gloom, alive: false, cheered: tick } : gloom,
-  );
 
 // The stage's secret charm: a feather (stronger jumps) in stage one, a shield (one hit taken for Glitchy) in stage two, a magnet
 // (metaplasma from much farther) in stage three.
@@ -106,12 +94,14 @@ function cleared(state: HillsState): HillsState {
   };
 }
 
-// One tick of Egg Hills: Glitchy moves, the gloomlings walk, the fire flies; then what Glitchy touched is settled.
+// One tick of Egg Hills: Glitchy moves, the gloomlings walk, the fire flies; then what Glitchy touched is settled, and last, a door
+// into or out of a secret area takes Glitchy through. While Glitchy is in a secret area, DeFu's fight waits.
 export function tickHills(state: HillsState): HillsState {
   if (state.over || state.finishTick !== null)
     return { ...state, tick: state.tick + 1 };
   const { level } = state;
   const tick = state.tick + 1;
+  const inMain = sectionOf(state.hero.x) === "main";
   const moved = moveHero(
     level,
     state.melted,
@@ -119,40 +109,46 @@ export function tickHills(state: HillsState): HillsState {
     state.controls,
     feelOf(state),
   );
-  const hero = moved.hero;
+  const hero = sprung(level, moved.hero);
   let glooms = walk(state);
   const flown = fly(state, glooms);
   for (const at of flown.cheered) glooms = cheer(glooms, at, tick);
-  const fired = fireAtBoss(
-    moveBoss(state.boss, hero, state.stage, tick),
-    flown.fireballs,
-    tick,
+  const fired = inMain
+    ? fireAtBoss(
+        moveBoss(state.boss, hero, state.stage, tick),
+        flown.fireballs,
+        tick,
+      )
+    : { boss: state.boss, cheered: 0, fireballs: flown.fireballs };
+  let next: HillsState = pickUp(
+    charmOf({
+      ...state,
+      boss: fired.boss,
+      cheers: state.cheers + flown.cheered.length,
+      fireCooldown: Math.max(0, state.fireCooldown - 1),
+      fireballs: fired.fireballs,
+      forcefield: Math.max(0, state.forcefield - 1),
+      glooms,
+      guardsCheered: state.guardsCheered + fired.cheered,
+      hero,
+      invulnerable: Math.max(0, state.invulnerable - 1),
+      melted: flown.melted,
+      meltedCount: state.meltedCount + flown.newlyMelted,
+      plasma: pullPlasma(
+        state.plasma,
+        level.motes,
+        hero.x + heroWidth / 2,
+        hero.y + heroHeight / 2,
+        {
+          catchWithin: plasmaCatch,
+          reach: state.magnet ? magnetReach : plasmaReach,
+          speed: plasmaSpeed,
+        },
+      ),
+      tick,
+      wings: Math.max(0, state.wings - 1),
+    }),
   );
-  let next: HillsState = charmOf({
-    ...state,
-    boss: fired.boss,
-    cheers: state.cheers + flown.cheered.length,
-    fireCooldown: Math.max(0, state.fireCooldown - 1),
-    fireballs: fired.fireballs,
-    glooms,
-    guardsCheered: state.guardsCheered + fired.cheered,
-    hero,
-    invulnerable: Math.max(0, state.invulnerable - 1),
-    melted: flown.melted,
-    meltedCount: state.meltedCount + flown.newlyMelted,
-    plasma: pullPlasma(
-      state.plasma,
-      level.motes,
-      hero.x + heroWidth / 2,
-      hero.y + heroHeight / 2,
-      {
-        catchWithin: plasmaCatch,
-        reach: state.magnet ? magnetReach : plasmaReach,
-        speed: plasmaSpeed,
-      },
-    ),
-    tick,
-  });
   const eggsTaken = state.eggsTaken.map((taken, at) => {
     const egg = level.eggs[at];
     return taken || (egg !== undefined && heroOn(hero, egg, eggSize));
@@ -163,61 +159,22 @@ export function tickHills(state: HillsState): HillsState {
     next = { ...next, goldenTaken: true, goldens: next.goldens + 1 };
   if (!next.berryTaken && heroOn(hero, level.berry, berrySize))
     next = { ...next, berryTaken: true, hasFire: true };
-  if (hero.y > rows * tile) return lose(next, true);
+  if (hero.y > rows * tile)
+    return sectionOf(hero.x) === "sky" ? doors(next) : lose(next, true);
   const bottom = state.hero.y + heroHeight;
-  let hurt = false;
-  next.glooms.forEach((gloom, at) => {
-    const patrol = level.patrols[at];
-    if (!gloom.alive || patrol === undefined) return;
-    if (
-      !touching(
-        hero.x,
-        hero.y,
-        heroWidth,
-        heroHeight,
-        gloom.x,
-        patrol.y,
-        gloomWidth,
-        gloomHeight,
+  const touched = touchHero(next, moved, bottom);
+  next = touched.state;
+  const met = inMain
+    ? meetBoss(
+        next.boss,
+        next.hero,
+        bottom,
+        moved.falling,
+        state.stage,
+        tick,
+        next.forcefield > 0,
       )
-    )
-      return;
-    if (moved.falling > 0 && bottom <= patrol.y + stompDepth)
-      next = {
-        ...next,
-        cheers: next.cheers + 1,
-        glooms: cheer(next.glooms, at, tick),
-        hero: {
-          ...next.hero,
-          grounded: false,
-          vy: state.controls.jump ? -bounceHeld : -bounce,
-        },
-      };
-    else hurt = true;
-  });
-  if (
-    level.thorns.some((thorn) =>
-      touching(
-        hero.x,
-        hero.y,
-        heroWidth,
-        heroHeight,
-        thorn.x,
-        thorn.y,
-        thornWidth,
-        thornHeight,
-      ),
-    )
-  )
-    hurt = true;
-  const met = meetBoss(
-    next.boss,
-    next.hero,
-    bottom,
-    moved.falling,
-    state.stage,
-    tick,
-  );
+    : { boss: next.boss, bounced: false, caught: 0, cheered: 0, hurt: false };
   next = {
     ...next,
     boss: met.boss,
@@ -231,17 +188,22 @@ export function tickHills(state: HillsState): HillsState {
         }
       : next.hero,
   };
-  if ((hurt || met.hurt) && next.invulnerable === 0)
+  if (
+    (touched.hurt || met.hurt) &&
+    next.invulnerable === 0 &&
+    next.forcefield === 0
+  )
     next = next.shield
       ? { ...next, invulnerable: shieldTicks, shield: false }
       : lose(next, false);
   const here: HillsState = {
     ...next,
-    checkpoint: next.checkpoint || next.hero.x >= level.checkpointX,
+    checkpoint: next.checkpoint || (inMain && next.hero.x >= level.checkpointX),
   };
-  return here.hero.x + heroWidth >= level.goalX &&
+  return inMain &&
+    here.hero.x + heroWidth >= level.goalX &&
     here.boss.beaten >= 0 &&
     !here.over
     ? cleared(here)
-    : here;
+    : doors(here);
 }

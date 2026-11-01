@@ -6,13 +6,13 @@ import {
   groundRow,
   heroHeight,
   heroWidth,
-  levelTiles,
   pixel,
   rows,
   stages,
   tile,
 } from "../rules/hills/constants.ts";
 import { solidAt } from "../rules/hills/collide.ts";
+import { sectionOf, sectionSpan } from "../rules/hills/secrets.ts";
 import type { HillsState } from "../rules/hills/types.ts";
 import {
   berry,
@@ -28,6 +28,13 @@ import {
 } from "./hills-things.ts";
 import { colour, hillSkies } from "./palette.ts";
 import { drawArena } from "./hills-boss.ts";
+import {
+  heroGear,
+  powerBars,
+  secretBackdrop,
+  secretThings,
+  secretTile,
+} from "./hills-secrets.ts";
 import { hillsHud, plasma, secretCharm, weather } from "./hills-sky.ts";
 import { glitchyColours, glitchySide } from "./sprites.ts";
 import { write } from "./text.ts";
@@ -42,11 +49,13 @@ const stageNames = [
   "FOGGY SUNSET RIDGE",
 ] as const;
 
-// The camera follows Glitchy, and once the boss fight begins it glides (over half a second) to the arena and stays there.
+// The camera follows Glitchy within the stretch of world Glitchy is in (the stage, the tunnel or the sky), and once the boss fight
+// begins it glides (over half a second) to the arena and stays there.
 export function hillsCamera(state: HillsState): number {
+  const [first, last] = sectionSpan(sectionOf(state.hero.x));
   const follow = Math.min(
-    Math.max(0, Math.round(state.hero.x / pixel) - 96),
-    levelTiles * tilePixels - width,
+    Math.max(first * tilePixels, Math.round(state.hero.x / pixel) - 96),
+    last * tilePixels - width,
   );
   const { started } = state.boss;
   if (started < 0 || state.hero.x + heroWidth < arenaX - 2 * tile)
@@ -63,6 +72,11 @@ function backdrop(
   state: HillsState,
   camera: number,
 ): void {
+  const section = sectionOf(state.hero.x);
+  if (section !== "main") {
+    secretBackdrop(context, section, camera, state.tick);
+    return;
+  }
   const [high, low, far] = hillSkies[state.stage - 1] ??
     hillSkies[0] ?? ["#6ec6ff", "#c9f1ff", "#8ed88a"];
   const sky = context.createLinearGradient(0, 0, 0, height);
@@ -107,6 +121,11 @@ function ground(
       }
       if (!solidAt(state.level, state.melted, column, row)) continue;
       const top = !solidAt(state.level, state.melted, column, row - 1);
+      const section = sectionOf(column * tile);
+      if (section !== "main") {
+        secretTile(context, section, x, y, top);
+        continue;
+      }
       const floating = state.level.solid.has(key);
       block(
         context,
@@ -248,11 +267,14 @@ export function drawHills(
   backdrop(context, state, camera);
   ground(context, state, camera);
   things(context, state, camera);
+  secretThings(context, state, camera);
   plasma(context, state, camera);
   secretCharm(context, state, camera);
   drawArena(context, state, camera);
   hero(context, state, camera);
-  weather(context, state, camera);
+  heroGear(context, state, camera);
+  if (sectionOf(state.hero.x) === "main") weather(context, state, camera);
   banner(context, state);
   hillsHud(context, state);
+  powerBars(context, state);
 }

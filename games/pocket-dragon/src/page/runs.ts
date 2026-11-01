@@ -71,6 +71,7 @@ export const hillsLook: Look<HillsControl, HillsState> = {
   draw: drawHills,
   means: {
     act: "jump",
+    down: "down",
     fire: "fire",
     left: "left",
     right: "right",

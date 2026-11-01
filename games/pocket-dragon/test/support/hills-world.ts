@@ -3,8 +3,11 @@ import {
   groundRow,
   levelTiles,
   tile,
+  worldTiles,
 } from "../../src/rules/hills/constants.ts";
 import { hillsRules } from "../../src/rules/hills/index.ts";
+import { Layout } from "../../src/rules/hills/layout.ts";
+import { secretAreas } from "../../src/rules/hills/secret-layout.ts";
 import { startHills } from "../../src/rules/hills/state.ts";
 import { tickHills } from "../../src/rules/hills/tick.ts";
 import type {
@@ -13,7 +16,9 @@ import type {
   HillsLevel,
   HillsState,
   Patrol,
+  Roller,
   Spot,
+  Vent,
   Weather,
 } from "../../src/rules/hills/types.ts";
 
@@ -32,31 +37,56 @@ export interface Extras {
   readonly weather?: Weather;
   readonly charm?: Spot;
   readonly motes?: readonly Spot[];
+  readonly burrow?: Spot;
+  readonly cloudGate?: Spot;
+  readonly forcefield?: Spot;
+  readonly rollers?: readonly Roller[];
+  readonly springs?: readonly Spot[];
+  readonly vents?: readonly Vent[];
+  readonly wings?: Spot;
+  // The tunnel and the sky past the stage's end, as every stage has them (their walls, ceiling and cloud steps, not their eggs).
+  readonly secrets?: boolean;
 }
 
 export function flatLevel(extras: Extras = {}): HillsLevel {
   const weather = extras.weather ?? "fog";
   const ice = extras.ice ?? [];
   const pits = new Set(extras.pits ?? []);
+  const world = new Layout(1);
+  const doors = secretAreas(world);
+  const ground = Array.from(
+    { length: extras.secrets === true ? worldTiles : levelTiles },
+    (_, column) =>
+      pits.has(column) ? 10 : (world.ground[column] ?? groundRow),
+  );
   return {
     berry: extras.berry ?? far,
+    burrow: extras.burrow ?? far,
     charm: extras.charm ?? far,
     checkpointX: 75 * tile,
+    cloudGate: extras.cloudGate ?? far,
     eggs: extras.eggs ?? [],
+    forcefield: extras.forcefield ?? far,
     gloomSpeed: 5,
     goalX: (levelTiles - 4) * tile,
     golden: extras.golden ?? far,
-    ground: Array.from({ length: levelTiles }, (_, column) =>
-      pits.has(column) ? 10 : groundRow,
-    ),
+    ground,
     ice,
     iceAt: new Map(ice.map((cell, at) => [cell.column * 64 + cell.row, at])),
     motes: extras.motes ?? [],
     patrols: extras.patrols ?? [],
-    solid: new Set(),
+    rollers: extras.rollers ?? [],
+    skyEnd: doors.skyEnd,
+    skyExit: 100 * tile,
+    solid: extras.secrets === true ? world.solid : new Set(),
+    springs: extras.springs ?? [],
     stage: 1,
     thorns: extras.thorns ?? [],
+    tunnelEnd: doors.tunnelEnd,
+    tunnelExit: 76 * tile,
+    vents: extras.vents ?? [],
     weather,
+    wings: extras.wings ?? far,
   };
 }
 

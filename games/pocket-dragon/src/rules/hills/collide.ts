@@ -1,24 +1,28 @@
 import {
   heroHeight,
   heroWidth,
-  levelTiles,
+  ceilingRow,
   pitRow,
   rows,
   tile,
+  wallRow,
 } from "./constants.ts";
 import type { HillsLevel } from "./types.ts";
 
 // Where Glitchy can stand: the ground (a column's top row and everything under it), floating ledges, and ice blocks not yet melted. The
-// ends of the stage are walls; above the world is open air; below the last row is the pit.
+// ends of the world, and the walls between the stage and its secret areas, are walls all the way up; above the world is open air up to
+// a ceiling two tiles over the screen; below the last row is the pit.
 export function solidAt(
   level: HillsLevel,
   melted: readonly boolean[],
   column: number,
   row: number,
 ): boolean {
-  if (column < 0 || column >= levelTiles) return true;
-  if (row < 0 || row >= rows) return false;
-  if (row >= (level.ground[column] ?? pitRow)) return true;
+  if (column < 0 || column >= level.ground.length) return true;
+  const top = level.ground[column] ?? pitRow;
+  if (row < 0) return row < ceilingRow || top === wallRow;
+  if (row >= rows) return false;
+  if (row >= top) return true;
   const key = column * 64 + row;
   if (level.solid.has(key)) return true;
   const ice = level.iceAt.get(key);

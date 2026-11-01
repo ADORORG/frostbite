@@ -120,6 +120,7 @@ describe("a level's run as the page plays it", () => {
     run.hold("quick", true);
     expect(run.record().inputs.map(({ type }) => type)).toEqual([
       "jump",
+      "down",
       "end",
     ]);
     const woods = startRun("woods", 4);

@@ -22,6 +22,13 @@ goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The villai
      strikes on three spots and an egg rocket full of eggs. Six hits burst the rocket and set a dozen eggs free to catch.
    - **Secret charms.** One per stage, up cloud steps away from the path, showing itself only up close: a feather (stronger jumps), a
      shield (takes one bump for Glitchy) and a magnet (draws metaplasma from far off).
+   - **Secret areas.** Every stage hides two, past its end behind walls and reached only by their doors: a burrow in the ground (it
+     shows only up close; press down on it) digs into a cave tunnel of eggs and cave gloomlings whose ladder comes up at the nest, and a
+     spring mushroom bounces Glitchy up into a swirl cloud and the sky islands, cloud steps of eggs with a rainbow down at the far end
+     (falling off a cloud floats Glitchy down unhurt). The weather and DeFu's fight wait while Glitchy is in one.
+   - **Power-ups and obstacles.** Wings (ten seconds of flapping: press jump in the air) and a forcefield bubble (ten seconds when
+     nothing hurts, and a gloomling or guard bumped is cheered up) on every stage; steam vents that puff on and off, and from stage two
+     boulders rolling to and fro (jump them, or land on top to bounce).
 2. **The Guild and the Castle** (a small role-playing quest on a map seen from above). Find what four dragon friends want so they join your
    guild, then use their powers (Bolt pushes boulders, Splash grows lily pads, Bloom parts brambles, Spark lights up a show) to get out of
    the woods. Cheer up three grumble guards and the Grumble King and raise your banner on the castle.
@@ -63,7 +70,7 @@ owners to weigh. A won quest is saved with the progress, so a card can say so in
 ## Controls
 
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps
-(hold for a high jump, tap for a hop); in the woods up and down walk and left and right turn, and in the launch round up and down aim, left
+(hold for a high jump, tap for a hop), down digs into a burrow, and with wings jump flaps in the air; in the woods up and down walk and left and right turn, and in the launch round up and down aim, left
 and right set the power and fire launches; in the castle the arrows walk and the action key talks and picks up. In a cheer battle the
 arrows move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C
 a charm. Enter starts a run, P pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch
@@ -78,8 +85,9 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
   held.ts           what the three levels share: controls pressed and let go of on a tick, the run closed with `end`
   plasma.ts         metaplasma: motes that drift to Glitchy and are gathered, the same in every level
   shared-marks.ts   the two marks every level can earn: a secret charm found, and 300 metaplasma in one run
-  hills/            Egg Hills: constants, types, layout and level (the seeded stages), collide, hero, weather, fire, boss and boss-meet
-                    (DeFu's fight), tick, state, milestones
+  hills/            Egg Hills: constants, types, layout, secret-layout and level (the seeded stages and their secret areas), collide,
+                    hero, weather, fire, boss and boss-meet (DeFu's fight), secrets (doors, power-ups, springs, vents, boulders),
+                    touch, tick, state, milestones
   woods/            the woods: trig (whole-number sines), maze (the seeded maze), stash (parts, eggs, charms, metaplasma, targets),
                     walk, tick (walking, fire, finding), launch (the launch round), milestones
   castle/           the guild: map, places, motes, world (walking, bumping, talking), battle (cheer battles), tick, milestones

@@ -44,7 +44,7 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     "evade",
     "charm",
   ],
-  hills: ["left", "right", "act", "fire"],
+  hills: ["left", "right", "down", "act", "fire"],
   woods: ["left", "right", "up", "down", "fire"],
 };
 
