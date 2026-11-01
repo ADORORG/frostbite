@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
-import { post } from "../src/upload-api.ts";
 import { signIn } from "../src/upload-helpers.ts";
 import {
   detailOf,
-  readPath,
+  readDraft,
   uploadProcessed,
 } from "./support/collection-helpers.ts";
 
@@ -42,6 +41,8 @@ test("a creator adds a whole list of items and traits from a file", async ({
   await page.getByRole("button", { name: "Create collection" }).click();
   await expect(page).toHaveURL(/\/studio\/collections\/[0-9a-f-]{36}$/u);
   const id = new URL(page.url()).pathname.split("/").pop();
+  if (id === undefined)
+    throw new Error("Expected the collection id in the address");
   await page.getByRole("button", { name: "4. Items" }).click();
   await page.getByText("Add many items from a file").click();
   const chooser = page.locator('input[type="file"][accept*=".csv"]');
@@ -95,9 +96,7 @@ test("a creator adds a whole list of items and traits from a file", async ({
   await expect(page.getByText("3. Charlie")).toBeVisible();
 
   // Traits arrived and are kept: two on the first item, one on the last (an empty cell is no trait).
-  const saved = await detailOf(
-    await post(page.request, baseURL, readPath, { collectionId: id }),
-  );
+  const saved = await detailOf(await readDraft(page.request, id));
   expect(saved.items.map(({ name }) => name)).toEqual([
     "Alpha",
     "Bravo",

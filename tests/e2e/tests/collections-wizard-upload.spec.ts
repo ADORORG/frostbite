@@ -2,9 +2,8 @@ import { createDecodablePng } from "@ador/test-kit/png";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
-import { post } from "../src/upload-api.ts";
 import { signIn } from "../src/upload-helpers.ts";
-import { detailOf, readPath } from "./support/collection-helpers.ts";
+import { detailOf, readDraft } from "./support/collection-helpers.ts";
 
 // Images are uploaded where they are used: a creator adds a cover and a banner from inside the wizard's
 // images step, on real storage and a real worker, and never leaves the page. Desktop only.
@@ -64,9 +63,9 @@ test("a creator uploads a cover and a banner inside the wizard and never leaves 
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("Saved.")).toBeVisible();
   const id = wizardPath.split("/").pop();
-  const saved = await detailOf(
-    await post(page.request, baseURL, readPath, { collectionId: id }),
-  );
+  if (id === undefined)
+    throw new Error("Expected the collection id in the address");
+  const saved = await detailOf(await readDraft(page.request, id));
   expect(saved.collection.coverAssetId).not.toBeNull();
   expect(saved.collection.bannerAssetId).not.toBeNull();
   expect(saved.collection.coverAssetId).not.toBe(

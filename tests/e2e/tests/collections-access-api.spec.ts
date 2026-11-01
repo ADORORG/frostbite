@@ -12,7 +12,7 @@ import {
   draftsPath,
   itemBody,
   itemsPath,
-  readPath,
+  readDraft,
   uploadProcessed,
 } from "./support/collection-helpers.ts";
 
@@ -81,9 +81,7 @@ test("another approved creator cannot read, change, or build on a creator's draf
     origin(baseURL),
     creatorE2EFixtures.collectionOtherCreator.sessionToken,
   );
-  const read = await post(other.request, baseURL, readPath, {
-    collectionId: draftId,
-  });
+  const read = await readDraft(other.request, draftId);
   expect([read.status(), await errorCode(read)]).toEqual([404, "not_found"]);
   const add = await post(
     other.request,

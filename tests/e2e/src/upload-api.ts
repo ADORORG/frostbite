@@ -36,6 +36,20 @@ export function post<Response>(
   });
 }
 
+// A read: a GET that takes its input from the query string (reads are not POSTs, so they need no origin or key).
+export function get<Response>(
+  request: {
+    get(
+      path: string,
+      options: { params: Record<string, string> },
+    ): Promise<Response>;
+  },
+  path: string,
+  params: Record<string, string> = {},
+) {
+  return request.get(path, { params });
+}
+
 export const createIntent = <Response>(
   request: JsonPoster<Response>,
   baseURL: string | undefined,

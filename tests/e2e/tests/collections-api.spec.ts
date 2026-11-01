@@ -14,7 +14,7 @@ import {
   draftsPath,
   itemBody,
   itemsPath,
-  readPath,
+  readDraft,
   uploadProcessed,
 } from "./support/collection-helpers.ts";
 
@@ -174,9 +174,7 @@ test("an approved creator builds a draft with signed previews and edits it under
   const removed = await remove();
   expect(removed.ok()).toBe(true);
   expect((await remove()).ok()).toBe(true);
-  const read = await detailOf(
-    await post(page.request, baseURL, readPath, { collectionId }),
-  );
+  const read = await detailOf(await readDraft(page.request, collectionId));
   expect(read.items.map(({ name }) => name)).toEqual(["Renamed two"]);
   const list = collectionListResponseSchema.parse(
     await (await page.request.get(draftsPath)).json(),
