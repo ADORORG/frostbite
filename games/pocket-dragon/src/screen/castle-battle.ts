@@ -64,7 +64,7 @@ function panel(
   block(context, "#f7f0dc", x + 2, y + 2, w - 4, h - 4);
 }
 
-function big(
+export function big(
   context: CanvasRenderingContext2D,
   rows: readonly string[],
   key: Readonly<Record<string, string>>,

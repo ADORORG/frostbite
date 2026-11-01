@@ -1,12 +1,13 @@
 import { chapterTitles } from "../chapters.ts";
 import type { Progress } from "../progress.ts";
-import { chapterIds, type ChapterId } from "../rules/constants.ts";
+import { chapterIds, type ChapterId, type PlayId } from "../rules/constants.ts";
 import { milestoneIds } from "../rules/milestones.ts";
 import type { Stat } from "../score.ts";
 import { inviteFrom } from "./invite.ts";
 import { masterfulMark, trophiesOf, type Trophy } from "./trophy-list.ts";
 import {
   chapterMoves,
+  questMoves,
   chapterNames,
   headlineOf,
   quoteOf,
@@ -19,7 +20,7 @@ import {
 // What a player's card is made from: the run it tells of (its chapter, how it ended, its score and counts), and the quest so far (the
 // chapters open and won, the bests, the milestones and the metaplasma banked), and the link that invites others, when it is known.
 export interface CardFacts {
-  readonly best: Readonly<Record<ChapterId, number>>;
+  readonly best: Readonly<Record<PlayId, number>>;
   readonly chapter: ChapterId;
   readonly invite: string | null;
   readonly masterful: boolean;
@@ -27,12 +28,14 @@ export interface CardFacts {
   readonly milestones: number;
   readonly outcome: Outcome;
   readonly plasma: number;
+  // The run was the whole quest (its chapter is the level it got to).
+  readonly quest: boolean;
   readonly score: number;
   readonly stats: readonly Stat[];
   // The trophies the card shows: the run's own, or every one held when the card is of the quest so far.
   readonly trophies: readonly Trophy[];
   readonly unlocked: number;
-  // The castle has been captured, in this run or one before.
+  // The whole quest has been won (or its last level cleared), in this run or one before.
   readonly won: boolean;
 }
 
@@ -40,15 +43,16 @@ export interface CardFacts {
 export interface LastRun {
   readonly chapter: ChapterId;
   readonly outcome: Outcome;
+  readonly quest: boolean;
   readonly score: number;
   readonly stats: readonly Stat[];
   // The milestones the run earned, by id.
   readonly trophies: readonly string[];
 }
 
-// A run that cleared the last chapter won it all.
-export const outcomeOf = (chapter: ChapterId, cleared: boolean): Outcome =>
-  !cleared ? "lost" : chapter === "castle" ? "won" : "cleared";
+// A run won it all when it won the whole quest; a level played alone is cleared or lost, and so is a quest that fell short.
+export const outcomeOf = (won: boolean, cleared: boolean): Outcome =>
+  won ? "won" : cleared ? "cleared" : "lost";
 
 // What the page knows, as card facts: the saved progress, the last run (if there was one), the milestones the player is known to have
 // and their titles, and the referrer of the page, for the invite.
@@ -68,6 +72,7 @@ export function factsOf(
     milestones: milestoneIds.filter((id) => marks.has(id)).length,
     outcome: last?.outcome ?? "journey",
     plasma: progress.plasma,
+    quest: last?.quest ?? false,
     score: last?.score ?? 0,
     stats: last?.stats ?? [],
     trophies: trophiesOf(last?.trophies ?? marks, titles),
@@ -123,7 +128,8 @@ const compact = (value: string): string => value.replace(" of ", "/");
 
 export function badgesOf(facts: CardFacts): readonly Badge[] {
   return chapterIds.map((id, at) => {
-    const cleared = at < facts.unlocked - 1 || (id === "castle" && facts.won);
+    const cleared =
+      at < facts.unlocked - 1 || (at === chapterIds.length - 1 && facts.won);
     return {
       best: grouped(facts.best[id]),
       name: chapterNames[id],
@@ -149,7 +155,7 @@ function movesOf(
     return [
       {
         name: "QUEST",
-        text: "Chapters cleared so far",
+        text: "Levels cleared so far",
         value: `${String(badges.filter((badge) => badge.state === "cleared").length)}/3`,
       },
       {
@@ -158,7 +164,9 @@ function movesOf(
         value: grouped(facts.plasma),
       },
     ];
-  const [first, second] = chapterMoves[facts.chapter];
+  const [first, second] = facts.quest
+    ? questMoves
+    : chapterMoves[facts.chapter];
   const value = (stat: number): string =>
     compact(facts.stats[stat]?.[1] ?? "0");
   return [
@@ -176,8 +184,10 @@ function saidOf(facts: CardFacts, cleared: number): string {
     return `I cleared ${chapter.replace(/^The /u, "the ")} in ${game}!`;
   if (facts.outcome === "lost")
     return `${chapter} got me this time in ${game}. Think you can do better?`;
-  return `My quest in ${game} so far: ${String(cleared)} of 3 chapters cleared.`;
+  return `My quest in ${game} so far: ${String(cleared)} of 3 levels cleared.`;
 }
+
+const lastLevel = chapterIds[2];
 
 export function cardOf(facts: CardFacts): CardContent {
   const badges = badgesOf(facts);
@@ -190,13 +200,15 @@ export function cardOf(facts: CardFacts): CardContent {
     facts.outcome === "journey"
       ? furthest
       : facts.outcome === "won"
-        ? "castle"
+        ? lastLevel
         : facts.chapter;
   const headline = headlineOf(facts.outcome, facts.chapter);
   const score = grouped(
-    facts.outcome === "journey"
-      ? Object.values(facts.best).reduce((sum, best) => sum + best, 0)
-      : facts.score,
+    facts.outcome !== "journey"
+      ? facts.score
+      : facts.best.quest > 0
+        ? facts.best.quest
+        : chapterIds.reduce((sum, id) => sum + facts.best[id], 0),
   );
   const milestones = `${String(facts.milestones)}/${String(facts.milestoneTotal)}`;
   const said = saidOf(facts, cleared);
@@ -230,6 +242,6 @@ export function cardOf(facts: CardFacts): CardContent {
     trophies: facts.trophies,
     trophyHeading:
       facts.outcome === "journey" ? "TROPHY CASE" : "TROPHIES THIS RUN",
-    typeLine: `BABY DRAGON  ·  ${facts.outcome === "journey" ? `${String(cleared)} OF 3 CLEARED` : `CHAPTER ${String(chapterIds.indexOf(art) + 1)} OF 3`}`,
+    typeLine: `BABY DRAGON  ·  ${facts.outcome === "journey" ? `${String(cleared)} OF 3 CLEARED` : `LEVEL ${String(chapterIds.indexOf(art) + 1)} OF 3`}`,
   };
 }

@@ -50,16 +50,15 @@ export const maxFires = 2;
 // Where the puff leaves Glitchy's mouth, from the top of the hero.
 export const mouthDrop = 3 * pixel;
 
-// Hearts: three to start, one more for clearing each of these stages, at most five.
-export const startHearts = 3;
+// Hearts (three to start, at most five, as in every chapter): one more for clearing each of these stages.
+export { maxHearts, startHearts } from "../constants.ts";
 export const heartStages = [1, 2] as const;
-export const maxHearts = 5;
 export const invulnerableTicks = 90;
 export const hitKnock = 40;
 // The name of a stage shows over the screen this long after it starts.
 export const bannerTicks = 120;
 
-// The last screen of every stage is the boss's arena: Madame Vex on her ledge high over the sealed portal.
+// The last screen of every stage is the boss's arena: DeFu on her ledge high over the sealed portal.
 export const arenaTiles = 16;
 export const arenaX = (levelTiles - arenaTiles) * tile;
 

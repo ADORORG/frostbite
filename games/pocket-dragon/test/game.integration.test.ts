@@ -7,6 +7,7 @@ import type { RunRecord } from "@ador/game-sdk/run-record";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { pocketDragonRules } from "../src/rules/index.ts";
+import { createQuestSession } from "../src/quest-session.ts";
 import { sampleRun } from "../src/sample-run.ts";
 import { playCastle } from "./support/castle-bot.ts";
 import { closeGame, play, settle, whileRunning } from "./support/page.ts";
@@ -17,7 +18,7 @@ afterEach(closeGame);
 const quickLoss = 6;
 
 describe("the verifier the game publishes", () => {
-  it("is one script with the three chapters' rules, which replays the sample and a run of the castle as the source does", async () => {
+  it("is one script with the three levels' rules and the quest's, which replays the sample, a run of the castle and a quest as the source does", async () => {
     const built = await bundleVerifier(join(import.meta.dirname, ".."));
     expect(built).toMatchObject({ id: "pocket-dragon", version: 1 });
     expect(built?.bytes ?? 0).toBeLessThan(200_000);
@@ -40,6 +41,14 @@ describe("the verifier the game publishes", () => {
       seed: 9,
     };
     expect(verdict(castle)).toEqual(replayRecord(pocketDragonRules, castle));
+    const questRun = createQuestSession({ seed: quickLoss });
+    questRun.hold("right", true);
+    for (let at = 0; at < 2_000 && !questRun.state().ended; at += 1)
+      questRun.tick();
+    const lost = questRun.record();
+    expect(lost.config).toEqual({ cabinet: "quest" });
+    expect(verdict(lost)).toEqual(replayRecord(pocketDragonRules, lost));
+    expect(verdict(lost)).toMatchObject({ ok: true });
     expect(
       verdict({ ...sampleRun(), config: { cabinet: "woods" } }),
     ).toMatchObject({ ok: false, reason: "illegal-input" });
@@ -50,7 +59,7 @@ describe("the verifier the game publishes", () => {
 });
 
 describe("Pocket Dragon, bundled and run against a simulated platform", () => {
-  it("connects, opens the first chapter only, and lets the player start only once it has", async () => {
+  it("connects, offers the quest and the first level only, and lets the player start only once it has", async () => {
     const game = await play();
     await settle();
     expect(game.text("status")).toBe("Connected.");
@@ -61,29 +70,42 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     ];
     expect(chapters.map((button) => button.hasAttribute("disabled"))).toEqual([
       false,
+      false,
       true,
       true,
     ]);
+    expect(chapters[0]?.getAttribute("data-chapter")).toBe("quest");
     expect(chapters[0]?.getAttribute("aria-pressed")).toBe("true");
     for (const button of game.window.document.querySelectorAll("#pad button"))
       expect(button.hasAttribute("disabled")).toBe(true);
-    expect(game.text("stat-0-label")).toBe("Eggs");
+    expect(game.text("stat-0-label")).toBe("Time");
   });
 
-  it("goes back to the furthest chapter reached, with that chapter's counts and best", async () => {
+  it("starts on the quest, with its best and Hall of Fame, and offers every level reached for practice", async () => {
     const game = await play({
-      best: { castle: 4_200, hills: 9, woods: 0 },
+      best: { castle: 4_200, hills: 9, quest: 31_000, woods: 0 },
+      fame: [{ eggs: 70, hearts: 2, score: 31_000, secrets: 3, ticks: 40_000 }],
       unlocked: 3,
     });
     await settle();
-    const pressed = game.window.document.querySelector('[aria-pressed="true"]');
-    expect(pressed?.getAttribute("data-chapter")).toBe("castle");
+    const pressed = () =>
+      game.window.document
+        .querySelector('[aria-pressed="true"]')
+        ?.getAttribute("data-chapter");
+    expect(pressed()).toBe("quest");
+    expect(game.text("best")).toBe("31000");
+    expect(game.text("stat-0-label")).toBe("Time");
+    expect(game.window.document.querySelectorAll("#fame li")).toHaveLength(1);
+    game.press("Digit2");
+    expect(pressed()).toBe("castle");
     expect(game.text("stat-0-label")).toBe("Guild");
     expect(game.text("best")).toBe("4200");
     expect(game.byId("act")?.textContent).toBe("Talk");
     game.press("Digit1");
     expect(game.text("stat-0-label")).toBe("Eggs");
     expect(game.text("best")).toBe("9");
+    game.press("Digit0");
+    expect(pressed()).toBe("quest");
   });
 
   it("plays a run on the platform's seed, sends the record when it ends, and says what the platform made of it", async () => {
@@ -118,9 +140,10 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     await settle(200);
     expect(sent).toHaveLength(1);
     expect(sent[0]).toMatchObject({
-      config: { cabinet: "hills" },
+      config: { cabinet: "quest" },
       seed: quickLoss,
     });
+    expect(game.text("note")).toContain("The quest ended in Egg Hills.");
     expect(game.text("note")).toContain("The platform checked this run.");
     expect(game.text("stat-1")).toBe("0");
     expect(game.byId("start")?.textContent).toBe("Play again");

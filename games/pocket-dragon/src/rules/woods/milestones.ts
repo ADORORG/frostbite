@@ -13,7 +13,6 @@ import type { WoodsState } from "./types.ts";
 const marks: readonly (readonly [string, (state: WoodsState) => boolean])[] = [
   ["woods-first-clue", (s) => cluesRead(s) >= 1],
   ["woods-all-clues", (s) => cluesRead(s) >= clueCount],
-  ["woods-first-chest", (s) => chestsOpened(s) >= 1],
   ["woods-chests-5", (s) => chestsOpened(s) >= chestCount],
   ["woods-lanterns", (s) => lanternsLit(s) >= lanternCount],
   ["woods-frozen-chest", (s) => s.moonChest],

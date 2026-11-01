@@ -19,7 +19,7 @@ import {
 } from "../src/rules/hills/constants.ts";
 import { begun, groundY, run, standing } from "./support/hills-fight.ts";
 
-describe("Madame Vex's fight", () => {
+describe("DeFu's fight", () => {
   it("is harder each stage: more ghost dragons, guards sent down, quicker strikes on more spots, and the egg rocket last", () => {
     const fights = [1, 2, 3].map(bossOf);
     expect(fights.map((fight) => fight.ghosts)).toEqual([1, 2, 2]);

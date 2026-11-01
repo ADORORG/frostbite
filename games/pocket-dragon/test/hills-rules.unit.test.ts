@@ -248,7 +248,7 @@ describe("Egg Hills' rules", () => {
           stage,
         },
       );
-    // The portal is sealed while Madame Vex's baby ghost dragon is still about.
+    // The portal is sealed while DeFu's baby ghost dragon is still about.
     const sealed = ticks(
       press({ ...near(1, 3), boss: startBoss(1, 1) }, "right"),
       40,

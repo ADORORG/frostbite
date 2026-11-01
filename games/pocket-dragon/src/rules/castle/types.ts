@@ -90,6 +90,9 @@ export interface CastleState {
   readonly finishTick: number | null;
   readonly fireTick: number;
   readonly friends: readonly boolean[];
+  // Hearts left, and hearts lost in the run (in the quest, the level starts with the hearts the one before ended with).
+  readonly hearts: number;
+  readonly heartsLost: number;
   readonly held: readonly boolean[];
   readonly melted: boolean;
   readonly message: Message | null;

@@ -42,27 +42,27 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     expect(starts(audio)).toBe(1);
   });
 
-  it("chooses an open chapter with its number key or its button, and none during a run", async () => {
+  it("chooses the quest or an open level with its number key or its button, and none during a run", async () => {
     const game = await driver({ best: {}, unlocked: 2 });
     const chosen = () =>
       game.window.document
         .querySelector('[aria-pressed="true"]')
         ?.getAttribute("data-chapter");
-    expect(chosen()).toBe("woods");
+    expect(chosen()).toBe("quest");
     game.press("Digit1");
     expect(chosen()).toBe("hills");
     game.press("Digit3");
     expect(chosen()).toBe("hills");
     game.window.document
-      .querySelector('[data-chapter="woods"]')
+      .querySelector('[data-chapter="castle"]')
       ?.dispatchEvent(new game.window.MouseEvent("click", { bubbles: true }));
-    expect(chosen()).toBe("woods");
-    expect(game.text("stat-0-label")).toBe("Clues");
+    expect(chosen()).toBe("castle");
+    expect(game.text("stat-0-label")).toBe("Guild");
     game.press("Enter");
     await settle(100);
     game.press("Digit1");
-    expect(chosen()).toBe("woods");
-    expect(game.text("note")).toContain("clue stones");
+    expect(chosen()).toBe("castle");
+    expect(game.text("note")).toContain("four friends");
   });
 
   it("pauses on P: the page says so, the sound stops, and it carries on after", async () => {
@@ -151,7 +151,7 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     game.press("Digit1");
     await settle(100);
     expect(game.running()).toBe(false);
-    expect(chosen()).toBe("woods");
+    expect(chosen()).toBe("quest");
     game.byId("card-close")?.dispatchEvent(
       new game.window.KeyboardEvent("keydown", {
         bubbles: true,
@@ -165,9 +165,9 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     expect(game.running()).toBe(true);
   });
 
-  it("keeps the sound the player chose, and saves a change with the chapters reached, the bests and the metaplasma banked", async () => {
+  it("keeps the sound the player chose, and saves a change with the levels reached, the bests and the metaplasma banked", async () => {
     const { stored, window } = await driver({
-      best: { castle: 0, hills: 7, woods: 0 },
+      best: { castle: 0, hills: 7, quest: 0, woods: 0 },
       plasma: 1234,
       sound: { effects: false, music: true, volume: 0.2 },
       unlocked: 2,
@@ -181,7 +181,8 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     music?.dispatchEvent(new window.MouseEvent("click"));
     await settle();
     expect(stored.progress).toEqual({
-      best: { castle: 0, hills: 7, woods: 0 },
+      best: { castle: 0, hills: 7, quest: 0, woods: 0 },
+      fame: [],
       plasma: 1234,
       sound: { effects: false, music: false, volume: 0.2 },
       unlocked: 2,

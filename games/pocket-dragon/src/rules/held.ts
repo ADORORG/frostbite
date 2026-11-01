@@ -29,6 +29,24 @@ export interface Chapter<
   pressed(state: State, control: Control): State;
 }
 
+// A control pressed or let go of on the tick the run is at: refused once the run is over, or if it is already so. The quest takes its
+// changes through this too, so a chapter played alone and the same chapter in the quest take a press the same way.
+export function change<Control extends string, State extends Running<Control>>(
+  chapter: Chapter<Control, State>,
+  state: State,
+  control: Control,
+  on: boolean,
+): Stepped<State> {
+  if (chapter.done(state)) return refuse("the run is over");
+  if (state.controls[control] === on)
+    return refuse(`${control} is already ${on ? "held" : "released"}`);
+  const held: State = {
+    ...state,
+    controls: { ...state.controls, [control]: on },
+  };
+  return { ok: true, state: on ? chapter.pressed(held, control) : held };
+}
+
 function hold<Control extends string, State extends Running<Control>>(
   chapter: Chapter<Control, State>,
   state: State,
@@ -40,16 +58,12 @@ function hold<Control extends string, State extends Running<Control>>(
     if (typeof tick === "string") return refuse(tick);
     if (fields.on !== 0 && fields.on !== 1)
       return refuse("on must be 1 (pressed) or 0 (released)");
-    const moved = chapter.advanceTo(state, tick);
-    if (chapter.done(moved)) return refuse("the run is over");
-    const on = fields.on === 1;
-    if (moved.controls[control] === on)
-      return refuse(`${control} is already ${on ? "held" : "released"}`);
-    const held: State = {
-      ...moved,
-      controls: { ...moved.controls, [control]: on },
-    };
-    return { ok: true, state: on ? chapter.pressed(held, control) : held };
+    return change(
+      chapter,
+      chapter.advanceTo(state, tick),
+      control,
+      fields.on === 1,
+    );
   });
 }
 

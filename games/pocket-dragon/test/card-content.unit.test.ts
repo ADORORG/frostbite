@@ -28,7 +28,7 @@ describe("a card's words", () => {
       score: "12,840",
       stamp: "CLEARED!",
       title: "HILL RUNNER",
-      typeLine: "BABY DRAGON  ·  CHAPTER 1 OF 3",
+      typeLine: "BABY DRAGON  ·  LEVEL 1 OF 3",
     });
     expect(card.moves).toEqual([
       { name: "EGG SNATCH", text: "Eggs caught on the run", value: "72" },
@@ -78,23 +78,33 @@ describe("a card's words", () => {
     ).toContain("I cleared the Whispering Woods");
   });
 
-  it("say a win as a blaze with the castle drawn, and as masterful once the masterful charm is earned", () => {
+  it("say a won quest as a blaze with the last level drawn and the quest's moves, and as masterful once the masterful charm is earned", () => {
     const won = {
       ...facts,
-      chapter: "castle" as const,
+      chapter: "woods" as const,
       outcome: "won" as const,
+      quest: true,
+      stats: [
+        ["Time", "12:41"],
+        ["Hearts", "2"],
+        ["Level", "3 of 3"],
+      ] as const,
       unlocked: 3,
       won: true,
     };
     expect(cardOf(won)).toMatchObject({
-      art: "castle",
+      art: "woods",
       headline: "I WON IT ALL!",
       rarity: 3,
       rarityName: "BLAZE",
       stamp: "WON IT ALL!",
-      title: "CASTLE CHAMPION",
-      typeLine: "BABY DRAGON  ·  CHAPTER 3 OF 3",
+      title: "QUEST CHAMPION",
+      typeLine: "BABY DRAGON  ·  LEVEL 3 OF 3",
     });
+    expect(cardOf(won).moves).toEqual([
+      { name: "SPEED RUN", text: "Time on the quest clock", value: "12:41" },
+      { name: "HEART GUARD", text: "Hearts kept to the very end", value: "2" },
+    ]);
     expect(cardOf(won).badges.every((badge) => badge.state === "cleared")).toBe(
       true,
     );
@@ -114,7 +124,7 @@ describe("a card's words", () => {
       stats: [],
     };
     expect(cardOf(journey)).toMatchObject({
-      art: "woods",
+      art: "castle",
       headline: "MY POCKET DRAGON QUEST",
       rarity: 2,
       score: "21,940",
@@ -123,7 +133,7 @@ describe("a card's words", () => {
       typeLine: "BABY DRAGON  ·  1 OF 3 CLEARED",
     });
     expect(cardOf(journey).moves).toEqual([
-      { name: "QUEST", text: "Chapters cleared so far", value: "1/3" },
+      { name: "QUEST", text: "Levels cleared so far", value: "1/3" },
       { name: "METAPLASMA", text: "Banked from every run", value: "1,204" },
     ]);
     expect(cardOf({ ...journey, unlocked: 1 })).toMatchObject({
@@ -131,14 +141,18 @@ describe("a card's words", () => {
       rarity: 1,
     });
     expect(cardOf({ ...journey, unlocked: 3, won: true })).toMatchObject({
-      art: "castle",
+      art: "woods",
       rarity: 3,
     });
+    // Once the quest has a best, the quest card shows it rather than the levels' bests added up.
+    expect(
+      cardOf({ ...journey, best: { ...journey.best, quest: 50_000 } }).score,
+    ).toBe("50,000");
     expect(
       cardOf({ ...journey, masterful: true, unlocked: 3, won: true }),
     ).toMatchObject({ rarity: 4, title: "MASTERFUL POCKET DRAGON" });
     expect(cardOf(journey).shareText).toBe(
-      `My quest in Pocket Dragon: Glitchy's Quest so far: 1 of 3 chapters cleared. Join me: ${link}`,
+      `My quest in Pocket Dragon: Glitchy's Quest so far: 1 of 3 levels cleared. Join me: ${link}`,
     );
   });
 
@@ -168,7 +182,7 @@ describe("a card's words", () => {
 });
 
 describe("the quest on a card", () => {
-  it("counts a chapter cleared once the next is open, and the castle once it is captured", () => {
+  it("counts a level cleared once the next is open, and the last once the quest is won", () => {
     const states = (unlocked: number, won: boolean) =>
       badgesOf({ ...facts, unlocked, won }).map((badge) => badge.state);
     expect(states(1, false)).toEqual(["open", "locked", "locked"]);
@@ -178,8 +192,8 @@ describe("the quest on a card", () => {
       badgesOf(facts).map((badge) => [badge.number, badge.name, badge.best]),
     ).toEqual([
       [1, "EGG HILLS", "12,840"],
-      [2, "THE WHISPERING WOODS", "9,100"],
-      [3, "THE GUILD AND THE CASTLE", "0"],
+      [2, "THE GUILD AND THE CASTLE", "9,100"],
+      [3, "THE WHISPERING WOODS", "0"],
     ]);
   });
 
@@ -188,21 +202,23 @@ describe("the quest on a card", () => {
     const progress = { ...freshProgress, plasma: 50, unlocked: 3, won: true };
     const titles = new Map([["guild-castle", "Castle captured"]]);
     const last = {
-      chapter: "castle" as const,
-      outcome: outcomeOf("castle", true),
+      chapter: "woods" as const,
+      outcome: outcomeOf(true, false),
+      quest: true,
       score: 900,
       stats: [],
       trophies: ["guild-castle", "nothing-of-ours"],
     };
     expect(factsOf(progress, last, marks, titles, `${link}?x=1`)).toEqual({
       best: progress.best,
-      chapter: "castle",
+      chapter: "woods",
       invite: link,
       masterful: true,
       milestoneTotal: milestoneIds.length,
       milestones: 2,
       outcome: "won",
       plasma: 50,
+      quest: true,
       score: 900,
       stats: [],
       trophies: [
@@ -223,12 +239,13 @@ describe("the quest on a card", () => {
       masterful: false,
       milestones: 0,
       outcome: "journey",
+      quest: false,
       score: 0,
     });
     expect([
-      outcomeOf("hills", false),
-      outcomeOf("woods", true),
-      outcomeOf("castle", false),
-    ]).toEqual(["lost", "cleared", "lost"]);
+      outcomeOf(false, false),
+      outcomeOf(false, true),
+      outcomeOf(true, false),
+    ]).toEqual(["lost", "cleared", "won"]);
   });
 });

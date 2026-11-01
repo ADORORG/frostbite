@@ -88,10 +88,10 @@ describe("the chapters", () => {
   it("are played in order under one verifier, which decides every milestone the manifest names", () => {
     expect(chapterIds.map((id) => chapterTitles[id])).toEqual([
       "Egg Hills",
-      "The Whispering Woods",
       "The Guild and the Castle",
+      "The Whispering Woods",
     ]);
-    expect([hillsPlay.id, woodsPlay.id, castlePlay.id]).toEqual(chapterIds);
+    expect([hillsPlay.id, castlePlay.id, woodsPlay.id]).toEqual(chapterIds);
     // 39 marks: the secret charm and the metaplasma mark are shared, so each chapter can earn them but the manifest names them once.
     expect(milestoneIds).toHaveLength(39);
     expect(new Set(milestoneIds).size).toBe(39);
@@ -105,5 +105,9 @@ describe("the chapters", () => {
     expect(pocketDragonRules.init(1, {}).ok).toBe(false);
     expect(pocketDragonRules.init(1, { cabinet: "moon" }).ok).toBe(false);
     expect(pocketDragonRules.init(1, { cabinet: "woods" }).ok).toBe(true);
+    expect(pocketDragonRules.init(1, { cabinet: "quest" }).ok).toBe(true);
+    expect(pocketDragonRules.init(1, { cabinet: "quest", hard: 1 }).ok).toBe(
+      false,
+    );
   });
 });

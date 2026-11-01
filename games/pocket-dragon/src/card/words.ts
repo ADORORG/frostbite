@@ -12,8 +12,9 @@ export const chapterNames: Readonly<Record<ChapterId, string>> = {
   woods: "THE WHISPERING WOODS",
 };
 
+const wonLine = "I WON IT ALL!";
 const clearedLines: Readonly<Record<ChapterId, string>> = {
-  castle: "I WON IT ALL!",
+  castle: "I STORMED THE CASTLE!",
   hills: "I CLEARED EGG HILLS!",
   woods: "I ESCAPED THE WHISPERING WOODS!",
 };
@@ -24,14 +25,15 @@ const lostLines: Readonly<Record<ChapterId, string>> = {
 };
 
 export function headlineOf(outcome: Outcome, chapter: ChapterId): string {
-  if (outcome === "won") return clearedLines.castle;
+  if (outcome === "won") return wonLine;
   if (outcome === "cleared") return clearedLines[chapter];
   if (outcome === "lost") return lostLines[chapter];
   return "MY POCKET DRAGON QUEST";
 }
 
+const championTitle = "QUEST CHAMPION";
 const clearedTitles: Readonly<Record<ChapterId, string>> = {
-  castle: "CASTLE CHAMPION",
+  castle: "CASTLE STORMER",
   hills: "HILL RUNNER",
   woods: "MOON GATE OPENER",
 };
@@ -42,7 +44,7 @@ export function titleOf(
   masterful: boolean,
 ): string {
   if (outcome === "won" || (outcome === "journey" && masterful))
-    return masterful ? "MASTERFUL POCKET DRAGON" : clearedTitles.castle;
+    return masterful ? "MASTERFUL POCKET DRAGON" : championTitle;
   if (outcome === "cleared") return clearedTitles[chapter];
   return outcome === "lost" ? "BRAVE CHALLENGER" : "QUESTING HATCHLING";
 }
@@ -81,6 +83,12 @@ export const chapterMoves: Readonly<
   ],
 };
 
+// A quest card's two moves: the time on the clock and the hearts kept (the quest's stats are time, hearts and level).
+export const questMoves: readonly [MoveWords, MoveWords] = [
+  { name: "SPEED RUN", stat: 0, text: "Time on the quest clock" },
+  { name: "HEART GUARD", stat: 1, text: "Hearts kept to the very end" },
+];
+
 // The quote on a card. Each is our own; one is picked by the run's score, so a card says the same thing in every size.
 const quotes: Readonly<Record<Outcome, readonly string[]>> = {
   cleared: [
@@ -99,9 +107,9 @@ const quotes: Readonly<Record<Outcome, readonly string[]>> = {
     "Every great dragon tumbled a few times first.",
   ],
   won: [
-    "Three chapters, one tiny dragon, and a castle that finally smiled.",
-    "Eggs caught, clues read, friends made: the banner flies for all of us.",
-    "They said the castle could not be won. Nobody told Glitchy.",
+    "Three dimensions, one tiny dragon, and a rocket that never left the ground.",
+    "Eggs saved, clues read, friends made: every dragon is free again.",
+    "They said DeFu could not be stopped. Nobody told Glitchy.",
   ],
 };
 

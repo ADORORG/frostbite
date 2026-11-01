@@ -1,5 +1,6 @@
 import { startState, stepInt } from "@ador/game-sdk/seeded";
 
+import { startHearts } from "../constants.ts";
 import { freshPlasma, pullPlasma } from "../plasma.ts";
 import {
   act,
@@ -32,7 +33,10 @@ import {
 import { ahead, arrive, breathe, interact, walkable } from "./world.ts";
 import type { CastleControl, CastleState, Facing, Spot } from "./types.ts";
 
-export function startCastle(seed: number): CastleState {
+export function startCastle(
+  seed: number,
+  hearts: number = startHearts,
+): CastleState {
   let rng = startState(seed ^ 0x5eed_0003);
   const favourites = foes.map(() => {
     const rolled = stepInt(rng, moves.length);
@@ -70,6 +74,8 @@ export function startCastle(seed: number): CastleState {
     finishTick: null,
     fireTick: -1,
     friends: friends.map(() => false),
+    hearts,
+    heartsLost: 0,
     held: items.map(() => false),
     lilies: false,
     melted: false,

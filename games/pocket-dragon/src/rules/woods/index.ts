@@ -1,6 +1,6 @@
 import type { GameVerifier } from "@ador/game-sdk/run-record";
 
-import { verifierVersion } from "../constants.ts";
+import { startHearts, verifierVersion } from "../constants.ts";
 import { noSettings, playOn, stepChapter, type Chapter } from "../held.ts";
 import { freshPlasma } from "../plasma.ts";
 import {
@@ -22,7 +22,10 @@ import { woodsControls, type WoodsControl, type WoodsState } from "./types.ts";
 // THE WHISPERING WOODS's rules as a pure state machine. Inputs: `left` and `right` turn, `up` walks on, `down` backs up, `fire`
 // breathes (once per press), and `end`. Out through the moon gate, the same keys run the launch round: up and down tilt the launcher, left
 // and right set its power, fire launches an egg. Once the round is over, only `end` is taken.
-export function startWoods(seed: number): WoodsState {
+export function startWoods(
+  seed: number,
+  hearts: number = startHearts,
+): WoodsState {
   const level = generateWoods(seed);
   return {
     angle: level.start.angle,
@@ -44,6 +47,8 @@ export function startWoods(seed: number): WoodsState {
     finishTick: null,
     fireCooldown: 0,
     found: null,
+    hearts,
+    heartsLost: 0,
     lanterns: Array.from({ length: lanternCount }, () => false),
     launch: null,
     level,
@@ -62,7 +67,8 @@ export function startWoods(seed: number): WoodsState {
 export const woodsChapter: Chapter<WoodsControl, WoodsState> = {
   advanceTo: (state, tick) => playOn(state, tick, tickWoods),
   controls: woodsControls,
-  done: (state) => state.escaped && (state.launch?.ended ?? true),
+  done: (state) =>
+    state.hearts <= 0 || (state.escaped && (state.launch?.ended ?? true)),
   maxTicks,
   pressed: (state, control) => {
     if (control !== "fire") return state;

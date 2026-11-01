@@ -24,7 +24,6 @@ describe("the Whispering Woods' milestones", () => {
     expect(woodsEarned(found)).toEqual([
       "woods-first-clue",
       "woods-all-clues",
-      "woods-first-chest",
       "woods-chests-5",
       "woods-lanterns",
       "woods-frozen-chest",

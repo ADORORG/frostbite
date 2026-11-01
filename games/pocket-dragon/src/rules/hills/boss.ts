@@ -13,7 +13,7 @@ import type { Boss, FreedEgg, Ghost, Hero, Rocket, Strike } from "./types.ts";
 
 // The boss fight at the end of each stage, harder each time. Stage one: one baby ghost dragon and slow laser strikes. Stage two: two
 // ghost dragons, security guards sent down one after another, and quicker strikes on two spots. Stage three: two ghost dragons, the egg
-// rocket, more guards and three spots at a time. A strike is warned: Madame Vex's eyes glow red and the spots are marked on the ground,
+// rocket, more guards and three spots at a time. A strike is warned: DeFu's eyes glow red and the spots are marked on the ground,
 // then the lasers come down there. Nobody is hurt: a beaten ghost dragon turns to sparkles, a guard goes home dizzy, and the rocket
 // bursts and lets its eggs go.
 export const ghostWidth = 14 * pixel;

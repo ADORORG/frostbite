@@ -97,6 +97,9 @@ export interface WoodsState {
   readonly finishTick: number | null;
   readonly fireCooldown: number;
   readonly found: Found | null;
+  // Hearts left, and hearts lost in the run.
+  readonly hearts: number;
+  readonly heartsLost: number;
   readonly lanterns: readonly boolean[];
   readonly launch: Launch | null;
   readonly level: WoodsLevel;

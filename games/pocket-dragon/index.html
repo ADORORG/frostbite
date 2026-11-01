@@ -32,17 +32,12 @@
           <span>Best <strong id="best">0</strong></span>
         </p>
       </div>
-      <nav id="chapters" class="chapters" aria-label="Chapters">
-        <button type="button" data-chapter="hills" aria-pressed="true">
-          <span aria-hidden="true">1</span> Egg Hills
+      <nav id="chapters" class="chapters" aria-label="The quest and its levels">
+        <button type="button" data-chapter="quest" aria-pressed="true">
+          <span aria-hidden="true">0</span> The whole quest
         </button>
-        <button
-          type="button"
-          data-chapter="woods"
-          aria-pressed="false"
-          disabled
-        >
-          <span aria-hidden="true">2</span> The Whispering Woods
+        <button type="button" data-chapter="hills" aria-pressed="false">
+          <span aria-hidden="true">1</span> Egg Hills
         </button>
         <button
           type="button"
@@ -50,7 +45,15 @@
           aria-pressed="false"
           disabled
         >
-          <span aria-hidden="true">3</span> The Guild and the Castle
+          <span aria-hidden="true">2</span> The Guild and the Castle
+        </button>
+        <button
+          type="button"
+          data-chapter="woods"
+          aria-pressed="false"
+          disabled
+        >
+          <span aria-hidden="true">3</span> The Whispering Woods
         </button>
       </nav>
       <canvas
@@ -89,6 +92,13 @@
       <section aria-labelledby="earned-title">
         <h2 id="earned-title">Earned this run</h2>
         <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+      <section aria-labelledby="fame-title" class="fame">
+        <h2 id="fame-title">Hall of Fame</h2>
+        <p id="fame-note" class="fame-note">
+          Win the whole quest to get in. Fastest and highest first.
+        </p>
+        <ol id="fame"></ol>
       </section>
     </main>
     <div

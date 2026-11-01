@@ -1,10 +1,10 @@
 import { colour } from "./palette.ts";
 import { glitchySide } from "./sprites.ts";
 
-// The boss of Egg Hills and her helpers, as pixel pictures (one character a pixel, `.` clear). Madame Vex: deep brown skin, a tall
+// The boss of Egg Hills and her helpers, as pixel pictures (one character a pixel, `.` clear). DeFu: deep brown skin, a tall
 // fro-hawk, gold hoops, and a turquoise two-piece (a V-neck top and wide trousers slit at one side). Her eyes glow red when she is about
 // to fire. Her baby ghost dragons are pale and see-through with red eyes; her guards wear turquoise caps; her rocket is full of eggs.
-export const vexRows = [
+export const defuRows = [
   ".......kk.......",
   "......khhk......",
   "......khHk......",
@@ -35,7 +35,9 @@ export const vexRows = [
   "....kkkkk.kkkk..",
 ] as const;
 
-export const vexKey = (eyesRed: boolean): Readonly<Record<string, string>> => ({
+export const defuKey = (
+  eyesRed: boolean,
+): Readonly<Record<string, string>> => ({
   H: "#4a2a6a",
   S: "#4a2a18",
   T: "#169a8e",

@@ -67,15 +67,24 @@ describe("the trophies on a card", () => {
   it("are coloured by where they were won, and named from their id when the platform has not named them", () => {
     expect(
       [
-        "eggs-25",
+        "eggs-60",
         "woods-lanterns",
         "guild-river",
         "secret-charm",
         "metaplasma-300",
         "masterful-charm",
+        "quest-swift",
       ].map(trophyKindOf),
-    ).toEqual(["hills", "woods", "castle", "shared", "shared", "masterful"]);
-    expect(titleFromId("hills-stage-2")).toBe("HILLS STAGE 2");
+    ).toEqual([
+      "hills",
+      "woods",
+      "castle",
+      "shared",
+      "shared",
+      "masterful",
+      "quest",
+    ]);
+    expect(titleFromId("quest-all-hearts")).toBe("QUEST ALL HEARTS");
   });
 
   it("are headed as the run's own on a run's card, and as the trophy case on a card of the quest", () => {

@@ -72,7 +72,7 @@ export interface Gloom {
   readonly x: number;
 }
 
-// The boss fight at the end of a stage. Madame Vex stays on her ledge and is never hurt; her baby ghost dragons (and in the last stage
+// The boss fight at the end of a stage. DeFu stays on her ledge and is never hurt; her baby ghost dragons (and in the last stage
 // her egg rocket) are what Glitchy must beat to unseal the portal. A ghost's height follows the clock (`ghostY` in `boss.ts`).
 export interface Ghost {
   readonly dir: -1 | 1;

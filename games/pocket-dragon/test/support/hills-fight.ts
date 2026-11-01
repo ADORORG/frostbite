@@ -8,7 +8,7 @@ import {
 import { startHero } from "../../src/rules/hills/state.ts";
 import type { Boss, Ghost, Hero } from "../../src/rules/hills/types.ts";
 
-// Pieces of Madame Vex's fight made by hand for the tests of its rules.
+// Pieces of DeFu's fight made by hand for the tests of its rules.
 export const groundY = groundRow * tile;
 export const standing = (x: number): Hero => ({ ...startHero(), x });
 // Glitchy coming down onto something whose top is at `top`: its feet were just above it, and now it is a little way in.

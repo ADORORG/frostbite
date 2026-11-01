@@ -15,7 +15,6 @@ const marks: readonly (readonly [string, (state: CastleState) => boolean])[] = [
   ["guild-full", (s) => friendsJoined(s) >= s.friends.length],
   ["guild-river", (s) => s.crossedRiver],
   ["guild-escape", (s) => s.escapedWoods],
-  ["guild-first-cheer", (s) => s.cheered.some(Boolean)],
   ["guild-guards", (s) => guardsCheered(s) >= 3],
   ["guild-castle", (s) => s.bannerRaised],
   ["guild-never-napped", (s) => s.bannerRaised && s.naps === 0],

@@ -23,6 +23,7 @@ const cupColours: Readonly<Record<TrophyKind, readonly [string, string]>> = {
   castle: [colour.pink, "#a8247a"],
   hills: [colour.gold, colour.goldDark],
   masterful: [colour.fireHot, colour.fire],
+  quest: [colour.mint, colour.mintDark],
   shared: [colour.lavender, colour.lavenderDark],
   woods: [colour.ice, colour.iceDark],
 };

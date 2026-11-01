@@ -211,7 +211,6 @@ describe("the guild's milestones", () => {
       "guild-full",
       "guild-river",
       "guild-escape",
-      "guild-first-cheer",
       "guild-guards",
       "guild-favourite",
       "guild-evade",

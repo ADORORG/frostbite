@@ -33,7 +33,7 @@ function inArena(
 }
 
 describe("the boss fight on the screen", () => {
-  it("is not drawn far from the arena, and shows the portal sealed and Madame Vex on her ledge as Glitchy comes", () => {
+  it("is not drawn far from the arena, and shows the portal sealed and DeFu on her ledge as Glitchy comes", () => {
     expect(count(drawHills, startHills(4), seal)).toBe(0);
     const coming = {
       ...startHills(4),
@@ -41,14 +41,14 @@ describe("the boss fight on the screen", () => {
       tick: 50,
     };
     expect(count(drawHills, coming, seal)).toBeGreaterThan(5);
-    expect(hills(coming)).not.toContain("MADAME VEX!");
+    expect(hills(coming)).not.toContain("DEFU!");
   });
 
   it("names her as the fight begins and counts what is left to beat, calling out the rocket on the last stage", () => {
     expect(hills(inArena(1, 110))).toEqual(
-      expect.arrayContaining(["MADAME VEX!", "SEALED: 1 TO GO"]),
+      expect.arrayContaining(["DEFU!", "SEALED: 1 TO GO"]),
     );
-    expect(hills(inArena(1, 300))).not.toContain("MADAME VEX!");
+    expect(hills(inArena(1, 300))).not.toContain("DEFU!");
     expect(hills(inArena(1, 300))).not.toContain(
       "FREE THE EGGS FROM THE ROCKET!",
     );
@@ -135,7 +135,7 @@ describe("the boss fight on the screen", () => {
     );
   });
 
-  it("says the portal is open once the fight is won, while Madame Vex flies off, promising to be back", () => {
+  it("says the portal is open once the fight is won, while DeFu flies off, promising to be back", () => {
     const won = inArena(1, 300, { beaten: 250, ghosts: [] });
     expect(hills(won)).toEqual(
       expect.arrayContaining([

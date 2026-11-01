@@ -3,7 +3,7 @@ import type { RunRecord } from "@ador/game-sdk/run-record";
 import { gameId, verifierId, verifierVersion } from "./rules/constants.ts";
 
 // One legal run the verifier is shown with, in the first chapter (Egg Hills): a player who sees what is coming runs the three stages,
-// climbs to each secret charm, fights Madame Vex's ghost dragons, guards and egg rocket at the end of each stage without being hit, and
+// climbs to each secret charm, fights DeFu's ghost dragons, guards and egg rocket at the end of each stage without being hit, and
 // catches the freed eggs. It earns every milestone the chapter can. It is a plain record, not one built with the SDK's recorder, so the
 // published verifier carries only the rules and not the recorder's schema library. Each choice is "tick on control": the tick, whether
 // the control was pressed (1) or let go of (0), and which control; the run is closed on tick 7622.
@@ -62,14 +62,12 @@ export function sampleRun(): RunRecord {
   return {
     claims: [
       "first-egg",
-      "eggs-25",
       "eggs-60",
       "golden-egg",
       "golden-eggs-3",
       "fire-breath",
       "ice-melter",
       "cheer-5",
-      "hills-stage-2",
       "hills-clear",
       "hills-no-bumps",
       "hills-guards",

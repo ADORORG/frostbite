@@ -14,14 +14,12 @@ const finished = (state: HillsState): boolean => state.finishTick !== null;
 
 const marks: readonly (readonly [string, (state: HillsState) => boolean])[] = [
   ["first-egg", (s) => eggsCaught(s) >= 1],
-  ["eggs-25", (s) => eggsCaught(s) >= 25],
   ["eggs-60", (s) => eggsCaught(s) >= 60],
   ["golden-egg", (s) => s.goldens >= 1],
   ["golden-eggs-3", (s) => s.goldens >= 3],
   ["fire-breath", (s) => s.breaths >= 1],
   ["ice-melter", (s) => s.meltedCount >= 15],
   ["cheer-5", (s) => s.cheers >= 5],
-  ["hills-stage-2", (s) => s.stagesCleared >= 1],
   ["hills-clear", finished],
   ["hills-no-bumps", (s) => finished(s) && s.heartsLost === 0],
   ["hills-guards", (s) => s.guardsCheered >= 4],

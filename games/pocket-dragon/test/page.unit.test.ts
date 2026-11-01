@@ -9,7 +9,7 @@ import { buttonsIn, element } from "../src/page/elements.ts";
 import {
   actions,
   attachHands,
-  chapterOfKey,
+  playOfKey,
   type Action,
 } from "../src/page/hands.ts";
 import { startRun } from "../src/page/runs.ts";
@@ -66,7 +66,7 @@ describe("the player's hands", () => {
     }
   });
 
-  it("start on Enter and pause on P on the press alone, and know which chapter a number key chooses between runs", () => {
+  it("start on Enter and pause on P on the press alone, and know what a number key chooses between runs", () => {
     const handed = hands();
     for (const code of ["Enter", "KeyP"]) {
       key("keydown", code);
@@ -75,14 +75,24 @@ describe("the player's hands", () => {
     expect(handed.start).toHaveBeenCalledTimes(1);
     expect(handed.pause).toHaveBeenCalledTimes(1);
     expect(handed.hold).not.toHaveBeenCalled();
-    const asked: readonly Action[] = ["hot1", "hot2", "hot3", "hot4", "quick"];
-    expect(asked.map(chapterOfKey)).toEqual([
+    const asked: readonly Action[] = [
+      "hot0",
+      "hot1",
+      "hot2",
+      "hot3",
+      "hot4",
+      "quick",
+    ];
+    expect(asked.map(playOfKey)).toEqual([
+      "quest",
       "hills",
-      "woods",
       "castle",
+      "woods",
       undefined,
       undefined,
     ]);
+    key("keydown", "Digit0");
+    expect(handed.hold).toHaveBeenLastCalledWith("hot0", true);
   });
 
   it("hold a touch button while a finger is on it, and let everything go when the page is left", () => {
@@ -100,10 +110,9 @@ describe("the player's hands", () => {
   });
 });
 
-describe("a chapter's run as the page plays it", () => {
-  it("gives each action its meaning in the chapter, and holds a control while any of its actions is held", () => {
+describe("a level's run as the page plays it", () => {
+  it("gives each action its meaning in the level, and holds a control while any of its actions is held", () => {
     const run = startRun("hills", 4);
-    expect(run.uses).toEqual(["left", "right", "up", "act", "fire"]);
     run.hold("act", true);
     run.hold("up", true);
     run.hold("act", false);
@@ -113,16 +122,14 @@ describe("a chapter's run as the page plays it", () => {
       "jump",
       "end",
     ]);
-    expect(startRun("woods", 4).uses).toEqual([
-      "left",
-      "right",
-      "up",
-      "down",
-      "act",
+    const woods = startRun("woods", 4);
+    woods.hold("act", true);
+    woods.hold("hot1", true);
+    expect(woods.record().inputs.map(({ type }) => type)).toEqual([
       "fire",
+      "end",
     ]);
     const castle = startRun("castle", 4);
-    expect(castle.uses).toEqual(actions);
     castle.hold("hot2", true);
     expect(castle.record().inputs[0]).toEqual({
       data: { on: 1, tick: 0 },
@@ -130,12 +137,15 @@ describe("a chapter's run as the page plays it", () => {
     });
   });
 
-  it("plays, scores, counts metaplasma and draws the same for every chapter", () => {
-    for (const id of ["hills", "woods", "castle"] as const) {
+  it("plays, scores, counts metaplasma and draws the same for every level, and is never a won quest", () => {
+    for (const id of ["hills", "castle", "woods"] as const) {
       const run = startRun(id, 4);
       expect(run.tick()).toEqual(expect.any(Array));
       expect(run.ended()).toBe(false);
-      expect(run.cleared()).toBe(false);
+      expect(run.cleared()).toEqual([]);
+      expect(run.won()).toBe(false);
+      expect(run.fame()).toBeNull();
+      expect(run.level()).toBe(id);
       expect(run.earned()).toEqual([]);
       expect(run.score()).toBe(0);
       expect(run.plasma()).toBeGreaterThanOrEqual(0);
@@ -182,22 +192,31 @@ describe("the page's view", () => {
     expect(element("banked", "strong").textContent).toBe("9");
   });
 
-  it("opens only the chapters reached, offers each chapter's touch buttons, and lists what was earned", () => {
+  it("opens the quest and the levels reached, offers each level's touch buttons, and lists what was earned", () => {
     const view = createView();
-    view.chapters("woods", { ...freshProgress, unlocked: 2 }, false);
-    const [hills, woods, castle] = buttonsIn(document, "[data-chapter]");
-    expect([hills?.disabled, woods?.disabled, castle?.disabled]).toEqual([
-      false,
-      false,
-      true,
-    ]);
-    expect(woods?.getAttribute("aria-pressed")).toBe("true");
-    expect(castle?.querySelector("span")?.textContent).toBe("🔒");
+    view.chapters("castle", { ...freshProgress, unlocked: 2 }, false);
+    const [quest, hills, castle, woods] = buttonsIn(document, "[data-chapter]");
+    expect([
+      quest?.disabled,
+      hills?.disabled,
+      castle?.disabled,
+      woods?.disabled,
+    ]).toEqual([false, false, false, true]);
+    expect(castle?.getAttribute("aria-pressed")).toBe("true");
+    expect(quest?.querySelector("span")?.textContent).toBe("0");
+    expect(castle?.querySelector("span")?.textContent).toBe("2");
+    expect(woods?.querySelector("span")?.textContent).toBe("🔒");
+    expect(quest?.title).toContain("All three levels");
+    expect(woods?.title).toContain("Clear the level before");
+    view.level("woods");
     expect(element("act", "button").textContent).toBe("Fire");
+    expect(element("screen", "canvas").getAttribute("aria-label")).toContain(
+      "maze",
+    );
     const hidden = () =>
       buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold);
     expect(hidden()).toEqual(["act", "quick", "evade", "charm"]);
-    view.chapters("castle", { ...freshProgress, unlocked: 3 }, false);
+    view.level("castle");
     expect(hidden()).toEqual([]);
     view.chapters("woods", freshProgress, true);
     expect(
@@ -217,6 +236,26 @@ describe("the page's view", () => {
     expect(
       buttonsIn(document, "#pad button").some((button) => button.disabled),
     ).toBe(false);
+  });
+
+  it("lists the Hall of Fame best first, and says how to get in while it is empty", () => {
+    const view = createView();
+    view.fame([]);
+    expect(element("fame-note", "p").hidden).toBe(false);
+    view.fame([
+      { eggs: 90, hearts: 3, score: 52_300, secrets: 6, ticks: 36_060 },
+      { eggs: 12, hearts: 1, score: 9_000, secrets: 0, ticks: 61_000 },
+    ]);
+    expect(element("fame-note", "p").hidden).toBe(true);
+    expect(
+      [...document.querySelectorAll("#fame li")].map((item) => [
+        item.getAttribute("data-rank"),
+        item.textContent,
+      ]),
+    ).toEqual([
+      ["1", "52,300 points in 10:01, 3 hearts, 90 eggs, 6 secrets"],
+      ["2", "9,000 points in 16:56, 1 heart, 12 eggs, 0 secrets"],
+    ]);
   });
 
   it("stops at a missing or misnamed element", () => {

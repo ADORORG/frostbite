@@ -196,7 +196,7 @@ describe("the metaplasma of Egg Hills", () => {
 
 describe("the new marks of Egg Hills", () => {
   it("are earned for cheering up the guards, freeing the rocket's eggs, a secret charm and a great deal of metaplasma", () => {
-    expect(hillsMilestones).toHaveLength(15);
+    expect(hillsMilestones).toHaveLength(13);
     const start = startHills(4);
     expect(hillsEarned(start)).toEqual([]);
     expect(hillsEarned({ ...start, guardsCheered: 4 })).toEqual([
@@ -219,7 +219,7 @@ describe("the new marks of Egg Hills", () => {
 });
 
 describe("the end of each stage", () => {
-  it("is the boss's arena: flat ground with nothing else in it, Madame Vex's ledge out of reach, and the portal at its far end", () => {
+  it("is the boss's arena: flat ground with nothing else in it, DeFu's ledge out of reach, and the portal at its far end", () => {
     for (const seed of seeds)
       for (const stage of [1, 2, 3]) {
         const level = generateHills(seed, stage);

@@ -119,7 +119,7 @@ export function generateHills(seed: number, stage = 1): HillsLevel {
       );
   }
   layout.flat(column, levelTiles - column, groundRow);
-  // Madame Vex's ledge, over the portal and out of reach.
+  // DeFu's ledge, over the portal and out of reach.
   for (let at = levelTiles - 4; at < levelTiles; at += 1)
     layout.platform(at, groundRow - 5);
   return {

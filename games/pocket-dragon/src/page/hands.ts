@@ -1,10 +1,10 @@
 import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
 
-import { chapterIds, type ChapterId } from "../rules/constants.ts";
+import { chapterIds, type PlayId } from "../rules/constants.ts";
 
 // What the player's hands can do, the same in every chapter: four ways to go, an action button, a fire button, and the hotkeys of a
-// cheer challenge (1 to 5 for the shows, Q a quick cheer, E evade, C a charm); start (Enter) and pause (P, or the button). Each chapter
-// says what they mean to it (`runs.ts`); between runs, 1, 2 and 3 choose a chapter instead. The keys are the arrows and WASD; Space and Z
+// cheer challenge (1 to 5 for the shows, Q a quick cheer, E evade, C a charm); start (Enter) and pause (P, or the button). Each level
+// says what they mean to it (`runs.ts`); between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise instead. The keys are the arrows and WASD; Space and Z
 // are the action; F and X breathe fire. A touch screen has a button for each (any element with a `data-hold`).
 export const actions = [
   "left",
@@ -13,6 +13,7 @@ export const actions = [
   "down",
   "act",
   "fire",
+  "hot0",
   "hot1",
   "hot2",
   "hot3",
@@ -24,11 +25,13 @@ export const actions = [
 ] as const;
 export type Action = (typeof actions)[number];
 
-// The chapter a number key chooses between runs.
-export const chapterOfKey = (action: Action): ChapterId | undefined =>
-  action === "hot1" || action === "hot2" || action === "hot3"
+// What a number key chooses between runs: 0 the whole quest, 1 to 3 a level to practise.
+export function playOfKey(action: Action): PlayId | undefined {
+  if (action === "hot0") return "quest";
+  return action === "hot1" || action === "hot2" || action === "hot3"
     ? chapterIds[Number(action.slice(3)) - 1]
     : undefined;
+}
 
 export interface Hands {
   readonly hold: (action: Action, on: boolean) => void;
@@ -42,6 +45,7 @@ const keys = {
   ArrowLeft: "left",
   ArrowRight: "right",
   ArrowUp: "up",
+  Digit0: "hot0",
   Digit1: "hot1",
   Digit2: "hot2",
   Digit3: "hot3",
@@ -57,6 +61,7 @@ const keys = {
   KeyW: "up",
   KeyX: "fire",
   KeyZ: "act",
+  Numpad0: "hot0",
   Numpad1: "hot1",
   Numpad2: "hot2",
   Numpad3: "hot3",

@@ -95,14 +95,12 @@ describe("Egg Hills' milestones", () => {
     expect(eggsCaught(busy)).toBe(60);
     expect(hillsEarned(busy)).toEqual([
       "first-egg",
-      "eggs-25",
       "eggs-60",
       "golden-egg",
       "golden-eggs-3",
       "fire-breath",
       "ice-melter",
       "cheer-5",
-      "hills-stage-2",
     ]);
     const bumped = {
       ...busy,

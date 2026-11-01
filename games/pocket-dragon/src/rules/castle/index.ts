@@ -17,7 +17,7 @@ import {
 export const castleChapter: Chapter<CastleControl, CastleState> = {
   advanceTo: (state, tick) => playOn(state, tick, tickCastle),
   controls: castleControls,
-  done: (state) => state.bannerRaised,
+  done: (state) => state.bannerRaised || state.hearts <= 0,
   maxTicks,
   pressed: pressCastle,
 };

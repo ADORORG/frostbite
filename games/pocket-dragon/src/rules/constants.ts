@@ -6,6 +6,14 @@ export const verifierId = "pocket-dragon";
 export const verifierVersion = 1;
 export const ticksPerSecond = 60;
 
+// Hearts: three to start a run (or the quest), at most five. In the quest, each level starts with the hearts the one before ended with.
+export const startHearts = 3;
+export const maxHearts = 5;
+
 // The chapters, in the order they are played and unlocked. Each is a cabinet of the one verifier, named in a run's settings.
-export const chapterIds = ["hills", "woods", "castle"] as const;
+export const chapterIds = ["hills", "castle", "woods"] as const;
 export type ChapterId = (typeof chapterIds)[number];
+
+// What can be played: the whole quest (the three levels as one run, its own cabinet), or one level alone.
+export const playIds = ["quest", ...chapterIds] as const;
+export type PlayId = (typeof playIds)[number];

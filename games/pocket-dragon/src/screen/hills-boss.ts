@@ -26,18 +26,18 @@ import {
   guardRows,
   rocketKey,
   rocketRows,
-  vexKey,
-  vexRows,
-} from "./vex.ts";
+  defuKey,
+  defuRows,
+} from "./defu.ts";
 
-// The boss fight on the screen: Madame Vex on her ledge (red-eyed before a strike), the strikes' marks and beams, her ghost dragons,
+// The boss fight on the screen: DeFu on her ledge (red-eyed before a strike), the strikes' marks and beams, her ghost dragons,
 // guards and egg rocket, the eggs set free, and the seal on the portal until the fight is won.
 const px = (units: number): number => Math.round(units / pixel);
 const groundY = groundRow * (tile / pixel);
 const ledgeX = (levelTiles - 4) * (tile / pixel);
 const ledgeY = (groundRow - 5) * (tile / pixel);
 
-function vex(
+function defu(
   context: CanvasRenderingContext2D,
   state: HillsState,
   camera: number,
@@ -48,14 +48,14 @@ function vex(
   const warning =
     boss.strike !== null && !striking(boss.strike, state.tick, state.stage);
   const x = ledgeX + 22 - camera + Math.floor(gone / 3);
-  const y = ledgeY - vexRows.length - Math.floor(gone / 2);
-  sprite(context, vexRows, vexKey(boss.strike !== null), x, y);
+  const y = ledgeY - defuRows.length - Math.floor(gone / 2);
+  sprite(context, defuRows, defuKey(boss.strike !== null), x, y);
   if (warning && Math.floor(state.tick / 4) % 2 === 0) {
     block(context, "#ff2a3a", x + 5, y + 8, 1, 1);
     block(context, "#ff2a3a", x + 9, y + 8, 1, 1);
   }
   if (boss.started >= 0 && boss.beaten < 0 && state.tick - boss.started < 90)
-    write(context, "MADAME VEX!", 128, 30, 10, "#ff5fd2");
+    write(context, "DEFU!", 128, 30, 10, "#ff5fd2");
   if (boss.beaten >= 0 && gone < 90)
     write(context, "I'LL BE BACK, LITTLE DRAGON!", 128, 30, 8, colour.white);
 }
@@ -188,7 +188,7 @@ export function drawArena(
 ): void {
   if (px(arenaX) - camera > 256) return;
   seal(context, state, camera);
-  vex(context, state, camera);
+  defu(context, state, camera);
   strikes(context, state, camera);
   minions(context, state, camera);
   const { boss } = state;

@@ -10,29 +10,28 @@ import {
 } from "@ador/game-sdk/run-notes";
 
 import { effects, tracks } from "./audio.ts";
-import { factsOf, outcomeOf, type LastRun } from "./card/content.ts";
-import { chapterTitles } from "./chapters.ts";
+import { factsOf, type LastRun } from "./card/content.ts";
 import { instructions } from "./guide.ts";
 import { createCardPanel } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
-import { attachHands, chapterOfKey } from "./page/hands.ts";
-import { startRun, type ChapterRun } from "./page/runs.ts";
+import { attachHands, playOfKey } from "./page/hands.ts";
+import { startQuestRun } from "./page/quest-run.ts";
+import { startRun, type PlayRun } from "./page/runs.ts";
+import { settle } from "./page/settle.ts";
 import { createView } from "./page/view.ts";
 import {
   freshProgress,
   isOpen,
   restore,
   saved,
-  withBest,
-  withCleared,
-  withPlasma,
   withSound,
   type Progress,
 } from "./progress.ts";
 import {
-  chapterIds,
+  playIds,
   ticksPerSecond,
   type ChapterId,
+  type PlayId,
 } from "./rules/constants.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
@@ -48,8 +47,10 @@ const view = createView();
 
 let play: PlatformPlay | null = null;
 let progress: Progress = freshProgress;
-let chapter: ChapterId = "hills";
-let run: ChapterRun | null = null;
+let chosen: PlayId = "quest";
+let run: PlayRun | null = null;
+// The level last shown, so the touch buttons and the music change only when it does.
+let shownLevel: ChapterId | null = null;
 let runId: string | null = null;
 let titles: ReadonlyMap<string, string> = new Map();
 let heldNote = "";
@@ -73,31 +74,43 @@ const sound = setUpSound({
   track: tracks.hills,
 });
 
-// What each chapter's screen shows before a run of it: the start of the chapter (just after its opening banner), with its guide over it.
-// It is never played and never recorded.
+// What the quest's (and each level's) screen shows before a run: its start (just after the opening banner), with its guide over it. It
+// is never played and never recorded.
 const idleTicks = 150;
-const idle = new Map<ChapterId, ChapterRun>();
-function idleRun(id: ChapterId): ChapterRun {
+const idle = new Map<PlayId, PlayRun>();
+const startPlay = (
+  id: PlayId,
+  seed: number,
+  onEarned?: (milestone: string) => void,
+): PlayRun =>
+  id === "quest" ? startQuestRun(seed, onEarned) : startRun(id, seed, onEarned);
+function idleRun(id: PlayId): PlayRun {
   const found = idle.get(id);
   if (found !== undefined) return found;
-  const made = startRun(id, 1);
+  const made = startPlay(id, 1);
   for (let at = 0; at < idleTicks; at += 1) made.tick();
   idle.set(id, made);
   return made;
 }
 
 function show(): void {
-  const shown = run ?? idleRun(chapter);
+  const shown = run ?? idleRun(chosen);
+  const level = shown.level();
+  if (level !== shownLevel) {
+    shownLevel = level;
+    view.level(level);
+    if (run !== null && !run.ended()) sound.sound.playMusic(tracks[level]);
+  }
   view.draw(shown, run === null, progress.best[shown.id], progress.plasma);
 }
 
 function showChapters(): void {
-  view.chapters(chapter, progress, run !== null && !run.ended());
+  view.chapters(chosen, progress, run !== null && !run.ended());
 }
 
-function choose(id: ChapterId): void {
-  if (loop.running() || !isOpen(progress, id) || id === chapter) return;
-  chapter = id;
+function choose(id: PlayId): void {
+  if (loop.running() || !isOpen(progress, id) || id === chosen) return;
+  chosen = id;
   run = null;
   view.earned([], titles);
   note.textContent = "";
@@ -113,40 +126,21 @@ pause.subscribe((paused) => {
   } else note.textContent = heldNote;
 });
 
-// What clearing a chapter opens, said before what the platform said of the run.
-function opened(finished: ChapterRun): string {
-  if (!finished.cleared()) return "";
-  const before = progress.unlocked;
-  progress = withCleared(progress, finished.id);
-  const next = chapterIds[chapterIds.indexOf(finished.id) + 1];
-  if (next === undefined) return "You finished Glitchy's quest! ";
-  if (progress.unlocked === before) return "";
-  chapter = next;
-  return `Chapter ${String(chapterIds.indexOf(next) + 1)} is open: ${chapterTitles[next]}! `;
-}
-
-async function finish(finished: ChapterRun): Promise<void> {
+async function finish(finished: PlayRun): Promise<void> {
   view.running(false);
   sound.sound.stopMusic();
-  lastRun = {
-    chapter: finished.id,
-    outcome: outcomeOf(finished.id, finished.cleared()),
-    score: finished.score(),
-    stats: finished.stats(),
-    trophies: finished.earned(),
-  };
-  shareButton.classList.add("fresh");
   const record = finished.record();
-  progress = withPlasma(
-    withBest(progress, finished.id, finished.score()),
-    finished.plasma(),
-  );
-  const news = opened(finished);
+  const after = settle(progress, finished);
+  const news = after.news;
+  progress = after.progress;
+  lastRun = after.lastRun;
+  shareButton.classList.add("fresh");
+  if (finished.id !== "quest" && after.opened !== null) chosen = after.opened;
   saveProgress();
   showChapters();
+  view.fame(progress.fame);
   show();
-  startButton.textContent =
-    finished.id === chapter ? "Play again" : "Start run";
+  startButton.textContent = finished.id === chosen ? "Play again" : "Start run";
   if (runId === null || play === null) {
     note.textContent = news + submitNote(null);
     return;
@@ -184,8 +178,8 @@ const begin = (): Promise<void> =>
     const started = await play?.runs.start().catch(() => null);
     const ready = started?.status === "started" ? started : null;
     runId = ready?.runId ?? null;
-    note.textContent = startNote(started ?? null, instructions[chapter]);
-    run = startRun(chapter, ready?.seed ?? localSeed(), (id) => {
+    note.textContent = startNote(started ?? null, instructions[chosen]);
+    run = startPlay(chosen, ready?.seed ?? localSeed(), (id) => {
       sound.sfx("milestone");
       play?.report(id);
       marks.add(id);
@@ -194,7 +188,9 @@ const begin = (): Promise<void> =>
     view.running(true);
     showChapters();
     sound.sfx("start");
-    sound.sound.playMusic(tracks[chapter]);
+    shownLevel = run.level();
+    view.level(shownLevel);
+    sound.sound.playMusic(tracks[shownLevel]);
   });
 
 // The platform's list of the game's milestones, noting which the player has; asked again when the card opens, so a run just checked
@@ -219,7 +215,7 @@ async function connect(): Promise<void> {
     await client.ready();
     progress = restore(await client.progress.load());
     sound.apply(progress.sound);
-    chapter = chapterIds[progress.unlocked - 1] ?? "hills";
+    view.fame(progress.fame);
     play = await connectToPlatform(client);
     titles = new Map((await learnMarks()).map(({ id, title }) => [id, title]));
     status.textContent = "Connected.";
@@ -236,12 +232,12 @@ async function connect(): Promise<void> {
 
 // The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.
 attachHands(document.body, {
-  // During a run every key goes to it; between runs, 1, 2 and 3 choose a chapter.
+  // During a run every key goes to it; between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise.
   hold(action, on) {
     if (loop.running()) run?.hold(action, on);
-    const chapter = chapterOfKey(action);
-    if (!loop.running() && !card.isOpen() && on && chapter !== undefined)
-      choose(chapter);
+    const pick = playOfKey(action);
+    if (!loop.running() && !card.isOpen() && on && pick !== undefined)
+      choose(pick);
   },
   pause: () => void (loop.running() && pause.toggle()),
   start: () => void (!startButton.disabled && !card.isOpen() && begin()),
@@ -251,7 +247,7 @@ picker.addEventListener("click", (event) => {
     event.target instanceof Element
       ? event.target.closest("[data-chapter]")
       : null;
-  const id = chapterIds.find(
+  const id = playIds.find(
     (name) => name === target?.getAttribute("data-chapter"),
   );
   if (id !== undefined) choose(id);
