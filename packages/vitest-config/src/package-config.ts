@@ -13,6 +13,9 @@ const coverageReporters = ["text", "json-summary", "lcov"];
 /** The integration suites of database-backed packages are slower than the five-second default. */
 export const databaseTestTimeoutMs = 15_000;
 
+/** Integration suites whose tests start a container of their own (a database to migrate and seed) need longer still, most of all on a cold CI runner. */
+export const containerTestTimeoutMs = 60_000;
+
 /** jsdom suites render whole React trees; on a busy machine they exceed the five-second default without being wrong. */
 export const domTestTimeoutMs = 15_000;
 
