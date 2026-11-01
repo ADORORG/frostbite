@@ -5,6 +5,7 @@ import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { signIn } from "../src/upload-helpers.ts";
 import { openDock } from "./support/dock.ts";
 import { watch } from "./support/frame-watch.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The ice-field cabinet in FROST·BITE, played in the platform's isolated frame. Signed out, it plays on a seed of its own and
 // the milestone it earns is the game's own report. Signed in, the platform gives it a run and a seed, replays the record the
@@ -43,7 +44,7 @@ test("signed out, it is played on its own seed and the milestone is the game's r
 }) => {
   const { errors, violations } = watch(page);
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await expect(game.locator(".if-status")).toContainText(
@@ -71,18 +72,15 @@ test("signed in, the platform replays the run and holds the milestone as replay-
   const { errors, violations } = watch(page);
   await signIn(page, baseURL, creatorE2EFixtures.runPlayer);
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await winABoard(game);
   await expect(game.locator(".if-status")).not.toContainText("local seed");
 
   await game.getByRole("button", { name: "End run" }).click();
-  await expect(game.locator(".if-note")).toContainText(
-    "first-win replay-checked",
-  );
-  await expect(game.locator(".if-note")).toContainText(
-    "not that a person played it",
+  await expect(game.locator(".if-note")).toHaveText(
+    "The platform checked this run. Earned: first-win.",
   );
 
   // The page shows the account's record: replay-checked, with what that does and does not show.
@@ -154,7 +152,7 @@ test("a run is played once: the record of a run already settled is refused", asy
 
 test("looks like part of the game when opened", async ({ page }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   const launcher = game.getByRole("button", { name: "Ice field", exact: true });
   await launcher.click();

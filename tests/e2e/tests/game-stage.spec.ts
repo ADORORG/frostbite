@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The game page built as a game screen: the game on nearly the whole screen under a slim bar that holds its
 // title, a dock of sections at the foot that opens over the game, a notice when a milestone is reported, and an
@@ -12,6 +13,13 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
 });
 
+// Where an element is on the page, not on the screen: opening the dock may scroll the page, which moves nothing in it.
+const placeOnPage = async (page: Page, selector: string) => {
+  const found = await box(page, selector);
+  const scrolled = await page.evaluate(() => ({ x: scrollX, y: scrollY }));
+  return { ...found, x: found.x + scrolled.x, y: found.y + scrolled.y };
+};
+
 const box = async (page: Page, selector: string) => {
   const found = await page.locator(selector).first().boundingBox();
   if (found === null) throw new Error(`${selector} has no box`);
@@ -22,7 +30,7 @@ test("the page is the game on nearly the whole screen, with its title in the bar
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const bar = await box(page, ".arcade-stage__bar");
   const stage = await box(page, frameSelector);
   const dock = await box(page, ".arcade-dock__strip");
@@ -50,8 +58,8 @@ test("the dock is closed until asked, opens one section over the game without mo
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
-  const before = await box(page, frameSelector);
+  await expectConnectedToPlatform(page);
+  const before = await placeOnPage(page, frameSelector);
   await expect(page.getByRole("region", { name: "About" })).toBeHidden();
   const about = await openDock(page, "About");
   await expect(about).toContainText("Declarations digest:");
@@ -59,7 +67,7 @@ test("the dock is closed until asked, opens one section over the game without mo
     page.getByRole("region", { name: "Your milestones" }),
   ).toBeHidden();
   // It is drawn over the game, so the game is where it was.
-  expect(await box(page, frameSelector)).toEqual(before);
+  expect(await placeOnPage(page, frameSelector)).toEqual(before);
   const panel = await box(page, ".arcade-dock__panel:not([hidden])");
   const strip = await box(page, ".arcade-dock__strip");
   expect(panel.y + panel.height).toBeLessThanOrEqual(strip.y + 1);
@@ -78,7 +86,7 @@ test("Escape closes the dock and keeps the focus on its button", async ({
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await openDock(page, "About");
   await page.keyboard.press("Escape");
   await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
@@ -90,7 +98,7 @@ test("Escape closes the dock and keeps the focus on its button", async ({
 test("clicking into the game closes the dock", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "One check is enough.");
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await openDock(page, "Milestones");
   await page.locator(frameSelector).click({ position: { x: 40, y: 40 } });
   await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
@@ -101,14 +109,14 @@ test("clicking into the game closes the dock", async ({ page }, testInfo) => {
 test.describe("a short screen", () => {
   test.use({ viewport: { height: 560, width: 1100 } });
 
-  test("keeps the dock in view over the foot of a game that is taller than the screen", async ({
+  test("fits the whole stage, dock included, on the screen", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "One check is enough.");
     await page.goto("/games/frostbite");
-    await expect(page.getByText("Connected to the platform")).toBeVisible();
+    await expectConnectedToPlatform(page);
     const stage = await box(page, ".arcade-stage");
-    expect(stage.y + stage.height).toBeGreaterThan(560);
+    expect(stage.y + stage.height).toBeLessThanOrEqual(560);
     const dock = await box(page, ".arcade-dock__strip");
     expect(Math.round(dock.y + dock.height)).toBe(560);
   });
@@ -123,7 +131,7 @@ test("has a way back to the list in the bar", async ({ page }) => {
   await expect(page).toHaveURL(/\/games$/u);
 });
 
-test("the bar stays below the site header while the game is in view, on a large screen", async ({
+test("the bar sits directly under the site header on a large screen, with Full screen in view", async ({
   page,
 }, testInfo) => {
   test.skip(
@@ -131,17 +139,11 @@ test("the bar stays below the site header while the game is in view, on a large 
     "Large screens only.",
   );
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
-  const bar = page.locator(".arcade-stage__bar");
-  await expect(bar).toHaveCSS("position", "sticky");
-  await page.evaluate(() => window.scrollBy(0, 400));
-  await expect
-    .poll(async () => (await bar.boundingBox())?.y ?? -1)
-    .toBeGreaterThan(60);
+  await expectConnectedToPlatform(page);
+  const bar = await box(page, ".arcade-stage__bar");
   const header = await box(page, ".app-header");
-  const top = (await bar.boundingBox())?.y ?? 0;
-  expect(top).toBeGreaterThanOrEqual(header.y + header.height - 1);
-  expect(top).toBeLessThan(header.y + header.height + 12);
+  expect(bar.y).toBeGreaterThanOrEqual(header.y + header.height - 1);
+  expect(bar.y).toBeLessThan(header.y + header.height + 12);
   await expect(
     page.getByRole("button", { name: "Full screen" }),
   ).toBeInViewport();
@@ -162,7 +164,7 @@ test("a milestone the game reports is announced over the game, and the notice go
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const frame = page
     .frames()
     .find((candidate) =>
@@ -202,7 +204,7 @@ test.describe("a phone held sideways", () => {
 
   test("is offered full screen, and can decline", async ({ page }) => {
     await page.goto("/games/sdk-explorer");
-    await expect(page.getByText("Connected to the platform")).toBeVisible();
+    await expectConnectedToPlatform(page);
     const supported = await page.evaluate(() => document.fullscreenEnabled);
     test.skip(!supported, "This browser does not allow full screen.");
     const offer = page.getByTestId("fullscreen-prompt");
@@ -213,7 +215,7 @@ test.describe("a phone held sideways", () => {
 
   test("takes the game full screen from the offer", async ({ page }) => {
     await page.goto("/games/sdk-explorer");
-    await expect(page.getByText("Connected to the platform")).toBeVisible();
+    await expectConnectedToPlatform(page);
     const supported = await page.evaluate(() => document.fullscreenEnabled);
     test.skip(!supported, "This browser does not allow full screen.");
     await page
@@ -235,6 +237,6 @@ test("a computer is not offered the phone prompt", async ({
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "One check is enough.");
   await page.goto("/games/sdk-explorer");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await expect(page.getByTestId("fullscreen-prompt")).toHaveCount(0);
 });

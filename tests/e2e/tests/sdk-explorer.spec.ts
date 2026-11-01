@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { dockButton, openDock } from "./support/dock.ts";
 import { installFakeWallet } from "./support/fake-wallet.ts";
 import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The SDK explorer, played in the platform's isolated frame: every call of the game SDK answered by the real
 // platform page, and the events the platform sends on its own. The platform lists the explorer only when run
@@ -80,7 +81,7 @@ test("a message from the game is shown by the platform under the game's name", a
 test("the platform says what the game can see of a wallet, and that none is connected", async ({
   page,
 }) => {
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const wallet = await openDock(page, "Wallet");
   await expect(wallet).toContainText("No wallet is connected.");
   // The game's page asks the app's own wallet chooser to open; it has none of its own.
@@ -128,7 +129,7 @@ test("a game asks for the wallet chooser, the player connects, and the game is t
 test("the platform tells the game when the tab is hidden and shown again", async ({
   page,
 }) => {
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await page.evaluate(() => {
     const set = (hidden: boolean) => {
       Object.defineProperty(document, "hidden", {
@@ -153,7 +154,7 @@ test("a game that did not declare the wallet is refused it, in the real browser"
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const frame = page
     .frames()
     .find((candidate) =>

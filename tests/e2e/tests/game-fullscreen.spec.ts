@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The player's full screen button on the game panel, in a real browser: it is offered exactly where the browser
 // allows full screen, takes the game's frame (not the page) full screen, leaves it again, and the game keeps
@@ -10,7 +11,7 @@ const fullscreenElement = () =>
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/games/sdk-explorer");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
 });
 
 test("the button is offered where the browser allows full screen, and only there", async ({

@@ -3,6 +3,7 @@ import { expect, test, type FrameLocator } from "@playwright/test";
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { signIn } from "../src/upload-helpers.ts";
 import { watch } from "./support/frame-watch.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The SAT SNAKE cabinet in FROST·BITE, played in the platform's isolated frame. It is real-time on the screen (a timer moves
 // the snake) and replayable on the server (the record holds only the player's turns and the tick each was made on). The
@@ -38,7 +39,7 @@ test("signed out, it is played on its own seed and the record is not sent anywhe
 }) => {
   const { errors, violations } = watch(page);
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await expect(game.locator(".if-status")).toContainText(
@@ -60,7 +61,7 @@ test("signed in, the platform replays a run of steering and says it was checked"
   const { errors, violations } = watch(page);
   await signIn(page, baseURL, creatorE2EFixtures.runPlayer);
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await expect(game.locator(".if-status")).toContainText(
@@ -85,7 +86,7 @@ test("a snake that turns back on itself is told no, and the turn is not recorded
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await game.getByRole("button", { name: "Turn left" }).click();
@@ -98,7 +99,7 @@ test("a snake that turns back on itself is told no, and the turn is not recorded
 
 test("looks like part of the game when opened", async ({ page }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   const launcher = game.getByRole("button", { name: "Sat snake", exact: true });
   await launcher.click();

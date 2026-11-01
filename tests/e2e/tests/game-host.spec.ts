@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
 import { closeMatrix, skipToMain } from "./support/quality.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // A game (the SDK explorer) played in the platform's isolated frame: it connects, saves through the platform,
 // unlocks milestones the platform remembers across a reload, and cannot reach the network, storage or cookies.
@@ -19,7 +20,7 @@ test("the game connects, and the platform remembers what it does across a reload
   page,
 }) => {
   const game = page.frameLocator(frameSelector);
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await expect(game.locator("#status")).toHaveText(connected);
   await game.locator("#progress-save").click();
   await expect(game.locator("#log li").first()).toHaveText(

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
+import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // FROST·BITE, the first real game, played on the platform in the isolated frame: it boots from one bundle with
 // nothing from the network, gets a storage the platform keeps, and is cut off like every game. Desktop only: the
@@ -49,7 +50,7 @@ test("the game boots from its one bundle, connects to the platform and can be en
 }) => {
   const problems = watch(page);
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   const game = await enterArcade(page);
   // The game's own onboarding is a simulation and says so on its first step.
   await expect(game.getByTestId("simulation-notice")).toContainText(
@@ -73,7 +74,7 @@ test("what the game keeps goes through the platform, and is back after a reload"
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await enterArcade(page);
   // The game asks for its `localStorage`, which the frame does not have; it is given the platform's.
   const set = await gameFrame(page).evaluate(() => {
@@ -90,7 +91,7 @@ test("what the game keeps goes through the platform, and is back after a reload"
     .toBe('{"storage":{"frostbite.levels.v1":"{\\"sats\\":3}"}}');
 
   await page.reload();
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await expect
     .poll(() =>
       gameFrame(page).evaluate(() => [
@@ -105,7 +106,7 @@ test("the game is cut off from the network and the platform's cookies", async ({
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await page.evaluate(() => {
     document.cookie = "platform_marker=1; path=/";
   });
@@ -149,7 +150,7 @@ test("a mark the game makes shows on the platform as reached, and stays after a 
   page,
 }) => {
   await page.goto("/games/frostbite");
-  await expect(page.getByText("Connected to the platform")).toBeVisible();
+  await expectConnectedToPlatform(page);
   await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
     "0 of 4 reached",
