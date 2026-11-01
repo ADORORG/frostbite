@@ -6,7 +6,7 @@ services and seeded users.
 ## Browser tests
 
 `pnpm test:e2e` (from the repository root) builds the app, starts a disposable PostgreSQL, local S3
-(MinIO), the worker, and a self-hosted Inngest, seeds the fixture users, and runs Playwright on four
+(SeaweedFS), the worker, and a self-hosted Inngest, seeds the fixture users, and runs Playwright on four
 viewport projects (mobile, tablet, desktop, wide). Real-service flows (uploads, collections, review)
 run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experience-quality matrices
 (axe, keyboard, reduced motion, visual baselines) run on every viewport. Update a visual baseline only
@@ -31,8 +31,8 @@ PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the s
 until Ctrl+C. It builds the web app first (every start; Next reuses its cache, `--no-build` skips it), then
 prints the address, the pages worth visiting, and which rewards chain it is on.
 
-- **The data is kept.** The stack's PostgreSQL and S3 store (MinIO) are containers named `ador-stack-postgres` and
-  `ador-stack-minio` with their data in Docker volumes (`ador-stack-postgres-data`, `ador-stack-minio-data`). Ctrl+C
+- **The data is kept.** The stack's PostgreSQL and S3 store (SeaweedFS) are containers named `ador-stack-postgres` and
+  `ador-stack-s3` with their data in Docker volumes (`ador-stack-postgres-data`, `ador-stack-s3-data`). Ctrl+C
   stops them and keeps them; the next `pnpm stack` starts them again, applies any new migrations, and seeds the people and
   sample content only if they are not there. The passwords they were made with are in `.stack-data/secrets.json` (ignored by
   git, owner-readable). `pnpm stack --fresh` deletes the containers, volumes and passwords first, after you type `delete`
@@ -60,7 +60,7 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
 - Everything is disposable and local: the server binds the loopback address, the session tokens are fixed
-  fixtures of a throwaway database and storage is MinIO (never real R2). The only real thing is the rewards
+  fixtures of a throwaway database and storage is SeaweedFS (never real R2). The only real thing is the rewards
   chain above, when one is set. Never run it on a shared host.
 - Docker is required (as for the integration tests).
 

@@ -139,7 +139,7 @@ export function formatStackGuide(input: {
   lines.push(
     "",
     "The database and the stored files are kept in Docker volumes when you stop the stack (Ctrl+C), and are there next time.",
-    "`pnpm stack --fresh` deletes them (after asking) and starts over. Storage is local MinIO, not R2. The rewards chain, if the line",
+    "`pnpm stack --fresh` deletes them (after asking) and starts over. Storage is local SeaweedFS, not R2. The rewards chain, if the line",
     "below names one, is real: what is sent to it stays there whatever happens to this stack.",
     "",
   );

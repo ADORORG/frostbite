@@ -8,13 +8,13 @@ import {
 } from "./durable-container.ts";
 import {
   accessKeyId,
-  createBuckets,
+  prepareStore,
+  s3ContainerPort,
+  s3ContainerSettings,
   s3ImageReference,
   waitUntilReady,
   type S3Runtime,
 } from "./s3-runtime.ts";
-
-const containerPort = 9000;
 
 // The S3-compatible store of a stack that keeps its data: a named container with its objects in a named volume, started again (not
 // made new) on the next run, and only stopped, never removed, when the run ends. The secret must be the one it was first made with.
@@ -28,6 +28,10 @@ export async function startDurableS3Runtime(input: {
   readonly volume: string;
 }): Promise<S3Runtime> {
   const docker = input.docker ?? runDocker;
+  const settings = s3ContainerSettings({
+    corsOrigins: input.corsOrigins,
+    secretAccessKey: input.secret,
+  });
   await ensureRunning(
     {
       create: [
@@ -35,23 +39,13 @@ export async function startDurableS3Runtime(input: {
         "--detach",
         "--name",
         input.container,
-        "--env",
-        `MINIO_ROOT_USER=${accessKeyId}`,
-        "--env",
-        `MINIO_ROOT_PASSWORD=${input.secret}`,
-        ...(input.corsOrigins === undefined
-          ? []
-          : [
-              "--env",
-              `MINIO_API_CORS_ALLOW_ORIGIN=${input.corsOrigins.join(",")}`,
-            ]),
+        ...settings.environment,
         "--volume",
         `${input.volume}:/data`,
         "--publish",
-        `127.0.0.1::${String(containerPort)}`,
+        `127.0.0.1::${String(s3ContainerPort)}`,
         input.image ?? s3ImageReference,
-        "server",
-        "/data",
+        ...settings.command,
       ],
       name: input.container,
     },
@@ -61,7 +55,7 @@ export async function startDurableS3Runtime(input: {
   const mapping = await docker([
     "port",
     input.container,
-    `${String(containerPort)}/tcp`,
+    `${String(s3ContainerPort)}/tcp`,
   ]);
   const endpoint = `http://127.0.0.1:${mapping.slice(mapping.lastIndexOf(":") + 1)}`;
   try {
@@ -72,7 +66,7 @@ export async function startDurableS3Runtime(input: {
       forcePathStyle: true,
       region: "us-east-1",
     });
-    await createBuckets(client, input.buckets);
+    await prepareStore(client, input.buckets);
     client.destroy();
   } catch (error) {
     await stopKeeping(input.container, docker);

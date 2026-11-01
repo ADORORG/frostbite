@@ -137,7 +137,7 @@ passkeys). Not yet done there: backups and a restore drill, uptime monitoring an
 
 ## Status (what was and was not verified)
 
-Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO containers (placeholder credentials, `APP_ENV=local`):
+Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO containers (later replaced by SeaweedFS in the tests) (placeholder credentials, `APP_ENV=local`):
 
 - The image builds (`docker build -f deploy/Dockerfile .`, about 5 minutes cold) and is 2.8 GB. It holds the full production `node_modules`
   and the worker's sources, because the worker and the migration run TypeScript from the workspace packages.
