@@ -10,7 +10,7 @@ import {
 } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { join } from "node:path";
-import { promisify } from "node:util";
+import { promisify, stripVTControlCharacters } from "node:util";
 
 import { gameManifestSchema } from "@ador/shared/games";
 import { checkGameConformance } from "@ador/test-kit/game-conformance";
@@ -232,7 +232,8 @@ describe("the names made from an id", () => {
         ["run", "--config", "vitest.config.ts", "--project", project],
         { cwd: join(workspace, "games/river-run") },
       );
-      expect(stdout).toMatch(/Tests\s+\d+ passed/u);
+      // A CI runner makes the game's vitest colour its summary, which puts escape codes between "Tests" and the count.
+      expect(stripVTControlCharacters(stdout)).toMatch(/Tests\s+\d+ passed/u);
     },
     60_000,
   );
