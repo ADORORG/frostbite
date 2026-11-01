@@ -63,11 +63,13 @@ jobs:
         env:
           COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-          COOLIFY_APP_UUID: ${{ vars.COOLIFY_APP_UUID }}
-          COOLIFY_DEPLOY_BRANCH: ${{ vars.COOLIFY_DEPLOY_BRANCH }}
+          REPOSITORY_VARIABLES: ${{ toJSON(vars) }}
         run: |
-          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_APP_UUID" ] || [ "$GITHUB_REF_NAME" != "$COOLIFY_DEPLOY_BRANCH" ]; then
-            echo "Not deploying: Coolify is not configured for the branch $GITHUB_REF_NAME. The image is published."
+          # One Coolify application per branch: the variable COOLIFY_APP_UUID_<BRANCH> (dev -> COOLIFY_APP_UUID_DEV) names it.
+          variable="COOLIFY_APP_UUID_$(printf '%s' "$GITHUB_REF_NAME" | tr 'a-z' 'A-Z' | tr -c 'A-Z0-9\n' '_')"
+          COOLIFY_APP_UUID="$(printf '%s' "$REPOSITORY_VARIABLES" | jq -r --arg name "$variable" '.[$name] // empty')"
+          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_APP_UUID" ]; then
+            echo "Not deploying: Coolify is not configured for the branch $GITHUB_REF_NAME ($variable is not set). The image is published."
             exit 0
           fi
           case "$COOLIFY_URL" in

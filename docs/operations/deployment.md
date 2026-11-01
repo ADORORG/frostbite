@@ -111,17 +111,21 @@ builds `deploy/Dockerfile` once on GitHub and pushes `ghcr.io/<owner>/<repo>` (l
 
 ### Deploy on every push
 
-After the image is pushed, `publish-image.yml` calls Coolify's deploy API for the application, so a push to the deployed branch redeploys it. The
-compose file sets `pull_policy: always`, because the `dev` tag keeps its name while its content changes. In the repository settings:
+After the image is pushed, `publish-image.yml` calls Coolify's deploy API for the application of the pushed branch, so a push to `dev` or
+`main` redeploys that branch's application. The compose file sets `pull_policy: always`, because the `dev` tag keeps its name while its content
+changes. In the repository settings (Settings, Secrets and variables, Actions):
 
 - Secret `COOLIFY_URL`: the **https** address of Coolify (the step refuses anything else, so the token is never sent in the clear).
 - Secret `COOLIFY_TOKEN`: a Coolify API token (Keys & Tokens, API tokens) allowed to deploy; the API must be enabled in Coolify's settings.
-- Variable `COOLIFY_APP_UUID`: the compose application's UUID (in its address in Coolify).
-- Variable `COOLIFY_DEPLOY_BRANCH`: the branch whose image the application runs (`dev`).
+  One Coolify server, so both are shared by every branch.
+- Variable `COOLIFY_APP_UUID_DEV`: the UUID of the compose application that runs the `dev` image.
+- Variable `COOLIFY_APP_UUID_MAIN`: the UUID of the compose application that runs the `main` image.
 
-With any of these missing, or on another branch, the image is published and nothing is deployed. Coolify's own GitHub webhook is not used: it
-fires on the push, before the image exists. The deploy does not wait for the Verify checks (they run on pull requests and on `main`), so a
-broken commit on the deployed branch is deployed.
+The variable name is `COOLIFY_APP_UUID_` plus the branch name in capitals (any other character becomes `_`). A branch without its variable is
+published and not deployed. Each branch has its own Coolify application, so its environment (database, buckets, `PUBLIC_BASE_URL`, keys) is set
+in that application in Coolify; nothing environment-specific is stored in GitHub. Set the `IMAGE` variable of each application to its own branch
+tag (`ghcr.io/adororg/frostbite:dev` or `:main`). Coolify's own GitHub webhook is not used: it fires on the push, before the image exists. The
+deploy does not wait for the Verify checks (they run on pull requests and on `main`), so a broken commit on a deployed branch is deployed.
 
 The workflow does not run the Verify checks: merge to `dev` or `main` only what Verify has passed. Deploy a `sha-` tag, not `dev`, when you
 want a version you can roll back to.
