@@ -20,11 +20,12 @@ test("the public collection list closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "Collections" }),
   ).toBeVisible();
-  const card = page.getByRole("article", { name: publicCollection.name });
+  const card = page.getByRole("link", {
+    name: `View ${publicCollection.name}`,
+  });
   await expect(card).toBeVisible();
-  await expect(
-    page.getByText("does not mean they are minted, listed, or on sale"),
-  ).toBeVisible();
+  // The list no longer explains itself; what matters is that it claims nothing about a sale.
+  await expect(page.getByText(/minted|on sale|price/iu)).toHaveCount(0);
 
   // Keyboard: past the skip link, the collections are reachable in reading order.
   await skipToMain(page);
@@ -68,7 +69,7 @@ test("an approved collection's page closes the experience-quality matrix", async
 }) => {
   await page.goto(`/collections/${publicCollection.id}`);
   await expect(
-    page.getByRole("heading", { level: 2, name: publicCollection.name }),
+    page.getByRole("heading", { level: 1, name: publicCollection.name }),
   ).toBeVisible();
   await expect(page.getByText("Not on sale yet")).toBeVisible();
   await skipToMain(page);

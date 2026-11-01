@@ -19,9 +19,9 @@ test("the games list closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "Games" }),
   ).toBeVisible();
-  const card = page.getByRole("article", { name: "FROST·BITE" });
+  const card = page.getByRole("link", { name: "View FROST·BITE" });
   await expect(card).toBeVisible();
-  await expect(card.getByText("Playable")).toBeVisible();
+  await expect(card).toContainText("Playable");
   await skipToMain(page);
   await page.getByRole("link", { name: "View FROST·BITE" }).focus();
   await expect(
