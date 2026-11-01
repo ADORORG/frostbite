@@ -43,7 +43,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "typecheck": "turbo run typecheck && pnpm contracts:typecheck",
-    "test:unit": "turbo run test:unit",
+    "test:unit": "turbo run test:unit --concurrency=2",
     "test:integration": "turbo run test:integration --concurrency=2 && pnpm contracts:test",
     "test:coverage": "turbo run test:coverage --concurrency=2 && pnpm contracts:coverage && pnpm repository:coverage",
     "mailbox": "pnpm --filter @repo/platform-admin mailbox",
