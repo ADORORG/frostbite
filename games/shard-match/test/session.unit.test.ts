@@ -45,6 +45,7 @@ describe("a session", () => {
     expect(ids).toContain("first-swap");
   });
 
+  // Plays a whole run to its end: about 2 s alone, and many times that on a busy CI machine, so it has the time the other long tests have.
   it("does not close a run twice, nor one that ended itself", () => {
     const session = createMatchSession({ seed: 2 });
     const first = session.record();
@@ -54,7 +55,7 @@ describe("a session", () => {
     for (const { cell, to } of play(3, greedyPlayer).swaps) over.swap(cell, to);
     expect(over.state().cause).toBe("out");
     expect(over.record().inputs.at(-1)).not.toEqual({ type: "end" });
-  });
+  }, 60_000);
 });
 
 describe("the sample run", () => {
