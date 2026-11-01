@@ -90,7 +90,9 @@ jobs:
             tooling/*/coverage
           if-no-files-found: error
 
+  # Proves the image builds before a pull request merges. On a push the publish job below builds the same image, so it is not built twice.
   image:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -104,10 +106,11 @@ jobs:
       - name: Check the release tooling is in the image and needs no download
         run: docker run --rm --network none the-well:ci pnpm --version
 
-  # Only a push to a deployed branch, and only once the checks and the image build above passed: publish the image and deploy it.
+  # Only a push to a deployed branch, and only once the checks above passed: build and publish the image, then deploy it. A failing
+  # build stops the deploy the same way a failing check does.
   publish:
     if: github.event_name == 'push'
-    needs: [verify, image]
+    needs: [verify]
     permissions:
       contents: read
       packages: write
