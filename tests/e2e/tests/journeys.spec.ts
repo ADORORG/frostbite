@@ -6,7 +6,7 @@ import {
 } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
 import { loadFonts } from "./support/quality.ts";
-import { siteLink } from "./support/site-navigation.ts";
+import { accountLink, siteLink } from "./support/site-navigation.ts";
 
 // One journey per kind of person, each started once at the home page and then followed by clicking only: after
 // the first load, typing an address is refused, so a page that cannot be reached from another fails here
@@ -92,7 +92,7 @@ test("someone who never applied is led from the studio to the application and ba
   await heading(page, "Apply to create");
   await breadcrumb(page).getByRole("link", { name: "Studio" }).click();
   await heading(page, "Creator studio");
-  await (await siteLink(page, "Account")).click();
+  await (await accountLink(page)).click();
   await heading(page, "Account");
   await pictureOfTheBar(page, "applicant");
 });
@@ -183,7 +183,7 @@ test("staff without the reviewer role see their console and no review links", as
   await expect(page.getByRole("link", { name: "Creator reviews" })).toHaveCount(
     0,
   );
-  await (await siteLink(page, "Account")).click();
+  await (await accountLink(page)).click();
   await heading(page, "Account");
   await pictureOfTheBar(page, "staff");
 });

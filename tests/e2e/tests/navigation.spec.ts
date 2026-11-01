@@ -2,7 +2,11 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { walletButton } from "./support/fake-wallet.ts";
-import { siteLink, siteNavigation } from "./support/site-navigation.ts";
+import {
+  accountLink,
+  siteLink,
+  siteNavigation,
+} from "./support/site-navigation.ts";
 import { useE2ESession } from "../src/session.ts";
 
 const more = (page: Page) => page.getByRole("navigation", { name: "More" });
@@ -64,7 +68,7 @@ test("a signed-in person keeps their links on public pages and finds the account
   await page.goto("/collections");
   await expect(await siteLink(page, "Studio")).toBeVisible();
   await expect(page.getByRole("link", { name: "Admin" })).toHaveCount(0);
-  await (await siteLink(page, "Account")).click();
+  await (await accountLink(page)).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(
     page.getByRole("heading", { exact: true, name: "Account" }),
