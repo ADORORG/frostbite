@@ -8,9 +8,11 @@ import {
   heroHeight,
   invulnerableTicks,
   jumpSpeed,
+  levelTiles,
   maxHearts,
   tile,
 } from "../src/rules/hills/constants.ts";
+import { startBoss } from "../src/rules/hills/boss.ts";
 import { hillsChapter, hillsRules } from "../src/rules/hills/index.ts";
 import { startHills } from "../src/rules/hills/state.ts";
 import { tickHills } from "../src/rules/hills/tick.ts";
@@ -228,12 +230,32 @@ describe("Egg Hills' rules", () => {
     expect(tickHills(last).tick).toBe(last.tick + 1);
   });
 
-  it("count a stage at the portal, begin the next with a heart for each of the first two, and finish after the third", () => {
+  it("count a stage at the portal once the boss is beaten, begin the next with a heart for each of the first two, and finish after the third", () => {
+    const beaten = (stage: number) => ({
+      ...startBoss(1, stage),
+      beaten: 0,
+      ghosts: [],
+      rocket: null,
+      started: 0,
+    });
     const near = (stage: number, hearts: number) =>
       flatHills(
         {},
-        { hearts, hero: { ...startHills(1).hero, x: 145 * tile }, stage },
+        {
+          boss: beaten(stage),
+          hearts,
+          hero: { ...startHills(1).hero, x: (levelTiles - 5) * tile },
+          stage,
+        },
       );
+    // The portal is sealed while Madame Vex's baby ghost dragon is still about.
+    const sealed = ticks(
+      press({ ...near(1, 3), boss: startBoss(1, 1) }, "right"),
+      40,
+    );
+    expect(sealed.stage).toBe(1);
+    expect(sealed.stagesCleared).toBe(0);
+    expect(sealed.boss.started).toBeGreaterThan(0);
     const second = ticks(press(near(1, 3), "right"), 20);
     expect(second.stage).toBe(2);
     expect(second.stagesCleared).toBe(1);

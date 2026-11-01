@@ -9,7 +9,7 @@ export const pixel = 16;
 export const tile = 16 * pixel;
 // The world is this many tiles high; a stage is this many long; the ground tops out at `groundRow`, and a pit has none.
 export const rows = 9;
-export const levelTiles = 150;
+export const levelTiles = 166;
 export const groundRow = 7;
 export const pitRow = rows + 1;
 
@@ -58,3 +58,23 @@ export const invulnerableTicks = 90;
 export const hitKnock = 40;
 // The name of a stage shows over the screen this long after it starts.
 export const bannerTicks = 120;
+
+// The last screen of every stage is the boss's arena: Madame Vex on her ledge high over the sealed portal.
+export const arenaTiles = 16;
+export const arenaX = (levelTiles - arenaTiles) * tile;
+
+// The weather of each stage: gusts of wind that push, rain that makes the grass slippery and puts fire out sooner, then fog.
+export const gustTicks = 150;
+export const windPush = 2;
+export const rainAccel = 1;
+export const rainFireLife = 28;
+
+// Metaplasma drifts to Glitchy from this far (much farther with the magnet charm), this fast, and is gathered this close.
+export const plasmaReach = 40 * pixel;
+export const magnetReach = 112 * pixel;
+export const plasmaSpeed = 40;
+export const plasmaCatch = 6 * pixel;
+// The feather charm makes every jump this much stronger; the shield charm takes one hit and leaves Glitchy blinking this long.
+export const featherBoost = 10;
+export const shieldTicks = 60;
+export const charmSize = 12 * pixel;

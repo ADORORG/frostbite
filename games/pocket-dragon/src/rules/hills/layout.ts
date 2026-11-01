@@ -2,6 +2,7 @@ import { startState, stepSeed } from "@ador/game-sdk/seeded";
 
 import {
   berrySize,
+  charmSize,
   eggSize,
   gloomHeight,
   groundRow,
@@ -28,6 +29,7 @@ export class Layout {
   readonly patrols: Patrol[] = [];
   readonly thorns: Spot[] = [];
   berry: Spot | null = null;
+  charm: Spot | null = null;
   golden: Spot | null = null;
   state: number;
   constructor(seed: number) {
@@ -166,4 +168,17 @@ export function perch(layout: Layout, from: number, row: number): number {
   layout.egg(from + 2, row - 2);
   layout.egg(from + 3, row - 2);
   return 10;
+}
+
+// The secret: cloud steps up to a high ledge where the stage's charm hides (it shows itself only when Glitchy is close).
+export function secret(layout: Layout, from: number, row: number): number {
+  layout.flat(from, 9, row);
+  layout.platform(from + 2, row - 2);
+  layout.platform(from + 3, row - 2);
+  layout.platform(from + 5, row - 4);
+  layout.platform(from + 6, row - 4);
+  layout.charm = centred(from + 6, row - 5, charmSize);
+  layout.egg(from + 2, row - 3);
+  layout.egg(from + 3, row - 3);
+  return 9;
 }

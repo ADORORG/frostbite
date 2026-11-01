@@ -10,6 +10,7 @@ import {
   size,
 } from "../rules/woods/constants.ts";
 import { cluesRead } from "../rules/woods/tick.ts";
+import { gateOpen } from "../rules/woods/walk.ts";
 import { cosOf, sinOf, unit } from "../rules/woods/trig.ts";
 import type { Place, WoodsState } from "../rules/woods/types.ts";
 import { colour } from "./palette.ts";
@@ -64,6 +65,7 @@ export function minimap(
   context.globalAlpha = 1;
   state.level.walls.forEach((wall, at) => {
     const seen =
+      state.charms[1] === true ||
       state.visited[at] === true ||
       [1, -1, size, -size].some((step) => state.visited[at + step] === true);
     if (!seen) return;
@@ -88,7 +90,7 @@ export function minimap(
   const next = state.level.clues.find((_, at) => state.clues[at] !== true);
   const pulse = Math.floor(state.tick / 15) % 2 === 0;
   if (next !== undefined && pulse) mark(context, next, colour.cyan);
-  if (read >= clueCount && pulse)
+  if (read >= clueCount && gateOpen(state) && pulse)
     mark(
       context,
       { x: state.level.gate % size, y: Math.floor(state.level.gate / size) },
@@ -97,6 +99,15 @@ export function minimap(
   state.level.lanterns.forEach((place, at) => {
     if (state.lanterns[at] === true) mark(context, place, colour.fireHot);
   });
+  // The map charm shows where the launcher's parts and the eggs still are.
+  if (state.charms[1] === true) {
+    state.level.parts.forEach((place, at) => {
+      if (state.parts[at] !== true) mark(context, place, colour.gold);
+    });
+    state.level.eggs.forEach((place, at) => {
+      if (state.eggs[at] !== true && pulse) mark(context, place, colour.white);
+    });
+  }
   const x = mapX + (state.x / cell) * dot;
   const y = mapY + (state.y / cell) * dot;
   block(context, colour.gold, x - 1, y - 1, 2, 2);
@@ -111,12 +122,21 @@ export function minimap(
 }
 
 const foundWords = {
+  charm: "A SECRET CHARM!",
   chest: "TREASURE!",
   clue: "A CLUE STONE WHISPERS...",
+  egg: "AN EGG FOR THE LAUNCHER",
   lantern: "A LANTERN GLOWS",
+  launcher: "THE EGG LAUNCHER IS BUILT!",
   melt: "THE FROZEN HEDGE MELTS",
   moon: "THE MOON CHEST!",
+  part: "A LAUNCHER PART!",
 } as const;
+const charmNames = [
+  "SWIFT FEET",
+  "THE WHOLE MAP",
+  "METAPLASMA MAGNET",
+] as const;
 
 export function woodsWords(
   context: CanvasRenderingContext2D,
@@ -125,7 +145,7 @@ export function woodsWords(
   const read = cluesRead(state);
   write(
     context,
-    `CLUES ${String(read)}/${String(clueCount)}`,
+    `CLUES ${String(read)}/${String(clueCount)}  PARTS ${String(state.parts.filter(Boolean).length)}/${String(state.parts.length)}`,
     4,
     4,
     8,
@@ -135,7 +155,7 @@ export function woodsWords(
   if (state.tick < 240)
     write(
       context,
-      "FIND 3 CLUE STONES TO OPEN THE MOON GATE",
+      "READ 3 CLUE STONES, BUILD THE EGG LAUNCHER",
       128,
       118,
       7,
@@ -143,18 +163,22 @@ export function woodsWords(
     );
   const { found } = state;
   if (found !== null && state.tick - found.tick < 120) {
+    const opened = found.kind === "clue" || found.kind === "launcher";
     const words =
-      found.kind === "clue" && read >= clueCount
+      opened && gateOpen(state)
         ? "THE MOON GATE IS OPEN!"
-        : foundWords[found.kind];
+        : found.kind === "clue" && read >= clueCount
+          ? "NOW FINISH THE LAUNCHER!"
+          : foundWords[found.kind];
     write(context, words, 128, 40, 10, colour.gold);
   }
-  if (state.escaped)
-    write(context, "OUT OF THE WOODS!", 128, 50, 14, colour.gold);
+  const powers = charmNames.filter((_, at) => state.charms[at] === true);
+  if (powers.length > 0)
+    write(context, powers.join("  "), 4, 24, 6, colour.mint, "left");
   const left = Math.ceil(Math.max(0, maxTicks - state.tick) / 60);
   write(
     context,
-    `MOONLIGHT ${String(Math.floor(left / 60))}:${String(left % 60).padStart(2, "0")}`,
+    `EGGS ${String(state.eggs.filter(Boolean).length)}  PLASMA ${String(state.plasma.gathered)}  MOONLIGHT ${String(Math.floor(left / 60))}:${String(left % 60).padStart(2, "0")}`,
     4,
     14,
     7,

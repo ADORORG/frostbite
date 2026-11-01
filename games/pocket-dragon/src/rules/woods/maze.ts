@@ -12,6 +12,7 @@ import {
   size,
   tree,
 } from "./constants.ts";
+import { stashOf } from "./stash.ts";
 import type { Place, WoodsLevel } from "./types.ts";
 
 // The woods are laid out once from the seed: a maze of paths between trees (every path cell reachable from every other), a few extra
@@ -194,7 +195,16 @@ export function generateWoods(seed: number): WoodsLevel {
     choose(paths, chosen, roller),
   );
   const angle = walls[indexOf(2, 1)] === open ? 0 : 256;
+  const stash = stashOf(seed, walls, [
+    start,
+    exit,
+    moonChest,
+    ...clues,
+    ...chests,
+    ...lanterns,
+  ]);
   return {
+    ...stash,
     chests,
     clues,
     frozen: frozenAt,

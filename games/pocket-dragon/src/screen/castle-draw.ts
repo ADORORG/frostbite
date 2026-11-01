@@ -5,6 +5,7 @@ import { mapHeight, mapWidth } from "../rules/castle/map.ts";
 import { banner, foes, friends, items, king } from "../rules/castle/places.ts";
 import type { CastleState, Spot } from "../rules/castle/types.ts";
 import { drawBattle } from "./castle-battle.ts";
+import { landHud, landStash } from "./castle-stash.ts";
 import { drawTile } from "./castle-tiles.ts";
 import { castleWords } from "./castle-words.ts";
 import { colour } from "./palette.ts";
@@ -220,12 +221,18 @@ export function drawCastle(
   context: CanvasRenderingContext2D,
   state: CastleState,
 ): void {
+  if (state.battle !== null) {
+    block(context, colour.deep, 0, 0, width, height);
+    drawBattle(context, state, state.battle);
+    return;
+  }
   const camera = cameraOf(state);
   const firstX = Math.floor(camera.x / 16);
   const firstY = Math.floor(camera.y / 16);
   for (let ty = firstY; ty <= firstY + height / 16 + 1; ty += 1)
     for (let tx = firstX; tx <= firstX + width / 16 + 1; tx += 1)
       drawTile(context, state, tx, ty, tx * 16 - camera.x, ty * 16 - camera.y);
+  landStash(context, state, camera);
   people(context, state, camera);
   glitchy(context, state, camera);
   if (state.fireTick >= 0 && state.tick - state.fireTick < 12) {
@@ -233,7 +240,7 @@ export function drawCastle(
     block(context, colour.fire, at.x - camera.x + 4, at.y - camera.y - 6, 8, 6);
   }
   words(context, state);
-  if (state.battle !== null) drawBattle(context, state, state.battle);
+  landHud(context, state);
   if (state.bannerRaised)
     write(context, "THE CASTLE IS CAPTURED!", width / 2, 40, 12, colour.gold);
 }

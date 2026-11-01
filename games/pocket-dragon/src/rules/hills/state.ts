@@ -1,4 +1,6 @@
 import { groundRow, heroHeight, startHearts, tile } from "./constants.ts";
+import { freshPlasma } from "../plasma.ts";
+import { startBoss } from "./boss.ts";
 import { generateHills } from "./level.ts";
 import type { Hero, HillsState } from "./types.ts";
 
@@ -19,6 +21,8 @@ export function freshStage(seed: number, stage: number) {
   const level = generateHills(seed, stage);
   return {
     berryTaken: false,
+    boss: startBoss(seed, stage),
+    charmTaken: false,
     checkpoint: false,
     eggsTaken: level.eggs.map(() => false),
     fireballs: [],
@@ -32,6 +36,7 @@ export function freshStage(seed: number, stage: number) {
     hero: startHero(),
     level,
     melted: level.ice.map(() => false),
+    plasma: freshPlasma(level.motes),
   };
 }
 
@@ -39,20 +44,27 @@ export function startHills(seed: number): HillsState {
   return {
     ...freshStage(seed, 1),
     breaths: 0,
+    charms: 0,
     cheers: 0,
     controls: { fire: false, jump: false, left: false, right: false },
     eggsBanked: 0,
     ended: false,
+    feather: false,
     finishTick: null,
     fireCooldown: 0,
+    freedCaught: 0,
     goldens: 0,
+    guardsCheered: 0,
     hasFire: false,
     hearts: startHearts,
     heartsLost: 0,
     invulnerable: 0,
+    magnet: false,
     meltedCount: 0,
     over: false,
+    plasmaBanked: 0,
     seed,
+    shield: false,
     stage: 1,
     stageStart: 0,
     stagesCleared: 0,

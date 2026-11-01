@@ -1,3 +1,5 @@
+import type { Plasma } from "../plasma.ts";
+
 // The shape of Egg Hills: a level (laid out from the seed, never changed while it is played) and the run going on in it.
 export interface Spot {
   readonly x: number;
@@ -17,8 +19,12 @@ export interface Patrol {
   readonly y: number;
 }
 
+export type Weather = "fog" | "rain" | "wind";
+
 export interface HillsLevel {
   readonly berry: Spot;
+  // The secret charm, high up off the path: a feather in stage one, a shield in stage two, a magnet in stage three.
+  readonly charm: Spot;
   readonly checkpointX: number;
   readonly eggs: readonly Spot[];
   readonly gloomSpeed: number;
@@ -29,11 +35,14 @@ export interface HillsLevel {
   // Ice blocks, and where each is by `column * 64 + row`.
   readonly ice: readonly Cell[];
   readonly iceAt: ReadonlyMap<number, number>;
+  // Metaplasma, sorted by `x` (see `../plasma.ts`).
+  readonly motes: readonly Spot[];
   readonly patrols: readonly Patrol[];
   // Floating tiles as `column * 64 + row`.
   readonly solid: ReadonlySet<number>;
   readonly stage: number;
   readonly thorns: readonly Spot[];
+  readonly weather: Weather;
 }
 
 export type HillsControl = "fire" | "jump" | "left" | "right";
@@ -63,6 +72,59 @@ export interface Gloom {
   readonly x: number;
 }
 
+// The boss fight at the end of a stage. Madame Vex stays on her ledge and is never hurt; her baby ghost dragons (and in the last stage
+// her egg rocket) are what Glitchy must beat to unseal the portal. A ghost's height follows the clock (`ghostY` in `boss.ts`).
+export interface Ghost {
+  readonly dir: -1 | 1;
+  // The tick it was beaten (it turns to sparkles and floats away), or -1.
+  readonly freed: number;
+  readonly hp: number;
+  // Ticks it flashes after a hit, when it cannot be hit again.
+  readonly hurt: number;
+  readonly phase: number;
+  readonly x: number;
+}
+
+// A security guard she sends down: it walks toward Glitchy, and is sent home dizzy by a stomp or a puff of fire.
+export interface Guard {
+  readonly dir: -1 | 1;
+  readonly x: number;
+}
+
+export interface Rocket {
+  readonly dir: -1 | 1;
+  readonly hp: number;
+  readonly hurt: number;
+  readonly x: number;
+}
+
+export interface FreedEgg {
+  readonly caught: boolean;
+  readonly vx: number;
+  readonly vy: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+// Red eyes, then laser strikes on the marked spots.
+export interface Strike {
+  readonly marks: readonly number[];
+  readonly start: number;
+}
+
+export interface Boss {
+  // The tick it was won, or -1; the tick it began (Glitchy came into the arena), or -1.
+  readonly beaten: number;
+  readonly freed: readonly FreedEgg[];
+  readonly ghosts: readonly Ghost[];
+  readonly guards: readonly Guard[];
+  readonly launched: number;
+  readonly rng: number;
+  readonly rocket: Rocket | null;
+  readonly started: number;
+  readonly strike: Strike | null;
+}
+
 export interface Fireball {
   readonly life: number;
   readonly vx: number;
@@ -72,30 +134,43 @@ export interface Fireball {
 
 export interface HillsState {
   readonly berryTaken: boolean;
+  readonly boss: Boss;
   // Puffs of fire breathed, in the whole run.
   readonly breaths: number;
+  // This stage's charm has been found; `charms` counts them in the run, and the three powers last the run (the shield until used).
+  readonly charmTaken: boolean;
+  readonly charms: number;
   readonly checkpoint: boolean;
   readonly cheers: number;
   readonly controls: Readonly<Record<HillsControl, boolean>>;
   readonly eggsBanked: number;
   readonly eggsTaken: readonly boolean[];
   readonly ended: boolean;
+  readonly feather: boolean;
   readonly finishTick: number | null;
   readonly fireCooldown: number;
   readonly fireballs: readonly Fireball[];
+  // Eggs caught from the burst egg rocket, and security guards cheered up, in the run.
+  readonly freedCaught: number;
   readonly glooms: readonly Gloom[];
   readonly goldenTaken: boolean;
   readonly goldens: number;
+  readonly guardsCheered: number;
   readonly hasFire: boolean;
   readonly hearts: number;
   readonly heartsLost: number;
   readonly hero: Hero;
   readonly invulnerable: number;
   readonly level: HillsLevel;
+  readonly magnet: boolean;
   readonly melted: readonly boolean[];
   readonly meltedCount: number;
   readonly over: boolean;
+  // This stage's metaplasma, and what earlier stages of the run gathered.
+  readonly plasma: Plasma;
+  readonly plasmaBanked: number;
   readonly seed: number;
+  readonly shield: boolean;
   readonly stage: number;
   readonly stageStart: number;
   readonly stagesCleared: number;

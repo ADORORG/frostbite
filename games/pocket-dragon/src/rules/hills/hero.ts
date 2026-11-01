@@ -11,6 +11,16 @@ import {
 import { moveAlongX, moveAlongY, standing } from "./collide.ts";
 import type { Hero, HillsControl, HillsLevel } from "./types.ts";
 
+// How the stage feels underfoot: how quickly Glitchy speeds up and slows down (less in the rain), how hard a jump leaves the ground (more
+// with the feather charm), and the wind's push this tick.
+export interface Feel {
+  readonly accel: number;
+  readonly jump: number;
+  readonly push: number;
+}
+
+export const calm: Feel = { accel, jump: jumpSpeed, push: 0 };
+
 export interface Moved {
   // How fast Glitchy was falling this tick before landing on anything: a stomp needs a dragon coming down.
   readonly falling: number;
@@ -28,21 +38,22 @@ export function moveHero(
   melted: readonly boolean[],
   before: Hero,
   controls: Readonly<Record<HillsControl, boolean>>,
+  feel: Feel = calm,
 ): Moved {
   const direction = Number(controls.right) - Number(controls.left);
-  let vx = toward(before.vx, direction * topSpeed, accel);
+  let vx = toward(before.vx, direction * topSpeed, feel.accel);
   let vy = before.vy;
   let buffer = Math.max(0, before.buffer - 1);
   let coyote = before.coyote;
   if (before.buffer > 0 && (before.grounded || coyote > 0)) {
-    vy = -jumpSpeed;
+    vy = -feel.jump;
     coyote = 0;
     buffer = 0;
   }
   if (!controls.jump && vy < -shortHop) vy = -shortHop;
   vy = Math.min(vy + gravity, maxFall);
   const falling = vy;
-  const across = moveAlongX(level, melted, before.x, before.y, vx);
+  const across = moveAlongX(level, melted, before.x, before.y, vx + feel.push);
   if (across.blocked) vx = 0;
   const down = moveAlongY(level, melted, across.x, before.y, vy);
   if (down.hit !== null) vy = 0;

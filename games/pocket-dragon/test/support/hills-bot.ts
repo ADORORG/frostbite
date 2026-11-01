@@ -6,6 +6,7 @@ import { eggsCaught } from "../../src/rules/hills/milestones.ts";
 import { freshStage, startHills } from "../../src/rules/hills/state.ts";
 import { tickHills } from "../../src/rules/hills/tick.ts";
 import type { HillsControl, HillsState } from "../../src/rules/hills/types.ts";
+import { arenaChoice, eggToFetch, hit } from "./hills-arena.ts";
 
 // A player who sees what is coming, for Egg Hills: every tick it tries, on a copy of the run played through the real rules, running on
 // and each of several jumps, and does what keeps Glitchy safe over the next `horizon` ticks while getting furthest (a golden egg, a
@@ -34,14 +35,24 @@ function score(from: HillsState, ticks: number): number | null {
       now = pressOn(now, "jump", false);
     now = tickHills(now);
     if (now.stage > from.stage || now.finishTick !== null) return 1_000_000;
-    if (now.hearts < from.hearts || now.over) return null;
+    if (hit(now, from)) return null;
   }
   const gained = now.hero.x - from.hero.x;
   const golden = now.goldens - from.goldens;
-  if (gained < 600 && golden === 0) return null;
+  const charm = now.charms - from.charms;
+  // Near a secret charm not yet found, climbing counts as getting somewhere.
+  const { charm: spot } = from.level;
+  const climbing =
+    !from.charmTaken && Math.abs(spot.x - from.hero.x) < 7 * tile
+      ? 12 * Math.max(0, from.hero.y - now.hero.y)
+      : 0;
+  if (gained < 600 && golden === 0 && charm === 0 && climbing === 0)
+    return null;
   return (
     gained +
     4_000 * golden +
+    8_000 * charm +
+    climbing +
     300 * (now.cheers - from.cheers) +
     60 * (eggsCaught(now) - eggsCaught(from))
   );
@@ -81,6 +92,7 @@ export function planHills(
   let state = from;
   const inputs: RunInput[] = [];
   const press = (key: HillsControl, on: boolean): void => {
+    if (state.controls[key] === on) return;
     const data = { on: on ? 1 : 0, tick: state.tick };
     state = pressOn(state, key, on);
     inputs.push({ data, type: key });
@@ -94,6 +106,32 @@ export function planHills(
     !until(state)
   ) {
     if (state.controls.jump && state.tick >= releaseAt) press("jump", false);
+    if (state.controls.fire) press("fire", false);
+    const { boss } = state;
+    if (boss.started >= 0 && boss.beaten < 0) {
+      if (state.tick % 2 === 0) {
+        const choice = arenaChoice(state);
+        press("left", choice.dir < 0);
+        press("right", choice.dir > 0);
+        if (choice.jump > 0 && !state.controls.jump) {
+          press("jump", true);
+          releaseAt = state.tick + choice.jump;
+        }
+        if (choice.fire) press("fire", true);
+      }
+      state = tickHills(state);
+      continue;
+    }
+    const egg = boss.beaten >= 0 ? eggToFetch(state) : null;
+    if (egg !== null && state.tick - boss.beaten < 900) {
+      const middle = state.hero.x + heroWidth / 2;
+      press("left", egg + 64 < middle);
+      press("right", egg + 64 >= middle);
+      state = tickHills(state);
+      continue;
+    }
+    press("left", false);
+    press("right", true);
     if (state.controls.fire) press("fire", false);
     else if (
       state.hasFire &&

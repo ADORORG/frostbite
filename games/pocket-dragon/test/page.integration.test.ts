@@ -122,12 +122,14 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     expect(game.text("note")).toContain("your own claim");
   }, 40_000);
 
-  it("keeps the sound the player chose, and saves a change with the chapters reached and the bests", async () => {
+  it("keeps the sound the player chose, and saves a change with the chapters reached, the bests and the metaplasma banked", async () => {
     const { stored, window } = await driver({
       best: { castle: 0, hills: 7, woods: 0 },
+      plasma: 1234,
       sound: { effects: false, music: true, volume: 0.2 },
       unlocked: 2,
     });
+    expect(window.document.querySelector("#banked")?.textContent).toBe("1,234");
     const music = window.document.querySelector('[data-sound="music"]');
     expect(music?.textContent).toBe("Music on");
     expect(
@@ -137,6 +139,7 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     await settle();
     expect(stored.progress).toEqual({
       best: { castle: 0, hills: 7, woods: 0 },
+      plasma: 1234,
       sound: { effects: false, music: false, volume: 0.2 },
       unlocked: 2,
     });

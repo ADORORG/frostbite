@@ -1,3 +1,5 @@
+import type { Plasma } from "../plasma.ts";
+
 // The shape of the guild's quest: where Glitchy is, what the guild has done, and a cheer challenge when one is going on.
 export interface Spot {
   readonly x: number;
@@ -5,7 +7,22 @@ export interface Spot {
 }
 
 export type Facing = "down" | "left" | "right" | "up";
-export type CastleControl = "act" | "down" | "fire" | "left" | "right" | "up";
+// The ways, `act` and `fire`, and in a cheer challenge the hotkeys: a show by its number (1 to 5), a quick cheer, evade, and a charm.
+export type CastleControl =
+  | "act"
+  | "charm"
+  | "down"
+  | "evade"
+  | "fire"
+  | "left"
+  | "quick"
+  | "right"
+  | "show1"
+  | "show2"
+  | "show3"
+  | "show4"
+  | "show5"
+  | "up";
 export const castleControls: readonly CastleControl[] = [
   "left",
   "right",
@@ -13,9 +30,26 @@ export const castleControls: readonly CastleControl[] = [
   "down",
   "act",
   "fire",
+  "show1",
+  "show2",
+  "show3",
+  "show4",
+  "show5",
+  "quick",
+  "evade",
+  "charm",
 ];
 
 export interface Battle {
+  // The keeper's last grumble attack (by its place in the keeper's list; -1 before the first) and whether it missed (evaded or blocked).
+  readonly attack: number;
+  readonly dodged: boolean;
+  // The guild is evading the next grumble; a quick cheer keeps the next one small; the shield charm blocks this many; the star charm
+  // makes the next show three times as strong.
+  readonly evading: boolean;
+  readonly gentle: boolean;
+  readonly shield: number;
+  readonly star: boolean;
   // The move picked in the menu, by its place in the list of moves the guild has.
   readonly choice: number;
   // Whether the first move against this keeper was its favourite (null before the first move).
@@ -40,11 +74,16 @@ export interface Message {
 export interface CastleState {
   readonly bannerRaised: boolean;
   readonly battle: Battle | null;
+  // The secret charms found on the map (spirit, star, shield) and those used up in challenges.
+  readonly charms: readonly boolean[];
+  readonly charmsUsed: readonly boolean[];
   readonly cheered: readonly boolean[];
   readonly controls: Readonly<Record<CastleControl, boolean>>;
   readonly crossedRiver: boolean;
   readonly ended: boolean;
   readonly escapedWoods: boolean;
+  // Grumbles the guild evaded.
+  readonly evades: number;
   readonly facing: Facing;
   // Each keeper's favourite move, laid out from the seed.
   readonly favourites: readonly number[];
@@ -57,6 +96,7 @@ export interface CastleState {
   readonly naps: number;
   readonly opened: readonly boolean[];
   readonly perfectPicks: number;
+  readonly plasma: Plasma;
   readonly pushed: readonly boolean[];
   readonly lilies: boolean;
   readonly rng: number;

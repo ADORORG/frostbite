@@ -4,6 +4,7 @@ import {
   bolt,
   boulders,
   brambles,
+  charmSpots,
   foes,
   friends,
   ice,
@@ -139,6 +140,15 @@ export function arrive(state: CastleState): CastleState {
         taken: passed.taken.map((done, index) => done || index === item),
       },
       `got-${String(item)}`,
+    );
+  const charm = at(charmSpots, state.x, state.y);
+  if (charm >= 0 && state.charms[charm] !== true)
+    return say(
+      {
+        ...passed,
+        charms: passed.charms.map((found, index) => found || index === charm),
+      },
+      `found-charm-${String(charm)}`,
     );
   if (
     state.x === banner.x &&

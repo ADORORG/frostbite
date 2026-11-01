@@ -9,15 +9,20 @@ import {
 } from "./constants.ts";
 import type { WoodsState } from "./types.ts";
 
-// What stops Glitchy: trees, the frozen hedge until it is melted, and the moon gate until every clue stone has been read.
+// The moon gate opens for a dragon who has read every clue stone and built the egg launcher (found all its parts).
+export const gateOpen = (state: WoodsState): boolean =>
+  state.clues.filter(Boolean).length >= clueCount && state.parts.every(Boolean);
+
+// The cell (by `y * size + x`) a point of the woods is in.
 export const cellAt = (x: number, y: number): number =>
   Math.floor(y / cell) * size + Math.floor(x / cell);
 
+// What stops Glitchy: trees, the frozen hedge until it is melted, and the moon gate until it opens.
 export function blocks(state: WoodsState, index: number): boolean {
   const wall = state.level.walls[index];
   if (wall === undefined || wall === tree) return true;
   if (wall === frozen) return !state.melted;
-  if (wall === gate) return state.clues.filter(Boolean).length < clueCount;
+  if (wall === gate) return !gateOpen(state);
   return false;
 }
 

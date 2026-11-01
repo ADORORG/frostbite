@@ -1,9 +1,21 @@
 import type { RunInput } from "@ador/game-sdk/run-record";
 
-import { moves, showsOf } from "../../src/rules/castle/battle.ts";
+import {
+  evadeMove,
+  heldCharm,
+  menuOf,
+  moves,
+  showsOf,
+} from "../../src/rules/castle/battle.ts";
 import { maxTicks } from "../../src/rules/castle/constants.ts";
 import { castleRules } from "../../src/rules/castle/index.ts";
-import { boulders, brambles, items } from "../../src/rules/castle/places.ts";
+import {
+  boulders,
+  brambles,
+  charmSpots,
+  items,
+  king,
+} from "../../src/rules/castle/places.ts";
 import { startCastle, tickCastle } from "../../src/rules/castle/tick.ts";
 import type {
   CastleControl,
@@ -47,14 +59,24 @@ const meet = (
   stand,
 });
 
-export const quest = (skipSpark = false): readonly Task[] => [
+const charmAt = (charm: number): Task => ({
+  done: (s) => s.charms[charm] === true,
+  face: "down",
+  press: null,
+  stand: charmSpots[charm] ?? { x: 0, y: 0 },
+});
+
+export const quest = (skipSpark = false, charms = true): readonly Task[] => [
   fetch(0),
+  ...(charms ? [charmAt(0)] : []),
   meet({ x: 22, y: 25 }, "up", (s) => s.friends[0] === true),
   meet({ x: 23, y: 25 }, "up", (s) => s.pushed[0] === true),
   meet({ x: 30, y: 25 }, "right", (s) => s.pushed[1] === true),
   fetch(1),
+  ...(charms ? [charmAt(1)] : []),
   meet({ x: 24, y: 23 }, "up", (s) => s.friends[1] === true),
   meet({ x: 23, y: 22 }, "up", (s) => s.lilies),
+  ...(charms ? [charmAt(2)] : []),
   meet({ x: 9, y: 17 }, "left", (s) => s.melted, "fire"),
   fetch(2),
   meet({ x: 21, y: 17 }, "up", (s) => s.friends[2] === true),
@@ -79,6 +101,8 @@ export const quest = (skipSpark = false): readonly Task[] => [
 ];
 
 const ways: readonly Facing[] = ["up", "down", "left", "right"];
+// The hotkey of each show, by its place in `moves`.
+const showKeys = ["show1", "show2", "show3", "show4", "show5"] as const;
 
 function firstStep(state: CastleState, goal: Spot): Facing | null {
   const key = (x: number, y: number): number => y * 64 + x;
@@ -130,19 +154,26 @@ export function playCastle(
     set(control, true);
     set(control, false);
   };
-  const tasks = quest(options.skipSpark ?? false);
+  const tasks = quest(options.skipSpark ?? false, options.worstShow !== true);
   while (state.tick < maxTicks && !state.bannerRaised) {
     const { battle } = state;
     if (battle !== null) {
       for (const way of ways) set(way, false);
-      if (battle.phase === "choose") {
-        const shows = showsOf(state);
-        const wanted =
-          options.worstShow === true
-            ? (shows.find((m) => m !== battle.last) ?? 0)
-            : bestShow(state);
-        if (shows[battle.choice] !== wanted) tap("right");
+      if (battle.phase === "choose" && options.worstShow === true) {
+        const menu = menuOf(state);
+        const wanted = menu.find((m) => m !== battle.last) ?? 0;
+        if (menu[battle.choice] !== wanted) tap("right");
         else tap("act");
+      } else if (battle.phase === "choose") {
+        const opened = battle.firstFavourite !== null;
+        // The spirit charm when spirit runs low; the star and the shield for the king.
+        const charm = heldCharm(state);
+        const useful =
+          charm === 0 ? battle.spirit <= 5 : charm > 0 && battle.foe === king;
+        if (opened && useful) tap("charm");
+        else if (opened && state.evades === 0 && battle.last !== evadeMove)
+          tap("evade");
+        else tap(showKeys[bestShow(state)] ?? "show1");
       }
     } else if (state.step === null) {
       const task = tasks.find((t) => !t.done(state));

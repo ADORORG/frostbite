@@ -225,12 +225,19 @@ describe("the Whispering Woods' rules", () => {
     expect(opened.found?.kind).toBe("chest");
   });
 
-  it("keep the moon gate shut until all three clues are read, then let Glitchy out and take only the end", () => {
+  it("keep the moon gate shut until all three clues are read and the launcher is built, then let Glitchy out and take only the end", () => {
     const start = startWoods(11);
     const exit = placeOf(start.level.gate);
     const shut = hold(facing(start, exit), "up");
     expect(play(shut, 80).escaped).toBe(false);
-    const out = play({ ...shut, clues: [true, true, true] }, 80);
+    const read = { ...shut, clues: [true, true, true] };
+    expect(play(read, 80).escaped).toBe(false);
+    expect(play({ ...shut, parts: [true, true, true, true] }, 80).escaped).toBe(
+      false,
+    );
+    // With no eggs to launch, the launch round is over as soon as it starts.
+    const out = play({ ...read, parts: [true, true, true, true] }, 80);
+    expect(out.launch?.ended).toBe(true);
     expect(out.escaped).toBe(true);
     expect(out.finishTick).not.toBeNull();
     expect(woodsChapter.done(out)).toBe(true);

@@ -2,7 +2,6 @@ import type { RunInput } from "@ador/game-sdk/run-record";
 
 import {
   cell,
-  clueCount,
   frozen,
   gate,
   maxTicks,
@@ -11,14 +10,15 @@ import {
 } from "../../src/rules/woods/constants.ts";
 import { startWoods, woodsRules } from "../../src/rules/woods/index.ts";
 import { indexOf } from "../../src/rules/woods/maze.ts";
-import { cluesRead, tickWoods } from "../../src/rules/woods/tick.ts";
+import { tickWoods } from "../../src/rules/woods/tick.ts";
 import { fullTurn } from "../../src/rules/woods/trig.ts";
+import { bestShot, type Shot } from "./woods-launch-bot.ts";
 import type {
   Place,
   WoodsControl,
   WoodsState,
 } from "../../src/rules/woods/types.ts";
-import { cellAt } from "../../src/rules/woods/walk.ts";
+import { cellAt, gateOpen } from "../../src/rules/woods/walk.ts";
 
 // A player who knows the woods, for the Whispering Woods: it walks the paths (found by a breadth-first search over the cells) to
 // whatever is nearest of what is left (clue stones and chests, the lanterns and the frozen hedge, which it faces and breathes fire at,
@@ -40,7 +40,7 @@ const passable = (state: WoodsState, index: number): boolean => {
   return (
     wall === open ||
     (wall === frozen && state.melted) ||
-    (wall === gate && cluesRead(state) >= clueCount)
+    (wall === gate && gateOpen(state))
   );
 };
 
@@ -107,7 +107,10 @@ function nextGoal(state: WoodsState, hurry: boolean): Goal | null {
         goals.push({ aim: null, cells: new Set([placeIndex(place)]) });
     });
   take(state.level.clues, state.clues);
+  take(state.level.parts, state.parts);
   if (!hurry) {
+    take(state.level.eggs, state.eggs);
+    take(state.level.charms, state.charms);
     take(state.level.chests, state.chests);
     state.level.lanterns.forEach((place, at) => {
       if (state.lanterns[at] !== true)
@@ -128,7 +131,7 @@ function nextGoal(state: WoodsState, hurry: boolean): Goal | null {
       });
   }
   if (goals.length === 0)
-    return cluesRead(state) >= clueCount
+    return gateOpen(state)
       ? { aim: null, cells: new Set([state.level.gate]) }
       : null;
   const here = cellAt(state.x, state.y);
@@ -181,6 +184,25 @@ export function walkWoods(seed: number, plan: WoodsPlan = {}): Played {
       if (fireNow && Math.abs(turn) <= 6 && state.fireCooldown === 0)
         set("fire", true);
     }
+    state = tickWoods(state);
+  }
+  let shot: Shot | null = null;
+  while (state.tick < limit && state.launch !== null && !state.launch.ended) {
+    const { launch } = state;
+    set("fire", false);
+    if (launch.flying === null) {
+      shot ??= bestShot(state);
+      set("up", launch.aim < shot.aim);
+      set("down", launch.aim > shot.aim);
+      set("right", launch.power < shot.power);
+      set("left", launch.power > shot.power);
+      if (launch.aim === shot.aim && launch.power === shot.power) {
+        set("fire", true);
+        shot = null;
+      }
+    } else
+      for (const control of ["left", "right", "up", "down"] as const)
+        set(control, false);
     state = tickWoods(state);
   }
   const data = { tick: state.tick };

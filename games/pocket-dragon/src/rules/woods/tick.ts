@@ -7,10 +7,17 @@ import {
   frozen,
   gate,
   lanternReach,
+  magnetReach,
+  plasmaCatch,
+  plasmaReach,
+  plasmaSpeed,
   reach,
+  swiftSpeed,
   turnSpeed,
   walkSpeed,
 } from "./constants.ts";
+import { pullPlasma } from "../plasma.ts";
+import { startLaunch, tickLaunch } from "./launch.ts";
 import { along, fullTurn } from "./trig.ts";
 import { blocks, cellAt, slide } from "./walk.ts";
 import type { Place, WoodsState } from "./types.ts";
@@ -64,13 +71,48 @@ export function breatheFire(state: WoodsState): WoodsState {
   return breathed;
 }
 
-// One tick of the woods: Glitchy turns and walks, takes what is close, and steps through the moon gate if it is open.
+// What of `places` has been picked up after this tick: the very same list when nothing new was close, so a find shows as a new list.
+const gather = (
+  state: WoodsState,
+  places: readonly Place[],
+  had: readonly boolean[],
+): readonly boolean[] => {
+  const now = places.map(
+    (place, at) => had[at] === true || near(state, place, reach),
+  );
+  return now.some((got, at) => got !== had[at]) ? now : had;
+};
+
+// Picking up the launcher's parts, eggs and secret charms, and the metaplasma drifting to Glitchy.
+function pickUp(state: WoodsState, tick: number): WoodsState {
+  const parts = gather(state, state.level.parts, state.parts);
+  const eggs = gather(state, state.level.eggs, state.eggs);
+  const charms = gather(state, state.level.charms, state.charms);
+  const plasma = pullPlasma(state.plasma, state.level.motes, state.x, state.y, {
+    catchWithin: plasmaCatch,
+    reach: state.charms[2] === true ? magnetReach : plasmaReach,
+    speed: plasmaSpeed,
+  });
+  const found: WoodsState["found"] =
+    parts !== state.parts
+      ? { kind: parts.every(Boolean) ? "launcher" : "part", tick }
+      : charms !== state.charms
+        ? { kind: "charm", tick }
+        : eggs !== state.eggs
+          ? { kind: "egg", tick }
+          : state.found;
+  return { ...state, charms, eggs, found, parts, plasma };
+}
+
+// One tick of the woods: Glitchy turns and walks, takes what is close, and steps through the moon gate if it is open; out of the woods,
+// the launch round.
 export function tickWoods(state: WoodsState): WoodsState {
-  if (state.escaped) return { ...state, tick: state.tick + 1 };
+  if (state.escaped) return tickLaunch(state);
   const { controls } = state;
   const turn = (Number(controls.right) - Number(controls.left)) * turnSpeed;
   const angle = (((state.angle + turn) % fullTurn) + fullTurn) % fullTurn;
-  const speed = controls.up ? walkSpeed : controls.down ? -backSpeed : 0;
+  const forward = state.charms[0] === true ? swiftSpeed : walkSpeed;
+  const speed = controls.up ? forward : controls.down ? -backSpeed : 0;
   const [dx, dy] = along(angle, speed);
   const turned = { ...state, angle };
   const moved = speed === 0 ? turned : { ...turned, ...slide(turned, dx, dy) };
@@ -97,23 +139,35 @@ export function tickWoods(state: WoodsState): WoodsState {
       : moonChest && !moved.moonChest
         ? { kind: "moon", tick }
         : moved.found;
-  const next: WoodsState = {
-    ...moved,
-    chests,
-    clues,
-    fireCooldown: Math.max(0, moved.fireCooldown - 1),
-    found,
-    moonChest,
+  const next: WoodsState = pickUp(
+    {
+      ...moved,
+      chests,
+      clues,
+      fireCooldown: Math.max(0, moved.fireCooldown - 1),
+      found,
+      moonChest,
+      tick,
+      visited:
+        moved.visited[here] === true
+          ? moved.visited
+          : moved.visited.map((seen, at) => seen || at === here),
+    },
     tick,
-    visited:
-      moved.visited[here] === true
-        ? moved.visited
-        : moved.visited.map((seen, at) => seen || at === here),
-  };
+  );
   return here === next.level.gate &&
     next.level.walls[here] === gate &&
     !blocks(next, here)
-    ? { ...next, escaped: true, finishTick: next.tick }
+    ? {
+        ...next,
+        escaped: true,
+        finishTick: next.tick,
+        launch: startLaunch(
+          next.eggs.filter(Boolean).length,
+          next.level.targets.length,
+          next.tick,
+        ),
+      }
     : next;
 }
 

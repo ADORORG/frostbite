@@ -14,3 +14,11 @@ export const spiritMax = 10;
 export const grumbles = [10, 11, 12, 18] as const;
 export const showTicks = 45;
 export const replyMost = 3;
+
+// A keeper's grumble back takes up to this much spirit (the king's one more); a quick cheer keeps it to one; a shield charm blocks two.
+export const kingExtra = 1;
+export const shieldBlocks = 2;
+// Metaplasma, in pixels (sixteen to a tile): it drifts to Glitchy from a tile and a half, two pixels a tick, and is gathered at four.
+export const plasmaReach = 24;
+export const plasmaSpeed = 2;
+export const plasmaCatch = 4;

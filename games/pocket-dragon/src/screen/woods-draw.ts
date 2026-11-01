@@ -13,6 +13,15 @@ import { fullTurn } from "../rules/woods/trig.ts";
 import type { Place, WoodsState } from "../rules/woods/types.ts";
 import { colour } from "./palette.ts";
 import { breath, minimap, woodsWords } from "./woods-hud.ts";
+import { drawLaunch } from "./woods-launch.ts";
+import {
+  charmPictures,
+  charmSeen,
+  eggPicture,
+  partPictures,
+  plasmaInView,
+  type Projector,
+} from "./woods-stash-look.ts";
 import {
   chestOpen,
   chestShut,
@@ -191,8 +200,36 @@ function thingsOf(state: WoodsState): readonly Thing[] {
       picture: state.lanterns[at] === true ? lanternLit : lanternDark,
       place,
     })),
+    ...level.parts.flatMap((place, at) =>
+      state.parts[at] === true
+        ? []
+        : [{ picture: partPictures[at] ?? eggPicture, place }],
+    ),
+    ...level.eggs.flatMap((place, at) =>
+      state.eggs[at] === true ? [] : [{ picture: eggPicture, place }],
+    ),
+    ...level.charms.flatMap((place, at) =>
+      charmSeen(state, at)
+        ? [{ picture: charmPictures[at] ?? eggPicture, place }]
+        : [],
+    ),
   ];
 }
+
+// Where a point of the woods (in cells) falls on the screen, for things smaller than a picture.
+const projectorOf = (view: View): Projector => {
+  const invert = 1 / (view.planeX * view.dy - view.dx * view.planeY);
+  return {
+    onScreen(x, y) {
+      const sx = x - view.px;
+      const sy = y - view.py;
+      const far = invert * (-view.planeY * sx + view.planeX * sy);
+      if (far <= 0.2) return null;
+      const across = invert * (view.dy * sx - view.dx * sy);
+      return { column: (width / 2) * (1 + across / far), far };
+    },
+  };
+};
 
 function things(
   context: CanvasRenderingContext2D,
@@ -245,10 +282,15 @@ export function drawWoods(
   context: CanvasRenderingContext2D,
   state: WoodsState,
 ): void {
+  if (state.escaped) {
+    drawLaunch(context, state);
+    return;
+  }
   const view = viewOf(state);
   sky(context, state);
   const depth = walls(context, state, view);
   things(context, state, view, depth);
+  plasmaInView(context, state, projectorOf(view), depth, horizon);
   breath(context, state);
   minimap(context, state);
   woodsWords(context, state);

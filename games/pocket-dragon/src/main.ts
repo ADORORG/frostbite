@@ -13,7 +13,7 @@ import { effects, tracks } from "./audio.ts";
 import { chapterTitles } from "./chapters.ts";
 import { instructions } from "./guide.ts";
 import { element } from "./page/elements.ts";
-import { attachHands } from "./page/hands.ts";
+import { attachHands, chapterOfKey } from "./page/hands.ts";
 import { startRun, type ChapterRun } from "./page/runs.ts";
 import { createView } from "./page/view.ts";
 import {
@@ -23,6 +23,7 @@ import {
   saved,
   withBest,
   withCleared,
+  withPlasma,
   withSound,
   type Progress,
 } from "./progress.ts";
@@ -80,7 +81,7 @@ function idleRun(id: ChapterId): ChapterRun {
 
 function show(): void {
   const shown = run ?? idleRun(chapter);
-  view.draw(shown, run === null, progress.best[shown.id]);
+  view.draw(shown, run === null, progress.best[shown.id], progress.plasma);
 }
 
 function showChapters(): void {
@@ -121,7 +122,10 @@ async function finish(finished: ChapterRun): Promise<void> {
   view.running(false);
   sound.sound.stopMusic();
   const record = finished.record();
-  progress = withBest(progress, finished.id, finished.score());
+  progress = withPlasma(
+    withBest(progress, finished.id, finished.score()),
+    finished.plasma(),
+  );
   const news = opened(finished);
   saveProgress();
   showChapters();
@@ -204,8 +208,12 @@ async function connect(): Promise<void> {
 
 // The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.
 attachHands(document.body, {
-  choose,
-  hold: (action, on) => void run?.hold(action, on),
+  // During a run every key goes to it; between runs, 1, 2 and 3 choose a chapter.
+  hold(action, on) {
+    if (loop.running()) run?.hold(action, on);
+    const chapter = chapterOfKey(action);
+    if (!loop.running() && on && chapter !== undefined) choose(chapter);
+  },
   pause: () => void (loop.running() && pause.toggle()),
   start: () => void (!startButton.disabled && begin()),
 });

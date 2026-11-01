@@ -1,3 +1,4 @@
+import { freshPlasma } from "../../src/rules/plasma.ts";
 import {
   groundRow,
   levelTiles,
@@ -13,6 +14,7 @@ import type {
   HillsState,
   Patrol,
   Spot,
+  Weather,
 } from "../../src/rules/hills/types.ts";
 
 // A stage of Egg Hills made by hand for the tests of the rules: flat ground from end to end with nothing on it, which each test fills
@@ -27,13 +29,18 @@ export interface Extras {
   readonly patrols?: readonly Patrol[];
   readonly pits?: readonly number[];
   readonly thorns?: readonly Spot[];
+  readonly weather?: Weather;
+  readonly charm?: Spot;
+  readonly motes?: readonly Spot[];
 }
 
 export function flatLevel(extras: Extras = {}): HillsLevel {
+  const weather = extras.weather ?? "fog";
   const ice = extras.ice ?? [];
   const pits = new Set(extras.pits ?? []);
   return {
     berry: extras.berry ?? far,
+    charm: extras.charm ?? far,
     checkpointX: 75 * tile,
     eggs: extras.eggs ?? [],
     gloomSpeed: 5,
@@ -44,10 +51,12 @@ export function flatLevel(extras: Extras = {}): HillsLevel {
     ),
     ice,
     iceAt: new Map(ice.map((cell, at) => [cell.column * 64 + cell.row, at])),
+    motes: extras.motes ?? [],
     patrols: extras.patrols ?? [],
     solid: new Set(),
     stage: 1,
     thorns: extras.thorns ?? [],
+    weather,
   };
 }
 
@@ -67,6 +76,7 @@ export function flatHills(
     })),
     level,
     melted: level.ice.map(() => false),
+    plasma: freshPlasma(level.motes),
     ...state,
   };
 }

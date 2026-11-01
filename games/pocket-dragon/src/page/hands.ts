@@ -2,14 +2,35 @@ import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
 
 import { chapterIds, type ChapterId } from "../rules/constants.ts";
 
-// What the player's hands can do, the same in every chapter: four ways to go, an action button and a fire button, start (Enter), pause
-// (P, or the button) and pick a chapter (1, 2 or 3). Each chapter says what the six mean to it (`runs.ts`). The keys are the arrows and
-// WASD; Space, E and Z are the action; F and X breathe fire. A touch screen has a button for each (any element with a `data-hold`).
-export const actions = ["left", "right", "up", "down", "act", "fire"] as const;
+// What the player's hands can do, the same in every chapter: four ways to go, an action button, a fire button, and the hotkeys of a
+// cheer challenge (1 to 5 for the shows, Q a quick cheer, E evade, C a charm); start (Enter) and pause (P, or the button). Each chapter
+// says what they mean to it (`runs.ts`); between runs, 1, 2 and 3 choose a chapter instead. The keys are the arrows and WASD; Space and Z
+// are the action; F and X breathe fire. A touch screen has a button for each (any element with a `data-hold`).
+export const actions = [
+  "left",
+  "right",
+  "up",
+  "down",
+  "act",
+  "fire",
+  "hot1",
+  "hot2",
+  "hot3",
+  "hot4",
+  "hot5",
+  "quick",
+  "evade",
+  "charm",
+] as const;
 export type Action = (typeof actions)[number];
 
+// The chapter a number key chooses between runs.
+export const chapterOfKey = (action: Action): ChapterId | undefined =>
+  action === "hot1" || action === "hot2" || action === "hot3"
+    ? chapterIds[Number(action.slice(3)) - 1]
+    : undefined;
+
 export interface Hands {
-  readonly choose: (chapter: ChapterId) => void;
   readonly hold: (action: Action, on: boolean) => void;
   readonly pause: () => void;
   readonly start: () => void;
@@ -21,27 +42,31 @@ const keys = {
   ArrowLeft: "left",
   ArrowRight: "right",
   ArrowUp: "up",
-  Digit1: "hills",
-  Digit2: "woods",
-  Digit3: "castle",
+  Digit1: "hot1",
+  Digit2: "hot2",
+  Digit3: "hot3",
+  Digit4: "hot4",
+  Digit5: "hot5",
   KeyA: "left",
+  KeyC: "charm",
   KeyD: "right",
-  KeyE: "act",
+  KeyE: "evade",
   KeyF: "fire",
+  KeyQ: "quick",
   KeyS: "down",
   KeyW: "up",
   KeyX: "fire",
   KeyZ: "act",
-  Numpad1: "hills",
-  Numpad2: "woods",
-  Numpad3: "castle",
+  Numpad1: "hot1",
+  Numpad2: "hot2",
+  Numpad3: "hot3",
+  Numpad4: "hot4",
+  Numpad5: "hot5",
   Space: "act",
 } as const;
 
 const actionNamed = (name: string | null | undefined): Action | undefined =>
   actions.find((action) => action === name);
-const chapterNamed = (name: string): ChapterId | undefined =>
-  chapterIds.find((chapter) => chapter === name);
 
 // Keys on the page, and the touch buttons. A key or finger held when the page is left is let go of, since its release would never be
 // seen. Returns a function that stops listening.
@@ -49,11 +74,6 @@ export function attachHands(root: HTMLElement, hands: Hands): () => void {
   const stopKeys = attachKeys(window, keys, (name, phase) => {
     if (name === "start" || name === "pause") {
       if (phase === "down") hands[name]();
-      return;
-    }
-    const chapter = chapterNamed(name);
-    if (chapter !== undefined) {
-      if (phase === "down") hands.choose(chapter);
       return;
     }
     const action = actionNamed(name);

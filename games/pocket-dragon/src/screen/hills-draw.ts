@@ -1,9 +1,11 @@
 import { block, sprite, wrap } from "@ador/game-sdk/pixels";
 
 import {
+  arenaX,
   bannerTicks,
   groundRow,
   heroHeight,
+  heroWidth,
   levelTiles,
   pixel,
   rows,
@@ -25,6 +27,8 @@ import {
   thorn,
 } from "./hills-things.ts";
 import { colour, hillSkies } from "./palette.ts";
+import { drawArena } from "./hills-boss.ts";
+import { hillsHud, plasma, secretCharm, weather } from "./hills-sky.ts";
 import { glitchyColours, glitchySide } from "./sprites.ts";
 import { write } from "./text.ts";
 
@@ -33,16 +37,24 @@ export const width = 256;
 export const height = 144;
 const tilePixels = tile / pixel;
 const stageNames = [
-  "MEADOW MORNING",
-  "BUTTERCUP AFTERNOON",
-  "SUNSET RIDGE",
+  "WINDY MEADOW",
+  "RAINY BUTTERCUP HILLS",
+  "FOGGY SUNSET RIDGE",
 ] as const;
 
-export const hillsCamera = (state: HillsState): number =>
-  Math.min(
+// The camera follows Glitchy, and once the boss fight begins it glides (over half a second) to the arena and stays there.
+export function hillsCamera(state: HillsState): number {
+  const follow = Math.min(
     Math.max(0, Math.round(state.hero.x / pixel) - 96),
     levelTiles * tilePixels - width,
   );
+  const { started } = state.boss;
+  if (started < 0 || state.hero.x + heroWidth < arenaX - 2 * tile)
+    return follow;
+  const lock = arenaX / pixel;
+  const glide = Math.min(30, state.tick - started);
+  return follow + Math.round(((lock - follow) * glide) / 30);
+}
 
 const px = (units: number): number => Math.round(units / pixel);
 
@@ -201,7 +213,7 @@ function banner(context: CanvasRenderingContext2D, state: HillsState): void {
     colour.white,
     "left",
   );
-  if (state.hasFire)
+  if (state.hasFire && state.boss.started < 0)
     write(context, "FIRE: F OR X", width - 4, 4, 7, colour.fireHot, "right");
   const since = state.tick - state.stageStart;
   if (since < bannerTicks) {
@@ -236,6 +248,11 @@ export function drawHills(
   backdrop(context, state, camera);
   ground(context, state, camera);
   things(context, state, camera);
+  plasma(context, state, camera);
+  secretCharm(context, state, camera);
+  drawArena(context, state, camera);
   hero(context, state, camera);
+  weather(context, state, camera);
   banner(context, state);
+  hillsHud(context, state);
 }

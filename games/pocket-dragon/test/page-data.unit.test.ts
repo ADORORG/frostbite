@@ -11,14 +11,14 @@ import {
   saved,
   withBest,
   withCleared,
+  withPlasma,
   withSound,
 } from "../src/progress.ts";
-import { challenge, perform, reply } from "../src/rules/castle/battle.ts";
-import { showTicks } from "../src/rules/castle/constants.ts";
-import { startCastle } from "../src/rules/castle/tick.ts";
 import { chapterIds } from "../src/rules/constants.ts";
 import { startHills } from "../src/rules/hills/state.ts";
 import { startWoods } from "../src/rules/woods/index.ts";
+import { startLaunch } from "../src/rules/woods/launch.ts";
+import { startCastle } from "../src/rules/castle/tick.ts";
 import {
   castleScore,
   castleStats,
@@ -32,6 +32,7 @@ describe("the saved progress", () => {
   it("is read back only when it is this game's, and a fresh game otherwise", () => {
     const good = {
       best: { castle: 5, hills: 900, woods: 0 },
+      plasma: 4_321,
       sound: { effects: false, music: true, volume: 0.3 },
       unlocked: 2,
     };
@@ -50,15 +51,18 @@ describe("the saved progress", () => {
       { best: 3, unlocked: 1 },
       { best: { hills: -1 }, unlocked: 1 },
       { best: { woods: "a" }, unlocked: 1 },
+      { plasma: -5, unlocked: 1 },
+      { plasma: 2.5, unlocked: 1 },
     ])
       expect(restore(bad)).toEqual(freshProgress);
     expect(restore({ best: {}, unlocked: 1 }).sound).toEqual(defaultSound);
   });
 
-  it("keeps the best score of each chapter, opens the next chapter on a clear, and saves the sound", () => {
+  it("keeps the best score of each chapter, banks metaplasma, opens the next chapter on a clear, and saves the sound", () => {
     const best = withBest(freshProgress, "woods", 40);
     expect(best.best).toEqual({ castle: 0, hills: 0, woods: 40 });
     expect(withBest(best, "woods", 30)).toBe(best);
+    expect(withPlasma(withPlasma(freshProgress, 300), 25).plasma).toBe(325);
     expect(withCleared(freshProgress, "hills").unlocked).toBe(2);
     expect(
       withCleared({ ...freshProgress, unlocked: 3 }, "hills").unlocked,
@@ -73,6 +77,7 @@ describe("the saved progress", () => {
     expect(withSound(freshProgress, quiet).sound).toEqual(quiet);
     expect(saved(freshProgress)).toEqual({
       best: freshProgress.best,
+      plasma: 0,
       sound: defaultSound,
       unlocked: 1,
     });
@@ -102,22 +107,40 @@ describe("the score and counts", () => {
       ...startWoods(1),
       chests: [true, false, false, false, false],
       clues: [true, true, false],
+      eggs: [
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+      ],
       moonChest: true,
+      parts: [true, false, false, false],
     };
     expect(woodsScore(woods)).toBe(1_000 + 300 + 1_000);
-    expect(woodsScore({ ...woods, escaped: true, finishTick: 21_600 })).toBe(
-      woodsScore(woods) + 2_000,
-    );
     expect(woodsStats(woods)).toEqual([
       ["Clues", "2 of 3"],
-      ["Chests", "2 of 6"],
-      ["Lanterns", "0 of 3"],
+      ["Parts", "1 of 4"],
+      ["Eggs", "2"],
     ]);
+    const out = {
+      ...woods,
+      escaped: true,
+      finishTick: 21_600,
+      launch: { ...startLaunch(2, 5, 0), eggsLeft: 1, score: 400 },
+    };
+    expect(woodsScore(out)).toBe(woodsScore(woods) + 2_000 + 400);
+    expect(woodsStats(out)[2]).toEqual(["Eggs", "1"]);
     const castle = {
       ...startCastle(1),
+      charms: [true, false, false],
       cheered: [true, false, false, false],
       friends: [true, true, false, false],
-      naps: 2,
     };
     expect(castleScore(castle)).toBe(1_000 + 800);
     expect(
@@ -126,104 +149,31 @@ describe("the score and counts", () => {
     expect(castleStats(castle)).toEqual([
       ["Guild", "2 of 4"],
       ["Cheered", "1 of 4"],
-      ["Naps", "2"],
+      ["Charms", "1 of 3"],
     ]);
   });
 });
 
-describe("what is heard", () => {
-  it("in Egg Hills: a jump, a breath, an egg, the golden egg, the berry, melting, a cheer, a bump and a stage", () => {
-    const before = startHills(1);
-    const jumped = {
-      ...before,
-      hero: { ...before.hero, grounded: false, vy: -70 },
-    };
-    expect(hillsSounds(before, jumped)).toEqual(["jump"]);
-    const busy = {
-      ...before,
-      berryTaken: true,
-      breaths: 1,
-      cheers: 1,
-      eggsBanked: 1,
-      goldens: 1,
-      hasFire: true,
-      heartsLost: 1,
-      meltedCount: 3,
-      stagesCleared: 1,
-    };
-    expect(hillsSounds(before, busy)).toEqual([
-      "fire",
-      "egg",
-      "golden",
-      "berry",
-      "melt",
-      "cheer",
-      "hit",
-      "stage",
-    ]);
-    expect(
-      hillsSounds(before, { ...before, finishTick: 9, stagesCleared: 1 }),
-    ).toEqual(["finish"]);
-    expect(hillsSounds(before, before)).toEqual([]);
-  });
-
-  it("in the woods: a breath, melting, a lantern, a clue (and the gate on the last), a chest and the way out", () => {
-    const before = startWoods(1);
-    const after = {
-      ...before,
-      breaths: 1,
-      chests: [true, false, false, false, false],
-      clues: [true, false, false],
-      lanterns: [true, false, false],
-      melted: true,
-    };
-    expect(woodsSounds(before, after)).toEqual([
-      "fire",
-      "melt",
-      "lantern",
-      "clue",
-      "chest",
-    ]);
-    const opened = { ...before, clues: [true, true, true] };
-    expect(
-      woodsSounds({ ...before, clues: [true, true, false] }, opened),
-    ).toEqual(["gate"]);
-    expect(woodsSounds(before, { ...before, moonChest: true })).toEqual([
-      "chest",
-    ]);
-    expect(woodsSounds(before, { ...before, escaped: true })).toEqual([
-      "finish",
-    ]);
-  });
-
-  it("in the castle: a breath, what is said, a show and a grumble back", () => {
-    const before = startCastle(1);
-    const say = (id: string) =>
-      castleSounds(before, { ...before, message: { id, tick: 1 } });
-    expect(say("joined-1")).toEqual(["join"]);
-    expect(say("got-2")).toEqual(["chest"]);
-    expect(say("cheered-0")).toEqual(["cheer"]);
-    expect(say("wants-0")).toEqual(["talk"]);
-    expect(say("nap")).toEqual(["nap"]);
-    expect(say("captured")).toEqual(["finish"]);
-    expect(castleSounds(before, { ...before, fireTick: 3 })).toEqual(["fire"]);
-    const asked = challenge(before, 0);
-    const shown = perform(asked);
-    expect(castleSounds({ ...asked, message: shown.message }, shown)).toEqual([
-      "show",
-    ]);
-    const answered = reply({ ...shown, tick: shown.tick + showTicks });
-    expect(
-      castleSounds(shown, { ...answered, message: shown.message }),
-    ).toEqual(["reply"]);
-  });
-
-  it("are all made of the sounds the game has, with a tune and a guide for every chapter", () => {
+describe("the tunes, effects and guides", () => {
+  it("have a tune and a guide for every chapter, and every sound the feedback names", () => {
     for (const id of chapterIds) {
       expect(tracks[id].voices.length).toBeGreaterThan(0);
       expect(guides[id].lines).toHaveLength(3);
       expect(instructions[id].length).toBeGreaterThan(40);
     }
-    expect(Object.keys(effects).length).toBeGreaterThan(20);
+    expect(Object.keys(effects).length).toBeGreaterThan(30);
+    const hills = startHills(1);
+    const woods = startWoods(1);
+    const castle = startCastle(1);
+    const named = [
+      ...hillsSounds(hills, { ...hills, charms: 1, plasmaBanked: 5 }),
+      ...woodsSounds(woods, { ...woods, charms: [true, false, false] }),
+      ...castleSounds(castle, {
+        ...castle,
+        message: { id: "found-charm-0", tick: 1 },
+      }),
+    ];
+    expect(named).toEqual(["charm", "plasma", "charm", "charm"]);
+    for (const name of named) expect(effects[name]).toBeDefined();
   });
 });

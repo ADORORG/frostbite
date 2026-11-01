@@ -229,6 +229,28 @@ export const effects = {
     tone("square", 450, 900, 0.1, 0.25, 0.05),
   ],
   talk: commonEffects.click,
+  burst: [
+    tone("noise", 0, 0, 0.4, 0.3),
+    tone("square", 300, 1200, 0.4, 0.25, 0.05),
+  ],
+  charm: [
+    tone("sine", 988, 1319, 0.1, 0.3),
+    tone("sine", 1319, 1760, 0.12, 0.3, 0.08),
+    tone("sine", 1760, 2349, 0.2, 0.25, 0.16),
+  ],
+  evade: [tone("sine", 1200, 600, 0.15, 0.25)],
+  freed: [tone("sine", 523, 1047, 0.3, 0.3)],
+  ghost: [tone("sine", 700, 300, 0.2, 0.3)],
+  guard: [tone("square", 600, 200, 0.2, 0.25)],
+  laser: [tone("sawtooth", 1400, 300, 0.3, 0.25)],
+  launch: [tone("square", 200, 600, 0.15, 0.25)],
+  plasma: [tone("sine", 1400, 1800, 0.05, 0.12)],
+  quick: [tone("square", 1000, 1400, 0.06, 0.25)],
+  target: [tone("square", 784, 1568, 0.15, 0.3)],
+  warning: [
+    tone("square", 880, 880, 0.08, 0.2),
+    tone("square", 880, 880, 0.08, 0.2, 0.15),
+  ],
 } as const satisfies Record<string, Effect>;
 
 export type EffectName = keyof typeof effects;

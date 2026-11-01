@@ -1,3 +1,4 @@
+import { sharedMarks } from "../shared-marks.ts";
 import { swiftTicks } from "./constants.ts";
 import { king } from "./places.ts";
 import type { CastleState } from "./types.ts";
@@ -23,6 +24,23 @@ const marks: readonly (readonly [string, (state: CastleState) => boolean])[] = [
     "guild-swift",
     (s) => s.bannerRaised && (s.finishTick ?? swiftTicks + 1) <= swiftTicks,
   ],
+  ["guild-evade", (s) => s.evades >= 1],
+  ["guild-charm", (s) => s.charmsUsed.some(Boolean)],
+  // The masterful Pocket Dragon charm: the castle captured with the whole guild and every secret charm, never a nap, and every keeper
+  // cheered up with its favourite show first.
+  [
+    "masterful-charm",
+    (s) =>
+      s.bannerRaised &&
+      friendsJoined(s) >= s.friends.length &&
+      s.charms.every(Boolean) &&
+      s.naps === 0 &&
+      s.perfectPicks >= s.cheered.length,
+  ],
+  ...sharedMarks<CastleState>(
+    (s) => s.charms.filter(Boolean).length,
+    (s) => s.plasma.gathered,
+  ),
 ];
 
 export const castleMilestones = marks.map(([id]) => id);

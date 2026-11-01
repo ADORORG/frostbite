@@ -4,6 +4,7 @@ import {
   lanternCount,
   swiftTicks,
 } from "./constants.ts";
+import { sharedMarks } from "../shared-marks.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./tick.ts";
 import type { WoodsState } from "./types.ts";
 
@@ -25,6 +26,12 @@ const marks: readonly (readonly [string, (state: WoodsState) => boolean])[] = [
     "woods-everything",
     (s) => s.escaped && chestsOpened(s) >= chestCount && s.moonChest,
   ],
+  ["woods-launcher", (s) => s.parts.every(Boolean)],
+  ["woods-launch-1000", (s) => (s.launch?.score ?? 0) >= 1_000],
+  ...sharedMarks<WoodsState>(
+    (s) => s.charms.filter(Boolean).length,
+    (s) => s.plasma.gathered,
+  ),
 ];
 
 export const woodsMilestones = marks.map(([id]) => id);

@@ -16,6 +16,12 @@ export const castleWords: Readonly<Record<string, string>> = {
   "got-1": "A SHINY SHELL!",
   "got-2": "A BAG OF FLOWER SEEDS!",
   "got-3": "A JAR OF FIREFLIES!",
+  "charm-0": "SPIRIT CHARM! THE GUILD FEELS BRAND NEW!",
+  "charm-1": "STAR CHARM! THE NEXT SHOW SHINES THREE TIMES AS BRIGHT!",
+  "charm-2": "SHIELD CHARM! THE NEXT TWO GRUMBLES WILL BOUNCE OFF!",
+  "found-charm-0": "A SECRET SPIRIT CHARM! PRESS C IN A CHALLENGE TO USE IT.",
+  "found-charm-1": "A SECRET STAR CHARM! PRESS C IN A CHALLENGE TO USE IT.",
+  "found-charm-2": "A SECRET SHIELD CHARM! PRESS C IN A CHALLENGE TO USE IT.",
   ice: "FROZEN SOLID. TRY BREATHING FIRE WITH F!",
   "joined-0": "BOLT JOINED THE GUILD! BUMP A BOULDER TO PUSH IT.",
   "joined-1": "SPLASH JOINED! BUMP THE FORD TO GROW LILY PADS.",
@@ -23,7 +29,8 @@ export const castleWords: Readonly<Record<string, string>> = {
   "joined-3": "SPARK JOINED! THE GUILD IS COMPLETE!",
   lilies: "SPLASH GREW LILY PADS ACROSS THE FORD!",
   melted: "YOUR FIRE MELTED THE ICE!",
-  nap: "YOUR GUILD TOOK A NAP AND WOKE UP REFRESHED. TRY AGAIN!",
+  nap: "YOUR GUILD TOOK A NAP AND WOKE UP REFRESHED. KEEP GOING!",
+  "not-yet": "THAT FRIEND HAS NOT JOINED YOUR GUILD YET!",
   parted: "BLOOM ASKED THE BRAMBLES TO PART!",
   pushed: "BOLT PUSHED THE BOULDER OUT OF THE WAY!",
   river: "TOO DEEP TO CROSS. A WATER FRIEND COULD HELP!",
@@ -55,4 +62,21 @@ export const keeperNames = [
   "HALL GUARD",
   "TOWER GUARD",
   "GRUMBLE KING",
+] as const;
+
+// Every move in a challenge, by its number (`moves`, then quick cheer, evade, charm), and its hotkey.
+export const moveNames = [
+  ...showNames,
+  "QUICK CHEER",
+  "EVADE",
+  "CHARM",
+] as const;
+export const moveKeys = ["1", "2", "3", "4", "5", "Q", "E", "C"] as const;
+
+// Each keeper's three grumble attacks.
+export const attackNames = [
+  ["GRUMPY GLARE", "HUFF AND PUFF", "STOMP OF SULKS"],
+  ["SIGH STORM", "ECHO GRUMBLE", "ARMS FOLDED"],
+  ["TOWER TANTRUM", "COLD SHOULDER", "SULKY SHADOW"],
+  ["ROYAL GRUMBLE", "THRONE THUMP", "CROWN FROWN"],
 ] as const;

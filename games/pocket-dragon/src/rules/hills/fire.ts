@@ -10,6 +10,7 @@ import {
   maxFires,
   mouthDrop,
   pixel,
+  rainFireLife,
 } from "./constants.ts";
 import { solidAt, tilesUnder, touching } from "./collide.ts";
 import type { Fireball, Gloom, HillsState } from "./types.ts";
@@ -25,7 +26,7 @@ export function breathe(state: HillsState): HillsState {
     return state;
   const { hero } = state;
   const fireball: Fireball = {
-    life: fireLife,
+    life: state.level.weather === "rain" ? rainFireLife : fireLife,
     vx: hero.facing * fireSpeed,
     x:
       hero.facing > 0

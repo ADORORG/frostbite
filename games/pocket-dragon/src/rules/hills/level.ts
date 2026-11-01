@@ -1,4 +1,11 @@
-import { gloomSpeeds, groundRow, levelTiles, tile } from "./constants.ts";
+import { sortedMotes } from "../plasma.ts";
+import {
+  arenaTiles,
+  gloomSpeeds,
+  groundRow,
+  levelTiles,
+  tile,
+} from "./constants.ts";
 import {
   berry,
   cloud,
@@ -10,18 +17,20 @@ import {
   ledges,
   meadow,
   perch,
+  secret,
   thorn,
   thornCloud,
   type Stretch,
 } from "./layout.ts";
-import type { HillsLevel } from "./types.ts";
+import type { HillsLevel, Spot, Weather } from "./types.ts";
 
 // A stage is laid out once, from the run's seed and the stage's number. Stage one is gentle: flat meadows, narrow pits, a few slow
 // gloomlings. Stage two adds wider pits, thorn bushes and gloomlings in pairs; stage three has pits close together and the most ice. On
 // every stage the fire berry comes before the first ice wall, there is one golden egg on a high ledge, and there are always enough
-// eggs, gloomlings and ice blocks for every mark to be possible.
+// eggs, gloomlings and ice blocks for every mark to be possible. Each stage hides a secret charm up cloud steps, has metaplasma all
+// along it, its own weather (wind, then rain, then fog), and ends in the boss's arena: a flat screen under her high ledge.
 const startFlat = 8;
-const endFlat = 12;
+const endFlat = arenaTiles + 4;
 const longestStretch = 17;
 const checkpointAt = 75;
 const eggEvery = 6;
@@ -37,6 +46,27 @@ const mixes: readonly (readonly Stretch[])[] = [
   [gap(2), gap(2), doubleGap, doubleGap, thorn, thornCloud, thornCloud, ledges],
 ];
 
+const weathers: readonly Weather[] = ["wind", "rain", "fog"];
+
+// Metaplasma floats one to three tiles over the ground (over a pit, as if the ground were there), with an extra mote every third tile.
+function motesOf(ground: readonly number[], stage: number): readonly Spot[] {
+  const motes: Spot[] = [];
+  for (let column = 4; column < levelTiles - 1; column += 1) {
+    const top = Math.min(ground[column] ?? groundRow, groundRow);
+    const lift = 1 + ((column * 5 + stage) % 3);
+    motes.push({
+      x: column * tile + tile / 2,
+      y: (top - lift) * tile + tile / 2,
+    });
+    if (column % 3 === 0)
+      motes.push({
+        x: column * tile + tile / 4,
+        y: (top - lift - 1) * tile + tile / 2,
+      });
+  }
+  return sortedMotes(motes);
+}
+
 export const stageSeed = (seed: number, stage: number): number =>
   Math.imul((seed ^ Math.imul(stage, 0x9e37_79b1)) >>> 0, 0x85eb_ca6b) >>> 0;
 
@@ -48,6 +78,7 @@ export function generateHills(seed: number, stage = 1): HillsLevel {
   const at = Math.max(0, Math.min(2, stage - 1));
   const mix = pick(mixes, at, []);
   const perchAt = 40 + layout.roll(50);
+  const secretAt = 50 + layout.roll(50);
   layout.flat(0, startFlat, groundRow);
   let column = startFlat;
   let checkpoint = 0;
@@ -69,6 +100,8 @@ export function generateHills(seed: number, stage = 1): HillsLevel {
       column += 5;
     } else if (layout.golden === null && column >= perchAt)
       column += perch(layout, column, groundRow);
+    else if (layout.charm === null && column >= secretAt)
+      column += secret(layout, column, groundRow);
     else if (walls < wantWalls) {
       walls += 1;
       column += iceWall(layout, column, groundRow);
@@ -86,21 +119,27 @@ export function generateHills(seed: number, stage = 1): HillsLevel {
       );
   }
   layout.flat(column, levelTiles - column, groundRow);
+  // Madame Vex's ledge, over the portal and out of reach.
+  for (let at = levelTiles - 4; at < levelTiles; at += 1)
+    layout.platform(at, groundRow - 5);
   return {
     berry: layout.berry ?? { x: 0, y: 0 },
+    charm: layout.charm ?? { x: 0, y: 0 },
     checkpointX: checkpoint * tile,
     eggs: layout.eggs,
     gloomSpeed: pick(gloomSpeeds, at, 5),
-    goalX: (levelTiles - 4) * tile,
+    goalX: (levelTiles - 3) * tile,
     golden: layout.golden ?? { x: 0, y: 0 },
     ground: layout.ground,
     ice: layout.ice,
     iceAt: new Map(
       layout.ice.map((cell, index) => [cell.column * 64 + cell.row, index]),
     ),
+    motes: motesOf(layout.ground, stage),
     patrols: layout.patrols,
     solid: layout.solid,
     stage,
     thorns: layout.thorns,
+    weather: pick(weathers, at, "wind"),
   };
 }

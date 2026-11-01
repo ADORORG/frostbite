@@ -6,7 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { freshProgress } from "../src/progress.ts";
 import { buttonsIn, element } from "../src/page/elements.ts";
-import { attachHands } from "../src/page/hands.ts";
+import {
+  actions,
+  attachHands,
+  chapterOfKey,
+  type Action,
+} from "../src/page/hands.ts";
 import { startRun } from "../src/page/runs.ts";
 import { createView } from "../src/page/view.ts";
 import { surface } from "./support/canvas.ts";
@@ -27,18 +32,13 @@ const touch = (target: Element, type: string) =>
     new MouseEvent(type, { bubbles: true, cancelable: true }),
   );
 const hands = () => {
-  const handed = {
-    choose: vi.fn(),
-    hold: vi.fn(),
-    pause: vi.fn(),
-    start: vi.fn(),
-  };
+  const handed = { hold: vi.fn(), pause: vi.fn(), start: vi.fn() };
   stops.push(attachHands(document.body, handed));
   return handed;
 };
 
 describe("the player's hands", () => {
-  it("hold the six actions on their keys while the keys are down", () => {
+  it("hold each action on its keys while the keys are down, the challenge hotkeys among them", () => {
     const handed = hands();
     for (const [code, action] of [
       ["ArrowLeft", "left"],
@@ -50,10 +50,14 @@ describe("the player's hands", () => {
       ["ArrowDown", "down"],
       ["KeyS", "down"],
       ["Space", "act"],
-      ["KeyE", "act"],
       ["KeyZ", "act"],
       ["KeyF", "fire"],
       ["KeyX", "fire"],
+      ["Digit1", "hot1"],
+      ["Numpad5", "hot5"],
+      ["KeyQ", "quick"],
+      ["KeyE", "evade"],
+      ["KeyC", "charm"],
     ] as const) {
       key("keydown", code);
       expect(handed.hold).toHaveBeenLastCalledWith(action, true);
@@ -62,16 +66,23 @@ describe("the player's hands", () => {
     }
   });
 
-  it("start on Enter, pause on P and choose a chapter on 1, 2 or 3, each on the press alone", () => {
+  it("start on Enter and pause on P on the press alone, and know which chapter a number key chooses between runs", () => {
     const handed = hands();
-    for (const code of ["Enter", "KeyP", "Digit2", "Numpad3"]) {
+    for (const code of ["Enter", "KeyP"]) {
       key("keydown", code);
       key("keyup", code);
     }
     expect(handed.start).toHaveBeenCalledTimes(1);
     expect(handed.pause).toHaveBeenCalledTimes(1);
-    expect(handed.choose.mock.calls).toEqual([["woods"], ["castle"]]);
     expect(handed.hold).not.toHaveBeenCalled();
+    const asked: readonly Action[] = ["hot1", "hot2", "hot3", "hot4", "quick"];
+    expect(asked.map(chapterOfKey)).toEqual([
+      "hills",
+      "woods",
+      "castle",
+      undefined,
+      undefined,
+    ]);
   });
 
   it("hold a touch button while a finger is on it, and let everything go when the page is left", () => {
@@ -85,7 +96,7 @@ describe("the player's hands", () => {
     touch(document.body, "pointerdown");
     expect(handed.hold).toHaveBeenCalledTimes(2);
     window.dispatchEvent(new Event("blur"));
-    expect(handed.hold).toHaveBeenCalledTimes(8);
+    expect(handed.hold).toHaveBeenCalledTimes(2 + actions.length);
   });
 });
 
@@ -97,6 +108,7 @@ describe("a chapter's run as the page plays it", () => {
     run.hold("up", true);
     run.hold("act", false);
     run.hold("down", true);
+    run.hold("quick", true);
     expect(run.record().inputs.map(({ type }) => type)).toEqual([
       "jump",
       "end",
@@ -109,10 +121,16 @@ describe("a chapter's run as the page plays it", () => {
       "act",
       "fire",
     ]);
-    expect(startRun("castle", 4).id).toBe("castle");
+    const castle = startRun("castle", 4);
+    expect(castle.uses).toEqual(actions);
+    castle.hold("hot2", true);
+    expect(castle.record().inputs[0]).toEqual({
+      data: { on: 1, tick: 0 },
+      type: "show2",
+    });
   });
 
-  it("plays, scores and draws the same for every chapter", () => {
+  it("plays, scores, counts metaplasma and draws the same for every chapter", () => {
     for (const id of ["hills", "woods", "castle"] as const) {
       const run = startRun(id, 4);
       expect(run.tick()).toEqual(expect.any(Array));
@@ -120,6 +138,7 @@ describe("a chapter's run as the page plays it", () => {
       expect(run.cleared()).toBe(false);
       expect(run.earned()).toEqual([]);
       expect(run.score()).toBe(0);
+      expect(run.plasma()).toBeGreaterThanOrEqual(0);
       expect(run.stats()).toHaveLength(3);
       const screen = surface();
       run.draw(screen.context);
@@ -129,20 +148,38 @@ describe("a chapter's run as the page plays it", () => {
 });
 
 describe("the page's view", () => {
-  it("draws the run twice its size with its counts, and the guide on an idle screen", () => {
+  it("draws the run twice its size with its counts and the metaplasma banked, and the guide on an idle screen", () => {
     const screen = surface();
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
       screen.context,
     );
     const view = createView();
-    view.draw(startRun("woods", 4), true, 70);
+    view.draw(startRun("woods", 4), true, 70, 12_345);
     expect(element("screen", "canvas").width).toBe(512);
     expect(screen.transforms).toEqual([[2, 0, 0, 2, 0, 0]]);
     expect(element("score", "strong").textContent).toBe("0");
     expect(element("best", "strong").textContent).toBe("70");
+    expect(element("plasma", "strong").textContent).toBe("0");
+    expect(element("banked", "strong").textContent).toBe("12,345");
     expect(element("stat-0-label", "span").textContent).toBe("Clues");
-    expect(element("stat-1", "strong").textContent).toBe("0 of 6");
+    expect(element("stat-1", "strong").textContent).toBe("0 of 4");
     expect(screen.texts()).toContain("THE WHISPERING WOODS");
+    const playing = {
+      ...startRun("hills", 4),
+      plasma: () => 7,
+      score: () => 40,
+    };
+    view.draw(playing, false, 70, 12_346);
+    expect(element("score", "strong").textContent).toBe("40");
+    expect(element("plasma", "strong").textContent).toBe("7");
+    expect(screen.transforms).toHaveLength(2);
+  });
+
+  it("still keeps the counts when the screen cannot be drawn on", () => {
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    createView().draw(startRun("castle", 4), true, 3, 9);
+    expect(element("best", "strong").textContent).toBe("3");
+    expect(element("banked", "strong").textContent).toBe("9");
   });
 
   it("opens only the chapters reached, offers each chapter's touch buttons, and lists what was earned", () => {
@@ -157,9 +194,11 @@ describe("the page's view", () => {
     expect(woods?.getAttribute("aria-pressed")).toBe("true");
     expect(castle?.querySelector("span")?.textContent).toBe("🔒");
     expect(element("act", "button").textContent).toBe("Fire");
-    expect(
-      buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold),
-    ).toEqual(["act"]);
+    const hidden = () =>
+      buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold);
+    expect(hidden()).toEqual(["act", "quick", "evade", "charm"]);
+    view.chapters("castle", { ...freshProgress, unlocked: 3 }, false);
+    expect(hidden()).toEqual([]);
     view.chapters("woods", freshProgress, true);
     expect(
       buttonsIn(document, "[data-chapter]").every((button) => button.disabled),

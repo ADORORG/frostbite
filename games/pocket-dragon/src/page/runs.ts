@@ -8,6 +8,7 @@ import {
   type ChapterPlay,
 } from "../chapters.ts";
 import { castleSounds, hillsSounds, woodsSounds } from "../feedback.ts";
+import { plasmaGathered } from "../rules/hills/milestones.ts";
 import type { CastleControl, CastleState } from "../rules/castle/types.ts";
 import type { ChapterId } from "../rules/constants.ts";
 import type { Running } from "../rules/held.ts";
@@ -39,6 +40,8 @@ export interface ChapterRun {
   earned(): readonly string[];
   ended(): boolean;
   hold(action: Action, on: boolean): void;
+  // Metaplasma gathered in the run.
+  plasma(): number;
   record(): RunRecord;
   score(): number;
   stats(): readonly Stat[];
@@ -50,6 +53,7 @@ interface Look<Control extends string, State extends Running<Control>> {
   readonly cleared: (state: State) => boolean;
   readonly draw: (context: CanvasRenderingContext2D, state: State) => void;
   readonly means: Readonly<Partial<Record<Action, Control>>>;
+  readonly plasma: (state: State) => number;
   readonly play: ChapterPlay<Control, State>;
   readonly score: (state: State) => number;
   readonly sounds: (before: State, after: State) => readonly EffectName[];
@@ -66,6 +70,7 @@ const hills: Look<HillsControl, HillsState> = {
     right: "right",
     up: "jump",
   },
+  plasma: plasmaGathered,
   play: hillsPlay,
   score: hillsScore,
   sounds: hillsSounds,
@@ -83,6 +88,7 @@ const woods: Look<WoodsControl, WoodsState> = {
     right: "right",
     up: "up",
   },
+  plasma: (state) => state.plasma.gathered,
   play: woodsPlay,
   score: woodsScore,
   sounds: woodsSounds,
@@ -94,12 +100,21 @@ const castle: Look<CastleControl, CastleState> = {
   draw: drawCastle,
   means: {
     act: "act",
+    charm: "charm",
     down: "down",
+    evade: "evade",
     fire: "fire",
+    hot1: "show1",
+    hot2: "show2",
+    hot3: "show3",
+    hot4: "show4",
+    hot5: "show5",
     left: "left",
+    quick: "quick",
     right: "right",
     up: "up",
   },
+  plasma: (state) => state.plasma.gathered,
   play: castlePlay,
   score: castleScore,
   sounds: castleSounds,
@@ -132,6 +147,7 @@ function runOf<Control extends string, State extends Running<Control>>(
       );
     },
     id: look.play.id,
+    plasma: () => look.plasma(session.state()),
     record: () => session.record(),
     score: () => look.score(session.state()),
     stats: () => look.stats(session.state()),

@@ -7,20 +7,24 @@ import {
 import { chapterIds, type ChapterId } from "./rules/constants.ts";
 
 // What the platform may be handed back as this game's saved progress; anything else is a fresh game. It is how far the player has got
-// (how many chapters are open), the best score in each chapter, and the sound settings, since the frame has no storage of its own.
+// (how many chapters are open), the best score in each chapter, the metaplasma banked from every run (to be turned into items one day;
+// it takes a great deal), and the sound settings, since the frame has no storage of its own.
 export interface Progress {
   readonly best: Readonly<Record<ChapterId, number>>;
+  readonly plasma: number;
   readonly sound: SoundSettings;
   readonly unlocked: number;
 }
 
 export const freshProgress: Progress = {
   best: { castle: 0, hills: 0, woods: 0 },
+  plasma: 0,
   sound: defaultSound,
   unlocked: 1,
 };
 
 const highestScore = 100_000_000;
+const mostPlasma = 1_000_000_000_000;
 
 const count = (value: unknown, most: number): number | null =>
   typeof value === "number" &&
@@ -52,9 +56,12 @@ export function restore(saved: unknown): Progress {
     : typeof saved.best === "object" && saved.best !== null
       ? bests(saved.best)
       : null;
-  if (unlocked === null || unlocked < 1 || best === null) return freshProgress;
+  const plasma = count("plasma" in saved ? saved.plasma : 0, mostPlasma);
+  if (unlocked === null || unlocked < 1 || best === null || plasma === null)
+    return freshProgress;
   return {
     best,
+    plasma,
     sound: parseSound("sound" in saved ? saved.sound : undefined),
     unlocked,
   };
@@ -81,6 +88,12 @@ export const withCleared = (
   ),
 });
 
+// A finished run's metaplasma goes into the bank.
+export const withPlasma = (progress: Progress, gathered: number): Progress => ({
+  ...progress,
+  plasma: Math.min(mostPlasma, progress.plasma + gathered),
+});
+
 export const withSound = (
   progress: Progress,
   sound: SoundSettings,
@@ -92,6 +105,7 @@ export const isOpen = (progress: Progress, chapter: ChapterId): boolean =>
 // What is saved: everything in `Progress`, as plain data.
 export const saved = (progress: Progress) => ({
   best: progress.best,
+  plasma: progress.plasma,
   sound: progress.sound,
   unlocked: progress.unlocked,
 });

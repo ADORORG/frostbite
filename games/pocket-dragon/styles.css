@@ -58,9 +58,14 @@ h1 {
 h2 {
   font-size: 1rem;
 }
-#status {
+#status,
+#bank {
   color: var(--lavender);
   font-size: 0.875rem;
+}
+#bank strong {
+  color: var(--mint);
+  font-variant-numeric: tabular-nums;
 }
 .score {
   display: flex;
@@ -134,7 +139,7 @@ canvas {
 }
 /* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves. */
 #note {
-  block-size: 3rem;
+  block-size: 4.5rem;
   overflow-y: auto;
   color: var(--lavender);
 }
@@ -209,6 +214,7 @@ button[hidden] {
 .pad {
   display: none;
   grid-template-columns: repeat(4, 1fr) 1.5fr 1.5fr;
+  grid-auto-rows: auto;
   gap: 0.5rem;
 }
 @media (pointer: coarse) {

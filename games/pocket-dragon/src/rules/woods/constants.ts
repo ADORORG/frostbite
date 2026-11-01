@@ -31,3 +31,33 @@ export const open = 0;
 export const tree = 1;
 export const frozen = 2;
 export const gate = 3;
+
+// The egg launcher: four parts to find (a base, a spring, a barrel and a sight), and eggs to load it with. Once all four are found it is
+// built, and the moon gate opens only for a dragon with every clue read and the launcher built.
+export const partCount = 4;
+export const eggCount = 10;
+// Three secret charms hide in dead ends: swift feet, the sight of the whole map, and a metaplasma magnet.
+export const charmCount = 3;
+export const swiftSpeed = 10;
+// Metaplasma drifts to Glitchy from this far (farther with the magnet), this fast, and is gathered this close.
+export const plasmaReach = 200;
+export const magnetReach = 600;
+export const plasmaSpeed = 24;
+export const plasmaCatch = 40;
+
+// The launch round, out past the gate, in field units (sixteen to a pixel of the screen). The launcher sits at the left; up and down
+// tilt it (in steps of the woods' turn, 1,024 a circle), left and right set its power, fire launches an egg. An egg flies under gravity
+// until it lands, leaves the field or hits a target. The round ends when the eggs are spent, or after half a minute.
+export const fieldWidth = 4_096;
+export const fieldGround = 1_920;
+export const launcherX = 384;
+export const launcherY = 1_760;
+export const aimLow = 40;
+export const aimHigh = 220;
+export const aimStart = 128;
+export const powerLow = 30;
+export const powerHigh = 90;
+export const powerStart = 60;
+export const eggGravity = 4;
+export const flyingEgg = 64;
+export const launchTicks = 1_800;

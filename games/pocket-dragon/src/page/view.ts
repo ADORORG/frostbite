@@ -4,7 +4,6 @@ import { chapterTitles } from "../chapters.ts";
 import { guides } from "../guide.ts";
 import { isOpen, type Progress } from "../progress.ts";
 import { chapterIds, type ChapterId } from "../rules/constants.ts";
-import { actions } from "./hands.ts";
 import { buttonsIn, element } from "./elements.ts";
 import type { ChapterRun } from "./runs.ts";
 
@@ -32,7 +31,17 @@ const actWords: Readonly<Record<ChapterId, string>> = {
 
 // The touch buttons each chapter offers; the others keep their place but are not shown.
 const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
-  castle: actions,
+  castle: [
+    "left",
+    "right",
+    "up",
+    "down",
+    "act",
+    "fire",
+    "quick",
+    "evade",
+    "charm",
+  ],
   hills: ["left", "right", "act", "fire"],
   woods: ["left", "right", "up", "down", "fire"],
 };
@@ -42,6 +51,8 @@ export function createView() {
   const context = screen.getContext("2d");
   const scoreOut = element("score", "strong");
   const bestOut = element("best", "strong");
+  const plasmaOut = element("plasma", "strong");
+  const bankedOut = element("banked", "strong");
   const statLabels = [0, 1, 2].map((at) =>
     element(`stat-${String(at)}-label`, "span"),
   );
@@ -59,9 +70,11 @@ export function createView() {
 
   return {
     // The chapter's run (or its idle screen, with the guide over it) and the counts that go with it.
-    draw(run: ChapterRun, idle: boolean, best: number): void {
+    draw(run: ChapterRun, idle: boolean, best: number, banked: number): void {
       scoreOut.textContent = String(idle ? 0 : run.score());
       bestOut.textContent = String(best);
+      plasmaOut.textContent = String(idle ? 0 : run.plasma());
+      bankedOut.textContent = banked.toLocaleString("en-US");
       run.stats().forEach(([label, value], at) => {
         const labelOut = statLabels[at];
         const valueOut = statValues[at];

@@ -38,18 +38,13 @@ export const woodsScore = (state: WoodsState): number =>
   lanternsLit(state) * 200 +
   (state.moonChest ? 1_000 : 0) +
   (state.escaped ? 2_000 : 0) +
+  (state.launch?.score ?? 0) +
   bonus(state.finishTick, woodsMax);
 
 export const woodsStats = (state: WoodsState): readonly Stat[] => [
   ["Clues", of(cluesRead(state), state.clues.length)],
-  [
-    "Chests",
-    of(
-      chestsOpened(state) + (state.moonChest ? 1 : 0),
-      state.chests.length + 1,
-    ),
-  ],
-  ["Lanterns", of(lanternsLit(state), state.lanterns.length)],
+  ["Parts", of(state.parts.filter(Boolean).length, state.parts.length)],
+  ["Eggs", String(state.launch?.eggsLeft ?? state.eggs.filter(Boolean).length)],
 ];
 
 export const castleScore = (state: CastleState): number =>
@@ -61,5 +56,5 @@ export const castleScore = (state: CastleState): number =>
 export const castleStats = (state: CastleState): readonly Stat[] => [
   ["Guild", of(friendsJoined(state), state.friends.length)],
   ["Cheered", of(state.cheered.filter(Boolean).length, state.cheered.length)],
-  ["Naps", String(state.naps)],
+  ["Charms", of(state.charms.filter(Boolean).length, state.charms.length)],
 ];

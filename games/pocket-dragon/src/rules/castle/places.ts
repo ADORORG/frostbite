@@ -44,5 +44,12 @@ export const king = 3;
 export const banner: Spot = { x: 19, y: 2 };
 
 // The river's rows and the bramble wall's row: south of the river is home, north of the wall is the castle.
+// The three secret charms, off the quest's way: spirit in the village corner, the star on the beach, the shield in the north meadow.
+export const charmSpots: readonly Spot[] = [
+  { x: 1, y: 22 },
+  { x: 38, y: 22 },
+  { x: 37, y: 18 },
+];
+
 export const riverRow = 20;
 export const wallRow = 14;
