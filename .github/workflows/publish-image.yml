@@ -1,10 +1,11 @@
 name: Publish image
 
 # Builds deploy/Dockerfile once and pushes it to the GitHub Container Registry, so a small server only pulls the image and never builds it
-# (docs/operations/deployment.md, "Prebuilt image"). It does not run the Verify workflow: merge only what Verify passes.
+# (docs/operations/deployment.md, "Prebuilt image"), then asks Coolify to deploy it. The Verify workflow (ci.yml) calls this on a push to
+# main or dev once its own jobs have passed, so a commit that fails Verify is neither published nor deployed. Run by hand (workflow_dispatch)
+# it skips that check: use it only to republish a commit already known to be good.
 on:
-  push:
-    branches: [main, dev]
+  workflow_call:
   workflow_dispatch:
 
 permissions:

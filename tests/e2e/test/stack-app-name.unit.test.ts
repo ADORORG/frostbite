@@ -4,9 +4,7 @@ import { appNameFrom } from "../src/stack-app-name.ts";
 
 describe("the name the stack calls the platform", () => {
   it("is the settings file's, so the stack shows the product as it will be", () => {
-    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbit", {})).toBe(
-      "Frostbit",
-    );
+    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbit", {})).toBe("Frostbit");
     expect(appNameFrom("NEXT_PUBLIC_APP_NAME=  Frostbit  ", {})).toBe(
       "Frostbit",
     );

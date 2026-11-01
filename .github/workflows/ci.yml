@@ -3,7 +3,7 @@ name: Verify
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, dev]
 
 permissions:
   contents: read
@@ -103,3 +103,13 @@ jobs:
 
       - name: Check the release tooling is in the image and needs no download
         run: docker run --rm --network none the-well:ci pnpm --version
+
+  # Only a push to a deployed branch, and only once the checks and the image build above passed: publish the image and deploy it.
+  publish:
+    if: github.event_name == 'push'
+    needs: [verify, image]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-image.yml
+    secrets: inherit

@@ -124,11 +124,11 @@ changes. In the repository settings (Settings, Secrets and variables, Actions):
 The variable name is `COOLIFY_APP_UUID_` plus the branch name in capitals (any other character becomes `_`). A branch without its variable is
 published and not deployed. Each branch has its own Coolify application, so its environment (database, buckets, `PUBLIC_BASE_URL`, keys) is set
 in that application in Coolify; nothing environment-specific is stored in GitHub. Set the `IMAGE` variable of each application to its own branch
-tag (`ghcr.io/adororg/frostbite:dev` or `:main`). Coolify's own GitHub webhook is not used: it fires on the push, before the image exists. The
-deploy does not wait for the Verify checks (they run on pull requests and on `main`), so a broken commit on a deployed branch is deployed.
+tag (`ghcr.io/adororg/frostbite:dev` or `:main`). Coolify's own GitHub webhook is not used: it fires on the push, before the image exists.
 
-The workflow does not run the Verify checks: merge to `dev` or `main` only what Verify has passed. Deploy a `sha-` tag, not `dev`, when you
-want a version you can roll back to.
+**Deploys wait for Verify.** On a push to `dev` or `main`, `ci.yml` runs all the Verify jobs and the image build, and only when both pass does
+it call `publish-image.yml` (publish, then deploy). A failing commit is neither published nor deployed, and the previous version keeps
+running. Starting "Publish image" by hand skips that check. Deploy a `sha-` tag, not `dev`, when you want a version you can roll back to.
 
 ## Checklist before the first real deployment
 
