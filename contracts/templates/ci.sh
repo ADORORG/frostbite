@@ -9,13 +9,18 @@ set -euo pipefail
 cd "$(dirname "$0")"
 wasm=(--target wasm32-unknown-unknown)
 
+# The harness tests embed the built contracts (include_bytes!), so they do not even compile until build.sh has made them.
+build() { ./build.sh >/dev/null; }
+
 case "${1:-}" in
   lint)
+    build
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets "${wasm[@]}" -- -D warnings
     cargo clippy -p rewards-core -p responder-kit --all-targets -- -D warnings
     ;;
   typecheck)
+    build
     cargo check --workspace --all-targets "${wasm[@]}"
     cargo check -p rewards-core --all-targets
     ;;
@@ -23,7 +28,7 @@ case "${1:-}" in
     ./build.sh --check
     ;;
   test)
-    ./build.sh >/dev/null
+    build
     cargo test -p rewards-core
     (cd harness && cargo test --no-fail-fast)
     ;;
