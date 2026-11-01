@@ -62,6 +62,7 @@ export function createView() {
   const earnedList = element("earned", "ul");
   const startButton = element("start", "button");
   const pauseButton = element("pause", "button");
+  const shareButton = element("share", "button");
   const pad = element("pad", "div");
   const picker = element("chapters", "nav");
   const actButton = element("act", "button");
@@ -123,6 +124,7 @@ export function createView() {
     running(on: boolean): void {
       startButton.hidden = on;
       pauseButton.disabled = !on;
+      shareButton.disabled = on;
       for (const button of buttonsIn(pad, "button")) button.disabled = !on;
     },
   };

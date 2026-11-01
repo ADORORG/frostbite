@@ -10,8 +10,10 @@ import {
 } from "@ador/game-sdk/run-notes";
 
 import { effects, tracks } from "./audio.ts";
+import { factsOf, outcomeOf, type LastRun } from "./card/content.ts";
 import { chapterTitles } from "./chapters.ts";
 import { instructions } from "./guide.ts";
+import { createCardPanel } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
 import { attachHands, chapterOfKey } from "./page/hands.ts";
 import { startRun, type ChapterRun } from "./page/runs.ts";
@@ -41,6 +43,7 @@ const note = element("note", "p");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
 const picker = element("chapters", "nav");
+const shareButton = element("share", "button");
 const view = createView();
 
 let play: PlatformPlay | null = null;
@@ -50,6 +53,10 @@ let run: ChapterRun | null = null;
 let runId: string | null = null;
 let titles: ReadonlyMap<string, string> = new Map();
 let heldNote = "";
+// For the player's card: the last run, and the milestones the player is known to have (the platform's list, and what runs here earned).
+let lastRun: LastRun | null = null;
+const marks = new Set<string>();
+const card = createCardPanel(() => shareButton.focus());
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 
@@ -121,6 +128,14 @@ function opened(finished: ChapterRun): string {
 async function finish(finished: ChapterRun): Promise<void> {
   view.running(false);
   sound.sound.stopMusic();
+  lastRun = {
+    chapter: finished.id,
+    outcome: outcomeOf(finished.id, finished.cleared()),
+    score: finished.score(),
+    stats: finished.stats(),
+    trophies: finished.earned(),
+  };
+  shareButton.classList.add("fresh");
   const record = finished.record();
   progress = withPlasma(
     withBest(progress, finished.id, finished.score()),
@@ -173,6 +188,7 @@ const begin = (): Promise<void> =>
     run = startRun(chapter, ready?.seed ?? localSeed(), (id) => {
       sound.sfx("milestone");
       play?.report(id);
+      marks.add(id);
     });
     view.earned([], titles);
     view.running(true);
@@ -181,6 +197,23 @@ const begin = (): Promise<void> =>
     sound.sound.playMusic(tracks[chapter]);
   });
 
+// The platform's list of the game's milestones, noting which the player has; asked again when the card opens, so a run just checked
+// counts.
+async function learnMarks() {
+  const listed = await client.milestones.list().catch(() => []);
+  for (const { id, status } of listed) if (status === "unlocked") marks.add(id);
+  return listed;
+}
+
+function openCard(): void {
+  if (loop.running()) return;
+  shareButton.classList.remove("fresh");
+  const facts = () =>
+    factsOf(progress, lastRun, marks, titles, document.referrer);
+  card.open(facts());
+  void learnMarks().then(() => card.update(facts()));
+}
+
 async function connect(): Promise<void> {
   try {
     await client.ready();
@@ -188,12 +221,7 @@ async function connect(): Promise<void> {
     sound.apply(progress.sound);
     chapter = chapterIds[progress.unlocked - 1] ?? "hills";
     play = await connectToPlatform(client);
-    titles = new Map(
-      (await client.milestones.list().catch(() => [])).map(({ id, title }) => [
-        id,
-        title,
-      ]),
-    );
+    titles = new Map((await learnMarks()).map(({ id, title }) => [id, title]));
     status.textContent = "Connected.";
   } catch (error) {
     status.textContent =
@@ -212,10 +240,11 @@ attachHands(document.body, {
   hold(action, on) {
     if (loop.running()) run?.hold(action, on);
     const chapter = chapterOfKey(action);
-    if (!loop.running() && on && chapter !== undefined) choose(chapter);
+    if (!loop.running() && !card.isOpen() && on && chapter !== undefined)
+      choose(chapter);
   },
   pause: () => void (loop.running() && pause.toggle()),
-  start: () => void (!startButton.disabled && begin()),
+  start: () => void (!startButton.disabled && !card.isOpen() && begin()),
 });
 picker.addEventListener("click", (event) => {
   const target =
@@ -232,6 +261,7 @@ pauseButton.addEventListener(
   () => void (loop.running() && pause.toggle()),
 );
 startButton.addEventListener("click", () => void begin());
+shareButton.addEventListener("click", openCard);
 view.running(false);
 showChapters();
 show();

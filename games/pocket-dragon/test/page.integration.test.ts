@@ -112,15 +112,58 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     const early = game.audio.oscillators.length;
     await settle(600);
     expect(game.audio.oscillators.length).toBeGreaterThan(early);
+    expect(game.byId("share")?.hasAttribute("disabled")).toBe(true);
     game.press("ArrowRight");
     await whileRunning(game, 200);
     expect(game.running()).toBe(false);
     await settle(200);
+    // A new card is ready: the share button says so until it is opened.
+    expect(game.byId("share")?.classList.contains("fresh")).toBe(true);
+    game.click("share");
+    expect(game.byId("share")?.classList.contains("fresh")).toBe(false);
+    expect(game.byId("card-panel")?.hasAttribute("hidden")).toBe(false);
+    game.click("card-close");
     const ended = game.audio.oscillators.length;
     await settle(600);
     expect(game.audio.oscillators).toHaveLength(ended);
     expect(game.text("note")).toContain("your own claim");
   }, 40_000);
+
+  it("opens the player's card between runs, keeps Enter and the chapter keys from the game while it is open, and closes on Escape", async () => {
+    const game = await driver({ best: {}, unlocked: 2 });
+    const panel = () => game.byId("card-panel");
+    const chosen = () =>
+      game.window.document
+        .querySelector('[data-chapter][aria-pressed="true"]')
+        ?.getAttribute("data-chapter");
+    expect(game.byId("share")?.hasAttribute("disabled")).toBe(false);
+    game.click("share");
+    await settle();
+    expect(panel()?.hasAttribute("hidden")).toBe(false);
+    expect(
+      game.window.document.querySelector("main")?.hasAttribute("inert"),
+    ).toBe(true);
+    // The test's browser cannot draw, so the panel says so rather than offering an empty picture.
+    expect(game.text("card-hint")).toBe(
+      "This browser could not draw the card.",
+    );
+    game.press("Enter");
+    game.press("Digit1");
+    await settle(100);
+    expect(game.running()).toBe(false);
+    expect(chosen()).toBe("woods");
+    game.byId("card-close")?.dispatchEvent(
+      new game.window.KeyboardEvent("keydown", {
+        bubbles: true,
+        key: "Escape",
+      }),
+    );
+    expect(panel()?.hasAttribute("hidden")).toBe(true);
+    expect(game.window.document.activeElement?.id).toBe("share");
+    game.press("Enter");
+    await settle(100);
+    expect(game.running()).toBe(true);
+  });
 
   it("keeps the sound the player chose, and saves a change with the chapters reached, the bests and the metaplasma banked", async () => {
     const { stored, window } = await driver({
@@ -142,6 +185,7 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
       plasma: 1234,
       sound: { effects: false, music: false, volume: 0.2 },
       unlocked: 2,
+      won: false,
     });
   });
 });

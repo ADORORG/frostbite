@@ -11,7 +11,8 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // guild, use their powers, cheer up grumble guards with shows). Clearing a chapter opens the next; nobody is ever hurt, a guard is cheered
 // up and a tired guild takes a nap. Egg Hills ends each stage in a boss fight with Madame Vex (her ghost dragons, guards and egg rocket),
 // the woods add an egg launcher and a launch round, the castle's challenges are turn-based with hotkeys, and every chapter has secret
-// charms and metaplasma (banked by the page to be turned into items later). Every milestone is decided by the rules alone
+// charms and metaplasma (banked by the page to be turned into items later). Between runs the page makes a card of the last run (or the
+// quest so far) to share; it is a picture only, and decides nothing. Every milestone is decided by the rules alone
 // (`games/pocket-dragon/src/rules/*/milestones.ts`), so each can be replay-checked: the three chapters are published as one verifier, the
 // platform replays a run it issued a seed for, and the milestone is then held as replay-verified. That shows the run followed the rules,
 // not that a person played it. The digest pins the built file: a change to the rules is a change here, and a test fails until it is. The
@@ -39,7 +40,7 @@ export const pocketDragonGame = defineGame({
     video: null,
   },
   description:
-    "Help Glitchy the baby dragon through a quest in three chapters, each harder than the last. In Egg Hills, run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat Madame Vex's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. In the Whispering Woods, walk a moonlit maze through Glitchy's eyes: read three clue stones, find the parts of an egg launcher, then launch eggs at targets for bonus points. In the Guild and the Castle, help four dragon friends join your guild, then win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Every chapter hides secret charms and metaplasma to gather. Clearing a chapter opens the next. Thirty-nine milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm.",
+    "Help Glitchy the baby dragon through a quest in three chapters, each harder than the last. In Egg Hills, run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat Madame Vex's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. In the Whispering Woods, walk a moonlit maze through Glitchy's eyes: read three clue stones, find the parts of an egg launcher, then launch eggs at targets for bonus points. In the Guild and the Castle, help four dragon friends join your guild, then win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Every chapter hides secret charms and metaplasma to gather. Clearing a chapter opens the next. Thirty-nine milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
   id: "pocket-dragon",
   launch: { mode: "embedded" },
   milestones: [

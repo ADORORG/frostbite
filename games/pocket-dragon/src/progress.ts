@@ -7,13 +7,14 @@ import {
 import { chapterIds, type ChapterId } from "./rules/constants.ts";
 
 // What the platform may be handed back as this game's saved progress; anything else is a fresh game. It is how far the player has got
-// (how many chapters are open), the best score in each chapter, the metaplasma banked from every run (to be turned into items one day;
-// it takes a great deal), and the sound settings, since the frame has no storage of its own.
+// (how many chapters are open, and whether the castle has been captured), the best score in each chapter, the metaplasma banked from
+// every run (to be turned into items one day; it takes a great deal), and the sound settings, since the frame has no storage of its own.
 export interface Progress {
   readonly best: Readonly<Record<ChapterId, number>>;
   readonly plasma: number;
   readonly sound: SoundSettings;
   readonly unlocked: number;
+  readonly won: boolean;
 }
 
 export const freshProgress: Progress = {
@@ -21,6 +22,7 @@ export const freshProgress: Progress = {
   plasma: 0,
   sound: defaultSound,
   unlocked: 1,
+  won: false,
 };
 
 const highestScore = 100_000_000;
@@ -57,13 +59,21 @@ export function restore(saved: unknown): Progress {
       ? bests(saved.best)
       : null;
   const plasma = count("plasma" in saved ? saved.plasma : 0, mostPlasma);
-  if (unlocked === null || unlocked < 1 || best === null || plasma === null)
+  const won = "won" in saved ? saved.won : false;
+  if (
+    unlocked === null ||
+    unlocked < 1 ||
+    best === null ||
+    plasma === null ||
+    typeof won !== "boolean"
+  )
     return freshProgress;
   return {
     best,
     plasma,
     sound: parseSound("sound" in saved ? saved.sound : undefined),
     unlocked,
+    won,
   };
 }
 
@@ -76,7 +86,7 @@ export const withBest = (
     ? { ...progress, best: { ...progress.best, [chapter]: score } }
     : progress;
 
-// Clearing a chapter opens the next one (and the last stays the last).
+// Clearing a chapter opens the next one (and the last stays the last); clearing the last captures the castle.
 export const withCleared = (
   progress: Progress,
   chapter: ChapterId,
@@ -86,6 +96,7 @@ export const withCleared = (
     progress.unlocked,
     Math.min(chapterIds.length, chapterIds.indexOf(chapter) + 2),
   ),
+  won: progress.won || chapter === chapterIds[chapterIds.length - 1],
 });
 
 // A finished run's metaplasma goes into the bank.
@@ -108,4 +119,5 @@ export const saved = (progress: Progress) => ({
   plasma: progress.plasma,
   sound: progress.sound,
   unlocked: progress.unlocked,
+  won: progress.won,
 });

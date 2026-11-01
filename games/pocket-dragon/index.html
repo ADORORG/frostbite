@@ -66,6 +66,7 @@
         <div class="actions">
           <button id="start" type="button" disabled>Start run</button>
           <button id="pause" type="button" disabled>Pause</button>
+          <button id="share" type="button" disabled>Share card</button>
         </div>
       </div>
       <div id="pad" class="pad" role="group" aria-label="Touch controls">
@@ -90,6 +91,45 @@
         <ul id="earned" aria-label="Milestones earned this run"></ul>
       </section>
     </main>
+    <div
+      id="card-panel"
+      class="card-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="card-title"
+      hidden
+    >
+      <div class="card-sheet">
+        <div class="card-head">
+          <h2 id="card-title">Your Pocket Dragon card</h2>
+          <button id="card-close" type="button">Close</button>
+        </div>
+        <div class="card-shapes" role="group" aria-label="Card size">
+          <button type="button" data-shape="square" aria-pressed="true">
+            1:1 post
+          </button>
+          <button type="button" data-shape="story" aria-pressed="false">
+            9:16 story
+          </button>
+          <button type="button" data-shape="wide" aria-pressed="false">
+            16:9 wide
+          </button>
+        </div>
+        <div id="card-holo" class="card-holo">
+          <img id="card-image" alt="" hidden />
+        </div>
+        <p id="card-hint" class="card-hint" aria-live="polite"></p>
+        <div id="card-link-row" class="card-link" hidden>
+          <label for="card-link">Invite link</label>
+          <input id="card-link" type="text" readonly />
+        </div>
+        <div class="card-actions">
+          <button id="card-download" type="button">Download</button>
+          <button id="card-send" type="button">Share</button>
+          <button id="card-copy" type="button">Copy invite link</button>
+        </div>
+      </div>
+    </div>
     <script src="main.js"></script>
   </body>
 </html>

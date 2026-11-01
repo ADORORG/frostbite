@@ -36,6 +36,24 @@ beaten ghost dragon turns to sparkles, a guard goes home dizzy, a bump costs a h
 **Metaplasma** is in every chapter: little bits of light that drift to Glitchy like pollen when it comes close. The page banks what every
 run gathers ("Metaplasma banked"), to be turned into items one day, which will take a tremendous amount; for now it is only counted.
 
+## Your card
+
+Between runs, **Share card** makes a picture to post: a square (1:1), a story (9:16) or a wide post (16:9). At its heart is a trading card
+of the game's own design: Glitchy's name and title, the run's score, a picture of the chapter with a stamp (cleared, try again, won it
+all), two moves made from the run's counts, a quote of the game's own, and a foil frame by rarity: a spark for a run that fell short, a
+flame for a cleared chapter, a blaze for winning it all, and masterful once the masterful charm is earned. Around it go a headline, the
+trophy shelf (the milestones the run earned, each with a cup coloured by where it was won, or every trophy held on a card of the quest
+so far), the three chapters (cleared, open or locked, with their bests), the metaplasma banked, and an invitation. Before any run of a
+visit, the card is of the quest so far.
+
+The invite link is the platform's own page for the game. The game is never told the platform's address, so it reads it from the page
+that frames it (its referrer) and only when that is the game's page (`/games/pocket-dragon`); anywhere else the card says to find the
+game in the arcade instead. The platform's frame is `sandbox="allow-scripts"` with no `allow-downloads` and no `web-share`, so there
+the Download and Share buttons are stopped by the browser and the clipboard may be refused; the panel says to save the picture from the
+browser's own menu on the image (right-click, or press and hold), and the link is shown to select and copy. Letting the buttons work on
+the platform is a change to the frame (`features/games/src/ui/game-player.tsx` and `packages/game-sdk/src/frame-headers.ts`) for its
+owners to weigh. The castle captured is saved with the progress, so a card can say so in a later visit.
+
 ## Controls
 
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps
@@ -43,7 +61,8 @@ Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg
 and right set the power and fire launches; in the castle the arrows walk and the action key talks and picks up. In a cheer battle the
 arrows move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C
 a charm. Enter starts a run, P pauses, and 1, 2 and 3 choose an open chapter between runs. On a touch screen there are buttons for the
-actions a chapter uses. M and N turn the music and the effects off and on; the sound panel is at the bottom left.
+actions a chapter uses. M and N turn the music and the effects off and on; the sound panel is at the bottom left. The card panel takes
+its own keys while it is open (Tab to move, Enter or Space to press, Escape to close), so none of them start a run.
 
 ## Layout
 
@@ -61,10 +80,14 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
 src/chapters.ts     what the page needs of each chapter to play it
 src/session.ts      one run as a player plays it: ticks, control changes, and the run record they make
 src/screen/         drawing each chapter (a side view, a raycast first-person view, a map from above), at twice the size for sharp words
-src/page/           the page: the keys and touch buttons, a chapter's run as the page sees it, and what is shown around the screen
+src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
+                    layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
+                    trophies (the shelf), badges (the chapters) and poster (the whole picture)
+src/page/           the page: the keys and touch buttons, a chapter's run as the page sees it, what is shown around the screen, and
+                    card-panel (making, saving and sharing a card); its styles are in `card.css`
 src/main.ts         joins the page to the platform (progress, milestones, runs) and runs it on the SDK's run loop
 src/audio.ts        a tune for each chapter and the effects, as data for the SDK's sound engine; `feedback.ts` says which to play
-src/progress.ts     what is saved: chapters opened, the best score of each, the metaplasma banked, the sound settings
+src/progress.ts     what is saved: chapters opened, the castle captured, the best score of each, the metaplasma banked, the sound settings
 src/replay.ts       the verifier the platform replays runs with (rules + one sample run)
 ```
 

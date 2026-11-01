@@ -35,8 +35,10 @@ describe("the saved progress", () => {
       plasma: 4_321,
       sound: { effects: false, music: true, volume: 0.3 },
       unlocked: 2,
+      won: false,
     };
     expect(restore(good)).toEqual(good);
+    expect(restore({ ...good, unlocked: 3, won: true }).won).toBe(true);
     expect(restore({ sound: defaultSound, unlocked: 3 })).toEqual({
       ...freshProgress,
       unlocked: 3,
@@ -53,12 +55,13 @@ describe("the saved progress", () => {
       { best: { woods: "a" }, unlocked: 1 },
       { plasma: -5, unlocked: 1 },
       { plasma: 2.5, unlocked: 1 },
+      { unlocked: 3, won: "yes" },
     ])
       expect(restore(bad)).toEqual(freshProgress);
     expect(restore({ best: {}, unlocked: 1 }).sound).toEqual(defaultSound);
   });
 
-  it("keeps the best score of each chapter, banks metaplasma, opens the next chapter on a clear, and saves the sound", () => {
+  it("keeps the best score of each chapter, banks metaplasma, opens the next chapter on a clear, notes the castle captured, and saves the sound", () => {
     const best = withBest(freshProgress, "woods", 40);
     expect(best.best).toEqual({ castle: 0, hills: 0, woods: 40 });
     expect(withBest(best, "woods", 30)).toBe(best);
@@ -67,9 +70,10 @@ describe("the saved progress", () => {
     expect(
       withCleared({ ...freshProgress, unlocked: 3 }, "hills").unlocked,
     ).toBe(3);
-    expect(
-      withCleared({ ...freshProgress, unlocked: 3 }, "castle").unlocked,
-    ).toBe(3);
+    const captured = withCleared({ ...freshProgress, unlocked: 3 }, "castle");
+    expect(captured).toMatchObject({ unlocked: 3, won: true });
+    expect(withCleared(freshProgress, "woods").won).toBe(false);
+    expect(withCleared(captured, "hills").won).toBe(true);
     expect(
       chapterIds.map((id) => isOpen(withCleared(freshProgress, "hills"), id)),
     ).toEqual([true, true, false]);
@@ -80,6 +84,7 @@ describe("the saved progress", () => {
       plasma: 0,
       sound: defaultSound,
       unlocked: 1,
+      won: false,
     });
   });
 });
