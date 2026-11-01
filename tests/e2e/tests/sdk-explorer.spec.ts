@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { openDock } from "./support/dock.ts";
+import { dockButton, openDock } from "./support/dock.ts";
 import { installFakeWallet } from "./support/fake-wallet.ts";
 import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
 
@@ -201,12 +201,20 @@ test("progress toward a target is held by the platform, shown on the page, and e
   await expect(dock.locator('[data-milestone="ten-presses"]')).toContainText(
     "4 of 10",
   );
+  // The open panel covers the game, so it is closed before the game is played on, as a player would.
+  await page.keyboard.press("Escape");
+  await expect(dockButton(page, "Milestones")).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
   for (let press = 5; press <= 10; press += 1)
     await game.locator("#milestones-progress").click();
   await expect(newest(page)).toContainText('"status":"unlocked"');
-  await expect(dock.locator('[data-milestone="ten-presses"]')).toContainText(
-    "Reached",
-  );
+  const reopened = await openDock(page, "Milestones");
+  await expect(
+    reopened.locator('[data-milestone="ten-presses"]'),
+  ).toContainText("Reached");
+  await dockButton(page, "Milestones").click();
   // Reported again, the total stays at the target.
   await game.locator("#milestones-progress").click();
   await expect(newest(page)).toContainText('"current":10');

@@ -194,7 +194,7 @@ test("once approved the collection is public, as the version that was approved, 
     new RegExp(`/collections/${collectionId}$`, "u"),
   );
   await expect(page.getByText("Not on sale yet")).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
   await expect(
     page.getByText("A small ready collection, drawn by hand", { exact: true }),
   ).toBeVisible();
