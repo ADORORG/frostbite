@@ -10,6 +10,10 @@ import {
 } from "../src/index.ts";
 import { migrationsDirectory } from "../src/migrations/apply.ts";
 import { withMigrationLock } from "../src/migrations/lock.ts";
+import {
+  createScratchDatabase,
+  dropScratchDatabase,
+} from "./support/scratch-database.ts";
 
 const environment = parseDatabaseEnvironment(process.env);
 const admin = createDatabasePool(environment);
@@ -24,12 +28,11 @@ const config = toPoolConfig(environment, scratch.toString());
 const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
 
 beforeAll(async () => {
-  await admin.query(`drop database if exists ${databaseName}`);
-  await admin.query(`create database ${databaseName}`);
+  await createScratchDatabase(admin, databaseName);
 });
 
 afterAll(async () => {
-  await admin.query(`drop database if exists ${databaseName} with (force)`);
+  await dropScratchDatabase(admin, databaseName);
   await admin.end();
 });
 
