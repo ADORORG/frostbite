@@ -9,7 +9,13 @@ import {
   tileAt,
 } from "../src/rules/castle/map.ts";
 import {
-  banner,
+  bubble,
+  cage,
+  doors,
+  gate,
+  guardStarts,
+  nightEggs,
+  throne,
   boulders,
   brambles,
   foes,
@@ -61,7 +67,7 @@ const yes = [true, true, true, true];
 describe("the land between the woods and the castle", () => {
   it("is 40 tiles by 30, drawn only in its legend, and closed all round", () => {
     expect([mapWidth, mapHeight]).toEqual([40, 30]);
-    for (const row of mapRows) expect(row).toMatch(/^[T.,fs~LoI#HWc]{40}$/u);
+    for (const row of mapRows) expect(row).toMatch(/^[T.,fs~LoI#HDWGc]{40}$/u);
     for (let x = 0; x < mapWidth; x += 1) {
       expect(floor.has(tileAt(x, 0))).toBe(false);
       expect(floor.has(tileAt(x, mapHeight - 1))).toBe(false);
@@ -74,8 +80,23 @@ describe("the land between the woods and the castle", () => {
   });
 
   it("has everyone on open ground, and each obstacle on its own kind of tile", () => {
-    for (const spot of [start, banner, ...items, ...friends, ...foes])
+    for (const spot of [
+      start,
+      throne,
+      ...items,
+      ...friends,
+      ...foes,
+      ...nightEggs,
+      ...guardStarts,
+      cage,
+      bubble,
+    ])
       expect(floor.has(tileAt(spot.x, spot.y))).toBe(true);
+    for (const door of doors) {
+      expect(tileAt(door.x, door.y)).toBe("D");
+      expect(floor.has(tileAt(door.x, door.y + 1))).toBe(true);
+    }
+    expect(tileAt(gate.x, gate.y)).toBe("G");
     for (const spot of boulders) expect(tileAt(spot.x, spot.y)).toBe("o");
     for (const spot of brambles) expect(tileAt(spot.x, spot.y)).toBe("#");
     expect(tileAt(ice.x, ice.y)).toBe("I");
@@ -179,13 +200,13 @@ describe("the guild's rules", () => {
     expect(said(inside)).toBe("got-2");
   });
 
-  it("count the river crossed, start a cheer challenge at a grumpy guard, and raise the banner once every keeper has cheered", () => {
+  it("count the river crossed, start a cheer challenge at a grumpy guard, and give the golden egg once every keeper has cheered", () => {
     const crossed = play(
       hold(at(23, 20, { lilies: true }), "up"),
       stepTicks + 1,
     );
     expect(crossed.crossedRiver).toBe(true);
-    const challenged = pressCastle(at(19, 11), "up");
+    const challenged = pressCastle(at(19, 10, { gateOpen: true }), "up");
     expect(said(challenged)).toBe("challenge-0");
     expect(challenged.battle?.foe).toBe(0);
     const throne = at(19, 3, { cheered: yes });
@@ -193,9 +214,9 @@ describe("the guild's rules", () => {
       hold(at(19, 3, { cheered: [true, true, true, false] }), "up"),
       stepTicks + 1,
     );
-    expect(notYet.bannerRaised).toBe(false);
+    expect(notYet.goldenEgg).toBe(false);
     const raised = play(hold(throne, "up"), stepTicks + 1);
-    expect([said(raised), raised.bannerRaised]).toEqual(["captured", true]);
+    expect([said(raised), raised.goldenEgg]).toEqual(["captured", true]);
     expect(raised.finishTick).not.toBeNull();
     expect(castleChapter.done(raised)).toBe(true);
     expect(tickCastle(raised).tick).toBe(raised.tick + 1);

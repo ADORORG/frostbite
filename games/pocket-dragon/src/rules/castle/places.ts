@@ -33,15 +33,17 @@ export const brambles: readonly Spot[] = [
 ];
 export const ice: Spot = { x: 8, y: 17 };
 
-// The castle's keepers, from the gate in: three guards, then the Grumble King. The banner goes up behind the king.
+// The castle's keepers, from the gate in: three guards, then the Grumble King. The Legendary Golden Egg rests on the throne behind the
+// king. The gate itself opens only in winter, to the three clues.
 export const foes: readonly Spot[] = [
-  { x: 19, y: 10 },
+  { x: 19, y: 9 },
   { x: 19, y: 7 },
   { x: 19, y: 4 },
   { x: 19, y: 3 },
 ];
 export const king = 3;
-export const banner: Spot = { x: 19, y: 2 };
+export const throne: Spot = { x: 19, y: 2 };
+export const gate: Spot = { x: 19, y: 10 };
 
 // The river's rows and the bramble wall's row: south of the river is home, north of the wall is the castle.
 // The three secret charms, off the quest's way: spirit in the village corner, the star on the beach, the shield in the north meadow.
@@ -53,3 +55,31 @@ export const charmSpots: readonly Spot[] = [
 
 export const riverRow = 20;
 export const wallRow = 14;
+
+// The three houses that can be entered, by the door in their wall and the room inside (`rooms.ts`): the bakery and the library in the
+// village, the watchtower in the north meadow.
+export const doors: readonly Spot[] = [
+  { x: 3, y: 24 },
+  { x: 3, y: 27 },
+  { x: 37, y: 12 },
+];
+
+// The night: the eggs the security guards are after, where the guards come from, and the cage cart they carry eggs to (next to the
+// castle). A forcefield bubble lies in the village.
+export const nightEggs: readonly Spot[] = [
+  { x: 6, y: 22 },
+  { x: 14, y: 26 },
+  { x: 27, y: 27 },
+  { x: 12, y: 18 },
+  { x: 30, y: 17 },
+  { x: 25, y: 16 },
+  { x: 8, y: 13 },
+  { x: 30, y: 12 },
+];
+export const guardStarts: readonly Spot[] = [
+  { x: 17, y: 12 },
+  { x: 22, y: 13 },
+  { x: 24, y: 11 },
+];
+export const cage: Spot = { x: 21, y: 12 };
+export const bubble: Spot = { x: 16, y: 25 };

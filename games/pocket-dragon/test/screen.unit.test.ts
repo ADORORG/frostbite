@@ -185,7 +185,7 @@ describe("the screen of the guild's chapter", () => {
     });
   });
 
-  it("shows what was said in a box, the challenge with its shows, and the banner raised", () => {
+  it("shows what was said in a box, the challenge with its shows, and the golden egg taken", () => {
     const start = startCastle(3);
     const told = drawnWith(drawCastle, {
       ...start,
@@ -199,9 +199,9 @@ describe("the screen of the guild's chapter", () => {
     expect(menu).toEqual(
       expect.arrayContaining([
         "GATE GUARD",
-        "GRUMBLE 10/10",
+        "GRUMBLE 16/16",
         "GLITCHY'S GUILD",
-        "SPIRIT 10/10",
+        "SPIRIT 12/12",
         "HINT: IT LOOKS HOT AND STUFFY.",
         "1 FIREWORKS",
         "Q QUICK CHEER",
@@ -239,10 +239,10 @@ describe("the screen of the guild's chapter", () => {
     );
     const raised = drawnWith(drawCastle, {
       ...start,
-      bannerRaised: true,
+      goldenEgg: true,
       fireTick: 0,
       tick: 5,
     });
-    expect(raised.texts()).toContain("THE CASTLE IS CAPTURED!");
+    expect(raised.texts()).toContain("THE GOLDEN EGG IS YOURS!");
   });
 });

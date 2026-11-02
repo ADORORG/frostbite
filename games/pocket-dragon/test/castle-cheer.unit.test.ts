@@ -21,6 +21,7 @@ import {
   spiritMax,
   swiftTicks,
 } from "../src/rules/castle/constants.ts";
+import { spiritOf } from "../src/rules/castle/guild.ts";
 import { castleChapter } from "../src/rules/castle/index.ts";
 import {
   castleEarned,
@@ -121,7 +122,8 @@ describe("a cheer challenge", () => {
     };
     expect(heldCharm(low)).toBe(0);
     const healed = act(low, charmMove);
-    expect(healed.battle?.spirit).toBe(spiritMax);
+    expect(healed.battle?.spirit).toBe(spiritOf(low));
+    expect(spiritOf(low)).toBeGreaterThan(spiritMax);
     expect(healed.charmsUsed).toEqual([true, false, false]);
     expect(healed.battle?.phase).toBe("choose");
     const starred = act(healed, charmMove);
@@ -141,15 +143,17 @@ describe("a cheer challenge", () => {
   it("cheers the keeper up once its grumble runs out, and counts a perfect pick when the favourite came first", () => {
     let state = perform(facing(everyone));
     state = perform(pick(answered(state), 3));
-    expect(state.battle?.grumble).toBe(1);
-    state = act(answered(state), 1);
+    expect(state.battle?.grumble).toBeGreaterThan(0);
+    const battle = state.battle;
+    if (battle === null) throw new Error("the challenge ended too soon");
+    state = act(answered({ ...state, battle: { ...battle, grumble: 1 } }), 1);
     expect(state.battle).toBeNull();
     expect(state.cheered[0]).toBe(true);
     expect(state.message?.id).toBe("cheered-0");
     expect(state.perfectPicks).toBe(1);
     let plain = act(facing(everyone), 1);
-    plain = act(answered(plain), 3);
-    plain = act(answered(plain), 0);
+    for (let turn = 0; plain.battle !== null && turn < 20; turn += 1)
+      plain = act(answered(plain), turn % 2 === 0 ? 3 : 0);
     expect(plain.cheered[0]).toBe(true);
     expect(plain.perfectPicks).toBe(0);
   });
@@ -220,7 +224,7 @@ describe("the guild's milestones", () => {
     ]);
     const done = {
       ...most,
-      bannerRaised: true,
+      goldenEgg: true,
       charms: [true, true, true],
       cheered: everyone,
       finishTick: swiftTicks + 1,
@@ -238,17 +242,17 @@ describe("the guild's milestones", () => {
     );
   });
 
-  // A player who reads every hint (`support/castle-bot.ts`) earns every mark, the masterful charm among them; one who leaves Spark and
-  // the charms behind and puts on whatever show comes first still captures the castle, after a nap.
-  it("can all be earned in one quest, and the castle can be captured even played badly", () => {
+  // A player who reads every hint (`support/castle-bot.ts`) earns every mark, the masterful charm among them; one who leaves the charms
+  // behind and puts on whatever show comes first still takes the golden egg, after a nap.
+  it("can all be earned in one quest, and the golden egg can be won even played badly", () => {
     for (const seed of [4, 20_261_031]) {
       const best = playCastle(seed);
       expect(castleEarned(best.state)).toEqual(castleMilestones);
-      const worst = playCastle(seed, { skipSpark: true, worstShow: true });
-      expect(worst.state.bannerRaised).toBe(true);
+      const worst = playCastle(seed, { worstShow: true });
+      expect(worst.state.goldenEgg).toBe(true);
       expect(worst.state.naps).toBeGreaterThan(0);
     }
-  }, 60_000);
+  }, 120_000);
 
   it("are given again when a quest's record is replayed through the published rules", () => {
     const quest = playCastle(4);

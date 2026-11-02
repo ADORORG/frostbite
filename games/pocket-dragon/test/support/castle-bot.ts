@@ -7,13 +7,12 @@ import {
   moves,
   showsOf,
 } from "../../src/rules/castle/battle.ts";
-import { maxTicks } from "../../src/rules/castle/constants.ts";
+import { fireEvery, maxTicks } from "../../src/rules/castle/constants.ts";
 import { castleRules } from "../../src/rules/castle/index.ts";
 import {
   boulders,
   brambles,
-  charmSpots,
-  items,
+  cage,
   king,
 } from "../../src/rules/castle/places.ts";
 import { startCastle, tickCastle } from "../../src/rules/castle/tick.ts";
@@ -24,81 +23,17 @@ import type {
   Spot,
 } from "../../src/rules/castle/types.ts";
 import { ahead, walkable } from "../../src/rules/castle/world.ts";
+import { dayAndWinter } from "./castle-tasks.ts";
 
-// A player who knows the quest, for the guild's chapter: it walks (by a breadth-first search over the tiles it can walk) to each step of
-// the quest in order, faces what it needs and talks, pushes, breathes or picks it up, and in a cheer challenge puts on the keeper's
-// favourite show first and then the strongest show that is not tired. It stands for a player who reads every hint; the inputs it makes
-// are a legal run to replay.
+// A player who knows the level, for the guild's chapter: it walks (by a breadth-first search over the tiles it can walk) to each step of
+// the day and the winter in order (`castle-tasks.ts`), faces what it needs and talks, pushes, breathes or picks it up; at night it opens
+// the cage when eggs are in it, saves the nearest loose egg, and breathes fire at a guard in its way or carrying an egg; in a cheer
+// challenge it puts on the keeper's favourite show first and then the strongest show that is not tired. It stands for a player who reads
+// every hint; the inputs it makes are a legal run to replay.
 export interface Played {
   readonly inputs: readonly RunInput[];
   readonly state: CastleState;
 }
-
-interface Task {
-  readonly done: (state: CastleState) => boolean;
-  readonly face: Facing;
-  readonly press: "act" | "fire" | null;
-  readonly stand: Spot;
-}
-
-const fetch = (item: number): Task => ({
-  done: (s) => s.taken[item] === true,
-  face: "down",
-  press: null,
-  stand: items[item] ?? { x: 0, y: 0 },
-});
-const meet = (
-  stand: Spot,
-  face: Facing,
-  done: (s: CastleState) => boolean,
-  press: "act" | "fire" = "act",
-): Task => ({
-  done,
-  face,
-  press,
-  stand,
-});
-
-const charmAt = (charm: number): Task => ({
-  done: (s) => s.charms[charm] === true,
-  face: "down",
-  press: null,
-  stand: charmSpots[charm] ?? { x: 0, y: 0 },
-});
-
-export const quest = (skipSpark = false, charms = true): readonly Task[] => [
-  fetch(0),
-  ...(charms ? [charmAt(0)] : []),
-  meet({ x: 22, y: 25 }, "up", (s) => s.friends[0] === true),
-  meet({ x: 23, y: 25 }, "up", (s) => s.pushed[0] === true),
-  meet({ x: 30, y: 25 }, "right", (s) => s.pushed[1] === true),
-  fetch(1),
-  ...(charms ? [charmAt(1)] : []),
-  meet({ x: 24, y: 23 }, "up", (s) => s.friends[1] === true),
-  meet({ x: 23, y: 22 }, "up", (s) => s.lilies),
-  ...(charms ? [charmAt(2)] : []),
-  meet({ x: 9, y: 17 }, "left", (s) => s.melted, "fire"),
-  fetch(2),
-  meet({ x: 21, y: 17 }, "up", (s) => s.friends[2] === true),
-  meet({ x: 19, y: 15 }, "up", (s) => s.opened[0] === true),
-  ...(skipSpark
-    ? []
-    : [
-        meet({ x: 4, y: 12 }, "left", (s) => s.opened[1] === true),
-        fetch(3),
-        meet({ x: 34, y: 12 }, "right", (s) => s.friends[3] === true),
-      ]),
-  meet({ x: 19, y: 11 }, "up", (s) => s.cheered[0] === true),
-  meet({ x: 19, y: 8 }, "up", (s) => s.cheered[1] === true),
-  meet({ x: 19, y: 5 }, "up", (s) => s.cheered[2] === true),
-  meet({ x: 19, y: 4 }, "up", (s) => s.cheered[3] === true),
-  {
-    done: (s) => s.bannerRaised,
-    face: "up",
-    press: null,
-    stand: { x: 19, y: 2 },
-  },
-];
 
 const ways: readonly Facing[] = ["up", "down", "left", "right"];
 // The hotkey of each show, by its place in `moves`.
@@ -136,9 +71,56 @@ export function bestShow(state: CastleState): number {
   );
 }
 
+interface Goal {
+  readonly face: Facing;
+  readonly press: "act" | "fire" | null;
+  readonly stand: Spot;
+}
+
+const facingTo = (from: Spot, to: Spot): Facing =>
+  to.x > from.x
+    ? "right"
+    : to.x < from.x
+      ? "left"
+      : to.y > from.y
+        ? "down"
+        : "up";
+
+// At night: a guard next to Glitchy gets a puff of fire; the cage is opened when eggs are in it; the nearest loose egg is saved; and
+// when every egg left is carried, the nearest guard carrying one is gone after.
+function nightGoal(state: CastleState): Goal | null {
+  const here = { x: state.x, y: state.y };
+  const ready = state.fireTick < 0 || state.tick - state.fireTick >= fireEvery;
+  const next = state.guards.find(
+    (guard) => Math.abs(guard.x - state.x) + Math.abs(guard.y - state.y) === 1,
+  );
+  if (next !== undefined && ready && next.dizzy === 0)
+    return { face: facingTo(here, next), press: "fire", stand: here };
+  if (state.eggs.some((egg) => egg.state === "caged"))
+    return { face: "up", press: "act", stand: { x: cage.x, y: cage.y + 1 } };
+  const near = (spots: readonly Spot[]): Spot | undefined =>
+    [...spots].sort(
+      (a, b) =>
+        Math.abs(a.x - here.x) +
+        Math.abs(a.y - here.y) -
+        (Math.abs(b.x - here.x) + Math.abs(b.y - here.y)),
+    )[0];
+  const loose = near(state.eggs.filter((egg) => egg.state === "loose"));
+  if (loose !== undefined) return { face: "down", press: null, stand: loose };
+  const thief = near(state.guards.filter((guard) => guard.carrying >= 0));
+  if (thief === undefined) return null;
+  const beside = ways
+    .map((way) => ({ x: thief.x - ahead[way].x, y: thief.y - ahead[way].y }))
+    .filter((spot) => walkable(state, spot.x, spot.y));
+  const stand = near(beside);
+  return stand === undefined
+    ? null
+    : { face: facingTo(stand, thief), press: "fire", stand };
+}
+
 export function playCastle(
   seed: number,
-  options: { readonly skipSpark?: boolean; readonly worstShow?: boolean } = {},
+  options: { readonly worstShow?: boolean } = {},
 ): Played {
   let state = startCastle(seed);
   const inputs: RunInput[] = [];
@@ -154,8 +136,20 @@ export function playCastle(
     set(control, true);
     set(control, false);
   };
-  const tasks = quest(options.skipSpark ?? false, options.worstShow !== true);
-  while (state.tick < maxTicks && !state.bannerRaised) {
+  const tasks = dayAndWinter(options.worstShow !== true);
+  // Walks one step toward a place to stand (letting go of the other ways); once there, faces the way and presses the key.
+  const go = (goal: Goal): void => {
+    if (state.x !== goal.stand.x || state.y !== goal.stand.y) {
+      const way = firstStep(state, goal.stand);
+      for (const other of ways) if (other !== way) set(other, false);
+      if (way !== null) set(way, true);
+      return;
+    }
+    for (const way of ways) set(way, false);
+    if (state.facing !== goal.face) tap(goal.face);
+    else if (goal.press !== null) tap(goal.press);
+  };
+  while (state.tick < maxTicks && !state.goldenEgg) {
     const { battle } = state;
     if (battle !== null) {
       for (const way of ways) set(way, false);
@@ -175,18 +169,14 @@ export function playCastle(
           tap("evade");
         else tap(showKeys[bestShow(state)] ?? "show1");
       }
+    } else if (state.step === null && state.phase === "night") {
+      const goal = nightGoal(state);
+      if (goal === null) for (const way of ways) set(way, false);
+      else go(goal);
     } else if (state.step === null) {
       const task = tasks.find((t) => !t.done(state));
       if (task === undefined) break;
-      if (state.x !== task.stand.x || state.y !== task.stand.y) {
-        const way = firstStep(state, task.stand);
-        for (const other of ways) if (other !== way) set(other, false);
-        if (way !== null) set(way, true);
-      } else {
-        for (const way of ways) set(way, false);
-        if (state.facing !== task.face) tap(task.face);
-        else if (task.press !== null && !task.done(state)) tap(task.press);
-      }
+      go({ ...task, press: task.done(state) ? null : task.press });
     }
     state = tickCastle(state);
   }

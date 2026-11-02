@@ -1,9 +1,15 @@
 import { tone, type Effect } from "@ador/game-sdk/audio/effects";
 
 // The effects of the quest's newer things, kept apart from the first ones (`audio.ts`) so each file stays short: a spring, a secret
-// area found, a door through to it, the wings and their flaps, and the forcefield.
+// area found, a door through to it, the wings and their flaps, the forcefield, and the guild going up a level.
 export const moreEffects = {
   flap: [tone("sine", 500, 900, 0.07, 0.18)],
+  levelup: [
+    tone("square", 523, 523, 0.08, 0.25),
+    tone("square", 659, 659, 0.08, 0.25, 0.08),
+    tone("square", 784, 784, 0.08, 0.25, 0.16),
+    tone("square", 1047, 1047, 0.25, 0.25, 0.24),
+  ],
   secret: [
     tone("sine", 784, 784, 0.08, 0.25),
     tone("sine", 988, 988, 0.08, 0.25, 0.08),

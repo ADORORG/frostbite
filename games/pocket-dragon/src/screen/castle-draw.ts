@@ -1,10 +1,12 @@
 import { block, sprite } from "@ador/game-sdk/pixels";
 
-import { stepTicks } from "../rules/castle/constants.ts";
+import { stepOf } from "../rules/castle/guild.ts";
 import { mapHeight, mapWidth } from "../rules/castle/map.ts";
-import { banner, foes, friends, items, king } from "../rules/castle/places.ts";
+import { foes, friends, items, king } from "../rules/castle/places.ts";
 import type { CastleState, Spot } from "../rules/castle/types.ts";
 import { drawBattle } from "./castle-battle.ts";
+import { darkness, nightThings, phaseBanner, snow } from "./castle-night.ts";
+import { drawRoom, roomCamera } from "./castle-room.ts";
 import { landHud, landStash } from "./castle-stash.ts";
 import { drawTile } from "./castle-tiles.ts";
 import { castleWords } from "./castle-words.ts";
@@ -84,7 +86,7 @@ const itemKey = {
 // Where Glitchy is drawn, between the tile stepped from and the tile stepped to.
 export function glitchyAt(state: CastleState): Spot {
   if (state.step === null) return { x: state.x * 16, y: state.y * 16 };
-  const share = Math.min(1, (state.tick - state.step.start) / stepTicks);
+  const share = Math.min(1, (state.tick - state.step.start) / stepOf(state));
   return {
     x: Math.round(
       (state.step.from.x + (state.x - state.step.from.x) * share) * 16,
@@ -96,6 +98,7 @@ export function glitchyAt(state: CastleState): Spot {
 }
 
 export function cameraOf(state: CastleState): Spot {
+  if (state.room >= 0) return roomCamera;
   const at = glitchyAt(state);
   return {
     x: Math.min(Math.max(0, at.x + 8 - width / 2), mapWidth * 16 - width),
@@ -157,6 +160,7 @@ function people(
         spot.y * 16 - camera.y,
       );
   });
+  if (state.room >= 0) return;
   friends.forEach((spot, at) => {
     if (state.friends[at] === true) return;
     const x = spot.x * 16 - camera.x;
@@ -189,14 +193,27 @@ function people(
       spot.y * 16 - camera.y + 4 + (Math.floor(state.tick / 15) % 2),
     );
   });
-  const flagX = banner.x * 16 - camera.x;
-  const flagY = banner.y * 16 - camera.y;
-  block(context, colour.woodDark, flagX + 7, flagY - 6, 2, 22);
-  const wave = Math.floor(state.tick / 10) % 2;
-  if (state.bannerRaised) {
-    block(context, colour.mint, flagX + 9, flagY - 6 + wave, 10, 7);
-    block(context, colour.pink, flagX + 12, flagY - 4 + wave, 3, 3);
-  } else block(context, colour.stone, flagX + 9, flagY + 8, 8, 6);
+}
+
+// The forcefield around Glitchy, blinking in its last two seconds.
+function shield(
+  context: CanvasRenderingContext2D,
+  state: CastleState,
+  camera: Spot,
+): void {
+  if (state.forcefield < 120 && Math.floor(state.tick / 6) % 2 === 0) return;
+  const at = glitchyAt(state);
+  for (let dot = 0; dot < 20; dot += 1) {
+    const angle = (dot / 20) * Math.PI * 2 + state.tick / 30;
+    block(
+      context,
+      dot % 3 === 0 ? colour.white : colour.cyan,
+      at.x - camera.x + 8 + Math.cos(angle) * 11,
+      at.y - camera.y + 8 + Math.sin(angle) * 11,
+      1,
+      1,
+    );
+  }
 }
 
 function words(context: CanvasRenderingContext2D, state: CastleState): void {
@@ -227,20 +244,36 @@ export function drawCastle(
     return;
   }
   const camera = cameraOf(state);
-  const firstX = Math.floor(camera.x / 16);
-  const firstY = Math.floor(camera.y / 16);
-  for (let ty = firstY; ty <= firstY + height / 16 + 1; ty += 1)
-    for (let tx = firstX; tx <= firstX + width / 16 + 1; tx += 1)
-      drawTile(context, state, tx, ty, tx * 16 - camera.x, ty * 16 - camera.y);
-  landStash(context, state, camera);
+  if (state.room >= 0) drawRoom(context, state);
+  else {
+    const firstX = Math.floor(camera.x / 16);
+    const firstY = Math.floor(camera.y / 16);
+    for (let ty = firstY; ty <= firstY + height / 16 + 1; ty += 1)
+      for (let tx = firstX; tx <= firstX + width / 16 + 1; tx += 1)
+        drawTile(
+          context,
+          state,
+          tx,
+          ty,
+          tx * 16 - camera.x,
+          ty * 16 - camera.y,
+        );
+    landStash(context, state, camera);
+    nightThings(context, state, camera);
+  }
   people(context, state, camera);
-  glitchy(context, state, camera);
+  if (state.invulnerable === 0 || Math.floor(state.tick / 4) % 2 === 1)
+    glitchy(context, state, camera);
+  if (state.forcefield > 0) shield(context, state, camera);
+  darkness(context, state, camera, glitchyAt(state));
+  snow(context, state);
   if (state.fireTick >= 0 && state.tick - state.fireTick < 12) {
     const at = glitchyAt(state);
     block(context, colour.fire, at.x - camera.x + 4, at.y - camera.y - 6, 8, 6);
   }
   words(context, state);
   landHud(context, state);
-  if (state.bannerRaised)
-    write(context, "THE CASTLE IS CAPTURED!", width / 2, 40, 12, colour.gold);
+  phaseBanner(context, state);
+  if (state.goldenEgg)
+    write(context, "THE GOLDEN EGG IS YOURS!", width / 2, 40, 12, colour.gold);
 }

@@ -7,7 +7,8 @@ import {
   menuOf,
   quickMove,
 } from "../rules/castle/battle.ts";
-import { spiritMax, showTicks } from "../rules/castle/constants.ts";
+import { showTicks } from "../rules/castle/constants.ts";
+import { spiritOf } from "../rules/castle/guild.ts";
 import { king } from "../rules/castle/places.ts";
 import type { Battle, CastleState } from "../rules/castle/types.ts";
 import { arena } from "./castle-arena.ts";
@@ -176,14 +177,14 @@ function guild(
   write(context, "GLITCHY'S GUILD", 150, 73, 7, colour.ink, "left");
   write(
     context,
-    `SPIRIT ${String(Math.max(0, battle.spirit))}/${String(spiritMax)}`,
+    `SPIRIT ${String(Math.max(0, battle.spirit))}/${String(spiritOf(state))}`,
     150,
     82,
     6,
     colour.ink,
     "left",
   );
-  bar(context, 184, 90, battle.spirit, spiritMax, colour.mint);
+  bar(context, 184, 90, battle.spirit, spiritOf(state), colour.mint);
   const status = [
     battle.star ? "STAR" : "",
     battle.shield > 0 ? `SHIELD ${String(battle.shield)}` : "",

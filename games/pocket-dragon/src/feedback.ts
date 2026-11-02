@@ -1,5 +1,6 @@
 import type { EffectName } from "./audio.ts";
 import { evadeMove, quickMove } from "./rules/castle/battle.ts";
+import { guildLevel } from "./rules/castle/guild.ts";
 import type { CastleState } from "./rules/castle/types.ts";
 import { striking } from "./rules/hills/boss.ts";
 import { flapSpeed, jumpSpeed } from "./rules/hills/constants.ts";
@@ -114,13 +115,22 @@ export function woodsSounds(
 }
 
 const messageSounds: Readonly<Record<string, EffectName>> = {
+  bumped: "hit",
+  "cage-opened": "freed",
   captured: "finish",
+  "egg-saved": "egg",
+  forcefield: "shield",
+  "gate-open": "gate",
   lilies: "open",
   melted: "melt",
   nap: "nap",
+  night: "stage",
   parted: "open",
   pushed: "open",
+  shrugged: "shield",
+  stunned: "guard",
   tired: "talk",
+  winter: "stage",
 };
 
 const soundOf = (id: string): EffectName =>
@@ -129,11 +139,13 @@ const soundOf = (id: string): EffectName =>
     ? "join"
     : id.startsWith("got")
       ? "chest"
-      : id.startsWith("cheered")
-        ? "cheer"
-        : id.includes("charm")
-          ? "charm"
-          : "talk");
+      : id.startsWith("gear") || id.startsWith("clue")
+        ? "chest"
+        : id.startsWith("cheered")
+          ? "cheer"
+          : id.includes("charm")
+            ? "charm"
+            : "talk");
 
 export function castleSounds(
   before: CastleState,
@@ -164,5 +176,6 @@ export function castleSounds(
     heard.push(battle.dodged ? "evade" : "reply");
   if (fifths(before.plasma.gathered, after.plasma.gathered))
     heard.push("plasma");
+  if (guildLevel(after) > guildLevel(before)) heard.push("levelup");
   return heard;
 }

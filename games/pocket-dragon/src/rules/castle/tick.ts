@@ -17,7 +17,6 @@ import {
   plasmaCatch,
   plasmaReach,
   plasmaSpeed,
-  stepTicks,
   trailLength,
 } from "./constants.ts";
 import { castleMotes } from "./motes.ts";
@@ -30,7 +29,10 @@ import {
   items,
   start,
 } from "./places.ts";
-import { ahead, arrive, breathe, interact, walkable } from "./world.ts";
+import { stepOf } from "./guild.ts";
+import { guardsTick, nightFalls } from "./night.ts";
+import { rooms } from "./rooms.ts";
+import { ahead, arrive, breathe, interact, land, walkable } from "./world.ts";
 import type { CastleControl, CastleState, Facing, Spot } from "./types.ts";
 
 export function startCastle(
@@ -44,11 +46,11 @@ export function startCastle(
     return rolled.value;
   });
   return {
-    bannerRaised: false,
     battle: null,
     charms: charmSpots.map(() => false),
     charmsUsed: charmSpots.map(() => false),
     cheered: foes.map(() => false),
+    clues: rooms.map(() => false),
     controls: {
       act: false,
       charm: false,
@@ -66,6 +68,7 @@ export function startCastle(
       up: false,
     },
     crossedRiver: false,
+    eggs: [],
     ended: false,
     escapedWoods: false,
     evades: 0,
@@ -73,21 +76,32 @@ export function startCastle(
     favourites,
     finishTick: null,
     fireTick: -1,
+    forceTaken: false,
+    forcefield: 0,
     friends: friends.map(() => false),
+    gateOpen: false,
+    gear: rooms.map(() => false),
+    goldenEgg: false,
+    guards: [],
     hearts,
     heartsLost: 0,
     held: items.map(() => false),
+    invulnerable: 0,
     lilies: false,
     melted: false,
     message: null,
     naps: 0,
     opened: brambles.map(() => false),
     perfectPicks: 0,
+    phase: "day",
+    phaseTick: 0,
     plasma: freshPlasma(castleMotes),
     pushed: boulders.map(() => false),
     rng,
+    room: -1,
     seed,
     step: null,
+    stuns: 0,
     taken: items.map(() => false),
     tick: 0,
     trail: [],
@@ -112,11 +126,12 @@ const hotkeys: Partial<Record<CastleControl, number>> = {
 export function standingAt(state: CastleState): Spot {
   const to = { x: state.x * 16 + 8, y: state.y * 16 + 8 };
   if (state.step === null) return to;
-  const part = Math.min(stepTicks, state.tick - state.step.start);
+  const ticks = stepOf(state);
+  const part = Math.min(ticks, state.tick - state.step.start);
   const from = { x: state.step.from.x * 16 + 8, y: state.step.from.y * 16 + 8 };
   return {
-    x: from.x + Math.trunc(((to.x - from.x) * part) / stepTicks),
-    y: from.y + Math.trunc(((to.y - from.y) * part) / stepTicks),
+    x: from.x + Math.trunc(((to.x - from.x) * part) / ticks),
+    y: from.y + Math.trunc(((to.y - from.y) * part) / ticks),
   };
 }
 const isDirection = (control: CastleControl): control is Facing =>
@@ -150,23 +165,31 @@ export function pressCastle(
   return turned;
 }
 
-// One tick: metaplasma drifts to Glitchy; a challenge's reply comes when its show is over; a step finishes; or, with a way held, the
-// next step begins.
+// One tick: metaplasma drifts to Glitchy (outdoors); the blinking and the forcefield wear off; night falls once the guild is whole and
+// winter comes once every egg is saved; the guards step; a challenge's reply comes when its show is over; a step finishes; or, with a way
+// held, the next step begins. Once the golden egg is taken, or the hearts are gone, only the clock goes on.
 export function tickCastle(before: CastleState): CastleState {
   const at = standingAt(before);
-  const state = {
+  const timed = {
     ...before,
-    plasma: pullPlasma(before.plasma, castleMotes, at.x, at.y, {
-      catchWithin: plasmaCatch,
-      reach: plasmaReach,
-      speed: plasmaSpeed,
-    }),
+    forcefield: Math.max(0, before.forcefield - 1),
+    invulnerable: Math.max(0, before.invulnerable - 1),
+    plasma:
+      before.room >= 0
+        ? before.plasma
+        : pullPlasma(before.plasma, castleMotes, at.x, at.y, {
+            catchWithin: plasmaCatch,
+            reach: plasmaReach,
+            speed: plasmaSpeed,
+          }),
     tick: before.tick + 1,
   };
-  if (state.bannerRaised) return state;
-  if (state.battle !== null) return reply(state);
+  if (timed.goldenEgg || timed.hearts <= 0) return timed;
+  if (timed.battle !== null) return reply(timed);
+  const fallen = nightFalls(timed);
+  const state = guardsTick(fallen, (x, y) => land(fallen, x, y));
   if (state.step !== null)
-    return state.tick - state.step.start >= stepTicks
+    return state.tick - state.step.start >= stepOf(state)
       ? arrive({ ...state, step: null })
       : state;
   const way = state.controls[state.facing]

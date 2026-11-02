@@ -66,20 +66,43 @@ export interface Battle {
   readonly spirit: number;
 }
 
+// The guild's level has three parts, each with its own look: the day (gather the guild), the night (save the eggs from DeFu's
+// security guards) and the winter (storm the castle for the Legendary Golden Egg).
+export type Phase = "day" | "night" | "winter";
+
+// An egg of the night: where it is, and whether it lies loose, is carried off by a guard, sits in the guards' cage, or has been saved.
+export interface NightEgg {
+  readonly state: "caged" | "carried" | "loose" | "saved";
+  readonly x: number;
+  readonly y: number;
+}
+
+// A security guard of the night: where it stands, the egg it carries (-1 for none), the ticks it stays dizzy, and when it last stepped.
+export interface NightGuard {
+  readonly carrying: number;
+  readonly dizzy: number;
+  readonly moved: number;
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface Message {
   readonly id: string;
   readonly tick: number;
 }
 
 export interface CastleState {
-  readonly bannerRaised: boolean;
   readonly battle: Battle | null;
   // The secret charms found on the map (spirit, star, shield) and those used up in challenges.
   readonly charms: readonly boolean[];
   readonly charmsUsed: readonly boolean[];
   readonly cheered: readonly boolean[];
+  // The clues read in the houses (three open the castle gate in winter).
+  readonly clues: readonly boolean[];
   readonly controls: Readonly<Record<CastleControl, boolean>>;
   readonly crossedRiver: boolean;
+  // The night's eggs (none before night falls).
+  readonly eggs: readonly NightEgg[];
   readonly ended: boolean;
   readonly escapedWoods: boolean;
   // Grumbles the guild evaded.
@@ -89,23 +112,41 @@ export interface CastleState {
   readonly favourites: readonly number[];
   readonly finishTick: number | null;
   readonly fireTick: number;
+  // Ticks of the forcefield left, and whether its bubble has been taken.
+  readonly forcefield: number;
+  readonly forceTaken: boolean;
   readonly friends: readonly boolean[];
+  readonly gateOpen: boolean;
+  // The gear found in the houses: swift boots, the cheer cape, the ember helm.
+  readonly gear: readonly boolean[];
+  // The Legendary Golden Egg has been taken from the throne: the level is won.
+  readonly goldenEgg: boolean;
+  readonly guards: readonly NightGuard[];
   // Hearts left, and hearts lost in the run (in the quest, the level starts with the hearts the one before ended with).
   readonly hearts: number;
   readonly heartsLost: number;
   readonly held: readonly boolean[];
+  // Ticks Glitchy blinks after a bump, when no other bump counts.
+  readonly invulnerable: number;
   readonly melted: boolean;
   readonly message: Message | null;
   readonly naps: number;
   readonly opened: readonly boolean[];
   readonly perfectPicks: number;
+  readonly phase: Phase;
+  // The tick the phase began.
+  readonly phaseTick: number;
   readonly plasma: Plasma;
   readonly pushed: readonly boolean[];
   readonly lilies: boolean;
   readonly rng: number;
+  // The house Glitchy is inside (by its place in `doors`), or -1 outdoors.
+  readonly room: number;
   readonly seed: number;
   // The tile stepped from and the tick the step began, while Glitchy walks to (x, y).
   readonly step: { readonly from: Spot; readonly start: number } | null;
+  // Guards left dizzy with a puff of fire.
+  readonly stuns: number;
   readonly taken: readonly boolean[];
   readonly tick: number;
   readonly trail: readonly Spot[];

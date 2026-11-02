@@ -7,9 +7,9 @@ import type { PlayId } from "./rules/constants.ts";
 export const guides: Readonly<Record<PlayId, Guide>> = {
   castle: {
     lines: [
-      "ARROWS: WALK ANYWHERE   SPACE: TALK   F: BREATHE FIRE",
-      "CHALLENGES: 1-5 SHOWS  Q QUICK  E EVADE  C CHARM",
-      "BUILD A GUILD, CHEER UP THE GUARDS, RAISE THE BANNER",
+      "ARROWS: WALK   SPACE: TALK AND OPEN   F: FIRE",
+      "DAY: BUILD THE GUILD  NIGHT: SAVE THE EGGS",
+      "WINTER: STORM THE CASTLE FOR THE GOLDEN EGG",
     ],
     start: "ENTER TO PRACTISE LEVEL 2",
     title: "THE GUILD AND THE CASTLE",
@@ -45,7 +45,7 @@ export const guides: Readonly<Record<PlayId, Guide>> = {
 
 export const instructions: Readonly<Record<PlayId, string>> = {
   castle:
-    "Arrows walk, space talks and picks up, F breathes fire. Help four friends join your guild. In a challenge: 1 to 5 shows, Q quick cheer, E evade, C charm.",
+    "Arrows walk, space talks and opens, F breathes fire. By day, help four friends join your guild and search the houses for gear and clues; by night, save the eggs from DeFu's guards; in winter, storm the castle. In a challenge: 1 to 5 shows, Q quick cheer, E evade, C charm.",
   hills:
     "Arrows or A and D run, space or up jumps, F breathes fire, down digs into a burrow. Take the wings to fly and the bubble for a forcefield, bounce a spring into the sky, and beat DeFu's ghost dragons to unseal each portal.",
   quest:

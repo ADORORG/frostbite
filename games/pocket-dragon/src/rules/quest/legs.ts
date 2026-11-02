@@ -75,7 +75,7 @@ const hills: LegKind<HillsControl, HillsState> = {
 
 const castle: LegKind<CastleControl, CastleState> = {
   chapter: castleChapter,
-  cleared: (state) => state.bannerRaised,
+  cleared: (state) => state.goldenEgg,
   earned: castleEarned,
   failed: (state) => state.hearts <= 0,
   hearts: (state) => state.hearts,

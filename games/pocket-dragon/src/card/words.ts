@@ -70,8 +70,8 @@ export const chapterMoves: Readonly<
   Record<ChapterId, readonly [MoveWords, MoveWords]>
 > = {
   castle: [
-    { name: "GUILD CALL", stat: 0, text: "Friends who joined the guild" },
-    { name: "CHEER SHOW", stat: 1, text: "Castle keepers cheered up" },
+    { name: "GUILD LEVEL", stat: 0, text: "The guild's level, one to ten" },
+    { name: "EGG RESCUE", stat: 2, text: "Eggs saved from DeFu's guards" },
   ],
   hills: [
     { name: "EGG SNATCH", stat: 0, text: "Eggs caught on the run" },

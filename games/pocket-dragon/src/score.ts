@@ -1,5 +1,12 @@
 import { maxTicks as castleMax } from "./rules/castle/constants.ts";
-import { friendsJoined } from "./rules/castle/milestones.ts";
+import {
+  cluesRead as cluesFound,
+  eggsSaved,
+  friendsJoined,
+  gearFound,
+  guildLevel,
+} from "./rules/castle/guild.ts";
+import { nightEggs } from "./rules/castle/places.ts";
 import type { CastleState } from "./rules/castle/types.ts";
 import { maxTicks as hillsMax, stages } from "./rules/hills/constants.ts";
 import { eggsCaught } from "./rules/hills/milestones.ts";
@@ -55,13 +62,17 @@ export const woodsStats = (state: WoodsState): readonly Stat[] => [
 export const castleScore = (state: CastleState): number =>
   friendsJoined(state) * 500 +
   state.cheered.filter(Boolean).length * 800 +
-  (state.bannerRaised ? 3_000 : 0) +
+  eggsSaved(state) * 300 +
+  cluesFound(state) * 200 +
+  gearFound(state) * 200 +
+  (state.goldenEgg ? 3_000 : 0) +
   bonus(state.finishTick, castleMax);
 
+// The guild's level, the hearts left and the eggs saved from the night's guards.
 export const castleStats = (state: CastleState): readonly Stat[] => [
-  ["Guild", of(friendsJoined(state), state.friends.length)],
-  ["Cheered", of(state.cheered.filter(Boolean).length, state.cheered.length)],
-  ["Charms", of(state.charms.filter(Boolean).length, state.charms.length)],
+  ["Guild", `Lv ${String(guildLevel(state))}`],
+  ["Hearts", String(state.hearts)],
+  ["Eggs", of(eggsSaved(state), nightEggs.length)],
 ];
 
 // What a level of the quest is worth and holds, whichever it is.

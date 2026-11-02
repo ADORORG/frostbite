@@ -29,9 +29,21 @@ goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The villai
    - **Power-ups and obstacles.** Wings (ten seconds of flapping: press jump in the air) and a forcefield bubble (ten seconds when
      nothing hurts, and a gloomling or guard bumped is cheered up) on every stage; steam vents that puff on and off, and from stage two
      boulders rolling to and fro (jump them, or land on top to bounce).
-2. **The Guild and the Castle** (a small role-playing quest on a map seen from above). Find what four dragon friends want so they join your
-   guild, then use their powers (Bolt pushes boulders, Splash grows lily pads, Bloom parts brambles, Spark lights up a show) to get out of
-   the woods. Cheer up three grumble guards and the Grumble King and raise your banner on the castle.
+2. **The Guild and the Castle** (a small role-playing quest on a map seen from above, walked tile by tile anywhere on it). It has three
+   parts, and finishing each one changes the whole land's look:
+   - **Day: gather the guild.** Find what four dragon friends want so they join your guild and follow you, then use their powers (Bolt
+     pushes boulders, Splash grows lily pads, Bloom parts brambles, Spark lights up a show). Bump a house's door to go in: the bakery,
+     the library and the watchtower each hold a chest of gear (swift boots step faster, the cheer cape makes every show stronger, the
+     ember helm breathes fire three tiles) and a clue on a stand.
+   - **Night: save the eggs.** Once the guild is whole the sun sets. DeFu's security guards walk out with lanterns, carry the night's
+     eight eggs off to their cage cart, and chase Glitchy when none is loose. Puff fire at a guard to leave it dizzy (it drops what it
+     carries), walk onto a loose egg to save it, and open the cage to save every egg in it. A guard that bumps into Glitchy costs a heart;
+     a forcefield bubble in the village keeps the guards off for ten seconds. Out of hearts, the level is lost.
+   - **Winter: storm the castle.** With every egg safe, snow falls and the river freezes, so the land can be walked end to end. The gate
+     opens to the three clues; inside, three grumble guards and the Grumble King stand between the guild and the **Legendary Golden
+     Egg** on the throne.
+   - **The guild levels up.** Everything the guild does is experience (friends, gear, clues, eggs, dizzy guards, keepers cheered,
+     charms), shown as a level from one to ten: a higher level has more spirit in a challenge, and every four levels stronger shows.
    - **Cheer battles.** Each keeper is met on its own background (the courtyard, the torch hall, the starry tower and the throne room),
      with its grumble and the guild's spirit as bars. Each turn, put on a show (each keeper has a favourite, which counts twice, and a hint
      says which), a quick cheer (only one, but the keeper's grumble back is only one too) or evade (its next grumble misses). The same show
@@ -70,12 +82,14 @@ owners to weigh. A won quest is saved with the progress, so a card can say so in
 ## Controls
 
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps
-(hold for a high jump, tap for a hop), down digs into a burrow, and with wings jump flaps in the air; in the woods up and down walk and left and right turn, and in the launch round up and down aim, left
-and right set the power and fire launches; in the castle the arrows walk and the action key talks and picks up. In a cheer battle the
-arrows move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C
-a charm. Enter starts a run, P pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch
-screen there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the effects off and on; the sound panel is at the bottom left. The card panel takes
-its own keys while it is open (Tab to move, Enter or Space to press, Escape to close), so none of them start a run.
+(hold for a high jump, tap for a hop), down digs into a burrow, and with wings jump flaps in the air; in the woods up and down walk and
+left and right turn, and in the launch round up and down aim, left and right set the power and fire launches; in the castle the arrows
+walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
+move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
+charm. Enter starts a run, P pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
+there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the
+effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space
+to press, Escape to close), so none of them start a run.
 
 ## Layout
 
@@ -90,7 +104,8 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
                     touch, tick, state, milestones
   woods/            the woods: trig (whole-number sines), maze (the seeded maze), stash (parts, eggs, charms, metaplasma, targets),
                     walk, tick (walking, fire, finding), launch (the launch round), milestones
-  castle/           the guild: map, places, motes, world (walking, bumping, talking), battle (cheer battles), tick, milestones
+  castle/           the guild: map, places, motes, rooms (the houses), guild (experience, levels, gear), night (guards and eggs),
+                    world (walking, bumping, talking), battle (cheer battles), tick, milestones
   quest/            the whole quest: keys (presses written compactly), legs (each level as the quest plays it), tick (the shift
                     between levels, hearts carried, won and lost), milestones, index (the quest's verifier)
   milestones.ts     every milestone id, in the manifest's order
@@ -148,13 +163,14 @@ owner to approve.
 The tests hold what the generators guarantee: in Egg Hills the fire berry always comes at least six tiles before the first ice wall, pits
 are at most two tiles wide, every stage has a golden egg on a ledge, a nest halfway, a secret charm with a ledge to reach it from and an
 arena with nothing else in it, every run has at least 90 eggs, 15 blocks of ice and 8 gloomlings, and stages get more pits and faster
-gloomlings as they go; in the woods every path cell can be reached, the parts, eggs and charms are each on their own cell that Glitchy
-can walk to, the moon chest is a dead end behind the frozen hedge, and nothing shuts Glitchy in at the start. Players who see what is
-coming (`test/support/*-bot.ts`) earn every milestone of each level on the seeds tried, and their records replay through the published
-verifier to the same milestones: Egg Hills, all three of DeFu's fights included, without a bump; the woods with everything found and
-a bonus over 1,000; the castle with the Masterful Pocket Dragon Charm; and the whole quest, won in about four minutes with every heart
-(`test/support/quest-bot.ts` plays each level with its own bot on the quest's clock). A player who puts on the weakest shows and leaves a friend and the
-charms behind still captures the castle, after a nap. Nobody has played it as a person yet.
+gloomlings as they go; in the woods every path cell can be reached, the parts, eggs and charms are each on their own cell that Glitchy can
+walk to, the moon chest is a dead end behind the frozen hedge, and nothing shuts Glitchy in at the start. Players who see what is coming
+(`test/support/*-bot.ts`) earn every milestone of each level on the seeds tried, and their records replay through the published verifier
+to the same milestones: Egg Hills, all three of DeFu's fights included, without a bump; the woods with everything found and a bonus over
+1,000; the castle with the Masterful Pocket Dragon Charm; and the whole quest, won in about four minutes with every heart
+(`test/support/quest-bot.ts` plays each level with its own bot on the quest's clock). A player who puts on the weakest shows and leaves
+the charms behind still takes the golden egg, after a nap; the castle bot plays the night as it comes (the cage first, then the nearest
+egg, then a puff of fire at any guard beside it or carrying an egg). Nobody has played it as a person yet.
 
 ## Tests
 

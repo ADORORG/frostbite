@@ -97,7 +97,7 @@ describe("the quest", () => {
       state: expect.anything(),
     });
     expect(pocketDragonRules.init(5, { cabinet: "quest" }).ok).toBe(true);
-    expect(maxTicks).toBe(21_600 + 36_000 + 21_600 + 2 * shiftTicks);
+    expect(maxTicks).toBe(21_600 + 54_000 + 21_600 + 2 * shiftTicks);
   });
 
   it("shifts into the next dimension when a level is cleared, and starts it with the hearts the last ended with", () => {
@@ -156,7 +156,7 @@ describe("the quest", () => {
     const late = tickQuest(
       inLevel(
         startQuest(5),
-        legRun(legKinds.castle, { ...startCastle(5), tick: 36_000 - 1 }),
+        legRun(legKinds.castle, { ...startCastle(5), tick: 54_000 - 1 }),
       ),
     );
     expect(late.lost).toBe(true);

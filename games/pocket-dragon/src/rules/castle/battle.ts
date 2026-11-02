@@ -6,8 +6,8 @@ import {
   replyMost,
   shieldBlocks,
   showTicks,
-  spiritMax,
 } from "./constants.ts";
+import { showBonus, spiritOf } from "./guild.ts";
 import { king } from "./places.ts";
 import type { Battle, CastleState } from "./types.ts";
 
@@ -15,7 +15,7 @@ import type { Battle, CastleState } from "./types.ts";
 // guild picks a move: a show (fireworks from Glitchy, and one from each friend who has joined), which brings the keeper's grumble down
 // by its power (twice over for the keeper's favourite; the same show twice running is too tired to work); a quick cheer (only 1, but the
 // grumble back is kept small); evade (the next grumble misses; not twice running); or a secret charm. Then the keeper grumbles back with
-// one of its attacks and the guild's spirit dips. A keeper whose grumble runs out cheers up; a guild whose spirit runs out takes a nap
+// one of its attacks and the guild's spirit dips. The guild's level and gear make it stronger (`guild.ts`). A keeper whose grumble runs out cheers up; a guild whose spirit runs out takes a nap
 // and carries on, fresh (the keeper stays as cheered up as it was, so a challenge can always be won in the end).
 export const moves = [
   { id: "fireworks", member: -1, power: 3 },
@@ -65,7 +65,7 @@ export function challenge(state: CastleState, foe: number): CastleState {
     phase: "choose",
     shield: 0,
     since: state.tick,
-    spirit: spiritMax,
+    spirit: spiritOf(state),
     star: false,
   };
   return {
@@ -103,7 +103,7 @@ function useCharm(state: CastleState, battle: Battle): CastleState {
   };
   const changed =
     charm === 0
-      ? { ...battle, spirit: spiritMax }
+      ? { ...battle, spirit: spiritOf(state) }
       : charm === 1
         ? { ...battle, star: true }
         : { ...battle, shield: battle.shield + shieldBlocks };
@@ -133,7 +133,9 @@ export function act(state: CastleState, move: number): CastleState {
   const power =
     move === quickMove
       ? 1
-      : (moves[move]?.power ?? 2) * (favourite ? 2 : 1) * (battle.star ? 3 : 1);
+      : ((moves[move]?.power ?? 2) + showBonus(state)) *
+        (favourite ? 2 : 1) *
+        (battle.star ? 3 : 1);
   const firstFavourite = battle.firstFavourite ?? favourite;
   const grumble = battle.grumble - power;
   if (grumble <= 0)
@@ -192,7 +194,7 @@ export function reply(state: CastleState): CastleState {
     return { ...state, battle: next, evades, rng: rolled.state };
   return {
     ...say(state, "nap"),
-    battle: { ...next, last: -1, spirit: spiritMax },
+    battle: { ...next, last: -1, spirit: spiritOf(state) },
     evades,
     naps: state.naps + 1,
     rng: rolled.state,

@@ -7,19 +7,32 @@ import { colour } from "./palette.ts";
 
 // One tile of the guild's land, sixteen pixels square, at (x, y) on the screen. What a boulder, a bramble, the ice or the ford looks like
 // depends on what the guild has done to it.
+// Grass, or in winter snow.
 const grassy = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
   tx: number,
   ty: number,
+  winter = false,
 ): void => {
-  block(context, colour.grass, x, y, 16, 16);
-  if ((tx * 7 + ty * 13) % 4 === 0)
-    block(context, colour.grassDark, x + 4, y + 9, 1, 2);
-  if ((tx * 5 + ty * 3) % 3 === 0)
-    block(context, colour.grassDark, x + 11, y + 4, 1, 2);
+  block(context, winter ? "#eef6ff" : colour.grass, x, y, 16, 16);
+  const tuft = winter ? "#c9dcf2" : colour.grassDark;
+  if ((tx * 7 + ty * 13) % 4 === 0) block(context, tuft, x + 4, y + 9, 1, 2);
+  if ((tx * 5 + ty * 3) % 3 === 0) block(context, tuft, x + 11, y + 4, 1, 2);
 };
+
+// The river frozen over in winter.
+function frozen(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  tx: number,
+): void {
+  block(context, "#bfe6ff", x, y, 16, 16);
+  block(context, colour.white, x + ((tx * 5) % 9), y + 5, 6, 1);
+  block(context, "#8fcbec", x + 3, y + 11, 4, 1);
+}
 
 function water(
   context: CanvasRenderingContext2D,
@@ -49,13 +62,14 @@ export function drawTile(
   y: number,
 ): void {
   const tile = tileAt(tx, ty);
+  const winter = state.phase === "winter";
   switch (tile) {
     case ",":
-      block(context, "#d9b77a", x, y, 16, 16);
+      block(context, winter ? "#d8d2c8" : "#d9b77a", x, y, 16, 16);
       if ((tx + ty) % 3 === 0) block(context, "#b8935a", x + 6, y + 7, 2, 2);
       return;
     case "f":
-      grassy(context, x, y, tx, ty);
+      grassy(context, x, y, tx, ty, winter);
       block(
         context,
         (tx + ty) % 2 === 0 ? colour.pink : colour.gold,
@@ -72,9 +86,14 @@ export function drawTile(
         block(context, "#d9bf7a", x + 8, y + 6, 1, 1);
       return;
     case "~":
-      water(context, x, y, tx, state.tick);
+      if (winter) frozen(context, x, y, tx);
+      else water(context, x, y, tx, state.tick);
       return;
     case "L":
+      if (winter) {
+        frozen(context, x, y, tx);
+        return;
+      }
       water(context, x, y, tx, state.tick);
       if (state.lilies) {
         block(context, colour.leaf, x + 2, y + 3, 11, 10);
@@ -94,19 +113,45 @@ export function drawTile(
     case "H": {
       const roof = tileAt(tx, ty - 1) !== "H";
       block(context, roof ? "#d8504f" : "#e8c79a", x, y, 16, 16);
-      if (roof) block(context, "#a83434", x, y + 12, 16, 4);
+      if (roof)
+        block(context, winter ? colour.white : "#a83434", x, y + 12, 16, 4);
       else block(context, "#7ec3ff", x + 5, y + 4, 6, 5);
       return;
     }
+    case "D":
+      block(context, "#e8c79a", x, y, 16, 16);
+      block(context, colour.woodDark, x + 4, y + 3, 8, 13);
+      block(context, colour.gold, x + 9, y + 9, 2, 2);
+      return;
+    case "G":
+      block(context, "#6f6a9a", x, y, 16, 16);
+      for (let bar = 0; bar < 4; bar += 1)
+        block(
+          context,
+          colour.ink,
+          x + 1 + bar * 4,
+          y,
+          2,
+          state.gateOpen ? 3 : 16,
+        );
+      if (!state.gateOpen) block(context, colour.ink, x, y + 7, 16, 2);
+      return;
     case "T":
-      grassy(context, x, y, tx, ty);
+      grassy(context, x, y, tx, ty, winter);
       block(context, colour.woodDark, x + 6, y + 10, 4, 6);
       block(context, colour.leaf, x + 1, y + 1, 14, 11);
       block(context, "#2f8a4a", x + 3, y + 6, 10, 5);
-      block(context, "#7bd96b", x + 4, y + 3, 3, 2);
+      block(
+        context,
+        winter ? colour.white : "#7bd96b",
+        x + (winter ? 1 : 4),
+        y + (winter ? 1 : 3),
+        winter ? 14 : 3,
+        winter ? 4 : 2,
+      );
       return;
     default:
-      grassy(context, x, y, tx, ty);
+      grassy(context, x, y, tx, ty, winter);
   }
   if (tile === "o" && state.pushed[at(boulders, tx, ty)] !== true)
     sprite(

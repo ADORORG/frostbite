@@ -197,12 +197,22 @@ describe("the score and counts", () => {
     };
     expect(castleScore(castle)).toBe(1_000 + 800);
     expect(
-      castleScore({ ...castle, bannerRaised: true, finishTick: 36_000 }),
+      castleScore({ ...castle, finishTick: 54_000, goldenEgg: true }),
     ).toBe(castleScore(castle) + 3_000);
-    expect(castleStats(castle)).toEqual([
-      ["Guild", "2 of 4"],
-      ["Cheered", "1 of 4"],
-      ["Charms", "1 of 3"],
+    const night = {
+      ...castle,
+      clues: [true, false, false],
+      eggs: [
+        { state: "saved" as const, x: 1, y: 1 },
+        { state: "loose" as const, x: 2, y: 2 },
+      ],
+      gear: [true, true, false],
+    };
+    expect(castleScore(night)).toBe(castleScore(castle) + 300 + 200 + 400);
+    expect(castleStats(night)).toEqual([
+      ["Guild", "Lv 3"],
+      ["Hearts", "3"],
+      ["Eggs", "1 of 8"],
     ]);
   });
 });

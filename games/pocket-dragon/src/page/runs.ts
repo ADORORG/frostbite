@@ -103,7 +103,7 @@ export const woodsLook: Look<WoodsControl, WoodsState> = {
 };
 
 export const castleLook: Look<CastleControl, CastleState> = {
-  cleared: (state) => state.bannerRaised,
+  cleared: (state) => state.goldenEgg,
   draw: drawCastle,
   means: {
     act: "act",
