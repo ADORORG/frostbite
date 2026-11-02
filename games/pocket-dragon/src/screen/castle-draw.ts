@@ -5,11 +5,14 @@ import { mapHeight, mapWidth } from "../rules/castle/map.ts";
 import { foes, friends, items, king } from "../rules/castle/places.ts";
 import type { CastleState, Spot } from "../rules/castle/types.ts";
 import { drawBattle } from "./castle-battle.ts";
+import { castleKit } from "./castle-kit.ts";
 import { darkness, nightThings, phaseBanner, snow } from "./castle-night.ts";
 import { drawRoom, roomCamera } from "./castle-room.ts";
 import { landHud, landStash } from "./castle-stash.ts";
 import { drawTile } from "./castle-tiles.ts";
 import { castleWords } from "./castle-words.ts";
+import { spriteScaled } from "./kit-sprites.ts";
+import { drawPack } from "./pack-hud.ts";
 import { colour } from "./palette.ts";
 import {
   crown,
@@ -124,20 +127,22 @@ function glitchy(
         : state.facing === "right"
           ? side
           : side.map((row) => [...row].reverse().join(""));
+  const scale = state.powers.big ? 2 : 1;
   block(
     context,
     colour.shadow,
-    at.x - camera.x + 3,
+    at.x - camera.x + 8 - 5 * scale,
     at.y - camera.y + 14,
-    10,
+    10 * scale,
     2,
   );
-  sprite(
+  spriteScaled(
     context,
     picture,
     glitchyColours,
-    at.x - camera.x,
-    at.y - camera.y - (walking ? 1 : 0),
+    at.x - camera.x + 8 - 8 * scale,
+    at.y - camera.y + 16 - 16 * scale - (walking ? 1 : 0),
+    scale,
   );
 }
 
@@ -260,6 +265,7 @@ export function drawCastle(
         );
     landStash(context, state, camera);
     nightThings(context, state, camera);
+    castleKit(context, state, camera);
   }
   people(context, state, camera);
   if (state.invulnerable === 0 || Math.floor(state.tick / 4) % 2 === 1)
@@ -273,6 +279,7 @@ export function drawCastle(
   }
   words(context, state);
   landHud(context, state);
+  drawPack(context, state.powers, state.tick);
   phaseBanner(context, state);
   if (state.goldenEgg)
     write(context, "THE GOLDEN EGG IS YOURS!", width / 2, 40, 12, colour.gold);

@@ -36,7 +36,7 @@ export const pocketDragonGame = defineGame({
     video: null,
   },
   description:
-    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, then DeFu's woods and lair in full 3D, where you free caged dragons, find the rocket keys, break her egg factory, dodge her laser and shockwave, and defuse her egg rocket before it leaves for space. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather. Forty milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
+    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, then DeFu's woods and lair in full 3D, where you free caged dragons, find the rocket keys, break her egg factory, dodge her laser and shockwave, and defuse her egg rocket before it leaves for space. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather, and berries, mushrooms and pineapples for your backpack to use when you like: fire that reaches farther, a glitch blast that rolls through everything in its way, or growing big so the next bump only shrinks you. Forty milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
   id: "pocket-dragon",
   launch: { mode: "embedded" },
   milestones: [
@@ -292,7 +292,7 @@ export const pocketDragonGame = defineGame({
     replay: {
       id: "pocket-dragon",
       sha256:
-        "3d51f2a7927add36115f99c9599fec9fa1918a7b1a1c82e8f6996f9b1649484c",
+        "e912a5eb4bc172f17d13455402ba5081562b0e59924e3d92a7b09e1848fc031a",
       version: 1,
     },
   },

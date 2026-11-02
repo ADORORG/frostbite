@@ -166,6 +166,9 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
       "right",
       "act",
       "fire",
+      "berry",
+      "mushroom",
+      "pineapple",
     ]);
     expect(offered.every((button) => !button.hasAttribute("disabled"))).toBe(
       true,

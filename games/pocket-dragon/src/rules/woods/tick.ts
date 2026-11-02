@@ -1,5 +1,7 @@
+import { wearOff } from "../kit.ts";
 import {
   backSpeed,
+  blazeLonger,
   cell,
   fireCooldown,
   fireReach,
@@ -18,6 +20,7 @@ import {
 } from "./constants.ts";
 import { pullPlasma } from "../plasma.ts";
 import { startBase } from "./base.ts";
+import { takeMazeKit } from "./powers.ts";
 import { tickBase } from "./base-tick.ts";
 import { playScene, sceneOn } from "./scenes.ts";
 import { along, fullTurn } from "./trig.ts";
@@ -33,8 +36,8 @@ const near = (state: WoodsState, place: Place, within: number): boolean => {
   return Math.abs(state.x - cx) <= within && Math.abs(state.y - cy) <= within;
 };
 
-// A breath of fire: it goes straight ahead in short steps, melts the frozen hedge if it meets it, lights the first unlit lantern it passes
-// close to, and stops at a tree.
+// A breath of fire: it goes straight ahead in short steps (twice as far in a berry's blaze), melts the frozen hedge if it meets it, lights
+// the first unlit lantern it passes close to, and stops at a tree.
 export function breatheFire(state: WoodsState): WoodsState {
   if (state.fireCooldown > 0) return state;
   const breathed = {
@@ -44,7 +47,8 @@ export function breatheFire(state: WoodsState): WoodsState {
     fireCooldown: fireCooldown,
   };
   const [dx, dy] = along(state.angle, fireStep);
-  for (let step = 1; step * fireStep <= fireReach; step += 1) {
+  const farthest = fireReach * (state.powers.blaze > 0 ? blazeLonger : 1);
+  for (let step = 1; step * fireStep <= farthest; step += 1) {
     const x = state.x + dx * step;
     const y = state.y + dy * step;
     const lantern = state.level.lanterns.findIndex((place, at) => {
@@ -85,7 +89,7 @@ const gather = (
   return now.some((got, at) => got !== had[at]) ? now : had;
 };
 
-// Picking up the launcher's parts, eggs and secret charms, and the metaplasma drifting to Glitchy.
+// Picking up the launcher's parts, eggs, secret charms and the backpack's foods, and the metaplasma drifting to Glitchy.
 function pickUp(state: WoodsState, tick: number): WoodsState {
   const parts = gather(state, state.level.parts, state.parts);
   const eggs = gather(state, state.level.eggs, state.eggs);
@@ -103,7 +107,7 @@ function pickUp(state: WoodsState, tick: number): WoodsState {
         : eggs !== state.eggs
           ? { kind: "egg", tick }
           : state.found;
-  return { ...state, charms, eggs, found, parts, plasma };
+  return takeMazeKit({ ...state, charms, eggs, found, parts, plasma });
 }
 
 // One tick of the woods: while a scene plays only the clock moves; out of the maze, the woods seen from above (`base-tick.ts`); in the
@@ -153,6 +157,7 @@ export function tickWoods(before: WoodsState): WoodsState {
       fireCooldown: Math.max(0, moved.fireCooldown - 1),
       found,
       moonChest,
+      powers: wearOff(moved.powers),
       tick,
       visited:
         moved.visited[here] === true

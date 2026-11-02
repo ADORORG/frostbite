@@ -32,6 +32,7 @@ import {
   springs,
   vent,
 } from "./secret-layout.ts";
+import { kitSpots } from "./kit-layout.ts";
 import type { HillsLevel, Spot, Weather } from "./types.ts";
 
 // A stage is laid out once, from the run's seed and the stage's number. Stage one is gentle: flat meadows, narrow pits, a few slow
@@ -182,6 +183,7 @@ export function generateHills(seed: number, stage = 1): HillsLevel {
     iceAt: new Map(
       layout.ice.map((cell, index) => [cell.column * 64 + cell.row, index]),
     ),
+    kit: kitSpots(layout, checkpoint, stage),
     motes: motesOf(layout.ground, stage),
     patrols: layout.patrols,
     rollers: layout.rollers,

@@ -1,6 +1,7 @@
 import { startState, stepInt } from "@ador/game-sdk/seeded";
 
 import { startHearts } from "../constants.ts";
+import { isItem, noKit, startPowers, wearOff, type Kit } from "../kit.ts";
 import { freshPlasma, pullPlasma } from "../plasma.ts";
 import {
   act,
@@ -27,8 +28,10 @@ import {
   foes,
   friends,
   items,
+  kitSpots,
   start,
 } from "./places.ts";
+import { rollBlast, takeKit, useKit } from "./powers.ts";
 import { stepOf } from "./guild.ts";
 import { guardsTick, nightFalls } from "./night.ts";
 import { rooms } from "./rooms.ts";
@@ -38,6 +41,7 @@ import type { CastleControl, CastleState, Facing, Spot } from "./types.ts";
 export function startCastle(
   seed: number,
   hearts: number = startHearts,
+  kit: Kit = noKit,
 ): CastleState {
   let rng = startState(seed ^ 0x5eed_0003);
   const favourites = foes.map(() => {
@@ -47,17 +51,21 @@ export function startCastle(
   });
   return {
     battle: null,
+    blast: null,
     charms: charmSpots.map(() => false),
     charmsUsed: charmSpots.map(() => false),
     cheered: foes.map(() => false),
     clues: rooms.map(() => false),
     controls: {
       act: false,
+      berry: false,
       charm: false,
       down: false,
       evade: false,
       fire: false,
       left: false,
+      mushroom: false,
+      pineapple: false,
       quick: false,
       right: false,
       show1: false,
@@ -87,6 +95,7 @@ export function startCastle(
     heartsLost: 0,
     held: items.map(() => false),
     invulnerable: 0,
+    kitTaken: kitSpots.map(() => false),
     lilies: false,
     melted: false,
     message: null,
@@ -96,6 +105,7 @@ export function startCastle(
     phase: "day",
     phaseTick: 0,
     plasma: freshPlasma(castleMotes),
+    powers: startPowers(kit),
     pushed: boulders.map(() => false),
     rng,
     room: -1,
@@ -138,8 +148,8 @@ const isDirection = (control: CastleControl): control is Facing =>
   directions.some((d) => d === control);
 
 // What a press does at once: in a cheer challenge it moves the menu or puts on the show, and a hotkey makes its move at once; out of one,
-// a way pressed turns Glitchy and bumps into what is there, `act` talks to (or uses) what is ahead, `fire` breathes, and the hotkeys
-// do nothing.
+// a way pressed turns Glitchy and bumps into what is there, `act` talks to (or uses) what is ahead, `fire` breathes, a food from the
+// backpack is used, and the hotkeys do nothing.
 export function pressCastle(
   state: CastleState,
   control: CastleControl,
@@ -155,6 +165,7 @@ export function pressCastle(
       : { ...state, message: { id: "not-yet", tick: state.tick } };
   }
   if (hot !== undefined) return state;
+  if (isItem(control)) return useKit(state, control);
   if (control === "fire") return breathe(state);
   const facing = isDirection(control) ? control : state.facing;
   const turned = { ...state, facing };
@@ -182,15 +193,16 @@ export function tickCastle(before: CastleState): CastleState {
             reach: plasmaReach,
             speed: plasmaSpeed,
           }),
+    powers: wearOff(before.powers),
     tick: before.tick + 1,
   };
   if (timed.goldenEgg || timed.hearts <= 0) return timed;
   if (timed.battle !== null) return reply(timed);
   const fallen = nightFalls(timed);
-  const state = guardsTick(fallen, (x, y) => land(fallen, x, y));
+  const state = rollBlast(guardsTick(fallen, (x, y) => land(fallen, x, y)));
   if (state.step !== null)
     return state.tick - state.step.start >= stepOf(state)
-      ? arrive({ ...state, step: null })
+      ? takeKit(arrive({ ...state, step: null }))
       : state;
   const way = state.controls[state.facing]
     ? state.facing

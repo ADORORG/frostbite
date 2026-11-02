@@ -1,3 +1,4 @@
+import type { Powers, TileBlast } from "../kit.ts";
 import type { Plasma } from "../plasma.ts";
 
 // The shape of the guild's quest: where Glitchy is, what the guild has done, and a cheer challenge when one is going on.
@@ -7,14 +8,18 @@ export interface Spot {
 }
 
 export type Facing = "down" | "left" | "right" | "up";
-// The ways, `act` and `fire`, and in a cheer challenge the hotkeys: a show by its number (1 to 5), a quick cheer, evade, and a charm.
+// The ways, `act` and `fire`, the backpack's three foods, and in a cheer challenge the hotkeys: a show by its number (1 to 5), a quick
+// cheer, evade, and a charm.
 export type CastleControl =
   | "act"
+  | "berry"
   | "charm"
   | "down"
   | "evade"
   | "fire"
   | "left"
+  | "mushroom"
+  | "pineapple"
   | "quick"
   | "right"
   | "show1"
@@ -38,6 +43,9 @@ export const castleControls: readonly CastleControl[] = [
   "quick",
   "evade",
   "charm",
+  "berry",
+  "mushroom",
+  "pineapple",
 ];
 
 export interface Battle {
@@ -93,6 +101,8 @@ export interface Message {
 
 export interface CastleState {
   readonly battle: Battle | null;
+  // A glitch blast rolling over the land (`powers.ts`).
+  readonly blast: TileBlast | null;
   // The secret charms found on the map (spirit, star, shield) and those used up in challenges.
   readonly charms: readonly boolean[];
   readonly charmsUsed: readonly boolean[];
@@ -128,6 +138,8 @@ export interface CastleState {
   readonly held: readonly boolean[];
   // Ticks Glitchy blinks after a bump, when no other bump counts.
   readonly invulnerable: number;
+  // Which of the backpack's foods on the map have been picked up, and the backpack with what it does (`../kit.ts`).
+  readonly kitTaken: readonly boolean[];
   readonly melted: boolean;
   readonly message: Message | null;
   readonly naps: number;
@@ -137,6 +149,7 @@ export interface CastleState {
   // The tick the phase began.
   readonly phaseTick: number;
   readonly plasma: Plasma;
+  readonly powers: Powers;
   readonly pushed: readonly boolean[];
   readonly lilies: boolean;
   readonly rng: number;

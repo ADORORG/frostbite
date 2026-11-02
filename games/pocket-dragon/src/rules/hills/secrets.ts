@@ -104,6 +104,7 @@ export function dig(state: HillsState): HillsState {
   return found(
     {
       ...state,
+      blasts: [],
       fireballs: [],
       hero: standingAt((tunnelStart + 1) * tile, groundRow),
     },
@@ -119,19 +120,26 @@ export function doors(state: HillsState): HillsState {
   const door = (spot: Spot): boolean => touches(hero, spot, doorSize, doorSize);
   if (section === "main" && door(level.cloudGate))
     return found(
-      { ...state, fireballs: [], hero: standingAt((skyStart + 1) * tile, 6) },
+      {
+        ...state,
+        blasts: [],
+        fireballs: [],
+        hero: standingAt((skyStart + 1) * tile, 6),
+      },
       "sky",
     );
   if (section === "tunnel" && door(level.tunnelEnd))
     return {
       ...state,
       checkpoint: true,
+      blasts: [],
       fireballs: [],
       hero: standingAt(level.tunnelExit, groundRow),
     };
   if (section === "sky" && (door(level.skyEnd) || hero.y > rows * tile))
     return {
       ...state,
+      blasts: [],
       fireballs: [],
       hero: standingAt(level.skyExit, groundRow),
     };
@@ -166,13 +174,15 @@ export const sprung = (level: HillsLevel, hero: Hero): Hero =>
     ? { ...hero, grounded: false, sprung: true, vy: -springSpeed }
     : hero;
 
-// What the new obstacles do this tick: a puffing vent's steam hurts; a boulder's side hurts, but coming down on top of it bounces.
+// What the new obstacles do this tick: a puffing vent's steam hurts; a boulder's side hurts, but coming down on top of it bounces (one a
+// glitch blast took away, `gone`, does neither).
 export function obstacles(
   level: HillsLevel,
   hero: Hero,
   tick: number,
   falling: number,
   bottom: number,
+  gone: readonly boolean[] = [],
 ): { readonly bounced: boolean; readonly hurt: boolean } {
   const steamed = level.vents.some(
     (vent) =>
@@ -186,7 +196,8 @@ export function obstacles(
   );
   let bounced = false;
   let hurt = steamed;
-  for (const roller of level.rollers) {
+  for (const [at, roller] of level.rollers.entries()) {
+    if (gone[at] === true) continue;
     const spot = { x: rollerX(roller, tick), y: roller.y };
     if (!touches(hero, spot, rollerSize, rollerSize)) continue;
     if (falling > 0 && bottom <= roller.y + stompDepth) bounced = true;

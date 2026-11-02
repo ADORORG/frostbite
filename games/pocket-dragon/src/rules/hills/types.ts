@@ -1,3 +1,4 @@
+import type { KitSpot, Powers } from "../kit.ts";
 import type { Plasma } from "../plasma.ts";
 
 // The shape of Egg Hills: a level (laid out from the seed, never changed while it is played) and the run going on in it.
@@ -53,6 +54,8 @@ export interface HillsLevel {
   readonly burrow: Spot;
   // The top row of the ground in each column of the stage and its two secret areas; a pit is `pitRow`, a wall `wallRow`.
   readonly ground: readonly number[];
+  // The backpack's foods lying along the way (`kit-layout.ts`).
+  readonly kit: readonly KitSpot[];
   // Ice blocks, and where each is by `column * 64 + row`.
   readonly ice: readonly Cell[];
   readonly iceAt: ReadonlyMap<number, number>;
@@ -75,13 +78,25 @@ export interface HillsLevel {
   readonly weather: Weather;
 }
 
-export type HillsControl = "down" | "fire" | "jump" | "left" | "right";
+// The ways, jump, fire and down, and the backpack's three foods (each used at once when pressed).
+export type HillsControl =
+  | "berry"
+  | "down"
+  | "fire"
+  | "jump"
+  | "left"
+  | "mushroom"
+  | "pineapple"
+  | "right";
 export const hillsControls: readonly HillsControl[] = [
   "left",
   "right",
   "jump",
   "fire",
   "down",
+  "berry",
+  "mushroom",
+  "pineapple",
 ];
 
 export interface Hero {
@@ -158,6 +173,15 @@ export interface Boss {
   readonly strike: Strike | null;
 }
 
+// A glitch blast rolling along the ground (`blast.ts`).
+export interface Blast {
+  readonly life: number;
+  readonly vx: number;
+  readonly vy: number;
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface Fireball {
   readonly life: number;
   readonly vx: number;
@@ -167,6 +191,7 @@ export interface Fireball {
 
 export interface HillsState {
   readonly berryTaken: boolean;
+  readonly blasts: readonly Blast[];
   readonly boss: Boss;
   // Puffs of fire breathed, in the whole run.
   readonly breaths: number;
@@ -197,6 +222,8 @@ export interface HillsState {
   readonly heartsLost: number;
   readonly hero: Hero;
   readonly invulnerable: number;
+  // Which of this stage's foods have been picked up, and the backpack with what it does (`../kit.ts`).
+  readonly kitTaken: readonly boolean[];
   readonly level: HillsLevel;
   readonly magnet: boolean;
   readonly melted: readonly boolean[];
@@ -205,6 +232,9 @@ export interface HillsState {
   // This stage's metaplasma, and what earlier stages of the run gathered.
   readonly plasma: Plasma;
   readonly plasmaBanked: number;
+  readonly powers: Powers;
+  // This stage's boulders and thorn bushes glitched away by a blast.
+  readonly rollersGone: readonly boolean[];
   // Secret areas found in the run (a tunnel and a sky each stage), and whether this stage's have been.
   readonly secretsFound: number;
   readonly seed: number;
@@ -213,6 +243,7 @@ export interface HillsState {
   readonly stage: number;
   readonly stageStart: number;
   readonly stagesCleared: number;
+  readonly thornsGone: readonly boolean[];
   readonly tick: number;
   readonly tunnelFound: boolean;
   // Ticks of the wings left, and whether this stage's wings have been taken.

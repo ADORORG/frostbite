@@ -9,6 +9,7 @@ import {
   changeLeg,
   legCleared,
   legHearts,
+  legKit,
   legLost,
   startLeg,
   tickLeg,
@@ -16,7 +17,7 @@ import {
 import type { QuestState } from "./types.ts";
 
 // The quest begins in Egg Hills with three hearts. Clearing a level shifts Glitchy into the next dimension, where the next level begins
-// with the hearts the last one ended with; clearing the last wins the quest, and losing any level loses it.
+// with the hearts (and the backpack) the last one ended with; clearing the last wins the quest, and losing any level loses it.
 export const startQuest = (seed: number): QuestState => ({
   ended: false,
   finishTick: null,
@@ -43,7 +44,12 @@ export function tickQuest(state: QuestState): QuestState {
         }
       : {
           ...state,
-          leg: startLeg(state.shift.to, state.seed, legHearts(state.leg)),
+          leg: startLeg(
+            state.shift.to,
+            state.seed,
+            legHearts(state.leg),
+            legKit(state.leg),
+          ),
           past: [...state.past, state.leg],
           shift: null,
           tick,

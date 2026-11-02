@@ -1,10 +1,9 @@
-import { block, sprite, wrap } from "@ador/game-sdk/pixels";
+import { block, wrap } from "@ador/game-sdk/pixels";
 
 import {
   arenaX,
   bannerTicks,
   groundRow,
-  heroHeight,
   heroWidth,
   pixel,
   rows,
@@ -35,8 +34,9 @@ import {
   secretThings,
   secretTile,
 } from "./hills-secrets.ts";
+import { hillsHero, kitThings } from "./hills-kit.ts";
 import { hillsHud, plasma, secretCharm, weather } from "./hills-sky.ts";
-import { glitchyColours, glitchySide } from "./sprites.ts";
+import { drawPack } from "./pack-hud.ts";
 import { write } from "./text.ts";
 
 // Egg Hills on a screen 256 by 144 pixels: sixteen tiles across, nine down, scrolling with Glitchy. It reads the state and changes nothing.
@@ -180,8 +180,10 @@ function things(
     );
   if (!state.berryTaken)
     berry(context, px(level.berry.x) - camera, px(level.berry.y), state.tick);
-  for (const spot of level.thorns)
-    thorn(context, px(spot.x) - camera, px(spot.y));
+  level.thorns.forEach((spot, at) => {
+    if (state.thornsGone[at] !== true)
+      thorn(context, px(spot.x) - camera, px(spot.y));
+  });
   state.glooms.forEach((gloom, at) => {
     const patrol = level.patrols[at];
     if (patrol === undefined) return;
@@ -197,29 +199,6 @@ function things(
   });
   for (const ball of state.fireballs)
     fireball(context, px(ball.x) - camera, px(ball.y), state.tick);
-}
-
-function hero(
-  context: CanvasRenderingContext2D,
-  state: HillsState,
-  camera: number,
-): void {
-  if (state.invulnerable > 0 && Math.floor(state.tick / 4) % 2 === 0) return;
-  const { hero: h } = state;
-  const breathing = state.fireCooldown > 10;
-  const picture = breathing
-    ? glitchySide.breathe
-    : !h.grounded
-      ? glitchySide.jump
-      : h.vx === 0
-        ? glitchySide.stand
-        : (glitchySide.run[Math.floor(state.tick / 6) % 2] ??
-          glitchySide.stand);
-  const rowsOf =
-    h.facing > 0 ? picture : picture.map((row) => [...row].reverse().join(""));
-  const x = px(h.x) - camera - 2;
-  const y = px(h.y) + px(heroHeight) - rowsOf.length;
-  sprite(context, rowsOf, glitchyColours, x, y);
 }
 
 function banner(context: CanvasRenderingContext2D, state: HillsState): void {
@@ -271,10 +250,12 @@ export function drawHills(
   plasma(context, state, camera);
   secretCharm(context, state, camera);
   drawArena(context, state, camera);
-  hero(context, state, camera);
+  kitThings(context, state, camera);
+  hillsHero(context, state, camera);
   heroGear(context, state, camera);
   if (sectionOf(state.hero.x) === "main") weather(context, state, camera);
   banner(context, state);
   hillsHud(context, state);
   powerBars(context, state);
+  drawPack(context, state.powers, state.tick);
 }

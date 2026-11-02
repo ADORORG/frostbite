@@ -1,4 +1,6 @@
+import { packItem, shrink, wearOff } from "../kit.ts";
 import { pullPlasma } from "../plasma.ts";
+import { rollBlasts } from "./blast.ts";
 import { fireAtBoss, meetBoss } from "./boss-meet.ts";
 import { moveBoss } from "./boss.ts";
 import {
@@ -25,6 +27,7 @@ import {
 import { touching } from "./collide.ts";
 import { fly } from "./fire.ts";
 import { moveHero } from "./hero.ts";
+import { takeKit } from "./powers.ts";
 import { doors, pickUp, sectionOf, sprung } from "./secrets.ts";
 import { freshStage, startHero } from "./state.ts";
 import { cheer, touchHero } from "./touch.ts";
@@ -94,8 +97,9 @@ function cleared(state: HillsState): HillsState {
   };
 }
 
-// One tick of Egg Hills: Glitchy moves, the gloomlings walk, the fire flies; then what Glitchy touched is settled, and last, a door
-// into or out of a secret area takes Glitchy through. While Glitchy is in a secret area, DeFu's fight waits.
+// One tick of Egg Hills: Glitchy moves, the gloomlings walk, the fire flies and the glitch blasts roll; then what Glitchy touched is
+// settled (a bump while big only shrinks Glitchy back), and last, a door into or out of a secret area takes Glitchy through. While
+// Glitchy is in a secret area, DeFu's fight waits.
 export function tickHills(state: HillsState): HillsState {
   if (state.over || state.finishTick !== null)
     return { ...state, tick: state.tick + 1 };
@@ -145,10 +149,12 @@ export function tickHills(state: HillsState): HillsState {
           speed: plasmaSpeed,
         },
       ),
+      powers: wearOff(state.powers),
       tick,
       wings: Math.max(0, state.wings - 1),
     }),
   );
+  next = takeKit(rollBlasts(next, inMain));
   const eggsTaken = state.eggsTaken.map((taken, at) => {
     const egg = level.eggs[at];
     return taken || (egg !== undefined && heroOn(hero, egg, eggSize));
@@ -158,7 +164,13 @@ export function tickHills(state: HillsState): HillsState {
   if (!next.goldenTaken && heroOn(hero, level.golden, eggSize))
     next = { ...next, goldenTaken: true, goldens: next.goldens + 1 };
   if (!next.berryTaken && heroOn(hero, level.berry, berrySize))
-    next = { ...next, berryTaken: true, hasFire: true };
+    next = next.hasFire
+      ? {
+          ...next,
+          berryTaken: true,
+          powers: packItem(next.powers, "berry", tick),
+        }
+      : { ...next, berryTaken: true, hasFire: true };
   if (hero.y > rows * tile)
     return sectionOf(hero.x) === "sky" ? doors(next) : lose(next, true);
   const bottom = state.hero.y + heroHeight;
@@ -188,14 +200,18 @@ export function tickHills(state: HillsState): HillsState {
         }
       : next.hero,
   };
-  if (
+  const shrunk =
     (touched.hurt || met.hurt) &&
     next.invulnerable === 0 &&
     next.forcefield === 0
-  )
+      ? (shrink(next.powers, tick) ?? "hurt")
+      : null;
+  if (shrunk === "hurt")
     next = next.shield
       ? { ...next, invulnerable: shieldTicks, shield: false }
       : lose(next, false);
+  else if (shrunk !== null)
+    next = { ...next, invulnerable: invulnerableTicks, powers: shrunk };
   const here: HillsState = {
     ...next,
     checkpoint: next.checkpoint || (inMain && next.hero.x >= level.checkpointX),

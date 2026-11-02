@@ -10,6 +10,7 @@ import type { Boss, HillsState } from "./rules/hills/types.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./rules/woods/tick.ts";
 import type { WoodsState } from "./rules/woods/types.ts";
 import { baseSounds } from "./feedback-base.ts";
+import { packSounds } from "./feedback-kit.ts";
 
 // The sounds that go with what changed between two ticks of a run, in the order they would be heard. One function for each chapter.
 // Metaplasma makes a soft blip for every fifth mote gathered.
@@ -81,7 +82,11 @@ export function hillsSounds(
     heard.push(after.finishTick === null ? "stage" : "finish");
   if (fifths(plasmaGathered(before), plasmaGathered(after)))
     heard.push("plasma");
-  return [...heard, ...bossSounds(before, after)];
+  return [
+    ...heard,
+    ...bossSounds(before, after),
+    ...packSounds(before.powers, after.powers),
+  ];
 }
 
 export function woodsSounds(
@@ -106,7 +111,11 @@ export function woodsSounds(
   if (fifths(before.plasma.gathered, after.plasma.gathered))
     heard.push("plasma");
   if (after.escaped && !before.escaped) heard.push("finish");
-  return [...heard, ...baseSounds(before, after)];
+  return [
+    ...heard,
+    ...baseSounds(before, after),
+    ...packSounds(before.powers, after.powers),
+  ];
 }
 
 const messageSounds: Readonly<Record<string, EffectName>> = {
@@ -122,6 +131,7 @@ const messageSounds: Readonly<Record<string, EffectName>> = {
   night: "stage",
   parted: "open",
   pushed: "open",
+  shrank: "shrink",
   shrugged: "shield",
   stunned: "guard",
   tired: "talk",
@@ -172,5 +182,5 @@ export function castleSounds(
   if (fifths(before.plasma.gathered, after.plasma.gathered))
     heard.push("plasma");
   if (guildLevel(after) > guildLevel(before)) heard.push("levelup");
-  return heard;
+  return [...heard, ...packSounds(before.powers, after.powers)];
 }

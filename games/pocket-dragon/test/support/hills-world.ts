@@ -1,3 +1,4 @@
+import type { KitSpot } from "../../src/rules/kit.ts";
 import { freshPlasma } from "../../src/rules/plasma.ts";
 import {
   groundRow,
@@ -31,6 +32,7 @@ export interface Extras {
   readonly golden?: Spot;
   readonly berry?: Spot;
   readonly ice?: readonly Cell[];
+  readonly kit?: readonly KitSpot[];
   readonly patrols?: readonly Patrol[];
   readonly pits?: readonly number[];
   readonly thorns?: readonly Spot[];
@@ -73,6 +75,7 @@ export function flatLevel(extras: Extras = {}): HillsLevel {
     ground,
     ice,
     iceAt: new Map(ice.map((cell, at) => [cell.column * 64 + cell.row, at])),
+    kit: extras.kit ?? [],
     motes: extras.motes ?? [],
     patrols: extras.patrols ?? [],
     rollers: extras.rollers ?? [],
@@ -104,9 +107,12 @@ export function flatHills(
       dir: 1 as const,
       x: patrol.x,
     })),
+    kitTaken: level.kit.map(() => false),
     level,
     melted: level.ice.map(() => false),
     plasma: freshPlasma(level.motes),
+    rollersGone: level.rollers.map(() => false),
+    thornsGone: level.thorns.map(() => false),
     ...state,
   };
 }

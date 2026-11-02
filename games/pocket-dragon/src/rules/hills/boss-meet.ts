@@ -187,3 +187,47 @@ export function fireAtBoss(
     fireballs: flying,
   };
 }
+
+// A glitch blast rolling through the fight: every guard it touches goes home, and a ghost dragon or the rocket it touches is hit (once,
+// while they flash); unlike a puff of fire, it rolls on.
+export function blastAtBoss(
+  boss: Boss,
+  x: number,
+  y: number,
+  size: number,
+  tick: number,
+): { readonly boss: Boss; readonly cheered: number } {
+  if (boss.started < 0 || boss.beaten >= 0) return { boss, cheered: 0 };
+  const hit = (left: number, top: number, width: number, height: number) =>
+    touching(x, y, size, size, left, top, width, height);
+  let changed = false;
+  const ghosts = boss.ghosts.map((ghost) => {
+    if (
+      ghost.hp <= 0 ||
+      ghost.hurt > 0 ||
+      !hit(ghost.x, ghostY(ghost, tick), ghostWidth, ghostHeight)
+    )
+      return ghost;
+    changed = true;
+    return hitGhost(ghost, tick);
+  });
+  let { rocket } = boss;
+  if (
+    rocket !== null &&
+    rocket.hp > 0 &&
+    rocket.hurt === 0 &&
+    hit(rocket.x, rocketY(tick), rocketWidth, rocketHeight)
+  ) {
+    changed = true;
+    rocket = hitRocket(rocket);
+  }
+  const guards = boss.guards.filter(
+    (guard) => !hit(guard.x, guardY, guardWidth, guardHeight),
+  );
+  if (!changed && guards.length === boss.guards.length)
+    return { boss, cheered: 0 };
+  return {
+    boss: settle(boss, { ...boss, ghosts, guards, rocket }, tick),
+    cheered: boss.guards.length - guards.length,
+  };
+}

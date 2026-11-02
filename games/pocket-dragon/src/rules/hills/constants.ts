@@ -47,8 +47,15 @@ export const fireSpeed = 44;
 export const fireLife = 40;
 export const fireCooldown = 18;
 export const maxFires = 2;
-// Where the puff leaves Glitchy's mouth, from the top of the hero.
+// Where the puff leaves Glitchy's mouth, from the top of the hero. With a berry's blaze, a puff flies twice as far.
 export const mouthDrop = 3 * pixel;
+export const blazeLonger = 2;
+// A glitch blast (a mushroom from the backpack) is a ball this big, rolling this fast for this long (some thirty tiles); at most two
+// roll at once.
+export const blastSize = 10 * pixel;
+export const blastSpeed = 40;
+export const blastLife = 200;
+export const mostBlasts = 2;
 
 // Hearts (three to start, at most five, as in every chapter): one more for clearing each of these stages.
 export { maxHearts, startHearts } from "../constants.ts";

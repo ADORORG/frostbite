@@ -204,7 +204,8 @@ export function secretThings(
     if (phase >= ventOn && phase <= ventEvery - 20)
       block(context, colour.cloudDark, x + 3, y - 4, 4, 2);
   }
-  for (const roller of level.rollers) {
+  for (const [gone, roller] of level.rollers.entries()) {
+    if (state.rollersGone[gone] === true) continue;
     const x = px(rollerX(roller, tick)) - camera;
     const rows =
       Math.floor(x / 4) % 2 === 0

@@ -33,6 +33,9 @@ export const bumpDizzy = 150;
 export const fireEvery = 30;
 export const fireReach = 1;
 export const helmReach = 3;
+// A berry's blaze makes the puff reach two tiles farther; a guard a glitch blast rolls over is dizzy twice as long as from fire.
+export const blazeReach = 2;
+export const blastDizzy = 480;
 export const invulnerableTicks = 90;
 export const forceTicks = 600;
 // The name of a new part of the day stays up this long.

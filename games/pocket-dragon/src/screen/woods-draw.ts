@@ -10,32 +10,19 @@ import {
 } from "../rules/woods/constants.ts";
 import { cluesRead } from "../rules/woods/tick.ts";
 import { fullTurn } from "../rules/woods/trig.ts";
-import type { Place, WoodsState } from "../rules/woods/types.ts";
+import type { WoodsState } from "../rules/woods/types.ts";
 import { colour } from "./palette.ts";
 import { breath, minimap, woodsWords } from "./woods-hud.ts";
+import { drawPack } from "./pack-hud.ts";
+import { plasmaInView, type Projector } from "./woods-stash-look.ts";
 import {
-  charmPictures,
-  charmSeen,
-  eggPicture,
-  partPictures,
-  plasmaInView,
-  type Projector,
-} from "./woods-stash-look.ts";
-import {
-  chestOpen,
-  chestShut,
   frozenTexel,
   gateTexel,
-  lanternDark,
-  lanternLit,
-  moonChestOpen,
-  moonChestPicture,
-  stoneLit,
-  stoneRead,
   thingKey,
   treeTexel,
   type Texel,
 } from "./woods-look.ts";
+import { mazeBlastLook, thingsOf } from "./woods-things.ts";
 
 // The maze of the Whispering Woods seen through Glitchy's eyes: a raycaster, one ray for each of the 256 columns, walls textured and fogged by
 // distance, things drawn as pictures that face the player, the moon and stars overhead, and a map of the paths walked in a corner. It
@@ -175,46 +162,6 @@ function walls(
   return depth;
 }
 
-interface Thing {
-  readonly picture: readonly string[];
-  readonly place: Place;
-}
-
-function thingsOf(state: WoodsState): readonly Thing[] {
-  const { level } = state;
-  return [
-    ...level.chests.map((place, at) => ({
-      picture: state.chests[at] === true ? chestOpen : chestShut,
-      place,
-    })),
-    {
-      picture: state.moonChest ? moonChestOpen : moonChestPicture,
-      place: level.moonChest,
-    },
-    ...level.clues.map((place, at) => ({
-      picture: state.clues[at] === true ? stoneRead : stoneLit,
-      place,
-    })),
-    ...level.lanterns.map((place, at) => ({
-      picture: state.lanterns[at] === true ? lanternLit : lanternDark,
-      place,
-    })),
-    ...level.parts.flatMap((place, at) =>
-      state.parts[at] === true
-        ? []
-        : [{ picture: partPictures[at] ?? eggPicture, place }],
-    ),
-    ...level.eggs.flatMap((place, at) =>
-      state.eggs[at] === true ? [] : [{ picture: eggPicture, place }],
-    ),
-    ...level.charms.flatMap((place, at) =>
-      charmSeen(state, at)
-        ? [{ picture: charmPictures[at] ?? eggPicture, place }]
-        : [],
-    ),
-  ];
-}
-
 // Where a point of the woods (in cells) falls on the screen, for things smaller than a picture.
 const projectorOf = (view: View): Projector => {
   const invert = 1 / (view.planeX * view.dy - view.dx * view.planeY);
@@ -288,6 +235,8 @@ export function drawMaze(
   things(context, state, view, depth);
   plasmaInView(context, state, projectorOf(view), depth, horizon);
   breath(context, state);
+  mazeBlastLook(context, state);
   minimap(context, state);
   woodsWords(context, state, test);
+  drawPack(context, state.powers, state.tick);
 }

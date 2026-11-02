@@ -16,7 +16,7 @@ import type { Gloom, HillsState } from "./types.ts";
 
 // What Glitchy bumped into this tick, once it has moved. A gloomling landed on is cheered up and Glitchy bounces (higher with jump
 // held); one bumped into while the forcefield is up is cheered up too; any other bump, a thorn bush, a puffing vent or a boulder's side
-// hurts. Landing on a boulder bounces.
+// hurts. Landing on a boulder bounces. A thorn bush or a boulder a glitch blast took away is gone.
 export const cheer = (
   glooms: readonly Gloom[],
   at: number,
@@ -64,21 +64,30 @@ export function touchHero(
     else hurt = true;
   });
   if (
-    level.thorns.some((thorn) =>
-      touching(
-        hero.x,
-        hero.y,
-        heroWidth,
-        heroHeight,
-        thorn.x,
-        thorn.y,
-        thornWidth,
-        thornHeight,
-      ),
+    level.thorns.some(
+      (thorn, at) =>
+        state.thornsGone[at] !== true &&
+        touching(
+          hero.x,
+          hero.y,
+          heroWidth,
+          heroHeight,
+          thorn.x,
+          thorn.y,
+          thornWidth,
+          thornHeight,
+        ),
     )
   )
     hurt = true;
-  const hit = obstacles(level, hero, tick, moved.falling, bottom);
+  const hit = obstacles(
+    level,
+    hero,
+    tick,
+    moved.falling,
+    bottom,
+    state.rollersGone,
+  );
   if (hit.bounced)
     next = { ...next, hero: { ...next.hero, grounded: false, vy: springBack } };
   return { hurt: hurt || hit.hurt, state: next };

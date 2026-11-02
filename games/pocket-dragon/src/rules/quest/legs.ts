@@ -7,6 +7,7 @@ import { startCastle, tickCastle } from "../castle/tick.ts";
 import type { CastleControl, CastleState } from "../castle/types.ts";
 import type { ChapterId } from "../constants.ts";
 import { change, type Chapter, type Running } from "../held.ts";
+import { kitOf, noKit, type Kit } from "../kit.ts";
 import { hillsChapter } from "../hills/index.ts";
 import { hillsEarned } from "../hills/milestones.ts";
 import { startHills } from "../hills/state.ts";
@@ -38,8 +39,10 @@ export interface LegKind<
   readonly hearts: (state: State) => number;
   readonly heartsLost: (state: State) => number;
   readonly id: ChapterId;
+  // What it hands on to the next level: the backpack, and whether Glitchy is big.
+  readonly kit: (state: State) => Kit;
   readonly shown: (state: State) => Leg;
-  readonly start: (seed: number, hearts: number) => State;
+  readonly start: (seed: number, hearts: number, kit: Kit) => State;
   readonly tick: (state: State) => State;
 }
 
@@ -68,6 +71,7 @@ const hills: LegKind<HillsControl, HillsState> = {
   hearts: (state) => state.hearts,
   heartsLost: (state) => state.heartsLost,
   id: "hills",
+  kit: (state) => kitOf(state.powers),
   shown: (state) => ({ id: "hills", state }),
   start: (seed) => startHills(seed),
   tick: tickHills,
@@ -81,6 +85,7 @@ const castle: LegKind<CastleControl, CastleState> = {
   hearts: (state) => state.hearts,
   heartsLost: (state) => state.heartsLost,
   id: "castle",
+  kit: (state) => kitOf(state.powers),
   shown: (state) => ({ id: "castle", state }),
   start: startCastle,
   tick: tickCastle,
@@ -94,6 +99,7 @@ const woods: LegKind<WoodsControl, WoodsState> = {
   hearts: (state) => state.hearts,
   heartsLost: (state) => state.heartsLost,
   id: "woods",
+  kit: (state) => kitOf(state.powers),
   shown: (state) => ({ id: "woods", state }),
   start: startWoods,
   tick: tickWoods,
@@ -102,14 +108,20 @@ const woods: LegKind<WoodsControl, WoodsState> = {
 // The three kinds, by level.
 export const legKinds = { castle, hills, woods } as const;
 
-export function startLeg(id: ChapterId, seed: number, hearts: number): LegRun {
+// A level of the quest begins with the hearts, and the backpack, the level before it ended with (Egg Hills, the first, with none).
+export function startLeg(
+  id: ChapterId,
+  seed: number,
+  hearts: number,
+  kit: Kit = noKit,
+): LegRun {
   switch (id) {
     case "castle":
-      return legRun(castle, castle.start(seed, hearts));
+      return legRun(castle, castle.start(seed, hearts, kit));
     case "hills":
-      return legRun(hills, hills.start(seed, hearts));
+      return legRun(hills, hills.start(seed, hearts, kit));
     case "woods":
-      return legRun(woods, woods.start(seed, hearts));
+      return legRun(woods, woods.start(seed, hearts, kit));
   }
 }
 
@@ -123,6 +135,8 @@ export const legCleared = (leg: LegRun): boolean =>
   leg.visit((kind, state) => kind.cleared(state));
 export const legHearts = (leg: LegRun): number =>
   leg.visit((kind, state) => kind.hearts(state));
+export const legKit = (leg: LegRun): Kit =>
+  leg.visit((kind, state) => kind.kit(state));
 export const legHeartsLost = (leg: LegRun): number =>
   leg.visit((kind, state) => kind.heartsLost(state));
 export const legTick = (leg: LegRun): number =>

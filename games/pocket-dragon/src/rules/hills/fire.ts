@@ -1,4 +1,5 @@
 import {
+  blazeLonger,
   fireCooldown,
   fireHeight,
   fireLife,
@@ -15,8 +16,9 @@ import {
 import { solidAt, tilesUnder, touching } from "./collide.ts";
 import type { Fireball, Gloom, HillsState } from "./types.ts";
 
-// Glitchy's fire. After eating an fire berry, pressing fire breathes a little puff that flies straight ahead: it melts the first ice
-// wall it meets (the whole wall, all at once), cheers up a gloomling it touches (the cloud turns into a rainbow puff and floats off), and fizzles against the ground.
+// Glitchy's fire. After eating a fire berry, pressing fire breathes a little puff that flies straight ahead (twice as far in a berry's
+// blaze): it melts the first ice wall it meets (the whole wall, all at once), cheers up a gloomling it touches (the cloud turns into a
+// rainbow puff and floats off), and fizzles against the ground.
 export function breathe(state: HillsState): HillsState {
   if (
     !state.hasFire ||
@@ -26,7 +28,9 @@ export function breathe(state: HillsState): HillsState {
     return state;
   const { hero } = state;
   const fireball: Fireball = {
-    life: state.level.weather === "rain" ? rainFireLife : fireLife,
+    life:
+      (state.level.weather === "rain" ? rainFireLife : fireLife) *
+      (state.powers.blaze > 0 ? blazeLonger : 1),
     vx: hero.facing * fireSpeed,
     x:
       hero.facing > 0

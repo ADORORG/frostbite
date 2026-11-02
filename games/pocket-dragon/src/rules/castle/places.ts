@@ -1,3 +1,4 @@
+import type { KitSpot } from "../kit.ts";
 import type { Spot } from "./types.ts";
 
 // Who and what is where on the map, by tile. The four friends each want one thing; once they have it they join the guild and follow
@@ -83,3 +84,10 @@ export const guardStarts: readonly Spot[] = [
 ];
 export const cage: Spot = { x: 21, y: 12 };
 export const bubble: Spot = { x: 16, y: 25 };
+
+// The backpack's foods on the map: a berry in the village, a mushroom on the beach (past Bolt's boulder), a pineapple in the north meadow.
+export const kitSpots: readonly KitSpot[] = [
+  { item: "berry", x: 12, y: 22 },
+  { item: "mushroom", x: 35, y: 25 },
+  { item: "pineapple", x: 4, y: 16 },
+];

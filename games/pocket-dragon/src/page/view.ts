@@ -34,7 +34,8 @@ const actWords: Readonly<Record<ChapterId, string>> = {
   woods: "Use",
 };
 
-// The touch buttons each level offers; the others keep their place but are not shown.
+// The touch buttons each level offers; the others keep their place but are not shown. Every level has the backpack's three foods.
+const foods = ["berry", "mushroom", "pineapple"] as const;
 const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
   castle: [
     "left",
@@ -46,9 +47,10 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     "quick",
     "evade",
     "charm",
+    ...foods,
   ],
-  hills: ["left", "right", "down", "act", "fire"],
-  woods: ["left", "right", "up", "down", "act", "fire"],
+  hills: ["left", "right", "down", "act", "fire", ...foods],
+  woods: ["left", "right", "up", "down", "act", "fire", ...foods],
 };
 
 export function createView() {

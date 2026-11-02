@@ -1,4 +1,5 @@
 import type { WoodsState } from "../rules/woods/types.ts";
+import { drawPack } from "./pack-hud.ts";
 import { drawBase } from "./woods-base.ts";
 import { baseHud } from "./woods-base-hud.ts";
 import { drawMaze } from "./woods-draw.ts";
@@ -24,4 +25,5 @@ export function drawWoods(
   }
   if (!layered) drawBase(context, state, base);
   baseHud(context, state, base);
+  drawPack(context, state.powers, state.tick);
 }

@@ -23,6 +23,10 @@ export const fireReach = 640;
 export const fireStep = 32;
 export const lanternReach = 96;
 export const fireCooldown = 30;
+// A berry's blaze makes fire reach twice as far in the maze, and three tiles out of it. A glitch blast in the maze rolls this far.
+export const blazeLonger = 2;
+export const blazeTiles = 3;
+export const mazeBlastReach = 2_048;
 // Extra openings knocked through the maze, so there is more than one way round.
 export const loops = 14;
 

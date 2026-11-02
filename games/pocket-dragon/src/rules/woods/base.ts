@@ -1,7 +1,9 @@
 import { maxHearts } from "../constants.ts";
 import { ahead, type Facing, type Spot } from "../grid.ts";
+import { shrink } from "../kit.ts";
 import {
   arrival,
+  baseKit,
   baseTile,
   bubbleSpot,
   cages,
@@ -14,6 +16,7 @@ import {
 } from "./base-map.ts";
 import {
   baseStep,
+  blazeTiles,
   dizzyTicks,
   eggRange,
   fireEvery,
@@ -21,6 +24,7 @@ import {
   invulnerableTicks,
   launchEvery,
 } from "./constants.ts";
+import { takeBaseKit } from "./powers.ts";
 import { playScene, sceneTicks } from "./scenes.ts";
 import type { Base, BaseGuard, WoodsState } from "./types.ts";
 
@@ -33,6 +37,7 @@ export function startBase(state: WoodsState): Base {
   return {
     allies: cages.map(() => false),
     ammo: state.eggs.filter(Boolean).length,
+    blast: null,
     broken: valves.map(() => false),
     bubbleTaken: false,
     cheered: 0,
@@ -53,6 +58,7 @@ export function startBase(state: WoodsState): Base {
     heartTaken: false,
     installed: panels.map(() => false),
     invulnerable: 0,
+    kitTaken: baseKit.map(() => false),
     lairStart: -1,
     laser: null,
     launchTick: -launchEvery,
@@ -94,10 +100,18 @@ export const withBase = (state: WoodsState, base: Base): WoodsState => ({
   base,
 });
 
-// A bump: a heart, unless Glitchy is blinking or has the forcefield. Out of hearts, the rocket launches.
+// A bump: a heart, unless Glitchy is blinking or has the forcefield (or is big, when the bump only shrinks Glitchy back). Out of hearts,
+// the rocket launches.
 export function hurt(state: WoodsState, base: Base): WoodsState {
   if (base.invulnerable > 0 || base.forcefield > 0)
     return withBase(state, base);
+  const shrunk = shrink(state.powers, state.tick);
+  if (shrunk !== null)
+    return {
+      ...state,
+      base: { ...base, invulnerable: invulnerableTicks },
+      powers: shrunk,
+    };
   const hearts = state.hearts - 1;
   const bumped = {
     ...state,
@@ -148,14 +162,25 @@ export function strike(base: Base, x: number, y: number): Base | null {
   return null;
 }
 
+// A puff of fire reaches the tile ahead (three tiles in a berry's blaze, stopped by a tree or a wall) and strikes the first thing there.
 export function breathe(state: WoodsState, base: Base): WoodsState {
   if (state.tick - base.fireTick < fireEvery) return state;
   const way = ahead[base.facing];
   const fired = { ...base, fireTick: state.tick };
-  return withBase(
-    { ...state, breaths: state.breaths + 1, breathTick: state.tick },
-    strike(fired, base.x + way.x, base.y + way.y) ?? fired,
-  );
+  const breathed = {
+    ...state,
+    breaths: state.breaths + 1,
+    breathTick: state.tick,
+  };
+  const reach = state.powers.blaze > 0 ? blazeTiles : 1;
+  for (let far = 1; far <= reach; far += 1) {
+    const x = base.x + way.x * far;
+    const y = base.y + way.y * far;
+    const hit = strike(fired, x, y);
+    if (hit !== null) return withBase(breathed, hit);
+    if (!ground(fired, x, y) && baseTile(x, y) !== "~") break;
+  }
+  return withBase(breathed, fired);
 }
 
 // The action key: free the dragon in a cage, open a chest for its rocket key, fit a key into a panel of the rocket (all three defuse
@@ -212,8 +237,8 @@ export const turn = (base: Base, way: Facing): Base => ({
   facing: way,
 });
 
-// Arriving on a tile: the forcefield bubble and the heart are taken, and stepping through the lair's gate plays DeFu's scene; the lair
-// begins (its countdown and DeFu's weapons) once the scene is over or skipped.
+// Arriving on a tile: the forcefield bubble, the heart and a food for the backpack are taken, and stepping through the lair's gate plays
+// DeFu's scene; the lair begins (its countdown and DeFu's weapons) once the scene is over or skipped.
 export function arrive(state: WoodsState, base: Base): WoodsState {
   const { x, y } = base;
   let next = base;
@@ -224,7 +249,7 @@ export function arrive(state: WoodsState, base: Base): WoodsState {
     next = { ...next, heartTaken: true };
     hearts = Math.min(maxHearts, hearts + 1);
   }
-  const arrived = withBase({ ...state, hearts }, next);
+  const arrived = takeBaseKit({ ...state, hearts }, next);
   if (next.lairStart >= 0 || x !== lairGate.x || y !== lairGate.y)
     return arrived;
   const lairStart = state.tick + sceneTicks.lair;

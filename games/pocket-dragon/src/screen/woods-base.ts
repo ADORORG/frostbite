@@ -15,6 +15,7 @@ import { laserPhase, waveAt } from "../rules/woods/lair.ts";
 import type { Base, WoodsState } from "../rules/woods/types.ts";
 import { defuKey, defuRows, guardKey, guardRows } from "./defu.ts";
 import { egg } from "./hills-things.ts";
+import { spriteScaled } from "./kit-sprites.ts";
 import { colour } from "./palette.ts";
 import {
   friendKey,
@@ -24,11 +25,12 @@ import {
   glitchySide,
 } from "./sprites.ts";
 import { drawTiles, tileSize } from "./woods-base-tiles.ts";
+import { baseKitLook } from "./woods-base-kit.ts";
 
 // The woods outside the maze seen from above, flat: the picture when the screen cannot show them in three dimensions, following Glitchy.
-// Over the ground: the forcefield bubble and the heart, DeFu on her platform, her guards and shadow dragons, the dragons freed from
-// their cages following Glitchy in a line, an egg in flight, Glitchy (blinking after a bump, ringed while the forcefield lasts), and
-// DeFu's laser and shockwave. The counts over it are in `woods-base-hud.ts`.
+// Over the ground: the backpack's foods and a glitch blast, the forcefield bubble and the heart, DeFu on her platform, her guards and
+// shadow dragons, the dragons freed from their cages following Glitchy in a line, an egg in flight, Glitchy (blinking after a bump,
+// ringed while the forcefield lasts, twice as big while a pineapple lasts), and DeFu's laser and shockwave. The counts over it are in `woods-base-hud.ts`.
 const width = 256;
 const height = 144;
 
@@ -125,6 +127,7 @@ function actors(
   base: Base,
   tick: number,
   camera: Spot,
+  scale: number,
 ): void {
   const at = (spot: Spot, dx = 0, dy = 0) =>
     [
@@ -160,7 +163,14 @@ function actors(
   const x = glitchy.x - camera.x;
   const y = glitchy.y - camera.y;
   if (base.invulnerable === 0 || Math.floor(tick / 4) % 2 === 1)
-    sprite(context, glitchyPicture(base), glitchyColours, x, y);
+    spriteScaled(
+      context,
+      glitchyPicture(base),
+      glitchyColours,
+      x + 8 - 8 * scale,
+      y + 16 - 16 * scale,
+      scale,
+    );
   if (base.forcefield > 0)
     for (let dot = 0; dot < 16; dot += 1) {
       const angle = (dot / 16) * Math.PI * 2 + tick / 30;
@@ -182,6 +192,7 @@ export function drawBase(
   camera: Spot = baseCamera(base, state.tick),
 ): void {
   drawTiles(context, base, camera, width, height);
-  actors(context, base, state.tick, camera);
+  baseKitLook(context, base, state.tick, camera);
+  actors(context, base, state.tick, camera, state.powers.big ? 2 : 1);
   weapons(context, base, state.tick, camera);
 }

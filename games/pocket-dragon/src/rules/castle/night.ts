@@ -1,4 +1,6 @@
+import { shrink } from "../kit.ts";
 import {
+  blazeReach,
   bumpDizzy,
   dizzyTicks,
   forceTicks,
@@ -65,11 +67,14 @@ const dropped = (
     at === guard.carrying ? { state: "loose", x: guard.x, y: guard.y } : egg,
   );
 
-// Glitchy bumped by a guard: a heart, unless blinking or shielded; the guard drops its egg and is dizzy a while.
+// Glitchy bumped by a guard: a heart, unless blinking or shielded (or big, when the bump only shrinks Glitchy back); the guard drops its
+// egg and is dizzy a while.
 function bumped(state: CastleState, at: number): CastleState {
   const guard = state.guards[at];
   if (guard === undefined) return state;
-  const hurt = state.invulnerable === 0 && state.forcefield === 0;
+  const open = state.invulnerable === 0 && state.forcefield === 0;
+  const shrunk = open ? shrink(state.powers, state.tick) : null;
+  const hurt = open && shrunk === null;
   return say(
     {
       ...state,
@@ -79,9 +84,10 @@ function bumped(state: CastleState, at: number): CastleState {
       ),
       hearts: state.hearts - (hurt ? 1 : 0),
       heartsLost: state.heartsLost + (hurt ? 1 : 0),
-      invulnerable: hurt ? invulnerableTicks : state.invulnerable,
+      invulnerable: open ? invulnerableTicks : state.invulnerable,
+      powers: shrunk ?? state.powers,
     },
-    hurt ? "bumped" : "shrugged",
+    hurt ? "bumped" : shrunk === null ? "shrugged" : "shrank",
   );
 }
 
@@ -151,36 +157,46 @@ export function guardsTick(
   return next;
 }
 
-// A puff of fire along the way Glitchy faces (one tile, three in the ember helm, stopped by what cannot be walked through): every guard
-// it reaches is dizzy and drops its egg.
+// The guard on a tile, if there is one, is dizzy for `dizzy` ticks and drops its egg.
+export function stunAt(
+  state: CastleState,
+  x: number,
+  y: number,
+  dizzy: number,
+): CastleState | null {
+  const hit = state.guards.findIndex((guard) => guard.x === x && guard.y === y);
+  const guard = state.guards[hit];
+  if (guard === undefined) return null;
+  return say(
+    {
+      ...state,
+      eggs: dropped(state.eggs, guard),
+      guards: state.guards.map((other, index) =>
+        index === hit ? { ...other, carrying: -1, dizzy } : other,
+      ),
+      stuns: state.stuns + 1,
+    },
+    "stunned",
+  );
+}
+
+// A puff of fire along the way Glitchy faces (one tile, three in the ember helm, two more in a berry's blaze, stopped by what cannot be
+// walked through): every guard it reaches is dizzy and drops its egg.
 export function scare(
   state: CastleState,
   way: Spot,
   open: (x: number, y: number) => boolean,
 ): CastleState {
-  const reach = state.gear[2] === true ? helmReach : fireReach;
+  const reach =
+    (state.gear[2] === true ? helmReach : fireReach) +
+    (state.powers.blaze > 0 ? blazeReach : 0);
   let next = state;
   for (let far = 1; far <= reach; far += 1) {
     const x = state.x + way.x * far;
     const y = state.y + way.y * far;
-    const hit = next.guards.findIndex(
-      (guard) => guard.x === x && guard.y === y,
-    );
-    const guard = next.guards[hit];
-    if (guard !== undefined) {
-      next = say(
-        {
-          ...next,
-          eggs: dropped(next.eggs, guard),
-          guards: next.guards.map((other, index) =>
-            index === hit
-              ? { ...other, carrying: -1, dizzy: dizzyTicks }
-              : other,
-          ),
-          stuns: next.stuns + 1,
-        },
-        "stunned",
-      );
+    const stunned = stunAt(next, x, y, dizzyTicks);
+    if (stunned !== null) {
+      next = stunned;
       continue;
     }
     if (!open(x, y)) break;

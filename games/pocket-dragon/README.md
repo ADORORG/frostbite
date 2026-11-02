@@ -72,6 +72,24 @@ walk, flap and swish their tails, guards, DeFu and her machines, moonlight with 
 The camera follows Glitchy from above and behind and has its own path in each scene. The words and counts are drawn over it on the game
 screen. Where there is no WebGL 2, the same woods are drawn flat from above, and the game plays the same.
 
+**The backpack** goes with Glitchy everywhere, and in the quest from level to level. Berries, mushrooms and pineapples lie along the
+way in every level (three in each Egg Hills stage, three on the castle's land, three in the maze and four out of it), and once Egg Hills'
+fire berry is eaten the next fire berries go in the backpack too. Each is kept, nine at most of each, until the player uses it:
+
+- **B eats a berry**: for twenty seconds fire reaches farther (a puff flies twice as far in Egg Hills and the maze, two tiles more in the
+  castle, three tiles instead of one out of the maze). A berry also teaches fire, if the fire berry has not been found yet.
+- **R rolls a mushroom's glitch blast**: a ball of glitch that rolls a long way and clears its path. In Egg Hills it rolls along the
+  ground (up steps a tile high, down every drop) for about thirty tiles, cheering up gloomlings, glitching thorn bushes and boulders away,
+  melting ice walls and sending DeFu's guards home; on the castle's land it rolls ten tiles through the night's guards (dizzy twice as long
+  as from fire) and melts the ice around Bloom's seeds; in the maze it lights every lantern ahead and melts the frozen hedge; out of the
+  maze it rolls ten tiles, sending guards home, setting shadow dragons free and breaking a valve of the egg factory. It stops at what
+  cannot be walked through (and is never used indoors or in a cheer battle).
+- **G eats a pineapple**: Glitchy grows twice as big, and the next bump only shrinks Glitchy back (it blinks a while) instead of costing a
+  heart. A fall in Egg Hills still costs one.
+
+The backpack shows at the right edge of the screen once anything is in it, with a flame bar while a blaze lasts and BIG while Glitchy is
+big, and a line at the top says what was found or used.
+
 **Metaplasma** is in every level: little bits of light that drift to Glitchy like pollen when it comes close. The page banks what every
 run gathers ("Metaplasma banked"), to be turned into items one day, which will take a tremendous amount; for now it is only counted.
 
@@ -121,7 +139,8 @@ left and right turn in the maze, and outside it the arrows walk, fire breathes a
 opens a chest, fits a key or launches an egg (and skips a scene); in the castle the arrows
 walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
 move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
-charm. Enter starts a run, P pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
+charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack. Enter starts a run, P
+pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
 there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the
 effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space
 to press, Escape to close), so none of them start a run.
@@ -134,6 +153,8 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
   held.ts           what the three levels share: controls pressed and let go of on a tick, the run closed with `end`
   plasma.ts         metaplasma: motes that drift to Glitchy and are gathered, the same in every level
   shared-marks.ts   the two marks every level can earn: a secret charm found, and 300 metaplasma in one run
+  kit.ts            the backpack, the same in every level: its three foods, using one, the blaze, growing big and shrinking back, and
+                    a glitch blast rolling over tiles; each level has its own `powers.ts` (and Egg Hills `blast.ts` and kit-layout)
   hills/            Egg Hills: constants, types, layout, secret-layout and level (the seeded stages and their secret areas), collide,
                     hero, weather, fire, boss and boss-meet (DeFu's fight), secrets (doors, power-ups, springs, vents, boulders),
                     touch, tick, state, milestones
@@ -152,10 +173,12 @@ src/session.ts      one run of a level as a player plays it: ticks, control chan
 src/quest-session.ts the whole quest as a player plays it, its presses written into `keys` inputs sixty-four at a time
 src/screen/         drawing each level (a side view, a map from above, a raycast first-person view), at twice the size for sharp words;
                     the woods outside the maze flat (woods-base, the fallback) with what is written over them in 3D too (woods-base-hud,
-                    woods-scenes); quest-draw adds the quest's clock and hearts, the shift into the next dimension and how it ended
+                    woods-scenes); quest-draw adds the quest's clock and hearts, the shift into the next dimension and how it ended;
+                    kit-sprites, pack-hud and each level's kit file draw the backpack, its foods, the glitch blasts and a big Glitchy
 src/three/          the woods outside the maze in 3D with three.js: parts (shapes and paints), dragon and people (the jointed models),
                     props and machines (what is used or broken), land (the map as instances), effects (laser, shockwave, confetti),
-                    cast and world (building it all and setting it from a state), camera (where it looks), stage (the WebGL view)
+                    cast and world (building it all and setting it from a state), camera (where it looks), stage (the WebGL view),
+                    kit (the backpack's foods and the glitch blast)
 src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
                     layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
                     trophies (the shelf), badges (the levels) and poster (the whole picture)

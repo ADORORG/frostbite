@@ -1,4 +1,5 @@
 import type { Spot } from "../grid.ts";
+import type { KitSpot } from "../kit.ts";
 
 // Out of the maze, the woods are seen from above: DeFu's outpost in the trees (south), her dungeon (a dark hall) and, past it, the hall
 // of her castle with the egg rocket (north). T tree, . grass, , path, ~ water, W stone wall, f the castle's floor, d the dungeon's
@@ -79,4 +80,13 @@ export const guardRoutes: readonly (readonly [Spot, Spot])[] = [
     { x: 19, y: 21 },
     { x: 26, y: 21 },
   ],
+];
+
+// The backpack's foods out of the maze: a berry near where Glitchy comes out, a pineapple by the heart, a mushroom by the far cage, and
+// one more mushroom in a corner of the dungeon, for the valves.
+export const baseKit: readonly KitSpot[] = [
+  { item: "berry", x: 4, y: 26 },
+  { item: "pineapple", x: 26, y: 24 },
+  { item: "mushroom", x: 26, y: 15 },
+  { item: "mushroom", x: 26, y: 11 },
 ];

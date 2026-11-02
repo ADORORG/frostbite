@@ -6,13 +6,16 @@ import type { JsonValue } from "@ador/game-sdk/protocol";
 // tick 42, and jump pressed on tick 42 too.
 export const letters = {
   a: "act",
+  b: "berry",
   c: "charm",
   d: "down",
   e: "evade",
   f: "fire",
+  g: "pineapple",
   j: "jump",
   k: "skip",
   l: "left",
+  m: "mushroom",
   q: "quick",
   r: "right",
   u: "up",

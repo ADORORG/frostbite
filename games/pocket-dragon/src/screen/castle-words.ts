@@ -16,6 +16,7 @@ export const castleWords: Readonly<Record<string, string>> = {
   "egg-saved": "AN EGG IS SAFE!",
   forcefield: "A FORCEFIELD! THE GUARDS CANNOT BUMP YOU FOR A WHILE.",
   "gate-clues": "THE GATE WANTS ALL THREE CLUES. SEARCH THE HOUSES!",
+  shrank: "OOF! YOU SHRINK BACK TO SIZE, BUT YOUR HEART IS SAFE.",
   "gate-open": "THE GUILD SINGS THE CLUES, AND THE GATE CREAKS OPEN!",
   "gate-shut": "THE CASTLE GATE IS SHUT TIGHT. IT OPENS ONLY IN WINTER.",
   "gear-0": "SWIFT BOOTS! THE GUILD WALKS FASTER.",

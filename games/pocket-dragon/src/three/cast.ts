@@ -136,6 +136,7 @@ function showGlitchy(
   const [x, z] = glitchyPoint(base, state.tick);
   const { root } = cast.glitchy;
   root.position.set(x, 0, z);
+  root.scale.setScalar(toward(root.scale.x, state.powers.big ? 2 : 1, dt, 6));
   root.rotation.y = turnToward(
     root.rotation.y,
     facingAngle[base.facing],

@@ -1,5 +1,6 @@
 import { startState, stepSeed } from "@ador/game-sdk/seeded";
 
+import { itemList } from "../kit.ts";
 import {
   cell,
   chestCount,
@@ -203,12 +204,33 @@ export function generateWoods(seed: number): WoodsLevel {
     ...chests,
     ...lanterns,
   ]);
+  // The backpack's foods go in rooms left over, apart from the rest, from a seed of their own so nothing else moves for them.
+  const placed = [
+    start,
+    exit,
+    moonChest,
+    ...clues,
+    ...chests,
+    ...lanterns,
+    ...stash.parts,
+    ...stash.eggs,
+    ...stash.charms,
+  ];
+  const free = rooms.filter(
+    (p) => !placed.some((q) => q.x === p.x && q.y === p.y),
+  );
+  const kitRoller = new Roller(seed ^ 0x5eed_0006);
+  const kit = itemList.map((item) => ({
+    item,
+    ...choose(free, placed, kitRoller),
+  }));
   return {
     ...stash,
     chests,
     clues,
     frozen: frozenAt,
     gate: indexOf(out.x, out.y),
+    kit,
     lanterns,
     moonChest,
     start: { angle, x: cell + cell / 2, y: cell + cell / 2 },

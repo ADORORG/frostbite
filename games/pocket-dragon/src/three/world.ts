@@ -40,6 +40,7 @@ import {
   type Party,
   type Wave,
 } from "./effects.ts";
+import { makeKitProps, showKitProps } from "./kit.ts";
 import { animateLand, buildLand, outerWoods, type Land } from "./land.ts";
 import {
   makeFactory,
@@ -235,6 +236,7 @@ export function buildWorld(): World {
   const land: Land = buildLand();
   scene.add(land.root, outerWoods());
   const things = makeThings(scene);
+  const kit = makeKitProps(scene);
   const cast: Cast = makeCast(guardRoutes.length);
   scene.add(cast.root);
   const laser: Laser = makeLaser();
@@ -245,6 +247,7 @@ export function buildWorld(): World {
     scene,
     show(state, base, time, dt) {
       showThings(things, state, base, time, dt);
+      showKitProps(kit, state, base, time);
       showCast(cast, state, base, time, dt);
       animateLand(land, time);
       setLaser(laser, base.laser, laserPhase(base, state.tick), time);

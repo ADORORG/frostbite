@@ -1,4 +1,5 @@
 import type { Facing, Spot } from "../grid.ts";
+import type { KitSpot, Powers, TileBlast } from "../kit.ts";
 import type { Mote, Plasma } from "../plasma.ts";
 
 // The shape of the woods (laid out from the seed and never changed) and the walk through them.
@@ -16,6 +17,8 @@ export interface WoodsLevel {
   readonly frozen: number;
   readonly gate: number;
   readonly eggs: readonly Place[];
+  // The backpack's foods lying in the maze, by cell.
+  readonly kit: readonly KitSpot[];
   readonly lanterns: readonly Place[];
   readonly moonChest: Place;
   // Metaplasma, sorted by `x`, in the woods' units (256 to a cell).
@@ -30,7 +33,17 @@ export interface WoodsLevel {
   readonly walls: readonly number[];
 }
 
-export type WoodsControl = "act" | "down" | "fire" | "left" | "right" | "up";
+// The ways, fire and act, and the backpack's three foods.
+export type WoodsControl =
+  | "act"
+  | "berry"
+  | "down"
+  | "fire"
+  | "left"
+  | "mushroom"
+  | "pineapple"
+  | "right"
+  | "up";
 export const woodsControls: readonly WoodsControl[] = [
   "left",
   "right",
@@ -38,6 +51,9 @@ export const woodsControls: readonly WoodsControl[] = [
   "down",
   "fire",
   "act",
+  "berry",
+  "mushroom",
+  "pineapple",
 ];
 
 // The last thing found (or done, out of the maze), and the tick it was found on, for the screen and the sounds.
@@ -103,6 +119,8 @@ export interface Laser {
 export interface Base {
   readonly allies: readonly boolean[];
   readonly ammo: number;
+  // A glitch blast rolling over the tiles, and which of the foods lying out of the maze have been picked up.
+  readonly blast: TileBlast | null;
   readonly broken: readonly boolean[];
   readonly bubbleTaken: boolean;
   readonly cheered: number;
@@ -116,6 +134,7 @@ export interface Base {
   readonly heartTaken: boolean;
   readonly installed: readonly boolean[];
   readonly invulnerable: number;
+  readonly kitTaken: readonly boolean[];
   readonly lairStart: number;
   readonly laser: Laser | null;
   readonly launchTick: number;
@@ -157,6 +176,8 @@ export interface WoodsState {
   // Hearts left, and hearts lost in the run.
   readonly hearts: number;
   readonly heartsLost: number;
+  // Which of the maze's foods have been picked up, and the backpack with what it does (`../kit.ts`).
+  readonly kitTaken: readonly boolean[];
   readonly lanterns: readonly boolean[];
   readonly level: WoodsLevel;
   readonly melted: boolean;
@@ -165,6 +186,7 @@ export interface WoodsState {
   readonly outcome: "defused" | "launched" | null;
   readonly parts: readonly boolean[];
   readonly plasma: Plasma;
+  readonly powers: Powers;
   readonly scene: Scene | null;
   readonly seed: number;
   readonly tick: number;

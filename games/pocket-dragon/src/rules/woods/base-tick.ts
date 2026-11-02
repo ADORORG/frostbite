@@ -1,4 +1,6 @@
+import { wearOff } from "../kit.ts";
 import { walk, withBase } from "./base.ts";
+import { rollBaseBlast } from "./blast.ts";
 import { eggFlies, guardsMove, shadowsMove } from "./foes.ts";
 import { lairTick } from "./lair.ts";
 import type { Base, FoundKind, WoodsState } from "./types.ts";
@@ -29,21 +31,26 @@ export function withNews(before: WoodsState, after: WoodsState): WoodsState {
     : { ...after, found: { kind, tick: after.tick } };
 }
 
-// One tick outside the maze (the clock already moved on): Glitchy's blinking and forcefield wear off, Glitchy steps, a launched egg
-// flies; then in the woods the guards walk, and in the lair the shadow dragons chase and DeFu's weapons and the countdown go on.
+// One tick outside the maze (the clock already moved on): Glitchy's blinking, forcefield and blaze wear off, Glitchy steps, a launched egg
+// flies and a glitch blast rolls; then in the woods the guards walk, and in the lair the shadow dragons chase and DeFu's weapons and the
+// countdown go on.
 export const tickBase = (state: WoodsState): WoodsState =>
   withNews(state, tickOutside(state));
 
 function tickOutside(state: WoodsState): WoodsState {
   const { base } = state;
   if (base === null || state.outcome !== null) return state;
-  const timed = withBase(state, {
-    ...base,
-    forcefield: Math.max(0, base.forcefield - 1),
-    invulnerable: Math.max(0, base.invulnerable - 1),
-  });
+  const timed = withBase(
+    { ...state, powers: wearOff(state.powers) },
+    {
+      ...base,
+      forcefield: Math.max(0, base.forcefield - 1),
+      invulnerable: Math.max(0, base.invulnerable - 1),
+    },
+  );
   let next = walk(timed, timed.base ?? base);
   next = eggFlies(next, next.base ?? base);
+  next = rollBaseBlast(next, next.base ?? base);
   const now = next.base ?? base;
   if (now.lairStart < 0) return guardsMove(next, now);
   next = shadowsMove(next, now);
