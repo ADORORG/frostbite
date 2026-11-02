@@ -52,3 +52,15 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/* The secret Sky Nursery's button, once a won quest has opened it: a gold edge that shimmers. */
+.chapters .secret {
+  grid-column: 1 / -1;
+  border-color: var(--gold);
+  background: linear-gradient(120deg, #2b1a66, #5a2f86, #2b1a66);
+  color: var(--gold);
+}
+.chapters .secret span {
+  background: var(--gold);
+  color: #1d1140;
+}

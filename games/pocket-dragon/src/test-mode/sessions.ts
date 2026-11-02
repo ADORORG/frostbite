@@ -27,7 +27,7 @@ import { keepHearts, keepLeg } from "./keep.ts";
 // replays to nothing.
 const taken: Outcome = { ok: true };
 
-const nothing = (cabinet: PlayId, seed: number): RunRecord =>
+export const nothing = (cabinet: PlayId, seed: number): RunRecord =>
   createRunRecorder({
     config: { cabinet },
     gameId,

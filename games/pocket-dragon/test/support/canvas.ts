@@ -37,9 +37,13 @@ export function surface() {
     font: "",
     globalAlpha: 1,
     imageSmoothingEnabled: true,
+    restore: () => undefined,
+    save: () => undefined,
+    scale: (...values: number[]) => void transforms.push(values),
     setTransform: (...values: number[]) => void transforms.push(values),
     textAlign: "",
     textBaseline: "",
+    translate: (...values: number[]) => void transforms.push(values),
   };
   return {
     cleared: () => cleared,

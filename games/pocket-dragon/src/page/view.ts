@@ -3,12 +3,12 @@ import { drawGuide } from "@ador/game-sdk/guide";
 import { chapterTitles } from "../chapters.ts";
 import { guides } from "../guide.ts";
 import { isOpen, type FameEntry, type Progress } from "../progress.ts";
-import { playIds, type ChapterId, type PlayId } from "../rules/constants.ts";
+import { playIds, type PlayId } from "../rules/constants.ts";
 import { clockOf } from "../score.ts";
 import { drawTestMark } from "../screen/test-mark.ts";
 import { createDepthView, type DepthView } from "../three/stage.ts";
 import { buttonsIn, element } from "./elements.ts";
-import type { PlayRun } from "./runs.ts";
+import type { PlayRun, Shown } from "./runs.ts";
 
 // What the page shows: the screen, the counts above it, the quest and levels to choose from, the touch buttons, the milestones earned
 // and the Hall of Fame. Every
@@ -19,24 +19,27 @@ export const logicalHeight = 144;
 const scale = 2;
 const none = "—";
 
-const screenWords: Readonly<Record<ChapterId, string>> = {
+const screenWords: Readonly<Record<Shown, string>> = {
   castle:
     "The game screen: a map of the woods and the castle seen from above, where Glitchy meets dragon friends and cheers up grumpy guards",
   hills:
     "The game screen: Glitchy the baby dragon running and jumping across sunny hills, catching eggs and breathing fire",
+  nursery:
+    "The game screen: the secret Sky Nursery, where Glitchy gathers eggs, hatches baby dragons, dances and paints the night sky",
   woods:
     "The game screen: a moonlit maze of trees seen through Glitchy's eyes, then the woods and DeFu's lair seen from above, with caged dragons, rocket keys and her egg rocket",
 };
 
-const actWords: Readonly<Record<ChapterId, string>> = {
+const actWords: Readonly<Record<Shown, string>> = {
   castle: "Talk",
   hills: "Jump",
+  nursery: "Dance",
   woods: "Use",
 };
 
 // The touch buttons each level offers; the others keep their place but are not shown. Every level has the backpack's three foods.
 const foods = ["berry", "mushroom", "pineapple"] as const;
-const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
+const padOf: Readonly<Record<Shown, readonly string[]>> = {
   castle: [
     "left",
     "right",
@@ -50,6 +53,17 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     ...foods,
   ],
   hills: ["left", "right", "down", "act", "fire", ...foods],
+  nursery: [
+    "left",
+    "right",
+    "up",
+    "down",
+    "act",
+    "fire",
+    "quick",
+    "evade",
+    "charm",
+  ],
   woods: [
     "left",
     "right",
@@ -64,10 +78,13 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     ...foods,
   ],
 };
-// Two of the castle's challenge buttons fly Glitchy up and down out of the maze.
-const flightWords: Readonly<Record<string, readonly [string, string]>> = {
-  evade: ["Evade", "Fly up"],
-  quick: ["Quick", "Fly down"],
+// Some buttons mean something else on some screens: the castle's challenge buttons fly Glitchy up and down out of the maze, and in the
+// Sky Nursery change the paint's colour, wipe the sky and paint.
+const padWords: Readonly<Record<string, Partial<Record<Shown, string>>>> = {
+  charm: { castle: "Charm", nursery: "Clear" },
+  evade: { castle: "Evade", nursery: "Ink +", woods: "Fly up" },
+  fire: { castle: "Fire", nursery: "Paint" },
+  quick: { castle: "Quick", nursery: "Ink -", woods: "Fly down" },
 };
 
 export function createView() {
@@ -149,15 +166,15 @@ export function createView() {
       }
     },
     // The level on the screen: what the screen shows, and what the touch buttons mean in it.
-    level(level: ChapterId): void {
+    level(level: Shown): void {
       screen.setAttribute("aria-label", screenWords[level]);
       actButton.textContent = actWords[level];
       for (const button of buttonsIn(pad, "button[data-hold]")) {
         const hold = button.dataset.hold ?? "";
         button.hidden = !padOf[level].includes(hold);
-        const words = flightWords[hold];
+        const words = padWords[hold];
         if (words !== undefined)
-          button.textContent = level === "woods" ? words[1] : words[0];
+          button.textContent = words[level] ?? words.castle ?? "";
       }
     },
     // The Hall of Fame: the best won quests, best first.
@@ -199,3 +216,12 @@ export function createView() {
 }
 
 export type View = ReturnType<typeof createView>;
+
+// The play a click in the chapter picker chose, if it was on one.
+export function pickedFrom(event: Event): PlayId | undefined {
+  const target =
+    event.target instanceof Element
+      ? event.target.closest("[data-chapter]")
+      : null;
+  return playIds.find((name) => name === target?.getAttribute("data-chapter"));
+}

@@ -59,6 +59,9 @@
         >
           <span aria-hidden="true">3</span> The Whispering Woods
         </button>
+        <button id="nursery" type="button" class="secret" hidden>
+          <span aria-hidden="true">4</span> Secret: the Sky Nursery
+        </button>
       </nav>
       <div class="stage">
         <canvas
@@ -166,6 +169,23 @@
         <div class="card-head">
           <h2 id="card-title">Your Pocket Dragon card</h2>
           <button id="card-close" type="button">Close</button>
+        </div>
+        <div
+          id="card-kinds"
+          class="card-shapes"
+          role="group"
+          aria-label="Which card"
+          hidden
+        >
+          <button type="button" data-kind="family" aria-pressed="true">
+            Dragon family
+          </button>
+          <button type="button" data-kind="art" aria-pressed="false">
+            Sky art
+          </button>
+          <button type="button" data-kind="dance" aria-pressed="false">
+            Dance party
+          </button>
         </div>
         <div class="card-shapes" role="group" aria-label="Card size">
           <button type="button" data-shape="square" aria-pressed="true">

@@ -9,17 +9,22 @@ import {
   type SubmitState,
 } from "@ador/game-sdk/run-notes";
 
-import { effects, tracks } from "./audio.ts";
+import { effects, trackOf, tracks } from "./audio.ts";
+import {
+  nurseryNote,
+  nurseryRun,
+  type NurseryRun,
+} from "./bonus/nursery-run.ts";
 import { factsOf, type LastRun } from "./card/content.ts";
 import { instructions } from "./guide.ts";
-import { createCardPanel } from "./page/card-panel.ts";
+import { createCardPanel, noteMarks } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
 import { attachHands, playOfKey } from "./page/hands.ts";
 import { createIdleRuns, startPlay } from "./page/plays.ts";
-import type { PlayRun } from "./page/runs.ts";
+import type { PlayRun, Shown } from "./page/runs.ts";
 import { settle } from "./page/settle.ts";
 import { attachTestMode, testNote, testOverNote } from "./page/test-panel.ts";
-import { createView } from "./page/view.ts";
+import { createView, pickedFrom } from "./page/view.ts";
 import {
   freshProgress,
   isOpen,
@@ -28,12 +33,7 @@ import {
   withSound,
   type Progress,
 } from "./progress.ts";
-import {
-  playIds,
-  ticksPerSecond,
-  type ChapterId,
-  type PlayId,
-} from "./rules/constants.ts";
+import { ticksPerSecond, type PlayId } from "./rules/constants.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the
 // network. The rules, the sessions and the screen are in their own modules; this only joins them to the page and the platform.
@@ -44,6 +44,7 @@ const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
 const picker = element("chapters", "nav");
 const shareButton = element("share", "button");
+const nurseryButton = element("nursery", "button");
 const view = createView();
 
 let play: PlatformPlay | null = null;
@@ -51,12 +52,16 @@ let progress: Progress = freshProgress;
 let chosen: PlayId = "quest";
 let run: PlayRun | null = null;
 // The level last shown, so the touch buttons and the music change only when it does.
-let shownLevel: ChapterId | null = null;
+let shownLevel: Shown | null = null;
 let runId: string | null = null;
 let titles: ReadonlyMap<string, string> = new Map();
 let heldNote = "";
 // For the player's card: the last run, and the milestones the player is known to have (the platform's list, and what runs here earned).
 let lastRun: LastRun | null = null;
+// The secret Sky Nursery, open once the quest is won (and in test mode): the visit going on, and the last one, for its cards.
+let visit: NurseryRun | null = null;
+let lastVisit: NurseryRun | null = null;
+const nurseryOpen = (): boolean => progress.won || testMode.on();
 const marks = new Set<string>();
 const card = createCardPanel(() => shareButton.focus());
 
@@ -79,11 +84,11 @@ const idleRun = createIdleRuns();
 
 function show(): void {
   const shown = run ?? idleRun(chosen);
-  const level = shown.level();
+  const level = shown.screen ?? shown.level();
   if (level !== shownLevel) {
     shownLevel = level;
     view.level(level);
-    if (run !== null && !run.ended()) sound.sound.playMusic(tracks[level]);
+    if (run !== null && !run.ended()) sound.sound.playMusic(trackOf(level));
   }
   view.draw(shown, run === null, progress.best[shown.id], progress.plasma);
 }
@@ -93,7 +98,10 @@ const reach = (): Progress =>
   testMode.on() ? { ...progress, unlocked: 3 } : progress;
 
 function showChapters(): void {
-  view.chapters(chosen, reach(), run !== null && !run.ended());
+  const running = run !== null && !run.ended();
+  view.chapters(chosen, reach(), running);
+  nurseryButton.hidden = !nurseryOpen();
+  nurseryButton.disabled = running;
 }
 
 function choose(id: PlayId): void {
@@ -117,8 +125,9 @@ pause.subscribe((paused) => {
 async function finish(finished: PlayRun): Promise<void> {
   view.running(false);
   sound.sound.stopMusic();
+  lastVisit = finished === visit ? visit : null;
   if (finished.test) {
-    note.textContent = testOverNote;
+    note.textContent = finished.overNote ?? testOverNote;
     showChapters();
     show();
     return;
@@ -180,9 +189,14 @@ async function startRealRun(): Promise<PlayRun> {
   });
 }
 
-const begin = (): Promise<void> =>
+const begin = (nursery = false): Promise<void> =>
   loop.launch(async () => {
-    if (testMode.on()) {
+    visit = nursery ? nurseryRun(localSeed()) : null;
+    if (visit !== null) {
+      runId = null;
+      note.textContent = nurseryNote;
+      run = visit;
+    } else if (testMode.on()) {
       runId = null;
       note.textContent = testNote;
       run = startPlay(chosen, localSeed(), undefined, true);
@@ -191,18 +205,12 @@ const begin = (): Promise<void> =>
     view.running(true);
     showChapters();
     sound.sfx("start");
-    shownLevel = run.level();
+    shownLevel = run.screen ?? run.level();
     view.level(shownLevel);
-    sound.sound.playMusic(tracks[shownLevel]);
+    sound.sound.playMusic(trackOf(shownLevel));
   });
 
-// The platform's list of the game's milestones, noting which the player has; asked again when the card opens, so a run just checked
-// counts.
-async function learnMarks() {
-  const listed = await client.milestones.list().catch(() => []);
-  for (const { id, status } of listed) if (status === "unlocked") marks.add(id);
-  return listed;
-}
+const learnMarks = () => noteMarks(client, marks);
 
 function openCard(): void {
   if (loop.running()) return;
@@ -233,6 +241,7 @@ async function connect(): Promise<void> {
   show();
 }
 
+const togglePause = (): void => void (loop.running() && pause.toggle());
 // No dialog is open over the page.
 const free = (): boolean => !card.isOpen() && !testMode.isOpen();
 // The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.
@@ -242,24 +251,16 @@ attachHands(document.body, {
     if (loop.running()) run?.hold(action, on);
     const pick = playOfKey(action);
     if (!loop.running() && free() && on && pick !== undefined) choose(pick);
+    if (on && action === "hot4" && nurseryOpen() && free()) void begin(true);
   },
-  pause: () => void (loop.running() && pause.toggle()),
+  pause: togglePause,
   start: () => void (!startButton.disabled && free() && begin()),
 });
 picker.addEventListener("click", (event) => {
-  const target =
-    event.target instanceof Element
-      ? event.target.closest("[data-chapter]")
-      : null;
-  const id = playIds.find(
-    (name) => name === target?.getAttribute("data-chapter"),
-  );
+  const id = pickedFrom(event);
   if (id !== undefined) choose(id);
 });
-pauseButton.addEventListener(
-  "click",
-  () => void (loop.running() && pause.toggle()),
-);
+pauseButton.addEventListener("click", togglePause);
 startButton.addEventListener("click", () => void begin());
 
 // Test mode, on or off. Leaving it ends a test run being played.
@@ -282,7 +283,13 @@ const testMode = attachTestMode({
   canOpen: () => !loop.running() && !card.isOpen(),
   changed: setTesting,
 });
-shareButton.addEventListener("click", openCard);
+shareButton.addEventListener("click", () =>
+  lastVisit === null ? openCard() : card.openNursery(lastVisit.nursery()),
+);
+nurseryButton.addEventListener(
+  "click",
+  () => void (nurseryOpen() && free() && begin(true)),
+);
 view.running(false);
 showChapters();
 show();

@@ -256,3 +256,7 @@ export const effects = {
 } as const satisfies Record<string, Effect>;
 
 export type EffectName = keyof typeof effects;
+
+// The tune for what is on the screen: a level's own, and the castle's for the Sky Nursery.
+export const trackOf = (shown: ChapterId | "nursery"): Track =>
+  tracks[shown === "nursery" ? "castle" : shown];

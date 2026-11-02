@@ -11,6 +11,9 @@ import { castleSounds, hillsSounds, woodsSounds } from "../feedback.ts";
 import { plasmaGathered } from "../rules/hills/milestones.ts";
 import type { CastleControl, CastleState } from "../rules/castle/types.ts";
 import type { ChapterId, PlayId } from "../rules/constants.ts";
+
+// What can be on the screen: a level, or the Sky Nursery.
+export type Shown = ChapterId | "nursery";
 import type { FameEntry } from "../progress.ts";
 import type { Running } from "../rules/held.ts";
 import type { HillsControl, HillsState } from "../rules/hills/types.ts";
@@ -50,6 +53,10 @@ export interface PlayRun {
   hold(action: Action, on: boolean): void;
   // The level on the screen (in the quest, the one being played).
   level(): ChapterId;
+  // What the screen shows when it is not a level: the secret Sky Nursery.
+  readonly screen?: Shown;
+  // What the note says when the run is over, for one that counts for nothing (a test run says its own).
+  readonly overNote?: string;
   // Metaplasma gathered in the run.
   plasma(): number;
   record(): RunRecord;

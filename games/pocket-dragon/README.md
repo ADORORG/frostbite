@@ -107,6 +107,14 @@ fire berry is eaten the next fire berries go in the backpack too. Each is kept, 
 The backpack shows at the right edge of the screen once anything is in it, with a flame bar while a blaze lasts and BIG while Glitchy is
 big, and a line at the top says what was found or used.
 
+**The secret Sky Nursery** opens once the whole quest is won (and in test mode): a gold button under the levels, or the 4 key between
+runs. It is a night sky over a cloud nest where Glitchy flies freely with the arrows: gather the eggs floating about, bring them to the
+nest to hatch them into baby dragons (each with a name, up to twelve) who fly along behind, press space to dance (a new move each time,
+with every dragon dancing too), hold F to paint the sky with stars (Q and E change the colour, C wipes it clean), and fly into the rainbow
+door on the right to leave. Nothing in it is timed, scored, saved or sent. After a visit, **Share card** makes the nursery's own cards
+instead of the run card: **Dragon family** (Glitchy and every dragon hatched, with their names), **Sky art** (the stars painted, framed
+like a painting) and **Dance party**, each in the three sizes.
+
 **Metaplasma** is in every level: little bits of light that drift to Glitchy like pollen when it comes close. The page banks what every
 run gathers ("Metaplasma banked"), to be turned into items one day, which will take a tremendous amount; for now it is only counted.
 
@@ -158,7 +166,8 @@ walk, the action key talks, picks up and opens (a door, a chest, the cage), and 
 move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
 charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack; out of the maze in the
 woods E flies up, Q flies down, V turns on frost vision and H sends Sparky (on a touch screen: Fly up, Fly down, Vision and Sparky). Enter starts a run, P
-pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
+pauses, and between runs 0 chooses the whole quest, 1, 2 and 3 a level open to practise, and (once the quest is won) 4 visits the secret
+Sky Nursery. On a touch screen
 there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the
 effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space
 to press, Escape to close), so none of them start a run.
@@ -207,6 +216,8 @@ src/card/           the player's card: words, content (what a card says, from th
 src/page/           the page: the keys and touch buttons, a level's run and the quest's run as the page sees them (runs, quest-run),
                     settle (what a finished run changes), what is shown around the screen (view, with the Hall of Fame), and
                     card-panel (making, saving and sharing a card); its styles are in `card.css`
+src/bonus/          the secret Sky Nursery: nursery (its own small seeded state machine), nursery-draw, nursery-run (a visit as
+                    the page plays it, counting for nothing) and cards (its three cards to share)
 src/main.ts         joins the page to the platform (progress, milestones, runs) and runs it on the SDK's run loop
 src/audio.ts        a tune for each level and the effects, as data for the SDK's sound engine; `feedback.ts` says which to play
 src/progress.ts     what is saved: levels open to practise, the quest won, the best of the quest and of each level, the Hall of Fame,

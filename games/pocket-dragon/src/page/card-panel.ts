@@ -1,6 +1,12 @@
 import { cardOf, type CardContent, type CardFacts } from "../card/content.ts";
 import { fileNameOf, layoutOf, shapes, type Shape } from "../card/layout.ts";
 import { drawPoster } from "../card/poster.ts";
+import {
+  nurseryCards,
+  paintNurseryCard,
+  type NurseryCard,
+} from "../bonus/cards.ts";
+import type { NurseryState } from "../bonus/nursery.ts";
 import { buttonsIn, element } from "./elements.ts";
 
 // The panel where a player makes their card: pick a size, see it, and download it, share it or copy the invite link. The platform's
@@ -17,6 +23,8 @@ export interface CardPanel {
   close(): void;
   isOpen(): boolean;
   open(facts: CardFacts): void;
+  // The Sky Nursery's own cards, of a visit: the dragon family, the sky art or the dance party.
+  openNursery(visit: NurseryState): void;
   // Draws the card again with what is known now, if the panel is open.
   update(facts: CardFacts): void;
 }
@@ -38,9 +46,12 @@ export function createCardPanel(onClosed: () => void): CardPanel {
   let picture = "";
   let file: File | null = null;
   let drawn = 0;
+  const kinds = element("card-kinds", "div");
+  let visit: NurseryState | null = null;
+  let kind: NurseryCard = "family";
 
   function render(): void {
-    if (card === null) return;
+    if (card === null && visit === null) return;
     const layout = layoutOf(shape);
     const canvas = document.createElement("canvas");
     canvas.width = layout.width;
@@ -53,6 +64,8 @@ export function createCardPanel(onClosed: () => void): CardPanel {
         "aria-pressed",
         String(button.dataset.shape === shape),
       );
+    for (const button of buttonsIn(root, "[data-kind]"))
+      button.setAttribute("aria-pressed", String(button.dataset.kind === kind));
     if (context === null) {
       picture = "";
       image.hidden = true;
@@ -61,10 +74,16 @@ export function createCardPanel(onClosed: () => void): CardPanel {
       hint.textContent = "This browser could not draw the card.";
       return;
     }
-    drawPoster(context, layout, card);
+    let alt = "";
+    if (visit !== null)
+      alt = paintNurseryCard(context, layout.width, layout.height, visit, kind);
+    else if (card !== null) {
+      drawPoster(context, layout, card);
+      alt = card.alt;
+    }
     picture = canvas.toDataURL("image/png");
     image.src = picture;
-    image.alt = card.alt;
+    image.alt = alt;
     image.hidden = false;
     download.disabled = false;
     send.disabled = false;
@@ -147,6 +166,14 @@ export function createCardPanel(onClosed: () => void): CardPanel {
       shape = picked;
       render();
     }
+    const chosen = nurseryCards.find(
+      (name) =>
+        name === target?.closest("[data-kind]")?.getAttribute("data-kind"),
+    );
+    if (chosen !== undefined && chosen !== kind) {
+      kind = chosen;
+      render();
+    }
   });
   // Keys pressed in the panel are the panel's: the game's keys must not take them (and stop a button being pressed).
   const ownKeys = (event: KeyboardEvent): void => {
@@ -166,6 +193,8 @@ export function createCardPanel(onClosed: () => void): CardPanel {
     isOpen: () => !root.hidden,
     open(facts) {
       card = cardOf(facts);
+      visit = null;
+      kinds.hidden = true;
       linkField.value = card.link ?? "";
       linkRow.hidden = card.link === null;
       copy.hidden = card.link === null;
@@ -174,10 +203,42 @@ export function createCardPanel(onClosed: () => void): CardPanel {
       render();
       buttonsIn(root, `[data-shape="${shape}"]`)[0]?.focus();
     },
+    openNursery(seen) {
+      visit = seen;
+      card = null;
+      kinds.hidden = false;
+      linkRow.hidden = true;
+      copy.hidden = true;
+      root.hidden = false;
+      main?.setAttribute("inert", "");
+      render();
+      buttonsIn(root, `[data-kind="${kind}"]`)[0]?.focus();
+    },
     update(facts) {
-      if (root.hidden) return;
+      if (root.hidden || visit !== null) return;
       card = cardOf(facts);
       render();
     },
   };
+}
+
+// The platform's list of the game's milestones, noting in `marks` which the player has; asked again when the card opens, so a run just
+// checked counts.
+export async function noteMarks(
+  client: {
+    readonly milestones: {
+      list(): Promise<
+        readonly {
+          readonly id: string;
+          readonly status: string;
+          readonly title: string;
+        }[]
+      >;
+    };
+  },
+  marks: Set<string>,
+) {
+  const listed = await client.milestones.list().catch(() => []);
+  for (const { id, status } of listed) if (status === "unlocked") marks.add(id);
+  return listed;
 }
