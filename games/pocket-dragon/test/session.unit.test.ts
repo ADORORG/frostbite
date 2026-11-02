@@ -93,8 +93,8 @@ describe("the chapters", () => {
     ]);
     expect([hillsPlay.id, castlePlay.id, woodsPlay.id]).toEqual(chapterIds);
     // 39 marks: the secret charm and the metaplasma mark are shared, so each chapter can earn them but the manifest names them once.
-    expect(milestoneIds).toHaveLength(39);
-    expect(new Set(milestoneIds).size).toBe(39);
+    expect(milestoneIds).toHaveLength(40);
+    expect(new Set(milestoneIds).size).toBe(40);
     expect(milestoneIds).toContain("secret-charm");
     expect(milestoneIds).toContain("metaplasma-300");
     expect(milestoneIds).toContain("masterful-charm");

@@ -7,6 +7,7 @@ import { freshStage, startHills } from "../../src/rules/hills/state.ts";
 import { tickHills } from "../../src/rules/hills/tick.ts";
 import type { HillsControl, HillsState } from "../../src/rules/hills/types.ts";
 import { arenaChoice, eggToFetch, hit } from "./hills-arena.ts";
+import { detour } from "./hills-detours.ts";
 
 // A player who sees what is coming, for Egg Hills: every tick it tries, on a copy of the run played through the real rules, running on
 // and each of several jumps, and does what keeps Glitchy safe over the next `horizon` ticks while getting furthest (a golden egg, a
@@ -99,10 +100,12 @@ export const startStage = (seed: number, stage: number): HillsState => ({
   stage,
 });
 
+// With `explore`, the player also goes into each stage's secret areas (and leaves some of the stage's treasure behind for it).
 export function planHills(
   from: HillsState,
   until: (state: HillsState) => boolean = () => false,
   limit = maxTicks,
+  explore = false,
 ): Played {
   let state = from;
   const inputs: RunInput[] = [];
@@ -142,6 +145,19 @@ export function planHills(
       const middle = state.hero.x + heroWidth / 2;
       press("left", egg + 64 < middle);
       press("right", egg + 64 >= middle);
+      state = tickHills(state);
+      continue;
+    }
+    if (state.controls.down) press("down", false);
+    const turn = explore ? detour(state) : null;
+    if (turn !== null) {
+      press("left", turn.left);
+      press("right", turn.right);
+      if (turn.down) press("down", true);
+      if (turn.jump && !state.controls.jump) {
+        press("jump", true);
+        releaseAt = state.tick + 30;
+      }
       state = tickHills(state);
       continue;
     }
@@ -185,4 +201,5 @@ export function planHills(
   return { inputs: [...inputs, { data, type: "end" }], state: closed.state };
 }
 
-export const playHills = (seed: number): Played => planHills(startHills(seed));
+export const playHills = (seed: number, explore = false): Played =>
+  planHills(startHills(seed), () => false, maxTicks, explore);

@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import { gameId, verifierId, verifierVersion } from "../src/rules/constants.ts";
 import { pocketDragonRules } from "../src/rules/index.ts";
 import { swiftTicks } from "../src/rules/woods/constants.ts";
+import { startBase } from "../src/rules/woods/base.ts";
 import { startWoods } from "../src/rules/woods/index.ts";
+import type { Base } from "../src/rules/woods/types.ts";
 import { woodsEarned, woodsMilestones } from "../src/rules/woods/milestones.ts";
 import { walkWoods } from "./support/woods-bot.ts";
 
@@ -22,14 +24,16 @@ describe("the Whispering Woods' milestones", () => {
       moonChest: true,
     };
     expect(woodsEarned(found)).toEqual([
-      "woods-first-clue",
       "woods-all-clues",
       "woods-chests-5",
       "woods-lanterns",
       "woods-frozen-chest",
     ]);
+    expect(woodsEarned({ ...found, clues: [true, true, false] })).not.toContain(
+      "woods-all-clues",
+    );
     const late = { ...found, escaped: true, escapeTick: swiftTicks + 1 };
-    expect(woodsEarned(late)).toContain("woods-everything");
+    expect(woodsEarned(late)).toContain("woods-escape");
     expect(woodsEarned(late)).not.toContain("woods-swift");
     expect(woodsEarned({ ...late, escapeTick: swiftTicks })).toContain(
       "woods-swift",
@@ -41,8 +45,19 @@ describe("the Whispering Woods' milestones", () => {
     expect(woodsEarned({ ...late, outcome: "defused" })).toContain(
       "woods-defused",
     );
-    const hurried = { ...late, chests: [true, false, false, false, false] };
-    expect(woodsEarned(hurried)).not.toContain("woods-everything");
+    const base = startBase(late);
+    const outside = (changes: Partial<Base>) => ({
+      ...late,
+      base: { ...base, ...changes },
+    });
+    expect(woodsEarned(outside({ allies: [true, true, false] }))).not.toContain(
+      "woods-allies",
+    );
+    expect(woodsEarned(outside({ allies: all }))).toContain("woods-allies");
+    expect(woodsEarned(outside({ broken: [true, false, true] }))).not.toContain(
+      "woods-factory",
+    );
+    expect(woodsEarned(outside({ broken: all }))).toContain("woods-factory");
   });
 
   // A careful player who maps as they go (`support/woods-bot.ts`) finds everything, gets out well inside three minutes and defuses the

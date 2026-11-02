@@ -69,7 +69,7 @@ describe("the trophies on a card", () => {
       [
         "eggs-60",
         "woods-lanterns",
-        "guild-river",
+        "guild-gear",
         "secret-charm",
         "metaplasma-300",
         "masterful-charm",

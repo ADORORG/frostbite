@@ -219,7 +219,7 @@ describe("the card panel", () => {
       surface().context,
     );
     panel.update({ ...facts, milestones: 5 });
-    expect(element("card-image", "img").alt).toContain("5/39");
+    expect(element("card-image", "img").alt).toContain("5/40");
     expect(element("card-download", "button").disabled).toBe(false);
   });
 });

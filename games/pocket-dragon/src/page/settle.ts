@@ -58,8 +58,10 @@ export function settle(before: Progress, finished: PlayRun): Settled {
       : null;
   const fame = finished.fame();
   const placed = fame === null ? null : withFame(progress, fame);
+  const rank = placed?.rank ?? null;
   return {
     lastRun: {
+      ...(rank === null ? {} : { rank }),
       chapter: finished.level(),
       outcome: outcomeOf(
         finished.won(),
@@ -70,7 +72,7 @@ export function settle(before: Progress, finished: PlayRun): Settled {
       stats: finished.stats(),
       trophies: finished.earned(),
     },
-    news: newsOf(finished, opened, placed?.rank ?? null),
+    news: newsOf(finished, opened, rank),
     opened,
     progress: placed?.progress ?? progress,
   };

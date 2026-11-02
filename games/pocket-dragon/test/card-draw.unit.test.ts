@@ -121,7 +121,7 @@ describe("a card picture", () => {
         "3/3",
         "FLAME",
         "POCKET DRAGON",
-        "12/39",
+        "12/40",
         "JOIN ME ON THE QUEST",
         "METAPLASMA BANKED 1,204",
         "EGG HILLS",
@@ -195,7 +195,7 @@ describe("the trophy shelf", () => {
       expect(texts).toEqual(
         expect.arrayContaining([
           "TROPHIES THIS RUN",
-          "12/39",
+          "12/40",
           "EGG HILLS CLEARED",
           "SECRET CHARM",
           "FIRST EGG",

@@ -11,8 +11,12 @@ import type { WoodsState } from "./types.ts";
 // The marks a walk through the Whispering Woods earns, each decided by the state of the walk alone. The words are in the manifest; the
 // list is a draft for the owner to approve. Every seed lays out every clue stone, chest and lantern where a walk can reach it, and the
 // woods outside the maze are the same for every seed.
+const all = (list: readonly boolean[] | undefined): boolean =>
+  list !== undefined && list.every(Boolean);
+
+// The marks of the three parts: the maze (its clues, treasure and way out), the woods outside it (every caged dragon freed) and DeFu's
+// lair (her factory broken, her rocket defused).
 const marks: readonly (readonly [string, (state: WoodsState) => boolean])[] = [
-  ["woods-first-clue", (s) => cluesRead(s) >= 1],
   ["woods-all-clues", (s) => cluesRead(s) >= clueCount],
   ["woods-chests-5", (s) => chestsOpened(s) >= chestCount],
   ["woods-lanterns", (s) => lanternsLit(s) >= lanternCount],
@@ -22,11 +26,9 @@ const marks: readonly (readonly [string, (state: WoodsState) => boolean])[] = [
     "woods-swift",
     (s) => s.escaped && (s.escapeTick ?? swiftTicks + 1) <= swiftTicks,
   ],
-  [
-    "woods-everything",
-    (s) => s.escaped && chestsOpened(s) >= chestCount && s.moonChest,
-  ],
   ["woods-launcher", (s) => s.parts.every(Boolean)],
+  ["woods-allies", (s) => all(s.base?.allies)],
+  ["woods-factory", (s) => all(s.base?.broken)],
   ["woods-defused", (s) => s.outcome === "defused"],
   ...sharedMarks<WoodsState>(
     (s) => s.charms.filter(Boolean).length,

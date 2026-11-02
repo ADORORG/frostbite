@@ -88,9 +88,12 @@ function idleRun(id: PlayId): PlayRun {
   const found = idle.get(id);
   if (found !== undefined) return found;
   const made = startPlay(id, 1);
+  // Its counts are those of a run not yet begun (the quest's clock at nothing), though the screen is a little way in.
+  const counts = made.stats();
   for (let at = 0; at < idleTicks; at += 1) made.tick();
-  idle.set(id, made);
-  return made;
+  const shown: PlayRun = { ...made, stats: () => counts };
+  idle.set(id, shown);
+  return shown;
 }
 
 function show(): void {

@@ -6,19 +6,13 @@ const [betaTarget] = targetChains;
 if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // POCKET DRAGON: GLITCHY'S QUEST: an original, family-friendly adventure in three levels that change dimension as they go, played as one
-// timed run (the whole quest) or a level at a time for practice. Egg Hills is a side-scrolling platformer (catch eggs, find the fire berry,
-// breathe fire, and beat DeFu's ghost dragons, guards and egg rocket at the end of each stage); its last portal shifts Glitchy into the
-// Guild and the Castle, a small role-playing quest on a map from above (help four dragon friends join a guild, use their powers, cheer up
-// grumble guards with turn-based shows); then into the Whispering Woods in the third dimension, a maze seen through Glitchy's eyes (clue
-// stones, lanterns, chests and an egg launcher) and then DeFu's woods and lair in 3D (caged dragons to free, rocket keys, her egg factory
-// to break and her egg rocket to defuse). Hearts carry from level to level and one clock runs; the page keeps a Hall of Fame of won quests
-// with the progress. Nobody is ever hurt: a guard is cheered up and a tired guild takes a nap. Every level has secret charms and
-// metaplasma (banked by the page to be turned into items later). Between runs the page makes a card of the last run (or the quest so far)
-// to share; it is a picture only, and decides nothing. Every milestone is decided by the rules alone
-// (`games/pocket-dragon/src/rules/*/milestones.ts`), so each can be replay-checked: the three levels and the whole quest are published as
-// one verifier with a cabinet each, the platform replays a run it issued a seed for, and the milestone is then held as replay-verified.
-// That shows the run followed the rules, not that a person played it. The digest pins the built file: a change to the rules is a change
-// here, and a test fails until it is. The title, summary and milestone list are a draft for the owner to approve.
+// timed run (the whole quest) or a level at a time for practice: Egg Hills, a side-scrolling platformer with DeFu's fights; the Guild
+// and the Castle, a small role-playing quest on a map from above (day, night and winter); and the Whispering Woods, a maze seen through
+// Glitchy's eyes and then DeFu's woods and lair in 3D, where her egg rocket is defused or launched. Hearts carry from level to level on one
+// clock, and the page keeps a Hall of Fame of won quests. Nobody is ever hurt. Every milestone is decided by the rules alone
+// (`games/pocket-dragon/src/rules/*/milestones.ts`) and replay-checked: the levels and the whole quest are one verifier with a cabinet
+// each, and the platform replays a run it issued a seed for, which shows the run followed the rules, not that a person played it. The
+// digest pins the built file: a change to the rules is a change here. The title, summary and milestone list are a draft for the owner.
 const once = (
   id: string,
   title: string,
@@ -42,7 +36,7 @@ export const pocketDragonGame = defineGame({
     video: null,
   },
   description:
-    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, then DeFu's woods and lair in full 3D, where you free caged dragons, find the rocket keys, break her egg factory, dodge her laser and shockwave, and defuse her egg rocket before it leaves for space. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather. Thirty-nine milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
+    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, then DeFu's woods and lair in full 3D, where you free caged dragons, find the rocket keys, break her egg factory, dodge her laser and shockwave, and defuse her egg rocket before it leaves for space. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather. Forty milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
   id: "pocket-dragon",
   launch: { mode: "embedded" },
   milestones: [
@@ -113,12 +107,6 @@ export const pocketDragonGame = defineGame({
       "The eggs are free!",
     ),
     once(
-      "woods-first-clue",
-      "First clue",
-      "Read a clue stone in the Whispering Woods.",
-      "The stones are talking.",
-    ),
-    once(
       "woods-all-clues",
       "Three clues",
       "Read all three clue stones in one run of the Whispering Woods.",
@@ -144,27 +132,33 @@ export const pocketDragonGame = defineGame({
     ),
     once(
       "woods-escape",
-      "Out of the woods",
-      "Leave the Whispering Woods through the open gate.",
-      "Chapter two is complete.",
+      "Out of the maze",
+      "Leave the Whispering Woods' maze through the moon gate.",
+      "The trees open up.",
     ),
     once(
       "woods-swift",
       "Swift wings",
-      "Leave the Whispering Woods within 3 minutes of starting.",
+      "Get out of the Whispering Woods' maze within 3 minutes of starting.",
       "Out in under three minutes.",
-    ),
-    once(
-      "woods-everything",
-      "Nothing left behind",
-      "Leave the Whispering Woods after opening all 5 chests and the moon chest.",
-      "Every treasure in the woods.",
     ),
     once(
       "woods-launcher",
       "Launcher built",
       "Find all 4 parts of the egg launcher in the Whispering Woods.",
       "Ready to launch.",
+    ),
+    once(
+      "woods-allies",
+      "Cages open",
+      "Free all 3 dragons from DeFu's cages in the Whispering Woods.",
+      "Three more friends.",
+    ),
+    once(
+      "woods-factory",
+      "Factory down",
+      "Break all 3 valves of DeFu's egg factory in her lair.",
+      "No more shadow dragons.",
     ),
     once(
       "woods-defused",
@@ -185,28 +179,28 @@ export const pocketDragonGame = defineGame({
       "Bolt, Splash, Bloom and Spark.",
     ),
     once(
-      "guild-river",
-      "Across the ford",
-      "Cross the river with your guild.",
-      "Lily pads all the way.",
+      "guild-gear",
+      "Fully geared",
+      "Find the swift boots, the cheer cape and the ember helm in the castle's houses.",
+      "Ready for anything.",
     ),
     once(
-      "guild-escape",
-      "Through the brambles",
-      "Lead your guild through the brambles and out of the woods, in sight of the castle.",
-      "The woods are behind you.",
+      "guild-eggs",
+      "Night watch",
+      "Save all 8 eggs from DeFu's guards on the night of the Guild and the Castle.",
+      "Every egg is safe.",
     ),
     once(
-      "guild-guards",
-      "All smiles",
-      "Cheer up all 3 grumble guards in one run.",
-      "Every guard is grinning.",
+      "guild-level-5",
+      "Seasoned guild",
+      "Raise your guild to level 5 in one run.",
+      "A guild to be reckoned with.",
     ),
     once(
       "guild-castle",
-      "Castle captured",
-      "Cheer up the Grumble King and raise your banner on the castle.",
-      "Chapter three is complete.",
+      "Castle stormed",
+      "Storm the castle and take the Legendary Golden Egg from the throne.",
+      "The Legendary Golden Egg is yours.",
     ),
     once(
       "guild-never-napped",
@@ -226,7 +220,6 @@ export const pocketDragonGame = defineGame({
       "Capture the castle within 4 minutes of starting.",
       "Captured in under four minutes.",
     ),
-    once("guild-evade", "Dodged it", "Evade a keeper's grumble.", "Missed!"),
     once(
       "guild-charm",
       "Charmed",
@@ -258,6 +251,18 @@ export const pocketDragonGame = defineGame({
       "Faster than a rocket countdown.",
     ),
     once(
+      "quest-all-eggs",
+      "Every egg",
+      "Win the whole quest with Egg Hills' 3 golden eggs, all 8 eggs of the castle's night saved, and every egg in the woods' maze.",
+      "Not one egg left behind.",
+    ),
+    once(
+      "quest-all-secrets",
+      "Secret keeper",
+      "Win the whole quest after visiting all 6 of Egg Hills' secret areas.",
+      "Every tunnel and every cloud.",
+    ),
+    once(
       "masterful-charm",
       "Masterful Pocket Dragon Charm",
       "Capture the castle with all 4 friends and all 3 secret charms, never napping, picking every keeper's favourite show first.",
@@ -266,13 +271,13 @@ export const pocketDragonGame = defineGame({
     once(
       "secret-charm",
       "Secret charm",
-      "Find a secret charm in any chapter.",
+      "Find a secret charm in any level.",
       "A secret, found.",
     ),
     once(
       "metaplasma-300",
       "Metaplasma",
-      "Gather 300 metaplasma in one run of any chapter.",
+      "Gather 300 metaplasma in one run of any level.",
       "A glowing armful.",
     ),
   ],
@@ -287,7 +292,7 @@ export const pocketDragonGame = defineGame({
     replay: {
       id: "pocket-dragon",
       sha256:
-        "a96dc2f442b35d52fd9215ff542965515f3849ead75394162eaa1a0fccc2f92b",
+        "3d51f2a7927add36115f99c9599fec9fa1918a7b1a1c82e8f6996f9b1649484c",
       version: 1,
     },
   },

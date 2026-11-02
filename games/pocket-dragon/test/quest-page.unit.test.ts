@@ -156,6 +156,7 @@ describe("a finished run, settled", () => {
       chapter: "woods",
       outcome: "won",
       quest: true,
+      rank: 1,
       score: 12_000,
       stats: [["Time", "4:00"]],
       trophies: ["first-egg"],
@@ -171,6 +172,7 @@ describe("a finished run, settled", () => {
     );
     expect(low.news).toBe("You won the whole quest in 8:20! ");
     expect(low.progress.fame).toEqual(full.fame);
+    expect(low.lastRun.rank).toBeUndefined();
   });
 
   it("says where a lost quest ended, and opens what it cleared", () => {

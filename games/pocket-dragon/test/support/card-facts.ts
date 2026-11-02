@@ -9,11 +9,12 @@ export const facts: CardFacts = {
   chapter: "hills",
   invite: link,
   masterful: false,
-  milestoneTotal: 39,
+  milestoneTotal: 40,
   milestones: 12,
   outcome: "cleared",
   plasma: 1_204,
   quest: false,
+  rank: null,
   score: 12_840,
   stats: [
     ["Eggs", "72"],

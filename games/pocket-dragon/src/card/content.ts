@@ -30,6 +30,8 @@ export interface CardFacts {
   readonly plasma: number;
   // The run was the whole quest (its chapter is the level it got to).
   readonly quest: boolean;
+  // A won quest's place in the Hall of Fame (null for any other run, or one that did not make it in).
+  readonly rank: number | null;
   readonly score: number;
   readonly stats: readonly Stat[];
   // The trophies the card shows: the run's own, or every one held when the card is of the quest so far.
@@ -44,6 +46,8 @@ export interface LastRun {
   readonly chapter: ChapterId;
   readonly outcome: Outcome;
   readonly quest: boolean;
+  // Its place in the Hall of Fame, for a won quest that made it in.
+  readonly rank?: number;
   readonly score: number;
   readonly stats: readonly Stat[];
   // The milestones the run earned, by id.
@@ -73,6 +77,7 @@ export function factsOf(
     outcome: last?.outcome ?? "journey",
     plasma: progress.plasma,
     quest: last?.quest ?? false,
+    rank: last?.rank ?? null,
     score: last?.score ?? 0,
     stats: last?.stats ?? [],
     trophies: trophiesOf(last?.trophies ?? marks, titles),
@@ -179,7 +184,10 @@ function movesOf(
 function saidOf(facts: CardFacts, cleared: number): string {
   const game = "Pocket Dragon: Glitchy's Quest";
   const chapter = chapterTitles[facts.chapter];
-  if (facts.outcome === "won") return `I won it all in ${game}!`;
+  if (facts.outcome === "won")
+    return facts.rank === null
+      ? `I won it all in ${game}!`
+      : `I won it all in ${game}, and took number ${String(facts.rank)} in my Hall of Fame!`;
   if (facts.outcome === "cleared")
     return `I cleared ${chapter.replace(/^The /u, "the ")} in ${game}!`;
   if (facts.outcome === "lost")
@@ -188,6 +196,14 @@ function saidOf(facts: CardFacts, cleared: number): string {
 }
 
 const lastLevel = chapterIds[2];
+
+// The line under the card's picture: how far the quest has come, the level the run was of, or a won quest's place in the Hall of Fame.
+function typeOf(facts: CardFacts, cleared: number, art: ChapterId): string {
+  if (facts.outcome === "journey") return `${String(cleared)} OF 3 CLEARED`;
+  if (facts.outcome === "won" && facts.rank !== null)
+    return `HALL OF FAME #${String(facts.rank)}`;
+  return `LEVEL ${String(chapterIds.indexOf(art) + 1)} OF 3`;
+}
 
 export function cardOf(facts: CardFacts): CardContent {
   const badges = badgesOf(facts);
@@ -242,6 +258,6 @@ export function cardOf(facts: CardFacts): CardContent {
     trophies: facts.trophies,
     trophyHeading:
       facts.outcome === "journey" ? "TROPHY CASE" : "TROPHIES THIS RUN",
-    typeLine: `BABY DRAGON  ·  ${facts.outcome === "journey" ? `${String(cleared)} OF 3 CLEARED` : `LEVEL ${String(chapterIds.indexOf(art) + 1)} OF 3`}`,
+    typeLine: `BABY DRAGON  ·  ${typeOf(facts, cleared, art)}`,
   };
 }

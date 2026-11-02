@@ -20,7 +20,7 @@ describe("a card's words", () => {
       headline: "I CLEARED EGG HILLS!",
       invite: "play.example.com/games/pocket-dragon",
       link,
-      milestones: "12/39",
+      milestones: "12/40",
       outcome: "cleared",
       plasma: "1,204",
       rarity: 2,
@@ -43,7 +43,7 @@ describe("a card's words", () => {
       `I cleared Egg Hills in Pocket Dragon: Glitchy's Quest! Join me: ${link}`,
     );
     expect(card.alt).toContain("I cleared Egg Hills");
-    expect(card.alt).toContain("12,840 points, 12/39 milestones.");
+    expect(card.alt).toContain("12,840 points, 12/40 milestones.");
   });
 
   it("say a lost run plainly but kindly, as a spark, and ask friends to find the game when there is no link", () => {
@@ -114,6 +114,10 @@ describe("a card's words", () => {
       title: "MASTERFUL POCKET DRAGON",
     });
     expect(cardOf(won).shareText).toContain("I won it all in Pocket Dragon");
+    const famous = cardOf({ ...won, rank: 2 });
+    expect(famous.typeLine).toBe("BABY DRAGON  ·  HALL OF FAME #2");
+    expect(famous.shareText).toContain("number 2 in my Hall of Fame!");
+    expect(famous.alt).toContain("number 2 in my Hall of Fame!");
   });
 
   it("tell the quest so far when there is no run to tell of: the furthest chapter, the bests added up, and the bank", () => {
@@ -205,6 +209,7 @@ describe("the quest on a card", () => {
       chapter: "woods" as const,
       outcome: outcomeOf(true, false),
       quest: true,
+      rank: 3,
       score: 900,
       stats: [],
       trophies: ["guild-castle", "nothing-of-ours"],
@@ -219,6 +224,7 @@ describe("the quest on a card", () => {
       outcome: "won",
       plasma: 50,
       quest: true,
+      rank: 3,
       score: 900,
       stats: [],
       trophies: [

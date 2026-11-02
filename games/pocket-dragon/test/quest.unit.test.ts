@@ -270,6 +270,8 @@ describe("the quest's marks", () => {
       "quest-all-hearts",
       "quest-one-heart",
       "quest-swift",
+      "quest-all-eggs",
+      "quest-all-secrets",
     ]);
   });
 });

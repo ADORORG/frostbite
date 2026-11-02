@@ -21,12 +21,13 @@ import {
   spiritMax,
   swiftTicks,
 } from "../src/rules/castle/constants.ts";
-import { spiritOf } from "../src/rules/castle/guild.ts";
+import { guildLevel, spiritOf } from "../src/rules/castle/guild.ts";
 import { castleChapter } from "../src/rules/castle/index.ts";
 import {
   castleEarned,
   castleMilestones,
 } from "../src/rules/castle/milestones.ts";
+import { nightEggs } from "../src/rules/castle/places.ts";
 import { startCastle } from "../src/rules/castle/tick.ts";
 import type { CastleState } from "../src/rules/castle/types.ts";
 import { gameId, verifierId, verifierVersion } from "../src/rules/constants.ts";
@@ -213,17 +214,34 @@ describe("the guild's milestones", () => {
     expect(castleEarned(most)).toEqual([
       "guild-first-friend",
       "guild-full",
-      "guild-river",
-      "guild-escape",
-      "guild-guards",
       "guild-favourite",
-      "guild-evade",
       "guild-charm",
       "secret-charm",
       "metaplasma-300",
     ]);
+    const geared = { ...most, gear: [true, true, true] };
+    expect(castleEarned(geared)).toContain("guild-gear");
+    expect(castleEarned({ ...most, gear: [true, true, false] })).not.toContain(
+      "guild-gear",
+    );
+    const saved = nightEggs.map(({ x, y }) => ({
+      state: "saved" as const,
+      x,
+      y,
+    }));
+    expect(castleEarned({ ...most, eggs: saved })).toContain("guild-eggs");
+    const oneLeft = saved.map((egg, at) =>
+      at === 0 ? { ...egg, state: "caged" as const } : egg,
+    );
+    expect(castleEarned({ ...most, eggs: oneLeft })).not.toContain(
+      "guild-eggs",
+    );
+    expect(guildLevel(geared)).toBe(4);
+    expect(castleEarned({ ...geared, eggs: saved })).toContain("guild-level-5");
     const done = {
       ...most,
+      eggs: saved,
+      gear: [true, true, true],
       goldenEgg: true,
       charms: [true, true, true],
       cheered: everyone,

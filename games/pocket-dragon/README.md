@@ -81,7 +81,7 @@ Between runs, **Share card** makes a picture to post: a square (1:1), a story (9
 of the game's own design: Glitchy's name and title, the run's score, a picture of the level with a stamp (cleared, try again, won it
 all), two moves made from the run's counts, a quote of the game's own, and a foil frame by rarity: a spark for a run that fell short, a
 flame for a cleared level, a blaze for winning the whole quest, and masterful once the masterful charm is earned. A quest's card shows its
-time and the hearts kept as its two moves. Around it go a headline, the
+time and the hearts kept as its two moves, and a won quest that makes the Hall of Fame shows its place there. Around it go a headline, the
 trophy shelf (the milestones the run earned, each with a cup coloured by where it was won, or every trophy held on a card of the quest
 so far), the three levels (cleared, open or locked, with their bests), the metaplasma banked, and an invitation. Before any run of a
 visit, the card is of the quest so far.
@@ -169,17 +169,19 @@ count what a run gathers, but the bank is not a milestone and is not checked.
 
 ## Milestones
 
-Thirty-nine, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs,
-fire, ice melted, gloomlings cheered, the hills cleared, a clear without a bump, guards cheered up and the rocket's eggs freed. The woods
-have ten: clues, chests, lanterns, the moon chest, getting out of the maze, getting out within three minutes, getting out with every
-treasure, the launcher built and DeFu's rocket defused. The guild has twelve: friends, the river, the brambles, guards cheered, the castle captured, without
-a nap, a perfect pick, within four minutes, an evade, a charm used, and the **Masterful Pocket Dragon Charm**, for
-capturing the castle with every friend, every secret charm found, no nap, and every keeper won over with its favourite show first. Two
-more can be earned in any level and are named once: a first secret charm, and 300 metaplasma in one run. The whole quest earns every
-level's marks on the way (the same as each level played alone) and four of its own: winning it, winning without losing a heart, winning
-with exactly one heart left, and winning in ten minutes or less. Some are earned on the same
-tick as a level's clear, but each asks for something more than the clear. The words are in the manifest. The list is a draft for the
-owner to approve.
+Forty, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs, fire,
+ice melted, gloomlings cheered, the hills cleared, a clear without a bump, guards cheered up and the rocket's eggs freed. The woods have
+ten, across their three parts: the maze's clues, chests, lanterns and moon chest, getting out of it (and within three minutes), the
+launcher built; every caged dragon freed in the woods; and DeFu's factory broken and her rocket defused in the lair. The guild has eleven,
+across day, night and winter: a first friend and the whole guild, every piece of gear, all eight of the night's eggs saved, the guild at
+level five, the castle stormed, without a nap, a perfect pick, within four minutes, a charm used, and the **Masterful Pocket Dragon
+Charm**, for storming the castle with every friend, every secret charm found, no nap, and every keeper won over with its favourite show
+first. Two more can be earned in any level and are named once: a first secret charm, and 300 metaplasma in one run. The whole quest
+earns every level's marks on the way (the same as each level played alone) and six of its own: winning it, winning without losing a
+heart, winning with exactly one heart left, winning in ten minutes or less, winning with every egg (Egg Hills' three golden eggs, all
+eight of the castle's night eggs saved and every egg of the woods' maze), and winning after visiting all six of Egg Hills' secret areas.
+Some are earned on the same tick as a level's clear, but each asks for something more than the clear. The words are in the manifest.
+The list is a draft for the owner to approve.
 
 ## Fairness
 
@@ -192,7 +194,9 @@ walk to, the moon chest is a dead end behind the frozen hedge, and nothing shuts
 to the same milestones: Egg Hills, all three of DeFu's fights included, without a bump; the woods with everything found, every caged
 dragon freed and the rocket defused without a bump (dodging DeFu's laser and shockwave, whether the scenes are skipped or watched); the
 castle with the Masterful Pocket Dragon Charm; and the whole quest, won in about four minutes with every heart
-(`test/support/quest-bot.ts` plays each level with its own bot on the quest's clock). A player who puts on the weakest shows and leaves
+(`test/support/quest-bot.ts` plays each level with its own bot on the quest's clock). Two more quests earn the quest's last two marks:
+one that takes every treasure of the woods wins with every egg, and one whose Egg Hills player also goes into each stage's tunnel and
+sky (`test/support/hills-detours.ts`) wins having visited all six secret areas. A player who puts on the weakest shows and leaves
 the charms behind still takes the golden egg, after a nap; the castle bot plays the night as it comes (the cage first, then the nearest
 egg, then a puff of fire at any guard beside it or carrying an egg). A player who does nothing in DeFu's lair loses the rocket, and the
 level still ends. Nobody has played it as a person yet.
