@@ -11,70 +11,11 @@ import { showTicks } from "../src/rules/castle/constants.ts";
 import { charmSpots } from "../src/rules/castle/places.ts";
 import { startCastle } from "../src/rules/castle/tick.ts";
 import { startWoods } from "../src/rules/woods/index.ts";
-import { launchEgg, startLaunch } from "../src/rules/woods/launch.ts";
-import type { WoodsState } from "../src/rules/woods/types.ts";
 import { drawCastle } from "../src/screen/castle-draw.ts";
-import { drawWoods } from "../src/screen/woods-draw.ts";
+import { drawWoods } from "../src/screen/woods-screen.ts";
 import { drawnWith, sound } from "./support/drawn.ts";
 
-describe("the Whispering Woods' launch round on the screen", () => {
-  const round = (eggs: number, tick = 600): WoodsState => ({
-    ...startWoods(3),
-    escaped: true,
-    launch: startLaunch(eggs, 5, 500),
-    tick,
-  });
-
-  it("shows the targets and their points, the bonus, the eggs left, and how to play at first", () => {
-    const texts = drawnWith(drawWoods, round(3)).texts();
-    expect(texts).toEqual(
-      expect.arrayContaining([
-        "100",
-        "200",
-        "300",
-        "400",
-        "500",
-        "BONUS 0",
-        "EGGS LEFT 3",
-        "UP/DOWN: AIM  LEFT/RIGHT: POWER  F: LAUNCH",
-      ]),
-    );
-    expect(drawnWith(drawWoods, round(3, 900)).texts()).not.toContain(
-      "UP/DOWN: AIM  LEFT/RIGHT: POWER  F: LAUNCH",
-    );
-  });
-
-  it("draws an egg in flight, cheers a hit, and says when the round is over", () => {
-    const flying = launchEgg(round(2));
-    expect(drawnWith(drawWoods, flying).drawn.length).toBeGreaterThan(
-      drawnWith(drawWoods, round(2)).drawn.length,
-    );
-    const launch = flying.launch ?? startLaunch(2, 5, 500);
-    const hit = {
-      ...flying,
-      launch: {
-        ...launch,
-        flying: null,
-        last: { target: 4, tick: 590 },
-        score: 500,
-      },
-    };
-    expect(drawnWith(drawWoods, hit).texts()).toEqual(
-      expect.arrayContaining(["+500!", "BONUS 500"]),
-    );
-    expect(drawnWith(drawWoods, { ...hit, tick: 700 }).texts()).not.toContain(
-      "+500!",
-    );
-    const over = {
-      ...hit,
-      launch: { ...hit.launch, ended: true, score: 1200 },
-    };
-    expect(drawnWith(drawWoods, over).texts()).toContain(
-      "BONUS ROUND OVER: 1200!",
-    );
-    expect(sound(drawWoods, [round(3), flying, hit, over])).toBe(true);
-  });
-
+describe("the Whispering Woods' charms on the screen", () => {
   it("lists the charms' powers, and with the map charm shows the whole map and what is left to find", () => {
     const start = startWoods(3);
     const charmed = { ...start, charms: [true, true, true], tick: 300 };

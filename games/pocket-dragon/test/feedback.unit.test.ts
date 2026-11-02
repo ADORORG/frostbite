@@ -13,7 +13,16 @@ import { startCastle } from "../src/rules/castle/tick.ts";
 import { startBoss } from "../src/rules/hills/boss.ts";
 import { startHills } from "../src/rules/hills/state.ts";
 import { startWoods } from "../src/rules/woods/index.ts";
-import { startLaunch } from "../src/rules/woods/launch.ts";
+import { startBase } from "../src/rules/woods/base.ts";
+import {
+  laserEvery,
+  laserOn,
+  laserWarn,
+  waveFirst,
+  waveWarn,
+} from "../src/rules/woods/constants.ts";
+import { playScene } from "../src/rules/woods/scenes.ts";
+import type { Base, WoodsState } from "../src/rules/woods/types.ts";
 
 describe("what is heard", () => {
   it("in Egg Hills: a jump, a breath, an egg, the golden egg, the berry, a charm, melting, a cheer, a bump, a stage and metaplasma", () => {
@@ -144,23 +153,46 @@ describe("what is heard", () => {
     ]);
   });
 
-  it("in the launch round: an egg launched and a target hit", () => {
-    const round = {
-      ...startWoods(1),
-      escaped: true,
-      launch: startLaunch(3, 5, 0),
-    };
-    const launched = {
-      ...round,
-      launch: { ...startLaunch(3, 5, 0), eggsLeft: 2 },
-    };
-    expect(woodsSounds(round, launched)).toEqual(["launch"]);
-    expect(
-      woodsSounds(launched, {
-        ...launched,
-        launch: { ...launched.launch, score: 300 },
-      }),
-    ).toEqual(["target"]);
+  it("outside the maze: the scenes, a dragon freed, a key found and fitted, a guard dizzy or sent home, a shadow dragon hatched or freed, a valve, an egg, a bump and the pickups", () => {
+    const maze = startWoods(1);
+    const out = { ...maze, base: startBase(maze), escaped: true };
+    const base = out.base;
+    const changed = (changes: Partial<Base>, more: Partial<WoodsState> = {}) =>
+      woodsSounds(out, { ...out, ...more, base: { ...base, ...changes } });
+    expect(woodsSounds(out, playScene(out, "rise"))).toEqual(["whoosh"]);
+    expect(woodsSounds(out, playScene(out, "lair"))).toEqual(["warning"]);
+    expect(woodsSounds(out, playScene(out, "peace"))).toEqual(["finish"]);
+    expect(woodsSounds(out, playScene(out, "launch"))).toEqual(["launch"]);
+    expect(changed({ allies: [true, false, false] })).toEqual(["join"]);
+    expect(changed({ pieces: [false, true, false] })).toEqual(["chest"]);
+    expect(changed({ installed: [false, false, true] })).toEqual(["gate"]);
+    expect(changed({ cheered: 1 })).toEqual(["cheer"]);
+    const dizzy = base.guards.map((guard, at) =>
+      at === 0 ? { ...guard, dizzy: 200 } : guard,
+    );
+    expect(changed({ guards: dizzy })).toEqual(["guard"]);
+    expect(changed({ freed: 1 })).toEqual(["freed"]);
+    expect(changed({ broken: [true, false, false] })).toEqual(["burst"]);
+    expect(changed({ ammo: base.ammo - 1 })).toEqual(["launch"]);
+    expect(changed({}, { heartsLost: 1 })).toEqual(["hit"]);
+    expect(changed({ forcefield: 600 })).toEqual(["shield"]);
+    expect(changed({ heartTaken: true })).toEqual(["berry"]);
+    expect(changed({ hatched: 1 })).toEqual(["ghost"]);
+    expect(woodsSounds(maze, { ...maze, tick: 1 })).toEqual([]);
+  });
+
+  it("in DeFu's lair: her laser glowing, then burning, and her shockwave going off", () => {
+    const maze = startWoods(1);
+    const lair = { ...startBase(maze), lairStart: 0 };
+    const at = (tick: number) => ({ ...maze, base: lair, escaped: true, tick });
+    const glow = laserEvery - laserOn - laserWarn;
+    expect(woodsSounds(at(glow - 1), at(glow))).toEqual(["warning"]);
+    expect(woodsSounds(at(glow + laserWarn - 1), at(glow + laserWarn))).toEqual(
+      ["laser"],
+    );
+    const wave = waveFirst + waveWarn;
+    expect(woodsSounds(at(wave - 1), at(wave))).toEqual(["burst"]);
+    expect(woodsSounds(at(wave), at(wave + 1))).toEqual([]);
   });
 
   it("in the castle: a breath, what is said, a show, a quick cheer, evading, a grumble back, a dodge and metaplasma", () => {

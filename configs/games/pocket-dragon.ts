@@ -9,8 +9,9 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // timed run (the whole quest) or a level at a time for practice. Egg Hills is a side-scrolling platformer (catch eggs, find the fire berry,
 // breathe fire, and beat DeFu's ghost dragons, guards and egg rocket at the end of each stage); its last portal shifts Glitchy into the
 // Guild and the Castle, a small role-playing quest on a map from above (help four dragon friends join a guild, use their powers, cheer up
-// grumble guards with turn-based shows); then into the Whispering Woods, a maze seen through Glitchy's eyes (clue stones, lanterns, chests,
-// an egg launcher and a launch round). Hearts carry from level to level and one clock runs; the page keeps a Hall of Fame of won quests
+// grumble guards with turn-based shows); then into the Whispering Woods in the third dimension, a maze seen through Glitchy's eyes (clue
+// stones, lanterns, chests and an egg launcher) and then DeFu's woods and lair in 3D (caged dragons to free, rocket keys, her egg factory
+// to break and her egg rocket to defuse). Hearts carry from level to level and one clock runs; the page keeps a Hall of Fame of won quests
 // with the progress. Nobody is ever hurt: a guard is cheered up and a tired guild takes a nap. Every level has secret charms and
 // metaplasma (banked by the page to be turned into items later). Between runs the page makes a card of the last run (or the quest so far)
 // to share; it is a picture only, and decides nothing. Every milestone is decided by the rules alone
@@ -41,7 +42,7 @@ export const pocketDragonGame = defineGame({
     video: null,
   },
   description:
-    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, with clue stones, the parts of an egg launcher and a launch round. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather. Thirty-nine milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
+    "Help Glitchy the baby dragon stop DeFu's egg rocket in a quest across three dimensions, played as one run against the clock. In Egg Hills (a side view), run and jump through wind, rain and fog, catch eggs, breathe fire, and at the end of each stage beat DeFu's baby ghost dragons (and her egg rocket) to unseal the portal while dodging her red-eyed laser strikes. The last portal shifts Glitchy into a new dimension: the Guild and the Castle, a map seen from above, where you help four dragon friends join your guild and win turn-based cheer challenges with hotkeys for shows, quick cheers, evading and secret charms. Then the world turns into the third dimension: the Whispering Woods, a moonlit maze seen through Glitchy's eyes, then DeFu's woods and lair in full 3D, where you free caged dragons, find the rocket keys, break her egg factory, dodge her laser and shockwave, and defuse her egg rocket before it leaves for space. Your hearts carry from level to level and the clock never stops: win fast, with hearts to spare, for a place in your Hall of Fame. Each level you clear opens to practise on its own. Every level hides secret charms and metaplasma to gather. Thirty-nine milestones, each checked by replaying your run, up to the Masterful Pocket Dragon Charm. After every run, make a trading card of it, trophies and all, to share as a post or a story.",
   id: "pocket-dragon",
   launch: { mode: "embedded" },
   milestones: [
@@ -166,10 +167,10 @@ export const pocketDragonGame = defineGame({
       "Ready to launch.",
     ),
     once(
-      "woods-launch-1000",
-      "Egg-cellent aim",
-      "Score 1,000 bonus points launching eggs at the targets.",
-      "Bullseye after bullseye.",
+      "woods-defused",
+      "Rocket defused",
+      "Fit the three rocket keys into DeFu's egg rocket before it launches.",
+      "Peace in the woods.",
     ),
     once(
       "guild-first-friend",
@@ -280,13 +281,13 @@ export const pocketDragonGame = defineGame({
   scene: "hopper",
   schemaVersion: 1,
   summary:
-    "A baby dragon's quest in three chapters: a boss-battle platformer, a moonlit maze with an egg launcher, and a guild of dragons who capture the castle.",
+    "A baby dragon's quest across three dimensions: a boss-battle platformer, a guild of dragons who storm a castle, and a 3D race to defuse DeFu's egg rocket.",
   title: "Pocket Dragon: Glitchy's Quest",
   verification: {
     replay: {
       id: "pocket-dragon",
       sha256:
-        "d701e5b0cf9bb27c91d60e6dbe29177fc32a94735d6ba4943ceb57e2316ef4d6",
+        "a96dc2f442b35d52fd9215ff542965515f3849ead75394162eaa1a0fccc2f92b",
       version: 1,
     },
   },

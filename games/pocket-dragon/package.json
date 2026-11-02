@@ -12,7 +12,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/game-sdk": "workspace:*"
+    "@ador/game-sdk": "workspace:*",
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@ador/test-kit": "workspace:*",
@@ -20,6 +21,7 @@
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "@types/node": "26.4.0",
+    "@types/three": "0.187.0",
     "@vitest/coverage-v8": "4.1.11",
     "eslint": "10.9.1",
     "typescript": "5.9.3",

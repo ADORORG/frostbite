@@ -15,6 +15,7 @@ import { cosOf, sinOf, unit } from "../rules/woods/trig.ts";
 import type { Place, WoodsState } from "../rules/woods/types.ts";
 import { colour } from "./palette.ts";
 import { write } from "./text.ts";
+import { doneWords } from "./woods-base-hud.ts";
 
 // What is drawn over the woods: a puff of fire when Glitchy breathes, a map of the paths walked so far (the clue stones whisper where
 // the next one is, and the last where the moon gate is), and a few words when something is found.
@@ -121,17 +122,6 @@ export function minimap(
   );
 }
 
-const foundWords = {
-  charm: "A SECRET CHARM!",
-  chest: "TREASURE!",
-  clue: "A CLUE STONE WHISPERS...",
-  egg: "AN EGG FOR THE LAUNCHER",
-  lantern: "A LANTERN GLOWS",
-  launcher: "THE EGG LAUNCHER IS BUILT!",
-  melt: "THE FROZEN HEDGE MELTS",
-  moon: "THE MOON CHEST!",
-  part: "A LAUNCHER PART!",
-} as const;
 const charmNames = [
   "SWIFT FEET",
   "THE WHOLE MAP",
@@ -169,7 +159,7 @@ export function woodsWords(
         ? "THE MOON GATE IS OPEN!"
         : found.kind === "clue" && read >= clueCount
           ? "NOW FINISH THE LAUNCHER!"
-          : foundWords[found.kind];
+          : doneWords[found.kind];
     write(context, words, 128, 40, 10, colour.gold);
   }
   const powers = charmNames.filter((_, at) => state.charms[at] === true);

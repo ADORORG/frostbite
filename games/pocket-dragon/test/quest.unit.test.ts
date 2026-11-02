@@ -97,7 +97,7 @@ describe("the quest", () => {
       state: expect.anything(),
     });
     expect(pocketDragonRules.init(5, { cabinet: "quest" }).ok).toBe(true);
-    expect(maxTicks).toBe(21_600 + 54_000 + 21_600 + 2 * shiftTicks);
+    expect(maxTicks).toBe(21_600 + 54_000 + 54_000 + 2 * shiftTicks);
   });
 
   it("shifts into the next dimension when a level is cleared, and starts it with the hearts the last ended with", () => {
@@ -140,7 +140,7 @@ describe("the quest", () => {
         legRun(legKinds.woods, {
           ...woods,
           escaped: true,
-          launch: null,
+          outcome: "defused",
         }),
       ),
     );

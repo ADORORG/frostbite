@@ -56,13 +56,22 @@
           <span aria-hidden="true">3</span> The Whispering Woods
         </button>
       </nav>
-      <canvas
-        id="screen"
-        width="512"
-        height="288"
-        role="img"
-        aria-label="The game screen"
-      ></canvas>
+      <div class="stage">
+        <canvas
+          id="world"
+          width="512"
+          height="288"
+          aria-hidden="true"
+          hidden
+        ></canvas>
+        <canvas
+          id="screen"
+          width="512"
+          height="288"
+          role="img"
+          aria-label="The game screen"
+        ></canvas>
+      </div>
       <div class="foot">
         <div id="sound"></div>
         <p id="note" aria-live="polite"></p>

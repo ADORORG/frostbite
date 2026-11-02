@@ -56,7 +56,13 @@ export function questRun(session: QuestSession): PlayRun {
         ...(won() || state.shift !== null ? [state.leg.id] : []),
       ];
     },
-    draw: (context) => drawQuest(context, session.state()),
+    depth() {
+      const shown = legShown(session.state().leg);
+      return shown.id === "woods" && shown.state.base !== null
+        ? shown.state
+        : null;
+    },
+    draw: (context, layered) => drawQuest(context, session.state(), layered),
     earned: () => session.earned(),
     ended: () => session.state().ended,
     fame() {

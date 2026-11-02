@@ -12,7 +12,7 @@ import { startWoods, woodsRules } from "../../src/rules/woods/index.ts";
 import { indexOf } from "../../src/rules/woods/maze.ts";
 import { tickWoods } from "../../src/rules/woods/tick.ts";
 import { fullTurn } from "../../src/rules/woods/trig.ts";
-import { bestShot, type Shot } from "./woods-launch-bot.ts";
+import { playBase, type BasePlan } from "./woods-base-bot.ts";
 import type {
   Place,
   WoodsControl,
@@ -20,19 +20,19 @@ import type {
 } from "../../src/rules/woods/types.ts";
 import { cellAt, gateOpen } from "../../src/rules/woods/walk.ts";
 
-// A player who knows the woods, for the Whispering Woods: it walks the paths (found by a breadth-first search over the cells) to
-// whatever is nearest of what is left (clue stones and chests, the lanterns and the frozen hedge, which it faces and breathes fire at,
-// then the moon chest), and last to the moon gate. It stands for a careful player who maps as they go; the inputs it makes are a legal
-// run to replay.
+// A player who knows the woods, for the Whispering Woods: in the maze it walks the paths (found by a breadth-first search over the
+// cells) to whatever is nearest of what is left (clue stones and chests, the lanterns and the frozen hedge, which it faces and breathes
+// fire at, then the moon chest), and last to the moon gate; outside the maze it plays on as `woods-base-bot.ts` says. It stands for a
+// careful player who maps as they go; the inputs it makes are a legal run to replay.
 export interface Played {
   readonly inputs: readonly RunInput[];
   readonly state: WoodsState;
 }
 
-export interface WoodsPlan {
-  // Leave out the lanterns, the moon chest and the chests, and go straight for the clues and the gate.
+export interface WoodsPlan extends Partial<BasePlan> {
+  // Leave out the lanterns, the moon chest and the chests (and outside the maze, the cages, the forcefield and the heart), and go
+  // straight for the clues and the gate (and the rocket keys and the rocket).
   readonly hurry?: boolean;
-  readonly limit?: number;
 }
 
 const passable = (state: WoodsState, index: number): boolean => {
@@ -145,7 +145,7 @@ function nextGoal(state: WoodsState, hurry: boolean): Goal | null {
 }
 
 export function walkWoods(seed: number, plan: WoodsPlan = {}): Played {
-  const { hurry = false, limit = maxTicks } = plan;
+  const { hurry = false, idle = false, limit = maxTicks, watch = false } = plan;
   let state = startWoods(seed);
   const inputs: RunInput[] = [];
   const set = (control: WoodsControl, on: boolean): void => {
@@ -186,25 +186,10 @@ export function walkWoods(seed: number, plan: WoodsPlan = {}): Played {
     }
     state = tickWoods(state);
   }
-  let shot: Shot | null = null;
-  while (state.tick < limit && state.launch !== null && !state.launch.ended) {
-    const { launch } = state;
-    set("fire", false);
-    if (launch.flying === null) {
-      shot ??= bestShot(state);
-      set("up", launch.aim < shot.aim);
-      set("down", launch.aim > shot.aim);
-      set("right", launch.power < shot.power);
-      set("left", launch.power > shot.power);
-      if (launch.aim === shot.aim && launch.power === shot.power) {
-        set("fire", true);
-        shot = null;
-      }
-    } else
-      for (const control of ["left", "right", "up", "down"] as const)
-        set(control, false);
-    state = tickWoods(state);
-  }
+  playBase(
+    { set, state: () => state, tick: () => void (state = tickWoods(state)) },
+    { hurry, idle, limit, watch },
+  );
   const data = { tick: state.tick };
   const closed = woodsRules.step(state, { data, type: "end" });
   if (!closed.ok) throw new Error(closed.reason);

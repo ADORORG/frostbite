@@ -13,7 +13,7 @@ import type { WoodsState } from "../src/rules/woods/types.ts";
 import { drawCastle } from "../src/screen/castle-draw.ts";
 import { drawHills } from "../src/screen/hills-draw.ts";
 import { friendKey } from "../src/screen/sprites.ts";
-import { drawWoods } from "../src/screen/woods-draw.ts";
+import { drawWoods } from "../src/screen/woods-screen.ts";
 import { surface, type Drawn } from "./support/canvas.ts";
 
 // Every frame of a chapter, wherever Glitchy is and whatever has been done, is drawn in the screen's own colours with whole numbers: a

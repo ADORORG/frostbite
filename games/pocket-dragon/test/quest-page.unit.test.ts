@@ -104,6 +104,7 @@ function finished(
 ): PlayRun {
   return {
     cleared: () => [],
+    depth: () => null,
     draw: () => undefined,
     earned: () => ["first-egg"],
     ended: () => true,

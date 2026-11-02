@@ -16,12 +16,12 @@ const wonLine = "I WON IT ALL!";
 const clearedLines: Readonly<Record<ChapterId, string>> = {
   castle: "I STORMED THE CASTLE!",
   hills: "I CLEARED EGG HILLS!",
-  woods: "I ESCAPED THE WHISPERING WOODS!",
+  woods: "I DEFUSED DEFU'S EGG ROCKET!",
 };
 const lostLines: Readonly<Record<ChapterId, string>> = {
   castle: "THE CASTLE HELD OUT... FOR NOW",
   hills: "EGG HILLS GOT ME... FOR NOW",
-  woods: "THE WOODS KEPT ME... FOR NOW",
+  woods: "THE ROCKET GOT AWAY... FOR NOW",
 };
 
 export function headlineOf(outcome: Outcome, chapter: ChapterId): string {
@@ -35,7 +35,7 @@ const championTitle = "QUEST CHAMPION";
 const clearedTitles: Readonly<Record<ChapterId, string>> = {
   castle: "CASTLE STORMER",
   hills: "HILL RUNNER",
-  woods: "MOON GATE OPENER",
+  woods: "ROCKET DEFUSER",
 };
 
 export function titleOf(
@@ -79,7 +79,7 @@ export const chapterMoves: Readonly<
   ],
   woods: [
     { name: "CLUE SENSE", stat: 0, text: "Clue stones read in the maze" },
-    { name: "LAUNCHER BUILD", stat: 1, text: "Egg launcher parts found" },
+    { name: "KEY FINDER", stat: 1, text: "Rocket keys found in the woods" },
   ],
 };
 

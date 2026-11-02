@@ -34,9 +34,9 @@ export const guides: Readonly<Record<PlayId, Guide>> = {
   },
   woods: {
     lines: [
-      "UP AND DOWN: WALK   LEFT AND RIGHT: TURN",
-      "SPACE OR F: BREATHE FIRE ON LANTERNS AND ICE",
-      "READ 3 CLUES, BUILD THE EGG LAUNCHER, GET OUT",
+      "MAZE: UP/DOWN WALK  LEFT/RIGHT TURN  F: FIRE",
+      "OUTSIDE: SPACE FREES, OPENS AND FITS KEYS",
+      "BURST THE FACTORY, THEN DEFUSE DEFU'S ROCKET",
     ],
     start: "ENTER TO PRACTISE LEVEL 3",
     title: "THE WHISPERING WOODS",
@@ -51,5 +51,5 @@ export const instructions: Readonly<Record<PlayId, string>> = {
   quest:
     "The whole quest in one run: Egg Hills, then the Guild and the Castle, then the Whispering Woods. Your hearts carry from level to level, and the clock never stops.",
   woods:
-    "Up and down walk, left and right turn, space or F breathes fire. Find three clue stones and four launcher parts, then launch eggs at the targets.",
+    "In the maze, up and down walk, left and right turn, and F breathes fire: read three clue stones and find four launcher parts to open the moon gate. Outside, the arrows walk, F breathes fire, and space frees caged dragons, opens chests for three rocket keys and fits them into DeFu's rocket once her factory's valves are broken. Dodge her laser and shockwave.",
 };

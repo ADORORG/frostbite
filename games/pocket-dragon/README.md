@@ -1,7 +1,8 @@
 # Pocket Dragon: Glitchy's Quest
 
 An original, family-friendly adventure for the platform's arcade, starring Glitchy, a mysterious baby dragon, in three levels that change
-dimension as they go: a side view, a map from above, then a maze seen through Glitchy's eyes. **The whole quest** plays them as one run
+dimension as they go: a side view, a map from above, then the third dimension (a maze seen through Glitchy's eyes, and then the woods and
+DeFu's lair in true 3D). **The whole quest** plays them as one run
 against one clock: clear Egg Hills and its last portal shifts Glitchy into a new dimension, the Guild and the Castle; clear that and it
 turns into the third dimension, the Whispering Woods. The hearts Glitchy has left carry from level to level, and losing them all (or
 running out of a level's time) ends the quest. Win fast, with hearts to spare, for a place in the **Hall of Fame** (the ten best won quests,
@@ -50,12 +51,26 @@ goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The villai
      twice running is too tired to work. The keeper grumbles back after each move; a guild out of spirit naps and tries again.
    - **Secret charms.** Three on the land, kept for the battles and used at once without taking a turn: spirit (back to full), a star (the
      next show counts three times) and a shield (blocks two grumbles).
-3. **The Whispering Woods** (a maze seen through Glitchy's eyes). Read three clue stones and find the four parts of the egg launcher to
-   open the moon gate before the moonlight runs out (six minutes); collect eggs for the launcher on the way, open five chests, light three
-   lanterns with fire and melt the frozen hedge that hides the moon chest. Three secret charms hide in dead ends: swift feet (walk faster),
-   the whole map (the map shows every path, and where the parts and eggs still are) and a metaplasma magnet. Out of the gate, the launch
-   round: tilt the launcher with up and down, set its power with left and right, and launch the eggs found at three baskets (100, 200 and
-   300 points), a ring (400) and a high star (500) within thirty seconds. The bonus adds to the level's score.
+3. **The Whispering Woods** (the third dimension). It has three parts, each in a scene of its own, with short scenes between them
+   (the camera rising out of the maze, DeFu at her lair, the rocket defused or gone) that the action key skips:
+   - **The maze** (seen through Glitchy's eyes). Read three clue stones and find the four parts of the egg launcher to open the moon gate;
+     collect eggs for the launcher on the way, open five chests, light three lanterns with fire and melt the frozen hedge that hides the
+     moon chest. Three secret charms hide in dead ends: swift feet (walk faster), the whole map (the map shows every path, and where the
+     parts and eggs still are) and a metaplasma magnet.
+   - **The woods** (seen from above, in 3D). Out of the maze the camera rises over the trees to DeFu's outpost. Free the three dragons
+     in her cages (each follows Glitchy and brings a heart), open three chests for the rocket keys, take the forcefield bubble and the
+     heart, and get past her four guards (a puff of fire leaves one dizzy; a second sends it home cheered up), or launch an egg at them
+     from afar with the launcher. With the three keys, the lair's gate opens.
+   - **The dungeon and castle** (DeFu's lair). DeFu stands on her platform beside her egg rocket, which leaves in two minutes. Her egg
+     factory hatches shadow dragons that chase Glitchy (fire sets one free) and shields the rocket while it runs: break its three valves
+     with fire, then fit the three keys into the rocket's panels to defuse it. Her laser glows along Glitchy's row (or column) before
+     it burns, and her shockwave spreads out from her platform a tile at a time; the dungeon is out of reach of both. If the countdown
+     runs out (or the hearts do), the rocket leaves for space and DeFu wins; defused, peace comes back to the woods.
+
+The woods outside the maze are drawn in true 3D (three.js on WebGL 2): low-poly woods, a pond and DeFu's castle, jointed dragons that
+walk, flap and swish their tails, guards, DeFu and her machines, moonlight with shadows, torches, and her laser and shockwave as light.
+The camera follows Glitchy from above and behind and has its own path in each scene. The words and counts are drawn over it on the game
+screen. Where there is no WebGL 2, the same woods are drawn flat from above, and the game plays the same.
 
 **Metaplasma** is in every level: little bits of light that drift to Glitchy like pollen when it comes close. The page banks what every
 run gathers ("Metaplasma banked"), to be turned into items one day, which will take a tremendous amount; for now it is only counted.
@@ -83,7 +98,8 @@ owners to weigh. A won quest is saved with the progress, so a card can say so in
 
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps
 (hold for a high jump, tap for a hop), down digs into a burrow, and with wings jump flaps in the air; in the woods up and down walk and
-left and right turn, and in the launch round up and down aim, left and right set the power and fire launches; in the castle the arrows
+left and right turn in the maze, and outside it the arrows walk, fire breathes at the tile ahead and the action key frees a caged dragon,
+opens a chest, fits a key or launches an egg (and skips a scene); in the castle the arrows
 walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
 move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
 charm. Enter starts a run, P pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
@@ -102,8 +118,11 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
   hills/            Egg Hills: constants, types, layout, secret-layout and level (the seeded stages and their secret areas), collide,
                     hero, weather, fire, boss and boss-meet (DeFu's fight), secrets (doors, power-ups, springs, vents, boulders),
                     touch, tick, state, milestones
-  woods/            the woods: trig (whole-number sines), maze (the seeded maze), stash (parts, eggs, charms, metaplasma, targets),
-                    walk, tick (walking, fire, finding), launch (the launch round), milestones
+  grid.ts           maps walked tile by tile (the castle's land, DeFu's woods): the four ways, and the shortest way toward something
+  woods/            the woods: trig (whole-number sines), maze (the seeded maze), stash (parts, eggs, charms, metaplasma), walk, tick
+                    (walking, fire, finding), base-map (the woods and lair outside the maze), base (walking, using, fire, bumps),
+                    foes (guards, shadow dragons, eggs in flight), lair (DeFu's laser, shockwave and countdown), base-tick, scenes,
+                    milestones
   castle/           the guild: map, places, motes, rooms (the houses), guild (experience, levels, gear), night (guards and eggs),
                     world (walking, bumping, talking), battle (cheer battles), tick, milestones
   quest/            the whole quest: keys (presses written compactly), legs (each level as the quest plays it), tick (the shift
@@ -113,7 +132,11 @@ src/chapters.ts     what the page needs of each level to play it, and their name
 src/session.ts      one run of a level as a player plays it: ticks, control changes, and the run record they make
 src/quest-session.ts the whole quest as a player plays it, its presses written into `keys` inputs sixty-four at a time
 src/screen/         drawing each level (a side view, a map from above, a raycast first-person view), at twice the size for sharp words;
-                    quest-draw adds the quest's clock and hearts, the shift into the next dimension and how the quest ended
+                    the woods outside the maze flat (woods-base, the fallback) with what is written over them in 3D too (woods-base-hud,
+                    woods-scenes); quest-draw adds the quest's clock and hearts, the shift into the next dimension and how it ended
+src/three/          the woods outside the maze in 3D with three.js: parts (shapes and paints), dragon and people (the jointed models),
+                    props and machines (what is used or broken), land (the map as instances), effects (laser, shockwave, confetti),
+                    cast and world (building it all and setting it from a state), camera (where it looks), stage (the WebGL view)
 src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
                     layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
                     trophies (the shelf), badges (the levels) and poster (the whole picture)
@@ -148,8 +171,8 @@ count what a run gathers, but the bank is not a milestone and is not checked.
 
 Thirty-nine, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs,
 fire, ice melted, gloomlings cheered, the hills cleared, a clear without a bump, guards cheered up and the rocket's eggs freed. The woods
-have ten: clues, chests, lanterns, the moon chest, getting out, getting out within three minutes, getting out with every treasure, the
-launcher built and a bonus of 1,000. The guild has twelve: friends, the river, the brambles, guards cheered, the castle captured, without
+have ten: clues, chests, lanterns, the moon chest, getting out of the maze, getting out within three minutes, getting out with every
+treasure, the launcher built and DeFu's rocket defused. The guild has twelve: friends, the river, the brambles, guards cheered, the castle captured, without
 a nap, a perfect pick, within four minutes, an evade, a charm used, and the **Masterful Pocket Dragon Charm**, for
 capturing the castle with every friend, every secret charm found, no nap, and every keeper won over with its favourite show first. Two
 more can be earned in any level and are named once: a first secret charm, and 300 metaplasma in one run. The whole quest earns every
@@ -166,17 +189,20 @@ arena with nothing else in it, every run has at least 90 eggs, 15 blocks of ice 
 gloomlings as they go; in the woods every path cell can be reached, the parts, eggs and charms are each on their own cell that Glitchy can
 walk to, the moon chest is a dead end behind the frozen hedge, and nothing shuts Glitchy in at the start. Players who see what is coming
 (`test/support/*-bot.ts`) earn every milestone of each level on the seeds tried, and their records replay through the published verifier
-to the same milestones: Egg Hills, all three of DeFu's fights included, without a bump; the woods with everything found and a bonus over
-1,000; the castle with the Masterful Pocket Dragon Charm; and the whole quest, won in about four minutes with every heart
+to the same milestones: Egg Hills, all three of DeFu's fights included, without a bump; the woods with everything found, every caged
+dragon freed and the rocket defused without a bump (dodging DeFu's laser and shockwave, whether the scenes are skipped or watched); the
+castle with the Masterful Pocket Dragon Charm; and the whole quest, won in about four minutes with every heart
 (`test/support/quest-bot.ts` plays each level with its own bot on the quest's clock). A player who puts on the weakest shows and leaves
 the charms behind still takes the golden egg, after a nap; the castle bot plays the night as it comes (the cage first, then the nearest
-egg, then a puff of fire at any guard beside it or carrying an egg). Nobody has played it as a person yet.
+egg, then a puff of fire at any guard beside it or carrying an egg). A player who does nothing in DeFu's lair loses the rocket, and the
+level still ends. Nobody has played it as a person yet.
 
 ## Tests
 
 `pnpm --filter @game/pocket-dragon test:unit` (the rules, the stages, the quest, the screen and the page's parts), `test:integration`
 (bundles the page and plays it against a simulated platform, including a quest on the platform's seed that is sent back and replayed),
-`test:coverage`.
+`test:coverage`. The 3D view is tested without WebGL: its models, their animation, the camera's paths and the world set from a state
+are plain three.js objects, and the renderer is stood in for; how it looks was checked in a browser.
 
 ## Ownership
 

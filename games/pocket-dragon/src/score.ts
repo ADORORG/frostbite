@@ -13,6 +13,7 @@ import { eggsCaught } from "./rules/hills/milestones.ts";
 import type { HillsState } from "./rules/hills/types.ts";
 import { maxTicks as woodsMax } from "./rules/woods/constants.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./rules/woods/tick.ts";
+import { cages, chests } from "./rules/woods/base-map.ts";
 import type { WoodsState } from "./rules/woods/types.ts";
 import { chapterIds, ticksPerSecond } from "./rules/constants.ts";
 import { plasmaGathered } from "./rules/hills/milestones.ts";
@@ -27,8 +28,9 @@ export type Stat = readonly [label: string, value: string];
 
 const bonus = (finishTick: number | null, most: number): number =>
   finishTick === null ? 0 : Math.floor((most - finishTick) / 4);
-const of = (count: number, total: number): string =>
-  `${String(count)} of ${String(total)}`;
+const of = (got: number, total: number): string =>
+  `${String(got)} of ${String(total)}`;
+const count = (list: readonly boolean[]): number => list.filter(Boolean).length;
 
 export const hillsScore = (state: HillsState): number =>
   eggsCaught(state) * 100 +
@@ -44,19 +46,34 @@ export const hillsStats = (state: HillsState): readonly Stat[] => [
   ["Stage", of(state.stage, stages)],
 ];
 
-export const woodsScore = (state: WoodsState): number =>
-  cluesRead(state) * 500 +
-  chestsOpened(state) * 300 +
-  lanternsLit(state) * 200 +
-  (state.moonChest ? 1_000 : 0) +
-  (state.escaped ? 2_000 : 0) +
-  (state.launch?.score ?? 0) +
-  bonus(state.finishTick, woodsMax);
+// The woods: the maze's finds and the way out, then what was done outside it, and the rocket defused (with a bonus for time left).
+export const woodsScore = (state: WoodsState): number => {
+  const base = state.base;
+  const outside =
+    base === null
+      ? 0
+      : count(base.allies) * 500 +
+        count(base.pieces) * 400 +
+        count(base.broken) * 200 +
+        base.cheered * 200 +
+        base.freed * 150;
+  return (
+    cluesRead(state) * 500 +
+    chestsOpened(state) * 300 +
+    lanternsLit(state) * 200 +
+    (state.moonChest ? 1_000 : 0) +
+    (state.escaped ? 2_000 : 0) +
+    outside +
+    (state.outcome === "defused" ? 5_000 : 0) +
+    bonus(state.finishTick, woodsMax)
+  );
+};
 
+// The clues read, the rocket keys found and the caged dragons freed.
 export const woodsStats = (state: WoodsState): readonly Stat[] => [
   ["Clues", of(cluesRead(state), state.clues.length)],
-  ["Parts", of(state.parts.filter(Boolean).length, state.parts.length)],
-  ["Eggs", String(state.launch?.eggsLeft ?? state.eggs.filter(Boolean).length)],
+  ["Keys", of(count(state.base?.pieces ?? []), chests.length)],
+  ["Allies", of(count(state.base?.allies ?? []), cages.length)],
 ];
 
 export const castleScore = (state: CastleState): number =>

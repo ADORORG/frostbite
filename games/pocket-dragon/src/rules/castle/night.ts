@@ -7,6 +7,7 @@ import {
   fireReach,
   invulnerableTicks,
 } from "./constants.ts";
+import { stepToward as stepOn } from "../grid.ts";
 import { friendsJoined } from "./guild.ts";
 import { mapHeight, mapWidth } from "./map.ts";
 import { bubble, cage, friends, guardStarts, nightEggs } from "./places.ts";
@@ -16,55 +17,17 @@ import type { CastleState, NightEgg, NightGuard, Spot } from "./types.ts";
 // steps along the shortest way (the first found, trying up, down, left, right). A puff of fire leaves a guard dizzy and makes it drop what
 // it carries; Glitchy walking onto a loose egg saves it, and opening the cage saves every egg in it. A guard that bumps into Glitchy
 // costs a heart (unless Glitchy is blinking or has the forcefield) and is dizzy a while after. Saving every egg brings the winter.
-const ways: readonly Spot[] = [
-  { x: 0, y: -1 },
-  { x: 0, y: 1 },
-  { x: -1, y: 0 },
-  { x: 1, y: 0 },
-];
-
 const say = (state: CastleState, id: string): CastleState => ({
   ...state,
   message: { id, tick: state.tick },
 });
 
-// The first step from `from` toward the nearest tile that `target` names, over tiles `open` allows; null when none can be reached.
-export function stepToward(
+// The first step from `from` toward the nearest tile that `target` names, over tiles `open` allows, on the guild's land.
+export const stepToward = (
   from: Spot,
   target: (x: number, y: number) => boolean,
   open: (x: number, y: number) => boolean,
-): Spot | null {
-  const seen = new Uint8Array(mapWidth * mapHeight);
-  const first = new Int32Array(mapWidth * mapHeight);
-  const queue = new Int32Array(mapWidth * mapHeight);
-  const start = from.y * mapWidth + from.x;
-  let head = 0;
-  let tail = 1;
-  queue[0] = start;
-  seen[start] = 1;
-  while (head < tail) {
-    const at = queue[head] ?? start;
-    head += 1;
-    const x = at % mapWidth;
-    const y = (at - x) / mapWidth;
-    for (const way of ways) {
-      const nx = x + way.x;
-      const ny = y + way.y;
-      if (nx < 0 || ny < 0 || nx >= mapWidth || ny >= mapHeight) continue;
-      const next = ny * mapWidth + nx;
-      if (seen[next] === 1) continue;
-      seen[next] = 1;
-      const step = at === start ? next : (first[at] ?? next);
-      if (target(nx, ny))
-        return { x: step % mapWidth, y: Math.floor(step / mapWidth) };
-      if (!open(nx, ny)) continue;
-      first[next] = step;
-      queue[tail] = next;
-      tail += 1;
-    }
-  }
-  return null;
-}
+): Spot | null => stepOn(mapWidth, mapHeight, from, target, open);
 
 export function nightFalls(state: CastleState): CastleState {
   if (state.phase === "day" && friendsJoined(state) >= friends.length)

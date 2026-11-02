@@ -225,7 +225,7 @@ describe("the Whispering Woods' rules", () => {
     expect(opened.found?.kind).toBe("chest");
   });
 
-  it("keep the moon gate shut until all three clues are read and the launcher is built, then let Glitchy out and take only the end", () => {
+  it("keep the moon gate shut until all three clues are read and the launcher is built, then let Glitchy out of the maze", () => {
     const start = startWoods(11);
     const exit = placeOf(start.level.gate);
     const shut = hold(facing(start, exit), "up");
@@ -235,18 +235,18 @@ describe("the Whispering Woods' rules", () => {
     expect(play({ ...shut, parts: [true, true, true, true] }, 80).escaped).toBe(
       false,
     );
-    // With no eggs to launch, the launch round is over as soon as it starts.
+    // Out of the maze, the camera rises over the trees and the woods are seen from above, from where the maze's path came out.
     const out = play({ ...read, parts: [true, true, true, true] }, 80);
-    expect(out.launch?.ended).toBe(true);
     expect(out.escaped).toBe(true);
-    expect(out.finishTick).not.toBeNull();
-    expect(woodsChapter.done(out)).toBe(true);
+    expect(out.escapeTick).not.toBeNull();
+    expect(out.scene).toEqual({ id: "rise", start: out.escapeTick });
+    expect(out.base?.x).toBe(12);
+    expect(out.base?.y).toBe(26);
+    expect(out.finishTick).toBeNull();
+    expect(woodsChapter.done(out)).toBe(false);
     expect(tickWoods(out).tick).toBe(out.tick + 1);
     expect(
       woodsRules.step(out, { data: { on: 0, tick: out.tick }, type: "up" }),
-    ).toEqual({
-      ok: false,
-      reason: "the run is over",
-    });
+    ).toMatchObject({ ok: true });
   });
 });

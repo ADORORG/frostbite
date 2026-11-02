@@ -127,7 +127,7 @@ describe("a level's run as the page plays it", () => {
     woods.hold("act", true);
     woods.hold("hot1", true);
     expect(woods.record().inputs.map(({ type }) => type)).toEqual([
-      "fire",
+      "act",
       "end",
     ]);
     const castle = startRun("castle", 4);
@@ -152,8 +152,9 @@ describe("a level's run as the page plays it", () => {
       expect(run.plasma()).toBeGreaterThanOrEqual(0);
       expect(run.stats()).toHaveLength(3);
       const screen = surface();
-      run.draw(screen.context);
+      run.draw(screen.context, false);
       expect(screen.drawn.length).toBeGreaterThan(0);
+      expect(run.depth()).toBeNull();
     }
   });
 });
@@ -173,7 +174,7 @@ describe("the page's view", () => {
     expect(element("plasma", "strong").textContent).toBe("0");
     expect(element("banked", "strong").textContent).toBe("12,345");
     expect(element("stat-0-label", "span").textContent).toBe("Clues");
-    expect(element("stat-1", "strong").textContent).toBe("0 of 4");
+    expect(element("stat-1", "strong").textContent).toBe("0 of 3");
     expect(screen.texts()).toContain("THE WHISPERING WOODS");
     const playing = {
       ...startRun("hills", 4),
@@ -210,13 +211,13 @@ describe("the page's view", () => {
     expect(quest?.title).toContain("All three levels");
     expect(woods?.title).toContain("Clear the level before");
     view.level("woods");
-    expect(element("act", "button").textContent).toBe("Fire");
+    expect(element("act", "button").textContent).toBe("Use");
     expect(element("screen", "canvas").getAttribute("aria-label")).toContain(
       "maze",
     );
     const hidden = () =>
       buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold);
-    expect(hidden()).toEqual(["act", "quick", "evade", "charm"]);
+    expect(hidden()).toEqual(["quick", "evade", "charm"]);
     view.level("castle");
     expect(hidden()).toEqual([]);
     view.chapters("woods", freshProgress, true);

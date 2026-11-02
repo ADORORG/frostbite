@@ -5,6 +5,7 @@ import { guides } from "../guide.ts";
 import { isOpen, type FameEntry, type Progress } from "../progress.ts";
 import { playIds, type ChapterId, type PlayId } from "../rules/constants.ts";
 import { clockOf } from "../score.ts";
+import { createDepthView, type DepthView } from "../three/stage.ts";
 import { buttonsIn, element } from "./elements.ts";
 import type { PlayRun } from "./runs.ts";
 
@@ -22,13 +23,13 @@ const screenWords: Readonly<Record<ChapterId, string>> = {
   hills:
     "The game screen: Glitchy the baby dragon running and jumping across sunny hills, catching eggs and breathing fire",
   woods:
-    "The game screen: a walk through a moonlit maze of trees seen through Glitchy's eyes, with clue stones, lanterns and treasure chests",
+    "The game screen: a moonlit maze of trees seen through Glitchy's eyes, then the woods and DeFu's lair seen from above, with caged dragons, rocket keys and her egg rocket",
 };
 
 const actWords: Readonly<Record<ChapterId, string>> = {
   castle: "Talk",
   hills: "Jump",
-  woods: "Fire",
+  woods: "Use",
 };
 
 // The touch buttons each level offers; the others keep their place but are not shown.
@@ -45,12 +46,15 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     "charm",
   ],
   hills: ["left", "right", "down", "act", "fire"],
-  woods: ["left", "right", "up", "down", "fire"],
+  woods: ["left", "right", "up", "down", "act", "fire"],
 };
 
 export function createView() {
   const screen = element("screen", "canvas");
   const context = screen.getContext("2d");
+  const world = element("world", "canvas");
+  // The three-dimensional view is made the first time the woods outside the maze are shown (null where it cannot be).
+  let depth: DepthView | null | undefined;
   const scoreOut = element("score", "strong");
   const bestOut = element("best", "strong");
   const plasmaOut = element("plasma", "strong");
@@ -87,9 +91,15 @@ export function createView() {
         if (valueOut !== undefined) valueOut.textContent = value;
       });
       if (context === null) return;
+      const woods = run.depth();
+      if (woods !== null && depth === undefined) depth = createDepthView(world);
+      const layered = woods !== null && depth !== null && depth !== undefined;
+      world.hidden = !layered;
+      if (layered) depth?.show(woods);
       context.setTransform(scale, 0, 0, scale, 0, 0);
+      context.clearRect(0, 0, logicalWidth, logicalHeight);
       context.imageSmoothingEnabled = false;
-      run.draw(context);
+      run.draw(context, layered);
       if (idle) drawGuide(context, logicalWidth, logicalHeight, guides[run.id]);
     },
     // What is chosen (the quest or a level), and which levels are open to practise.

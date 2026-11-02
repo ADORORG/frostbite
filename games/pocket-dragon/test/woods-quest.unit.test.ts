@@ -28,30 +28,54 @@ describe("the Whispering Woods' milestones", () => {
       "woods-lanterns",
       "woods-frozen-chest",
     ]);
-    const late = { ...found, escaped: true, finishTick: swiftTicks + 1 };
+    const late = { ...found, escaped: true, escapeTick: swiftTicks + 1 };
     expect(woodsEarned(late)).toContain("woods-everything");
     expect(woodsEarned(late)).not.toContain("woods-swift");
-    expect(woodsEarned({ ...late, finishTick: swiftTicks })).toContain(
+    expect(woodsEarned({ ...late, escapeTick: swiftTicks })).toContain(
       "woods-swift",
+    );
+    expect(woodsEarned(late)).not.toContain("woods-defused");
+    expect(woodsEarned({ ...late, outcome: "launched" })).not.toContain(
+      "woods-defused",
+    );
+    expect(woodsEarned({ ...late, outcome: "defused" })).toContain(
+      "woods-defused",
     );
     const hurried = { ...late, chests: [true, false, false, false, false] };
     expect(woodsEarned(hurried)).not.toContain("woods-everything");
   });
 
-  // A careful player who maps as they go (`support/woods-bot.ts`) finds everything and gets out well inside three minutes, on every
-  // seed tried; one who goes straight for the clues gets out sooner still.
-  it("can all be earned in one walk, and the gate can be reached sooner by skipping the treasure", () => {
+  // A careful player who maps as they go (`support/woods-bot.ts`) finds everything, gets out well inside three minutes and defuses the
+  // rocket, on every seed tried; one who goes straight for the clues, the keys and the rocket is done sooner still.
+  it("can all be earned in one walk, and the rocket can be defused sooner by skipping the treasure", () => {
     for (const seed of [11, 20_261_031, 1_989_854]) {
       const walked = walkWoods(seed);
       expect(woodsEarned(walked.state)).toEqual(woodsMilestones);
       expect(walked.inputs.length).toBeLessThan(5_000);
       const hurried = walkWoods(seed, { hurry: true });
-      expect(hurried.state.escaped).toBe(true);
+      expect(hurried.state.outcome).toBe("defused");
       expect(hurried.state.finishTick ?? 0).toBeLessThan(
         walked.state.finishTick ?? 0,
       );
     }
-  }, 60_000);
+  }, 180_000);
+
+  // Outside the maze the same player frees every caged dragon, finds the keys, breaks the factory's valves and defuses the rocket without
+  // a bump, whether the scenes are skipped or watched; one who does nothing in DeFu's lair loses the rocket, and the level ends anyway.
+  it("can be won outside the maze without a bump, and are lost (but over) by a player who does nothing in the lair", () => {
+    const watched = walkWoods(11, { watch: true });
+    expect(watched.state.outcome).toBe("defused");
+    expect(watched.state.heartsLost).toBe(0);
+    expect(watched.state.base?.allies).toEqual([true, true, true]);
+    const skipped = walkWoods(11);
+    expect(skipped.state.finishTick ?? 0).toBeLessThan(
+      watched.state.finishTick ?? 0,
+    );
+    const idle = walkWoods(11, { hurry: true, idle: true });
+    expect(idle.state.outcome).toBe("launched");
+    expect(idle.state.ended).toBe(true);
+    expect(woodsEarned(idle.state)).not.toContain("woods-defused");
+  }, 180_000);
 
   it("are given again when a walk's record is replayed through the published rules", () => {
     const walked = walkWoods(20_261_031);

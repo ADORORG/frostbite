@@ -61,7 +61,7 @@ describe("a card's words", () => {
     });
     expect(card).toMatchObject({
       art: "woods",
-      headline: "THE WOODS KEPT ME... FOR NOW",
+      headline: "THE ROCKET GOT AWAY... FOR NOW",
       invite: "FIND POCKET DRAGON IN THE ARCADE",
       link: null,
       rarity: 1,

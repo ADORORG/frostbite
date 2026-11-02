@@ -26,7 +26,7 @@ import {
 } from "../score.ts";
 import { drawCastle } from "../screen/castle-draw.ts";
 import { drawHills } from "../screen/hills-draw.ts";
-import { drawWoods } from "../screen/woods-draw.ts";
+import { drawWoods } from "../screen/woods-screen.ts";
 import { createRunSession } from "../session.ts";
 import { actions, type Action } from "./hands.ts";
 
@@ -36,7 +36,10 @@ export interface PlayRun {
   readonly id: PlayId;
   // The levels this run cleared.
   cleared(): readonly ChapterId[];
-  draw(context: CanvasRenderingContext2D): void;
+  // The woods outside the maze, while they are on the screen, for the three-dimensional view (null at any other time).
+  depth(): WoodsState | null;
+  // With `layered`, the three-dimensional view is already drawn behind the screen.
+  draw(context: CanvasRenderingContext2D, layered: boolean): void;
   earned(): readonly string[];
   ended(): boolean;
   // A won quest's entry for the Hall of Fame; null for anything else.
@@ -57,7 +60,12 @@ export interface PlayRun {
 
 export interface Look<Control extends string, State extends Running<Control>> {
   readonly cleared: (state: State) => boolean;
-  readonly draw: (context: CanvasRenderingContext2D, state: State) => void;
+  readonly depth: (state: State) => WoodsState | null;
+  readonly draw: (
+    context: CanvasRenderingContext2D,
+    state: State,
+    layered: boolean,
+  ) => void;
   readonly means: Readonly<Partial<Record<Action, Control>>>;
   readonly plasma: (state: State) => number;
   readonly play: ChapterPlay<Control, State>;
@@ -66,8 +74,11 @@ export interface Look<Control extends string, State extends Running<Control>> {
   readonly stats: (state: State) => readonly Stat[];
 }
 
+const flat = (): null => null;
+
 export const hillsLook: Look<HillsControl, HillsState> = {
   cleared: (state) => state.finishTick !== null,
+  depth: flat,
   draw: drawHills,
   means: {
     act: "jump",
@@ -85,10 +96,11 @@ export const hillsLook: Look<HillsControl, HillsState> = {
 };
 
 export const woodsLook: Look<WoodsControl, WoodsState> = {
-  cleared: (state) => state.escaped,
+  cleared: (state) => state.outcome === "defused",
+  depth: (state) => (state.base === null ? null : state),
   draw: drawWoods,
   means: {
-    act: "fire",
+    act: "act",
     down: "down",
     fire: "fire",
     left: "left",
@@ -104,6 +116,7 @@ export const woodsLook: Look<WoodsControl, WoodsState> = {
 
 export const castleLook: Look<CastleControl, CastleState> = {
   cleared: (state) => state.goldenEgg,
+  depth: flat,
   draw: drawCastle,
   means: {
     act: "act",
@@ -137,7 +150,8 @@ function runOf<Control extends string, State extends Running<Control>>(
   const held = new Set<Action>();
   return {
     cleared: () => (look.cleared(session.state()) ? [look.play.id] : []),
-    draw: (context) => look.draw(context, session.state()),
+    depth: () => look.depth(session.state()),
+    draw: (context, layered) => look.draw(context, session.state(), layered),
     earned: () => session.earned(),
     ended: () => session.state().ended,
     fame: () => null,

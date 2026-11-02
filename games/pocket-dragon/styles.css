@@ -124,19 +124,32 @@ h2 {
 .chapters button[data-locked="true"] span {
   font-size: 0.75rem;
 }
-canvas {
+/* The screen, and behind it (in the woods outside the maze) the three-dimensional view: both fill the same box, keeping their shape. */
+.stage {
+  display: grid;
+  min-block-size: 0;
+  overflow: hidden;
+  border: 0.1875rem solid var(--edge);
+  border-radius: 0.5rem;
+  background: var(--night);
+  box-shadow:
+    0 0 2rem rgb(91 234 198 / 0.18),
+    inset 0 0 0 0.125rem var(--night);
+}
+.stage canvas {
+  grid-area: 1 / 1;
   inline-size: 100%;
   block-size: 100%;
   min-block-size: 0;
   object-fit: contain;
-  border: 0.1875rem solid var(--edge);
-  border-radius: 0.5rem;
-  background: var(--night);
   image-rendering: pixelated;
   touch-action: manipulation;
-  box-shadow:
-    0 0 2rem rgb(91 234 198 / 0.18),
-    inset 0 0 0 0.125rem var(--night);
+}
+.stage canvas[hidden] {
+  display: none;
+}
+#world {
+  image-rendering: auto;
 }
 /* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves. */
 #note {

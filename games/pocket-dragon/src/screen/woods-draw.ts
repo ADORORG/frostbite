@@ -13,7 +13,6 @@ import { fullTurn } from "../rules/woods/trig.ts";
 import type { Place, WoodsState } from "../rules/woods/types.ts";
 import { colour } from "./palette.ts";
 import { breath, minimap, woodsWords } from "./woods-hud.ts";
-import { drawLaunch } from "./woods-launch.ts";
 import {
   charmPictures,
   charmSeen,
@@ -38,7 +37,7 @@ import {
   type Texel,
 } from "./woods-look.ts";
 
-// The Whispering Woods seen through Glitchy's eyes: a raycaster, one ray for each of the 256 columns, walls textured and fogged by
+// The maze of the Whispering Woods seen through Glitchy's eyes: a raycaster, one ray for each of the 256 columns, walls textured and fogged by
 // distance, things drawn as pictures that face the player, the moon and stars overhead, and a map of the paths walked in a corner. It
 // reads the state and changes nothing.
 export const width = 256;
@@ -278,14 +277,10 @@ function things(
   }
 }
 
-export function drawWoods(
+export function drawMaze(
   context: CanvasRenderingContext2D,
   state: WoodsState,
 ): void {
-  if (state.escaped) {
-    drawLaunch(context, state);
-    return;
-  }
   const view = viewOf(state);
   sky(context, state);
   const depth = walls(context, state, view);

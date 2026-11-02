@@ -121,7 +121,7 @@ describe("the quest's run on the page", () => {
     expect(run.cleared()).toEqual(["hills"]);
     for (let at = 0; at < 90; at += 1) run.tick();
     const screen = surface();
-    run.draw(screen.context);
+    run.draw(screen.context, false);
     expect(screen.texts()).toContain("A NEW DIMENSION!");
     // Held through the shift, right is pressed again when the castle begins.
     run.hold("right", true);

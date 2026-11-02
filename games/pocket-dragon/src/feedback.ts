@@ -9,6 +9,7 @@ import { eggsCaught, plasmaGathered } from "./rules/hills/milestones.ts";
 import type { Boss, HillsState } from "./rules/hills/types.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./rules/woods/tick.ts";
 import type { WoodsState } from "./rules/woods/types.ts";
+import { baseSounds } from "./feedback-base.ts";
 
 // The sounds that go with what changed between two ticks of a run, in the order they would be heard. One function for each chapter.
 // Metaplasma makes a soft blip for every fifth mote gathered.
@@ -105,13 +106,7 @@ export function woodsSounds(
   if (fifths(before.plasma.gathered, after.plasma.gathered))
     heard.push("plasma");
   if (after.escaped && !before.escaped) heard.push("finish");
-  const was = before.launch;
-  const now = after.launch;
-  if (now !== null && was !== null) {
-    if (now.eggsLeft < was.eggsLeft) heard.push("launch");
-    if (now.score > was.score) heard.push("target");
-  }
-  return heard;
+  return [...heard, ...baseSounds(before, after)];
 }
 
 const messageSounds: Readonly<Record<string, EffectName>> = {

@@ -5,16 +5,15 @@ import {
   cell,
   charmCount,
   eggCount,
-  fieldGround,
   open,
   partCount,
   size,
 } from "./constants.ts";
-import type { Place, Target } from "./types.ts";
+import type { Place } from "./types.ts";
 
 // What else is hidden in the woods once the maze and its stones, chests and lanterns are laid out: the launcher's parts and the eggs
 // (on the paths, apart from one another), the secret charms (in dead ends where there are any left), metaplasma in every open cell, and
-// the targets of the launch round. All from the seed, after the maze, so the maze is the same as it was without them.
+// all from the seed, after the maze, so the maze is the same as it was without them.
 const steps = [1, -1, size, -size] as const;
 const indexOf = (place: Place): number => place.y * size + place.x;
 
@@ -23,7 +22,6 @@ export interface Stash {
   readonly eggs: readonly Place[];
   readonly motes: readonly Mote[];
   readonly parts: readonly Place[];
-  readonly targets: readonly Target[];
 }
 
 export function stashOf(
@@ -85,43 +83,5 @@ export function stashOf(
       { x, y: y + 70 },
     );
   }
-  const jitter = () => roll(256) - 128;
-  const targets: Target[] = [
-    {
-      height: 160,
-      value: 100,
-      width: 320,
-      x: 1_200 + jitter(),
-      y: fieldGround - 160,
-    },
-    {
-      height: 160,
-      value: 200,
-      width: 256,
-      x: 2_000 + jitter(),
-      y: fieldGround - 160,
-    },
-    {
-      height: 160,
-      value: 300,
-      width: 224,
-      x: 3_000 + jitter(),
-      y: fieldGround - 160,
-    },
-    {
-      height: 160,
-      value: 400,
-      width: 160,
-      x: 2_300 + jitter(),
-      y: 800 + jitter(),
-    },
-    {
-      height: 128,
-      value: 500,
-      width: 128,
-      x: 3_500 + jitter(),
-      y: 500 + jitter(),
-    },
-  ];
-  return { charms, eggs, motes: sortedMotes(motes), parts, targets };
+  return { charms, eggs, motes: sortedMotes(motes), parts };
 }

@@ -17,7 +17,9 @@ import {
   walkSpeed,
 } from "./constants.ts";
 import { pullPlasma } from "../plasma.ts";
-import { startLaunch, tickLaunch } from "./launch.ts";
+import { startBase } from "./base.ts";
+import { tickBase } from "./base-tick.ts";
+import { playScene, sceneOn } from "./scenes.ts";
 import { along, fullTurn } from "./trig.ts";
 import { blocks, cellAt, slide } from "./walk.ts";
 import type { Place, WoodsState } from "./types.ts";
@@ -104,10 +106,14 @@ function pickUp(state: WoodsState, tick: number): WoodsState {
   return { ...state, charms, eggs, found, parts, plasma };
 }
 
-// One tick of the woods: Glitchy turns and walks, takes what is close, and steps through the moon gate if it is open; out of the woods,
-// the launch round.
-export function tickWoods(state: WoodsState): WoodsState {
-  if (state.escaped) return tickLaunch(state);
+// One tick of the woods: while a scene plays only the clock moves; out of the maze, the woods seen from above (`base-tick.ts`); in the
+// maze, Glitchy turns and walks, takes what is close, and steps through the moon gate if it is open (and the camera rises over the trees).
+export function tickWoods(before: WoodsState): WoodsState {
+  if (before.scene !== null)
+    return sceneOn({ ...before, tick: before.tick + 1 });
+  if (before.base !== null)
+    return tickBase({ ...before, tick: before.tick + 1 });
+  const state = before;
   const { controls } = state;
   const turn = (Number(controls.right) - Number(controls.left)) * turnSpeed;
   const angle = (((state.angle + turn) % fullTurn) + fullTurn) % fullTurn;
@@ -158,16 +164,15 @@ export function tickWoods(state: WoodsState): WoodsState {
   return here === next.level.gate &&
     next.level.walls[here] === gate &&
     !blocks(next, here)
-    ? {
-        ...next,
-        escaped: true,
-        finishTick: next.tick,
-        launch: startLaunch(
-          next.eggs.filter(Boolean).length,
-          next.level.targets.length,
-          next.tick,
-        ),
-      }
+    ? playScene(
+        {
+          ...next,
+          base: startBase(next),
+          escapeTick: next.tick,
+          escaped: true,
+        },
+        "rise",
+      )
     : next;
 }
 

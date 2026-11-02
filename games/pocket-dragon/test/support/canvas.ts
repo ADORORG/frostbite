@@ -19,7 +19,9 @@ export function surface() {
   const written: Written[] = [];
   const stops: string[] = [];
   const transforms: number[][] = [];
+  let cleared = 0;
   const context = {
+    clearRect: () => void (cleared += 1),
     // A gradient is noted by name: its colours are in `stops`.
     createLinearGradient: () => ({
       addColorStop: (_at: number, fill: string) => void stops.push(fill),
@@ -40,6 +42,7 @@ export function surface() {
     textBaseline: "",
   };
   return {
+    cleared: () => cleared,
     context: context as unknown as CanvasRenderingContext2D,
     drawn,
     stops,

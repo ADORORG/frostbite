@@ -12,7 +12,7 @@ import type { Box } from "./layout.ts";
 import { big, fall, sparkle } from "./paint.ts";
 
 // The picture on a card: the chapter it tells of, in the game's own pixels at a grand size. Egg Hills is a bright sky over the hills
-// with Glitchy leaping for eggs; the woods are moonlit hedges with the egg launcher; the castle is the guild before its walls, the
+// with Glitchy leaping for eggs; the woods are moonlit hedges with DeFu's egg rocket; the castle is the guild before its walls, the
 // banner flying and fireworks overhead once it is won. Everything is drawn on a grid 96 cells wide, so it looks the same at every size.
 const cells = 96;
 const eggRows = [
@@ -157,17 +157,14 @@ function woods(context: CanvasRenderingContext2D, grid: Grid): void {
     grid.cell("#2d7a4a", cells - reach, row + 1, 3, 2);
   }
   for (let x = 30; x < 66; x += 6) grid.cell("#2f6b3a", x, ground + 4, 3, 1);
-  grid.cell(colour.woodDark, 10, ground + 2, 16, 3);
-  grid.cell(colour.stone, 12, ground + 5, 4, 4);
-  grid.cell(colour.stone, 20, ground + 5, 4, 4);
-  for (let along = 0; along < 8; along += 1)
-    grid.cell(
-      along > 5 ? colour.gold : colour.cyan,
-      22 + along,
-      ground - along,
-      2,
-      2,
-    );
+  // DeFu's egg rocket, waiting on its pad.
+  grid.cell(colour.stoneDark, 10, ground + 1, 14, 2);
+  grid.cell(colour.white, 14, ground - 12, 6, 13);
+  grid.cell(colour.berry, 15, ground - 15, 4, 3);
+  grid.cell(colour.berry, 12, ground - 4, 2, 5);
+  grid.cell(colour.berry, 20, ground - 4, 2, 5);
+  grid.cell(colour.berry, 14, ground - 6, 6, 1);
+  grid.cell(colour.cyan, 16, ground - 10, 2, 2);
   const scale = Math.floor((grid.box.height * 0.48) / 16);
   big(
     context,

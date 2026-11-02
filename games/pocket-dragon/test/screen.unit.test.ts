@@ -12,7 +12,8 @@ import { castleWords } from "../src/screen/castle-words.ts";
 import { drawHills, hillsCamera } from "../src/screen/hills-draw.ts";
 import { colour } from "../src/screen/palette.ts";
 import { lines } from "../src/screen/text.ts";
-import { drawWoods } from "../src/screen/woods-draw.ts";
+import { startBase } from "../src/rules/woods/base.ts";
+import { drawWoods } from "../src/screen/woods-screen.ts";
 import { surface } from "./support/canvas.ts";
 import { flatHills } from "./support/hills-world.ts";
 
@@ -119,7 +120,7 @@ describe("the screen of the Whispering Woods", () => {
     expect(start.texts()).toEqual(
       expect.arrayContaining([
         "CLUES 0/3  PARTS 0/4",
-        "EGGS 0  PLASMA 0  MOONLIGHT 6:00",
+        "EGGS 0  PLASMA 0  MOONLIGHT 15:00",
         "READ 3 CLUE STONES, BUILD THE EGG LAUNCHER",
       ]),
     );
@@ -162,9 +163,14 @@ describe("the screen of the Whispering Woods", () => {
     expect(say("clue", read, [true, true, true, true])).toContain(
       "THE MOON GATE IS OPEN!",
     );
-    expect(drawnWith(drawWoods, { ...start, escaped: true }).texts()).toContain(
-      "OUT OF THE WOODS!",
-    );
+    const out = { ...start, base: startBase(start), escaped: true };
+    expect(
+      drawnWith(drawWoods, {
+        ...out,
+        scene: { id: "rise", start: 0 },
+        tick: 40,
+      }).texts(),
+    ).toContain("OUT OF THE MAZE, THE TREES OPEN UP...");
   });
 });
 

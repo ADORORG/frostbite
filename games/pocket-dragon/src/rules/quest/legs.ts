@@ -12,7 +12,7 @@ import { hillsEarned } from "../hills/milestones.ts";
 import { startHills } from "../hills/state.ts";
 import { tickHills } from "../hills/tick.ts";
 import type { HillsControl, HillsState } from "../hills/types.ts";
-import { startWoods, woodsChapter } from "../woods/index.ts";
+import { startWoods, woodsChapter, woodsDone } from "../woods/index.ts";
 import { woodsEarned } from "../woods/milestones.ts";
 import { tickWoods } from "../woods/tick.ts";
 import type { WoodsControl, WoodsState } from "../woods/types.ts";
@@ -88,10 +88,9 @@ const castle: LegKind<CastleControl, CastleState> = {
 
 const woods: LegKind<WoodsControl, WoodsState> = {
   chapter: woodsChapter,
-  cleared: (state) =>
-    state.hearts > 0 && state.escaped && (state.launch?.ended ?? true),
+  cleared: (state) => woodsDone(state) && state.outcome === "defused",
   earned: woodsEarned,
-  failed: (state) => state.hearts <= 0,
+  failed: (state) => woodsDone(state) && state.outcome !== "defused",
   hearts: (state) => state.hearts,
   heartsLost: (state) => state.heartsLost,
   id: "woods",

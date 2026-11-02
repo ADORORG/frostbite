@@ -19,7 +19,7 @@ import {
 import { chapterIds, playIds } from "../src/rules/constants.ts";
 import { startHills } from "../src/rules/hills/state.ts";
 import { startWoods } from "../src/rules/woods/index.ts";
-import { startLaunch } from "../src/rules/woods/launch.ts";
+import { startBase } from "../src/rules/woods/base.ts";
 import { startCastle } from "../src/rules/castle/tick.ts";
 import {
   castleScore,
@@ -178,17 +178,31 @@ describe("the score and counts", () => {
     expect(woodsScore(woods)).toBe(1_000 + 300 + 1_000);
     expect(woodsStats(woods)).toEqual([
       ["Clues", "2 of 3"],
-      ["Parts", "1 of 4"],
-      ["Eggs", "2"],
+      ["Keys", "0 of 3"],
+      ["Allies", "0 of 3"],
     ]);
+    const base = startBase(woods);
     const out = {
       ...woods,
+      base: {
+        ...base,
+        allies: [true, false, true],
+        broken: [true, false, false],
+        cheered: 1,
+        freed: 2,
+        pieces: [true, true, false],
+      },
       escaped: true,
-      finishTick: 21_600,
-      launch: { ...startLaunch(2, 5, 0), eggsLeft: 1, score: 400 },
     };
-    expect(woodsScore(out)).toBe(woodsScore(woods) + 2_000 + 400);
-    expect(woodsStats(out)[2]).toEqual(["Eggs", "1"]);
+    expect(woodsScore(out)).toBe(
+      woodsScore(woods) + 2_000 + 2 * 500 + 2 * 400 + 200 + 200 + 2 * 150,
+    );
+    expect(woodsStats(out).slice(1)).toEqual([
+      ["Keys", "2 of 3"],
+      ["Allies", "2 of 3"],
+    ]);
+    const defused = { ...out, finishTick: 50_000, outcome: "defused" as const };
+    expect(woodsScore(defused)).toBe(woodsScore(out) + 5_000 + 1_000);
     const castle = {
       ...startCastle(1),
       charms: [true, false, false],

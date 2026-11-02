@@ -12,7 +12,7 @@ import { drawHills } from "./hills-draw.ts";
 import { colour } from "./palette.ts";
 import { glitchyColours, glitchySide } from "./sprites.ts";
 import { write } from "./text.ts";
-import { drawWoods } from "./woods-draw.ts";
+import { drawWoods } from "./woods-screen.ts";
 
 // The whole quest on the screen: the level being played, drawn as it is when played alone, with the quest's clock and hearts over it;
 // between two levels, the shift into the next dimension; and how the quest ended.
@@ -134,11 +134,12 @@ function drawBanner(
 export function drawQuest(
   context: CanvasRenderingContext2D,
   state: QuestState,
+  layered = false,
 ): void {
   onLeg(legShown(state.leg), {
     castle: (level) => drawCastle(context, level),
     hills: (level) => drawHills(context, level),
-    woods: (level) => drawWoods(context, level),
+    woods: (level) => drawWoods(context, level, layered),
   });
   drawClock(context, state);
   const since = legTick(state.leg);
