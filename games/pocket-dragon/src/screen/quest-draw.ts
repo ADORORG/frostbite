@@ -135,13 +135,15 @@ export function drawQuest(
   context: CanvasRenderingContext2D,
   state: QuestState,
   layered = false,
+  test = false,
 ): void {
   onLeg(legShown(state.leg), {
     castle: (level) => drawCastle(context, level),
     hills: (level) => drawHills(context, level),
-    woods: (level) => drawWoods(context, level, layered),
+    woods: (level) => drawWoods(context, level, layered, test),
   });
-  drawClock(context, state);
+  // In test mode there is no clock (the page marks the screen instead).
+  if (!test) drawClock(context, state);
   const since = legTick(state.leg);
   if (state.shift !== null)
     drawShift(context, state.shift.left, state.shift.to, state.tick);
@@ -153,7 +155,9 @@ export function drawQuest(
     drawBanner(
       context,
       "QUEST COMPLETE!",
-      `THE DRAGONS ARE SAFE  TIME ${clockOf(state.finishTick)}`,
+      test
+        ? "A TEST RUN: NOTHING WAS COUNTED"
+        : `THE DRAGONS ARE SAFE  TIME ${clockOf(state.finishTick)}`,
       colour.gold,
     );
   else if (state.lost)

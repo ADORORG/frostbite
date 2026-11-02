@@ -5,6 +5,7 @@ import { guides } from "../guide.ts";
 import { isOpen, type FameEntry, type Progress } from "../progress.ts";
 import { playIds, type ChapterId, type PlayId } from "../rules/constants.ts";
 import { clockOf } from "../score.ts";
+import { drawTestMark } from "../screen/test-mark.ts";
 import { createDepthView, type DepthView } from "../three/stage.ts";
 import { buttonsIn, element } from "./elements.ts";
 import type { PlayRun } from "./runs.ts";
@@ -16,6 +17,7 @@ export const logicalWidth = 256;
 export const logicalHeight = 144;
 // The screen is drawn at twice its size, so its words are sharp.
 const scale = 2;
+const none = "—";
 
 const screenWords: Readonly<Record<ChapterId, string>> = {
   castle:
@@ -53,6 +55,9 @@ export function createView() {
   const screen = element("screen", "canvas");
   const context = screen.getContext("2d");
   const world = element("world", "canvas");
+  const testBadge = element("test-badge", "div");
+  // In the admin's test mode nothing is counted, so the counts that would be are not shown.
+  let testing = false;
   // The three-dimensional view is made the first time the woods outside the maze are shown (null where it cannot be).
   let depth: DepthView | null | undefined;
   const scoreOut = element("score", "strong");
@@ -80,15 +85,16 @@ export function createView() {
   return {
     // The run (or its idle screen, with the guide over it) and the counts that go with it.
     draw(run: PlayRun, idle: boolean, best: number, banked: number): void {
-      scoreOut.textContent = String(idle ? 0 : run.score());
-      bestOut.textContent = String(best);
-      plasmaOut.textContent = String(idle ? 0 : run.plasma());
+      scoreOut.textContent = testing ? none : String(idle ? 0 : run.score());
+      bestOut.textContent = testing ? none : String(best);
+      plasmaOut.textContent = testing ? none : String(idle ? 0 : run.plasma());
       bankedOut.textContent = banked.toLocaleString("en-US");
       run.stats().forEach(([label, value], at) => {
         const labelOut = statLabels[at];
         const valueOut = statValues[at];
         if (labelOut !== undefined) labelOut.textContent = label;
-        if (valueOut !== undefined) valueOut.textContent = value;
+        if (valueOut !== undefined)
+          valueOut.textContent = testing && label === "Time" ? none : value;
       });
       if (context === null) return;
       const woods = run.depth();
@@ -100,6 +106,7 @@ export function createView() {
       context.clearRect(0, 0, logicalWidth, logicalHeight);
       context.imageSmoothingEnabled = false;
       run.draw(context, layered);
+      if (testing) drawTestMark(context);
       if (idle) drawGuide(context, logicalWidth, logicalHeight, guides[run.id]);
     },
     // What is chosen (the quest or a level), and which levels are open to practise.
@@ -151,10 +158,17 @@ export function createView() {
         }),
       );
     },
+    // The admin's test mode, on or off: its badge, and the start button's words.
+    testing(on: boolean): void {
+      testing = on;
+      testBadge.hidden = !on;
+      startButton.textContent = on ? "Start test run" : "Start run";
+      shareButton.disabled = on;
+    },
     running(on: boolean): void {
       startButton.hidden = on;
       pauseButton.disabled = !on;
-      shareButton.disabled = on;
+      shareButton.disabled = on || testing;
       for (const button of buttonsIn(pad, "button")) button.disabled = !on;
     },
   };

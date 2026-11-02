@@ -128,9 +128,11 @@ const charmNames = [
   "METAPLASMA MAGNET",
 ] as const;
 
+// In test mode (`test`) there is no moonlight clock: the level has no end of time.
 export function woodsWords(
   context: CanvasRenderingContext2D,
   state: WoodsState,
+  test = false,
 ): void {
   const read = cluesRead(state);
   write(
@@ -166,9 +168,10 @@ export function woodsWords(
   if (powers.length > 0)
     write(context, powers.join("  "), 4, 24, 6, colour.mint, "left");
   const left = Math.ceil(Math.max(0, maxTicks - state.tick) / 60);
+  const clock = `  MOONLIGHT ${String(Math.floor(left / 60))}:${String(left % 60).padStart(2, "0")}`;
   write(
     context,
-    `EGGS ${String(state.eggs.filter(Boolean).length)}  PLASMA ${String(state.plasma.gathered)}  MOONLIGHT ${String(Math.floor(left / 60))}:${String(left % 60).padStart(2, "0")}`,
+    `EGGS ${String(state.eggs.filter(Boolean).length)}  PLASMA ${String(state.plasma.gathered)}${test ? "" : clock}`,
     4,
     14,
     7,

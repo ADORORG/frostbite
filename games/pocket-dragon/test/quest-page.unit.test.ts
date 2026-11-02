@@ -118,6 +118,7 @@ function finished(
     },
     score: () => 12_000,
     stats: () => [["Time", "4:00"]],
+    test: false,
     tick: () => [],
     won: () => false,
     ...more,

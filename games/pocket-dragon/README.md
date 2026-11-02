@@ -94,6 +94,25 @@ browser's own menu on the image (right-click, or press and hold), and the link i
 the platform is a change to the frame (`features/games/src/ui/game-player.tsx` and `packages/game-sdk/src/frame-headers.ts`) for its
 owners to weigh. A won quest is saved with the progress, so a card can say so in a later visit.
 
+## Test mode (for the admin)
+
+The game's admin can play through everything without being stopped. Hold the game's title down for two seconds (mouse or finger)
+between runs, type the admin key and press Unlock. A **Test mode** badge appears, and every level opens to choose. In a test run, a heart
+lost is given back at once, DeFu's rocket countdown never runs out (it winds back by whole rounds of her weapons), and no level ends for
+lack of time. Nothing is timed, scored, saved or sent: the page asks the platform for no run, records nothing, reports no milestone and
+changes no progress or Hall of Fame. **Leave** on the badge ends it (and any test run being played); nothing remembers it after the visit.
+
+The key is not in the game. `src/test-mode/key.ts` holds only a salted PBKDF2-SHA-256 hash of it (600,000 rounds), which can check a key
+but not give it back, and the key is long and random. A key is read as its letters and digits, in any case. To change it, choose a new key
+(at least 20 random letters and digits), and put the salt and hash this prints into `adminKey`:
+
+```
+node -e "const c=require('crypto');const k=process.argv[1].toUpperCase().replace(/[^0-9A-Z]/g,'');const s=c.randomBytes(16);console.log(s.toString('hex'),c.pbkdf2Sync(k,s,600000,32,'sha256').toString('hex'))" "YOUR-NEW-KEY"
+```
+
+The game is client-only, so someone who edits the page in their own browser could turn test mode on without the key. That is why test
+mode can win nothing: its runs never reach the platform, and the verifier (which has no test mode) would earn nothing from them anyway.
+
 ## Controls
 
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps

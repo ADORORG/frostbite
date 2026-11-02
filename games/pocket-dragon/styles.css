@@ -1,5 +1,6 @@
 @import "@ador/game-sdk/audio/panel.css";
 @import "./card.css";
+@import "./test.css";
 
 /* Glitchy's colours, as on the screen: mint, lavender, hot pink, cyan and cream on a night-purple world. */
 :root {

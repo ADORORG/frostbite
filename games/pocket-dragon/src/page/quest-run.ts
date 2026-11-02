@@ -11,6 +11,7 @@ import {
   questStats,
 } from "../score.ts";
 import { drawQuest } from "../screen/quest-draw.ts";
+import { createTestQuestSession } from "../test-mode/sessions.ts";
 import type { Action } from "./hands.ts";
 import {
   castleLook,
@@ -42,9 +43,14 @@ const soundsBetween = (before: Leg, after: Leg): readonly EffectName[] =>
 export const startQuestRun = (
   seed: number,
   onEarned?: (milestone: string) => void,
-): PlayRun => questRun(createQuestSession({ onEarned, seed }));
+  test = false,
+): PlayRun =>
+  test
+    ? questRun(createTestQuestSession(seed), true)
+    : questRun(createQuestSession({ onEarned, seed }));
 
-export function questRun(session: QuestSession): PlayRun {
+// In a test run the clock is not shown, and nothing it does is counted.
+export function questRun(session: QuestSession, test = false): PlayRun {
   const held = new Set<Action>();
   const won = (): boolean => session.state().finishTick !== null;
   return {
@@ -62,7 +68,8 @@ export function questRun(session: QuestSession): PlayRun {
         ? shown.state
         : null;
     },
-    draw: (context, layered) => drawQuest(context, session.state(), layered),
+    draw: (context, layered) =>
+      drawQuest(context, session.state(), layered, test),
     earned: () => session.earned(),
     ended: () => session.state().ended,
     fame() {
@@ -85,6 +92,7 @@ export function questRun(session: QuestSession): PlayRun {
     record: () => session.record(),
     score: () => questScore(session.state()),
     stats: () => questStats(session.state()),
+    test,
     tick() {
       const before = session.state();
       session.tick();

@@ -280,6 +280,7 @@ function things(
 export function drawMaze(
   context: CanvasRenderingContext2D,
   state: WoodsState,
+  test = false,
 ): void {
   const view = viewOf(state);
   sky(context, state);
@@ -288,5 +289,5 @@ export function drawMaze(
   plasmaInView(context, state, projectorOf(view), depth, horizon);
   breath(context, state);
   minimap(context, state);
-  woodsWords(context, state);
+  woodsWords(context, state, test);
 }

@@ -28,6 +28,8 @@ import { drawCastle } from "../screen/castle-draw.ts";
 import { drawHills } from "../screen/hills-draw.ts";
 import { drawWoods } from "../screen/woods-screen.ts";
 import { createRunSession } from "../session.ts";
+import { keepCountdown } from "../test-mode/keep.ts";
+import { createTestSession } from "../test-mode/sessions.ts";
 import { actions, type Action } from "./hands.ts";
 
 // One run of whatever is being played, as the page sees it: the same few things for a level and for the whole quest, so the page never
@@ -52,20 +54,29 @@ export interface PlayRun {
   record(): RunRecord;
   score(): number;
   stats(): readonly Stat[];
+  // A test run (the admin's test mode): nothing in it is recorded, scored, saved or sent.
+  readonly test: boolean;
   // Plays one tick, and says what is heard because of it.
   tick(): readonly EffectName[];
   // Whether the whole quest was won.
   won(): boolean;
 }
 
-export interface Look<Control extends string, State extends Running<Control>> {
+// A level as the page plays it. Each level's state counts hearts, which test mode keeps; `keep` is what else test mode does to it.
+type Hearted<Control extends string> = Running<Control> & {
+  readonly hearts: number;
+};
+
+export interface Look<Control extends string, State extends Hearted<Control>> {
   readonly cleared: (state: State) => boolean;
   readonly depth: (state: State) => WoodsState | null;
   readonly draw: (
     context: CanvasRenderingContext2D,
     state: State,
     layered: boolean,
+    test: boolean,
   ) => void;
+  readonly keep?: (state: State) => State;
   readonly means: Readonly<Partial<Record<Action, Control>>>;
   readonly plasma: (state: State) => number;
   readonly play: ChapterPlay<Control, State>;
@@ -99,6 +110,7 @@ export const woodsLook: Look<WoodsControl, WoodsState> = {
   cleared: (state) => state.outcome === "defused",
   depth: (state) => (state.base === null ? null : state),
   draw: drawWoods,
+  keep: keepCountdown,
   means: {
     act: "act",
     down: "down",
@@ -141,17 +153,21 @@ export const castleLook: Look<CastleControl, CastleState> = {
   stats: castleStats,
 };
 
-function runOf<Control extends string, State extends Running<Control>>(
+function runOf<Control extends string, State extends Hearted<Control>>(
   look: Look<Control, State>,
   seed: number,
   onEarned?: (milestone: string) => void,
+  test = false,
 ): PlayRun {
-  const session = createRunSession({ onEarned, play: look.play, seed });
+  const session = test
+    ? createTestSession(look.play, seed, look.keep)
+    : createRunSession({ onEarned, play: look.play, seed });
   const held = new Set<Action>();
   return {
     cleared: () => (look.cleared(session.state()) ? [look.play.id] : []),
     depth: () => look.depth(session.state()),
-    draw: (context, layered) => look.draw(context, session.state(), layered),
+    draw: (context, layered) =>
+      look.draw(context, session.state(), layered, test),
     earned: () => session.earned(),
     ended: () => session.state().ended,
     fame: () => null,
@@ -162,6 +178,7 @@ function runOf<Control extends string, State extends Running<Control>>(
     record: () => session.record(),
     score: () => look.score(session.state()),
     stats: () => look.stats(session.state()),
+    test,
     tick() {
       const before = session.state();
       session.tick();
@@ -189,18 +206,21 @@ export function holdOn(
   );
 }
 
-const looks = {
-  castle: (seed: number, onEarned?: (milestone: string) => void) =>
-    runOf(castleLook, seed, onEarned),
-  hills: (seed: number, onEarned?: (milestone: string) => void) =>
-    runOf(hillsLook, seed, onEarned),
-  woods: (seed: number, onEarned?: (milestone: string) => void) =>
-    runOf(woodsLook, seed, onEarned),
-} as const satisfies Record<ChapterId, unknown>;
+type Starter = (
+  seed: number,
+  onEarned?: (milestone: string) => void,
+  test?: boolean,
+) => PlayRun;
+const looks: Readonly<Record<ChapterId, Starter>> = {
+  castle: (seed, onEarned, test) => runOf(castleLook, seed, onEarned, test),
+  hills: (seed, onEarned, test) => runOf(hillsLook, seed, onEarned, test),
+  woods: (seed, onEarned, test) => runOf(woodsLook, seed, onEarned, test),
+};
 
-// A run of a level alone, on a seed. A level's idle screen is one of these that is never played.
+// A run of a level alone, on a seed (a test run in test mode). A level's idle screen is one of these that is never played.
 export const startRun = (
   chapter: ChapterId,
   seed: number,
   onEarned?: (milestone: string) => void,
-): PlayRun => looks[chapter](seed, onEarned);
+  test = false,
+): PlayRun => looks[chapter](seed, onEarned, test);

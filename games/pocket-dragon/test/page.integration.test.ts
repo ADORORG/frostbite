@@ -5,6 +5,8 @@ import { closeGame, play, settle, whileRunning } from "./support/page.ts";
 
 afterEach(closeGame);
 
+const refused = "That key does not unlock test mode.";
+
 // The keys, the pause, the chapters and the sound of the page: the same in every game where the SDK decides them, and played here
 // through the real page.
 describe("Pocket Dragon's keys, pause, chapters and sound", () => {
@@ -164,6 +166,44 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     await settle(100);
     expect(game.running()).toBe(true);
   });
+
+  it("keeps test mode locked without the admin's key: holding the title asks for it, a wrong one changes nothing, and runs still count", async () => {
+    const game = await driver({ best: {}, unlocked: 1 });
+    const hidden = (id: string) => game.byId(id)?.hasAttribute("hidden");
+    game
+      .byId("title")
+      ?.dispatchEvent(
+        new game.window.MouseEvent("pointerdown", { bubbles: true, button: 0 }),
+      );
+    await settle(2_100);
+    expect(hidden("test-panel")).toBe(false);
+    const input = game.window.document.querySelector("#test-key");
+    if (!(input instanceof game.window.HTMLInputElement))
+      throw new Error("no key field");
+    input.value = "NOT-THE-KEY";
+    game.click("test-unlock");
+    for (
+      let wait = 0;
+      wait < 30 && game.text("test-message") !== refused;
+      wait += 1
+    )
+      await settle(100);
+    expect(game.text("test-message")).toBe(refused);
+    game.click("test-cancel");
+    expect(hidden("test-panel")).toBe(true);
+    expect(hidden("test-badge")).toBe(true);
+    expect(game.text("start")).toBe("Start run");
+    game.press("Digit3");
+    expect(
+      game.window.document
+        .querySelector('[data-chapter][aria-pressed="true"]')
+        ?.getAttribute("data-chapter"),
+    ).toBe("quest");
+    game.press("Enter");
+    await settle(100);
+    expect(game.running()).toBe(true);
+    expect(game.text("note")).not.toContain("Test mode");
+  }, 20_000);
 
   it("keeps the sound the player chose, and saves a change with the levels reached, the bests and the metaplasma banked", async () => {
     const { stored, window } = await driver({

@@ -10,9 +10,13 @@
     <main>
       <div class="bar">
         <header>
-          <h1>Pocket Dragon: Glitchy's Quest</h1>
+          <h1 id="title">Pocket Dragon: Glitchy's Quest</h1>
           <p id="status">Connecting to the platform…</p>
           <p id="bank">Metaplasma banked: <strong id="banked">0</strong></p>
+          <div id="test-badge" class="test-badge" hidden>
+            <span>Test mode</span>
+            <button id="test-leave" type="button">Leave</button>
+          </div>
         </header>
         <p class="score">
           <span>Score <strong id="score">0</strong></span>
@@ -146,6 +150,35 @@
           <button id="card-download" type="button">Download</button>
           <button id="card-send" type="button">Share</button>
           <button id="card-copy" type="button">Copy invite link</button>
+        </div>
+      </div>
+    </div>
+    <div
+      id="test-panel"
+      class="card-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="test-title"
+      hidden
+    >
+      <div class="card-sheet test-sheet">
+        <h2 id="test-title">Test mode</h2>
+        <p>
+          For the game's admin only. In test mode hearts are never lost and the
+          rocket never leaves, and nothing is timed, scored, saved or sent.
+        </p>
+        <label for="test-key">Admin key</label>
+        <input
+          id="test-key"
+          type="password"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+        />
+        <p id="test-message" class="test-message" aria-live="polite"></p>
+        <div class="test-actions">
+          <button id="test-unlock" type="button">Unlock</button>
+          <button id="test-cancel" type="button">Cancel</button>
         </div>
       </div>
     </div>

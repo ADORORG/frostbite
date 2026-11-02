@@ -15,9 +15,10 @@ import { instructions } from "./guide.ts";
 import { createCardPanel } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
 import { attachHands, playOfKey } from "./page/hands.ts";
-import { startQuestRun } from "./page/quest-run.ts";
-import { startRun, type PlayRun } from "./page/runs.ts";
+import { createIdleRuns, startPlay } from "./page/plays.ts";
+import type { PlayRun } from "./page/runs.ts";
 import { settle } from "./page/settle.ts";
+import { attachTestMode, testNote, testOverNote } from "./page/test-panel.ts";
 import { createView } from "./page/view.ts";
 import {
   freshProgress,
@@ -74,27 +75,7 @@ const sound = setUpSound({
   track: tracks.hills,
 });
 
-// What the quest's (and each level's) screen shows before a run: its start (just after the opening banner), with its guide over it. It
-// is never played and never recorded.
-const idleTicks = 150;
-const idle = new Map<PlayId, PlayRun>();
-const startPlay = (
-  id: PlayId,
-  seed: number,
-  onEarned?: (milestone: string) => void,
-): PlayRun =>
-  id === "quest" ? startQuestRun(seed, onEarned) : startRun(id, seed, onEarned);
-function idleRun(id: PlayId): PlayRun {
-  const found = idle.get(id);
-  if (found !== undefined) return found;
-  const made = startPlay(id, 1);
-  // Its counts are those of a run not yet begun (the quest's clock at nothing), though the screen is a little way in.
-  const counts = made.stats();
-  for (let at = 0; at < idleTicks; at += 1) made.tick();
-  const shown: PlayRun = { ...made, stats: () => counts };
-  idle.set(id, shown);
-  return shown;
-}
+const idleRun = createIdleRuns();
 
 function show(): void {
   const shown = run ?? idleRun(chosen);
@@ -107,12 +88,16 @@ function show(): void {
   view.draw(shown, run === null, progress.best[shown.id], progress.plasma);
 }
 
+// What is open to choose: every level in the admin's test mode (`page/test-panel.ts`), whose runs count for nothing.
+const reach = (): Progress =>
+  testMode.on() ? { ...progress, unlocked: 3 } : progress;
+
 function showChapters(): void {
-  view.chapters(chosen, progress, run !== null && !run.ended());
+  view.chapters(chosen, reach(), run !== null && !run.ended());
 }
 
 function choose(id: PlayId): void {
-  if (loop.running() || !isOpen(progress, id) || id === chosen) return;
+  if (loop.running() || !isOpen(reach(), id) || id === chosen) return;
   chosen = id;
   run = null;
   view.earned([], titles);
@@ -132,6 +117,12 @@ pause.subscribe((paused) => {
 async function finish(finished: PlayRun): Promise<void> {
   view.running(false);
   sound.sound.stopMusic();
+  if (finished.test) {
+    note.textContent = testOverNote;
+    showChapters();
+    show();
+    return;
+  }
   const record = finished.record();
   const after = settle(progress, finished);
   const news = after.news;
@@ -176,17 +167,26 @@ const loop = createRunLoop({
   ticksPerSecond,
 });
 
+// A test run asks the platform for nothing: it has no run to submit and earns nothing to report.
+async function startRealRun(): Promise<PlayRun> {
+  const started = await play?.runs.start().catch(() => null);
+  const ready = started?.status === "started" ? started : null;
+  runId = ready?.runId ?? null;
+  note.textContent = startNote(started ?? null, instructions[chosen]);
+  return startPlay(chosen, ready?.seed ?? localSeed(), (id) => {
+    sound.sfx("milestone");
+    play?.report(id);
+    marks.add(id);
+  });
+}
+
 const begin = (): Promise<void> =>
   loop.launch(async () => {
-    const started = await play?.runs.start().catch(() => null);
-    const ready = started?.status === "started" ? started : null;
-    runId = ready?.runId ?? null;
-    note.textContent = startNote(started ?? null, instructions[chosen]);
-    run = startPlay(chosen, ready?.seed ?? localSeed(), (id) => {
-      sound.sfx("milestone");
-      play?.report(id);
-      marks.add(id);
-    });
+    if (testMode.on()) {
+      runId = null;
+      note.textContent = testNote;
+      run = startPlay(chosen, localSeed(), undefined, true);
+    } else run = await startRealRun();
     view.earned([], titles);
     view.running(true);
     showChapters();
@@ -233,17 +233,18 @@ async function connect(): Promise<void> {
   show();
 }
 
+// No dialog is open over the page.
+const free = (): boolean => !card.isOpen() && !testMode.isOpen();
 // The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.
 attachHands(document.body, {
   // During a run every key goes to it; between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise.
   hold(action, on) {
     if (loop.running()) run?.hold(action, on);
     const pick = playOfKey(action);
-    if (!loop.running() && !card.isOpen() && on && pick !== undefined)
-      choose(pick);
+    if (!loop.running() && free() && on && pick !== undefined) choose(pick);
   },
   pause: () => void (loop.running() && pause.toggle()),
-  start: () => void (!startButton.disabled && !card.isOpen() && begin()),
+  start: () => void (!startButton.disabled && free() && begin()),
 });
 picker.addEventListener("click", (event) => {
   const target =
@@ -260,6 +261,27 @@ pauseButton.addEventListener(
   () => void (loop.running() && pause.toggle()),
 );
 startButton.addEventListener("click", () => void begin());
+
+// Test mode, on or off. Leaving it ends a test run being played.
+function setTesting(on: boolean): void {
+  if (!on && loop.running()) {
+    loop.stop();
+    pause.set(false);
+    sound.sound.stopMusic();
+  }
+  run = null;
+  if (!isOpen(reach(), chosen)) chosen = "quest";
+  view.testing(on);
+  view.running(false);
+  view.earned([], titles);
+  note.textContent = on ? testNote : "";
+  showChapters();
+  show();
+}
+const testMode = attachTestMode({
+  canOpen: () => !loop.running() && !card.isOpen(),
+  changed: setTesting,
+});
 shareButton.addEventListener("click", openCard);
 view.running(false);
 showChapters();
