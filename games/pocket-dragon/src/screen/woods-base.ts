@@ -14,7 +14,9 @@ import { baseStep } from "../rules/woods/constants.ts";
 import { laserPhase, waveAt } from "../rules/woods/lair.ts";
 import type { Base, WoodsState } from "../rules/woods/types.ts";
 import { defuKey, defuRows, guardKey, guardRows } from "./defu.ts";
+import { flatFutures } from "./frost-look.ts";
 import { egg } from "./hills-things.ts";
+import { flatSparky } from "./sparky-look.ts";
 import { spriteScaled } from "./kit-sprites.ts";
 import { colour } from "./palette.ts";
 import {
@@ -30,9 +32,12 @@ import { baseKitLook } from "./woods-base-kit.ts";
 // The woods outside the maze seen from above, flat: the picture when the screen cannot show them in three dimensions, following Glitchy.
 // Over the ground: the backpack's foods and a glitch blast, the forcefield bubble and the heart, DeFu on her platform, her guards and
 // shadow dragons, the dragons freed from their cages following Glitchy in a line, an egg in flight, Glitchy (blinking after a bump,
-// ringed while the forcefield lasts, twice as big while a pineapple lasts), and DeFu's laser and shockwave. The counts over it are in `woods-base-hud.ts`.
+// ringed while the forcefield lasts, twice as big while a pineapple lasts, drawn up over its shadow while it flies), frost vision's
+// futures, and DeFu's laser and shockwave. The counts over it are in `woods-base-hud.ts`.
 const width = 256;
 const height = 144;
+// How far up Glitchy (and the dragons following it) is drawn at each height: on the ground, flying low, soaring.
+export const flightLift = [0, 5, 12] as const;
 
 // Where Glitchy is now, in pixels of the whole map: partway along a step.
 export function glitchyOnBase(base: Base, tick: number): Spot {
@@ -151,17 +156,23 @@ function actors(
   }
   for (const shadow of base.shadows)
     sprite(context, glitchyFront, shadowKey, ...at(shadow));
+  const lift = flightLift[base.altitude];
   let following = 0;
   base.allies.forEach((freed, ally) => {
     const spot = freed ? base.trail[following] : undefined;
     if (freed) following += 1;
     if (spot !== undefined)
-      sprite(context, glitchyFront, friendKey(ally), ...at(spot));
+      sprite(context, glitchyFront, friendKey(ally), ...at(spot, 0, -lift));
   });
   if (base.flight !== null) egg(context, ...at(base.flight, 4, 4), 0);
   const glitchy = glitchyOnBase(base, tick);
   const x = glitchy.x - camera.x;
-  const y = glitchy.y - camera.y;
+  const y = glitchy.y - camera.y - lift;
+  if (lift > 0) block(context, colour.shadow, x + 3, y + lift + 13, 10, 3);
+  flatSparky(context, base, tick, camera, {
+    x: glitchy.x,
+    y: glitchy.y - lift,
+  });
   if (base.invulnerable === 0 || Math.floor(tick / 4) % 2 === 1)
     spriteScaled(
       context,
@@ -193,6 +204,7 @@ export function drawBase(
 ): void {
   drawTiles(context, base, camera, width, height);
   baseKitLook(context, base, state.tick, camera);
+  flatFutures(context, state, camera);
   actors(context, base, state.tick, camera, state.powers.big ? 2 : 1);
   weapons(context, base, state.tick, camera);
 }

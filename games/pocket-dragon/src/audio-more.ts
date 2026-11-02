@@ -2,7 +2,7 @@ import { tone, type Effect } from "@ador/game-sdk/audio/effects";
 
 // The effects of the quest's newer things, kept apart from the first ones (`audio.ts`) so each file stays short: a spring, a secret
 // area found, a door through to it, the wings and their flaps, the forcefield, the guild going up a level, and the backpack (a food
-// put in it, a berry's blaze, a glitch blast, growing big and shrinking back).
+// put in it, a berry's blaze, a glitch blast, growing big and shrinking back), and frost vision.
 export const moreEffects = {
   blast: [
     tone("square", 180, 90, 0.25, 0.2),
@@ -14,6 +14,11 @@ export const moreEffects = {
     tone("sawtooth", 300, 900, 0.25, 0.18),
   ],
   flap: [tone("sine", 500, 900, 0.07, 0.18)],
+  frost: [
+    tone("sine", 1568, 2093, 0.15, 0.18),
+    tone("triangle", 2093, 1568, 0.3, 0.12, 0.1),
+    tone("sine", 3136, 3136, 0.25, 0.08, 0.2),
+  ],
   grow: [
     tone("triangle", 392, 392, 0.08, 0.25),
     tone("triangle", 523, 523, 0.08, 0.25, 0.08),

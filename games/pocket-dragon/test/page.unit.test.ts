@@ -217,9 +217,12 @@ describe("the page's view", () => {
     );
     const hidden = () =>
       buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold);
-    expect(hidden()).toEqual(["quick", "evade", "charm"]);
+    expect(hidden()).toEqual(["charm"]);
+    const evade = document.querySelector('#pad [data-hold="evade"]');
+    expect(evade?.textContent).toBe("Fly up");
     view.level("castle");
-    expect(hidden()).toEqual([]);
+    expect(hidden()).toEqual(["vision", "help"]);
+    expect(evade?.textContent).toBe("Evade");
     view.chapters("woods", freshProgress, true);
     expect(
       buttonsIn(document, "[data-chapter]").every((button) => button.disabled),

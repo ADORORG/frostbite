@@ -2,7 +2,10 @@ import { sprite } from "@ador/game-sdk/pixels";
 
 import { cages, chests, panels, valves } from "../rules/woods/base-map.ts";
 import { countdownLeft, laserPhase, waveAt } from "../rules/woods/lair.ts";
+import { plasmaLeft } from "../rules/woods/vision.ts";
 import type { Base, FoundKind, WoodsState } from "../rules/woods/types.ts";
+import { frostHud } from "./frost-look.ts";
+import { sparkyHud } from "./sparky-look.ts";
 import { colour } from "./palette.ts";
 import { write } from "./text.ts";
 
@@ -15,11 +18,15 @@ const heartKey = { r: colour.berry };
 export const doneWords: Readonly<Record<FoundKind, string>> = {
   ally: "A DRAGON IS FREE! +1 HEART",
   bubble: "FORCEFIELD!",
+  ceiling: "AS HIGH AS GLITCHY CAN FLY HERE",
   charm: "A SECRET CHARM!",
   chest: "TREASURE!",
   clue: "A CLUE STONE WHISPERS...",
   egg: "AN EGG FOR THE LAUNCHER",
+  empty: "NO NOOK FOR SPARKY THERE",
   freed: "A SHADOW DRAGON IS SET FREE!",
+  frost: "FROST VISION! THE WORLD SLOWS DOWN",
+  grounded: "NO ROOM TO LAND HERE",
   heart: "AN EXTRA HEART!",
   home: "A GUARD CHEERS UP AND GOES HOME",
   key: "A ROCKET KEY!",
@@ -30,7 +37,9 @@ export const doneWords: Readonly<Record<FoundKind, string>> = {
   panel: "A KEY FITS THE ROCKET!",
   part: "A LAUNCHER PART!",
   shielded: "THE FACTORY SHIELDS THE ROCKET!",
+  sparky: "SPARKY ZIPS BACK WITH A TREASURE!",
   valve: "A VALVE OF THE FACTORY BURSTS!",
+  weary: "FROST VISION IS NOT READY",
 };
 
 const count = (list: readonly boolean[]): number => list.filter(Boolean).length;
@@ -74,9 +83,14 @@ export function baseHud(
           of("PANELS", count(base.installed), panels.length),
           of("VALVES", count(base.broken), valves.length),
         ];
-  [...counts, `EGGS ${String(base.ammo)}`].forEach((text, at) =>
+  [
+    ...counts,
+    `EGGS ${String(base.ammo)}  PLASMA ${String(plasmaLeft(state))}`,
+  ].forEach((text, at) =>
     write(context, text, 4, 3 + at * 9, 7, colour.cyan, "left"),
   );
+  frostHud(context, state, base);
+  sparkyHud(context, state, base);
   if (base.lairStart >= 0) {
     const left = countdownLeft(base, state.tick);
     const urgent = left < 1_800 && Math.floor(state.tick / 15) % 2 === 0;

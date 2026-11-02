@@ -16,15 +16,15 @@ import {
 } from "./base-map.ts";
 import {
   baseStep,
-  blazeTiles,
   dizzyTicks,
-  eggRange,
   fireEvery,
   forceTicks,
   invulnerableTicks,
   launchEvery,
 } from "./constants.ts";
+import { passable } from "./flight.ts";
 import { takeBaseKit } from "./powers.ts";
+import { nooks } from "./sparky.ts";
 import { playScene, sceneTicks } from "./scenes.ts";
 import type { Base, BaseGuard, WoodsState } from "./types.ts";
 
@@ -36,6 +36,7 @@ const at = (list: readonly Spot[], x: number, y: number): number =>
 export function startBase(state: WoodsState): Base {
   return {
     allies: cages.map(() => false),
+    altitude: 0,
     ammo: state.eggs.filter(Boolean).length,
     blast: null,
     broken: valves.map(() => false),
@@ -60,12 +61,17 @@ export function startBase(state: WoodsState): Base {
     invulnerable: 0,
     kitTaken: baseKit.map(() => false),
     lairStart: -1,
+    nooksTaken: nooks.map(() => false),
     laser: null,
     launchTick: -launchEvery,
     pieces: chests.map(() => false),
     shadows: [],
     step: null,
     trail: [],
+    trip: null,
+    visionReady: 0,
+    visionStart: -1,
+    visionUntil: -1,
     x: arrival.x,
     y: arrival.y,
   };
@@ -162,85 +168,18 @@ export function strike(base: Base, x: number, y: number): Base | null {
   return null;
 }
 
-// A puff of fire reaches the tile ahead (three tiles in a berry's blaze, stopped by a tree or a wall) and strikes the first thing there.
-export function breathe(state: WoodsState, base: Base): WoodsState {
-  if (state.tick - base.fireTick < fireEvery) return state;
-  const way = ahead[base.facing];
-  const fired = { ...base, fireTick: state.tick };
-  const breathed = {
-    ...state,
-    breaths: state.breaths + 1,
-    breathTick: state.tick,
-  };
-  const reach = state.powers.blaze > 0 ? blazeTiles : 1;
-  for (let far = 1; far <= reach; far += 1) {
-    const x = base.x + way.x * far;
-    const y = base.y + way.y * far;
-    const hit = strike(fired, x, y);
-    if (hit !== null) return withBase(breathed, hit);
-    if (!ground(fired, x, y) && baseTile(x, y) !== "~") break;
-  }
-  return withBase(breathed, fired);
-}
-
-// The action key: free the dragon in a cage, open a chest for its rocket key, fit a key into a panel of the rocket (all three defuse
-// it, once the factory is down and DeFu's shield with it); with nothing to use ahead, launch an egg.
-export function use(state: WoodsState, base: Base): WoodsState {
-  const way = ahead[base.facing];
-  const x = base.x + way.x;
-  const y = base.y + way.y;
-  const cage = at(cages, x, y);
-  if (cage >= 0 && base.allies[cage] !== true)
-    return withBase(
-      { ...state, hearts: Math.min(maxHearts, state.hearts + 1) },
-      { ...base, allies: base.allies.map((done, i) => done || i === cage) },
-    );
-  const chest = at(chests, x, y);
-  if (chest >= 0)
-    return withBase(state, {
-      ...base,
-      pieces: base.pieces.map((done, i) => done || i === chest),
-    });
-  const panel = at(panels, x, y);
-  if (panel >= 0 && base.installed[panel] !== true) {
-    if (!base.broken.every(Boolean))
-      return { ...state, found: { kind: "shielded", tick: state.tick } };
-    const installed = base.installed.map((done, i) => done || i === panel);
-    const fitted = withBase(state, { ...base, installed });
-    return installed.every(Boolean)
-      ? playScene(
-          { ...fitted, finishTick: state.tick, outcome: "defused" },
-          "peace",
-        )
-      : fitted;
-  }
-  if (base.ammo <= 0 || state.tick - base.launchTick < launchEvery)
-    return state;
-  return withBase(state, {
-    ...base,
-    ammo: base.ammo - 1,
-    flight: {
-      dx: way.x,
-      dy: way.y,
-      left: eggRange,
-      moved: state.tick,
-      x: base.x,
-      y: base.y,
-    },
-    launchTick: state.tick,
-  });
-}
-
 // A way pressed turns Glitchy to it (walking is the tick's business, while the way is held).
 export const turn = (base: Base, way: Facing): Base => ({
   ...base,
   facing: way,
 });
 
-// Arriving on a tile: the forcefield bubble, the heart and a food for the backpack are taken, and stepping through the lair's gate plays
-// DeFu's scene; the lair begins (its countdown and DeFu's weapons) once the scene is over or skipped.
+// Arriving on a tile (on the ground or flying low; soaring is too high to reach anything): the forcefield bubble, the heart and a food
+// for the backpack are taken, and coming through the lair's gate plays DeFu's scene; the lair begins (its countdown and DeFu's weapons)
+// once the scene is over or skipped.
 export function arrive(state: WoodsState, base: Base): WoodsState {
   const { x, y } = base;
+  if (base.altitude === 2) return withBase(state, base);
   let next = base;
   let hearts = state.hearts;
   if (!next.bubbleTaken && x === bubbleSpot.x && y === bubbleSpot.y)
@@ -256,8 +195,8 @@ export function arrive(state: WoodsState, base: Base): WoodsState {
   return playScene(withBase(arrived, { ...next, lairStart }), "lair");
 }
 
-// Glitchy's steps: a way held begins one (only turning Glitchy when that way is closed). A step takes `baseStep` ticks, and with a way
-// still held the next begins on the tick it ends.
+// Glitchy's steps: a way held begins one (only turning Glitchy when that way is closed, on the ground or at the height Glitchy flies). A
+// step takes `baseStep` ticks, and with a way still held the next begins on the tick it ends.
 function stepOn(state: WoodsState, base: Base): WoodsState {
   const held = state.controls;
   const way = held[base.facing]
@@ -265,15 +204,20 @@ function stepOn(state: WoodsState, base: Base): WoodsState {
     : (["up", "down", "left", "right"] as const).find((one) => held[one]);
   if (way === undefined) return withBase(state, base);
   const step = ahead[way];
-  if (!walkable(base, base.x + step.x, base.y + step.y))
-    return withBase(state, turn(base, way));
+  const x = base.x + step.x;
+  const y = base.y + step.y;
+  const open =
+    base.altitude === 0
+      ? walkable(base, x, y)
+      : passable(base, x, y, base.altitude);
+  if (!open) return withBase(state, turn(base, way));
   return withBase(state, {
     ...base,
     facing: way,
     step: { from: { x: base.x, y: base.y }, start: state.tick },
     trail: [{ x: base.x, y: base.y }, ...base.trail].slice(0, cages.length),
-    x: base.x + step.x,
-    y: base.y + step.y,
+    x,
+    y,
   });
 }
 

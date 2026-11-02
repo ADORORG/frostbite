@@ -17,6 +17,7 @@ import { cages, chests } from "./rules/woods/base-map.ts";
 import type { WoodsState } from "./rules/woods/types.ts";
 import { chapterIds, ticksPerSecond } from "./rules/constants.ts";
 import { plasmaGathered } from "./rules/hills/milestones.ts";
+import { plasmaLeft } from "./rules/woods/vision.ts";
 import { legHearts, legShown, onLeg, type Leg } from "./rules/quest/legs.ts";
 import { legsOf } from "./rules/quest/milestones.ts";
 import type { QuestState } from "./rules/quest/types.ts";
@@ -111,7 +112,7 @@ export const legPlasma = (leg: Leg): number =>
   onLeg(leg, {
     castle: (state) => state.plasma.gathered,
     hills: plasmaGathered,
-    woods: (state) => state.plasma.gathered,
+    woods: plasmaLeft,
   });
 
 // The whole quest: every level's score added up and, for a win, a bonus for the win and one for each heart kept.

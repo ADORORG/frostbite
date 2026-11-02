@@ -3,8 +3,7 @@ import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
 import { chapterIds, type PlayId } from "../rules/constants.ts";
 
 // What the player's hands can do, the same in every chapter: four ways to go, an action button, a fire button, the backpack's three foods
-// (B a berry, R a mushroom, G a pineapple; M and N are the sound panel's), and the hotkeys of a cheer challenge (1 to 5 for the shows, Q a quick cheer, E evade, C a
-// charm); start (Enter) and pause (P, or the button). Each level
+// (B a berry, R a mushroom, G a pineapple; M and N are the sound panel's), frost vision (V), Sparky's help (H), and the hotkeys of a cheer challenge, which out of the maze in the woods fly up (E) and down (Q) (1 to 5 for the shows, Q a quick cheer, E evade, C a charm); start (Enter) and pause (P, or the button). Each level
 // says what they mean to it (`runs.ts`); between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise instead. The keys are the arrows and WASD; Space and Z
 // are the action; F and X breathe fire. A touch screen has a button for each (any element with a `data-hold`).
 export const actions = [
@@ -26,6 +25,8 @@ export const actions = [
   "berry",
   "mushroom",
   "pineapple",
+  "vision",
+  "help",
 ] as const;
 export type Action = (typeof actions)[number];
 
@@ -62,9 +63,11 @@ const keys = {
   KeyE: "evade",
   KeyF: "fire",
   KeyG: "pineapple",
+  KeyH: "help",
   KeyQ: "quick",
   KeyR: "mushroom",
   KeyS: "down",
+  KeyV: "vision",
   KeyW: "up",
   KeyX: "fire",
   KeyZ: "act",

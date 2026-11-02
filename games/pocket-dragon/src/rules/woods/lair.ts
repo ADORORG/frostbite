@@ -16,7 +16,8 @@ import type { Base, WoodsState } from "./types.ts";
 
 // DeFu's weapons in the hall of her castle, and the rocket's countdown. Her laser glows along the row (or, the next time, the column)
 // Glitchy is on (the hall's last row when Glitchy is below it), then burns there; her shockwave spreads out from her platform a tile at a
-// time. Both are shown before they hurt, and neither reaches the dungeon. When the countdown runs out the rocket launches.
+// time along the floor (Glitchy flying over it is not hurt). Both are shown before they hurt, and neither reaches the dungeon. When the
+// countdown runs out the rocket launches.
 export type LaserPhase = "burn" | "glow" | null;
 
 export function laserPhase(base: Base, tick: number): LaserPhase {
@@ -73,6 +74,10 @@ export function lairTick(state: WoodsState, base: Base): WoodsState {
     (aimed.laser.horizontal ? aimed.y : aimed.x) === aimed.laser.line;
   const wave = waveAt(aimed, tick);
   const rung =
-    inHall && wave !== null && wave > 0 && fromDefu(aimed.x, aimed.y) === wave;
+    inHall &&
+    aimed.altitude === 0 &&
+    wave !== null &&
+    wave > 0 &&
+    fromDefu(aimed.x, aimed.y) === wave;
   return burnt || rung ? hurt(state, aimed) : withBase(state, aimed);
 }

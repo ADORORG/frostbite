@@ -50,3 +50,23 @@ export function baseSounds(
     heard.push("burst");
   return heard;
 }
+
+// Flying up and down, frost vision coming on (or not being ready), and Sparky setting off and coming back with a treasure (or finding
+// no nook in reach).
+export function flightSounds(
+  before: WoodsState,
+  after: WoodsState,
+): readonly EffectName[] {
+  const was = before.base;
+  const now = after.base;
+  if (was === null || now === null) return [];
+  const heard: EffectName[] = [];
+  if (now.altitude > was.altitude) heard.push("wings");
+  if (now.altitude < was.altitude) heard.push("flap");
+  if (now.visionStart !== was.visionStart) heard.push("frost");
+  if (now.trip !== null && was.trip === null) heard.push("whoosh");
+  const said = after.found !== before.found ? after.found?.kind : undefined;
+  if (said === "sparky") heard.push("secret");
+  if (said === "weary" || said === "empty") heard.push("talk");
+  return heard;
+}

@@ -35,7 +35,7 @@ export const guides: Readonly<Record<PlayId, Guide>> = {
   woods: {
     lines: [
       "MAZE: UP/DOWN WALK  LEFT/RIGHT TURN  F: FIRE",
-      "OUTSIDE: SPACE FREES, OPENS AND FITS KEYS",
+      "OUTSIDE: E/Q FLY  V FROST VISION  H SPARKY",
       "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE",
     ],
     start: "ENTER TO PRACTISE LEVEL 3",
@@ -56,6 +56,6 @@ export const instructions: Readonly<Record<PlayId, string>> = {
   quest:
     "The whole quest in one run: Egg Hills, then the Guild and the Castle, then the Whispering Woods. Your hearts and your backpack carry from level to level, and the clock never stops.",
   woods:
-    "In the maze, up and down walk, left and right turn, and F breathes fire: read three clue stones and find four launcher parts to open the moon gate. Outside, the arrows walk, F breathes fire, and space frees caged dragons, opens chests for three rocket keys and fits them into DeFu's rocket once her factory's valves are broken. Dodge her laser and shockwave." +
+    "In the maze, up and down walk, left and right turn, and F breathes fire: read three clue stones and find four launcher parts to open the moon gate. Outside, the arrows walk, F breathes fire, and space frees caged dragons, opens chests for three rocket keys and fits them into DeFu's rocket once her factory's valves are broken. Dodge her laser and shockwave. Out of the maze, E flies up (low, then soaring over the trees) and Q flies down, and V spends 10 metaplasma on frost vision: the world slows to half speed and three futures show where each way leads. H sends Sparky, the tiny glowing atom who joins you there, into a nook too small for a dragon to bring back what hides in it." +
     backpack,
 };

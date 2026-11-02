@@ -33,17 +33,22 @@ export interface WoodsLevel {
   readonly walls: readonly number[];
 }
 
-// The ways, fire and act, and the backpack's three foods.
+// The ways, fire and act, the backpack's three foods, and out of the maze flying up (`climb`) and down (`dive`), frost vision, and
+// sending Sparky (`help`).
 export type WoodsControl =
   | "act"
   | "berry"
+  | "climb"
+  | "dive"
   | "down"
   | "fire"
+  | "help"
   | "left"
   | "mushroom"
   | "pineapple"
   | "right"
-  | "up";
+  | "up"
+  | "vision";
 export const woodsControls: readonly WoodsControl[] = [
   "left",
   "right",
@@ -54,17 +59,25 @@ export const woodsControls: readonly WoodsControl[] = [
   "berry",
   "mushroom",
   "pineapple",
+  "climb",
+  "dive",
+  "vision",
+  "help",
 ];
 
 // The last thing found (or done, out of the maze), and the tick it was found on, for the screen and the sounds.
 export type FoundKind =
   | "ally"
   | "bubble"
+  | "ceiling"
   | "charm"
   | "chest"
   | "clue"
   | "egg"
+  | "empty"
   | "freed"
+  | "frost"
+  | "grounded"
   | "heart"
   | "home"
   | "key"
@@ -75,7 +88,9 @@ export type FoundKind =
   | "panel"
   | "part"
   | "shielded"
-  | "valve";
+  | "sparky"
+  | "valve"
+  | "weary";
 export interface Found {
   readonly kind: FoundKind;
   readonly tick: number;
@@ -116,8 +131,12 @@ export interface Laser {
 // The walk outside the maze: the dragons freed from the cages (each follows Glitchy, and brings a heart), the eggs left to launch, the
 // valves of the factory broken, the guards sent home and the shadow dragons set free, the rocket keys found and fitted, the tick the
 // lair began (-1 before), and Glitchy itself, tile by tile.
+// How high Glitchy flies out of the maze: on the ground, flying low, or soaring over the treetops (`flight.ts`).
+export type Altitude = 0 | 1 | 2;
+
 export interface Base {
   readonly allies: readonly boolean[];
+  readonly altitude: Altitude;
   readonly ammo: number;
   // A glitch blast rolling over the tiles, and which of the foods lying out of the maze have been picked up.
   readonly blast: TileBlast | null;
@@ -136,12 +155,19 @@ export interface Base {
   readonly invulnerable: number;
   readonly kitTaken: readonly boolean[];
   readonly lairStart: number;
+  // Which of the nooks Sparky has emptied, and Sparky's trip to one (`sparky.ts`): the nook and the tick it set off.
+  readonly nooksTaken: readonly boolean[];
+  readonly trip: { readonly nook: number; readonly start: number } | null;
   readonly laser: Laser | null;
   readonly launchTick: number;
   readonly pieces: readonly boolean[];
   readonly shadows: readonly Shadow[];
   readonly step: { readonly from: Spot; readonly start: number } | null;
   readonly trail: readonly Spot[];
+  // Frost vision (`vision.ts`): the tick it began and the tick it ends (-1 before the first), and the tick it can be used again.
+  readonly visionReady: number;
+  readonly visionStart: number;
+  readonly visionUntil: number;
   readonly x: number;
   readonly y: number;
 }
@@ -186,6 +212,8 @@ export interface WoodsState {
   readonly outcome: "defused" | "launched" | null;
   readonly parts: readonly boolean[];
   readonly plasma: Plasma;
+  // Metaplasma spent on frost vision (what is left is the gathered less this).
+  readonly plasmaSpent: number;
   readonly powers: Powers;
   readonly scene: Scene | null;
   readonly seed: number;

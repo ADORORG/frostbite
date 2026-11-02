@@ -37,15 +37,24 @@ const defuHead: Point = [defu.x + 0.5, 1.6, defu.y + 0.5];
 const inside = (value: number, least: number, most: number): number =>
   Math.min(most, Math.max(least, value));
 
+// Soaring, the camera pulls up and back to show the woods around.
+const pull = [1, 1.12, 1.45] as const;
+
 function following(base: Base, glitchy: Point): Shot {
   const inLair = base.lairStart >= 0;
+  const away = pull[base.altitude];
   const look: Point = [
     inside(glitchy[0], 5.5, 22.5),
     glitchy[1] + 0.4,
     inside(glitchy[2] - (inLair ? 1 : 0.6), 4.5, 24.5),
   ];
   return {
-    from: plus(look, 0, inLair ? 12.5 : 10.5, inLair ? 7.2 : 6),
+    from: plus(
+      look,
+      0,
+      (inLair ? 12.5 : 10.5) * away,
+      (inLair ? 7.2 : 6) * away,
+    ),
     glide: true,
     look,
   };

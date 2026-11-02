@@ -7,7 +7,7 @@ export const sceneTicks: Readonly<Record<SceneId, number>> = {
   launch: 300,
   lair: 360,
   peace: 360,
-  rise: 300,
+  rise: 400,
 };
 
 export const playScene = (state: WoodsState, id: SceneId): WoodsState => ({

@@ -67,6 +67,23 @@ goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The villai
      it burns, and her shockwave spreads out from her platform a tile at a time; the dungeon is out of reach of both. If the countdown
      runs out (or the hearts do), the rocket leaves for space and DeFu wins; defused, peace comes back to the woods.
 
+**Flying and frost vision** (out of the maze, once the camera turns 3D). E flies Glitchy up and Q brings it down, a height at a time:
+from the ground to **flying low** (over the pond and small things like chests and cages, out of the guards' reach, and over DeFu's
+shockwave, though not her laser or her shadow dragons, which fly too) and on to **soaring** over the treetops, where the camera pulls up
+to show the woods around. DeFu's castle walls and its gate (while shut) block every height, her castle has a roof (only flying low inside),
+the action key works only on the ground, nothing is picked up while soaring, and Glitchy lands only on open ground. The dragons freed from
+the cages fly along behind. **V** spends 10 metaplasma on **frost vision**: for five seconds the world (DeFu's guards, shadow dragons,
+laser, shockwave, factory and the rocket's countdown) moves at half speed while Glitchy moves as fast as ever, the night turns icy, and the
+rules play three ways out from where Glitchy is (on ahead, and to either side) a few seconds into the future, shown as stepping stones:
+ice for safe, gold for something good, red for a bump. It can be used again fifteen seconds after it ends; the metaplasma it spends is
+not banked.
+
+**Sparky** joins Glitchy as it leaves the maze: a tiny glowing atom (a bright nucleus in three spinning rings) that hovers at Glitchy's
+shoulder and can zip into spaces too small for a dragon. Six nooks hide things: the hollows of four trees, the gap behind a torch in the
+dungeon and a crack in a pillar of DeFu's hall, each with a glint in it. **H** sends Sparky to the first nook up to three tiles ahead
+(past trees, water and machines, but not through DeFu's castle walls), and it comes back with what was there: a food for the backpack,
+three eggs for the launcher, or fifteen metaplasma. The line under the hearts says when a nook is in reach.
+
 The woods outside the maze are drawn in true 3D (three.js on WebGL 2): low-poly woods, a pond and DeFu's castle, jointed dragons that
 walk, flap and swish their tails, guards, DeFu and her machines, moonlight with shadows, torches, and her laser and shockwave as light.
 The camera follows Glitchy from above and behind and has its own path in each scene. The words and counts are drawn over it on the game
@@ -139,7 +156,8 @@ left and right turn in the maze, and outside it the arrows walk, fire breathes a
 opens a chest, fits a key or launches an egg (and skips a scene); in the castle the arrows
 walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
 move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
-charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack. Enter starts a run, P
+charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack; out of the maze in the
+woods E flies up, Q flies down, V turns on frost vision and H sends Sparky (on a touch screen: Fly up, Fly down, Vision and Sparky). Enter starts a run, P
 pauses, and between runs 0 chooses the whole quest and 1, 2 and 3 a level open to practise. On a touch screen
 there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the
 effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space
@@ -162,7 +180,8 @@ src/rules/          the rules, as pure seeded state machines (each a GameVerifie
   woods/            the woods: trig (whole-number sines), maze (the seeded maze), stash (parts, eggs, charms, metaplasma), walk, tick
                     (walking, fire, finding), base-map (the woods and lair outside the maze), base (walking, using, fire, bumps),
                     foes (guards, shadow dragons, eggs in flight), lair (DeFu's laser, shockwave and countdown), base-tick, scenes,
-                    milestones
+                    actions (fire and the action key), flight (the heights), vision (frost vision), sparky (Sparky and the
+                    nooks), milestones
   castle/           the guild: map, places, motes, rooms (the houses), guild (experience, levels, gear), night (guards and eggs),
                     world (walking, bumping, talking), battle (cheer battles), tick, milestones
   quest/            the whole quest: keys (presses written compactly), legs (each level as the quest plays it), tick (the shift
@@ -174,11 +193,14 @@ src/quest-session.ts the whole quest as a player plays it, its presses written i
 src/screen/         drawing each level (a side view, a map from above, a raycast first-person view), at twice the size for sharp words;
                     the woods outside the maze flat (woods-base, the fallback) with what is written over them in 3D too (woods-base-hud,
                     woods-scenes); quest-draw adds the quest's clock and hearts, the shift into the next dimension and how it ended;
-                    kit-sprites, pack-hud and each level's kit file draw the backpack, its foods, the glitch blasts and a big Glitchy
+                    kit-sprites, pack-hud and each level's kit file draw the backpack, its foods, the glitch blasts and a big Glitchy;
+                    frost-futures plays frost vision's three ways out with the rules, and frost-look draws them and the heights;
+                    sparky-look draws Sparky flat, in the scenes and under the hearts
 src/three/          the woods outside the maze in 3D with three.js: parts (shapes and paints), dragon and people (the jointed models),
                     props and machines (what is used or broken), land (the map as instances), effects (laser, shockwave, confetti),
                     cast and world (building it all and setting it from a state), camera (where it looks), stage (the WebGL view),
-                    kit (the backpack's foods and the glitch blast)
+                    kit (the backpack's foods and the glitch blast), frost (flying heights and frost vision's stepping stones),
+                    sparky (the glowing atom and the nooks' glints)
 src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
                     layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
                     trophies (the shelf), badges (the levels) and poster (the whole picture)

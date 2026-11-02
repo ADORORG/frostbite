@@ -8,6 +8,7 @@ import type { Base, WoodsState } from "../rules/woods/types.ts";
 import { colour } from "../screen/palette.ts";
 import { glitchyOnBase } from "../screen/woods-base.ts";
 import { tileSize } from "../screen/woods-base-tiles.ts";
+import { flightHeights } from "./frost.ts";
 import {
   allyLook,
   animateDragon,
@@ -135,7 +136,11 @@ function showGlitchy(
 ): void {
   const [x, z] = glitchyPoint(base, state.tick);
   const { root } = cast.glitchy;
-  root.position.set(x, 0, z);
+  root.position.set(
+    x,
+    toward(root.position.y, flightHeights[base.altitude], dt, 5),
+    z,
+  );
   root.scale.setScalar(toward(root.scale.x, state.powers.big ? 2 : 1, dt, 6));
   root.rotation.y = turnToward(
     root.rotation.y,
@@ -158,8 +163,8 @@ function showGlitchy(
   animateDragon(
     cast.glitchy,
     time,
-    base.step !== null,
-    puffing >= 0 && puffing < 20,
+    base.step !== null && base.altitude === 0,
+    base.altitude > 0 || (puffing >= 0 && puffing < 20),
   );
 }
 
@@ -176,11 +181,13 @@ function showFollowers(cast: Cast, base: Base, time: number, dt: number): void {
     if (!freed) return;
     const moving =
       spot !== undefined && glide(ally.root, spot.x + 0.5, spot.y + 0.5, dt);
+    const lift = flightHeights[base.altitude] * 0.85;
+    ally.root.position.y = toward(ally.root.position.y, lift, dt, 4);
     animateDragon(
       ally,
       time + at,
-      moving,
-      !moving && Math.sin(time * 2 + at) > 0.9,
+      moving && lift === 0,
+      lift > 0 || (!moving && Math.sin(time * 2 + at) > 0.9),
     );
   });
 }

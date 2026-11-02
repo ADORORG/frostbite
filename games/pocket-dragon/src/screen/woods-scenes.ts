@@ -6,6 +6,7 @@ import { sceneTicks } from "../rules/woods/scenes.ts";
 import type { Base, SceneId, WoodsState } from "../rules/woods/types.ts";
 import { defuKey, defuRows } from "./defu.ts";
 import { colour } from "./palette.ts";
+import { sparkyKey, sparkyRows } from "./sparky-look.ts";
 import { glitchyColours, glitchyFront } from "./sprites.ts";
 import { lines, write } from "./text.ts";
 import { cameraOn, drawBase, glitchyOnBase } from "./woods-base.ts";
@@ -15,7 +16,7 @@ import { middleOf, tileSize } from "./woods-base-tiles.ts";
 // says their lines one after another in the lower bar. Drawn flat, each has its own picture: the woods seen from above as the camera
 // rises out of the maze, the camera moving up to DeFu at her lair, fireworks over the defused rocket, and the rocket leaving for space.
 // In three dimensions the picture is the three-dimensional view's, and only the bars and words are drawn here.
-type Speaker = "defu" | "glitchy" | null;
+type Speaker = "defu" | "glitchy" | "sparky" | null;
 interface Line {
   readonly who: Speaker;
   readonly words: string;
@@ -58,6 +59,11 @@ const scripts: Readonly<Record<SceneId, readonly Line[]>> = {
   ],
   rise: [
     { who: null, words: "OUT OF THE MAZE, THE TREES OPEN UP..." },
+    {
+      who: "sparky",
+      words:
+        "BZZT! HI, GLITCHY, I'M SPARKY! I CAN ZIP INTO NOOKS TOO SMALL FOR A DRAGON. PRESS H!",
+    },
     { who: "glitchy", words: "LOOK! DEFU'S OUTPOST, AND DRAGONS IN CAGES!" },
     {
       who: null,
@@ -70,9 +76,15 @@ export const sceneLines = (id: SceneId): readonly string[] =>
   scripts[id].map((line) => line.words);
 
 const bar = 22;
-const names: Readonly<Record<"defu" | "glitchy", string>> = {
+const names: Readonly<Record<"defu" | "glitchy" | "sparky", string>> = {
   defu: "DEFU",
   glitchy: "GLITCHY",
+  sparky: "SPARKY",
+};
+const nameColours: Readonly<Record<"defu" | "glitchy" | "sparky", string>> = {
+  defu: colour.pink,
+  glitchy: colour.mint,
+  sparky: colour.cyan,
 };
 
 // How far into its scene the state is, from 0 to 1.
@@ -100,19 +112,12 @@ function bars(
     );
     return;
   }
-  const defuSpeaks = line.who === "defu";
-  if (defuSpeaks)
+  if (line.who === "defu")
     sprite(context, defuRows.slice(0, 16), defuKey(false), 6, 125);
+  else if (line.who === "sparky")
+    sprite(context, sparkyRows, sparkyKey, 6, 124);
   else sprite(context, glitchyFront, glitchyColours, 6, 125);
-  write(
-    context,
-    names[line.who],
-    26,
-    123,
-    6,
-    defuSpeaks ? colour.pink : colour.mint,
-    "left",
-  );
+  write(context, names[line.who], 26, 123, 6, nameColours[line.who], "left");
   lines(line.words, 54).forEach((text, row) =>
     write(context, text, 26, 130 + row * 7, 7, colour.white, "left"),
   );

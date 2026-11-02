@@ -9,7 +9,7 @@ import { eggsCaught, plasmaGathered } from "./rules/hills/milestones.ts";
 import type { Boss, HillsState } from "./rules/hills/types.ts";
 import { chestsOpened, cluesRead, lanternsLit } from "./rules/woods/tick.ts";
 import type { WoodsState } from "./rules/woods/types.ts";
-import { baseSounds } from "./feedback-base.ts";
+import { baseSounds, flightSounds } from "./feedback-base.ts";
 import { packSounds } from "./feedback-kit.ts";
 
 // The sounds that go with what changed between two ticks of a run, in the order they would be heard. One function for each chapter.
@@ -114,6 +114,7 @@ export function woodsSounds(
   return [
     ...heard,
     ...baseSounds(before, after),
+    ...flightSounds(before, after),
     ...packSounds(before.powers, after.powers),
   ];
 }

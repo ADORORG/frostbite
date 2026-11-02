@@ -50,7 +50,24 @@ const padOf: Readonly<Record<ChapterId, readonly string[]>> = {
     ...foods,
   ],
   hills: ["left", "right", "down", "act", "fire", ...foods],
-  woods: ["left", "right", "up", "down", "act", "fire", ...foods],
+  woods: [
+    "left",
+    "right",
+    "up",
+    "down",
+    "act",
+    "fire",
+    "evade",
+    "quick",
+    "vision",
+    "help",
+    ...foods,
+  ],
+};
+// Two of the castle's challenge buttons fly Glitchy up and down out of the maze.
+const flightWords: Readonly<Record<string, readonly [string, string]>> = {
+  evade: ["Evade", "Fly up"],
+  quick: ["Quick", "Fly down"],
 };
 
 export function createView() {
@@ -135,8 +152,13 @@ export function createView() {
     level(level: ChapterId): void {
       screen.setAttribute("aria-label", screenWords[level]);
       actButton.textContent = actWords[level];
-      for (const button of buttonsIn(pad, "button[data-hold]"))
-        button.hidden = !padOf[level].includes(button.dataset.hold ?? "");
+      for (const button of buttonsIn(pad, "button[data-hold]")) {
+        const hold = button.dataset.hold ?? "";
+        button.hidden = !padOf[level].includes(hold);
+        const words = flightWords[hold];
+        if (words !== undefined)
+          button.textContent = level === "woods" ? words[1] : words[0];
+      }
     },
     // The Hall of Fame: the best won quests, best first.
     fame(entries: readonly FameEntry[]): void {

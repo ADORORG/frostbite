@@ -82,3 +82,10 @@ export const waveReach = 9;
 export const hatchFirst = 60;
 export const hatchEvery = 240;
 export const mostShadows = 4;
+// Out of the maze Glitchy can fly: up from the ground to flying low (over water and what is small, out of the guards' reach and under
+// DeFu's shockwave), and up again to soaring over the treetops (not in DeFu's castle, which has a roof); landing only on open ground.
+// Frost vision costs `visionCost` metaplasma, lasts `visionTicks` (the world moves at half speed meanwhile), and can be used again
+// `visionCooldown` ticks after it ends.
+export const visionCost = 10;
+export const visionTicks = 300;
+export const visionCooldown = 900;

@@ -20,8 +20,8 @@ import {
 import type { Base, BaseGuard, Shadow, WoodsState } from "./types.ts";
 
 // Who moves outside the maze besides Glitchy: the guards of the woods walk their routes and chase Glitchy when it comes near; DeFu's
-// factory hatches shadow dragons that always chase; a launched egg flies on. Whoever steps into Glitchy bumps it (and a guard that does
-// is dizzy a while after).
+// factory hatches shadow dragons that always chase (they fly, so Glitchy flying low is no safer from them); a launched egg flies on.
+// Whoever steps into Glitchy bumps it (and a guard that does is dizzy a while after); a guard cannot reach Glitchy in the air.
 const nearGlitchy = (base: Base, spot: Spot): number =>
   Math.abs(spot.x - base.x) + Math.abs(spot.y - base.y);
 
@@ -45,7 +45,10 @@ function chase(
 function guardStepOf(base: Base, guard: BaseGuard): BaseGuard | "bump" {
   const route = guardRoutes[guard.route];
   const end = route?.[guard.toward] ?? guard;
-  const seen = base.y > lairRow && nearGlitchy(base, guard) <= guardSight;
+  const seen =
+    base.altitude === 0 &&
+    base.y > lairRow &&
+    nearGlitchy(base, guard) <= guardSight;
   const target = seen
     ? (x: number, y: number) => x === base.x && y === base.y
     : (x: number, y: number) => x === end.x && y === end.y;

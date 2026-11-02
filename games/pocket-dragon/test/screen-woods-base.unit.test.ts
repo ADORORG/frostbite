@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { sceneTicks } from "../src/rules/woods/scenes.ts";
+
 import { bubbleSpot, defu, heartSpot } from "../src/rules/woods/base-map.ts";
 import {
   laserEvery,
@@ -159,7 +161,7 @@ describe("what is written over the woods outside the maze", () => {
       { hearts: 4 },
     );
     expect(drawnWith(hud, woods).texts()).toEqual(
-      expect.arrayContaining(["ALLIES 2/3", "KEYS 1/3", "EGGS 3"]),
+      expect.arrayContaining(["ALLIES 2/3", "KEYS 1/3", "EGGS 3  PLASMA 0"]),
     );
     const hearts = (many: number) =>
       count(hud, outside({}, { hearts: many }), colour.berry);
@@ -213,7 +215,10 @@ describe("the scenes of the woods, and the woods on the screen", () => {
     ) =>
       drawnWith(
         (context, state: WoodsState) => drawWoods(context, state, layered),
-        outside({}, { scene: { id, start: 0 }, tick: Math.round(share * 300) }),
+        outside(
+          {},
+          { scene: { id, start: 0 }, tick: Math.round(share * sceneTicks[id]) },
+        ),
       );
     expect(scene("rise", 0).texts()).toEqual([]);
     expect(scene("rise", 0.1).texts()).toEqual(
@@ -222,7 +227,10 @@ describe("the scenes of the woods, and the woods on the screen", () => {
         "OUT OF THE MAZE, THE TREES OPEN UP...",
       ]),
     );
-    expect(scene("rise", 0.5).texts()).toEqual(
+    expect(scene("rise", 0.3).texts()).toEqual(
+      expect.arrayContaining(["SPARKY"]),
+    );
+    expect(scene("rise", 0.6).texts()).toEqual(
       expect.arrayContaining([
         "GLITCHY",
         "LOOK! DEFU'S OUTPOST, AND DRAGONS IN CAGES!",

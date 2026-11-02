@@ -14,11 +14,15 @@ import {
   partCount,
   size,
 } from "./constants.ts";
-import { breathe, turn, use } from "./base.ts";
+import { breathe, use } from "./actions.ts";
+import { turn, walkable } from "./base.ts";
+import { fly } from "./flight.ts";
 import { withNews } from "./base-tick.ts";
 import { generateWoods } from "./maze.ts";
 import { woodsEarned as milestonesOf } from "./milestones.ts";
 import { useKit } from "./powers.ts";
+import { sendSparky } from "./sparky.ts";
+import { frostVision } from "./vision.ts";
 import { skipScene } from "./scenes.ts";
 import { breatheFire, tickWoods } from "./tick.ts";
 import { woodsControls, type WoodsControl, type WoodsState } from "./types.ts";
@@ -46,13 +50,17 @@ export function startWoods(
     controls: {
       act: false,
       berry: false,
+      climb: false,
+      dive: false,
       down: false,
       fire: false,
+      help: false,
       left: false,
       mushroom: false,
       pineapple: false,
       right: false,
       up: false,
+      vision: false,
     },
     eggs: Array.from({ length: eggCount }, () => false),
     ended: false,
@@ -71,6 +79,7 @@ export function startWoods(
     outcome: null,
     parts: Array.from({ length: partCount }, () => false),
     plasma: freshPlasma(level.motes),
+    plasmaSpent: 0,
     powers: startPowers(kit),
     scene: null,
     seed,
@@ -101,6 +110,12 @@ export const woodsChapter: Chapter<WoodsControl, WoodsState> = {
         : state;
     if (control === "fire") return withNews(state, breathe(state, base));
     if (control === "act") return withNews(state, use(state, base));
+    if (control === "climb" || control === "dive")
+      return fly(state, base, control === "climb", (x, y) =>
+        walkable(base, x, y),
+      );
+    if (control === "vision") return frostVision(state, base);
+    if (control === "help") return sendSparky(state, base);
     return { ...state, base: turn(base, control) };
   },
 };

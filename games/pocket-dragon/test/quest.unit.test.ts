@@ -74,9 +74,9 @@ describe("the quest's compact presses", () => {
   });
 
   it("refuse anything else: no letter, an unknown letter, a gap too long, too many changes, or not a string", () => {
-    for (const bad of ["", "R", "12", "12R3", "1234567R", "12#", "4h", " 1R"])
+    for (const bad of ["", "R", "12", "12R3", "1234567R", "12#", "4n", " 1R"])
       expect(typeof readKeys(bad)).toBe("string");
-    expect(readKeys("4h")).toBe("no control is written h");
+    expect(readKeys("4n")).toBe("no control is written n");
     expect(readKeys(7)).toBe("keys must be ticks and letters, like 12R30r");
     expect(readKeys("1R1r".repeat(mostKeys / 2))).toHaveLength(mostKeys);
     expect(readKeys("1R1r".repeat(mostKeys / 2 + 1))).toBe(

@@ -1,6 +1,8 @@
 import { wearOff } from "../kit.ts";
 import { walk, withBase } from "./base.ts";
 import { rollBaseBlast } from "./blast.ts";
+import { sparkyTick } from "./sparky.ts";
+import { holdWorld, worldWaits } from "./vision.ts";
 import { eggFlies, guardsMove, shadowsMove } from "./foes.ts";
 import { lairTick } from "./lair.ts";
 import type { Base, FoundKind, WoodsState } from "./types.ts";
@@ -32,8 +34,8 @@ export function withNews(before: WoodsState, after: WoodsState): WoodsState {
 }
 
 // One tick outside the maze (the clock already moved on): Glitchy's blinking, forcefield and blaze wear off, Glitchy steps, a launched egg
-// flies and a glitch blast rolls; then in the woods the guards walk, and in the lair the shadow dragons chase and DeFu's weapons and the
-// countdown go on.
+// flies, a glitch blast rolls and Sparky goes on with a trip; then (unless frost vision makes the world wait this tick) in the woods the guards walk, and in the lair
+// the shadow dragons chase and DeFu's weapons and the countdown go on.
 export const tickBase = (state: WoodsState): WoodsState =>
   withNews(state, tickOutside(state));
 
@@ -51,7 +53,9 @@ function tickOutside(state: WoodsState): WoodsState {
   let next = walk(timed, timed.base ?? base);
   next = eggFlies(next, next.base ?? base);
   next = rollBaseBlast(next, next.base ?? base);
+  next = sparkyTick(next, next.base ?? base);
   const now = next.base ?? base;
+  if (worldWaits(now, state.tick)) return withBase(next, holdWorld(now));
   if (now.lairStart < 0) return guardsMove(next, now);
   next = shadowsMove(next, now);
   return next.outcome !== null ? next : lairTick(next, next.base ?? now);

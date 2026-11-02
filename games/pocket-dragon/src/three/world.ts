@@ -40,7 +40,9 @@ import {
   type Party,
   type Wave,
 } from "./effects.ts";
+import { makeFrost, showFrost } from "./frost.ts";
 import { makeKitProps, showKitProps } from "./kit.ts";
+import { makeSparky, showSparky } from "./sparky.ts";
 import { animateLand, buildLand, outerWoods, type Land } from "./land.ts";
 import {
   makeFactory,
@@ -237,6 +239,8 @@ export function buildWorld(): World {
   scene.add(land.root, outerWoods());
   const things = makeThings(scene);
   const kit = makeKitProps(scene);
+  const frost = makeFrost(scene);
+  const sparky = makeSparky(scene);
   const cast: Cast = makeCast(guardRoutes.length);
   scene.add(cast.root);
   const laser: Laser = makeLaser();
@@ -264,7 +268,10 @@ export function buildWorld(): World {
       );
       setSmoke(party, rocketFoot, playing?.id === "launch" ? share : null);
       const [x, z] = glitchyPoint(base, state.tick);
-      const shot = shotOf(state, base, [x, 0, z]);
+      const up = cast.glitchy.root.position.y;
+      showFrost(frost, scene, state, base, [x, up, z], dt);
+      showSparky(sparky, state, base, [x, up, z], time, dt);
+      const shot = shotOf(state, base, [x, up, z]);
       const inside = z < lairRow + 1;
       lights.sky.intensity = toward(
         lights.sky.intensity,

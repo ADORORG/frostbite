@@ -29,6 +29,7 @@ import { drawHills } from "../screen/hills-draw.ts";
 import { drawWoods } from "../screen/woods-screen.ts";
 import { createRunSession } from "../session.ts";
 import { keepCountdown } from "../test-mode/keep.ts";
+import { plasmaLeft } from "../rules/woods/vision.ts";
 import { createTestSession } from "../test-mode/sessions.ts";
 import { actions, type Action } from "./hands.ts";
 
@@ -118,14 +119,18 @@ export const woodsLook: Look<WoodsControl, WoodsState> = {
     act: "act",
     berry: "berry",
     down: "down",
+    evade: "climb",
     fire: "fire",
+    help: "help",
     left: "left",
     mushroom: "mushroom",
     pineapple: "pineapple",
+    quick: "dive",
     right: "right",
     up: "up",
+    vision: "vision",
   },
-  plasma: (state) => state.plasma.gathered,
+  plasma: plasmaLeft,
   play: woodsPlay,
   score: woodsScore,
   sounds: woodsSounds,

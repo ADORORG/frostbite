@@ -1,4 +1,5 @@
 import type { WoodsState } from "../rules/woods/types.ts";
+import { frostTint } from "./frost-look.ts";
 import { drawPack } from "./pack-hud.ts";
 import { drawBase } from "./woods-base.ts";
 import { baseHud } from "./woods-base-hud.ts";
@@ -24,6 +25,7 @@ export function drawWoods(
     return;
   }
   if (!layered) drawBase(context, state, base);
+  frostTint(context, state, base);
   baseHud(context, state, base);
   drawPack(context, state.powers, state.tick);
 }
