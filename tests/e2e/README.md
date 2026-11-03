@@ -9,8 +9,16 @@ services and seeded users.
 (SeaweedFS), the worker, and a self-hosted Inngest, seeds the fixture users, and runs Playwright on four
 viewport projects (mobile, tablet, desktop, wide). Real-service flows (uploads, collections, review)
 run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experience-quality matrices
-(axe, keyboard, reduced motion, visual baselines) run on every viewport. Update a visual baseline only
-after reading the diff: `pnpm test:e2e -- --update-snapshots changed <spec>`.
+(axe, keyboard, reduced motion, layout) run on every viewport.
+
+**Pictures are compared only on request.** Without `E2E_VISUAL=1` every `toHaveScreenshot` is skipped
+(`ignoreSnapshots`), and the rest of each test still runs. Verify (`ci.yml`) never compares pictures; the
+"Visual baselines" workflow (`visual.yml`, by hand or weekly) does, and gates nothing. Compare locally with
+`E2E_VISUAL=1 pnpm test:e2e`. Update a baseline only after reading the diff:
+`E2E_VISUAL=1 pnpm test:e2e -- --update-snapshots changed <spec>`.
+
+In CI the run uses `E2E_WORKERS` browsers (default 3, for the 4-vCPU runner), one retry, and a 25-minute
+`globalTimeout`; Verify splits the run into three `--shard=n/3` jobs.
 
 - `src/creator-fixtures.ts` is the one list of seeded users and their session tokens. A new fixture is
   seeded automatically (`scripts/stack-setup.ts`).
