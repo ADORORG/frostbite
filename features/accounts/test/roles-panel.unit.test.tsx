@@ -21,7 +21,6 @@ const flow = vi.hoisted(() => ({
   suspendRole: vi.fn(),
 }));
 vi.mock("../src/roles/roles-flow.ts", () => flow);
-
 import { RolesPanel } from "../src/roles/roles-panel.tsx";
 import type { Person } from "../src/roles/roles-flow.ts";
 
@@ -176,7 +175,6 @@ describe("changing a role", () => {
     "not-an-administrator",
     "last-administrator",
     "network",
-    "recent-authentication-required",
     "signed-out",
     "no-such-account",
   ] as const)(

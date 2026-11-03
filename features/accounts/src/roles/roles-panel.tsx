@@ -10,6 +10,7 @@ import {
 } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 
+import { ConfirmItIsYou } from "./confirm-it-is-you.tsx";
 import {
   findPeople,
   grantRole,
@@ -45,6 +46,12 @@ export function RolesPanel({
     text: "Changes are recorded with who made them. Your own role can be suspended only while another administrator is working.",
     tone: "attention",
   });
+  // The change that needs a recent sign-in, kept so it can be made again once the administrator has confirmed.
+  const [waiting, setWaiting] = useState<{
+    readonly action: "grant" | "suspend";
+    readonly person: Person;
+    readonly role: PlatformRole;
+  } | null>(null);
   const request = createRequester(sameOriginFetch);
 
   async function search(event: FormEvent) {
@@ -75,12 +82,15 @@ export function RolesPanel({
     action: "grant" | "suspend",
   ) {
     setWorking(true);
+    setWaiting(null);
     const outcome =
       action === "grant"
         ? await grantRole(request, person.userId, role)
         : await suspendRole(request, person.userId, role);
     if (outcome.kind === "failed") {
       setMessage({ text: outcome.message, tone: "unavailable" });
+      if (outcome.outcome === "recent-authentication-required")
+        setWaiting({ action, person, role });
     } else {
       let listed = true;
       try {
@@ -153,6 +163,13 @@ export function RolesPanel({
         title="Current role holders"
       >
         <StatusLamp plain label={message.text} tone={message.tone} />
+        {waiting === null ? null : (
+          <ConfirmItIsYou
+            onConfirmed={() =>
+              void change(waiting.person, waiting.role, waiting.action)
+            }
+          />
+        )}
         {people.length === 0 ? (
           <p>Nobody holds a platform role.</p>
         ) : (
