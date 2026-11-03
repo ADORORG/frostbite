@@ -52,6 +52,8 @@
     "platform:setup-link": "pnpm --filter @repo/platform-admin setup-link",
     "stack": "pnpm --filter @repo/e2e stack",
     "test:e2e": "pnpm build && pnpm --filter @repo/e2e test:e2e",
+    "test:visual": "pnpm build && pnpm --filter @repo/e2e test:visual",
+    "test:visual:update": "pnpm build && pnpm --filter @repo/e2e test:visual:update",
     "repository:check": "pnpm --filter @repo/repository-policy check",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
     "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",

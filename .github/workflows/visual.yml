@@ -3,8 +3,16 @@ name: Visual baselines
 # Compares screenshots of the main pages with the reviewed baselines in tests/e2e/tests/*-snapshots, on all four viewports. It is not part
 # of Verify and gates nothing: run it by hand before a release or after a design change, or read the weekly run. A difference is a prompt to
 # look at the picture, not a failed build. Update a baseline only after reading the diff (tests/e2e/README.md).
+#
+# Run by hand with "update" ticked, it rewrites the baselines that differ and hands them over as the artifact updated-baselines (a tar of just the
+# changed or new files, with their paths). Nothing is committed from here: unpack it at the repository root, read each picture, then commit.
 on:
   workflow_dispatch:
+    inputs:
+      update:
+        description: Rewrite the baselines that differ and upload them for review, instead of comparing
+        type: boolean
+        default: false
   schedule:
     - cron: "0 5 * * 1"
 
@@ -37,9 +45,33 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Compare screenshots
-        env:
-          E2E_VISUAL: "1"
-        run: pnpm --filter @repo/e2e test:e2e
+        if: ${{ !inputs.update }}
+        run: pnpm --filter @repo/e2e test:visual
+
+      - name: Regenerate the baselines that differ
+        if: ${{ inputs.update }}
+        run: pnpm --filter @repo/e2e test:visual:update
+
+      - name: Collect the changed baselines
+        if: ${{ inputs.update }}
+        run: |
+          git status --porcelain --untracked-files=all -- tests/e2e | sed 's/^...//' | grep -- '-snapshots/' | while read -r file; do
+            if [ -f "$file" ]; then printf '%s\n' "$file"; fi
+          done > "$RUNNER_TEMP/changed-baselines.txt" || true
+          if [ -s "$RUNNER_TEMP/changed-baselines.txt" ]; then
+            tar -czf updated-baselines.tgz -T "$RUNNER_TEMP/changed-baselines.txt"
+            { echo "### Changed baselines"; echo; sed 's/^/- /' "$RUNNER_TEMP/changed-baselines.txt"; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No baseline changed." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Retain the changed baselines
+        if: ${{ inputs.update }}
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: updated-baselines
+          path: updated-baselines.tgz
+          if-no-files-found: ignore
 
       - name: Retain the report and the differences
         if: always()

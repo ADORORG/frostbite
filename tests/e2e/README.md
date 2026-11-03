@@ -13,9 +13,16 @@ run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experien
 
 **Pictures are compared only on request.** Without `E2E_VISUAL=1` every `toHaveScreenshot` is skipped
 (`ignoreSnapshots`), and the rest of each test still runs. Verify (`ci.yml`) never compares pictures; the
-"Visual baselines" workflow (`visual.yml`, by hand or weekly) does, and gates nothing. Compare locally with
-`E2E_VISUAL=1 pnpm test:e2e`. Update a baseline only after reading the diff:
-`E2E_VISUAL=1 pnpm test:e2e -- --update-snapshots changed <spec>`.
+"Visual baselines" workflow (`visual.yml`, by hand or weekly) does, and gates nothing.
+
+- Compare: `pnpm test:visual` (root; builds first) or `pnpm --filter @repo/e2e test:visual`. Extra Playwright arguments go
+  after `--`, for example `pnpm test:visual -- tests/home.spec.ts --project=desktop`.
+- Update: `pnpm test:visual:update` rewrites only the baselines that differ. Read each picture (the HTML report shows
+  expected, actual and diff) before committing it.
+- In CI: run "Visual baselines" by hand with **update** ticked. It uploads the artifact `updated-baselines`, a tar of just the
+  changed or new files; unpack it at the repository root, review, and commit. CI itself commits nothing.
+- Baseline names carry the operating system (`-linux`), and fonts differ between machines, so compare and update in the same
+  place: the workflow, or a Linux environment like it.
 
 In CI the run uses `E2E_WORKERS` browsers (default 3, for the 4-vCPU runner), one retry, and a 25-minute
 `globalTimeout`; Verify splits the run into three `--shard=n/3` jobs.
