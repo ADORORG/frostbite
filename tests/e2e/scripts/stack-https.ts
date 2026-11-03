@@ -1,11 +1,15 @@
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
+import { networkInterfaces } from "node:os";
 import { resolve } from "node:path";
 
 import {
   certificateCommand,
   httpsStackEnvironment,
+  lanAddresses,
+  lanCertificate,
   localhostCertificate,
+  localhostNames,
   probeArguments,
   type CertificateTool,
 } from "../src/stack-https.ts";
@@ -13,14 +17,26 @@ import {
 // The local stack over HTTPS on localhost: makes a certificate once (a trusted one with mkcert if it is installed, else a self-signed one
 // with openssl), then starts the stack with it. Extra arguments (`--fresh`, `--yes`) go on to the stack.
 const repositoryRoot = resolve(import.meta.dirname, "../../..");
-const environment = httpsStackEnvironment();
+// `--lan` opens the stack to the local network: it listens on every interface and the certificate names this machine's addresses.
+const lan = process.argv.includes("--lan");
+const passedOn = process.argv
+  .slice(2)
+  .filter((argument) => argument !== "--lan");
+const addresses = lanAddresses(networkInterfaces());
+const environment = httpsStackEnvironment(
+  process.env,
+  lan ? { addresses } : null,
+);
+const files = lan ? lanCertificate : localhostCertificate;
+const names = lan ? [...localhostNames, ...addresses] : localhostNames;
 
 const hasTool = (name: CertificateTool) =>
   spawnSync(name, [...probeArguments[name]], { stdio: "ignore" }).status === 0;
 
 if (
-  !existsSync(resolve(repositoryRoot, localhostCertificate.cert)) ||
-  !existsSync(resolve(repositoryRoot, localhostCertificate.key))
+  lan ||
+  !existsSync(resolve(repositoryRoot, files.cert)) ||
+  !existsSync(resolve(repositoryRoot, files.key))
 ) {
   const tool: CertificateTool = hasTool("mkcert") ? "mkcert" : "openssl";
   if (tool === "openssl" && !hasTool("openssl")) {
@@ -30,7 +46,7 @@ if (
     process.exit(1);
   }
   mkdirSync(resolve(repositoryRoot, ".stack-data"), { recursive: true });
-  const { args, command } = certificateCommand(tool);
+  const { args, command } = certificateCommand(tool, files, names);
   const made = spawnSync(command, args, {
     cwd: repositoryRoot,
     stdio: "inherit",
@@ -46,12 +62,17 @@ if (
   );
 }
 
+if (lan)
+  console.log(
+    `Open https://<address>:4174 from another device, one of: ${addresses.join(", ")}. If nothing answers, the firewall is blocking port 4174.`,
+  );
+
 const child = spawn(
   process.execPath,
   [
     "--experimental-strip-types",
     resolve(import.meta.dirname, "manual-stack.ts"),
-    ...process.argv.slice(2),
+    ...passedOn,
   ],
   { env: environment, stdio: "inherit" },
 );

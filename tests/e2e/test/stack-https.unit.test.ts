@@ -4,6 +4,8 @@ import {
   certificateCommand,
   defaultHttpsBaseURL,
   httpsStackEnvironment,
+  lanAddresses,
+  lanCertificate,
   localhostCertificate,
   localhostNames,
   probeArguments,
@@ -73,6 +75,61 @@ describe("the https stack's environment", () => {
   it("gives the stack both files, which it requires together", () => {
     expect(resolveStackTls(httpsStackEnvironment({}))).toEqual(
       localhostCertificate,
+    );
+  });
+});
+
+describe("--lan", () => {
+  const entry = (family: string, address: string, internal = false) =>
+    ({ address, family, internal }) as never;
+
+  it("lists only the addresses other machines can reach", () => {
+    expect(
+      lanAddresses({
+        docker0: [entry("IPv4", "172.17.0.1")],
+        lo: [entry("IPv4", "127.0.0.1", true)],
+        wlan0: [
+          entry("IPv6", "fe80::1"),
+          entry("IPv4", "192.168.1.20"),
+          entry("IPv4", "169.254.3.4"),
+        ],
+        down: undefined,
+      }),
+    ).toEqual(["172.17.0.1", "192.168.1.20"]);
+  });
+
+  it("listens on every interface, at the first address, with the lan certificate", () => {
+    const environment = httpsStackEnvironment({}, { addresses: ["10.0.0.5"] });
+    expect(environment).toMatchObject({
+      STACK_BASE_URL: "https://10.0.0.5:4174",
+      STACK_HOST: "0.0.0.0",
+      STACK_TLS_CERT: lanCertificate.cert,
+      STACK_TLS_KEY: lanCertificate.key,
+    });
+    expect(
+      httpsStackEnvironment(
+        { STACK_BASE_URL: "https://10.0.0.9:4174", STACK_HOST: "10.0.0.5" },
+        { addresses: ["10.0.0.5"] },
+      ),
+    ).toMatchObject({
+      STACK_BASE_URL: "https://10.0.0.9:4174",
+      STACK_HOST: "10.0.0.5",
+    });
+  });
+
+  it("stops when the machine has no network address", () => {
+    expect(() => httpsStackEnvironment({}, { addresses: [] })).toThrow(
+      "--lan found no network address",
+    );
+  });
+
+  it("puts the addresses in the certificate", () => {
+    const { args } = certificateCommand("openssl", lanCertificate, [
+      ...localhostNames,
+      "10.0.0.5",
+    ]);
+    expect(args[args.indexOf("-addext") + 1]).toBe(
+      "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1,IP:10.0.0.5",
     );
   });
 });

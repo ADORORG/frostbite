@@ -94,6 +94,11 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   The phone warns about the certificate once; accept it. HTTPS also lets the `Secure` session cookie be kept, so sign-in works.
   The sign-in picker lets anyone who reaches it become any seeded person, so use it only on a network you trust.
 
+- `pnpm stack:https` does the same for localhost (certificate made once under `.stack-data`); add `--lan` (`pnpm stack:https --lan`) to open it
+  to other devices: it listens on every interface, names this machine's addresses in a fresh certificate and serves `https://<first address>:4174`
+  (`STACK_BASE_URL` picks another of the addresses). Without `--lan` the stack answers on this machine only, whatever address you try.
+  If a device still cannot connect, the firewall is blocking port 4174.
+
 - Everything is disposable and local: the server binds the loopback address (unless `STACK_HOST` is set), the session tokens are fixed
   fixtures of a throwaway database and storage is SeaweedFS (never real R2). The only real thing is the rewards
   chain above, when one is set. Never run it on a shared host.
