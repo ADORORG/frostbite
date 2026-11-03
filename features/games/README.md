@@ -12,6 +12,10 @@ page connects it to the platform through `@ador/game-sdk`.
 `submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
+Each game page declares its own title, summary and a share picture (`src/metadata.ts`); the games page is shared only when a game is
+registered. The picture is drawn by the web app at `/games/[id]/share-image` (title, summary and the game's cover when it is a
+PNG, JPEG or SVG). `sitemapPaths` lists `/games` and every registered game.
+
 The landing page's rail of games (`homeSections`, `ui/games-rail.tsx`) shows the first six, playable ones first; a game's own cover
 clip plays alone, and a game without one gets a scene chosen from its id laid over its picture (`ui/game-cover.tsx`).
 

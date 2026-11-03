@@ -4,7 +4,7 @@ import { platformSessionCookieName } from "@ador/shared/auth";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
 import { IndexingBadge } from "@ador/feature-chain-status/badge";
 import { AnimationToggle, ScenesProvider } from "@ador/scenes/react";
-import { productName, ShellStatusProvider } from "@repo/ui/arcade";
+import { ShellStatusProvider } from "@repo/ui/arcade";
 import "@repo/ui/styles.css";
 import "@ador/scenes/styles.css";
 import "./globals.css";
@@ -12,6 +12,8 @@ import { chainStatusConfig } from "../../../../configs/chain-status";
 import { walletAuthConfig } from "../../../../configs/wallet";
 import { getPageAccessDependencies } from "../server/auth/runtime";
 import { readSessionState } from "../server/auth/session-state";
+import { siteMetadata } from "../server/metadata/next-metadata";
+import { readSiteIdentity } from "../server/metadata/site";
 import { ClientNavigation } from "./client-navigation";
 import { sceneVideoBase } from "./scene-videos";
 import { WalletShell } from "./wallet-shell";
@@ -32,11 +34,10 @@ const pixelFont = Press_Start_2P({
   weight: "400",
 });
 
-export const metadata: Metadata = {
-  title: `${productName} — Play, earn, collect on Bitcoin`,
-  description:
-    "A browser arcade on Bitcoin: play games, earn milestones, collect.",
-};
+// The public origin and the name come from configuration read when the page is asked for, not when the image was built.
+export function generateMetadata(): Metadata {
+  return siteMetadata(readSiteIdentity());
+}
 
 // Tells the validation library, before any of its code runs, not to compile schemas at run time. Compiling
 // needs script evaluation, which the content security policy does not allow; the library probes for it and the

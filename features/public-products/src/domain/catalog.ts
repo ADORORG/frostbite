@@ -1,6 +1,8 @@
 export const productCatalogs = [
   {
     detailNoun: "launch",
+    // What a search result or a link preview says about the page.
+    metadataDescription: "Collections open to mint on the platform.",
     emptyBody: "Nothing is open to mint right now.",
     emptyTitle: "No launches yet",
     label: "Launches",
@@ -14,6 +16,7 @@ export const productCatalogs = [
   },
   {
     detailNoun: "creator",
+    metadataDescription: "The creators behind the platform's collections.",
     emptyBody: "Creator profiles will show up here.",
     emptyTitle: "No creators yet",
     label: "Creators",

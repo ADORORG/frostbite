@@ -32,3 +32,9 @@ export const homeSectionOrder = Object.freeze({
   games: 10,
   launches: 30,
 });
+
+// What the site says about itself in a title bar and a link preview. One place, so the landing page and the site-wide defaults
+// cannot drift apart.
+export const siteTagline = "Play, earn, collect on Bitcoin";
+export const siteDescription =
+  "A browser arcade on Bitcoin: play games, earn milestones, collect.";

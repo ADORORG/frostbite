@@ -27,6 +27,13 @@ Images are the creator's own processed uploads, signed for display through the u
 signed renditions are short-lived and never stored; a preview that is not available shows a placeholder.
 Public derivatives on an asset domain (ADR-004) are a later step.
 
+## Search and previews
+
+An approved collection's page declares its name and description (`src/metadata.ts`); a collection that is not valid, not approved,
+or cannot be read declares nothing, so a preview never reveals that a draft or a withdrawn collection exists. Previews use the
+site's picture: a cover is a signed address that expires, so a per-collection picture needs a route that fetches it (not built).
+`sitemapPaths` lists the collections page and each approved collection.
+
 ## Structure
 
 `src/application` (the catalog and the public model), `src/ui` (server components: index, detail, and the
