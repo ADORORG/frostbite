@@ -1,5 +1,6 @@
 import { registerHttpOperation } from "@ador/http/registered-operation";
 import type { FeatureEntrypoint } from "@ador/plugin-kit";
+import { privatePage } from "@ador/plugin-kit/page-metadata";
 import type { ChainOption } from "@ador/shared/chain";
 import { homeSectionOrder } from "@ador/shared/platform";
 import {
@@ -30,6 +31,11 @@ import { createGameClaimsResolver } from "./claims-runtime.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
 import { createGameRunsResolver } from "./runs-runtime.ts";
 import { createGameSyncResolver } from "./runtime.ts";
+import {
+  gameMetadata,
+  gameSitemapPaths,
+  gamesIndexMetadata,
+} from "./metadata.ts";
 import { GameDetail } from "./ui/game-detail.tsx";
 import { GamesIndex } from "./ui/games-index.tsx";
 import { GamesRail } from "./ui/games-rail.tsx";
@@ -80,6 +86,8 @@ export function createGamesEntrypoint(
     pages: [
       {
         access,
+        metadata: () =>
+          catalog.list().length === 0 ? privatePage : gamesIndexMetadata,
         path: gamesPath,
         render: ({ navigation }) => {
           const list = catalog.list();
@@ -103,6 +111,7 @@ export function createGamesEntrypoint(
       },
       {
         access,
+        metadata: ({ params }) => gameMetadata(catalog, params.slug),
         path: gamePagePath,
         render: ({ navigation, params }) => {
           const game = catalog.find(params.slug);
@@ -121,6 +130,7 @@ export function createGamesEntrypoint(
         },
       },
     ],
+    sitemapPaths: () => gameSitemapPaths(catalog),
     version: "1.0.0",
   };
 }

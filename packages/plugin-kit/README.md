@@ -18,6 +18,11 @@ Explicit feature/provider registration, boot validation, dependency checking, an
   `markCurrent` marks the link for the page being shown (longest matching parent). Visibility never
   replaces destination authorization.
 
+- `@ador/plugin-kit/page-metadata` is what a page says to search engines and link previews, as plain data: a page's optional
+  `metadata` returns `shared` (title, description, optional picture path) or `private`. A page that declares none, a page behind
+  sign-in, and a missing item are all `private`: told to stay out of search results and shown with no preview. `clipDescription`
+  cuts at a word. A feature's optional `sitemapPaths` lists its public addresses; `registry.listSitemapPaths()` merges them.
+
 Applications register a feature by importing its registration and adding it to
 `configs/features.ts`. The registry never scans the filesystem or activates modules through import
 side effects.

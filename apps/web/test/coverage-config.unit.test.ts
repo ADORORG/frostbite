@@ -9,6 +9,10 @@ describe("web coverage inventory", () => {
         coverage: {
           include: [
             "src/app/**/page.tsx",
+            "src/app/robots.ts",
+            "src/app/sitemap.ts",
+            "src/app/**/share-image/route.tsx",
+            "src/server/metadata/*.ts*",
             "src/client-navigation.ts",
             "src/instrumentation.ts",
             "src/app/api/v1/**/route.ts",

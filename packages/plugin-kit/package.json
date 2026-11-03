@@ -8,6 +8,7 @@
     "./boot": "./src/boot.ts",
     "./lazy": "./src/lazy.ts",
     "./navigation": "./src/navigation.ts",
+    "./page-metadata": "./src/page-metadata.ts",
     "./providers": "./src/provider-registry.ts"
   },
   "scripts": {

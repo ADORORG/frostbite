@@ -11,6 +11,7 @@ import {
   ProductDetailUnavailable,
   ProductIndex,
 } from "./ui/product-surface.tsx";
+import { productIndexMetadata } from "./metadata.ts";
 import { ProductRail } from "./ui/product-rail.tsx";
 
 export function createPublicProductEntrypoint(
@@ -31,6 +32,7 @@ export function createPublicProductEntrypoint(
     pages: [
       {
         access: { kind: "public" as const },
+        metadata: () => productIndexMetadata(catalog),
         path: catalog.path,
         render: ({ navigation }) => (
           <ProductIndex catalog={catalog} navigation={navigation} />
@@ -48,6 +50,7 @@ export function createPublicProductEntrypoint(
         ),
       },
     ],
+    sitemapPaths: () => [catalog.path],
     version: "1.0.0",
   };
 }

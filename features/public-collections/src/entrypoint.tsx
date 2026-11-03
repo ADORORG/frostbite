@@ -7,6 +7,11 @@ import { uuidV7Schema } from "@ador/shared/identifiers";
 import { homeSectionOrder } from "@ador/shared/platform";
 
 import type { PublicCatalog } from "./application/catalog.ts";
+import {
+  collectionPage,
+  collectionSitemapPaths,
+  collectionsIndexPage,
+} from "./metadata.ts";
 import { collectionPagePath, collectionsPath } from "./paths.ts";
 import { createCatalogResolver } from "./runtime.ts";
 import { CollectionDetail } from "./ui/collection-detail.tsx";
@@ -81,15 +86,18 @@ export function createPublicCollectionsEntrypoint(
     pages: [
       {
         access,
+        metadata: () => collectionsIndexPage(getCatalog),
         path: collectionsPath,
         render: ({ navigation }) => index(navigation),
       },
       {
         access,
+        metadata: ({ params }) => collectionPage(getCatalog, params.slug),
         path: collectionPagePath,
         render: ({ navigation, params }) => detail(navigation, params.slug),
       },
     ],
+    sitemapPaths: () => collectionSitemapPaths(getCatalog),
     version: "1.0.0",
   };
 }
