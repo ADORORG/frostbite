@@ -10,9 +10,9 @@ export interface KeyHash {
 }
 
 export const adminKey: KeyHash = {
-  hash: "07ef01c2fb30357538747312115dedb3dd68b45cbb98238c41880535e57088c1",
+  hash: "fc12c8b3316273c2d4cff069087d611f86c5c608b0fa0e4b4561d7f7cad2e917",
   iterations: 600_000,
-  salt: "c3c08710489fd28e3435db9a1a987eb8",
+  salt: "32ea035e32b042f515a999486abe134b",
 };
 
 export const keyText = (typed: string): string =>
