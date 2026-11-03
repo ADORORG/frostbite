@@ -1,0 +1,33 @@
+name: Set up Rust for the contracts
+description: The WebAssembly target, the protobuf compiler, a cache of the compiled crates, and the prebuilt cargo tools asked for (no compiling them from source).
+
+inputs:
+  tools:
+    description: Comma-separated tool@version list for taiki-e/install-action, for example cargo-llvm-cov@0.6.21. Empty installs none.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # contracts/templates pins its own toolchain (rust-toolchain.toml); the first cargo call there installs it with the wasm target.
+    - name: Install Rust WebAssembly target
+      shell: bash
+      run: rustup target add wasm32-unknown-unknown
+
+    # protoc: a dependency of the contract templates (metashrew-support) runs it in its build script.
+    - name: Install the protobuf compiler
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y --no-install-recommends protobuf-compiler
+
+    - name: Cache compiled crates
+      uses: Swatinem/rust-cache@v2.9.3
+      with:
+        workspaces: |
+          contracts
+          contracts/templates
+
+    - name: Install cargo tools
+      if: inputs.tools != ''
+      uses: taiki-e/install-action@v2.89.1
+      with:
+        tool: ${{ inputs.tools }}

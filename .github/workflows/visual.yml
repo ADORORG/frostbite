@@ -1,0 +1,52 @@
+name: Visual baselines
+
+# Compares screenshots of the main pages with the reviewed baselines in tests/e2e/tests/*-snapshots, on all four viewports. It is not part
+# of Verify and gates nothing: run it by hand before a release or after a design change, or read the weekly run. A difference is a prompt to
+# look at the picture, not a failed build. Update a baseline only after reading the diff (tests/e2e/README.md).
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Build production artifacts
+        run: pnpm exec turbo run build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Compare screenshots
+        env:
+          E2E_VISUAL: "1"
+        run: pnpm --filter @repo/e2e test:e2e
+
+      - name: Retain the report and the differences
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: visual-report
+          path: |
+            tests/e2e/playwright-report
+            tests/e2e/test-results
+          if-no-files-found: ignore
