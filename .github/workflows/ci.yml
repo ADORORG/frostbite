@@ -80,6 +80,10 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
 
+      # The games' layout guard (tests/e2e) builds every game and measures it in a real browser.
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Verify database migrations
         run: pnpm migration:check
 
