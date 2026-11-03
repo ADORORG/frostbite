@@ -66,6 +66,11 @@ export function packageVitestConfig(options: PackageVitestOptions) {
   const threshold = options.coverage.threshold ?? defaultCoverageThreshold;
   const environment = options.environment;
   const withEnvironment = environment === undefined ? {} : { environment };
+  // A project does not inherit the top-level `resolve`, so the aliases are given to each project too.
+  const aliases =
+    options.tsconfigPaths === true
+      ? { resolve: { tsconfigPaths: true as const } }
+      : {};
   return defineConfig({
     ...(options.react === true ? { plugins: [react()] } : {}),
     ...(options.tsconfigPaths === true
@@ -89,6 +94,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
       ...(options.fileParallelism === false ? { fileParallelism: false } : {}),
       projects: [
         {
+          ...aliases,
           test: {
             include: [`test/**/*.unit.test.${unit}`],
             name: "unit",
@@ -100,6 +106,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
           ? []
           : [
               {
+                ...aliases,
                 test: {
                   environment: "jsdom" as const,
                   include: ["test/**/*.dom.test.{ts,tsx}"],
@@ -110,6 +117,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
               },
             ]),
         {
+          ...aliases,
           test: {
             include: [`test/**/*.integration.test.${integration}`],
             name: "integration",

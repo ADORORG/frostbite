@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import { AccessState } from "@repo/ui/arcade";
 
-import { platformComposition } from "../../../../../configs/platform";
+import { platformComposition } from "@repo/configs/platform";
 import { resolvePageAccess } from "../../server/auth/page-access";
 import { declaredMetadata } from "../../server/metadata/declared";
 import { pageMetadata } from "../../server/metadata/next-metadata";

@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
-import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
+import { withDisposablePostgres } from "@ador/database/test-postgres";
 import { applyMigrations } from "@ador/database";
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { reviveSession } from "../scripts/stack-setup.ts";

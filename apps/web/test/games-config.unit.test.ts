@@ -1,7 +1,7 @@
 import { gameManifestSchema } from "@ador/shared/games";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { targetChains } from "../../../configs/chains.ts";
+import { targetChains } from "@repo/configs/chains";
 
 const signet = targetChains[0]?.chainId ?? "";
 
@@ -13,7 +13,7 @@ async function gamesWith(launches: string, appEnv = "local") {
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
   vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", launches);
-  return (await import("../../../configs/games.ts")).games;
+  return (await import("@repo/configs/games")).games;
 }
 
 beforeEach(() => {
@@ -116,15 +116,15 @@ describe("the platform's game list", () => {
 
   it("refuses to start with a game on a chain that is not configured", async () => {
     vi.resetModules();
-    vi.doMock("../../../configs/games/frostbite.ts", async (original) => {
+    vi.doMock("@repo/configs/games/frostbite", async (original) => {
       const { frostbite } =
-        await original<typeof import("../../../configs/games/frostbite.ts")>();
+        await original<typeof import("@repo/configs/games/frostbite")>();
       return { frostbite: { ...frostbite, network: "eip155:1" } };
     });
     try {
       await expect(gamesWith("")).rejects.toThrow("not a configured chain");
     } finally {
-      vi.doUnmock("../../../configs/games/frostbite.ts");
+      vi.doUnmock("@repo/configs/games/frostbite");
     }
   });
 

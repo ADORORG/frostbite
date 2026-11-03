@@ -3,7 +3,7 @@ import { createRateLimitGate, type RateLimitGate } from "@ador/http/rate-limit";
 import type { RateLimitDecision } from "@ador/shared/http";
 import { parseSecurityEnvironment } from "@repo/config/env";
 
-import { rateLimits } from "../../../../configs/rate-limits";
+import { rateLimits } from "@repo/configs/rate-limits";
 import { getDatabase } from "./database";
 import { refusal } from "./http/refusal";
 

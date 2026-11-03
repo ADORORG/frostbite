@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { betaChain } from "../../../configs/chains.ts";
+import { betaChain } from "@repo/configs/chains";
 
 const testAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
 // What the chain accepts as an address is the chain's word (see the rewards chain tests); here it accepts only the test address.
@@ -13,14 +13,14 @@ const chainAccepting = (
 
 async function sourceWith(followed: unknown) {
   vi.resetModules();
-  vi.doMock("../../../configs/game-rewards.ts", () => ({
+  vi.doMock("@repo/configs/game-rewards", () => ({
     followedRewardsChain: followed,
     rewardsChain: () => null,
   }));
   try {
-    return (await import("../../../configs/balance.ts")).balanceSource;
+    return (await import("@repo/configs/balance")).balanceSource;
   } finally {
-    vi.doUnmock("../../../configs/game-rewards.ts");
+    vi.doUnmock("@repo/configs/game-rewards");
     vi.resetModules();
   }
 }

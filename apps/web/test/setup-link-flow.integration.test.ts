@@ -21,8 +21,8 @@ import { correlationIdSchema } from "@ador/shared/http";
 import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { authMethods } from "../../../configs/auth-methods";
-import { authorizationPolicy } from "../../../configs/authorization";
+import { authMethods } from "@repo/configs/auth-methods";
+import { authorizationPolicy } from "@repo/configs/authorization";
 
 // The setup link as the page drives it, against real PostgreSQL: the HTTP operation, the service and the platform's real sign-in
 // method registry together (the framing around them, with its session and origin checks, is covered with the other auth routes).

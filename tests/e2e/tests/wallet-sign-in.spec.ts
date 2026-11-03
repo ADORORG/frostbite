@@ -9,10 +9,7 @@ import { accountOutcomes } from "@ador/shared/account-outcomes";
 import { platformSessionCookieName } from "@ador/shared/auth";
 
 import { authMethodsResponseSchema } from "@ador/auth";
-import {
-  testWallets,
-  signAs,
-} from "../../../packages/auth/test/support/fixtures.ts";
+import { testWallets, signAs } from "@ador/auth/test-fixtures";
 import {
   connectWallet,
   installFakeWallet,

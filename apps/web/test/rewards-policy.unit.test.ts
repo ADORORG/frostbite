@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { maxAdminPayloadChars } from "@ador/shared/games";
 
 import release from "../../../contracts/templates/release.json" with { type: "json" };
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
 
 const abi = (name: string): { version: string } =>
   JSON.parse(

@@ -16,6 +16,7 @@ export async function feeSourceStartupCheck(
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(
       `REWARDS_FEE_API_FORMAT (${feeSource.adapter}) is not usable: ${reason} Choose another, or set REWARDS_FEE_RATE_SAT_VB as a fallback.`,
+      { cause: error },
     );
   }
 }

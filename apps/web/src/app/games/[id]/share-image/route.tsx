@@ -1,9 +1,9 @@
 import { gameIdSchema } from "@ador/shared/games";
 
-import { games } from "../../../../../../../configs/games";
-import { pageImageCacheControl } from "../../../../server/metadata/cache";
-import { readGameCover } from "../../../../server/metadata/game-cover";
-import { shareCardResponse } from "../../../../server/metadata/share-card";
+import { games } from "@repo/configs/games";
+import { pageImageCacheControl } from "@/server/metadata/cache";
+import { readGameCover } from "@/server/metadata/game-cover";
+import { shareCardResponse } from "@/server/metadata/share-card";
 
 // The picture a link preview shows for a game: its title and summary beside its cover. An identifier that is not a registered game has
 // no picture, so the address reveals nothing about what is not listed.

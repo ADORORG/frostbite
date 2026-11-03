@@ -2,7 +2,7 @@ import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
 import { resolveRateLimit } from "@ador/shared/http";
 import { describe, expect, it } from "vitest";
 
-import { rateLimits } from "../../../configs/rate-limits";
+import { rateLimits } from "@repo/configs/rate-limits";
 
 // Signing in is a guess an attacker can repeat, so every step of it has a limit of its own, tighter than the anonymous default that
 // would otherwise apply to a route with no session. A new sign-in step must be added here as well as to the limits.

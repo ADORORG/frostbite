@@ -15,7 +15,8 @@
   "dependencies": {
     "@ador/chain": "workspace:*",
     "@ador/shared": "workspace:*",
-    "@repo/config": "workspace:*"
+    "@repo/config": "workspace:*",
+    "@repo/configs": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

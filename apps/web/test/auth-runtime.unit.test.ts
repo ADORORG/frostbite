@@ -23,7 +23,7 @@ vi.mock("@ador/auth", () => ({
 vi.mock("@ador/feature-accounts", () => ({
   createHeldMethodKinds: factories.heldKinds,
 }));
-vi.mock("../../../configs/auth-methods", () => ({
+vi.mock("@repo/configs/auth-methods", () => ({
   authMethods: { list: "the-method-registry" },
 }));
 vi.mock("@ador/authorization", () => ({

@@ -1,5 +1,5 @@
-import { getRateLimitGate, tooManyRequests } from "../../../server/rate-limit";
-import { readCspReport } from "../../../server/security/csp-report";
+import { getRateLimitGate, tooManyRequests } from "@/server/rate-limit";
+import { readCspReport } from "@/server/security/csp-report";
 
 export const runtime = "nodejs";
 

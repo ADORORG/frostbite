@@ -3,6 +3,6 @@
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
   const { checkRewardsChainAtStartup } =
-    await import("../../../configs/game-rewards");
+    await import("@repo/configs/game-rewards");
   await checkRewardsChainAtStartup();
 }

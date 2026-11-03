@@ -2,12 +2,12 @@ import { chainRefSchema } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it, vi } from "vitest";
 
-import { betaChain } from "../../../configs/chains.ts";
+import { betaChain } from "@repo/configs/chains";
 import {
   createRewardsChain,
   type RewardsPlatform,
-} from "../../../configs/rewards-chain.ts";
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+} from "@repo/configs/rewards-chain";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
 
 // The chain this deployment runs on (configs/chains.ts), whichever test network that is.
 const beta = chainRefSchema.parse(betaChain.chain.chainId);
@@ -130,9 +130,9 @@ describe("how far the rewards chain's indexer has read", () => {
 
   it("is readable while the policy keeps the release gate closed, because reading moves nothing", async () => {
     vi.resetModules();
-    vi.doMock("../../../configs/rewards-policy.ts", async (original) => {
+    vi.doMock("@repo/configs/rewards-policy", async (original) => {
       const real =
-        await original<typeof import("../../../configs/rewards-policy.ts")>();
+        await original<typeof import("@repo/configs/rewards-policy")>();
       return {
         ...real,
         rewardsPolicy: {
@@ -142,7 +142,7 @@ describe("how far the rewards chain's indexer has read", () => {
       };
     });
     try {
-      const closed = await import("../../../configs/rewards-chain.ts");
+      const closed = await import("@repo/configs/rewards-chain");
       const rewards = closed.createRewardsChain(
         environment,
         node({ indexed: 1, tip: 2 }).platform,
@@ -150,7 +150,7 @@ describe("how far the rewards chain's indexer has read", () => {
       expect(rewards?.chain(beta)).toBeNull();
       expect((await rewards?.followed.indexing())?.tipHeight).toBe(2);
     } finally {
-      vi.doUnmock("../../../configs/rewards-policy.ts");
+      vi.doUnmock("@repo/configs/rewards-policy");
       vi.resetModules();
     }
   });

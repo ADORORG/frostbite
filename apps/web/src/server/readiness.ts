@@ -3,7 +3,7 @@ import { runReadiness } from "@ador/http/readiness";
 import { storageReadinessProbe } from "@ador/object-storage/readiness";
 import type { Readiness } from "@ador/shared/readiness";
 
-import { platformComposition } from "../../../../configs/platform";
+import { platformComposition } from "@repo/configs/platform";
 import { getDatabase } from "./database";
 
 // Whether the web service can take traffic: the database and object storage answer. What went wrong is

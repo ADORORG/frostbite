@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
+import { withDisposablePostgres } from "@ador/database/test-postgres";
 
 import { captureMailEnvironment } from "../src/manual-stack.ts";
 import { normalizePlaywrightArguments } from "../src/playwright-arguments.ts";

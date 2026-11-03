@@ -92,6 +92,27 @@ describe("packageVitestConfig", () => {
     expect(declined.resolve).toBeUndefined();
   });
 
+  it("gives the tsconfig paths to every project, which do not inherit the top-level resolve", () => {
+    const projectsOf = (tsconfigPaths: boolean) =>
+      (
+        packageVitestConfig({
+          coverage: { include },
+          dom: { setupFile: "test/setup.ts" },
+          tsconfigPaths,
+        }).test?.projects ?? []
+      ).map((project) =>
+        typeof project === "object" && "resolve" in project
+          ? project.resolve
+          : undefined,
+      );
+    expect(projectsOf(true)).toEqual([
+      { tsconfigPaths: true },
+      { tsconfigPaths: true },
+      { tsconfigPaths: true },
+    ]);
+    expect(projectsOf(false)).toEqual([undefined, undefined, undefined]);
+  });
+
   it("runs files one at a time only when the package says they share a database", () => {
     expect(build({ coverage: { include } }).test).not.toHaveProperty(
       "fileParallelism",
