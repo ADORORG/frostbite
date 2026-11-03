@@ -74,6 +74,12 @@ prints the address, the pages worth visiting, and which rewards chain it is on.
   session cookie is secure, so use Chrome or Firefox on `localhost`.
 - Default address `http://localhost:4174` (`STACK_BASE_URL` moves it; it needs an explicit port). It
   does not clash with the test run's port.
+- `pnpm stack:https` serves the stack over HTTPS on `https://localhost:4174`, so the page is a secure context (the web app needs
+  `crypto.subtle`) and the `Secure` session cookie is kept. It makes a certificate once in `.stack-data/localhost-cert.pem` and
+  `localhost-key.pem` for `localhost`, `127.0.0.1` and `::1` (a trusted one with `mkcert` if it is installed, run `mkcert -install` once;
+  otherwise a self-signed one with `openssl`, which the browser warns about once), then starts the stack with it. Extra arguments such as
+  `--fresh` go on to the stack. To renew or switch to mkcert, delete the two `.pem` files. `STACK_BASE_URL` may move it to another
+  `https://` address. For a phone on the network use the commands below instead.
 - To open the stack on a phone on the same network, serve it over HTTPS: a page on a plain `http://<address>` is not a secure
   context, so `crypto.subtle` is missing and the web app fails on load. Make a throwaway certificate for the machine's address
   (`hostname -I`) and start the stack with it:
