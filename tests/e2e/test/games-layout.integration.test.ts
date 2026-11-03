@@ -8,6 +8,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { serveGame } from "../src/game-hosting.ts";
 import {
+  layoutDifferences,
+  parseSavedLayouts,
+} from "../src/game-layout-compare.ts";
+import {
   measureCard,
   measureLayout,
   type Card,
@@ -16,7 +20,8 @@ import {
 
 // Every game is built, served and measured in a browser, at a phone's two sizes of frame and at two desktop sizes.
 //  - On a phone the page must not scroll, and the screen must take the frame.
-//  - On a desktop the place of every named part must be what `fixtures/games-desktop-layout.json` holds, so a change made for phones cannot move
+//  - On a desktop the place of every named part must be what `fixtures/games-desktop-layout.json` holds, give or take the room a font takes
+//    (`layoutTolerancePx`: exact pixels passed on the machine that recorded them and failed on CI), so a change made for phones cannot move
 //    anything there. A change meant for desktops is made on purpose: `UPDATE_GAME_LAYOUT=1 pnpm test:integration` writes the new places.
 const gamesDirectory = resolve(import.meta.dirname, "../../../games");
 const fixture = resolve(
@@ -113,8 +118,8 @@ describe("on a desktop", () => {
       await writeFile(fixture, `${JSON.stringify(found, null, 2)}\n`);
       return;
     }
-    const saved: unknown = JSON.parse(await readFile(fixture, "utf8"));
-    expect(found).toEqual(saved);
+    const saved = parseSavedLayouts(await readFile(fixture, "utf8"));
+    expect(layoutDifferences(found, saved)).toEqual([]);
   }, 180_000);
 });
 
