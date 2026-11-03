@@ -11,6 +11,10 @@ import {
 import { findScriptPolicyViolations } from "./script-policy.ts";
 import { findSkillViolations } from "./skill-policy.ts";
 import { findTemplateReleaseViolations } from "./template-release-policy.ts";
+import {
+  findCoverageUploadViolations,
+  readCiWorkflow,
+} from "./workflow-policy.ts";
 import { discoverWorkspaces, repositoryRoot } from "./workspaces.ts";
 
 const root = repositoryRoot(import.meta.url);
@@ -28,6 +32,7 @@ const violations = [
     await readSentenceBaseline(root),
   ),
   ...(await findTemplateReleaseViolations(root)),
+  ...findCoverageUploadViolations(root, workspaces, await readCiWorkflow(root)),
 ];
 
 if (violations.length > 0) {
