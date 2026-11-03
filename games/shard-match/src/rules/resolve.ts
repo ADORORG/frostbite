@@ -9,6 +9,17 @@ import {
   type Board,
 } from "./board.ts";
 
+// One step of a chain, for the screen to play back: the board before it, the cells cleared, the specials made (cell and value) and the bombs
+// and stars that went off, and the board after what is left has fallen and new shards have come in, with how far each shard fell.
+export interface Step {
+  readonly after: Board;
+  readonly before: Board;
+  readonly clear: readonly number[];
+  readonly drops: readonly number[];
+  readonly fired: readonly number[];
+  readonly made: readonly (readonly [number, number])[];
+}
+
 // What one swap did: the board it left, the generator state, and the numbers the milestones count.
 export interface Resolved {
   readonly board: Board;
@@ -21,6 +32,7 @@ export interface Resolved {
   readonly points: number;
   readonly rng: number;
   readonly starsMade: number;
+  readonly steps: readonly Step[];
 }
 
 // Plays out what a swap sets going: every line is cleared (a line of four leaves a bomb where the swapped shard was, a line of five or more
@@ -44,6 +56,7 @@ export function resolve(
     starsMade: 0,
   };
   const everything = new Set<number>();
+  const steps: Step[] = [];
   for (;;) {
     const runs = runsOf(board);
     if (runs.length === 0) break;
@@ -96,6 +109,14 @@ export function resolve(
     for (const cell of going) everything.add(cell);
     const placed = board.map((value, cell) => made.get(cell) ?? value);
     const next = settle(placed, going, kindsFor, state);
+    steps.push({
+      after: next.board,
+      before: board,
+      clear: [...going],
+      drops: next.drops,
+      fired: [...fired],
+      made: [...made.entries()],
+    });
     board = next.board;
     state = next.state;
   }
@@ -105,5 +126,6 @@ export function resolve(
     clearedCells: [...everything],
     depth,
     rng: state,
+    steps,
   };
 }

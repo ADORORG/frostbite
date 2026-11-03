@@ -23,20 +23,32 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 
 - **Keys:** the arrows or WASD move a cursor; Space picks up the shard under it and an arrow then swaps it that way. A tap picks a shard up and a
   tap on a neighbour swaps them; so does a drag from a shard to its neighbour. Enter starts a run and never throws one away; P pauses (Space is
-  the main action here, so it does not).
+  the main action here, so it does not). After six seconds without a move the screen points at a swap that makes a line.
 - **A swap must make a line.** One that does not is refused, costs nothing and is not recorded. A board with no swap left is shuffled.
-- **Swaps:** sixteen to start. Each swap uses one; a star gives one, each step of a chain past the second gives one, and each level gives three.
-  Level L ends at 600 L + 400 L squared points.
+- **Levels.** A run is a series of levels, each on a fresh board with a number of swaps (22, fewer as the levels go, to 13). Odd levels ask for a
+  score (500 plus 450 a level); even levels freeze some cells (8 plus 3 a level, to 36) and the goal is to break all the frost, which a match that
+  clears a frosted cell does. A level not cleared when its swaps are gone ends the run. Clearing one pays the swaps left over (50 points a swap
+  times the level) and carries up to three of them into the next.
+- **Bombs and stars.** Four in a line makes a bomb (clears the nine cells round it), five or more a star (its row and column). A star, and each
+  step of a chain past the second, buys another swap.
 - **Score:** ten a shard times the step of the chain it is cleared in, and fifty times the step for each shard in a line past the third.
+- **What you see.** The swap slides, cleared shards flash and burst into confetti (ice for frost), what is left falls and new shards drop in, step
+  by step; the music rises a note with each step of a chain, the screen shakes for a bomb, a star or a third step, and words (SWEET! TASTY!
+  DELICIOUS! DIVINE!, BOMB!, STAR!) rise over the board. A new swap made while one is still playing ends that playback at once. None of it is read by
+  the rules: the rules play a swap in one go, and the screen plays the same steps (`src/screen/trace.ts`) back.
+
+## The tall screen
+
+On a phone held upright (`(max-width: 46rem) and (orientation: portrait)`, the same query the SDK's phone stylesheet uses) the screen is 90x108 instead of 160x90: the board is in the same place and the writing is in rows under it (`screen/hud.ts` `strip`), with shorter lines on the cards that say Start, not Enter (`screen/cards.ts`). `screen/shape.ts` watches the query and fits the canvas; touches are read by the size of the shape shown.
 
 ## Milestones
 
-Forty, all decided by the state of a run alone (`src/rules/milestones.ts`): the first swap, and ladders of score (1,000 to 300,000), level (2 to 18),
-the longest chain (2 to 7 steps), the longest line (4 to 6), bombs and stars made, bombs set off, shards cleared, the most one swap scored, and swaps
-made. The words are in the manifest; a test fails if the manifest and the rules name different ones. **The list is a draft for the owner to
-approve.** The numbers come from three measured players (`test/support/bots.ts`): one who makes any swap that makes a line runs out within about
-twenty to sixty swaps at level two to five; one who always makes the swap that scores most runs out at level seven to eighteen; one who looks a
-swap further never ran out in the 1,200 swaps measured. Together they earn every milestone. Nobody has played the game, so what a person finds hard
+Forty, all decided by the state of a run alone (`src/rules/milestones.ts`): the first swap, and ladders of score (1,000 to 300,000), levels
+cleared (1 to 16), the longest chain (2 to 7 steps), the longest line (4 to 6), bombs and stars made, bombs set off, shards cleared, frost broken
+(25 to 300) and the most one swap scored. The words are in the manifest; a test fails if the manifest and the rules name different ones. **The list is
+a draft for the owner to approve.** The numbers come from three measured players (`test/support/bots.ts`): one who makes any swap that makes a line
+clears one or two levels and runs out on the first frost level; one who always makes the swap that scores most (and breaks frost) clears about 3 to
+14; one who looks a swap further went on far past that. Together they earn every milestone. Nobody has played the game, so what a person finds hard
 is not known.
 
 ## Invariants

@@ -1,4 +1,5 @@
 @import "@ador/game-sdk/audio/panel.css";
+@import "@ador/game-sdk/phone.css";
 
 :root {
   color-scheme: dark;
@@ -233,4 +234,10 @@ button:focus-visible {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* The tall screen (a phone held upright) is a little taller than it is wide: the biggest such box that fits what is left of the page. */
+canvas[data-shape="tall"] {
+  inline-size: min(100cqw, 100cqh * 90 / 108);
+  aspect-ratio: 90 / 108;
 }

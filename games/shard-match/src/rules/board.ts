@@ -89,21 +89,30 @@ export function settle(
   gone: ReadonlySet<number>,
   kinds: number,
   state: number,
-): { readonly board: Board; readonly state: number } {
+): {
+  readonly board: Board;
+  // For each cell, how many rows its shard fell to get there (a new shard counts the rows it came down from above the board).
+  readonly drops: readonly number[];
+  readonly state: number;
+} {
   const next = new Array<number>(cells).fill(0);
+  const drops = new Array<number>(cells).fill(0);
   let rng = state;
   for (let x = 0; x < columns; x += 1) {
     let write = rows - 1;
     for (let y = rows - 1; y >= 0; y -= 1)
       if (!gone.has(cellOf(x, y))) {
         next[cellOf(x, write)] = at(board, cellOf(x, y));
+        drops[cellOf(x, write)] = write - y;
         write -= 1;
       }
+    const fresh = write + 1;
     for (; write >= 0; write -= 1) {
+      drops[cellOf(x, write)] = fresh;
       const stepped = stepInt(rng, kinds);
       rng = stepped.state;
       next[cellOf(x, write)] = stepped.value;
     }
   }
-  return { board: next, state: rng };
+  return { board: next, drops, state: rng };
 }

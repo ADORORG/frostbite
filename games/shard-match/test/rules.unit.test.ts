@@ -2,18 +2,19 @@ import type { JsonValue } from "@ador/game-sdk/protocol";
 import { describe, expect, it } from "vitest";
 
 import { runsOf } from "../src/rules/board.ts";
-import { cells, maxSwaps, startMoves } from "../src/rules/constants.ts";
+import { cells, maxSwaps } from "../src/rules/constants.ts";
 import { matchRules } from "../src/rules/index.ts";
 import {
   freshBoard,
   hasMove,
   legalMoves,
   makesLine,
+  withMove,
 } from "../src/rules/moves.ts";
 import {
   kindsAt,
   startRun,
-  targetOf,
+  movesFor,
   type MatchState,
 } from "../src/rules/state.ts";
 import { swapOnce } from "../src/rules/swap.ts";
@@ -37,16 +38,15 @@ describe("starting a run", () => {
       expect(runsOf(state.board)).toEqual([]);
       expect(hasMove(state.board)).toBe(true);
       expect(state.level).toBe(1);
-      expect(state.moves).toBe(startMoves);
+      expect(state.moves).toBe(movesFor(1));
       expect(Math.max(...state.board)).toBeLessThan(5);
       expect(startRun(seed)).toEqual(state);
     }
     expect(startRun(1).board).not.toEqual(startRun(2).board);
   });
 
-  it("has five kinds of shard up to level three and six after, and a rising score to go up", () => {
+  it("has five kinds of shard up to level three and six after", () => {
     expect([1, 3, 4, 20].map(kindsAt)).toEqual([5, 5, 6, 6]);
-    expect([1, 2, 3].map(targetOf)).toEqual([1000, 2800, 5400]);
   });
 });
 
@@ -96,7 +96,7 @@ describe("a swap", () => {
     expect(next.lastCleared.length).toBeGreaterThanOrEqual(3);
     expect(next.lastGain).toBe(next.score);
     expect(next.lastDepth).toBeGreaterThanOrEqual(1);
-    expect(next.moves).toBeLessThanOrEqual(startMoves - 1 + 3 + 6);
+    expect(next.moves).toBeLessThanOrEqual(movesFor(1) - 1 + 1 + 6);
     expect(next.bestSwap).toBe(next.score);
     expect(runsOf(next.board)).toEqual([]);
     expect(hasMove(next.board)).toBe(true);
@@ -126,33 +126,6 @@ describe("a swap", () => {
     const going = taken(swapOnce({ ...state, moves: 50 }, ...first(state)));
     expect(going.ended).toBe(false);
     expect(going.cause).toBeNull();
-  });
-
-  it("goes up a level when the score reaches the target, as many as it reaches, and gives swaps for each", () => {
-    const state = startRun(11);
-    const [cell, to] = first(state);
-    const near = taken(
-      swapOnce({ ...state, score: targetOf(1) - 1 }, cell, to),
-    );
-    expect(near.level).toBeGreaterThanOrEqual(2);
-    const jump = taken(swapOnce({ ...state, score: targetOf(3) }, cell, to));
-    expect(jump.level).toBeGreaterThanOrEqual(4);
-    expect(jump.moves).toBeGreaterThanOrEqual(startMoves - 1 + 3 * 3);
-    const stay = taken(swapOnce(state, cell, to));
-    expect(stay.level).toBe(state.score + stay.lastGain >= targetOf(1) ? 2 : 1);
-  });
-
-  it("goes up exactly when the score reaches the target, not a point before", () => {
-    const state = startRun(11);
-    const [cell, to] = first(state);
-    const gain = taken(swapOnce(state, cell, to)).lastGain;
-    expect(
-      taken(swapOnce({ ...state, score: targetOf(1) - gain }, cell, to)).level,
-    ).toBe(2);
-    expect(
-      taken(swapOnce({ ...state, score: targetOf(1) - gain - 1 }, cell, to))
-        .level,
-    ).toBe(1);
   });
 
   it("gives a swap for a star made, and none for a bomb", () => {
@@ -185,21 +158,20 @@ describe("a swap", () => {
     expect(after(four).moves).toBe(10 - 1);
   });
 
-  it("shuffles a board with no swap left, and says so", () => {
-    let found = false;
-    for (let seed = 1; seed <= 200 && !found; seed += 1) {
-      let state = startRun(seed);
-      for (let at = 0; at < 60 && !state.ended; at += 1) {
-        state = taken(swapOnce({ ...state, moves: 50 }, ...first(state)));
-        if (state.reshuffles > 0) {
-          found = true;
-          expect(hasMove(state.board)).toBe(true);
-          expect(runsOf(state.board)).toEqual([]);
-        }
-      }
-    }
-    expect(found).toBe(true);
-  }, 60_000);
+  it("shuffles a board with no swap left, and leaves one that has a swap", () => {
+    const kept = withMove(startRun(3).board, 99, 5);
+    expect(kept).toEqual({
+      board: startRun(3).board,
+      shuffled: false,
+      state: 99,
+    });
+    const dead = withMove(quiet(), 99, 5);
+    expect(dead.shuffled).toBe(true);
+    expect(hasMove(dead.board)).toBe(true);
+    expect(runsOf(dead.board)).toEqual([]);
+    expect(dead.state).not.toBe(99);
+    expect(withMove(quiet(), 99, 5)).toEqual(dead);
+  });
 });
 
 describe("the rules as the platform replays them", () => {
@@ -216,7 +188,7 @@ describe("the rules as the platform replays them", () => {
       reason: "no such setting: size",
     });
     expect(matchRules.id).toBe("shard-match");
-    expect(matchRules.version).toBe(1);
+    expect(matchRules.version).toBe(2);
   });
 
   it("make a swap by its cell and direction, and refuse what is not one", () => {

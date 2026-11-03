@@ -20,3 +20,15 @@ export const kindColours = [
   "#ff9f43",
   "#b58cff",
 ] as const;
+
+// The darker tone of each kind's colour, for the underside of a shard (it makes the flat shape look rounded).
+export const kindShades = [
+  "#1b9fb8",
+  "#b82c62",
+  "#c29a12",
+  "#2a9e6a",
+  "#c26a1c",
+  "#7a58c4",
+] as const;
+
+export const frostColour = "#cfefff";

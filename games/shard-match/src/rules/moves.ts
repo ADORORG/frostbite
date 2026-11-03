@@ -72,3 +72,18 @@ export function freshBoard(
     if (hasMove(board)) return { board, state: rng };
   }
 }
+
+// The board as it is if it has a swap to make, and otherwise a fresh one (a shuffle) from the generator state, and whether it was shuffled.
+export function withMove(
+  board: Board,
+  state: number,
+  kinds: number,
+): {
+  readonly board: Board;
+  readonly shuffled: boolean;
+  readonly state: number;
+} {
+  if (hasMove(board)) return { board, shuffled: false, state };
+  const fresh = freshBoard(state, kinds);
+  return { board: fresh.board, shuffled: true, state: fresh.state };
+}

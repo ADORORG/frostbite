@@ -38,7 +38,9 @@ async function opened(saved: Parameters<typeof play>[0] = { best: 0 }) {
       }
     }
   };
-  return { earned, el, press, stored, wander, window };
+  const ended = () =>
+    el("note")?.textContent?.includes("your own claim") === true;
+  return { earned, ended, el, press, stored, wander, window };
 }
 
 describe("Shard Match's page", () => {
@@ -103,12 +105,13 @@ describe("Shard Match's page", () => {
   });
 
   it("ends a run when the swaps are used up, says what the platform could not check, and saves the best", async () => {
-    const { el, press, stored, wander } = await opened();
+    const { ended, el, press, stored, wander } = await opened();
     press("Enter");
     await settle(100);
-    for (let at = 0; at < 80 && el("start")?.hasAttribute("hidden"); at += 1)
-      wander(10);
-    await settle(100);
+    for (let at = 0; at < 800 && !ended(); at += 1) wander(1);
+    // The run closes when the playback of its last swap is over.
+    for (let at = 0; at < 60 && el("start")?.hasAttribute("hidden"); at += 1)
+      await settle(50);
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Play again");
     expect(el("note")?.textContent).toContain("your own claim");
@@ -117,7 +120,7 @@ describe("Shard Match's page", () => {
       sound: defaultSound,
     });
     expect(el("pause")?.hasAttribute("disabled")).toBe(true);
-  }, 60_000);
+  }, 240_000);
 
   it("pauses itself when the tab is hidden during a run", async () => {
     const { el, press, window } = await opened();
