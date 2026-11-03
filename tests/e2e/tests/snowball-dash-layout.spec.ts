@@ -11,15 +11,17 @@ const watched = [
   "#earned",
   "#sound",
   ".bar",
-  ".foot",
 ] as const;
+// On a desktop the foot is a box of its own that holds the controls in place; on a phone the shared phone layout gives it no box (its parts sit
+// in rows of their own, each watched above).
+const desktopOnly = [".foot"] as const;
 
-async function boxes(game: FrameLocator) {
+async function boxes(game: FrameLocator, desktop: boolean) {
   const found: Record<
     string,
     { height: number; width: number; x: number; y: number }
   > = {};
-  for (const selector of watched) {
+  for (const selector of desktop ? [...watched, ...desktopOnly] : watched) {
     const box = await game.locator(selector).boundingBox();
     if (box === null) throw new Error(`${selector} has no box`);
     found[selector] = box;
@@ -39,18 +41,18 @@ for (const size of [
     await page.goto("/games/snowball-dash");
     const game = page.frameLocator(frameSelector);
     await expect(game.locator("#status")).toHaveText("Connected.");
-    const before = await boxes(game);
+    const before = await boxes(game, size.name === "desktop");
     await game.locator("#start").click();
     await expect(game.locator("#pause")).toBeEnabled();
-    expect(await boxes(game)).toEqual(before);
+    expect(await boxes(game, size.name === "desktop")).toEqual(before);
     // One hop earns the first milestone, which is listed: the list gains an item and nothing around it moves.
     await page.keyboard.down("Space");
     await page.waitForTimeout(200);
     await page.keyboard.up("Space");
     await expect(game.locator("#earned li").first()).toBeVisible();
-    expect(await boxes(game)).toEqual(before);
+    expect(await boxes(game, size.name === "desktop")).toEqual(before);
     // Hop no more: the snowball meets the first rock and the run ends with the card on the screen.
     await expect(game.locator("#start")).toBeVisible({ timeout: 15_000 });
     await expect(game.locator("#note")).not.toHaveText("");
-    expect(await boxes(game)).toEqual(before);
+    expect(await boxes(game, size.name === "desktop")).toEqual(before);
   });
