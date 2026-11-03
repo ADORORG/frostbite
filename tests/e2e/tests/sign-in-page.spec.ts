@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
+import { testWallets } from "@ador/auth/test-fixtures";
 import { connectWallet, installFakeWallet } from "./support/fake-wallet.ts";
 
 // Finding the way to sign in, and choosing how, in a real browser. Nothing here signs anyone in (that is `wallet-sign-in.spec.ts` and

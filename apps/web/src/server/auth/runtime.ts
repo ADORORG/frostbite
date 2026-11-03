@@ -10,8 +10,8 @@ import { createHeldMethodKinds } from "@ador/feature-accounts";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 
 import { getDatabase } from "../database";
-import { authMethods } from "../../../../../configs/auth-methods";
-import { authorizationPolicy } from "../../../../../configs/authorization";
+import { authMethods } from "@repo/configs/auth-methods";
+import { authorizationPolicy } from "@repo/configs/authorization";
 import type { PageAccessDependencies } from "./page-access.ts";
 
 let services: PageAccessDependencies | undefined;

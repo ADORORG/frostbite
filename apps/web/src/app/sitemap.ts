@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { platformComposition } from "../../../../configs/platform";
+import { platformComposition } from "@repo/configs/platform";
 import { sitemapFor } from "../server/metadata/crawl-rules";
 import { readSiteIdentity } from "../server/metadata/site";
 

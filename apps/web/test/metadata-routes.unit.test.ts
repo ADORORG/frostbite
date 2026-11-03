@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { games } from "../../../configs/games";
+import { games } from "@repo/configs/games";
 import { GET as gameImage } from "../src/app/games/[id]/share-image/route";
 import robots from "../src/app/robots";
 import { GET as defaultImage } from "../src/app/share-image/route";

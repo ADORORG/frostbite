@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 
 import { createNodeRequestListener } from "@ador/http/node-adapter";
 
-import { providerRegistry } from "../../../configs/providers.ts";
+import { providerRegistry } from "@repo/configs/providers";
 import { parseWorkerPort } from "./config.ts";
 import { createWorkerRuntime } from "./runtime.ts";
 

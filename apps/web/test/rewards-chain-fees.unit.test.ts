@@ -2,11 +2,11 @@ import { chainRefSchema } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it } from "vitest";
 
-import { betaChains } from "../../../configs/chains.ts";
+import { betaChains } from "@repo/configs/chains";
 import {
   createRewardsChain,
   type RewardsPlatform,
-} from "../../../configs/rewards-chain.ts";
+} from "@repo/configs/rewards-chain";
 
 const environment: RewardsChainEnvironment = {
   feeSource: { adapter: "mempool", fallbackSatPerVb: null },

@@ -16,7 +16,7 @@ vi.mock("next/headers", () => ({
 }));
 
 import { generateMetadata } from "../src/app/[[...path]]/page";
-import { games } from "../../../configs/games";
+import { games } from "@repo/configs/games";
 
 beforeEach(() => {
   vi.stubEnv("APP_ENV", "test");

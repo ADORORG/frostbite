@@ -5,19 +5,13 @@ import { readRequestInput } from "@ador/http/request-input";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import type { ActiveSession } from "@ador/auth";
 import { parseEnvironment } from "@repo/config/env";
-import {
-  getOpenApiDocument,
-  resolveApiOperation,
-} from "../../../../../../../configs/api";
-import { logAuthUnavailable } from "../../../../server/http/internal-error-log";
-import { refusal } from "../../../../server/http/refusal";
-import { executeNextOperation } from "../../../../server/http/next-operation";
-import { resolvePageAccess } from "../../../../server/auth/page-access";
-import { getPageAccessDependencies } from "../../../../server/auth/runtime";
-import {
-  getRateLimitGate,
-  tooManyRequests,
-} from "../../../../server/rate-limit";
+import { getOpenApiDocument, resolveApiOperation } from "@repo/configs/api";
+import { logAuthUnavailable } from "@/server/http/internal-error-log";
+import { refusal } from "@/server/http/refusal";
+import { executeNextOperation } from "@/server/http/next-operation";
+import { resolvePageAccess } from "@/server/auth/page-access";
+import { getPageAccessDependencies } from "@/server/auth/runtime";
+import { getRateLimitGate, tooManyRequests } from "@/server/rate-limit";
 
 export const runtime = "nodejs";
 

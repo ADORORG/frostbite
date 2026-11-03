@@ -18,7 +18,7 @@ import {
 } from "@ador/auth";
 
 import { useE2ESession } from "../src/session.ts";
-import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
+import { testWallets } from "@ador/auth/test-fixtures";
 import { installFakeWallet, walletButton } from "./support/fake-wallet.ts";
 
 // Adding and removing an email address on an account that is already signed in, and linking a wallet to an account that signed in by

@@ -6,7 +6,7 @@ import {
   createPostgresContainerArguments,
   postgresUrl,
   waitForPostgres,
-} from "../../../packages/database/test/support/postgres-container.ts";
+} from "@ador/database/test-postgres";
 import {
   ensureRunning,
   findContainer,

@@ -1,9 +1,9 @@
 import { chainRefSchema } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
 
-import { betaChain } from "../../../configs/chains.ts";
-import { rewardsPlan } from "../../../configs/rewards-plan.ts";
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+import { betaChain } from "@repo/configs/chains";
+import { rewardsPlan } from "@repo/configs/rewards-plan";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
 
 describe("the rewards plan staff administration follows", () => {
   it("is the beta's chain, with the family the chain is configured with", () => {

@@ -1,4 +1,4 @@
-import { getReadiness } from "../../../server/readiness";
+import { getReadiness } from "@/server/readiness";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -8,14 +8,11 @@ import { createGameVerifiers } from "@ador/game-verification/node";
 import { verifyRun } from "@ador/game-verification/verify";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { frostbite } from "../../../configs/games/frostbite.ts";
-import { createIceFieldSession } from "../../../games/frostbite/src/ice-field/session.ts";
-import {
-  playSession,
-  winnableSeed,
-} from "../../../games/frostbite/test/support/snake-solver.ts";
-import { iceFieldMines } from "../../../games/frostbite/src/verifier/ice-field.ts";
-import { iceFieldSampleRun } from "../../../games/frostbite/src/verifier/sample-run.ts";
+import { frostbite } from "@repo/configs/games/frostbite";
+import { createIceFieldSession } from "@game/frostbite/ice-field-session";
+import { playSession, winnableSeed } from "@game/frostbite/test-snake-solver";
+import { iceFieldMines } from "@game/frostbite/verifier";
+import { iceFieldSampleRun } from "@game/frostbite/verifier-sample";
 
 // FROST·BITE's ice-field rules exactly as the platform holds them: the artifact its source builds, placed where the game is
 // served, loaded through its manifest's pinned digest and replayed by the in-process runner. No part of the platform names

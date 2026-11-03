@@ -1,4 +1,4 @@
-import { decisionCatalog } from "../../../configs/decision-gates.ts";
+import { decisionCatalog } from "@repo/configs/decision-gates";
 
 import { findDecisionPolicyViolations } from "./decision-policy.ts";
 import { repositoryRoot } from "./workspaces.ts";

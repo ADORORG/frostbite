@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { chainStatusConfig } from "../../../configs/chain-status";
-import { gameAdminConfig } from "../../../configs/game-admin";
-import { rewardsPolicy } from "../../../configs/rewards-policy";
-import { gameWalletConfig } from "../../../configs/wallet";
+import { chainStatusConfig } from "@repo/configs/chain-status";
+import { gameAdminConfig } from "@repo/configs/game-admin";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
+import { gameWalletConfig } from "@repo/configs/wallet";
 
 // The server serves an old reading of the chain status for no longer than `maxStaleMs`; a page must stop showing one at the same age, or
 // the two would say different things. There is one value, and every page that follows the status is given it.
