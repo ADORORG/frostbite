@@ -77,6 +77,7 @@ jobs:
             https://*) ;;
             *) echo "::error::COOLIFY_URL must start with https:// so the token is not sent in the clear."; exit 1 ;;
           esac
-          curl --fail-with-body --silent --show-error --max-time 60 \
+          # Coolify's deploy endpoint takes POST (a GET is refused with 405); uuid and force stay query parameters.
+          curl --fail-with-body --silent --show-error --max-time 60 --request POST \
             --header "Authorization: Bearer ${COOLIFY_TOKEN}" \
             "${COOLIFY_URL%/}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}&force=false"
