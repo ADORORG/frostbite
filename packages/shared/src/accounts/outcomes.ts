@@ -1,12 +1,12 @@
 import type { HttpErrorCode } from "../http/index.ts";
 
-// Everything that can go wrong when a person signs in, links a way in, or administers roles, and what is said about it. This is the one
+// Everything that can go wrong when a person signs in, links a way in, administers roles, or opens the first-administrator link, and what is said about it. This is the one
 // catalogue: the server builds each failure from it (the reason travels in the error envelope), and the page chooses its words from the
 // reason, never from the message. A sentence is written here once; a test fails if two reasons say the same thing or a reason has no
 // words, and `tooling/repository-policy` fails if a sentence like these is written anywhere else.
 //
 // `http` is the status class the server answers with, or null for what only ever happens in the browser (no connection, a prompt closed).
-// `serverWords` marks the few where the server knows more than the catalogue (how long to wait), so the page shows the server's sentence
+// `serverWords` marks the few where the server knows more than the catalogue (how long to wait, which sign-in methods are missing), so the page shows the server's sentence
 // when it sent one and this one otherwise.
 interface Outcome {
   readonly http: HttpErrorCode | null;
@@ -143,6 +143,11 @@ export const accountOutcomes = {
     message: "That is not a platform role.",
   },
   "no-such-account": { http: "not_found", message: "No such account." },
+  "last-administrator": {
+    http: "conflict",
+    message:
+      "This is the last working administrator. Make another administrator first.",
+  },
   // The single-use link that makes the first administrator.
   "setup-link-invalid": {
     http: "not_found",
@@ -154,11 +159,6 @@ export const accountOutcomes = {
     message:
       "This account needs another way to sign in first. Add it, then open the link again.",
     serverWords: true,
-  },
-  "last-administrator": {
-    http: "conflict",
-    message:
-      "This is the last working administrator. Make another administrator first.",
   },
 } as const satisfies Record<string, Outcome>;
 

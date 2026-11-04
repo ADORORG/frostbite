@@ -26,7 +26,7 @@ export async function listPasskeys(
 }
 
 // Anything the server did not name as something else is a change that could not be completed, which is all these steps can fail on.
-const unknown = "passkey-change-failed";
+const unconfirmed = "passkey-change-failed";
 
 // Reads the list again after a change the server accepted. If that fails the change may have happened, so whatever the cause, the person
 // is told the change could not be confirmed and to refresh, never that the server could not be reached.
@@ -38,7 +38,7 @@ async function changed(
     return { credentialIds: await listPasskeys(request), kind };
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
-    return failed(unknown);
+    return failed(unconfirmed);
   }
 }
 
@@ -59,7 +59,7 @@ export async function linkPasskey(dependencies: {
       { body: {} },
     );
   } catch (error) {
-    return failedFrom(error, unknown);
+    return failedFrom(error, unconfirmed);
   }
   let credential: object;
   try {
@@ -75,7 +75,7 @@ export async function linkPasskey(dependencies: {
       { body: { challengeId: begun.challengeId, credential } },
     );
   } catch (error) {
-    return failedFrom(error, unknown);
+    return failedFrom(error, unconfirmed);
   }
   return changed(request, "linked");
 }
@@ -89,7 +89,7 @@ export async function removePasskey(
       body: { credentialId },
     });
   } catch (error) {
-    return failedFrom(error, unknown);
+    return failedFrom(error, unconfirmed);
   }
   return changed(request, "removed");
 }
