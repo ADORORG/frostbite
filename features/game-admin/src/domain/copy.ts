@@ -1,4 +1,8 @@
 import { plainTransactionLabel } from "@ador/feature-chain-status/transaction";
+import {
+  chainUnreachableWords,
+  submitRefusalWords,
+} from "@ador/shared/chain-step-words";
 import type { ArcadeTone } from "@repo/ui/arcade";
 import type {
   GameAdminAction,
@@ -161,25 +165,20 @@ export const startRefusalCopy: Readonly<
   "wrong-network": "That address is not an address on this game's network.",
 };
 
+// Why the platform turned down what the wallet signed, for a step.
+export const submitRefusalCopy = submitRefusalWords("step");
+
+// Why the platform turned down a contract address staff entered by hand. A step that is not there is said as it is for a signature.
 export const recordRefusalCopy = {
   "address-taken":
     "That address already holds a template or a game's contract.",
   "already-created": "This game already has its contract.",
-  "chain-unavailable": "The network could not be reached. Try again.",
+  "chain-unavailable": chainUnreachableWords,
   "different-code":
     "A contract is there, but it is not made from this game's template.",
-  "not-found": "This step could not be found.",
+  "not-found": submitRefusalCopy["not-found"],
   "not-on-chain": "No contract is at that address.",
   "not-recordable": "This step's contract address cannot be entered.",
-} as const;
-
-export const submitRefusalCopy = {
-  "chain-unavailable": "The network could not be reached. Try sending again.",
-  expired: "It was not signed in time. Start the step again.",
-  "invalid-signature":
-    "What was signed is not what was shown. Nothing was sent.",
-  "not-awaiting-signature": "This step can no longer be signed.",
-  "not-found": "This step could not be found.",
 } as const;
 
 export const walletUnavailableCopy =

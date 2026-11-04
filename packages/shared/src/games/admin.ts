@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { feeSpeedSchema } from "../chain/fees.ts";
+import { submitRefusalReasons } from "../chain/step-words.ts";
 import {
   gameAdminStepSchema,
   gameAdminTransactionSchema,
@@ -103,13 +104,8 @@ export const startGameAdminStepResponseSchema = z.discriminatedUnion("status", [
 export const submitGameAdminStepInputSchema = z
   .object({ signed: gameAdminTransactionSchema, stepId: z.uuid() })
   .strict();
-export const gameAdminSubmitRefusals = [
-  "chain-unavailable",
-  "expired",
-  "invalid-signature",
-  "not-awaiting-signature",
-  "not-found",
-] as const;
+// Why a signed step is turned down: the reasons any signed transaction can be (`../chain/step-words.ts`, where their words are too).
+export const gameAdminSubmitRefusals = submitRefusalReasons;
 export const submitGameAdminStepResponseSchema = z.discriminatedUnion(
   "status",
   [
