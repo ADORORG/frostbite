@@ -1,3 +1,7 @@
+import {
+  chainUnreachableWords,
+  submitRefusalWords,
+} from "@ador/shared/chain-step-words";
 import type {
   GameClaim,
   GameClaimState,
@@ -88,7 +92,7 @@ export const claimUnavailableCopy: Readonly<
   "not-earned": "Earn this milestone first.",
   "not-supported": "Claiming is not available for this game yet.",
   "signed-out": "Sign in to claim.",
-  unavailable: "The network could not be reached. Try again.",
+  unavailable: chainUnreachableWords,
   "wrong-network": "Your wallet is on another network than this game's.",
 };
 
@@ -98,6 +102,9 @@ export const claimSignerCopy = {
   "wallet-cannot-sign":
     "The wallet you connected cannot sign claims here. Connect another from the wallet button in the header.",
 } as const;
+
+// Why the platform turned down what the wallet signed, for a claim.
+export const claimSubmitRefusalCopy = submitRefusalWords("claim");
 
 export const unreachableCopy =
   "The platform could not be reached. Nothing was changed.";

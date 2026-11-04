@@ -5,6 +5,7 @@ import {
   chainRefTextSchema,
 } from "../chain/chain-ref.ts";
 import { feeDetailSchema, feeSpeedSchema } from "../chain/fees.ts";
+import { submitRefusalReasons } from "../chain/step-words.ts";
 import { gameIdSchema } from "./manifest.ts";
 
 // A player's claim of a milestone on chain, as the page is told of it. Nothing here is chain-specific beyond the opaque
@@ -117,13 +118,8 @@ export const startGameClaimResponseSchema = z.discriminatedUnion("status", [
 export const submitGameClaimInputSchema = z
   .object({ claimId: z.uuid(), signed: gameClaimTransactionSchema })
   .strict();
-export const gameClaimRefusalReasons = [
-  "chain-unavailable",
-  "expired",
-  "invalid-signature",
-  "not-awaiting-signature",
-  "not-found",
-] as const;
+// Why a signed claim is turned down: the reasons any signed transaction can be (`../chain/step-words.ts`, where their words are too).
+export const gameClaimRefusalReasons = submitRefusalReasons;
 export const submitGameClaimResponseSchema = z.discriminatedUnion("status", [
   z.object({ claim: gameClaimSchema, status: z.literal("submitted") }).strict(),
   z

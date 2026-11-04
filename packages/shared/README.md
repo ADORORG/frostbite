@@ -10,6 +10,10 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
   `ChainConfig` (role, per-operation finality, release gate), addresses, assets, amounts, contract
   references, transaction intents and summaries, opaque unsigned and signed payloads, broadcast
   outcomes, observations, and the neutral transaction state machine. No family concept appears here.
+- `@ador/shared/chain-step-words` — the words for what can go wrong around a transaction a person signs, said once for a player's claim and a
+  staff step alike: the reasons a signed transaction is turned down (`submitRefusalReasons`, which the claim and admin schemas use), the
+  sentences for them (`submitRefusalWords("claim" | "step")`), and the two that do not depend on the name (`chainUnreachableWords`,
+  `signatureMismatchWords`).
 - `@ador/shared/collections` — collection draft and item schemas, the engineering limits, the asset
   purposes a draft may reference, and the HTTP contract (inputs, responses, routes) of the collection
   studio API, the studio page paths and the wizard link helper, and the submission and review
