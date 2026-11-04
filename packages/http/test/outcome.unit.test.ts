@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   failure,
+  forbiddenMessage,
   idempotencyKeyConflict,
   invalidCursor,
   unauthenticated,
@@ -50,5 +51,9 @@ describe("the shared idempotency conflict", () => {
       message: "The page cursor is not valid.",
       ok: false,
     });
+  });
+
+  it("has one sentence for a caller who lacks the capability", () => {
+    expect(forbiddenMessage).toBe("The actor lacks the required capability.");
   });
 });

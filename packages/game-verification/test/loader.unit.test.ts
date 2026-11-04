@@ -88,6 +88,31 @@ describe("loading the verifiers games publish, with nothing about any game in th
     expect(verifyRun(registry, sample).status).toBe("verified");
   });
 
+  it.each([
+    ["text that is not JSON", "'not json'"],
+    ["JSON that is not an outcome", "'{}'"],
+  ])(
+    "answers %s as a failure of the verifier, in the one wording, and keeps serving",
+    async (_name, answer) => {
+      // A real build, wrapped so that one input makes it answer wrongly while the sample the platform checks it with is answered rightly.
+      const built = await buildArtifact();
+      const code = `${built.code}\n{ const real = globalThis.__adorReplay; globalThis.__adorReplay = (record) => record.includes('"garble"') ? ${answer} : real(record); }`;
+      const { registry } = await load([game(code)], { "tally-game": code });
+      const sample = registry.find("tally-game")?.sample;
+      expect(
+        verifyRun(registry, {
+          ...sample,
+          claims: [],
+          inputs: [{ type: "garble" }],
+        }),
+      ).toMatchObject({
+        detail: "The verifier did not answer with an outcome.",
+        reason: "verifier-error",
+      });
+      expect(verifyRun(registry, sample).status).toBe("verified");
+    },
+  );
+
   it("ignores a game that publishes no verifier, without a problem", async () => {
     const { problems, registry } = await load([{ id: "plain-game" }], {});
     expect(problems).toEqual([]);

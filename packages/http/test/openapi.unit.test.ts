@@ -6,6 +6,7 @@ import {
   describeOpenApiOperation,
 } from "../src/openapi.ts";
 import type { HttpOperation } from "../src/operation.ts";
+import { forbiddenMessage } from "../src/outcome.ts";
 
 function operation(
   method: "DELETE" | "GET" | "PATCH" | "POST" | "PUT" = "POST",
@@ -47,6 +48,13 @@ describe("OpenAPI generation", () => {
       outputSchema: z.object({ accepted: z.boolean() }).strict(),
       path: "/api/v1/fixture",
     });
+
+  it("documents a refusal for a missing capability in the words the platform answers it with", () => {
+    const { operation: described } = describeOpenApiOperation(operation());
+    expect(described.responses["403"]).toMatchObject({
+      description: forbiddenMessage,
+    });
+  });
 
   it("describes a file operation's answer as bytes of each kind it may send", () => {
     const description = describeOpenApiOperation({

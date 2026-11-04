@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
+import { forbiddenMessage } from "@ador/http/outcome";
 import { readRequestInput } from "@ador/http/request-input";
 import { platformSessionCookieName } from "@ador/shared/auth";
 import type { ActiveSession } from "@ador/auth";
@@ -68,7 +69,7 @@ async function handle(request: Request, context: RouteContext) {
         );
       }
       return access.kind === "forbidden"
-        ? refusal("forbidden", "The actor lacks the required capability.", 403)
+        ? refusal("forbidden", forbiddenMessage, 403)
         : refusal("unauthorized", "Authentication is required.", 401);
     }
     actorSession = access.session;

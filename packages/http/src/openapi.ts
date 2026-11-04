@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 
 import type { HttpOperation } from "./operation.js";
+import { forbiddenMessage } from "./outcome.ts";
 import { platformSessionCookieName } from "@ador/shared/auth";
 
 type JsonSchema = z.core.JSONSchema.JSONSchema;
@@ -79,7 +80,7 @@ function methodKey(method: HttpMethod): OpenApiMethod {
 
 const errorDescriptions: Readonly<Record<ApplicationHttpErrorCode, string>> = {
   conflict: "The request conflicts with current state.",
-  forbidden: "The actor lacks the required capability.",
+  forbidden: forbiddenMessage,
   invalid_request: "The request is invalid.",
   not_found: "The requested resource does not exist.",
   unauthorized: "Authentication is required or invalid.",
