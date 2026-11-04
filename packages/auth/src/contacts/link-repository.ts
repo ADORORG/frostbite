@@ -16,7 +16,7 @@ interface Change {
   readonly userId: string;
 }
 
-// An address an account holds and when it was added (the time its mailbox was proved).
+// An address an account holds and when it was added.
 export interface LinkedContact {
   readonly addedAt: Date;
   readonly value: string;

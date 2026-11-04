@@ -41,6 +41,14 @@ describe("the account's addresses in the browser", () => {
     ]);
   });
 
+  it("refuses an address whose time is not a time, rather than drawing a date nobody gave", async () => {
+    const { request } = answering({
+      addresses: [{ addedAt: "yesterday", address: "a@b.co" }],
+      maximum: 5,
+    });
+    await expect(listEmailAddresses(request)).rejects.toThrow();
+  });
+
   it("refuses an answer in the old shape, with no dates, rather than showing a list it cannot vouch for", async () => {
     const { request } = answering({ addresses: ["a@b.co"], maximum: 5 });
     await expect(listEmailAddresses(request)).rejects.toThrow();

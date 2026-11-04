@@ -157,10 +157,7 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers(
-      { mail, maximumAddresses: 4, policy },
-      methods,
-    );
+    const emails = createEmailResolvers({ mail, policy }, methods, 4);
     const first = emails.codes();
     expect(emails.codes()).toBe(first);
     expect(factories.contactService).toHaveBeenCalledOnce();
@@ -187,7 +184,7 @@ describe("passkey runtime composition", () => {
 
   it("has no channel at all while the deployment has no mail, and builds no sender", async () => {
     const { createEmailResolvers } = await import("../src/email-runtime.ts");
-    createEmailResolvers(null, methods).codes();
+    createEmailResolvers(null, methods, 4).codes();
     expect(factories.mailSender).not.toHaveBeenCalled();
     expect(factories.emailChannel).not.toHaveBeenCalled();
     expect(factories.contactService).toHaveBeenCalledWith(
@@ -210,10 +207,7 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers(
-      { mail, maximumAddresses: 4, policy },
-      methods,
-    );
+    const emails = createEmailResolvers({ mail, policy }, methods, 4);
     const links = emails.links();
     expect(emails.links()).toBe(links);
     // One service of each, and one channel and one sender between them.
@@ -235,6 +229,17 @@ describe("passkey runtime composition", () => {
           sessionIdleLifetimeMs: 86_400_000,
         },
         repository: "link-repository",
+      }),
+    );
+  });
+
+  it("gives the link service the limit even where there is no mail, so the list route never reports a number nobody chose", async () => {
+    const { createEmailResolvers } = await import("../src/email-runtime.ts");
+    createEmailResolvers(null, methods, 7).links();
+    expect(factories.linkService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channels: [],
+        policy: expect.objectContaining({ maximumAddresses: 7 }),
       }),
     );
   });

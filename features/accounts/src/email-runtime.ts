@@ -20,8 +20,6 @@ import { database } from "./shared-database.ts";
 // What signing in by email needs of the platform's configuration: how mail is sent and the code policy. Supplied by the composition
 // root, never read here; `null` means the deployment has no mail, and the email routes answer that they are not available.
 export interface EmailSignInRules {
-  // The most email addresses one account may hold.
-  readonly maximumAddresses: number;
   readonly mail: MailSettings;
   readonly policy: ContactCodePolicy;
 }
@@ -29,9 +27,12 @@ export interface EmailSignInRules {
 // The email services, made when a request first needs them: the one-time-code service (signing in) and the link service (adding and
 // removing an address on a signed-in account), over one channel and one sender. With no mail there is no channel at all, so asking for a
 // code is refused as unsupported and nothing is stored.
+// `maximumAddresses` is the most email addresses one account may hold. It is the platform's rule whether or not mail is set up (an account
+// can hold addresses, and the list route reports the limit, on any deployment), so it does not come with the mail rules.
 export function createEmailResolvers(
   rules: EmailSignInRules | null,
   methods: AccountMethods,
+  maximumAddresses: number,
 ): {
   readonly codes: () => ContactCodeService;
   readonly links: () => ContactLinkService;
@@ -70,8 +71,7 @@ export function createEmailResolvers(
         codes,
         policy: {
           ...sessions,
-          // With no mail there is no channel and nothing to add, so the number is never read; any valid one will do.
-          maximumAddresses: rules?.maximumAddresses ?? 1,
+          maximumAddresses,
           recentAuthenticationWindowMs:
             environment.PASSKEY_RECENT_AUTH_WINDOW_MS,
         },

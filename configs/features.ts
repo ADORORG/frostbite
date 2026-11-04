@@ -43,11 +43,8 @@ export const featureRegistry = createFeatureRegistry([
     },
     mailSettings === null
       ? null
-      : {
-          mail: mailSettings,
-          maximumAddresses: emailAddressPolicy.maximumPerAccount,
-          policy: emailCodePolicy,
-        },
+      : { mail: mailSettings, policy: emailCodePolicy },
+    emailAddressPolicy.maximumPerAccount,
   ),
   creatorAdmissionFeature,
   launchesFeature,

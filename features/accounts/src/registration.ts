@@ -40,12 +40,14 @@ export function createAccountsFeature(
   setup: SetupRules,
   // How email sign-in works here, or null when the deployment has no mail (the routes then answer that email is not available).
   email: EmailSignInRules | null,
+  // The most email addresses one account may hold, whether or not mail is set up.
+  maximumEmailAddresses: number,
 ) {
   const wallet = validateWalletAuthConfig(input);
   // One passkey service for the whole feature, made when a request first needs it.
   const passkeys = createPasskeyServiceResolver(methods);
   // One channel and one sender for signing in by email and for adding an address to an account.
-  const emails = createEmailResolvers(email, methods);
+  const emails = createEmailResolvers(email, methods, maximumEmailAddresses);
   return defineFeature({
     manifest: {
       capabilities: [
