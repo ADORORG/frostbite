@@ -43,17 +43,7 @@ import {
   broadcastGate,
 } from "./switches.ts";
 
-export {
-  chainAvailable,
-  chainFailure,
-  builtIntents,
-  placement,
-  hideCreated,
-  inspected,
-  indexer,
-  lostSend,
-  broadcastGate,
-} from "./switches.ts";
+export * from "./switches.ts";
 
 export { signSimulated };
 export const environment = parseDatabaseEnvironment(process.env);
