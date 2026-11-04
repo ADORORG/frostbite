@@ -149,6 +149,7 @@ export const towerStackGame = defineGame({
   schemaVersion: 1,
   summary:
     "Drop the sliding block on the tower and build it as high as you can.",
+  tags: ["reflex", "arcade"],
   title: "Tower Stacker",
   verification: {
     replay: {

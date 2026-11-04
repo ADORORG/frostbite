@@ -65,6 +65,7 @@ export const frostbite = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A predictive minefield game on Bitcoin.",
+  tags: ["strategy", "arcade"],
   title: "FROST·BITE",
   verification: {
     replay: {

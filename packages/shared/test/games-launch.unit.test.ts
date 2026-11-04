@@ -24,6 +24,7 @@ const game = (id = "sample-game"): GameManifest => ({
   network: signet,
   schemaVersion: 1,
   summary: "A sample game.",
+  tags: ["arcade"],
   title: "Sample game",
   version: "1.0.0",
 });

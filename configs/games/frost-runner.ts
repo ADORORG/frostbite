@@ -182,6 +182,7 @@ export const frostRunnerGame = defineGame({
   schemaVersion: 1,
   summary:
     "An endless runner: jump spikes, slide under icicles, take the shards.",
+  tags: ["endless", "reflex", "arcade"],
   title: "Frost Runner",
   verification: {
     replay: {

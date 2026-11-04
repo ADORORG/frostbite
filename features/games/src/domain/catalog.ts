@@ -8,6 +8,7 @@ import {
   gameManifestHash,
   gamePlayAddress,
   type GameCapability,
+  type GameTag,
   type GameManifest,
   type GameMilestone,
 } from "@ador/shared/games";
@@ -72,6 +73,8 @@ export interface PublicGame {
   // The scene the game asked for on its card (by id), or null when it left the choice to the platform.
   readonly scene: string | null;
   readonly summary: string;
+  // What the game is like, from the platform's list (the games page filters by it).
+  readonly tags: readonly GameTag[];
   readonly title: string;
   readonly version: string;
 }
@@ -127,6 +130,7 @@ export function createGameCatalog(
     playUrl: gamePlayAddress(game.launch),
     scene: game.scene ?? null,
     summary: game.summary,
+    tags: game.tags,
     title: game.title,
     version: game.version,
   }));

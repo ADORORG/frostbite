@@ -8,6 +8,7 @@ import {
 } from "./launch.ts";
 import { requestFingerprint } from "../http/fingerprint.ts";
 import { gameRewardsSchema } from "./rewards.ts";
+import { gameTagsSchema } from "./tags.ts";
 
 // The limits on what a game declares about itself. They bound what a public page must render.
 export const gameManifestLimits = Object.freeze({
@@ -133,6 +134,7 @@ export const gameReplayVerifierSchema = z
 
 export * from "./launch.ts";
 export * from "./rewards.ts";
+export * from "./tags.ts";
 
 export const gameManifestSchemaVersion = 1;
 
@@ -166,6 +168,8 @@ export const gameManifestSchema = z
       .optional(),
     schemaVersion: z.literal(gameManifestSchemaVersion),
     summary: z.string().trim().min(1).max(gameManifestLimits.summary),
+    // What the game is like, from the platform's list; the games page filters by it.
+    tags: gameTagsSchema,
     title: z.string().trim().min(1).max(gameManifestLimits.title),
     // The contract the game's milestones are claimed from; left out, none can be claimed on chain.
     rewards: gameRewardsSchema.optional(),

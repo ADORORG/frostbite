@@ -34,8 +34,10 @@ export async function generateMetadata({
 
 export default async function FeaturePage({
   params,
+  searchParams,
 }: PageProps<"/[[...path]]">) {
   const { path = [] } = await params;
+  const query = await searchParams;
   const routePath = `/${path.join("/")}`;
   const match = await platformComposition.features.resolvePage(routePath);
   if (!match) notFound();
@@ -55,6 +57,7 @@ export default async function FeaturePage({
         getPageAccessDependencies,
       ),
       params: routeParams,
+      searchParams: query,
     });
   }
   const access = await resolvePageAccess(
@@ -84,5 +87,6 @@ export default async function FeaturePage({
       getPageAccessDependencies,
     ),
     params: routeParams,
+    searchParams: query,
   });
 }

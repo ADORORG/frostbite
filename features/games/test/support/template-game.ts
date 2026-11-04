@@ -45,6 +45,7 @@ export const templateGame = defineGame({
   network: signet,
   schemaVersion: 1,
   summary: "Shows what a registered game looks like.",
+  tags: ["arcade"],
   title: "Template game",
   version: "0.3.0",
 });
@@ -59,6 +60,7 @@ export const bareGame = defineGame({
   network: "eip155:1",
   schemaVersion: 1,
   summary: "Registered, not playable.",
+  tags: ["arcade"],
   title: "Bare game",
   version: "0.0.1",
 });
@@ -73,6 +75,7 @@ export const embeddedGame = defineGame({
   network: signet,
   schemaVersion: 1,
   summary: "Played on this page.",
+  tags: ["arcade"],
   title: "Embedded game",
   version: "1.0.0",
 });

@@ -26,6 +26,7 @@ export { ArcadeButton } from "./primitives/arcade-button.tsx";
 export type { ArcadeTone } from "./primitives/arcade-button.tsx";
 export { ArcadeActionButton } from "./primitives/arcade-action-button.tsx";
 export { ArcadeBadge } from "./primitives/arcade-badge.tsx";
+export { ArcadeToggleTabs } from "./components/arcade-toggle-tabs.tsx";
 export { ArcadeProgress } from "./primitives/arcade-progress.tsx";
 export { ArcadeEmptyState } from "./components/arcade-empty-state.tsx";
 export { ArcadeFilterTabs } from "./components/arcade-filter-tabs.tsx";

@@ -172,6 +172,7 @@ export const snowballDashGame = defineGame({
   schemaVersion: 1,
   summary:
     "Hop a snowball down an endless slope. Tap to hop, hold to go higher.",
+  tags: ["endless", "reflex", "arcade"],
   title: "Snowball Dash",
   verification: {
     replay: {

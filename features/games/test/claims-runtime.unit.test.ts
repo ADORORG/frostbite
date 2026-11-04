@@ -32,6 +32,7 @@ const base = {
   network: chain,
   schemaVersion: 1 as const,
   summary: "A game.",
+  tags: ["arcade" as const],
   title: "A game",
   version: "1",
 };

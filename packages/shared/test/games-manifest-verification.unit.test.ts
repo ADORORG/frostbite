@@ -24,6 +24,7 @@ const manifest = (over: object = {}) => ({
   network: "bip122:00000008819873e925422c1ff0f99f7c",
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Sample",
   version: "1",
   ...over,

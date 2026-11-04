@@ -40,6 +40,7 @@ export const myGame = defineGame({
   id: "my-game",
   title: "My game",
   summary: "One sentence for the list.",
+  tags: ["arcade"], // one to four kinds from the platform's list (`gameTags` in `@ador/shared/games`); the games page searches and filters by them
   description: "A longer text for the game's page.",
   version: "0.1.0", // the game's own release; a change to a milestone is a new version, never an edit
   network: "bip122:00000008819873e925422c1ff0f99f7c", // must be a chain the platform is configured for

@@ -42,6 +42,7 @@ export const game = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Arcade",
   version: "1",
 });
@@ -56,6 +57,7 @@ export const plainGame = defineGame({
   network: chain,
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Plain",
   version: "1",
 });

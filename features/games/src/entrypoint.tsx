@@ -26,6 +26,7 @@ import {
 } from "./application/runs-operations.ts";
 import { createSyncGameStateOperation } from "./application/sync-operation.ts";
 import { createGameCatalog } from "./domain/catalog.ts";
+import { parseGameQuery, searchParamsOf } from "./domain/game-query.ts";
 import type { GameClaimsConfig } from "./claims-config.ts";
 import { createGameClaimsResolver } from "./claims-runtime.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
@@ -89,12 +90,16 @@ export function createGamesEntrypoint(
         metadata: () =>
           catalog.list().length === 0 ? privatePage : gamesIndexMetadata,
         path: gamesPath,
-        render: ({ navigation }) => {
+        render: ({ navigation, searchParams = {} }) => {
           const list = catalog.list();
           return list.length === 0 ? (
             <NoGames navigation={navigation} />
           ) : (
-            <GamesIndex games={list} navigation={navigation} />
+            <GamesIndex
+              games={list}
+              initial={parseGameQuery(searchParamsOf(searchParams))}
+              navigation={navigation}
+            />
           );
         },
       },
