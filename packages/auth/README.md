@@ -49,7 +49,12 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
   mailbox, the code is spent, and nothing moves and nothing says whose it is (ADR-021 point 5). Removing needs a recent sign-in and
   never takes the last way in (the registry's `removalOutcome`), under the account's lock. Both replace every session of the account
   and write `email-linked` / `email-unlinked` to `auth_security_events` with a hash of the address. Routes (all need a session):
-  `GET /api/v1/email/addresses`, `POST /api/v1/email/link/request`, `/link/verify`, `/unlink`.
+  `GET /api/v1/email/addresses` (the account's addresses oldest first, each with when it was added, and how many it may hold),
+  `POST /api/v1/email/link/request`, `/link/verify`, `/unlink`. An account holds at most `maximumAddresses` of one kind (the policy's
+  number, `emailAddressPolicy` in `@repo/config`): `request` refuses before anything is mailed (`limit-reached`, counting the account's own
+  addresses only, and letting through one it already holds), and `completeLink` counts again in its transaction under the account's lock,
+  in the order address, account, session that every other change takes, so sessions adding different addresses together cannot pass the
+  limit or wait on each other.
 
 Callers compose these exports explicitly. Removing wallet authentication requires removing its
 registration and route adapter; no feature discovery or global registration is used.

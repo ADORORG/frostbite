@@ -64,6 +64,11 @@ export const accountOutcomes = {
     message:
       "This email address is already linked to a different account. Sign in to that account and remove it there first, or use another address.",
   },
+  "email-limit-reached": {
+    http: "conflict",
+    message:
+      "This account already has as many email addresses as it can hold. Remove one before adding another.",
+  },
   "email-missing": {
     http: "not_found",
     message: "That address is not on this account any more.",

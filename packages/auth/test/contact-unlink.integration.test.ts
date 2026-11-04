@@ -102,10 +102,9 @@ describe("removing an address", () => {
   it("lists an account's addresses, oldest first, and only its own", async () => {
     const account = await twoAddresses();
     await signedInAccount({ address: "other@example.com" });
-    expect(await links.list(account.userId, "email")).toEqual([
-      "keep@example.com",
-      "drop@example.com",
-    ]);
+    expect(
+      (await links.list(account.userId, "email")).map(({ value }) => value),
+    ).toEqual(["keep@example.com", "drop@example.com"]);
     expect(await links.list(account.userId, "phone")).toEqual([]);
   });
 

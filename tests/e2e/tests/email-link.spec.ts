@@ -40,9 +40,9 @@ async function signedInAccount(
 ) {
   const pool = createDatabasePool(parseDatabaseEnvironment(process.env));
   const token = `e2e-email-link-${randomUUID()}`;
+  const userId = createUuidV7();
   try {
     const database = createDatabaseClient(pool);
-    const userId = createUuidV7();
     const now = new Date();
     await database.insert(authUsers).values({
       email: `contact-${userId}@contact.invalid`,
@@ -68,6 +68,28 @@ async function signedInAccount(
     await pool.end();
   }
   await useE2ESession(context, baseURL ?? "", token);
+  return { userId };
+}
+
+// More addresses for an account, put straight into the database (each a minute after the one before): the way to fill an account up
+// without a code for every one.
+async function holdAddresses(userId: string, addresses: readonly string[]) {
+  const pool = createDatabasePool(parseDatabaseEnvironment(process.env));
+  try {
+    const database = createDatabaseClient(pool);
+    const first = Date.now() - 3_600_000;
+    for (const [at, address] of addresses.entries())
+      await database.insert(contactIdentities).values({
+        createdAt: new Date(first + at * 60_000),
+        id: createUuidV7(),
+        kind: "email",
+        userId,
+        value: address,
+        verifiedAt: new Date(first + at * 60_000),
+      });
+  } finally {
+    await pool.end();
+  }
 }
 
 async function codeSentTo(address: string): Promise<string> {
@@ -102,6 +124,10 @@ const addressesOf = async (page: Page) =>
     await (await page.request.get("/api/v1/email/addresses")).json(),
   );
 
+// Just the addresses, oldest first, as the list route gives them.
+const addressList = async (page: Page) =>
+  (await addressesOf(page)).addresses.map(({ address }) => address);
+
 test("a signed-in person adds an email address with a code, sees it listed after a reload, and removes it again", async ({
   baseURL,
   context,
@@ -120,20 +146,92 @@ test("a signed-in person adds an email address with a code, sees it listed after
   await expect(lampOf(page).filter({ hasText: "Address added" })).toBeVisible();
   await page.reload();
   await expect(page.getByText(second, { exact: true })).toBeVisible();
-  expect((await addressesOf(page)).addresses).toEqual([first, second]);
+  expect(await addressList(page)).toEqual([first, second]);
 
   await page.getByRole("button", { name: `Remove ${second}` }).click();
   await expect(
     lampOf(page).filter({ hasText: "Address removed" }),
   ).toBeVisible();
-  expect((await addressesOf(page)).addresses).toEqual([first]);
+  expect(await addressList(page)).toEqual([first]);
 
   // The only way in cannot be removed, in the page or by asking the server.
   await page.getByRole("button", { name: `Remove ${first}` }).click();
   await expect(
     lampOf(page).filter({ hasText: "only way to sign in" }),
   ).toBeVisible();
-  expect((await addressesOf(page)).addresses).toEqual([first]);
+  expect(await addressList(page)).toEqual([first]);
+});
+
+test("each address shows the day it was added, and an account at its limit is offered nothing to add until one is removed", async ({
+  baseURL,
+  context,
+  page,
+}) => {
+  const first = unique();
+  const { userId } = await signedInAccount(context, baseURL, first);
+  await page.goto("/account");
+  // The limit is the server's: read it, then fill the account to one below it directly in the database.
+  const { maximum } = await addressesOf(page);
+  const filler = Array.from({ length: maximum - 2 }, unique);
+  await holdAddresses(userId, filler);
+  await page.reload();
+  const dates = page.getByText(/^Added \d{1,2} [A-Z][a-z]{2} \d{4}$/u);
+  await expect(dates).toHaveCount(maximum - 1);
+  await expect(
+    page.getByText(`Up to ${String(maximum)} can be linked`),
+  ).toBeVisible();
+
+  // The last address that fits is added through the page, with a code, and is listed with the day it was added.
+  const last = unique();
+  await addAddress(page, last);
+  await expect(lampOf(page).filter({ hasText: "Address added" })).toBeVisible();
+  await expect(dates).toHaveCount(maximum);
+  const { addresses } = await addressesOf(page);
+  // Oldest first: the ones put in the database an hour back, then the account's own first address, then the one just added.
+  expect(addresses.map(({ address }) => address)).toEqual([
+    ...filler,
+    first,
+    last,
+  ]);
+  expect(addresses).toHaveLength(maximum);
+  expect(
+    addresses.every(({ addedAt }) => !Number.isNaN(Date.parse(addedAt))),
+  ).toBe(true);
+
+  // Full: nothing to add is offered, and the page says why in the catalogue's words.
+  await expect(page.getByLabel("Add an email address")).toHaveCount(0);
+  await expect(
+    page.getByText(accountOutcomes["email-limit-reached"].message),
+  ).toBeVisible();
+
+  // Asking the server directly gets the same answer, and no code is mailed for it.
+  const over = unique();
+  const answer = await page.evaluate(async (email) => {
+    const response = await fetch("/api/v1/email/link/request", {
+      body: JSON.stringify({ email }),
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+    return {
+      body: JSON.stringify(await response.json()),
+      status: response.status,
+    };
+  }, over);
+  expect(answer.status).toBe(409);
+  expect(answer.body).toContain(accountOutcomes["email-limit-reached"].message);
+  const directory = process.env.MAIL_CAPTURE_DIRECTORY;
+  if (directory === undefined) throw new Error("The run has no mailbox.");
+  expect(
+    (await readCapturedMail(directory)).filter(({ to }) => to === over),
+  ).toEqual([]);
+
+  // Removing one makes room: the form comes back and the count falls.
+  await page.getByRole("button", { name: `Remove ${last}` }).click();
+  await expect(
+    lampOf(page).filter({ hasText: "Address removed" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Add an email address")).toBeVisible();
+  await expect(dates).toHaveCount(maximum - 1);
 });
 
 test("an address another account holds cannot be added, and nothing says whose it is", async ({
@@ -152,7 +250,7 @@ test("an address another account holds cannot be added, and nothing says whose i
   await expect(
     lampOf(page).filter({ hasText: accountOutcomes["email-taken"].message }),
   ).toBeVisible();
-  expect((await addressesOf(page)).addresses).toEqual([mine]);
+  expect(await addressList(page)).toEqual([mine]);
   await other.close();
 });
 
@@ -189,5 +287,5 @@ test("a person who signed in by email links a wallet from the account page, and 
   expect(methods.wallets.map(({ address }) => address)).toEqual([
     wallet.address,
   ]);
-  expect((await addressesOf(page)).addresses).toHaveLength(1);
+  expect(await addressList(page)).toHaveLength(1);
 });

@@ -11,6 +11,7 @@ import {
   type RoleServices,
 } from "./roles/operations.ts";
 import { RolesPage } from "./roles/roles-page.tsx";
+import { emailAddressesView } from "./application/email-addresses-view.ts";
 import { createEmailLinkOperations } from "./application/email-link-operations.ts";
 import { createEmailSignInOperations } from "./application/email-sign-in-operations.ts";
 import { createPasskeySignInOperations } from "./application/passkey-sign-in-operations.ts";
@@ -49,9 +50,7 @@ async function account(
   // The email addresses are shown only where mail is set up; a failure to read them hides the panel rather than showing a list
   // that was not read.
   const emailAddresses = emailOffered
-    ? await getEmailLinks()
-        .list(actorUserId, emailMethodKind)
-        .catch(() => null)
+    ? await emailAddressesView(getEmailLinks(), actorUserId).catch(() => null)
     : null;
   try {
     return (

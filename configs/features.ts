@@ -17,6 +17,7 @@ import { authMethods } from "./auth-methods.ts";
 import { authorizationPolicy } from "./authorization.ts";
 import { balanceSource } from "./balance.ts";
 import { chainStatusConfig } from "./chain-status.ts";
+import { emailAddressPolicy } from "./email-addresses.ts";
 import { emailCodePolicy } from "./email-code.ts";
 import { targetChains } from "./chains.ts";
 import { gameAdminConfig } from "./game-admin.ts";
@@ -42,7 +43,11 @@ export const featureRegistry = createFeatureRegistry([
     },
     mailSettings === null
       ? null
-      : { mail: mailSettings, policy: emailCodePolicy },
+      : {
+          mail: mailSettings,
+          maximumAddresses: emailAddressPolicy.maximumPerAccount,
+          policy: emailCodePolicy,
+        },
   ),
   creatorAdmissionFeature,
   launchesFeature,

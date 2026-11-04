@@ -14,6 +14,16 @@ import {
 
 useContactWorld();
 
+// The addresses an account holds, as text, oldest first.
+async function addressesOf(
+  links: Awaited<ReturnType<typeof world>>["links"],
+  userId: string,
+) {
+  return (await links.addresses(userId, "email")).addresses.map(
+    ({ value }) => value,
+  );
+}
+
 describe("linking a second address to a signed-in account", () => {
   async function activeSession(userId: string) {
     const sessions = await database.select().from(authSessions);
@@ -48,7 +58,7 @@ describe("linking a second address to a signed-in account", () => {
       session,
     });
     expect(linked.ok && linked.sessionToken !== null).toBe(true);
-    expect(await links.list(account.userId, "email")).toEqual([
+    expect(await addressesOf(links, account.userId)).toEqual([
       "first@example.com",
       "second@example.com",
     ]);
@@ -112,7 +122,7 @@ describe("linking a second address to a signed-in account", () => {
         session,
       }),
     ).toEqual({ ok: false, reason: "taken" });
-    expect(await links.list(account.userId, "email")).toEqual([
+    expect(await addressesOf(links, account.userId)).toEqual([
       "first@example.com",
     ]);
   });

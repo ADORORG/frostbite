@@ -166,12 +166,12 @@ describe("accounts entrypoint", () => {
   });
 
   describe("the email panel on the account page", () => {
-    // Only `list` is used by the page; the rest of the link service is not.
+    // Only `addresses` is used by the page; the rest of the link service is not.
     const linkService = (
-      list: ContactLinkService["list"],
+      addresses: ContactLinkService["addresses"],
     ): ContactLinkService => ({
+      addresses,
       confirm: vi.fn(),
-      list,
       request: vi.fn(),
       unlink: vi.fn(),
     });
@@ -200,25 +200,35 @@ describe("accounts entrypoint", () => {
       );
     }
 
-    it("lists the account's addresses where mail is set up", async () => {
-      const list = vi.fn(async () => ["a@b.co"]);
+    const held = (addresses: string[]) => ({
+      addresses: addresses.map((value) => ({
+        addedAt: new Date("2026-10-20T08:30:00.000Z"),
+        value,
+      })),
+      maximum: 5,
+    });
+
+    it("lists the account's addresses, each with the day it was added, where mail is set up", async () => {
+      const addresses = vi.fn(async () => held(["a@b.co"]));
       const markup = await accountPage({
-        links: () => linkService(list),
+        links: () => linkService(addresses),
         offered: ["wallet", "email"],
       });
       expect(markup).toContain("Email addresses");
       expect(markup).toContain("a@b.co");
-      expect(list).toHaveBeenCalledWith(expect.any(String), "email");
+      expect(markup).toContain("Added 20 Oct 2026");
+      expect(markup).toContain("Up to 5 can be linked");
+      expect(addresses).toHaveBeenCalledWith(expect.any(String), "email");
     });
 
     it("shows no panel, and reads nothing, where there is no mail", async () => {
-      const list = vi.fn(async () => ["a@b.co"]);
+      const addresses = vi.fn(async () => held(["a@b.co"]));
       const markup = await accountPage({
-        links: () => linkService(list),
+        links: () => linkService(addresses),
         offered: ["wallet"],
       });
       expect(markup).not.toContain("Email addresses");
-      expect(list).not.toHaveBeenCalled();
+      expect(addresses).not.toHaveBeenCalled();
     });
 
     it("shows no panel rather than a list it did not read", async () => {

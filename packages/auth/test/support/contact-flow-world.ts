@@ -64,7 +64,11 @@ export async function world(sender?: MailSender) {
     channels,
     clock: () => clock.now,
     codes: service,
-    policy: { ...sessions, recentAuthenticationWindowMs: 600_000 },
+    policy: {
+      ...sessions,
+      maximumAddresses: 3,
+      recentAuthenticationWindowMs: 600_000,
+    },
     repository: createDrizzleContactLinkRepository(
       database,
       createMethodRegistry([walletMethod, passkeyMethod, emailMethod]).list,

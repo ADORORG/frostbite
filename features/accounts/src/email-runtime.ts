@@ -20,6 +20,8 @@ import { database } from "./shared-database.ts";
 // What signing in by email needs of the platform's configuration: how mail is sent and the code policy. Supplied by the composition
 // root, never read here; `null` means the deployment has no mail, and the email routes answer that they are not available.
 export interface EmailSignInRules {
+  // The most email addresses one account may hold.
+  readonly maximumAddresses: number;
   readonly mail: MailSettings;
   readonly policy: ContactCodePolicy;
 }
@@ -68,6 +70,8 @@ export function createEmailResolvers(
         codes,
         policy: {
           ...sessions,
+          // With no mail there is no channel and nothing to add, so the number is never read; any valid one will do.
+          maximumAddresses: rules?.maximumAddresses ?? 1,
           recentAuthenticationWindowMs:
             environment.PASSKEY_RECENT_AUTH_WINDOW_MS,
         },

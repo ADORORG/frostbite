@@ -157,7 +157,10 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers({ mail, policy }, methods);
+    const emails = createEmailResolvers(
+      { mail, maximumAddresses: 4, policy },
+      methods,
+    );
     const first = emails.codes();
     expect(emails.codes()).toBe(first);
     expect(factories.contactService).toHaveBeenCalledOnce();
@@ -192,7 +195,7 @@ describe("passkey runtime composition", () => {
     );
   });
 
-  it("builds the link service with the same channel and code service, the registry's listing for the removal rule, and the recent-sign-in window", async () => {
+  it("builds the link service with the same channel and code service, the registry's listing for the removal rule, the recent-sign-in window and the address limit", async () => {
     const { createEmailResolvers } = await import("../src/email-runtime.ts");
     const policy = {
       codeLength: 6,
@@ -207,7 +210,10 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers({ mail, policy }, methods);
+    const emails = createEmailResolvers(
+      { mail, maximumAddresses: 4, policy },
+      methods,
+    );
     const links = emails.links();
     expect(emails.links()).toBe(links);
     // One service of each, and one channel and one sender between them.
@@ -222,6 +228,8 @@ describe("passkey runtime composition", () => {
         channels: ["email-channel"],
         codes: expect.objectContaining({ contactService: true }),
         policy: {
+          // The deployment's limit reaches the service that counts against it.
+          maximumAddresses: 4,
           recentAuthenticationWindowMs: 600_000,
           sessionAbsoluteLifetimeMs: 604_800_000,
           sessionIdleLifetimeMs: 86_400_000,

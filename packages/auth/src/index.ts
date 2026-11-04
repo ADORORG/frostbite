@@ -134,6 +134,7 @@ export { createDrizzleContactLinkRepository } from "./contacts/drizzle-link-repo
 export type {
   CompleteLinkResult,
   ContactLinkRepository,
+  LinkedContact,
   UnlinkContactResult,
 } from "./contacts/link-repository.ts";
 export type {
@@ -166,6 +167,7 @@ export {
   emailCodeVerifySchema,
   emailEmptyInputSchema,
   emailLinkedResponseSchema,
+  type EmailAddressesView,
   type EmailCodeRequest,
   type EmailCodeVerify,
 } from "./contacts/email-http.ts";
