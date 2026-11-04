@@ -27,7 +27,7 @@ are answered with a code and are not logged, so diagnosis relies on the database
 - **Passkey linking** (`/account`): the ceremony lasts at most `PASSKEY_CHALLENGE_TIMEOUT_MS` (default 5 min). Passkey sign-in spends
   its challenge on the first attempt, right or wrong.
 - **First administrator.** `pnpm platform:setup-link` prints a single-use link (`/setup#<token>`, valid for an hour) while no working
-  administrator exists; after that, administrators use the role screen (`/admin/roles`).
+  administrator exists; after that, administrators use the role screen (`/admin/roles`). On a deployment, run it in the web container (`docs/operations/deployment.md`, "First administrator").
 - **Local and test stacks.** `pnpm stack` runs the real sign-in (wallet, passkey, email with the codes captured by `pnpm mailbox`) and
   also a front door at `/dev/sign-in` that signs in as a seeded person. That page belongs to the stack's own front door, never to the
   application, so it cannot exist in a deployed build.

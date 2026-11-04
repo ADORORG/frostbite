@@ -90,7 +90,7 @@ Written from the Coolify docs; not run on Coolify yet.
   `INNGEST_DEV` must be set to `false`; the R2 API token must be _Object Read & Write_ on both buckets (a token scoped to other buckets
   gives `403` on the readiness probe, shown only as "the object-storage provider request failed"); comments inside the compose YAML blocks
   can be rejected by Coolify's parser; a 4 GB server needs swap to survive a build, which the prebuilt image avoids.
-- The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).
+- The first administrator's setup link is made by a command run in the web container; see "First administrator" below.
 
 ### Prebuilt image
 
@@ -130,6 +130,27 @@ tag (`ghcr.io/adororg/frostbite:dev` or `:main`). Coolify's own GitHub webhook i
 `publish-image.yml` (build and publish the image once, then deploy). A pull request also builds the image, as a check. A failing commit is neither published nor deployed, and the previous version keeps
 running. Starting "Publish image" by hand skips that check. Deploy a `sha-` tag, not `dev`, when you want a version you can roll back to.
 
+## First administrator
+
+A new deployment has no administrator. The first is made with a single-use link that an operator command prints to the terminal of whoever
+runs it (ADR-021 decision 8; the rules are in `tooling/platform-admin/README.md`). Nothing is emailed and nothing is stored that could be
+turned back into the link: the database keeps only its hash.
+
+1. **Open a shell in the running web container**: in Coolify, the application's Terminal; on the server, `docker exec -it <web container> sh`.
+   The container already holds the deployment's settings (database, `PUBLIC_BASE_URL`), so nothing is copied anywhere. Any platform that
+   gives a shell in the container works the same way (Railway was not tried).
+2. **Run `pnpm platform:setup-link`** from `/app`. It prints `<PUBLIC_BASE_URL>/setup#<token>` and when it stops working.
+3. **Open that link in a browser within the hour** and sign in with the wallet that will administer the platform (it must hold a wallet). The
+   link is spent and that account is the administrator. From then on administrators are managed on `/admin/roles`.
+
+Good to know: a link works once; making another stops the earlier one; while a working administrator exists no link is made (the command says
+so and exits 1; the way back in then is the role screen). The token is in the printed line only, so do not paste it into chat or a ticket.
+
+Without a shell in the container, run it from a checkout of the repository (`pnpm install` first): `pnpm platform:setup-link --env <file>`,
+where the file holds the deployment's settings. The command validates the same settings as the web app, so the file needs all of that
+app's keys (start from `.env.production.example`), and `DATABASE_URL` must be reachable from that machine (a database on the platform's
+private network is not, which is why the container is the usual way). `DATABASE_SSL_MODE` must match what the server offers.
+
 ## Checklist before the first real deployment
 
 See `preview-environment-checklist.md` for the accounts and settings outside this repository (Postgres, R2, Inngest, domain,
@@ -149,6 +170,13 @@ Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO c
 
 Added after: the migration moved to the start of the web container, under a lock. Verified against throwaway Postgres: four migrations
 started at once finish with each recorded once, and the same test fails without the lock. Not run: the image itself with the new command.
+
+First administrator, checked 2026-11-04 against a throwaway Postgres 18 on a Docker network: in the image built on 2026-11-03 (with this
+change's `package.json` mounted over the one in the image), `pnpm platform:setup-link` with a production-shaped environment printed a link
+with the right origin, a second run printed a new one, and the same command from a checkout against the same database did too. Before the
+change the command failed in the image with `tsx: not found`, because `tsx` is a dev dependency and the image installs production ones only;
+the script now starts with Node's type stripping, as the worker does. Not run: the case where an administrator already exists, in a
+container (the service's own tests cover it), and the image rebuilt with the change.
 
 Not verified: a real Railway or Coolify deployment (the Railway config files and CI image job were written from the platform docs and
 have never run), `APP_ENV=preview` or `production` (these need https and real services), the Inngest endpoint, running more than one web
