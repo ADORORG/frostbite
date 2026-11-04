@@ -15,11 +15,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
 });
 
+const launcherOf = (game: FrameLocator) =>
+  game.getByRole("button", { name: "Sat snake", exact: true });
+const cabinetOf = (game: FrameLocator) =>
+  game.getByRole("dialog", { name: "Sat snake cabinet" });
+
 async function openCabinet(game: FrameLocator) {
-  await game.getByRole("button", { name: "Sat snake", exact: true }).click();
-  await expect(
-    game.getByRole("dialog", { name: "Sat snake cabinet" }),
-  ).toBeVisible();
+  await launcherOf(game).click();
+  await expect(cabinetOf(game)).toBeVisible();
 }
 
 async function beginRun(game: FrameLocator) {
@@ -46,20 +49,29 @@ async function waitForMoves(game: FrameLocator, moves: number) {
 // Stops the page's clock, so the snake moves only when the test lets time pass. Done after the cabinet is open and before the run
 // starts, so nothing is moving yet. A snake that moves on real time cannot be steered one move at a time on a busy machine: a pause
 // of a second between two key presses is a few moves too many, and the row the test counts on being clear is left behind.
+// Pausing needs a time still to come; the page's own timers due before it simply fire.
+const freezeLeadMs = 1_000;
 async function freezeClock(page: Page) {
   const now = await page.evaluate(() => Date.now());
-  await page.clock.pauseAt(now + 1_000);
+  await page.clock.pauseAt(now + freezeLeadMs);
 }
 
-// Lets time pass in steps far shorter than a move, until the snake has made exactly `moves` moves. A step cannot jump over a move,
-// so the count is never passed.
+const moveCount = async (game: FrameLocator) =>
+  Number(await movesOf(game).textContent());
+
+// Lets time pass in steps far shorter than a move (a move lasts `tickMs`, in the cabinet's timing.ts), until the snake has made exactly `moves` moves.
+// A step cannot jump over a move; if one ever could, or the snake died on the way, the count is not `moves` and this fails. The step
+// limit is many times what any move needs, so only a snake that is not moving reaches it.
 const clockStepMs = 20;
+const maxClockSteps = 100;
 async function runUntilMoves(page: Page, game: FrameLocator, moves: number) {
-  for (let step = 0; step < 100; step += 1) {
-    if (Number(await movesOf(game).textContent()) >= moves) return;
+  for (
+    let step = 0;
+    step < maxClockSteps && (await moveCount(game)) < moves;
+    step += 1
+  )
     await page.clock.runFor(clockStepMs);
-  }
-  expect(Number(await movesOf(game).textContent())).toBe(moves);
+  expect(await moveCount(game)).toBe(moves);
 }
 
 test("signed out, it is played on its own seed and the record is not sent anywhere", async ({
@@ -132,10 +144,9 @@ test("looks like part of the game when opened", async ({ page }) => {
   await page.goto("/games/frostbite");
   await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
-  const launcher = game.getByRole("button", { name: "Sat snake", exact: true });
-  await launcher.click();
-  const panel = game.getByRole("dialog", { name: "Sat snake cabinet" });
-  await expect(panel).toBeVisible();
+  const launcher = launcherOf(game);
+  const panel = cabinetOf(game);
+  await openCabinet(game);
   await expect(panel).toHaveScreenshot("sat-snake-intro.png", {
     animations: "disabled",
   });
