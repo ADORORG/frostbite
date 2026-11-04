@@ -14,6 +14,12 @@ The import-boundary policy also keeps chain-family code and vendor SDKs (`@ador/
 `providers/chain/`, `packages/wallet/`, and conformance tests; `packages/auth/` is a recorded exception
 until sign-in moves to the neutral address codec (ADR-017). Everything else uses the neutral ports.
 
+## Every policy is wired
+
+`src/check.ts` only prints; the list of static policies `pnpm repository:check` runs is `collectViolations` in `src/collect-violations.ts`. Its test
+builds a clean fixture repository and breaks one policy at a time, so a policy that is dropped from the list (and so no longer enforced) fails a test.
+A new policy goes in that list and gets a breakage in `test/collect-violations.unit.test.ts`.
+
 ## Sentences are written once
 
 `src/sentence-policy.ts` fails `repository:check` when a user-facing sentence (a capitalised double-quoted literal of five words or more that
