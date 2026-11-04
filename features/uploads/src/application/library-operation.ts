@@ -1,4 +1,5 @@
 import type { HttpOperation } from "@ador/http";
+import { unauthenticated } from "@ador/http/outcome";
 import {
   libraryEmptyInputSchema,
   libraryOlderInputSchema,
@@ -12,12 +13,6 @@ import {
 import type { createAssetLibraryService } from "@ador/uploads";
 
 type Service = Pick<ReturnType<typeof createAssetLibraryService>, "list">;
-
-const unauthenticated = {
-  error: "unauthorized",
-  message: "Authentication is required.",
-  ok: false,
-} as const;
 
 // The caller's own assets with their processing outcome and short-lived signed rendition URLs
 // (ADR-016). The actor comes from the session, never from the request.

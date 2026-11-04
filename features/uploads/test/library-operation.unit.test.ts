@@ -1,3 +1,4 @@
+import { unauthenticated } from "@ador/http/outcome";
 import { uuidV7Schema } from "@ador/shared/identifiers";
 import {
   libraryResponseSchema,
@@ -24,7 +25,7 @@ describe("list uploaded assets operation", () => {
     const operation = createListUploadedAssetsOperation(getService);
     await expect(
       operation.execute({}, { ...context, actorUserId: null }),
-    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    ).resolves.toEqual(unauthenticated);
     expect(getService).not.toHaveBeenCalled();
   });
 
@@ -62,7 +63,7 @@ describe("list older uploaded assets operation", () => {
     const operation = createListOlderUploadedAssetsOperation(getService);
     await expect(
       operation.execute({ before: cursor }, { ...context, actorUserId: null }),
-    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    ).resolves.toEqual(unauthenticated);
     expect(getService).not.toHaveBeenCalled();
   });
 

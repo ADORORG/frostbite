@@ -120,7 +120,7 @@ export function createUploadRunner(dependencies: UploadRunnerDependencies) {
         });
       if (error instanceof ApiError)
         return emit({
-          cause: { code: error.code, kind: "api" },
+          cause: { code: error.code, kind: "api", reason: error.reason },
           retryable: isRetryableApiError(error),
           type: "failed",
         });

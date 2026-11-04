@@ -25,6 +25,10 @@ Runtime-neutral contracts and pure domain behavior shared by browser and server 
 - `@ador/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
   `requestFingerprint`, a key-order-independent digest used to detect an idempotency key reused with
   different content.
+  `defineOutcomes` (`@ador/shared/http` internals, used by every area's catalogue of what can go wrong: the reason a server sent is one
+  of the area's own, and the words for it) backs `@ador/shared/account-outcomes` and the uploads catalogue.
+- `@ador/shared/uploads` — the upload contracts and policies, the catalogue of what can go wrong when an image is sent (`uploadOutcomes`, in
+  the shape of the accounts one), and `describeUploadFormats`, which says the accepted formats from the one list of accepted types.
 - `@ador/shared/platform` — public platform-status input and output contracts.
 - `@ador/shared/providers` — provider identities and capability-bearing manifests.
 
