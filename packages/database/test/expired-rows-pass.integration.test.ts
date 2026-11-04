@@ -106,11 +106,16 @@ describe("a pass", () => {
     [{ ...limits, batchSize: 1.5 }],
     [{ ...limits, contactCodeRetentionMs: 0 }],
     [{ ...limits, deliveredOutboxRetentionMs: -1 }],
-  ])("refuses limits that cannot work, and removes nothing", async (bad) => {
-    await database
-      .insert(walletChallenges)
-      .values(wallet(10 * minute, 5 * minute));
-    await expect(removeExpiredRows(database, now, bad)).rejects.toThrow();
-    expect(await left(walletChallenges)).toBe(1);
-  });
+    // A limit it does not know (a misspelt name, a policy's version) is refused, not ignored.
+    [{ ...limits, version: 1 }],
+  ])(
+    "refuses limits that cannot work or that it does not know, and removes nothing",
+    async (bad) => {
+      await database
+        .insert(walletChallenges)
+        .values(wallet(10 * minute, 5 * minute));
+      await expect(removeExpiredRows(database, now, bad)).rejects.toThrow();
+      expect(await left(walletChallenges)).toBe(1);
+    },
+  );
 });

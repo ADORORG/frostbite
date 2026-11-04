@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import {
   contactCodes,
   parseDatabaseEnvironment,
@@ -7,6 +5,10 @@ import {
   walletChallenges,
   type ExpiredRowCounts,
 } from "@ador/database";
+import {
+  contactCodeRow,
+  walletChallengeRow,
+} from "@ador/database/test-expired-rows";
 import { createProviderRegistry } from "@ador/plugin-kit/providers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -25,35 +27,10 @@ afterAll(async () => {
 
 const minute = 60_000;
 const hour = 60 * minute;
-const ago = (ms: number) => new Date(Date.now() - ms);
-const challenge = (issuedAgo: number, expiresAgo: number) => ({
-  action: "sign-in" as const,
-  address: "tb1qexample",
-  attempts: 0,
-  domain: "example.test",
-  expiresAt: ago(expiresAgo),
-  id: randomUUID(),
-  issuedAt: ago(issuedAgo),
-  messageHash: "b".repeat(64),
-  network: "signet",
-  nonce: randomUUID(),
-  origin: "https://example.test",
-  requestId: randomUUID(),
-  schemaVersion: 1,
-  scriptIdentity: "script",
-  signatureScheme: "bip322-simple",
-  uri: "https://example.test",
-  walletAdapter: "unisat",
-});
-const code = (issuedAgo: number, expiresAgo: number) => ({
-  codeHash: "c".repeat(64),
-  destination: `${randomUUID().slice(0, 8)}@example.test`,
-  expiresAt: ago(expiresAgo),
-  id: randomUUID(),
-  issuedAt: ago(issuedAgo),
-  kind: "email",
-  salt: "salt",
-});
+const challenge = (issuedAgo: number, expiresAgo: number) =>
+  walletChallengeRow(new Date(), issuedAgo, expiresAgo);
+const code = (issuedAgo: number, expiresAgo: number) =>
+  contactCodeRow(new Date(), issuedAgo, expiresAgo);
 
 describe("removing finished rows through the real worker and database", () => {
   it("removes expired rows in batches until none are left, keeps the rest, and reports what went", async () => {

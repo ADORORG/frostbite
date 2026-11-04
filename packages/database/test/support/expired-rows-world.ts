@@ -16,6 +16,7 @@ import {
   walletChallenges,
   type ExpiredRowLimits,
 } from "../../src/index.ts";
+import { contactCodeRow, walletChallengeRow } from "./expired-row-fixtures.ts";
 
 // The database, the clock and the rows the expired-row tests share. Each row lives from `issued` to `expires`, both given as how long
 // before the test's `now`.
@@ -70,35 +71,10 @@ export async function aSession(userId: string) {
   });
   return id;
 }
-// Each row lives from `issued` to `expires`, both as how long before now.
-export const wallet = (issuedAgo: number, expiresAgo: number) => ({
-  action: "sign-in" as const,
-  address: "tb1qexample",
-  attempts: 0,
-  domain: "example.test",
-  expiresAt: ago(expiresAgo),
-  id: randomUUID(),
-  issuedAt: ago(issuedAgo),
-  messageHash: "b".repeat(64),
-  network: "signet",
-  nonce: randomUUID(),
-  origin: "https://example.test",
-  requestId: randomUUID(),
-  schemaVersion: 1,
-  scriptIdentity: "script",
-  signatureScheme: "bip322-simple",
-  uri: "https://example.test",
-  walletAdapter: "unisat",
-});
-export const code = (issuedAgo: number, expiresAgo: number) => ({
-  codeHash: "c".repeat(64),
-  destination: `${randomUUID().slice(0, 8)}@example.test`,
-  expiresAt: ago(expiresAgo),
-  id: randomUUID(),
-  issuedAt: ago(issuedAgo),
-  kind: "email",
-  salt: "salt",
-});
+export const wallet = (issuedAgo: number, expiresAgo: number) =>
+  walletChallengeRow(now, issuedAgo, expiresAgo);
+export const code = (issuedAgo: number, expiresAgo: number) =>
+  contactCodeRow(now, issuedAgo, expiresAgo);
 export const outbox = (
   status: "delivered" | "failed" | "pending",
   deliveredAgo: number | null,

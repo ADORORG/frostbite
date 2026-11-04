@@ -2,6 +2,7 @@ import { createProviderRegistry } from "@ador/plugin-kit/providers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createWorkerRuntime } from "../src/runtime.ts";
+import { rowSweepLimits } from "./support/row-sweep-limits.ts";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",
@@ -10,12 +11,6 @@ const environment = {
   DATABASE_SSL_MODE: "disable",
   DATABASE_STATEMENT_TIMEOUT_MS: "1000",
   DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-};
-
-const rowSweepLimits = {
-  batchSize: 10,
-  contactCodeRetentionMs: 3_600_000,
-  deliveredOutboxRetentionMs: 604_800_000,
 };
 
 describe("worker runtime", () => {

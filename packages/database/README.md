@@ -51,7 +51,7 @@ adapters as domain tables are accepted; it never exports database rows as HTTP c
   expired wallet, passkey and passkey sign-in challenges, contact codes that expired and are older than a look-back the caller gives (the send limits count
   expired codes), and delivered outbox rows older than a retention. At most a batch from each table per call, oldest first, by key from a
   bounded selection, so two calls at once never double-remove; the limits are validated and refuse what they do not know. The expiry
-  indexes of the three tables serve it; delivered outbox rows are found through the `status` prefix of `outbox_delivery_candidates`.
+  indexes of the four tables that expire (the three challenge tables and the contact codes) serve it; delivered outbox rows are found through the `status` prefix of `outbox_delivery_candidates`.
 - An upload intent ends `completed` (it has an asset) or, if never completed and past its cleanup
   time, `abandoned` (W3-07). `object_removed_at` records that its private object was removed and may be
   set only on an abandoned intent (`upload_intents_removal_requires_abandoned`). The partial index

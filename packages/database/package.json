@@ -26,6 +26,7 @@
     "./schema/rate-limit": "./src/schema/rate-limit.ts",
     "./schema/uploads": "./src/schema/uploads.ts",
     "./schema/wallet-release": "./src/schema/wallet-release.ts",
+    "./test-expired-rows": "./test/support/expired-row-fixtures.ts",
     "./test-postgres": "./test/support/postgres-container.ts"
   },
   "scripts": {

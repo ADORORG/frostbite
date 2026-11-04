@@ -1,7 +1,7 @@
 # `worker`
 
-The standalone background service: it runs the outbox relay and the abandoned-upload cleanup, and
-hosts the signed workflow endpoint.
+The standalone background service: it runs the outbox relay, the abandoned-upload cleanup and the
+finished-row sweeps, and hosts the signed workflow endpoint.
 It is a second deployable beside the web app and shares the platform's typed environment inventory
 (ADR-012, ADR-015 proposed).
 
@@ -50,7 +50,8 @@ Start with `pnpm --filter worker start` (reads `apps/worker/.env.local` when pre
 ## Operations
 
 Tuning (batch size, lease, retry bounds, polling delays, retries, media concurrency) is typed policy in
-`@ador/jobs/policy`, not environment. The signed endpoint needs the Inngest keys and base URL; the relay
+`@ador/jobs/policy`, not environment; how long finished rows are kept and how many a sweep removes is
+`expiredRowPolicy` in `configs/expired-rows.ts`. The signed endpoint needs the Inngest keys and base URL; the relay
 needs the same provider settings plus PostgreSQL. A missing or invalid provider setting fails on first
 use, is logged, and does not stop the process. Each media run buffers up to the upload size cap plus
 decoded pixels, and `maxConcurrentMediaRuns` bounds how many run at once; a hard memory limit belongs to
@@ -60,7 +61,7 @@ the container.
 
 `test:unit` covers configuration, routing, the endpoint resolver, relay wiring, and the runtime.
 `test:integration` runs against real PostgreSQL and the real Inngest server: an upload completion to a
-processed asset, abandoned-upload cleanup (including a storage outage and a later run), recovery after a provider outage, a lost delivery acknowledgement, a rejected upload,
+processed asset, abandoned-upload cleanup (including a storage outage and a later run), the finished-row sweeps in batches, recovery after a provider outage, a lost delivery acknowledgement, a rejected upload,
 persistent storage failure, the HTTP surface, and the real process. Platform engineering owns this
 service.
 

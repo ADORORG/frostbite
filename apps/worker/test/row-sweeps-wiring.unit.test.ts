@@ -10,6 +10,7 @@ const drain = vi.hoisted(() => ({
 vi.mock("@ador/jobs/drain-loop", () => ({ runDrainLoop: drain.run }));
 
 import { createWorkerRuntime } from "../src/runtime.ts";
+import { rowSweepLimits } from "./support/row-sweep-limits.ts";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",
@@ -25,11 +26,7 @@ describe("how the worker runs the row sweeps", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
-      rowSweepLimits: {
-        batchSize: 10,
-        contactCodeRetentionMs: 3_600_000,
-        deliveredOutboxRetentionMs: 604_800_000,
-      },
+      rowSweepLimits,
     });
     try {
       const errors: Error[] = [];
