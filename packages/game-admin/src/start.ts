@@ -51,8 +51,7 @@ export async function startStep(
     return {
       code: "could-not-build",
       ok: false,
-      reason:
-        error instanceof Error ? error.message : "The step could not be built.",
+      ...(error instanceof Error ? { reason: error.message } : {}),
     };
   }
   // What the platform cannot keep is refused here, in words, rather than failing as it is stored.
