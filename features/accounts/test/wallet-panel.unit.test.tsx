@@ -23,6 +23,7 @@ import {
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { WalletPanel } from "../src/ui/wallet-panel.tsx";
 import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { emailView } from "./support/email-view.ts";
 
 const panel = (otherWays = 0) =>
   show(<WalletPanel expectedNetwork="signet" otherWays={otherWays} />);
@@ -180,7 +181,7 @@ describe("the wallets card on the account page", () => {
       show(
         <AccountSurface
           actorUserId={createUuidV7()}
-          emailAddresses={emails}
+          emailAddresses={emails === null ? null : emailView(emails)}
           expectedNetwork="signet"
           passkeyCredentialIds={passkeys}
         />,

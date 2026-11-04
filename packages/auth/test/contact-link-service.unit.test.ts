@@ -1,79 +1,18 @@
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
-import type { ActiveSession } from "../src/application/session-repository.ts";
-import type { ContactChannel } from "../src/contacts/channel.ts";
-import type { ContactLinkRepository } from "../src/contacts/link-repository.ts";
 import { createContactLinkService } from "../src/contacts/link-service.ts";
-
-const now = new Date("2026-10-25T12:00:00.000Z");
-const window = 600_000;
-const policy = {
-  recentAuthenticationWindowMs: window,
-  sessionAbsoluteLifetimeMs: 3_600_000,
-  sessionIdleLifetimeMs: 600_000,
-};
-const correlationId = createUuidV7();
-const userId: UuidV7 = createUuidV7();
-const sessionAt = (authenticatedAt: Date): ActiveSession => ({
-  absoluteExpiresAt: new Date(now.getTime() + 3_600_000),
-  authenticatedAt,
-  idleExpiresAt: new Date(now.getTime() + 600_000),
-  sessionId: createUuidV7(),
+import {
+  correlationId,
+  future,
+  harness,
+  heldOne,
+  now,
+  policy,
+  recent,
+  stale,
   userId,
-});
-const recent = sessionAt(new Date(now.getTime() - window));
-const stale = sessionAt(new Date(now.getTime() - window - 1));
-const future = sessionAt(new Date(now.getTime() + 1));
-
-const channel: ContactChannel = {
-  accountName: "Email user",
-  deliver: async () => undefined,
-  kind: "email",
-  normalize: (raw) => (raw.includes("@") ? raw.trim().toLowerCase() : null),
-  policy: {
-    codeLength: 6,
-    lifetimeMs: 1,
-    maximumAttempts: 5,
-    maximumSendsPerWindow: 5,
-    resendCooldownMs: 1,
-    sendWindowMs: 2,
-  },
-};
-
-function harness(
-  options: {
-    readonly confirm?: "ok" | "invalid";
-    readonly link?: Awaited<
-      ReturnType<ContactLinkRepository["completeLink"]>
-    >["kind"];
-    readonly unlink?: Awaited<
-      ReturnType<ContactLinkRepository["unlink"]>
-    >["kind"];
-  } = {},
-) {
-  const repository: ContactLinkRepository = {
-    completeLink: vi.fn(async () => ({ kind: options.link ?? "linked" })),
-    list: vi.fn(async () => ["a@b.co"]),
-    unlink: vi.fn(async () => ({ kind: options.unlink ?? "unlinked" })),
-  };
-  const codes = {
-    confirm: vi.fn(async () =>
-      options.confirm === "invalid"
-        ? ({ ok: false, reason: "invalid" } as const)
-        : ({ codeId: "code-1", destination: "a@b.co", ok: true } as const),
-    ),
-    request: vi.fn(async () => ({ ok: true }) as const),
-  };
-  const service = createContactLinkService({
-    channels: [channel],
-    clock: () => now,
-    codes,
-    policy,
-    repository,
-  });
-  return { codes, repository, service };
-}
+  window,
+} from "./support/contact-link-service-world.ts";
 
 describe("asking for a link code", () => {
   it("asks the code service for a code for this account", async () => {
@@ -128,6 +67,8 @@ describe("confirming a link", () => {
       correlationId,
       destination: "a@b.co",
       kind: "email",
+      // The repository counts against the policy's number, in its own transaction.
+      maximumAddresses: policy.maximumAddresses,
       minimumAuthenticatedAt: new Date(now.getTime() - window),
       now,
       sessionId: recent.sessionId,
@@ -152,6 +93,7 @@ describe("confirming a link", () => {
 
   it.each([
     ["taken", "taken"],
+    ["limit-reached", "limit-reached"],
     ["code-spent", "invalid"],
     ["session-not-recent", "recent-authentication-required"],
   ] as const)("answers a %s link with %s", async (link, reason) => {
@@ -232,13 +174,19 @@ describe("removing an address", () => {
 });
 
 describe("the service", () => {
-  it("lists an account's addresses of one kind", async () => {
+  it("gives an account's addresses of one kind, each with when it was added, and how many it may hold", async () => {
     const { repository, service } = harness();
-    expect(await service.list("u", "email")).toEqual(["a@b.co"]);
+    expect(await service.addresses("u", "email")).toEqual({
+      addresses: [heldOne],
+      maximum: policy.maximumAddresses,
+    });
     expect(repository.list).toHaveBeenCalledWith("u", "email");
   });
 
   it.each([
+    [{ ...policy, maximumAddresses: 0 }],
+    [{ ...policy, maximumAddresses: -1 }],
+    [{ ...policy, maximumAddresses: 2.5 }],
     [{ ...policy, recentAuthenticationWindowMs: 0 }],
     [{ ...policy, sessionIdleLifetimeMs: 0 }],
     [

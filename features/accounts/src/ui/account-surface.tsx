@@ -1,3 +1,4 @@
+import type { EmailAddressesView } from "@ador/auth";
 import type { UuidV7 } from "@ador/shared/identifiers";
 import type { WalletNetwork } from "@ador/wallet/contracts";
 import type { NavigationItem } from "@ador/plugin-kit/navigation";
@@ -18,8 +19,8 @@ export function AccountSurface({
   passkeysUnavailable = false,
 }: {
   readonly actorUserId: UuidV7;
-  // The account's email addresses, or null when this deployment has no mail and the card is not shown.
-  readonly emailAddresses?: readonly string[] | null;
+  // The account's email addresses and how many it may hold, or null when this deployment has no mail and the card is not shown.
+  readonly emailAddresses?: EmailAddressesView | null;
   // The network wallets are asked for; a wallet on another one is flagged.
   readonly expectedNetwork: WalletNetwork;
   readonly navigation?: readonly NavigationItem[];
@@ -37,15 +38,15 @@ export function AccountSurface({
     >
       <WalletPanel
         expectedNetwork={expectedNetwork}
-        otherWays={passkeyCredentialIds.length + (emailAddresses?.length ?? 0)}
+        otherWays={
+          passkeyCredentialIds.length + (emailAddresses?.addresses.length ?? 0)
+        }
       />
       <PasskeyPanel
         initialCredentialIds={passkeyCredentialIds}
         initialUnavailable={passkeysUnavailable}
       />
-      {emailAddresses === null ? null : (
-        <EmailPanel initialAddresses={emailAddresses} />
-      )}
+      {emailAddresses === null ? null : <EmailPanel initial={emailAddresses} />}
       <ConsoleCard
         glyph="#"
         lead="The id support asks for. It is not a secret, and it never changes."

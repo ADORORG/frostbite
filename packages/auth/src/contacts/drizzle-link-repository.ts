@@ -8,7 +8,7 @@ import {
   contactIdentities,
 } from "@ador/database/schema/contact-sign-in";
 import { createUuidV7 } from "@ador/shared/identifiers";
-import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, asc, count, eq, gt, isNull, sql } from "drizzle-orm";
 
 import { lockActiveSession } from "../adapters/lock-active-session.ts";
 import { sha256 } from "../domain/crypto.ts";
@@ -64,7 +64,10 @@ export function createDrizzleContactLinkRepository(
   return {
     async list(userId, kind) {
       const rows = await database
-        .select({ value: contactIdentities.value })
+        .select({
+          addedAt: contactIdentities.createdAt,
+          value: contactIdentities.value,
+        })
         .from(contactIdentities)
         .where(
           and(
@@ -76,14 +79,16 @@ export function createDrizzleContactLinkRepository(
           asc(contactIdentities.createdAt),
           asc(contactIdentities.value),
         );
-      return rows.map(({ value }) => value);
+      return rows;
     },
 
     completeLink: (input) =>
       database.transaction(async (transaction) => {
-        // Adding an address cannot leave the account worse off, so it takes no account lock: the session row lock below serializes it
-        // with any other change from the same session, and the address lock with any sign-in or link of the same address.
+        // The address lock serializes this with any sign-in or link of the same address; the account lock, with any other change to the
+        // account's addresses, so the count below is the count the insert lands on. The order (address, account, session) is the order
+        // every other change takes them in, so none of them can wait on another in a circle.
         await lock(transaction, `contact:${input.kind}:${input.destination}`);
+        await lock(transaction, input.userId);
         if (!(await lockActiveSession(transaction, input)))
           return { kind: "session-not-recent" };
         // Spent by one statement, and only if it was sent to this account (a code with an account is a link code: the table checks it): of
@@ -115,6 +120,17 @@ export function createDrizzleContactLinkRepository(
           return {
             kind: holder.userId === input.userId ? "already-linked" : "taken",
           };
+        const [held] = await transaction
+          .select({ total: count() })
+          .from(contactIdentities)
+          .where(
+            and(
+              eq(contactIdentities.userId, input.userId),
+              eq(contactIdentities.kind, input.kind),
+            ),
+          );
+        if ((held?.total ?? 0) >= input.maximumAddresses)
+          return { kind: "limit-reached" };
         await transaction.insert(contactIdentities).values({
           createdAt: input.now,
           id: createUuidV7(),

@@ -18,6 +18,7 @@ const accountsFeature = createAccountsFeature(
     requiredMethods: { admin: ["wallet"] },
   },
   null,
+  5,
 );
 const allRoutes = [
   ...Object.values(passkeyRoutes),

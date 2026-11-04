@@ -16,6 +16,8 @@ import {
 
 import { createUuidV7 } from "@ador/shared/identifiers";
 
+import { emailView } from "./support/email-view.ts";
+
 const flow = vi.hoisted(() => ({
   confirmLinkCode: vi.fn(),
   listEmailAddresses: vi.fn(),
@@ -48,7 +50,7 @@ beforeEach(() => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  flow.listEmailAddresses.mockResolvedValue(["a@b.co", "new@b.co"]);
+  flow.listEmailAddresses.mockResolvedValue(emailView(["a@b.co", "new@b.co"]));
 });
 afterEach(() => {
   act(() => root.unmount());
@@ -56,7 +58,7 @@ afterEach(() => {
 });
 
 const mount = (addresses: readonly string[]) =>
-  act(() => root.render(<EmailPanel initialAddresses={addresses} />));
+  act(() => root.render(<EmailPanel initial={emailView(addresses)} />));
 const input = () => container.querySelector("input");
 // A button is found by its words, or by its accessible name where its words repeat down a list ("Remove" beside each address).
 const button = (name: string) =>
@@ -100,7 +102,7 @@ describe("the account page", () => {
     const withMail = renderToStaticMarkup(
       <AccountSurface
         actorUserId={createUuidV7()}
-        emailAddresses={["a@b.co"]}
+        emailAddresses={emailView(["a@b.co"])}
         expectedNetwork="signet"
       />,
     );
@@ -135,7 +137,7 @@ describe("the addresses", () => {
 
   it("removes one, shows the list the server now has, and says other sessions were signed out only after the server did it", async () => {
     flow.removeEmailAddress.mockResolvedValue({ kind: "removed" });
-    flow.listEmailAddresses.mockResolvedValue(["a@b.co"]);
+    flow.listEmailAddresses.mockResolvedValue(emailView(["a@b.co"]));
     await mount(["a@b.co", "c@d.co"]);
     await click("Remove c@d.co");
     expect(flow.removeEmailAddress).toHaveBeenCalledWith(

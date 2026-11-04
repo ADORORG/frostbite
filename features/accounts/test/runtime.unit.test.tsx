@@ -157,7 +157,7 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers({ mail, policy }, methods);
+    const emails = createEmailResolvers({ mail, policy }, methods, 4);
     const first = emails.codes();
     expect(emails.codes()).toBe(first);
     expect(factories.contactService).toHaveBeenCalledOnce();
@@ -184,7 +184,7 @@ describe("passkey runtime composition", () => {
 
   it("has no channel at all while the deployment has no mail, and builds no sender", async () => {
     const { createEmailResolvers } = await import("../src/email-runtime.ts");
-    createEmailResolvers(null, methods).codes();
+    createEmailResolvers(null, methods, 4).codes();
     expect(factories.mailSender).not.toHaveBeenCalled();
     expect(factories.emailChannel).not.toHaveBeenCalled();
     expect(factories.contactService).toHaveBeenCalledWith(
@@ -192,7 +192,7 @@ describe("passkey runtime composition", () => {
     );
   });
 
-  it("builds the link service with the same channel and code service, the registry's listing for the removal rule, and the recent-sign-in window", async () => {
+  it("builds the link service with the same channel and code service, the registry's listing for the removal rule, the recent-sign-in window and the address limit", async () => {
     const { createEmailResolvers } = await import("../src/email-runtime.ts");
     const policy = {
       codeLength: 6,
@@ -207,7 +207,7 @@ describe("passkey runtime composition", () => {
       from: "login@launch.invalid",
       transport: "capture",
     } as const;
-    const emails = createEmailResolvers({ mail, policy }, methods);
+    const emails = createEmailResolvers({ mail, policy }, methods, 4);
     const links = emails.links();
     expect(emails.links()).toBe(links);
     // One service of each, and one channel and one sender between them.
@@ -222,11 +222,24 @@ describe("passkey runtime composition", () => {
         channels: ["email-channel"],
         codes: expect.objectContaining({ contactService: true }),
         policy: {
+          // The deployment's limit reaches the service that counts against it.
+          maximumAddresses: 4,
           recentAuthenticationWindowMs: 600_000,
           sessionAbsoluteLifetimeMs: 604_800_000,
           sessionIdleLifetimeMs: 86_400_000,
         },
         repository: "link-repository",
+      }),
+    );
+  });
+
+  it("gives the link service the limit even where there is no mail, so the list route never reports a number nobody chose", async () => {
+    const { createEmailResolvers } = await import("../src/email-runtime.ts");
+    createEmailResolvers(null, methods, 7).links();
+    expect(factories.linkService).toHaveBeenCalledWith(
+      expect.objectContaining({
+        channels: [],
+        policy: expect.objectContaining({ maximumAddresses: 7 }),
       }),
     );
   });

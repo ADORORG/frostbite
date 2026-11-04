@@ -1,5 +1,6 @@
 import {
   emailAddressesResponseSchema,
+  type EmailAddressesView,
   emailCodeRequestResponseSchema,
   emailCodeRoutes,
   emailLinkedResponseSchema,
@@ -15,10 +16,8 @@ export type RemoveOutcome = { readonly kind: "removed" } | Failed;
 
 export async function listEmailAddresses(
   request: Requester,
-): Promise<readonly string[]> {
-  return (
-    await request(emailCodeRoutes.addresses, emailAddressesResponseSchema)
-  ).addresses;
+): Promise<EmailAddressesView> {
+  return request(emailCodeRoutes.addresses, emailAddressesResponseSchema);
 }
 
 export async function requestLinkCode(

@@ -22,6 +22,8 @@ export const links = createDrizzleContactLinkRepository(
   createMethodRegistry([walletMethod, passkeyMethod, emailMethod]).list,
 );
 export const window = 600_000;
+// The most addresses of one kind an account may hold in these tests.
+export const maximumAddresses = 3;
 
 // A link code for the account, issued through the real repository so the limits and replacement apply.
 export async function linkCode(
@@ -47,6 +49,7 @@ export function change(
     correlationId: createUuidV7(),
     destination,
     kind: "email",
+    maximumAddresses,
     minimumAuthenticatedAt: new Date(now.getTime() - window),
     now,
     replacementSession: sessionMaterial(),
