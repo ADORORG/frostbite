@@ -1,3 +1,4 @@
+import { feeSpeedQuestion } from "../src/domain/fee-copy.ts";
 import { click, mount, textOf } from "@ador/test-kit/dom";
 import type { FeeSpeed } from "@ador/shared/chain";
 import { describe, expect, it } from "vitest";
@@ -36,6 +37,9 @@ describe("the fee speed chip", () => {
     expect(trigger(container)?.textContent).toBe("FeeFast");
     await click(trigger(container));
     expect(textOf(container)).toContain("could not be asked what a fee costs");
+    expect(
+      container.querySelector(`[aria-label="${feeSpeedQuestion}"]`),
+    ).not.toBeNull();
   });
 
   it("chooses a speed from the opened picker and closes it", async () => {

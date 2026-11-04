@@ -1,10 +1,7 @@
 {
   "A connected wallet account is required.": 4,
-  "How fast should it confirm?": 2,
   "The actor lacks the required capability.": 2,
   "The contract or the sender is not valid for this chain.": 2,
   "The node has no fee estimate for the target.": 2,
-  "The page cursor is not valid.": 2,
-  "The submission was not found.": 2,
   "The verifier did not answer with an outcome.": 2
 }

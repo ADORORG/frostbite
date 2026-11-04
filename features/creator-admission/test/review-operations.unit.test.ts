@@ -1,3 +1,4 @@
+import { invalidCursor } from "@ador/http/outcome";
 import {
   creatorReviewQueueResponseSchema,
   creatorReviewReadResponseSchema,
@@ -161,7 +162,7 @@ describe("creator review queue operation", () => {
         { cursor: "not-a-cursor", group: "all", sort: "oldest" },
         context,
       ),
-    ).resolves.toMatchObject({ error: "invalid_request", ok: false });
+    ).resolves.toEqual(invalidCursor);
     expect(service.reviewQueue).not.toHaveBeenCalled();
   });
 });

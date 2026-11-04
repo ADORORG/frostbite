@@ -230,10 +230,16 @@ describe("reviewing submissions over the real database", () => {
       key: key(),
     });
     expect([missing.status, errorOf(missing.body)]).toEqual([404, "not_found"]);
+    expect(JSON.stringify(missing.body)).toContain(
+      "The submission was not found.",
+    );
     const unread = await call(reviewRoutes.read, {
       actor,
       body: { submissionId: unknown },
     });
     expect([unread.status, errorOf(unread.body)]).toEqual([404, "not_found"]);
+    expect(JSON.stringify(unread.body)).toContain(
+      "The submission was not found.",
+    );
   });
 });

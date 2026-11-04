@@ -3,7 +3,12 @@
 import { type FeeSpeed } from "@ador/shared/chain";
 import { Popover } from "@repo/ui/arcade";
 
-import { rateText, speedNames, waitText } from "../domain/fee-copy.ts";
+import {
+  feeSpeedQuestion,
+  rateText,
+  speedNames,
+  waitText,
+} from "../domain/fee-copy.ts";
 import { FeeSpeedPicker } from "./fee-speed-picker.tsx";
 import type { FeeMarket } from "./use-fee-quotes.ts";
 
@@ -29,7 +34,7 @@ export function FeeSpeedChip({
   return (
     <Popover
       align="start"
-      label="How fast should it confirm?"
+      label={feeSpeedQuestion}
       panelClassName="popover__panel--wide"
       trigger={
         <>
