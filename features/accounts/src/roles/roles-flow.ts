@@ -37,6 +37,21 @@ export async function findPeople(
   ).people;
 }
 
+// What looking a person up did: the accounts that match, or why not, from the catalogue of outcomes.
+export type SearchOutcome =
+  { readonly kind: "found"; readonly people: readonly Person[] } | Failed;
+
+export async function searchPeople(
+  request: Requester,
+  query: string,
+): Promise<SearchOutcome> {
+  try {
+    return { kind: "found", people: await findPeople(request, query) };
+  } catch (error) {
+    return failedFrom(error);
+  }
+}
+
 export async function grantRole(
   request: Requester,
   userId: string,

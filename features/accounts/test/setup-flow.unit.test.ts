@@ -1,3 +1,4 @@
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 import { ApiError } from "@ador/client-http";
 import { describe, expect, it, vi } from "vitest";
 
@@ -70,7 +71,10 @@ describe("opening the saved link", () => {
     const store = storeHolding("tok");
     expect(
       await redeemSavedToken({ redeem: failsWith("not_found"), store }),
-    ).toEqual({ kind: "invalid" });
+    ).toEqual({
+      kind: "invalid",
+      message: outcomeMessage("setup-link-invalid"),
+    });
     expect(store.held).toBeNull();
   });
 

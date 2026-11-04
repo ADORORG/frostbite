@@ -1,3 +1,4 @@
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 import type { RedeemResult } from "@ador/authorization";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
@@ -57,8 +58,9 @@ describe("redeeming a setup link over HTTP", () => {
     const { operation } = operationAnswering({ kind: "invalid-link" });
     expect(await operation.execute({ token }, context)).toEqual({
       error: "not_found",
-      message: "This setup link is not valid, or it has expired.",
+      message: outcomeMessage("setup-link-invalid"),
       ok: false,
+      reason: "setup-link-invalid",
     });
   });
 
@@ -72,6 +74,7 @@ describe("redeeming a setup link over HTTP", () => {
       message:
         "Add a wallet and passkey sign-in method to this account first, then open the link again.",
       ok: false,
+      reason: "setup-method-needed",
     });
   });
 
