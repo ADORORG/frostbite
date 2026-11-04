@@ -118,6 +118,7 @@ export const shardMatchGame = defineGame({
   schemaVersion: 1,
   summary:
     "Swap neighbouring shards to line up three or more, and chain the falls for more.",
+  tags: ["puzzle"],
   title: "Shard Match",
   verification: {
     replay: {

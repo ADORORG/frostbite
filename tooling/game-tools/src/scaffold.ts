@@ -131,7 +131,7 @@ export async function scaffoldGame(options: {
     manifestFile,
     rename(
       templateManifest.slice(0, templateManifest.indexOf("// ")) +
-        `// ${title}, started from the template. Replace the description, summary and milestones; a milestone's id\n// must be one the game's code asks the platform to unlock.\n${manifestBody}`,
+        `// ${title}, started from the template. Replace the description, summary, tags and milestones; a milestone's id\n// must be one the game's code asks the platform to unlock.\n${manifestBody}`,
     ),
   );
   await writeFile(

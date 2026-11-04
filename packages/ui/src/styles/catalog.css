@@ -196,3 +196,34 @@
 }
 @media (max-width: 52rem) {
 }
+/* The search box and filters above a wall of covers. */
+.arcade-search {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-end: 1.5rem;
+}
+.arcade-search .arcade-field {
+  max-width: 32rem;
+}
+.arcade-search .arcade-filter-tabs {
+  margin: 0;
+}
+.arcade-search > .arcade-button {
+  justify-self: start;
+}
+/* On a narrow screen each group of filters is one row that scrolls sideways, so the results stay near the top instead of under four rows of chips. */
+@media (max-width: 40rem) {
+  .arcade-search > * {
+    min-width: 0;
+  }
+  .arcade-search .arcade-filter-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-block-end: 0.25rem;
+    scrollbar-width: thin;
+  }
+  .arcade-search .arcade-filter-tabs__option {
+    flex: none;
+    white-space: nowrap;
+  }
+}

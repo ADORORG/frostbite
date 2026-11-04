@@ -48,6 +48,7 @@ describe("the game catalog", () => {
       playUrl: "https://play.example.test/template",
       scene: null,
       summary: "Shows what a registered game looks like.",
+      tags: ["arcade"],
       title: "Template game",
       version: "0.3.0",
     });

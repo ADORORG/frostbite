@@ -32,6 +32,7 @@ export const starterGame = defineGame({
   network: betaTarget.chainId,
   schemaVersion: 1,
   summary: "A tiny tapping game that shows how a game talks to the platform.",
+  tags: ["arcade"],
   title: "Starter Game",
   version: "0.1.0",
 });

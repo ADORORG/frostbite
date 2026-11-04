@@ -39,6 +39,10 @@ export interface PageRenderContext {
   readonly homeSections?: readonly HomeSection[];
   readonly navigation: readonly NavigationItem[];
   readonly params: Readonly<Record<string, string>>;
+  // The address's query string as the framework read it, for a page whose content depends on it (a search); left out by a caller with none.
+  readonly searchParams?: Readonly<
+    Record<string, string | readonly string[] | undefined>
+  >;
 }
 
 export interface ResolvedFeaturePage {

@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type Ref } from "react";
 
 interface ArcadeTextFieldProps {
   // What the browser may fill in or offer (`email`, `one-time-code`); see the HTML autocomplete values.
@@ -10,12 +10,14 @@ interface ArcadeTextFieldProps {
   readonly error?: string | null;
   // The on-screen keyboard to offer. A number field asks for the numeric one unless this says otherwise.
   readonly inputMode?: "email" | "numeric" | "text";
+  // The control itself, for a page that moves the focus to it (a search box answering a shortcut key).
+  readonly inputRef?: Ref<HTMLInputElement>;
   readonly label: string;
   readonly maxLength?: number;
   readonly multiline?: boolean;
   readonly onChange: (value: string) => void;
   readonly required?: boolean;
-  readonly type?: "email" | "number" | "text";
+  readonly type?: "email" | "number" | "search" | "text";
   readonly value: string;
 }
 
@@ -28,6 +30,7 @@ export function ArcadeTextField({
   error = null,
   hint,
   inputMode,
+  inputRef,
   label,
   maxLength,
   multiline = false,
@@ -61,6 +64,7 @@ export function ArcadeTextField({
           {...common}
           inputMode={inputMode ?? (type === "number" ? "numeric" : undefined)}
           onChange={(event) => onChange(event.target.value)}
+          ref={inputRef}
           type={type}
         />
       )}

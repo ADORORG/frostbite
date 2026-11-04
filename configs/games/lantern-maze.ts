@@ -111,6 +111,7 @@ export const lanternMazeGame = defineGame({
   schemaVersion: 1,
   summary:
     "Find the key and the door in a dark cellar, lit only by a lantern whose oil every step burns.",
+  tags: ["puzzle", "strategy"],
   title: "Lantern Maze",
   verification: {
     replay: {

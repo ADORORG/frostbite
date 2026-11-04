@@ -111,6 +111,7 @@ export const auroraPulseGame = defineGame({
   schemaVersion: 1,
   summary:
     "Tap four lanes of falling notes in time, and keep the light of the aurora burning.",
+  tags: ["rhythm", "arcade"],
   title: "Aurora Pulse",
   verification: {
     replay: {

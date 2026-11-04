@@ -46,6 +46,21 @@ describe("arcade text field", () => {
     expect(onChange).toHaveBeenCalledWith("First light");
   });
 
+  it("can be a search field, and hands its control to a page that moves the focus", async () => {
+    const control_: { current: HTMLInputElement | null } = { current: null };
+    const container = await mount(
+      <ArcadeTextField
+        inputRef={control_}
+        label="Search"
+        onChange={() => undefined}
+        type="search"
+        value=""
+      />,
+    );
+    expect(control(container).getAttribute("type")).toBe("search");
+    expect(control_.current).toBe(control(container));
+  });
+
   it("renders a multi-line field as a textarea", async () => {
     const onChange = vi.fn();
     const container = await mount(

@@ -33,6 +33,20 @@ platform learns the item's id from the network when the claim's transaction is s
 says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the piece shows no picture, and
 never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
 
+## Searching the games page
+
+`/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it
+answers on every keystroke with no request: `domain/search-games.ts` is a pure function from the games and a query to the matching games,
+best first. Every word typed must be found, as the start of a word, in a game's title, tags, summary, description or milestone titles (case
+and accents ignored; "frostbite" finds FROST·BITE); a title or tag hit ranks above a summary hit, and a title that is the whole query first of
+all. Titles and tags forgive a slipped letter in a word of four letters or more (`domain/typo.ts`); text a game wrote does not. Kinds are
+the closed list `gameTags` (`@ador/shared/games`, `tags` in the manifest, one to four per game): chosen kinds match any of them, "Playable
+now" narrows to games a player can open. A narrowed wall drops the featured first card and the place numbers.
+
+The query lives in the address (`?q=snow&tag=puzzle&playable=1`, `domain/game-query.ts` reads and writes it, trusting none of it): the
+server renders the first paint from it (the page receives `searchParams`), so a shared link opens already narrowed; later changes replace
+the history entry instead of adding one. `/` jumps to the box, Escape empties it and then leaves it.
+
 ## Onboarding a game (the template)
 
 1. Run `pnpm game:new <id>` (it copies the starter in `tooling/game-tools/template`) and write the game (see `docs/product/game-onboarding.md`, the full guide).

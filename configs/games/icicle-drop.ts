@@ -180,6 +180,7 @@ export const icicleDropGame = defineGame({
   schemaVersion: 1,
   summary:
     "A sliding ice-tile puzzle: join two of a kind and chase the big tile.",
+  tags: ["puzzle"],
   title: "Icicle Drop",
   verification: {
     replay: {

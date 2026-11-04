@@ -58,6 +58,7 @@ const game = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Claim game",
   version: "1",
 });

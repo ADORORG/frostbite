@@ -270,6 +270,7 @@ export const broMariaGame = defineGame({
   scene: "hopper",
   schemaVersion: 1,
   summary: "Run, jump and stomp across an icy level to the far lantern.",
+  tags: ["platformer", "action"],
   title: "Bro Maria",
   verification: {
     replay: {

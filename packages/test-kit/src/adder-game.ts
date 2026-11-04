@@ -75,6 +75,7 @@ export const adderManifest = (id: string, sha256: string) =>
     network: "bip122:00000008819873e925422c1ff0f99f7c",
     schemaVersion: 1,
     summary: "An adder.",
+    tags: ["arcade"],
     title: "Adder",
     verification: { replay: { id: "adder", sha256, version: 1 } },
     version: "1",
