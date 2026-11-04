@@ -15,6 +15,13 @@ It is a second deployable beside the web app and shares the platform's typed env
   failure; `defaultMaintenanceLoopPolicy`) removes the private objects of uploads that were never
   completed once their cleanup time has passed, and records it. Each pass logs what it found; failed
   removals are logged and retried on later passes. See `@ador/uploads` for the rules.
+- **Finished-row sweeps.** A second slow loop (the same `defaultMaintenanceLoopPolicy`) removes rows that have finished their work, from
+  `removeExpiredRows` in `@ador/database`, at most `expiredRowPolicy.batchSize` from each table per pass and again at once while a pass
+  removed anything: expired wallet, passkey and passkey sign-in challenges; contact codes once they have expired **and** are older than the send limits'
+  look-back (`contactCodeRetentionMs`, the send window: the limits count expired codes too, so an expired code inside the window is kept);
+  delivered outbox rows older than `deliveredOutboxRetentionMs` (a week; failed, waiting and in-flight rows are never removed). A pass that
+  removed something logs `expired rows removed` with the counts per table; a failed pass logs `row sweep failed` and backs off. It is its
+  own loop so a storage outage in the upload cleanup cannot stop it.
 - **Signed workflow endpoint.** `GET|POST|PUT /api/inngest` is served by the workflow provider, which
   verifies the request signature before any activity runs. The activities (asset validation, then
   derivative generation) come from the uploads feature and see only provider-neutral inputs.
@@ -27,8 +34,9 @@ It is a second deployable beside the web app and shares the platform's typed env
 
 - `src/main.ts` — the process shell: signals, an HTTP listener, the runtime. Excluded from in-process
   coverage; a smoke test starts it as a real process.
-- `src/runtime.ts` — composes the worker from the provider registry and environment: the endpoint, the
-  relay loop, and the cleanup loop.
+- `src/runtime.ts` — composes the worker from the provider registry, environment and the row sweep limits: the endpoint, the
+  relay loop, the cleanup loop and the row sweep loop. `src/sweeps.ts` is one sweep pass (its progress is the rows removed) and
+  `src/sweep-limits.ts` turns the platform's `expiredRowPolicy` into the limits a removal takes.
 - `src/routes.ts`, `src/endpoint.ts`, `src/relay.ts`, `src/cleanup.ts`, `src/config.ts` — routing, the
   memoized endpoint resolver (a failed build is not cached), one relay pass and one cleanup pass with
   injectable dependencies, and the port. A cleanup pass reports what it removed as its progress.

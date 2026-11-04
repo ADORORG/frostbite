@@ -26,6 +26,12 @@ export {
 } from "./outbox/repository.ts";
 export { createOutboxDeliveryStore } from "./outbox/relay-store.ts";
 export {
+  expiredRowLimitsSchema,
+  removeExpiredRows,
+  type ExpiredRowCounts,
+  type ExpiredRowLimits,
+} from "./maintenance/expired-rows.ts";
+export {
   accountAuditEvents,
   organizationMemberships,
   organizations,

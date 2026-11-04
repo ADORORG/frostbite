@@ -79,6 +79,11 @@ export async function createScenario() {
   const worker: WorkerRuntime = createWorkerRuntime({
     environment: process.env,
     providers,
+    rowSweepLimits: {
+      batchSize: 10,
+      contactCodeRetentionMs: 3_600_000,
+      deliveredOutboxRetentionMs: 604_800_000,
+    },
   });
   const served: ServedEndpoint = await serveFetchHandler(worker.handle);
   let inngest: InngestRuntime | undefined;

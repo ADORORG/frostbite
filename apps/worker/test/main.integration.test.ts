@@ -43,6 +43,10 @@ describe("the worker process", () => {
           `a "${failure}" line`,
         );
       expect((await fetch(`http://127.0.0.1:${port}/health`)).status).toBe(200);
+      // The row sweep runs against the real database in the same process; with nothing finished to remove it says nothing, and it does not fail.
+      expect(
+        worker.lines().filter((line) => line.includes("row sweep failed")),
+      ).toEqual([]);
       expect(await worker.stop()).toBe(0);
       const lines = worker.lines();
       expect(lines.some((line) => line.includes("worker stopped"))).toBe(true);

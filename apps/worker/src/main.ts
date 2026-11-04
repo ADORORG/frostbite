@@ -2,9 +2,11 @@ import { createServer } from "node:http";
 
 import { createNodeRequestListener } from "@ador/http/node-adapter";
 
+import { expiredRowPolicy } from "@repo/configs/expired-rows";
 import { providerRegistry } from "@repo/configs/providers";
 import { parseWorkerPort } from "./config.ts";
 import { createWorkerRuntime } from "./runtime.ts";
+import { rowSweepLimitsOf } from "./sweep-limits.ts";
 
 // The process entry shell: it only wires signals, a listener, and the runtime. It is excluded from
 // in-process coverage; the behavior it starts is covered by the unit and integration suites, and a
@@ -21,6 +23,7 @@ function log(
 const runtime = createWorkerRuntime({
   environment: process.env,
   providers: providerRegistry,
+  rowSweepLimits: rowSweepLimitsOf(expiredRowPolicy),
 });
 const shutdown = new AbortController();
 for (const signal of ["SIGINT", "SIGTERM"] as const)
@@ -40,6 +43,11 @@ await Promise.all([
   runtime.runRelay(shutdown.signal, (error) =>
     log("error", "relay pass failed", { error: error.message }),
   ),
+  runtime.runRowSweeps(shutdown.signal, {
+    onError: (error) =>
+      log("error", "row sweep failed", { error: error.message }),
+    onResult: (counts) => log("info", "expired rows removed", { ...counts }),
+  }),
   runtime.runCleanup(shutdown.signal, {
     onError: (error) =>
       log("error", "cleanup pass failed", { error: error.message }),

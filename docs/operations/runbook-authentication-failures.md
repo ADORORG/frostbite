@@ -149,6 +149,9 @@ confirm the session row shows a fresh `authenticated_at` and a future `idle_expi
 - An alert on a spike of `challenge-invalid`, `signature-invalid` or failed email codes. Rate limits exist for every sign-in step
   (`configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.
 - A view of audit events and of a user's sessions that does not need SQL (the role screen shows who holds roles, not the history).
-- No sweep of expired challenge and code rows (`passkey_sign_in_challenges`, `wallet_challenges`, `contact_codes`); their expiry
-  indexes are there for a cleanup job.
+- Expired challenge and code rows are swept by the worker (`passkey_challenges`, `passkey_sign_in_challenges`, `wallet_challenges`, `contact_codes`, and delivered
+  `outbox_events`; `expiredRowPolicy` in `configs/expired-rows.ts`): a challenge once it expires, a contact code once it has expired and
+  is older than the send window (the send limits count recent codes, expired or not), a delivered event after a week. The worker logs
+  `expired rows removed` with counts per table when a pass removed something and `row sweep failed` when one failed (the loop backs off
+  a minute and tries again). To see what is waiting: `select count(*) from ador.wallet_challenges where expires_at < now();`.
 - Sign-ins are not audited (only changes to ways in and to roles are).

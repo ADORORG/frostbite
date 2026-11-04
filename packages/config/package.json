@@ -11,6 +11,7 @@
     "./authorization": "./src/policy/authorization.ts",
     "./email-addresses": "./src/policy/email-addresses.ts",
     "./email-code": "./src/policy/email-code.ts",
+    "./expired-rows": "./src/policy/expired-rows.ts",
     "./setup-link": "./src/policy/setup-link.ts",
     "./transport": "./src/transport/loopback-transport.ts"
   },
