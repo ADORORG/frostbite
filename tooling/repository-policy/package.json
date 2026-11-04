@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "check": "node --experimental-strip-types src/check.ts",
+    "ci:local": "node --experimental-strip-types src/ci-local.ts",
     "check:coverage": "node --experimental-strip-types src/check-coverage.ts",
     "check:templates": "node --experimental-strip-types src/check-templates.ts",
     "check:decisions": "node --experimental-strip-types src/check-decisions.ts",
