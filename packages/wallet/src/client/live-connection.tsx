@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { requireSignedPsbt } from "../bridge/laser-eyes-signer.ts";
 import type { WalletNetwork } from "../contracts.ts";
 import type { WalletConnectionClient } from "./connection-client.ts";
+import { noConnectedAccountMessage } from "./connection-errors.ts";
 import type { ConnectionStore } from "./connection-store.ts";
 import type { LaserEyesProviderId } from "../conformance/contracts.ts";
 
@@ -50,6 +51,15 @@ export function useLiveWalletConnection(): WalletConnectionClient {
     }
     return wallet.url;
   };
+  // Signing needs an account that is connected and has an address; both signing paths check the same thing.
+  const requireConnectedAccount = (): void => {
+    if (
+      !state.connected ||
+      state.provider === undefined ||
+      state.address.length === 0
+    )
+      throw new Error(noConnectedAccountMessage);
+  };
   return {
     address: state.address,
     connected: state.connected,
@@ -59,26 +69,14 @@ export function useLiveWalletConnection(): WalletConnectionClient {
     connect: state.connect,
     disconnect: state.disconnect,
     signMessage: async (message) => {
-      if (
-        !state.connected ||
-        state.provider === undefined ||
-        state.address.length === 0
-      ) {
-        throw new Error("A connected wallet account is required.");
-      }
+      requireConnectedAccount();
       return state.signMessage(message, {
         toSignAddress: state.address,
         protocol: laserEyesBip322Protocol,
       });
     },
     signPsbt: async (psbt, inputs) => {
-      if (
-        !state.connected ||
-        state.provider === undefined ||
-        state.address.length === 0
-      ) {
-        throw new Error("A connected wallet account is required.");
-      }
+      requireConnectedAccount();
       const signed = requireSignedPsbt(
         await state.signPsbt({
           broadcast: false,

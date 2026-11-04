@@ -36,3 +36,7 @@ export const invalidCursor = failure(
   "invalid_request",
   "The page cursor is not valid.",
 );
+
+// What a request is told when the caller is signed in but lacks the capability the operation needs. The API's documentation and the
+// platform's answer say it in the same words.
+export const forbiddenMessage = "The actor lacks the required capability.";

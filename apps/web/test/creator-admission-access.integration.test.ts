@@ -1,3 +1,4 @@
+import { forbiddenMessage } from "@ador/http/outcome";
 import { httpErrorEnvelopeSchema } from "@ador/shared/http";
 import { createUuidV7 } from "@ador/shared/identifiers";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
@@ -48,7 +49,12 @@ describe("creator admission API access decisions", () => {
 
   it("maps insufficient capability and dependency failure without executing", async () => {
     resolvePageAccess.mockResolvedValueOnce({ kind: "forbidden" });
-    await expectError(await PUT(request(), context), 403, "forbidden");
+    const forbidden = await PUT(request(), context);
+    expect(
+      httpErrorEnvelopeSchema.parse(await forbidden.clone().json()).error
+        .message,
+    ).toBe(forbiddenMessage);
+    await expectError(forbidden, 403, "forbidden");
 
     resolvePageAccess.mockResolvedValueOnce({ kind: "unavailable" });
     await expectError(await PUT(request(), context), 503, "internal_error");

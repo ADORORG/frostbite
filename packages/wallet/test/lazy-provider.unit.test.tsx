@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { noConnectedAccountMessage } from "../src/client/connection-errors.ts";
 import { act, useEffect, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -106,7 +107,10 @@ describe("the wallet connection before the wallet library is wanted", () => {
     expect(seen?.isInstalled("xverse")).toBe(false);
     expect(() => seen?.installationUrl("xverse")).toThrow("not been loaded");
     await expect(seen?.signMessage("hi")).rejects.toThrow(
-      "connected wallet account",
+      noConnectedAccountMessage,
+    );
+    await expect(seen?.signPsbt("psbt", [0])).rejects.toThrow(
+      noConnectedAccountMessage,
     );
     expect(loaded.count).toBe(0);
   });

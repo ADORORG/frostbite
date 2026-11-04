@@ -13,6 +13,9 @@ import type { LoadedArtifact, VerifierRunner } from "./runner.ts";
 import type { ReplayOutcome, Verifier } from "./verifier.ts";
 
 // What the loader needs of a game: its id, and the replay verifier its manifest pins, if it publishes one.
+// What a replay is failed with when the verifier answered, but not with an outcome: not valid JSON, or JSON that is not an outcome.
+const noOutcomeWords = "The verifier did not answer with an outcome.";
+
 export interface VerifiableGame {
   readonly id: string;
   readonly verification?: { readonly replay: GameReplayVerifier } | undefined;
@@ -84,12 +87,10 @@ function verifierOf(
       try {
         parsed = JSON.parse(answer);
       } catch {
-        return failed("The verifier did not answer with an outcome.");
+        return failed(noOutcomeWords);
       }
       const outcome = outcomeSchema.safeParse(parsed);
-      return outcome.success
-        ? outcome.data
-        : failed("The verifier did not answer with an outcome.");
+      return outcome.success ? outcome.data : failed(noOutcomeWords);
     },
     version: meta.version,
   };

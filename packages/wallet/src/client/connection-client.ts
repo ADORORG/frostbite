@@ -1,3 +1,4 @@
+import { noConnectedAccountMessage } from "./connection-errors.ts";
 import type { WalletNetwork } from "../contracts.ts";
 import type { LaserEyesProviderId } from "../conformance/contracts.ts";
 
@@ -36,9 +37,7 @@ export function idleConnection(
     isInstalled: () => false,
     network,
     provider: null,
-    signMessage: () =>
-      Promise.reject(new Error("A connected wallet account is required.")),
-    signPsbt: () =>
-      Promise.reject(new Error("A connected wallet account is required.")),
+    signMessage: () => Promise.reject(new Error(noConnectedAccountMessage)),
+    signPsbt: () => Promise.reject(new Error(noConnectedAccountMessage)),
   };
 }

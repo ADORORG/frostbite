@@ -6,6 +6,7 @@ import type { ContractGateway } from "../ports.ts";
 import { gameRewardsOpcodes } from "./abi.ts";
 import { freeTemplateAddress } from "./admin/free-address.ts";
 import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
+import { invalidContractOrSenderWords } from "./refusal-words.ts";
 import { inspectContract } from "./inspect.ts";
 import { milestoneKey } from "./milestone-key.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
@@ -50,7 +51,7 @@ export function createContractGateway(
     const game = parseAlkaneId(intent.contract.id);
     const sender = validateBitcoinAddress(intent.sender.value, network);
     if (game === null || !sender.ok)
-      return refused("The contract or the sender is not valid for this chain.");
+      return refused(invalidContractOrSenderWords);
     const answer = await node.view(
       game,
       gameRewardsOpcodes.claim,

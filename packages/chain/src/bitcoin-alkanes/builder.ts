@@ -14,6 +14,7 @@ import type { TransactionBuilder } from "../ports.ts";
 import { psbtFormat } from "./format.ts";
 import { psbtToBase64 } from "./psbt-text.ts";
 import { milestoneKey } from "./milestone-key.ts";
+import { invalidContractOrSenderWords } from "./refusal-words.ts";
 import { nativeAsset, servedChain, type ServedChain } from "./chains.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";
 import { fromHex } from "./node/hex.ts";
@@ -59,7 +60,7 @@ export function createTransactionBuilder(
       if (game === null || !sender.ok) {
         throw new BuildRefusedError(
           "invalid-request",
-          "The contract or the sender is not valid for this chain.",
+          invalidContractOrSenderWords,
         );
       }
       const call = claimScript(game, milestoneKey(intent.milestoneId));

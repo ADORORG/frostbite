@@ -1,3 +1,4 @@
+import { invalidContractOrSenderWords } from "../../src/bitcoin-alkanes/refusal-words.ts";
 import { Transaction } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
 import { chainRefSchema } from "@ador/shared/chain";
@@ -103,13 +104,13 @@ describe("simulating a claim", () => {
         ...claimIntent,
         sender: { chain, value: "nope" },
       }),
-    ).toMatchObject({ ok: false });
+    ).toMatchObject({ ok: false, reason: invalidContractOrSenderWords });
     expect(
       await contracts.simulate({
         ...claimIntent,
         contract: { ...game, id: "rewards" },
       }),
-    ).toMatchObject({ ok: false });
+    ).toMatchObject({ ok: false, reason: invalidContractOrSenderWords });
     expect(seen).toHaveLength(0);
   });
 
