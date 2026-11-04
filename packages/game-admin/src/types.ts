@@ -234,9 +234,16 @@ export type StartStepResult =
       readonly ok: false;
     }
   | {
-      readonly code: "bad-drawing" | "could-not-build";
+      readonly code: "bad-drawing";
       readonly ok: false;
       readonly reason: string;
+    }
+  // What the builder said when it said anything: the page says that the step could not be built, so there is no detail to add when the
+  // builder failed without one.
+  | {
+      readonly code: "could-not-build";
+      readonly ok: false;
+      readonly reason?: string;
     };
 
 export type SubmitStepResult =

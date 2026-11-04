@@ -5,7 +5,11 @@ import {
 import { gameAdminSubmitRefusals } from "@ador/shared/games";
 import { describe, expect, it } from "vitest";
 
-import { recordRefusalCopy, submitRefusalCopy } from "../src/domain/copy.ts";
+import {
+  recordRefusalCopy,
+  startRefusalCopy,
+  submitRefusalCopy,
+} from "../src/domain/copy.ts";
 
 describe("why the platform turned down what staff signed", () => {
   it("has words, about a step, for every reason a signed step is turned down", () => {
@@ -21,5 +25,12 @@ describe("why the platform turned down what staff signed", () => {
     expect(submitRefusalCopy["invalid-signature"]).toBe(signatureMismatchWords);
     expect(recordRefusalCopy["chain-unavailable"]).toBe(chainUnreachableWords);
     expect(recordRefusalCopy["not-found"]).toBe(submitRefusalCopy["not-found"]);
+  });
+
+  it("says a game that already has its contract the same whether the step or the address was refused", () => {
+    expect(recordRefusalCopy["already-created"]).toBe(
+      startRefusalCopy["already-created"],
+    );
+    expect(startRefusalCopy["already-created"]).toContain("contract");
   });
 });

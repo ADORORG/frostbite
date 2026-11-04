@@ -79,6 +79,15 @@ describe("a step that cannot start", () => {
     });
   });
 
+  it("gives no reason of its own when the chain failed with something that is not an error, rather than one that repeats what the page already says", async () => {
+    const staff = await seedStaff();
+    chainFailure.build = "opaque";
+    expect(await service.start(pauseInput(staff))).toEqual({
+      code: "could-not-build",
+      ok: false,
+    });
+  });
+
   it("refuses, in words and before storing anything, a step larger than the platform keeps", async () => {
     const staff = await seedStaff();
     chainFailure.oversize = true;

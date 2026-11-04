@@ -141,6 +141,9 @@ export const actionLabel = (action: GameAdminAction): string =>
           : { operation: action.operation },
   );
 
+// Said both when a step is refused at the start and when an address is refused at the record: either way the game has its contract.
+const alreadyCreatedCopy = "This game already has its contract.";
+
 export const startRefusalCopy: Readonly<
   Record<
     Extract<StartGameAdminStepResponse, { status: "refused" }>["reason"],
@@ -149,7 +152,7 @@ export const startRefusalCopy: Readonly<
 > = {
   "address-taken":
     "That address already holds a template or a game's contract. Choose another.",
-  "already-created": "This game already has its contract.",
+  "already-created": alreadyCreatedCopy,
   "already-defined":
     "This milestone is already defined on the contract and cannot be defined again.",
   "already-published": "This template is already published.",
@@ -172,7 +175,7 @@ export const submitRefusalCopy = submitRefusalWords("step");
 export const recordRefusalCopy = {
   "address-taken":
     "That address already holds a template or a game's contract.",
-  "already-created": "This game already has its contract.",
+  "already-created": alreadyCreatedCopy,
   "chain-unavailable": chainUnreachableWords,
   "different-code":
     "A contract is there, but it is not made from this game's template.",
