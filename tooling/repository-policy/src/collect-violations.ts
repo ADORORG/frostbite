@@ -17,7 +17,7 @@ import {
 } from "./workflow-policy.ts";
 import { discoverWorkspaces } from "./workspaces.ts";
 
-export interface RepositoryReport {
+interface RepositoryReport {
   readonly fileCount: number;
   readonly violations: readonly string[];
   readonly workspaceCount: number;
