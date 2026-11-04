@@ -54,4 +54,20 @@ describe("the fee speed chip", () => {
     expect(chosen).toEqual(["medium"]);
     expect(container.querySelector(".popover__panel")).toBeNull();
   });
+
+  it("hands the platform's limit and the transaction's size to the picker, which prices each speed with them", async () => {
+    const container = await mount(
+      <FeeSpeedChip
+        market={answered(ok)}
+        maxFeeSats={100}
+        onChange={() => undefined}
+        value="fast"
+        vbytes={200}
+      />,
+    );
+    await click(trigger(container));
+    expect(textOf(container)).toContain(
+      "More than the 100 sats this step may pay",
+    );
+  });
 });
