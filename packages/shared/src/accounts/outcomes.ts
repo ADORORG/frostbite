@@ -143,6 +143,18 @@ export const accountOutcomes = {
     message: "That is not a platform role.",
   },
   "no-such-account": { http: "not_found", message: "No such account." },
+  // The single-use link that makes the first administrator.
+  "setup-link-invalid": {
+    http: "not_found",
+    message:
+      "This setup link is not valid, or it has expired. Ask for a new one.",
+  },
+  "setup-method-needed": {
+    http: "conflict",
+    message:
+      "This account needs another way to sign in first. Add it, then open the link again.",
+    serverWords: true,
+  },
   "last-administrator": {
     http: "conflict",
     message:

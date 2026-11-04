@@ -79,6 +79,10 @@ Everything that can go wrong when a person signs in, links a way in or administe
 - **Page:** `client/outcome.ts` (`failedFrom`, `outcomeOf`) turns a failed request into the catalogue's outcome by the reason, falling back to the
   status class only for what the server could not name (no connection, a rate limit, a gone session). It never reads the message, so rewording
   a sentence cannot change what a page does. Every flow returns `{ kind: "failed", outcome, message }`; no flow has a copy table of its own.
+  The flows are `ui/email-link-flow.ts`, `ui/passkey-link-flow.ts`, `sign-in/*-flow.ts`, `roles/roles-flow.ts` and `setup/setup-flow.ts`; a panel shows
+  a flow's `message` and keeps only the words for what went well ("Passkey linked"), which are written once where they are shown. The few
+  outcomes whose words depend on something only the server knows (`serverWords`: how long to wait, which sign-in methods are missing) show
+  the server's sentence when it sent one.
 - **Adding an outcome:** add one entry. A test fails if two outcomes say the same sentence, if one has no words, or if the browser-only set
   changes. A sentence written outside the catalogue is what `repository:check` is there to catch.
 

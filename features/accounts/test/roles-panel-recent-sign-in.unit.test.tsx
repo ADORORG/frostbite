@@ -19,6 +19,7 @@ const flow = vi.hoisted(() => ({
   findPeople: vi.fn(),
   grantRole: vi.fn(),
   listPeople: vi.fn(),
+  searchPeople: vi.fn(),
   suspendRole: vi.fn(),
 }));
 vi.mock("../src/roles/roles-flow.ts", () => flow);

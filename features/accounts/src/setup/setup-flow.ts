@@ -1,4 +1,5 @@
 import { ApiError } from "@ador/client-http";
+import { outcomeMessage } from "@ador/shared/account-outcomes";
 
 import type { RedeemSetupLinkResponse } from "./contract.ts";
 
@@ -14,7 +15,7 @@ export type SetupState =
   | { readonly kind: "checking" }
   | { readonly kind: "no-link" }
   | { readonly kind: "sign-in" }
-  | { readonly kind: "invalid" }
+  | { readonly kind: "invalid"; readonly message: string }
   | { readonly kind: "needs-method"; readonly message: string }
   | { readonly kind: "failed"; readonly message: string }
   | { readonly kind: "done" };
@@ -44,10 +45,16 @@ export async function redeemSavedToken(input: {
     if (error.code === "unauthorized") return { kind: "sign-in" };
     if (error.code === "not_found") {
       input.store.clear();
-      return { kind: "invalid" };
+      return {
+        kind: "invalid",
+        message: outcomeMessage("setup-link-invalid"),
+      };
     }
     if (error.code === "conflict")
-      return { kind: "needs-method", message: error.message };
+      return {
+        kind: "needs-method",
+        message: outcomeMessage("setup-method-needed", error.message),
+      };
     return { kind: "failed", message: error.message };
   }
 }

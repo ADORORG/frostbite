@@ -1,12 +1,11 @@
 "use client";
 
-import { startRegistration } from "@simplewebauthn/browser";
-import { useState } from "react";
 import {
-  passkeyBeginResponseSchema,
-  passkeyListResponseSchema,
-  passkeyMutationResponseSchema,
-} from "@ador/auth";
+  browserSupportsWebAuthn,
+  startRegistration,
+} from "@simplewebauthn/browser";
+import { createRequester, sameOriginFetch } from "@ador/client-http";
+import { useState } from "react";
 import {
   ArcadeActionButton,
   ConsoleCard,
@@ -14,23 +13,13 @@ import {
   StatusLamp,
 } from "@repo/ui/arcade";
 
-type Status = "idle" | "working" | "success" | "error";
+import {
+  linkPasskey,
+  removePasskey,
+  type PasskeyChange,
+} from "./passkey-link-flow.ts";
 
-async function jsonRequest(
-  path: string,
-  method: "GET" | "POST",
-  body?: object,
-) {
-  const response = await fetch(path, {
-    body: body === undefined ? undefined : JSON.stringify(body),
-    headers:
-      body === undefined ? undefined : { "content-type": "application/json" },
-    method,
-  });
-  const payload: unknown = await response.json();
-  if (!response.ok) throw new Error("Passkey request failed");
-  return payload;
-}
+type Status = "idle" | "working" | "success" | "error";
 
 export function PasskeyPanel({
   initialCredentialIds,
@@ -48,53 +37,38 @@ export function PasskeyPanel({
       ? "Passkey status is unavailable. No linked state is assumed."
       : "Linked passkeys are off-chain account methods only. Wallet and on-chain authority remain separate.",
   );
+  const request = createRequester(sameOriginFetch);
 
-  async function refresh() {
-    const payload = await jsonRequest("/api/v1/passkeys", "GET");
-    setCredentialIds(passkeyListResponseSchema.parse(payload).credentialIds);
+  // Shows what a change did. The list and the "done" words come only from a change the server accepted and the list confirmed.
+  function show(result: PasskeyChange, done: string) {
+    if (result.kind === "failed") {
+      setStatus("error");
+      setMessage(result.message);
+      return;
+    }
+    setCredentialIds(result.credentialIds);
+    setStatus("success");
+    setMessage(done);
   }
 
   async function link() {
     setStatus("working");
-    try {
-      const begin = passkeyBeginResponseSchema.parse(
-        await jsonRequest("/api/v1/passkeys/registration/options", "POST", {}),
-      );
-      const credential = await startRegistration({
-        optionsJSON: begin.options,
-      });
-      passkeyMutationResponseSchema.parse(
-        await jsonRequest("/api/v1/passkeys/registration/verify", "POST", {
-          challengeId: begin.challengeId,
-          credential,
-        }),
-      );
-      await refresh();
-      setStatus("success");
-      setMessage("Passkey linked. Other sessions were revoked for safety.");
-    } catch {
-      setStatus("error");
-      setMessage(
-        "Passkey linking could not be confirmed. Refresh before trying again.",
-      );
-    }
+    show(
+      await linkPasskey({
+        ask: (options) => startRegistration({ optionsJSON: options }),
+        request,
+        supported: browserSupportsWebAuthn,
+      }),
+      "Passkey linked. Other sessions were revoked for safety.",
+    );
   }
 
   async function unlink(credentialId: string) {
     setStatus("working");
-    try {
-      passkeyMutationResponseSchema.parse(
-        await jsonRequest("/api/v1/passkeys/unlink", "POST", { credentialId }),
-      );
-      await refresh();
-      setStatus("success");
-      setMessage("Passkey removed. Other sessions were revoked for safety.");
-    } catch {
-      setStatus("error");
-      setMessage(
-        "Passkey removal could not be confirmed. Refresh before trying again.",
-      );
-    }
+    show(
+      await removePasskey(request, credentialId),
+      "Passkey removed. Other sessions were revoked for safety.",
+    );
   }
 
   return (

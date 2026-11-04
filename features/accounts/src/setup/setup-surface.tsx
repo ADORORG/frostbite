@@ -83,11 +83,7 @@ export function SetupSurface({
         </p>
       );
     case "invalid":
-      return (
-        <p role="alert">
-          This setup link is not valid, or it has expired. Ask for a new one.
-        </p>
-      );
+      return <p role="alert">{state.message}</p>;
     case "done":
       return (
         <p role="status">
