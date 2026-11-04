@@ -20,5 +20,6 @@ describe("why the platform turned down what staff signed", () => {
     expect(submitRefusalCopy["chain-unavailable"]).toBe(chainUnreachableWords);
     expect(submitRefusalCopy["invalid-signature"]).toBe(signatureMismatchWords);
     expect(recordRefusalCopy["chain-unavailable"]).toBe(chainUnreachableWords);
+    expect(recordRefusalCopy["not-found"]).toBe(submitRefusalCopy["not-found"]);
   });
 });

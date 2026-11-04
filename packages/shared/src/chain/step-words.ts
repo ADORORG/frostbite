@@ -7,8 +7,8 @@ export const chainUnreachableWords =
 export const signatureMismatchWords =
   "What was signed is not what was shown. Nothing was sent.";
 
-// Why the platform turns down a signed transaction it was handed (the same five for a claim and a step; a test in each feature keeps its
-// own list equal to these).
+// Why the platform turns down a signed transaction it was handed: the same five for a claim and a step, so the claim and admin schemas
+// take this list as their own rather than writing it again.
 export const submitRefusalReasons = [
   "chain-unavailable",
   "expired",

@@ -165,6 +165,10 @@ export const startRefusalCopy: Readonly<
   "wrong-network": "That address is not an address on this game's network.",
 };
 
+// Why the platform turned down what the wallet signed, for a step.
+export const submitRefusalCopy = submitRefusalWords("step");
+
+// Why the platform turned down a contract address staff entered by hand. A step that is not there is said as it is for a signature.
 export const recordRefusalCopy = {
   "address-taken":
     "That address already holds a template or a game's contract.",
@@ -172,13 +176,10 @@ export const recordRefusalCopy = {
   "chain-unavailable": chainUnreachableWords,
   "different-code":
     "A contract is there, but it is not made from this game's template.",
-  "not-found": "This step could not be found.",
+  "not-found": submitRefusalCopy["not-found"],
   "not-on-chain": "No contract is at that address.",
   "not-recordable": "This step's contract address cannot be entered.",
 } as const;
-
-// Why the platform turned down what the wallet signed, for a step.
-export const submitRefusalCopy = submitRefusalWords("step");
 
 export const walletUnavailableCopy =
   "No wallet that signs steps is connected. Connect one from the wallet button in the header, or sign elsewhere and paste the result.";
