@@ -1,6 +1,6 @@
 import type { createCreatorAdmissionService } from "@ador/creator-admission";
 import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import { failure, invalidCursor, unauthenticated } from "@ador/http/outcome";
 import {
   creatorApplicationRoutes,
   creatorReviewQueueInputSchema,
@@ -32,8 +32,7 @@ export function createCreatorReviewOperations(getService: () => Service) {
       const position =
         input.cursor === null ? null : decodeCreatorReviewCursor(input.cursor);
       // A cursor this list did not produce is refused, not treated as the start of the list.
-      if (input.cursor !== null && position === null)
-        return failure("invalid_request", "The page cursor is not valid.");
+      if (input.cursor !== null && position === null) return invalidCursor;
       const page = await getService().reviewQueue({
         group: input.group,
         position,

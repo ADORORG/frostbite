@@ -4,7 +4,7 @@ import { type FeeSpeed } from "@ador/shared/chain";
 import { SegmentedChoice } from "@repo/ui/arcade";
 
 import { staleNote } from "../domain/copy.ts";
-import { speedNames } from "../domain/fee-copy.ts";
+import { feeSpeedQuestion, speedNames } from "../domain/fee-copy.ts";
 import { feeChoices } from "../domain/fee-choices.ts";
 import type { FeeMarket } from "./use-fee-quotes.ts";
 
@@ -60,7 +60,7 @@ export function FeeSpeedPicker({
     <div className="fee-picker">
       <SegmentedChoice
         disabled={disabled}
-        legend="How fast should it confirm?"
+        legend={feeSpeedQuestion}
         onChange={onChange}
         options={options}
         value={value}

@@ -29,3 +29,10 @@ export const idempotencyKeyConflict = failure(
   "conflict",
   "The idempotency key conflicts with another request.",
 );
+
+// The answer for a paginated read given a cursor the list did not produce. It is refused, not treated as the start of the list, and every
+// list says so in the same words.
+export const invalidCursor = failure(
+  "invalid_request",
+  "The page cursor is not valid.",
+);

@@ -1,4 +1,9 @@
 import type { ApiErrorCode } from "@ador/client-http";
+import {
+  isUploadOutcome,
+  uploadOutcomeMessage,
+  uploadOutcomes,
+} from "@ador/shared/uploads";
 import { assetRejectionCopy, describeFileRejection } from "./rejection-copy.ts";
 import type { FailureCause, UploadStage, UploadState } from "./upload-state.ts";
 
@@ -17,8 +22,7 @@ const stageText: Readonly<Record<UploadStage, string>> = {
 };
 
 const apiFailureText: Readonly<Record<ApiErrorCode, string>> = {
-  conflict:
-    "The upload could not be started. You may have reached the limit of active uploads; wait for the current ones to finish, then try again.",
+  conflict: "The upload could not go ahead. Choose the file again.",
   forbidden: "You do not have permission to upload here.",
   idempotency_key_required:
     "The upload request was incomplete. Choose the file again.",
@@ -30,7 +34,7 @@ const apiFailureText: Readonly<Record<ApiErrorCode, string>> = {
   method_not_allowed:
     "The upload request was not allowed. Reload the page and try again.",
   network: "Could not reach the server. Check your connection and retry.",
-  not_found: "The upload could not be found. Choose the file again.",
+  not_found: uploadOutcomes["upload-not-found"].message,
   rate_limited: "Too many requests in a short time. Wait a moment, then retry.",
   unauthorized: "Your session has ended. Sign in again to upload.",
 };
@@ -38,13 +42,18 @@ const apiFailureText: Readonly<Record<ApiErrorCode, string>> = {
 function describeFailure(cause: FailureCause): string {
   if (cause.kind === "unexpected")
     return "Something went wrong in this page. Reload it and try again.";
-  return cause.kind === "api"
-    ? apiFailureText[cause.code]
-    : cause.failure === "network"
-      ? "The file could not be sent. Check your connection and retry."
-      : cause.failure === "stalled"
-        ? "The file stopped sending. Check your connection and retry."
-        : "The storage service did not accept the upload. The upload link may have expired; retry.";
+  // The reason the server named, when it is one of the catalogue's, says more than the status class it came with (two different conflicts).
+  if (cause.kind === "api") {
+    const reason = cause.reason ?? null;
+    return isUploadOutcome(reason)
+      ? uploadOutcomeMessage(reason)
+      : apiFailureText[cause.code];
+  }
+  return cause.failure === "network"
+    ? "The file could not be sent. Check your connection and retry."
+    : cause.failure === "stalled"
+      ? "The file stopped sending. Check your connection and retry."
+      : "The storage service did not accept the upload. The upload link may have expired; retry.";
 }
 
 // The one line the user reads for each state. Nothing here claims success before the server has

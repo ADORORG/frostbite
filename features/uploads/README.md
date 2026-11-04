@@ -64,7 +64,8 @@ The page is organized so each layer can be replaced or tested alone:
 - `src/client/` is framework-free: `api-client` (typed routes on the shared `@ador/client-http` requester), `file-checks`, `transfer` (an
   `ObjectTransfer` port with an XHR implementation for progress), `upload-state` (a pure reducer),
   `upload-runner` (resumable orchestration), `asset-poller`, `library-refresh`, copy modules
-  (`rejection-copy`, `upload-messages`, `asset-presentation`, `purpose-labels`), `client-policy`, and
+  (`rejection-copy`, `upload-messages`, `asset-presentation`, `purpose-labels`; a failure the server named is told in the words of
+  `uploadOutcomes` in `@ador/shared/uploads`, by its reason, and the status class's words are only the fallback), `client-policy`, and
   `browser-services` (the one bundle of browser dependencies; tests inject fakes).
 - `src/ui/hooks/` connects that logic to React (`use-upload-session`, `use-asset-library`).
 - `src/ui/components/` holds small presentational components (`upload-form`, `upload-feedback`,

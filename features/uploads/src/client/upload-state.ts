@@ -26,7 +26,12 @@ export interface UploadAttempt {
 export type FinishedOutcome = "processed" | "rejected" | "unprocessable";
 
 export type FailureCause =
-  | { readonly kind: "api"; readonly code: ApiErrorCode }
+  // `reason` is the reason the server named, when it named one: what the page chooses its words by before it falls back on the status class.
+  | {
+      readonly kind: "api";
+      readonly code: ApiErrorCode;
+      readonly reason?: string | null;
+    }
   | { readonly kind: "transfer"; readonly failure: TransferFailure }
   // A defect in this page, not a failure of the network or the server.
   | { readonly kind: "unexpected" };

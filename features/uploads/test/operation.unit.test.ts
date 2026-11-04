@@ -1,5 +1,7 @@
+import { idempotencyKeyConflict, unauthenticated } from "@ador/http/outcome";
 import { idempotencyKeySchema } from "@ador/shared/http";
 import { uuidV7Schema } from "@ador/shared/identifiers";
+import { uploadOutcomes } from "@ador/shared/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 import { createUploadIntentOperation } from "../src/application/operation.ts";
@@ -23,7 +25,7 @@ describe("create upload intent operation", () => {
     const operation = createUploadIntentOperation(getService);
     await expect(
       operation.execute(input, { ...context, actorUserId: null }),
-    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    ).resolves.toEqual(unauthenticated);
     expect(getService).not.toHaveBeenCalled();
   });
 
@@ -63,18 +65,32 @@ describe("create upload intent operation", () => {
     });
   });
 
-  it.each([
-    ["conflict", "idempotency key"],
-    ["quota-exceeded", "active upload limit"],
-    ["invalid-size", "exceeds the limit"],
-  ] as const)("maps %s without exposing internals", async (kind, message) => {
+  it("answers a reused idempotency key as every operation does", async () => {
     const operation = createUploadIntentOperation(async () => ({
       complete: vi.fn(),
-      create: vi.fn(async () => ({ kind })),
+      create: vi.fn(async () => ({ kind: "conflict" as const })),
     }));
-    await expect(operation.execute(input, context)).resolves.toMatchObject({
-      message: expect.stringContaining(message),
-      ok: false,
-    });
+    await expect(operation.execute(input, context)).resolves.toEqual(
+      idempotencyKeyConflict,
+    );
   });
+
+  it.each([
+    ["quota-exceeded", "upload-limit-reached"],
+    ["invalid-size", "file-over-limit"],
+  ] as const)(
+    "maps %s to the catalogue's %s: its status class, its words and its reason",
+    async (kind, outcome) => {
+      const operation = createUploadIntentOperation(async () => ({
+        complete: vi.fn(),
+        create: vi.fn(async () => ({ kind })),
+      }));
+      await expect(operation.execute(input, context)).resolves.toEqual({
+        error: uploadOutcomes[outcome].http,
+        message: uploadOutcomes[outcome].message,
+        ok: false,
+        reason: outcome,
+      });
+    },
+  );
 });

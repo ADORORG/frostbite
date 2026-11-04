@@ -3,6 +3,9 @@ import { feeAtRate } from "@ador/shared/chain";
 
 // How the fee speeds are named and told, in the platform's words. Waits are estimates and are always said as "about"; a rate is the
 // chain's quote at the moment shown, which moves.
+// What the speed choice asks, as the label of the control however it is drawn (the chip's panel, the picker's group).
+export const feeSpeedQuestion = "How fast should it confirm?";
+
 export const speedNames: Readonly<Record<FeeSpeed, string>> = {
   fast: "Fast",
   lightning: "Lightning",

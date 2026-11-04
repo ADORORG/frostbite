@@ -7,7 +7,10 @@ import {
 import { ArcadeFileDrop, ArcadeSelect } from "@repo/ui/arcade";
 
 import { purposeOptions } from "../../client/purpose-labels.ts";
-import { describeByteLimit } from "../../client/rejection-copy.ts";
+import {
+  describeByteLimit,
+  describeUploadHint,
+} from "../../client/rejection-copy.ts";
 
 const accept = uploadContentTypes.join(",");
 
@@ -36,7 +39,7 @@ export function UploadForm({
       <ArcadeFileDrop
         accept={accept}
         disabled={disabled}
-        hint={`PNG, JPEG, or WebP, up to ${limit}. Animated images are not supported.`}
+        hint={describeUploadHint(limit)}
         label="Choose an image or drop it here"
         onFile={(file) => onFile(file, purpose)}
       />
