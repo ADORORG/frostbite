@@ -2,6 +2,7 @@ import { createProviderRegistry } from "@ador/plugin-kit/providers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createWorkerRuntime } from "../src/runtime.ts";
+import { rowSweepLimits } from "./support/row-sweep-limits.ts";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",
@@ -17,6 +18,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const response = await runtime.handle(
@@ -39,6 +41,7 @@ describe("worker runtime", () => {
         DATABASE_URL: "postgresql://test:test@127.0.0.1:1/test",
       },
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const response = await runtime.handle(new Request("http://worker/ready"));
@@ -67,6 +70,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       await expect(
@@ -81,6 +85,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const stopped = new AbortController();
@@ -97,6 +102,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const controller = new AbortController();
@@ -117,6 +123,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const stopped = new AbortController();
@@ -136,6 +143,7 @@ describe("worker runtime", () => {
     const runtime = createWorkerRuntime({
       environment,
       providers: createProviderRegistry([]),
+      rowSweepLimits,
     });
     try {
       const controller = new AbortController();
@@ -159,6 +167,7 @@ describe("worker runtime", () => {
       createWorkerRuntime({
         environment: {},
         providers: createProviderRegistry([]),
+        rowSweepLimits,
       }),
     ).toThrow();
   });

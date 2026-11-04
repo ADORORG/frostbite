@@ -21,6 +21,7 @@ import {
 
 import { createWorkerRuntime, type WorkerRuntime } from "../../src/runtime.ts";
 import { countingProcessor, memoryStorage } from "./fakes.ts";
+import { rowSweepLimits } from "./row-sweep-limits.ts";
 
 // Everything a chain test needs, wired the way production wires it except for the two ports faked
 // at their boundary: object storage and the media decoder.
@@ -79,6 +80,7 @@ export async function createScenario() {
   const worker: WorkerRuntime = createWorkerRuntime({
     environment: process.env,
     providers,
+    rowSweepLimits,
   });
   const served: ServedEndpoint = await serveFetchHandler(worker.handle);
   let inngest: InngestRuntime | undefined;

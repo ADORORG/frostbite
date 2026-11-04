@@ -95,6 +95,9 @@ select id, action, network, wallet_adapter, attempts, issued_at, expires_at, con
 from ador.wallet_challenges order by issued_at desc limit 10;
 ```
 
+The worker removes a challenge soon after it expires (within about five minutes), so a failure older than that leaves no row: an empty
+result does not mean no challenge was issued. The person sees the same words for an expired, unknown and used challenge.
+
 Never log, paste or ticket a signature, a session token or a challenge message.
 
 ## Symptom: "the email code never arrives" / the Email panel is missing
@@ -114,7 +117,7 @@ Never log, paste or ticket a signature, a session token or a challenge message.
    select issued_at, expires_at, attempts, consumed_at from ador.contact_codes
    where kind = 'email' and destination = '<lower-case address>' order by issued_at desc limit 5;
    ```
-   `attempts` of 5 means the code is spent (five tries, right or wrong); `consumed_at` set means it was used or replaced.
+   `attempts` of 5 means the code is spent (five tries, right or wrong); `consumed_at` set means it was used or replaced. A code stays in the table for at least an hour after it was sent (the send limits count it), then the worker removes it once it has expired.
 5. **Local stack.** Nothing is sent: `pnpm mailbox` prints what the stack "sent" (newest first).
 6. **Adding an address to an account.** "Recent authentication is required" means the session is older than `PASSKEY_RECENT_AUTH_WINDOW_MS`: the person signs in again, then retries. "This account already has as many email addresses as it can hold" means the account is at `emailAddressPolicy.maximumPerAccount` (`configs/email-addresses.ts`): the person removes one first; nothing is mailed for the refused address, and the check is also made when the code is entered (read-only check: `select count(*) from ador.contact_identities where user_id = '<user-id>' and kind = 'email';`). "This address cannot be added to this account" means another account holds it (the page does not say whose); the person signs in with that address instead, or removes it from the other account first. There is no merging. Every add or remove signs the account's other sessions out and writes `email-linked` / `email-unlinked` to `ador.auth_security_events` (read-only check: `select action, created_at, correlation_id from ador.auth_security_events where actor_user_id = '<user-id>' order by created_at desc limit 10;`).
 
@@ -149,6 +152,9 @@ confirm the session row shows a fresh `authenticated_at` and a future `idle_expi
 - An alert on a spike of `challenge-invalid`, `signature-invalid` or failed email codes. Rate limits exist for every sign-in step
   (`configs/rate-limits.ts`); a caller over a limit is answered 429 with `Retry-After`.
 - A view of audit events and of a user's sessions that does not need SQL (the role screen shows who holds roles, not the history).
-- No sweep of expired challenge and code rows (`passkey_sign_in_challenges`, `wallet_challenges`, `contact_codes`); their expiry
-  indexes are there for a cleanup job.
+- Expired challenge and code rows are swept by the worker (`passkey_challenges`, `passkey_sign_in_challenges`, `wallet_challenges`, `contact_codes`, and delivered
+  `outbox_events`; `expiredRowPolicy` in `configs/expired-rows.ts`): a challenge once it expires, a contact code once it has expired and
+  is older than the send window (the send limits count recent codes, expired or not), a delivered event after a week. The worker logs
+  `expired rows removed` with counts per table when a pass removed something and `row sweep failed` when one failed (the loop backs off
+  a minute and tries again). To see what is waiting: `select count(*) from ador.wallet_challenges where expires_at < now();`.
 - Sign-ins are not audited (only changes to ways in and to roles are).

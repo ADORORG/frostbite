@@ -10,7 +10,7 @@ One container image, built once (`deploy/Dockerfile`), run three ways. What a co
 | Role    | Start command                                                               | Health check     | Notes                                                                                                   |
 | ------- | --------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
 | web     | the image's default: `migration:apply`, then `node ...standalone/server.js` | `GET /api/ready` | Public UI, studio, `/api/v1`. Applies pending migrations before it serves. One replica until qualified. |
-| worker  | `pnpm --filter worker start`                                                | `GET /ready`     | Outbox relay, cleanup, the signed Inngest endpoint. Never migrates.                                     |
+| worker  | `pnpm --filter worker start`                                                | `GET /ready`     | Outbox relay, cleanup and finished-row sweeps, the signed Inngest endpoint. Never migrates.             |
 | release | `pnpm --filter @ador/database migration:apply`                              | exits 0 or fails | Optional: the same migration by hand or as a platform's own step.                                       |
 
 Secrets and settings are never in the image. They come from the platform's environment at run time; the keys are the ones in
