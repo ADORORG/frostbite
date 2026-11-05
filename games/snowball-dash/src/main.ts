@@ -1,14 +1,13 @@
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import {
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@ador/game-sdk/play";
 import { createRunLoop } from "@ador/game-sdk/run-loop";
 import { attachTapToStart } from "@ador/game-sdk/touch-start";
-import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
 
 import { effects, track } from "./audio.ts";
 import { tempoAt, worldSounds } from "./feedback.ts";
@@ -167,17 +166,7 @@ async function finish(finished: RunSession): Promise<void> {
   saveProgress();
   show();
   startButton.textContent = "Roll again";
-  if (runId === null || play === null) {
-    setText(note, submitNote(null));
-    return;
-  }
-  const sent = runId;
-  setText(note, submitNote({ kind: "pending" }));
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  setText(note, submitNote(settled));
+  await sendRun(play, runId, record);
 }
 
 const begin = (): Promise<void> =>
@@ -185,13 +174,7 @@ const begin = (): Promise<void> =>
     const started = await play?.runs.start().catch(() => null);
     const ready = started?.status === "started" ? started : null;
     runId = ready?.runId ?? null;
-    setText(
-      note,
-      startNote(
-        started ?? null,
-        "Press to hop, hold to go higher. Close calls build your multiplier.",
-      ),
-    );
+    setText(note, "Press to hop, hold to go higher.");
     session = createRunSession({
       onEarned: (id) => {
         sound.sfx("milestone");

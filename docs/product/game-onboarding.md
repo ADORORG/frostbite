@@ -94,7 +94,7 @@ refuses to start with a game that names one it does not have, rather than ignori
 
 A game that plays on a seed and wants its milestones replay-checked can build on small modules of the SDK instead of writing its
 own: `@ador/game-sdk/seeded` (the seeded generator every rule must use), `@ador/game-sdk/run-inputs` (checking a run input's fields
-and tick, and refusing with a reason), `@ador/game-sdk/run-notes` (what to tell the player about a run and what became of it), and
+and tick, and refusing with a reason), `@ador/game-sdk/cabinet-runs` (how a cabinet reaches the platform's runs); a finished run is sent with `sendRun` from `@ador/game-sdk/play`, which says nothing to the player (how a run is checked is not part of playing), and
 `@ador/game-sdk/play` (reporting a milestone only if the manifest declares it, and starting and submitting runs). A pixel-art screen on a canvas also has `@ador/game-sdk/pixels` (`block`, `sprite`, `wrap`) and
 `@ador/game-sdk/fixed-step` (whole ticks from elapsed time, at the game's own rate). Frost Runner, Icicle Drop and Tower Stacker
 (`games/frost-runner`, `games/icicle-drop`, `games/tower-stack`) are three complete examples: pure seeded rules, a session that records the

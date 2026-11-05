@@ -1,13 +1,13 @@
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { attachTapToStart } from "@ador/game-sdk/touch-start";
 import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@ador/game-sdk/play";
+import { byInput } from "@ador/game-sdk/touch";
+import { attachTapToStart } from "@ador/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { stepSounds, tempoFor } from "./feedback.ts";
@@ -139,17 +139,7 @@ async function finish(finished: MazeSession): Promise<void> {
   saveProgress();
   show();
   startButton.textContent = "Light another";
-  if (runId === null || play === null) {
-    setText(note, submitNote(null));
-    return;
-  }
-  const sent = runId;
-  setText(note, submitNote({ kind: "pending" }));
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  setText(note, submitNote(settled));
+  await sendRun(play, runId, record);
 }
 
 function choose(direction: Direction): void {
@@ -172,9 +162,9 @@ async function begin(): Promise<void> {
   runId = ready?.runId ?? null;
   setText(
     note,
-    startNote(
-      started ?? null,
-      "Find the key, then the door. Every step burns oil; flasks add some.",
+    byInput(
+      "Find the key, then the door.",
+      "Tap or hold to walk. Find the key, then the door.",
     ),
   );
   session = createMazeSession({

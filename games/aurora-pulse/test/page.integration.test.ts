@@ -46,7 +46,7 @@ describe("Aurora Pulse's page", () => {
     ).toBe(false);
   });
 
-  it("starts on Enter on a seed of its own and says so, and a lane does not start a run, nor a second Enter throw one away", async () => {
+  it("starts on Enter and says how to play, and a lane does not start a run, nor a second Enter throw one away", async () => {
     const { el, press } = await opened();
     press("KeyD");
     await settle(60);
@@ -55,7 +55,8 @@ describe("Aurora Pulse's page", () => {
     await settle(100);
     expect(el("start")?.hasAttribute("hidden")).toBe(true);
     expect(el("pause")?.hasAttribute("disabled")).toBe(false);
-    expect(el("note")?.textContent).toContain("local seed");
+    expect(el("note")?.textContent).toContain("Tap each note");
+    expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
     press("Enter");
     await settle(50);
     expect(el("start")?.hasAttribute("hidden")).toBe(true);
@@ -87,7 +88,7 @@ describe("Aurora Pulse's page", () => {
     expect(el("pause")?.textContent).toBe("Resume");
   });
 
-  it("ends the run when the light goes out (a player who never taps), says what the platform could not check, and saves the best", async () => {
+  it("ends the run when the light goes out (a player who never taps), saves the best, and says nothing about the platform", async () => {
     const { el, press, stored } = await opened();
     press("Enter");
     await settle(100);
@@ -95,7 +96,7 @@ describe("Aurora Pulse's page", () => {
       await settle(100);
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Play again");
-    expect(el("note")?.textContent).toContain("your own claim");
+    expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
     expect(stored.progress).toEqual({ best: 0, sound: defaultSound });
     expect(el("pause")?.hasAttribute("disabled")).toBe(true);
   }, 90_000);

@@ -82,19 +82,15 @@ test("signed out, it is played on its own seed and the record is not sent anywhe
   await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
-  await expect(game.locator(".if-status")).toContainText(
-    "Sign in to have the platform check a run.",
-  );
+  await expect(game.locator(".if-status")).not.toContainText("platform");
   await waitForMoves(game, 2);
   await game.getByRole("button", { name: "End run" }).click();
-  await expect(game.locator(".if-note")).toContainText(
-    "was not sent to the platform",
-  );
+  await expect(game.locator(".if-note")).toHaveCount(0);
   expect(violations).toEqual([]);
   expect(errors).toEqual([]);
 });
 
-test("signed in, the platform replays a run of steering and says it was checked", async ({
+test("signed in, the platform replays a run of steering", async ({
   baseURL,
   page,
 }) => {
@@ -107,9 +103,7 @@ test("signed in, the platform replays a run of steering and says it was checked"
   await openCabinet(game);
   await freezeClock(page);
   await beginRun(game);
-  await expect(game.locator(".if-status")).toContainText(
-    "The platform will check this run when you end it.",
-  );
+  await expect(game.locator(".if-status")).not.toContainText("platform");
   // Down into the next clear row with the keyboard, one move exactly, then along it with the pad: that row stays clear all the way round.
   await game.getByRole("dialog").press("ArrowDown");
   await runUntilMoves(page, game, 1);
@@ -118,9 +112,7 @@ test("signed in, the platform replays a run of steering and says it was checked"
   await game.getByRole("button", { name: "End run" }).click();
 
   await expect(game.locator(".if-record")).toContainText("3 steps");
-  await expect(game.locator(".if-note")).toContainText(
-    "The platform checked this run. It earned no milestone.",
-  );
+  await expect(game.locator(".if-note")).toHaveCount(0);
   expect(violations).toEqual([]);
   expect(errors).toEqual([]);
 });

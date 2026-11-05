@@ -38,18 +38,16 @@ function platform(
 const note = () => container.querySelector(".if-note")?.textContent ?? "";
 
 describe("a SAT SNAKE run on the platform's seed", () => {
-  it("is played on the seed the platform gave and says the platform will check it", async () => {
+  it("is played on the seed the platform gave, and says only how to play", async () => {
     const { runs, withRuns } = platform(async () => started);
     await startRun(1, withRuns);
     expect(runs.start).toHaveBeenCalledTimes(1);
-    expect(status()).toContain(
-      "The platform will check this run when you end it.",
-    );
+    expect(status()).not.toMatch(/platform|claim|seed/i);
     await clickButton("End run");
     expect(JSON.parse(recordText())).toMatchObject({ seed: platformSeed });
   });
 
-  it("sends the record for the run it was given, and calls it checked only when the platform says so", async () => {
+  it("sends the record for the run it was given, and says nothing of what came back", async () => {
     const { runs, withRuns } = platform(
       async () => started,
       async () => ({ earned: ["snake-ten"], status: "verified" }),
@@ -65,53 +63,41 @@ describe("a SAT SNAKE run on the platform's seed", () => {
       seed: platformSeed,
       verifier: "frostbite",
     });
-    expect(note()).toContain("Earned: snake-ten.");
+    expect(container.textContent).not.toMatch(/platform|checked|verified/i);
   });
 
-  it("says so when the platform rejects the record, and keeps the milestone as the player's own claim", async () => {
-    const { withRuns } = platform(
-      async () => started,
+  it("says nothing when the platform rejects the record or cannot be reached", async () => {
+    for (const submit of [
       async () => ({
         detail: "the snake cannot turn back on itself",
         reason: "illegal-input",
         status: "rejected",
       }),
-    );
-    await startRun(1, withRuns);
-    await clickButton("End run");
-    expect(note()).toContain("did not accept this run");
-    expect(note()).toContain("your own claim");
-  });
-
-  it("says the platform could not be reached when sending fails", async () => {
-    const { withRuns } = platform(
-      async () => started,
       async () => {
         throw new Error("offline");
       },
-    );
-    await startRun(1, withRuns);
-    await clickButton("End run");
-    expect(note()).toContain("could not be reached");
+    ] as Parameters<typeof platform>[1][]) {
+      const { withRuns } = platform(async () => started, submit);
+      await startRun(1, withRuns);
+      await clickButton("End run");
+      expect(container.textContent).not.toMatch(/platform|checked|verified/i);
+    }
   });
 
-  it("plays on a local seed when the platform has no run to give, and says why", async () => {
+  it("plays on a seed of its own, and says nothing of why, when the platform has no run to give or asking fails", async () => {
     const { runs, withRuns } = platform(async () => ({
       reason: "signed-out",
       status: "unavailable",
     }));
     await startRun(1, withRuns);
-    expect(status()).toContain("Sign in to have the platform check a run.");
+    expect(status()).not.toMatch(/platform|claim|seed/i);
     await clickButton("End run");
     expect(runs.submit).not.toHaveBeenCalled();
     expect(JSON.parse(recordText())).toMatchObject({ seed: 1 });
-  });
-
-  it("plays on a local seed when asking for a run fails", async () => {
-    const { withRuns } = platform(async () => {
+    const failing = platform(async () => {
       throw new Error("offline");
     });
-    await startRun(1, withRuns);
-    expect(status()).toContain("The platform cannot check runs here.");
+    await startRun(1, failing.withRuns);
+    expect(status()).not.toMatch(/platform|claim|seed/i);
   });
 });

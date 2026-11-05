@@ -33,7 +33,7 @@
     "./replay": "./src/replay.ts",
     "./run-inputs": "./src/run-inputs.ts",
     "./run-loop": "./src/run-loop.ts",
-    "./run-notes": "./src/run-notes.ts",
+    "./cabinet-runs": "./src/cabinet-runs.ts",
     "./run-record": "./src/run-record.ts",
     "./seeded": "./src/seeded.ts",
     "./storage-shim": "./src/storage-shim.ts",
@@ -194,9 +194,9 @@
         "types": "./dist/run-inputs.d.ts",
         "default": "./dist/run-inputs.js"
       },
-      "./run-notes": {
-        "types": "./dist/run-notes.d.ts",
-        "default": "./dist/run-notes.js"
+      "./cabinet-runs": {
+        "types": "./dist/cabinet-runs.d.ts",
+        "default": "./dist/cabinet-runs.js"
       },
       "./run-record": {
         "types": "./dist/run-record.d.ts",

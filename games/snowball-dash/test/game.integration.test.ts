@@ -20,12 +20,15 @@ describe("Snowball Dash, bundled and run against a simulated platform", () => {
     expect(byId(window, "count")?.textContent).toBe("0");
   });
 
-  it("starts a run on a seed of its own, says the run is its own report, and runs until a rock is hit", async () => {
+  it("starts a run, says how to play and nothing about the platform, and runs until a rock is hit", async () => {
     const { stored, window } = await play({ best: 0 });
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
-    expect(byId(window, "note")?.textContent).toContain("local seed");
+    expect(byId(window, "note")?.textContent).toContain("hop");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
     expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(false);
     // Left alone the snowball meets the first rock in about three seconds, and the run ends.
     await settle(3_500);
@@ -33,7 +36,9 @@ describe("Snowball Dash, bundled and run against a simulated platform", () => {
     expect(start?.textContent).toBe("Roll again");
     expect(start?.hasAttribute("hidden")).toBe(false);
     expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(true);
-    expect(byId(window, "note")?.textContent).toContain("your own claim");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

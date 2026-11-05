@@ -81,7 +81,7 @@ export function SatSnake({
     launcher.current?.focus();
   };
   const start = async () => {
-    const { note, seed } = await platformRun.begin(newSeed, instruction);
+    const { seed } = await platformRun.begin(newSeed);
     setSession(
       createSnakeSession({
         onEarned: (milestone) => host.milestone(markOf(milestone)),
@@ -93,7 +93,7 @@ export function SatSnake({
     sound.sfx("start");
     sound.music(true);
     setPhase("playing");
-    setMessage(note);
+    setMessage(instruction);
     // The button that was pressed is gone, and the keys need somewhere to land.
     panel.current?.focus();
   };
@@ -212,11 +212,7 @@ export function SatSnake({
             </div>
           ) : null}
           {phase === "ended" && record !== null ? (
-            <RecordView
-              onAgain={() => void start()}
-              record={record}
-              submit={platformRun.submitted}
-            />
+            <RecordView onAgain={() => void start()} record={record} />
           ) : null}
           {phase === "playing" ? null : (
             <p aria-live="polite" className="if-status" role="status">

@@ -66,13 +66,14 @@ describe("Shard Match's page", () => {
     ).toBe(false);
   });
 
-  it("starts on Enter on a seed of its own, says so, and does not throw a run away on Enter again", async () => {
+  it("starts on Enter, says how to play, and does not throw a run away on Enter again", async () => {
     const { earned, el, press, wander } = await opened();
     press("Enter");
     await settle(100);
     expect(el("start")?.hasAttribute("hidden")).toBe(true);
     expect(el("pause")?.hasAttribute("disabled")).toBe(false);
-    expect(el("note")?.textContent).toContain("local seed");
+    expect(el("note")?.textContent).toContain("Swap");
+    expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
     wander();
     expect(earned()).toContain("first-swap");
     const count = earned().length;
@@ -104,7 +105,7 @@ describe("Shard Match's page", () => {
     expect(el("pause")?.textContent).toBe("Resume");
   });
 
-  it("ends a run when the swaps are used up, says what the platform could not check, and saves the best", async () => {
+  it("ends a run when the swaps are used up, saves the best, and says nothing about the platform", async () => {
     const { ended, el, press, stored, wander } = await opened();
     press("Enter");
     await settle(100);
@@ -114,7 +115,7 @@ describe("Shard Match's page", () => {
       await settle(50);
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Play again");
-    expect(el("note")?.textContent).toContain("your own claim");
+    expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

@@ -137,17 +137,15 @@ describe("the ice-field cabinet in the bundled game", () => {
       gameId: "frostbite",
       seed: 4_000_000_000,
     });
-    expect(document.querySelector(".if-note")?.textContent).toContain(
-      "The platform checked this run.",
-    );
+    expect(document.querySelector(".if-note")).toBeNull();
   });
 
-  it("is played on a local seed, and says so, when the page offers no runs", async () => {
+  it("is played on a seed of its own, and says nothing of the platform, when the page offers no runs", async () => {
     const { buttonNamed, click, document } = await start();
     await click(buttonNamed("Ice field"));
     await click(buttonNamed("Start a run"));
-    expect(document.querySelector(".if-status")?.textContent).toContain(
-      "The platform cannot check runs here.",
+    expect(document.querySelector(".if-status")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
     );
   });
 });

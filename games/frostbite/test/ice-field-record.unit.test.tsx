@@ -63,16 +63,13 @@ describe("ending a run", () => {
     expect(summary).not.toContain("Claims:");
   });
 
-  it("never calls a run verified when none was sent to the platform: the milestones are the player's own claim", async () => {
+  it("says nothing about how the run is checked, and never calls it verified", async () => {
     await startRun();
     await clearBoard(0);
     await clickButton("Settle board");
     await clickButton("End run");
     const text = container.textContent ?? "";
-    expect(text).toContain(
-      "Milestones earned here are your own claim: this run was not sent to the platform to be checked.",
-    );
-    expect(text).not.toMatch(/verified/iu);
+    expect(text).not.toMatch(/platform|checked|verified/iu);
   });
 
   it("starts another run with a new seed and a clean board, and keeps the old record out of the way", async () => {
