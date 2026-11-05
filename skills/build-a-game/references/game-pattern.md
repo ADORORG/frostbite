@@ -32,10 +32,16 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
   (`visibility: hidden`, not `display: none`); buttons have a fixed minimum width; the note, the earned list and the score row have
   heights that never grow; scores do not wrap.
 - **Touch**: the screen is the controller, with as few buttons as the game can do without (on a touch screen `phone.css` keeps only a pause
-  icon and two sound icons, over the screen). A one-button game takes a tap on the canvas; a game with directions takes swipes; a game with
-  run and jump takes a thumb stick on the left half and a hold on the right (see `games/bro-maria/src/screen/thumbs.ts`). Call
-  `attachTapToStart(screen, startButton)` so a tap on a waiting game starts a run, and say "TAP" where a keyboard is told "ENTER"
-  (`byInput`, or `touchLines` and the guide's own touch start line). Keep a button only where a gesture cannot do the job.
+  icon and two sound icons, over the screen). A one-button game takes a tap on the canvas; a game with directions takes swipes or
+  steers toward the finger (`games/lantern-maze/src/screen/controls.ts`); a game with lanes takes a tap in a lane
+  (`games/aurora-pulse/src/screen/controls.ts`); a game with run and jump cuts the screen in zones, a finger holds the zone under it
+  and a thumb can run while the other jumps (`games/bro-maria/src/screen/thumbs.ts`). All of them are built on `attachZones`
+  (`<sdk>/touch-zones`): write only where the zones are, never your own pointer handling. Name the zones faintly on the first
+  screen of a run, as Bro Maria does, so a new player sees what each side does. Call `attachTapToStart(screen, startButton)` so a tap
+  on a waiting game starts a run, and say "TAP" where a keyboard is told "ENTER" (`byInput`, or `touchLines` and the guide's own touch
+  start line). Keep a button only where a gesture cannot do the job, and draw it over the screen, never in rows under it.
+- **A note about how to play, and nothing else**: one short line under the screen, with `byInput` for a keyboard and for a finger. No
+  seeds, no "claimed", no "sent to the platform": the player does not care how a run was checked.
 - **Styles**: copy the stylesheet of the closest finished game and change its colours; it already has the steady layout, the sound
   panel's place, the `visibility` rule for hidden buttons and the touch rules. Do not write a layout from nothing.
 - **Plays without the platform**: a failed `ready()` or `run.start()` shows a note and the game still starts on a seed of its own
@@ -84,8 +90,8 @@ async function connect() {
 }
 ```
 
-On finish: stop the music, record the best score, `play.runs.submit(runId, session.record())` if a run was issued, and tell the
-player what became of it with `submitNote`.
+On finish: stop the music, record the best score, and `await sendRun(play, runId, session.record())`. It does nothing if no run was
+issued and drops a failure quietly; the screen says nothing about it. Test that a finished run is submitted once (`recordingRuns()`).
 
 ## Untrusted values
 

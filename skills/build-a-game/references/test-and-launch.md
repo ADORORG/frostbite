@@ -38,6 +38,8 @@ sent and the `pushes` it made on its own) and installs fake audio. Copy it from 
 
 - `pnpm repository:check`: files under 300 lines, README present with an Ownership section, no duplicated user-facing sentences.
 - `pnpm typecheck`, `pnpm lint`, and the tests for the workspaces you touched.
+- The page test submits a finished run once with the platform's run id and seed (`recordingRuns()`), and the touch test drives the screen
+  with fingers (`attachZones`), not with buttons. Show each test can fail: break the line it guards and watch it go red.
 - From `apps/web`: `npx vitest run --project unit test/games`. It runs three files: `games-config.unit.test.ts` (the ordered list of
   game ids: add yours), `games-verifiers.unit.test.ts` (the pinned digest) and `games-conformance.unit.test.ts`.
 - The conformance test (`apps/web/test/games-conformance.unit.test.ts`) runs over every registered embedded game: the page must be one
