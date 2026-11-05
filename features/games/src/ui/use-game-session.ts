@@ -33,6 +33,7 @@ import { createAccountPort } from "../client/account-sync.ts";
 import { createClaimsService } from "../client/claims-port.ts";
 import { createRunsService } from "../client/runs-port.ts";
 import { useHostEvents } from "./use-host-events.ts";
+import { useKeyForwarding } from "./use-key-forwarding.ts";
 
 // How long a "milestone reached" notice stays up.
 export const toastMs = 6_000;
@@ -239,6 +240,7 @@ export function useGameSession(
   }, [canConnect, capabilities, frame, id, milestones, src, title]);
 
   useHostEvents(host, frame, wallet);
+  useKeyForwarding(host, connected);
 
   // Tells the game how a claim is going; dropped for a game that did not declare `milestone:claim`.
   const emitClaim = useCallback(

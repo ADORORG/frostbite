@@ -182,7 +182,7 @@ The full list, with the status of what is still to come, is `docs/product/game-s
   agrees**, never on confirmation alone. At most six asks a minute. The player sees the claim in the platform's own review over the game (what it does, the network fee they pay, and where it stands); the game only learns how it goes.
 - **Events** arrive without a request, through `client.on(name, handler)`, which returns a function that stops
   listening: `wallet.changed` (only for a game that declared `wallet`), `claim.changed` (only for `milestone:claim`), `lifecycle.changed` (`paused` while the tab
-  is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`.
+  is hidden, `active` when it returns) and `fullscreen.changed`. A game should stop its loop on `paused`. A key the player presses before clicking into the game arrives as `key.forwarded`; the SDK plays it back as a normal `keydown`/`keyup` on `window`, so a game that listens with `attachKeys` (or its own `window` listener) hears it with no extra code.
 - **`ui.toast(message)`** asks the page to show up to 140 characters of plain text; the page prefixes the game's
   name so it cannot pass for the platform's. It resolves to whether it was shown. At most six a minute.
 - **`capabilities.get()`** lists the methods and events this platform knows, the limits, and what the game was

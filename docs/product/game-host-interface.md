@@ -58,7 +58,7 @@ The host never forwards cookies, wallet objects, keys, signatures or raw transac
 (owner, 2026-10-13):** the wallet's public **address** and network name are given to a game that declared the
 `wallet` capability, because the game has no network access and an address is public. Every other call that
 needs a capability is refused with `permission_denied` unless the game declared it. The page also sends events
-(`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`, and `claim.changed` for a game that declared `milestone:claim`); see `game-sdk-roadmap.md`. A game that breaks the protocol is stopped and the player told.
+(`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`, `key.forwarded`, and `claim.changed` for a game that declared `milestone:claim`); see `game-sdk-roadmap.md`. `key.forwarded` carries a key the player pressed before clicking into the game (letters, digits, arrows, Space, Enter; never Tab or Escape); the SDK plays it back as an ordinary key event on the game's window, so a game that listens for keys needs no code for it. A game that breaks the protocol is stopped and the player told.
 
 ## 3. Where progress and milestones live
 

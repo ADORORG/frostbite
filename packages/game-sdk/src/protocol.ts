@@ -5,6 +5,7 @@ import {
   claimStates,
   claimUnavailableReasons,
   errorCodeSchema,
+  forwardedKeySchema,
   gameChannel,
   jsonValueSchema,
   milestoneStatusSchema,
@@ -243,6 +244,9 @@ export const events = {
     .object({ id: z.string().min(1).max(64), state: z.enum(claimStates) })
     .strict(),
   "fullscreen.changed": z.object({ active: z.boolean() }).strict(),
+  // A key pressed while the keyboard is the page's (nothing is focused), so a player can start a game without a click first and the
+  // page's skip link stays the first stop for Tab. The client plays it back as a key event on the game's window.
+  "key.forwarded": forwardedKeySchema,
   "player.changed": playerIdentitySchema,
   "lifecycle.changed": z
     .object({ state: z.enum(["active", "paused"]) })

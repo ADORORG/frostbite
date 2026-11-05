@@ -78,6 +78,11 @@ The platform core is not edited to add a game.
   public address and network (`wallet-game-player.tsx`); a game that did not declare it gets no wallet provider. The only persistence is the sync route (which also returns the player's random per-game id, kept on the save row), which
   stores the player's own state for a listed game and its declared milestones, never anything a request names
   for another player. Milestones are labelled self-reported.
+- The keyboard is the game's, without moving focus. A game hears keys only inside its own frame, but focusing the frame on load would
+  take the first Tab from the page's skip link. So `use-key-forwarding.ts` tells a connected game (`key.forwarded`) about the keys
+  pressed while nothing on the page has focus (`key-forwarding.ts` decides: letters, digits, arrows, Space, Enter; never Tab or
+  Escape, a shortcut, or a key a control or the frame already has), and stops the page scrolling for Space and the arrows it handed over.
+  `tests/e2e/tests/game-keyboard.spec.ts` checks every game in a real browser, with no click first.
 
 ## Dependencies and configuration
 

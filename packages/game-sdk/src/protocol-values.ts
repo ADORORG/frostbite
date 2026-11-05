@@ -118,3 +118,19 @@ export type ClaimState = (typeof claimStates)[number];
 
 // A message a game may ask the platform to show the player. Plain text, kept short.
 export const toastMaxLength = 140;
+
+// The keys a page may pass on to a game while the keyboard is the page's and not the game's frame: the letters, digits, arrows,
+// Space and Enter a game plays with. Never Tab (it walks the page, from its skip link on), Escape (it leaves theatre), a function
+// key or a modifier. The page and the game's client both check against this one pattern.
+export const forwardableKeyCode =
+  /^(?:Key[A-Z]|Digit[0-9]|Arrow(?:Up|Down|Left|Right)|Space|Enter|NumpadEnter)$/u;
+
+export const forwardedKeySchema = z
+  .object({
+    code: z.string().regex(forwardableKeyCode),
+    phase: z.enum(["down", "up"]),
+    // True for the repeats of a key held down, which a game ignores as it does in its own frame.
+    repeat: z.boolean(),
+  })
+  .strict();
+export type ForwardedKey = z.infer<typeof forwardedKeySchema>;
