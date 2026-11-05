@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-import { waitFor } from "@ador/test-kit/inngest-runtime";
+import { waitFor } from "@frostbite/test-kit/inngest-runtime";
 import { describe, expect, it } from "vitest";
 
 import { createInngestClient } from "../src/client.ts";

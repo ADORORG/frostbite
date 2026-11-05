@@ -1,14 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import type { HostServices } from "@ador/game-sdk/host";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import type { HostServices } from "@frostbite/game-sdk/host";
+import { defaultGameHostPolicy } from "@frostbite/game-sdk/policy";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+} from "@frostbite/test-kit/simulated-game-host";
 
 import { milestoneIds } from "../../src/rules/milestones.ts";
 

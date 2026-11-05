@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { readCapturedMail } from "@ador/mail";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { readCapturedMail } from "@frostbite/mail";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
 // Signing in with an emailed code against a real server and database. The server's mail is captured into a directory
 // (`scripts/run-with-postgres.ts`), so the test reads the code from the file the app "sent", as a person would from an inbox. Each test

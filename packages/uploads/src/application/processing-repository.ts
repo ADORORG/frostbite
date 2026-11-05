@@ -1,12 +1,12 @@
-import type { ObjectKey } from "@ador/object-storage/contracts";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { ProviderId } from "@ador/shared/providers";
+import type { ObjectKey } from "@frostbite/object-storage/contracts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { ProviderId } from "@frostbite/shared/providers";
 import type {
   AssetProcessingState,
   AssetRejectionReason,
   DerivativeKind,
   UploadContentType,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 // A validated asset waiting for derivatives: the bytes must still hash to `contentSha256`.
 export interface AssetProcessingSubject {

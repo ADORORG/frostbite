@@ -8,7 +8,7 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   walletIdentities,
-} from "@ador/database";
+} from "@frostbite/database";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { emailMethod } from "../src/contacts/method.ts";

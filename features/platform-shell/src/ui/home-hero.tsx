@@ -1,7 +1,7 @@
 "use client";
 
-import { snowfall } from "@ador/scenes/library";
-import { SceneStage, useChosenScene, useScenes } from "@ador/scenes/react";
+import { snowfall } from "@frostbite/scenes/library";
+import { SceneStage, useChosenScene, useScenes } from "@frostbite/scenes/react";
 import { ArcadeButton } from "@repo/ui/arcade";
 import { useState } from "react";
 

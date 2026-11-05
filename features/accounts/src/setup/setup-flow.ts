@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { ApiError } from "@frostbite/client-http";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 
 import type { RedeemSetupLinkResponse } from "./contract.ts";
 

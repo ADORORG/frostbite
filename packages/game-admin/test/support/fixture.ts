@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { createDrizzleContractStore } from "@ador/database/game-contracts";
+import { createDrizzleContractStore } from "@frostbite/database/game-contracts";
 import {
   gameAdminSteps,
   gameContracts,
@@ -10,16 +10,16 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
-import { chainRefSchema, type Address } from "@ador/shared/chain";
-import { maxAdminPayloadChars } from "@ador/shared/games";
-import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
-import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
+} from "@frostbite/database";
+import { chainRefSchema, type Address } from "@frostbite/shared/chain";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
+import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
+import { simulatedAddress } from "@frostbite/test-kit/simulated-chain-address";
 import {
   nativeAsset,
   signSimulated,
   simulatedFamily,
-} from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/test-kit/simulated-chain-transaction";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleGameAdminRepository } from "../../src/drizzle-repository.ts";

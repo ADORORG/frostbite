@@ -1,4 +1,4 @@
-import { isNamedLikeARead } from "@ador/http/registered-operation";
+import { isNamedLikeARead } from "@frostbite/http/registered-operation";
 import { describe, expect, it, vi } from "vitest";
 
 // A request with no session cookie.

@@ -21,7 +21,7 @@ Findings: S57.
   first run left 8 alive (an announcement on load that the game could not hear before it was ready, an unreachable guard that was
   replaced by a silent return, the newest-claim choice, a Sign button on a claim already sent, the "Confirmed" word, the expired
   state, and two flags that decide whether a game is offered claims at all); tests were added and all were caught on the re-run.
-- **Coverage (statements / branches / functions / lines):** `@ador/feature-games` 95.4/94.6/92.5/95.5. `pnpm test:coverage`,
+- **Coverage (statements / branches / functions / lines):** `@frostbite/feature-games` 95.4/94.6/92.5/95.5. `pnpm test:coverage`,
   `pnpm format:check`, `pnpm lint` (48 workspaces, repository policy) and `pnpm typecheck` passed.
 - **Full end-to-end run:** 388 passed, 137 skipped (project-specific), 0 failed, on a fresh production build. The first run had one
   failure, the explorer's claim answer: with no wallet connected the page says so (`no-wallet`) before the platform is asked.

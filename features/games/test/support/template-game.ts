@@ -1,5 +1,5 @@
-import { chainOptionSchema } from "@ador/shared/chain";
-import { defineGame } from "@ador/shared/games";
+import { chainOptionSchema } from "@frostbite/shared/chain";
+import { defineGame } from "@frostbite/shared/games";
 
 export const signet = "bip122:00000008819873e925422c1ff0f99f7c";
 

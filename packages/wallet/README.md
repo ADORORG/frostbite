@@ -1,4 +1,4 @@
-# `@ador/wallet`
+# `@frostbite/wallet`
 
 The single platform boundary around the exact-pinned LaserEyes React/Core pair.
 
@@ -16,15 +16,15 @@ The single platform boundary around the exact-pinned LaserEyes React/Core pair.
   for its address. This diagnostic primitive does not establish a session or qualify wallet support.
 - `useStepWallet(allowedProviders)` (client) is the connected wallet as a signer of the platform's own transactions: `sign` is present
   only while a wallet on the deployment's list is connected. `signWithWallet` (bridge) asks the wallet, one PSBT at a time, to sign
-  only the inputs nobody has signed (`@ador/chain/wallet-signing`: `walletRequests`, `withWalletSignatures`), finalised and never
+  only the inputs nobody has signed (`@frostbite/chain/wallet-signing`: `walletRequests`, `withWalletSignatures`), finalised and never
   sent, and puts the answers back; the platform then checks the result against what it built. Today the `bitcoin-alkanes` family;
   another family adds its own mapping beside it.
-- `@ador/wallet/registration` contributes LaserEyes through one explicit provider-registry entry.
+- `@frostbite/wallet/registration` contributes LaserEyes through one explicit provider-registry entry.
 - `createLaserEyesSigner` adapts one connected LaserEyes client to the narrow signer contract used
   by Alkanes application services.
 - Wallet contracts normalize account, network, and signed-PSBT results without leaking broad vendor
   response types.
-- `@ador/wallet/conformance` evaluates explicit device/browser evidence and returns only candidates
+- `@frostbite/wallet/conformance` evaluates explicit device/browser evidence and returns only candidates
   whose requested capabilities have a complete passing matrix for the pinned LaserEyes versions.
 
 ## Invariants

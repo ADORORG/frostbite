@@ -2,8 +2,8 @@ import {
   creatorAdmissionEvents,
   creatorApplications,
   type DatabaseClient,
-} from "@ador/database";
-import { creatorApplicationFixture } from "@ador/test-kit/creator-database";
+} from "@frostbite/database";
+import { creatorApplicationFixture } from "@frostbite/test-kit/creator-database";
 
 import {
   creatorE2EFixtures,

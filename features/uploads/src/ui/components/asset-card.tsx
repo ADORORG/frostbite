@@ -1,6 +1,6 @@
-import type { LibraryAsset } from "@ador/shared/uploads";
-import { collectionStudioPath } from "@ador/shared/collections";
-import { uploadDetailHref } from "@ador/shared/uploads";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
+import { collectionStudioPath } from "@frostbite/shared/collections";
+import { uploadDetailHref } from "@frostbite/shared/uploads";
 import { ArcadeBadge, ArcadeButton, ArcadeMediaTile } from "@repo/ui/arcade";
 
 import {

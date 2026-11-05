@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { correlationHeaderName } from "@ador/shared/http";
+import { correlationHeaderName } from "@frostbite/shared/http";
 
 import { cacheControl, type HttpCachePolicy } from "./cache.ts";
 import type { HttpAdapterResponse, HttpFile } from "./operation.ts";

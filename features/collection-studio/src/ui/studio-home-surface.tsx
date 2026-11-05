@@ -1,4 +1,4 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import { StudioFrame } from "./studio-frame.tsx";
 import { StudioHomeWorkspace } from "./studio-home-workspace.tsx";

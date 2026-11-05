@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { AccountPort } from "@ador/game-sdk/synced-backend";
+import type { AccountPort } from "@frostbite/game-sdk/synced-backend";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -120,7 +120,7 @@ describe("the game player with an account", () => {
       .filter((message) => "event" in (message as object));
     expect(events).toEqual([
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { id: playerId, kind: "account" },
         event: "player.changed",
         version: 1,

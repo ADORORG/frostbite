@@ -1,4 +1,4 @@
-import type { RunInput, RunRecord } from "@ador/game-sdk/run-record";
+import type { RunInput, RunRecord } from "@frostbite/game-sdk/run-record";
 
 import {
   cells,

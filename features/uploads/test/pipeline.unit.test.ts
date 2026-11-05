@@ -1,10 +1,10 @@
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import type { ImageProcessor } from "@ador/media/processing";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import type { ImageProcessor } from "@frostbite/media/processing";
 import {
   createProviderRegistry,
   defineProvider,
-} from "@ador/plugin-kit/providers";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/plugin-kit/providers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { describe, expect, it } from "vitest";
 
 import { systemClock } from "../src/clock.ts";

@@ -1,10 +1,13 @@
 import { createHash } from "node:crypto";
 
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
-import { defaultUploadPolicy, resolveUploadPolicy } from "@ador/shared/uploads";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
+import {
+  defaultUploadPolicy,
+  resolveUploadPolicy,
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { createAssetValidationService } from "../src/application/validation-service.ts";

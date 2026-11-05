@@ -3,16 +3,16 @@ import {
   createDrizzleCollectionRepository,
   createDrizzleSubmissionRepository,
   createSubmissionService,
-} from "@ador/collections";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import type { ChainOption } from "@ador/shared/chain";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/collections";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import {
   createAssetLibraryService,
   createDrizzleAssetLibraryRepository,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
-import type { UploadsContext } from "@ador/feature-uploads/context";
+import type { UploadsContext } from "@frostbite/feature-uploads/context";
 
 // A creator's own drafts listed at once; engineering bound, not a product quota.
 const draftListLimit = 100;

@@ -12,7 +12,7 @@ closing `end { tick }`. The platform replays that record with the same rules and
 
 ## What was built
 
-- **`@ador/game-sdk/cabinets`** (new, generic): `cabinet(rules)` and `combineCabinets({ id, version, cabinets })` make one
+- **`@frostbite/game-sdk/cabinets`** (new, generic): `cabinet(rules)` and `combineCabinets({ id, version, cabinets })` make one
   verifier from several cabinets' rules; a record names its cabinet in `config.cabinet`; the rest of the settings go to that
   cabinet. No `any`/`unknown`: each cabinet's state sits behind the functions that work on it.
 - **Rules** (`games/frostbite/src/verifier`): `snake.ts` (state machine: `turn`, `end`, `moveOnce`, `advanceTo`),
@@ -42,7 +42,7 @@ closing `end { tick }`. The platform replays that record with the same rules and
 - **Mutation proof:** 27 breaks of the rules, board, session, screen, hook and the SDK helper; the first run left 3 alive (food
   stream independent of the mine stream, a redundant guard in the session which was removed, the screen's guard against a key
   after the run ended); two tests were added; all killed on the re-run. The working tree was restored after each run.
-- **Coverage (statements / branches / functions / lines):** `@game/frostbite` 99.2/95.4/100/100 (its config now measures `src/cabinet` and `src/snake` too); `@ador/game-sdk` 98.3/96.9/98.6/98.4. `pnpm test:coverage` passed for all 47 workspaces.
+- **Coverage (statements / branches / functions / lines):** `@game/frostbite` 99.2/95.4/100/100 (its config now measures `src/cabinet` and `src/snake` too); `@frostbite/game-sdk` 98.3/96.9/98.6/98.4. `pnpm test:coverage` passed for all 47 workspaces.
 - `pnpm format:check`, `pnpm lint` (47 workspaces, repository policy), `pnpm typecheck`: passed. Web integration (80 tests,
   including the claim-path flow against real PostgreSQL) passed. The two spec files for the cabinets passed three times in a row.
 

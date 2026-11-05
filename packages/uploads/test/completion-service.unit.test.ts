@@ -1,10 +1,10 @@
 import { Readable } from "node:stream";
 
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { correlationIdSchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UploadIntentRepository } from "../src/application/repository.ts";

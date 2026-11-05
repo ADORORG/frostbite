@@ -1,4 +1,4 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   collectionDetailSchema,
   collectionListResponseSchema,
@@ -13,8 +13,8 @@ import {
   type ListCollectionDraftsInput,
   type ReadCollectionDraftInput,
   type SaveCollectionDraftInput,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { detailOf, type OperationDependencies } from "./dependencies.ts";
 import {

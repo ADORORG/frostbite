@@ -1,4 +1,7 @@
-import { createRunRecorder, type RunRecord } from "@ador/game-sdk/run-record";
+import {
+  createRunRecorder,
+  type RunRecord,
+} from "@frostbite/game-sdk/run-record";
 
 import {
   gameId,

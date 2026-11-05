@@ -1,4 +1,4 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it } from "vitest";
 
 import { ImageDetailWorkspace } from "../src/ui/image-detail-workspace.tsx";

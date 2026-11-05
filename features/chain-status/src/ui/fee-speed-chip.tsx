@@ -1,6 +1,6 @@
 "use client";
 
-import { type FeeSpeed } from "@ador/shared/chain";
+import { type FeeSpeed } from "@frostbite/shared/chain";
 import { Popover } from "@repo/ui/arcade";
 
 import {

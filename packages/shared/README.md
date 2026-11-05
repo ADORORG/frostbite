@@ -1,36 +1,36 @@
-# `@ador/shared`
+# `@frostbite/shared`
 
 Runtime-neutral contracts and pure domain behavior shared by browser and server runtimes.
 
 ## Public API
 
-- `@ador/shared/allowlists` — strict Leaf V1 bytes, decoder, and SHA-256 Merkle primitives used by
+- `@frostbite/shared/allowlists` — strict Leaf V1 bytes, decoder, and SHA-256 Merkle primitives used by
   browser, server, and contract fixture tooling.
-- `@ador/shared/chain` — the chain-neutral model of ADR-017: CAIP-2 `ChainRef` and `ChainFamilyId`,
+- `@frostbite/shared/chain` — the chain-neutral model of ADR-017: CAIP-2 `ChainRef` and `ChainFamilyId`,
   `ChainConfig` (role, per-operation finality, release gate), addresses, assets, amounts, contract
   references, transaction intents and summaries, opaque unsigned and signed payloads, broadcast
   outcomes, observations, and the neutral transaction state machine. No family concept appears here.
-- `@ador/shared/chain-step-words` — the words for what can go wrong around a transaction a person signs, said once for a player's claim and a
+- `@frostbite/shared/chain-step-words` — the words for what can go wrong around a transaction a person signs, said once for a player's claim and a
   staff step alike: the reasons a signed transaction is turned down (`submitRefusalReasons`, which the claim and admin schemas use), the
   sentences for them (`submitRefusalWords("claim" | "step")`), and the two that do not depend on the name (`chainUnreachableWords`,
   `signatureMismatchWords`).
-- `@ador/shared/collections` — collection draft and item schemas, the engineering limits, the asset
+- `@frostbite/shared/collections` — collection draft and item schemas, the engineering limits, the asset
   purposes a draft may reference, and the HTTP contract (inputs, responses, routes) of the collection
   studio API, the studio page paths and the wizard link helper, and the submission and review
   contracts: the review state machine, the frozen snapshot schema, submission readiness rules, the
   review capability name, and the HTTP contracts for creators and staff.
-- `@ador/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
+- `@frostbite/shared/features` — versioned feature identifiers, capabilities, pages, navigation, and
   manifest schema.
-- `@ador/shared/decisions` — accepted-decision records and fail-closed gate evaluation.
-- `@ador/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
+- `@frostbite/shared/decisions` — accepted-decision records and fail-closed gate evaluation.
+- `@frostbite/shared/http` — HTTP headers, methods, idempotency policy, the versioned error envelope, and
   `requestFingerprint`, a key-order-independent digest used to detect an idempotency key reused with
   different content.
   `defineOutcomes` (internal to this package, `src/http/outcomes.ts`) does for each area's catalogue of what can go wrong what both need: say that a
-  reason a server sent is one of the area's own, and give the words for it. It backs `@ador/shared/account-outcomes` and the uploads catalogue.
-- `@ador/shared/uploads` — the upload contracts and policies, the catalogue of what can go wrong when an image is sent (`uploadOutcomes`, in
+  reason a server sent is one of the area's own, and give the words for it. It backs `@frostbite/shared/account-outcomes` and the uploads catalogue.
+- `@frostbite/shared/uploads` — the upload contracts and policies, the catalogue of what can go wrong when an image is sent (`uploadOutcomes`, in
   the shape of the accounts one), and `describeUploadFormats`, which says the accepted formats from the one list of accepted types.
-- `@ador/shared/platform` — public platform-status input and output contracts.
-- `@ador/shared/providers` — provider identities and capability-bearing manifests.
+- `@frostbite/shared/platform` — public platform-status input and output contracts.
+- `@frostbite/shared/providers` — provider identities and capability-bearing manifests.
 
 ## Boundaries
 
@@ -60,7 +60,7 @@ sorted-pair convention are protocol behavior and are locked by Rust/TypeScript f
 
 ## Verification
 
-Run `pnpm --filter @ador/shared typecheck`, `test:unit`, `test:integration`, or `test:coverage`.
+Run `pnpm --filter @frostbite/shared typecheck`, `test:unit`, `test:integration`, or `test:coverage`.
 The platform engineering owner maintains this package.
 
 ## Ownership

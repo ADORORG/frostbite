@@ -1,29 +1,29 @@
 import { randomUUID } from "node:crypto";
 
-import { createDrizzleSubmissionRepository } from "@ador/collections";
-import { runMigrations } from "@ador/database";
+import { createDrizzleSubmissionRepository } from "@frostbite/collections";
+import { runMigrations } from "@frostbite/database";
 import {
   createDatabaseFromEnvironment,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { requestFingerprint } from "@ador/shared/http";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
+import { requestFingerprint } from "@frostbite/shared/http";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import {
   seedReadyCollection,
   seededChain,
-} from "@ador/test-kit/collection-database";
+} from "@frostbite/test-kit/collection-database";
 import {
   seedDerivative,
   seedPlatformUser,
   setCreatorApplicationState,
-} from "@ador/test-kit/creator-database";
+} from "@frostbite/test-kit/creator-database";
 import {
   storageRegistry,
   unusedStorage,
-} from "@ador/test-kit/storage-registry";
-import { ScenesProvider } from "@ador/scenes/react";
+} from "@frostbite/test-kit/storage-registry";
+import { ScenesProvider } from "@frostbite/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { createPublicCollectionsEntrypoint } from "../../src/entrypoint.tsx";

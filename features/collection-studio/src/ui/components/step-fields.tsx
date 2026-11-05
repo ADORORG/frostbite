@@ -1,6 +1,6 @@
-import type { ChainOption } from "@ador/shared/chain";
+import type { ChainOption } from "@frostbite/shared/chain";
 import { ArcadeSelect, ArcadeTextField } from "@repo/ui/arcade";
-import { collectionLimits } from "@ador/shared/collections";
+import { collectionLimits } from "@frostbite/shared/collections";
 
 import type {
   DraftFormErrors,

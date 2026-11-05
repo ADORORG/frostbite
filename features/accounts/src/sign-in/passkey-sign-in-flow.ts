@@ -3,8 +3,8 @@ import {
   passkeySignedInResponseSchema,
   passkeySignInBeginResponseSchema,
   type PasskeySignInBeginResponse,
-} from "@ador/auth";
-import type { Requester } from "@ador/client-http";
+} from "@frostbite/auth";
+import type { Requester } from "@frostbite/client-http";
 
 import { failed, failedFrom, type Failed } from "../client/outcome.ts";
 

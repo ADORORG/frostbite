@@ -1,6 +1,6 @@
-import type { StepView } from "@ador/game-admin";
-import { stageOf } from "@ador/shared/chain";
-import type { GameAdminStep } from "@ador/shared/games";
+import type { StepView } from "@frostbite/game-admin";
+import { stageOf } from "@frostbite/shared/chain";
+import type { GameAdminStep } from "@frostbite/shared/games";
 
 // A step as the page is told of it: the stage, the summary as plain text, the transaction only while it is still to be signed, and
 // the people in the log by name (a person whose account is gone is `null`, and the page says so).

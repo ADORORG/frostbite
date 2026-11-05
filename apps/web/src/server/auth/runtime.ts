@@ -1,12 +1,12 @@
 import {
   createSessionService,
   createDrizzleSessionRepository,
-} from "@ador/auth";
+} from "@frostbite/auth";
 import {
   createAuthorizationService,
   createDrizzleAuthorizationRepository,
-} from "@ador/authorization";
-import { createHeldMethodKinds } from "@ador/feature-accounts";
+} from "@frostbite/authorization";
+import { createHeldMethodKinds } from "@frostbite/feature-accounts";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 
 import { getDatabase } from "../database";

@@ -1,4 +1,4 @@
-import { stageOf } from "@ador/shared/chain";
+import { stageOf } from "@frostbite/shared/chain";
 
 import type { ClaimState } from "./repository.ts";
 

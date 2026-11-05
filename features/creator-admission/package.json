@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-creator-admission",
+  "name": "@frostbite/feature-creator-admission",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,13 +17,13 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/client-http": "workspace:*",
-    "@ador/client-react": "workspace:*",
-    "@ador/creator-admission": "workspace:*",
-    "@ador/database": "workspace:*",
-    "@ador/http": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/client-http": "workspace:*",
+    "@frostbite/client-react": "workspace:*",
+    "@frostbite/creator-admission": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8",

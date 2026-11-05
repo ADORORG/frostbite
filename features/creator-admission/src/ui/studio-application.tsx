@@ -1,6 +1,6 @@
 "use client";
 
-import type { CreatorApplicationResponse } from "@ador/shared/creator-admission";
+import type { CreatorApplicationResponse } from "@frostbite/shared/creator-admission";
 import { useState } from "react";
 
 import {

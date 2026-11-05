@@ -1,5 +1,5 @@
-import { mount, settle, textOf } from "@ador/test-kit/dom";
-import { WalletProvider } from "@ador/wallet/client";
+import { mount, settle, textOf } from "@frostbite/test-kit/dom";
+import { WalletProvider } from "@frostbite/wallet/client";
 import { describe, expect, it } from "vitest";
 
 import { GameSurface, GamesSurface } from "../src/ui/surfaces.tsx";

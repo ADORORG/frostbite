@@ -3,8 +3,8 @@
 import type {
   ChainStatusApi,
   StatusPolling,
-} from "@ador/feature-chain-status/api";
-import type { FeeSpeed } from "@ador/shared/chain";
+} from "@frostbite/feature-chain-status/api";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import { createContext, useContext, type ReactNode } from "react";
 
 // What a page needs to offer a fee speed: the one it starts on and how often to ask the chain what each costs. Provided once by the

@@ -1,4 +1,4 @@
-import { gameIdSchema } from "@ador/shared/games";
+import { gameIdSchema } from "@frostbite/shared/games";
 
 import { games } from "@repo/configs/games";
 import { pageImageCacheControl } from "@/server/metadata/cache";

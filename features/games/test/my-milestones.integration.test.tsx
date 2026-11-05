@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { ApiError } from "@ador/client-http";
-import { mintedPictureHref, defineGame } from "@ador/shared/games";
+import { ApiError } from "@frostbite/client-http";
+import { mintedPictureHref, defineGame } from "@frostbite/shared/games";
 import { standInInitials } from "@repo/ui/arcade";
 import {
   click,
@@ -9,7 +9,7 @@ import {
   mount,
   settle,
   textOf,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import type { MintedApi } from "../src/client/minted-api.ts";

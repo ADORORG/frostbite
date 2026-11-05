@@ -4,7 +4,7 @@ import type {
   SignedTransaction,
   UnsignedTransaction,
   VerificationResult,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { validateBitcoinAddress } from "../bitcoin/address.ts";
 import { psbtFormat } from "./format.ts";

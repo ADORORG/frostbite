@@ -1,4 +1,4 @@
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
 import type { StackActor } from "./manual-stack.ts";
 

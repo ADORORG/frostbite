@@ -1,4 +1,4 @@
-import type { ExpiredRowLimits } from "@ador/database";
+import type { ExpiredRowLimits } from "@frostbite/database";
 
 // The platform's `expiredRowPolicy` as the limits a removal takes: just the numbers it uses, so a field a policy record carries for its own
 // sake (its version) is never handed to a function that refuses what it does not know.

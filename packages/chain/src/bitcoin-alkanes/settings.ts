@@ -1,4 +1,4 @@
-import type { ChainRef } from "@ador/shared/chain";
+import type { ChainRef } from "@frostbite/shared/chain";
 
 import type { ChainAdapter } from "../adapter.ts";
 import type { BitcoinNetwork } from "../bitcoin/address.ts";

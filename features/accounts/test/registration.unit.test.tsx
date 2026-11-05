@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import { createAccountsFeature } from "../src/registration.ts";
 import { createAuthMethods } from "../src/methods.ts";
 import { roleRoutes } from "../src/roles/contract.ts";
-import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
+import {
+  emailCodeRoutes,
+  passkeyRoutes,
+  walletAuthRoutes,
+} from "@frostbite/auth";
 import { setupLinkRoutes } from "../src/setup/contract.ts";
 import { walletBalanceRoute } from "../src/balance/contract.ts";
 import { walletConfig } from "./support/wallet-config.ts";

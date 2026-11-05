@@ -1,10 +1,10 @@
 import type {
   CollectionAggregate,
   createCollectionService,
-} from "@ador/collections";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { CollectionDetail } from "@ador/shared/collections";
-import type { createAssetLibraryService } from "@ador/uploads";
+} from "@frostbite/collections";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { CollectionDetail } from "@frostbite/shared/collections";
+import type { createAssetLibraryService } from "@frostbite/uploads";
 
 import { presentDetail, referencedAssetIds } from "./present.ts";
 

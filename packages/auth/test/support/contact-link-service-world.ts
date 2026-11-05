@@ -1,4 +1,4 @@
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { vi } from "vitest";
 
 import type { ActiveSession } from "../../src/application/session-repository.ts";

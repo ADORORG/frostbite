@@ -2,7 +2,7 @@ import type {
   AssetPipelineActivities,
   AssetProcessingStatus,
   AssetValidationStatus,
-} from "@ador/jobs/activities";
+} from "@frostbite/jobs/activities";
 
 import type { AssetProcessingResult } from "./processing-service.ts";
 import type { AssetValidationResult } from "./validation-service.ts";

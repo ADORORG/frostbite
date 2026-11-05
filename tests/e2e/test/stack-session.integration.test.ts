@@ -3,13 +3,13 @@ import {
   authUsers,
   createDatabaseClient,
   createDatabasePool,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
-import { withDisposablePostgres } from "@ador/database/test-postgres";
-import { applyMigrations } from "@ador/database";
+import { withDisposablePostgres } from "@frostbite/database/test-postgres";
+import { applyMigrations } from "@frostbite/database";
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { reviveSession } from "../scripts/stack-setup.ts";
 

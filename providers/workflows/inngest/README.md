@@ -1,4 +1,4 @@
-# `@ador/provider-workflows-inngest`
+# `@frostbite/provider-workflows-inngest`
 
 Inngest adapter for the platform's workflow ports (ADR-003, ADR-014).
 
@@ -18,7 +18,7 @@ provides two typed capabilities:
 ## Structure
 
 The SDK is imported only here. `asset-pipeline-function.ts` is the Inngest wiring (trigger, retries,
-concurrency, non-retriable mapping); the workflow itself, `runAssetPipeline`, lives in `@ador/jobs` and is
+concurrency, non-retriable mapping); the workflow itself, `runAssetPipeline`, lives in `@frostbite/jobs` and is
 parameterized over a durable step, so it is tested without the SDK. The function id and step ids are
 stable compatibility surfaces. Concurrency is bounded globally and serial per asset.
 
@@ -39,7 +39,7 @@ the public endpoint unauthenticated.
 
 `test:unit` covers configuration, the publisher against real SDK error shapes, the function definition,
 signature rejection, and registration. `test:integration` runs the real self-hosted Inngest server with
-signing enforced (through `@ador/test-kit`): a signed sync, a completed run, duplicate event ids producing
+signing enforced (through `@frostbite/test-kit`): a signed sync, a completed run, duplicate event ids producing
 one run, retries and exhaustion, permanent failure without retry, the concurrency bound, a wrong event
 key, and unsigned and forged requests. Platform engineering owns this provider.
 

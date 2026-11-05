@@ -1,4 +1,4 @@
-# `@ador/authorization`
+# `@frostbite/authorization`
 
 Detachable server-side account mutation and authorization policy boundaries.
 
@@ -8,7 +8,7 @@ Detachable server-side account mutation and authorization policy boundaries.
   versioned policy and repository port.
 - `createAccountService` validates organization creation and derives permitted membership actors
   from the same policy.
-- `@ador/authorization/role-guard` exports `holdsActivePlatformRole`, which a domain transaction uses to
+- `@frostbite/authorization/role-guard` exports `holdsActivePlatformRole`, which a domain transaction uses to
   check a platform role with a shared lock on the assignment row, so a role withdrawal waits for the
   decision it would have authorized.
 - A platform role can be tied to a kind of sign-in method by the policy (`requiredMethods`: staff and admin need a `wallet`). Such a
@@ -46,12 +46,12 @@ and clock. This package reads no environment variables or provider configuration
 ## Verification
 
 ```bash
-pnpm --filter @ador/authorization env:check
-pnpm --filter @ador/authorization lint
-pnpm --filter @ador/authorization typecheck
-pnpm --filter @ador/authorization test:unit
-pnpm --filter @ador/authorization test:integration
-pnpm --filter @ador/authorization test:coverage
+pnpm --filter @frostbite/authorization env:check
+pnpm --filter @frostbite/authorization lint
+pnpm --filter @frostbite/authorization typecheck
+pnpm --filter @frostbite/authorization test:unit
+pnpm --filter @frostbite/authorization test:integration
+pnpm --filter @frostbite/authorization test:coverage
 ```
 
 ## Ownership

@@ -1,9 +1,9 @@
-# `@ador/game-claims`
+# `@frostbite/game-claims`
 
 A player's claim of a milestone from a game's rewards contract: build the transaction, keep what the wallet was shown and
 signed, send it, and follow it until the chain agrees. Plan: `docs/product/plan-g7-minting.md` (task G7b). **Nothing here talks
-to a real chain yet**: it works through the chain-neutral ports (`@ador/chain`) and is tested against the simulated chain
-(`@ador/test-kit/simulated-chain`). The real contract and adapter are G7e.
+to a real chain yet**: it works through the chain-neutral ports (`@frostbite/chain`) and is tested against the simulated chain
+(`@frostbite/test-kit/simulated-chain`). The real contract and adapter are G7e.
 
 ## Public API
 
@@ -25,7 +25,7 @@ to a real chain yet**: it works through the chain-neutral ports (`@ador/chain`) 
   when the network first shows the transaction included). Shown only when the item's issuer is the claim's own contract (chain, family
   and id) and its kind is one of `mintedPictureContentTypes`; otherwise `no-picture`. A chain that cannot be asked is `chain-unavailable`.
 
-`createDrizzleGameClaimRepository(database, { clock })` stores claims in `ador.game_milestone_claims`.
+`createDrizzleGameClaimRepository(database, { clock })` stores claims in `frostbite.game_milestone_claims`.
 
 ## States
 
@@ -41,7 +41,7 @@ nothing to reconcile.
 - At most one claim per player, game and milestone is in progress (a partial unique index), so two starts together make one
   claim. A claim that was never signed and has run out of time expires, and neither blocks nor counts.
 - A milestone is claimed no more than its manifest policy allows: `complete` claims count against the limit from
-  `rewardsInitialisation` (`@ador/shared/games`). The chain enforces its own limit per address; the platform's is per account.
+  `rewardsInitialisation` (`@frostbite/shared/games`). The chain enforces its own limit per address; the platform's is per account.
 - A step is written only if the lifecycle allows the move from where the claim is now (`canMove`), under the claim's row lock,
   so a step that arrives late or twice cannot move a claim backwards.
 - A claim is never reachable by another player: every read and write is scoped to the player, and another's claim id answers
@@ -56,7 +56,7 @@ adapter's build, broadcast and observe (G7e). The confirmation depth is the adap
 
 ## Tests
 
-`pnpm --filter @ador/game-claims test:unit` (transitions, summary codec), `test:integration` (the service end to end on the
+`pnpm --filter @frostbite/game-claims test:unit` (transitions, summary codec), `test:integration` (the service end to end on the
 simulated chain against real PostgreSQL: the whole lifecycle, every refusal, rejection, an unreachable network, a broadcast of
 unknown outcome, a revert, indexer lag, expiry, concurrency, ownership, and the table's own constraints), `test:coverage`.
 

@@ -1,8 +1,11 @@
-import { gameMilestoneClaims } from "@ador/database";
+import { gameMilestoneClaims } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import { BuildRefusedError, ChainUnavailableError } from "@ador/chain/ports";
+import {
+  BuildRefusedError,
+  ChainUnavailableError,
+} from "@frostbite/chain/ports";
 import {
   chainAvailable,
   chainFailure,

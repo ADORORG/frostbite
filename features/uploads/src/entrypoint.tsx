@@ -1,6 +1,6 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
 
 import { createUploadIntentOperation } from "./application/operation.ts";
 import { createCompleteUploadIntentOperation } from "./application/completion-operation.ts";
@@ -8,7 +8,7 @@ import {
   uploadDetailPath,
   uploadsNewPath,
   uploadsStudioPath,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { createUploadsContextResolver } from "./context.ts";
 import { ImageDetailSurface } from "./ui/image-detail-surface.tsx";
 import { NewUploadSurface } from "./ui/new-upload-surface.tsx";

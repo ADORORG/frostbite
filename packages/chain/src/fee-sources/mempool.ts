@@ -1,4 +1,4 @@
-import type { FeeRate } from "@ador/shared/chain";
+import type { FeeRate } from "@frostbite/shared/chain";
 
 import {
   assertTimeout,

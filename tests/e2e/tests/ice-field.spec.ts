@@ -1,4 +1,4 @@
-import { syncGameStateResponseSchema } from "@ador/shared/games";
+import { syncGameStateResponseSchema } from "@frostbite/shared/games";
 import { expect, test, type FrameLocator } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

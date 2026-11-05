@@ -2,8 +2,8 @@ import type {
   ObjectStoragePort,
   StorageScope,
   StoredObjectMetadata,
-} from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
+} from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
 
 import { r2ConfigSchema, type R2Config } from "./config.ts";
 import { toStoredMetadata, toStoredObject } from "./metadata.ts";

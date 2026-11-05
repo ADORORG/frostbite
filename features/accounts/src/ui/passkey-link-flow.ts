@@ -4,8 +4,8 @@ import {
   passkeyMutationResponseSchema,
   passkeyRoutes,
   type PasskeyBeginResponse,
-} from "@ador/auth";
-import { ApiError, type Requester } from "@ador/client-http";
+} from "@frostbite/auth";
+import { ApiError, type Requester } from "@frostbite/client-http";
 
 import { failed, failedFrom, type Failed } from "../client/outcome.ts";
 

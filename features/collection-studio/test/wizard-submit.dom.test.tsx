@@ -1,4 +1,4 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import {
   button,
   buttonMatching,
@@ -8,7 +8,7 @@ import {
   settle,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { detail, imageAsset, itemRecord } from "./support/detail.ts";

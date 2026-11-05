@@ -1,4 +1,4 @@
-import { transactionStates } from "@ador/shared/chain";
+import { transactionStates } from "@frostbite/shared/chain";
 import { sql } from "drizzle-orm";
 import {
   check,

@@ -1,4 +1,4 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import { ImageDetailWorkspace } from "./image-detail-workspace.tsx";
 import { UploadsFrame } from "./uploads-frame.tsx";

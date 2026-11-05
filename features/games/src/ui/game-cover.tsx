@@ -1,4 +1,4 @@
-import { SceneOverlay } from "@ador/scenes/react";
+import { SceneOverlay } from "@frostbite/scenes/react";
 import { ArcadePreview } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";

@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadsStudioPath } from "@ador/shared/uploads";
+import { uploadsStudioPath } from "@frostbite/shared/uploads";
 import {
   ArcadeActionButton,
   ArcadeButton,

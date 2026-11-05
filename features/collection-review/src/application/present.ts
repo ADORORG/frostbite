@@ -2,13 +2,13 @@ import type {
   ActivityPage,
   ReviewQueueRecord,
   ReviewSubmissionRecord,
-} from "@ador/collections";
+} from "@frostbite/collections";
 import {
   encodeActivityCursor,
   type ReviewActivityResponse,
   type ReviewQueueItem,
   type ReviewSubmission,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 export function presentQueueItem(record: ReviewQueueRecord): ReviewQueueItem {
   return {

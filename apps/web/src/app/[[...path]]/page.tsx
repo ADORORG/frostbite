@@ -1,7 +1,7 @@
 import type { Metadata, Route } from "next";
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { AccessState } from "@repo/ui/arcade";
 
 import { platformComposition } from "@repo/configs/platform";

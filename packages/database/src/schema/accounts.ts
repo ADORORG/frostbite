@@ -2,7 +2,7 @@ import {
   accountStatuses,
   organizationRoles,
   platformRoles,
-} from "@ador/shared/accounts";
+} from "@frostbite/shared/accounts";
 import { sql } from "drizzle-orm";
 import {
   check,

@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { gameAdminSteps } from "@ador/database";
+import { gameAdminSteps } from "@frostbite/database";
 import { describe, expect, it } from "vitest";
 
 import {

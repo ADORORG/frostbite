@@ -1,8 +1,8 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
-import { gameRuns } from "@ador/database/schema/game-runs";
+} from "@frostbite/database/connection";
+import { gameRuns } from "@frostbite/database/schema/game-runs";
 import { and, eq, lte, sql } from "drizzle-orm";
 
 import type {

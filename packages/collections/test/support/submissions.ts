@@ -1,6 +1,6 @@
-import { collectionSubmissions } from "@ador/database";
-import { requestFingerprint } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import { collectionSubmissions } from "@frostbite/database";
+import { requestFingerprint } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 
 import {

@@ -1,6 +1,6 @@
-import { frequency, stepsAt } from "@ador/game-sdk/audio/tracks";
-import { defaultSound } from "@ador/game-sdk/audio/settings";
-import { replayRecord } from "@ador/game-sdk/replay";
+import { frequency, stepsAt } from "@frostbite/game-sdk/audio/tracks";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
+import { replayRecord } from "@frostbite/game-sdk/replay";
 import { describe, expect, it } from "vitest";
 
 import { effects, track } from "../src/audio.ts";

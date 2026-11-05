@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { ApiError } from "@frostbite/client-http";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { StudioHomeWorkspace } from "../src/ui/studio-home-workspace.tsx";

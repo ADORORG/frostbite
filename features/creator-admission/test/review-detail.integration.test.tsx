@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { creatorReviewPath } from "@ador/shared/creator-admission";
+import { ApiError } from "@frostbite/client-http";
+import { creatorReviewPath } from "@frostbite/shared/creator-admission";
 import { act } from "react";
 import {
   afterEach,

@@ -1,7 +1,7 @@
 import { invalidContractOrSenderWords } from "../../src/bitcoin-alkanes/refusal-words.ts";
 import { Transaction } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema } from "@frostbite/shared/chain";
 
 import { gameRewardsOpcodes } from "../../src/bitcoin-alkanes/abi.ts";
 import {

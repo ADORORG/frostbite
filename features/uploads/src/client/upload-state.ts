@@ -1,7 +1,10 @@
-import type { AssetRejectionReason, UploadPurpose } from "@ador/shared/uploads";
-import type { IdempotencyKey } from "@ador/shared/http";
+import type {
+  AssetRejectionReason,
+  UploadPurpose,
+} from "@frostbite/shared/uploads";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 
-import type { ApiErrorCode } from "@ador/client-http";
+import type { ApiErrorCode } from "@frostbite/client-http";
 import type { FileRejection } from "./file-checks.ts";
 import type { TransferFailure } from "./transfer.ts";
 

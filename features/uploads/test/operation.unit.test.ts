@@ -1,7 +1,10 @@
-import { idempotencyKeyConflict, unauthenticated } from "@ador/http/outcome";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { uploadOutcomes } from "@ador/shared/uploads";
+import {
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "@frostbite/http/outcome";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { uploadOutcomes } from "@frostbite/shared/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 import { createUploadIntentOperation } from "../src/application/operation.ts";

@@ -12,8 +12,8 @@ only the SDK, publishes its own rules, and declares in its manifest which milest
 ## Decisions taken on the documented defaults (review at merge)
 
 - **Run lifetime 24 hours; three open runs per player and game; signed-in players only; milestones earned once only**
-  (typed policy: `maxOpenRuns`, `runLifetimeMs` in `@ador/game-runs`). A run left open stops counting when it expires.
-- **A verifier is the game's own published file, pinned by digest in the manifest** and loaded by `@ador/game-verification`
+  (typed policy: `maxOpenRuns`, `runLifetimeMs` in `@frostbite/game-runs`). A run left open stops counting when it expires.
+- **A verifier is the game's own published file, pinned by digest in the manifest** and loaded by `@frostbite/game-verification`
   (`/node`, `/loader`, `/runner`). The registry is keyed by game id; the old code registry (`configs/verifiers.ts`) and the web
   app's and the repository root's dependencies on a game are gone.
 - **First-party runner only.** `createInProcessRunner` runs the artifact in a `node:vm` context with a per-call time limit. It
@@ -33,22 +33,22 @@ only the SDK, publishes its own rules, and declares in its manifest which milest
 
 ## What was built
 
-- **Schema and migrations:** `ador.game_runs` (`20261015175833_game_runs`) with checks for state, seed range, expiry, verdict
+- **Schema and migrations:** `frostbite.game_runs` (`20261015175833_game_runs`) with checks for state, seed range, expiry, verdict
   coherence, digest shape and a 64 KB record; `game_milestone_unlocks.verification` accepts `replay-verified`
   (`20261015180946_milestone_replay_verified`).
-- **`@ador/game-runs`** (new): `createGameRunsService` (start, submit), `createDrizzleGameRunRepository` (advisory lock per
+- **`@frostbite/game-runs`** (new): `createGameRunsService` (start, submit), `createDrizzleGameRunRepository` (advisory lock per
   player and game for starts, row lock for submissions, a hook inside the settling transaction), policy, README.
-- **`@ador/game-saves`:** `recordVerifiedMilestones`, `asReported`, level kept through the repository.
-- **`@ador/game-verification`:** `runner.ts`, `loader.ts`, `node.ts`; the registry keyed by game id.
-- **`@ador/shared`:** manifest `verification` (game and milestone), `runs.ts` contracts, level in the sync schema and merge.
-- **`@ador/game-sdk`:** `run.start` / `run.submit` (protocol, host, client), policy (`runCallsPerMinute`, `runRecordMaxBytes`),
+- **`@frostbite/game-saves`:** `recordVerifiedMilestones`, `asReported`, level kept through the repository.
+- **`@frostbite/game-verification`:** `runner.ts`, `loader.ts`, `node.ts`; the registry keyed by game id.
+- **`@frostbite/shared`:** manifest `verification` (game and milestone), `runs.ts` contracts, level in the sync schema and merge.
+- **`@frostbite/game-sdk`:** `run.start` / `run.submit` (protocol, host, client), policy (`runCallsPerMinute`, `runRecordMaxBytes`),
   `refreshVerified` and `adoptVerified` so the browser's copy takes back what the platform verified; `build` emits
   `verifier.js` and `verifier.json` for a game with `src/replay.ts`.
-- **`@ador/feature-games`:** the two operations, the runs resolver (loads the verifiers once, logs those it cannot), the
+- **`@frostbite/feature-games`:** the two operations, the runs resolver (loads the verifiers once, logs those it cannot), the
   same-origin runs port, the labels in the dock and the milestone list. `configs/game-runs.ts`, rate limits.
 - **FROST·BITE:** `src/replay.ts`, a manifest that pins the verifier and marks `first-win` and `first-glacier`
   replay-verifiable, and a cabinet that starts a run on the platform's seed when it can and submits at "End run".
-- **Tests support:** `@ador/test-kit/adder-game`, a made-up second game the platform has never heard of, built and loaded by
+- **Tests support:** `@frostbite/test-kit/adder-game`, a made-up second game the platform has never heard of, built and loaded by
   the same path in an integration test against real PostgreSQL (the principle "no platform change to onboard a game").
 - **Docs:** `run-record.md`, `game-host-interface.md`, `game-onboarding.md`, the roadmap, READMEs, the ledger.
 
@@ -60,9 +60,9 @@ only the SDK, publishes its own rules, and declares in its manifest which milest
   bounded reader; tests added); SDK, host, session 18 (3 survived: a redundant filter removed, the submit timeout, the page's
   refresh after a verdict; tests added); labels 9 (all killed); the FROST·BITE cabinet 15 (1 equivalent). The working tree was
   restored after each run.
-- **Coverage (statements / branches / functions / lines):** `@ador/game-runs` 100/100/100/100; `@ador/game-saves`
-  98.6/97.5/100/98.4; `@ador/game-verification` 100/96.4/100/100; `@ador/game-sdk` 98.3/96.8/98.5/98.3; `@ador/shared`
-  98.9/99.1/97.9/98.9; `@ador/http` 100/100/100/100; `@ador/feature-games` 96.9/96.3/94.2/97.0; `@game/frostbite`
+- **Coverage (statements / branches / functions / lines):** `@frostbite/game-runs` 100/100/100/100; `@frostbite/game-saves`
+  98.6/97.5/100/98.4; `@frostbite/game-verification` 100/96.4/100/100; `@frostbite/game-sdk` 98.3/96.8/98.5/98.3; `@frostbite/shared`
+  98.9/99.1/97.9/98.9; `@frostbite/http` 100/100/100/100; `@frostbite/feature-games` 96.9/96.3/94.2/97.0; `@game/frostbite`
   98.5/93.8/100/100; `@game/sdk-explorer` 100/91.7/100/100.
 - **Tests:** real PostgreSQL for the run repository (concurrent starts and submissions, expiry, rollback when the milestone write
   fails, every table check, cascade) and for the whole claim path with a second game (`apps/web/test/game-runs-flow`); the

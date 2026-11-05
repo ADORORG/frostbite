@@ -1,4 +1,4 @@
-import { fieldByLabel, mount, typeInto } from "@ador/test-kit/dom";
+import { fieldByLabel, mount, typeInto } from "@frostbite/test-kit/dom";
 
 import { GameAdminPanel } from "../../src/ui/game-admin-panel.tsx";
 import { info } from "./fixtures.ts";

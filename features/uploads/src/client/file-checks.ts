@@ -3,7 +3,7 @@ import {
   uploadContentTypes,
   type UploadContentType,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 export type FileRejection =
   | { readonly kind: "empty" }

@@ -3,7 +3,7 @@ import {
   submissionActionPastLabels,
   submissionStateLabels,
   type ReviewActivityItem,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
 
 // The events, newest first, each as a sentence: who did what to which submission, when, and the state

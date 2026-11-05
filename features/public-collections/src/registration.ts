@@ -1,6 +1,6 @@
-import { defineFeature } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import type { ChainOption } from "@ador/shared/chain";
+import { defineFeature } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import type { ChainOption } from "@frostbite/shared/chain";
 
 import { collectionPagePath, collectionsPath } from "./paths.ts";
 
@@ -38,7 +38,7 @@ export function createPublicCollectionsFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-public-collections/entrypoint").then(
+      import("@frostbite/feature-public-collections/entrypoint").then(
         ({ createPublicCollectionsEntrypoint }) =>
           createPublicCollectionsEntrypoint(providers, chains),
       ),

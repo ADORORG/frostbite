@@ -2,7 +2,7 @@ import {
   assetRejectionReasons,
   uploadOutcomes,
   uploadPurposes,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { checkFile } from "../../src/client/file-checks.ts";

@@ -5,10 +5,10 @@ Findings: S58.
 
 ## What was built
 
-- `@ador/game-sdk/dev-host`: `startDevHost` (`server.ts`), the page and its styles (`page.ts`), the page's behaviour
+- `@frostbite/game-sdk/dev-host`: `startDevHost` (`server.ts`), the page and its styles (`page.ts`), the page's behaviour
   (`page-controller.ts`: the real host, the game's sandboxed frame, a panel, a log), the fake platform (`fake-platform.ts`:
   wallet and network, sign-in, claims by press), the browser start (`client.ts`), the game description (`config.ts`), the command
-  (`cli.ts` with its process entry `bin.ts`); a `bin` named `ador-game-dev`.
+  (`cli.ts` with its process entry `bin.ts`); a `bin` named `frostbite-game-dev`.
 - `tooling/game-tools`: `pnpm game:dev <id>` (`dev-game.ts`) over a tested lookup of the registered game (`dev-games.ts`).
 - Docs: the SDK README, the builder guide, the roadmap.
 

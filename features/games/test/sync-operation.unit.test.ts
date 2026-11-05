@@ -1,11 +1,14 @@
-import { createGameSyncService, type GameSyncService } from "@ador/game-saves";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import {
+  createGameSyncService,
+  type GameSyncService,
+} from "@frostbite/game-saves";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import {
   gameSyncRoute,
   syncGameStateInputSchema,
   type GameState,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { createSyncGameStateOperation } from "../src/application/sync-operation.ts";

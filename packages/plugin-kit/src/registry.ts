@@ -5,9 +5,9 @@ import {
   type FeatureManifest,
   type NavigationContribution,
   type PageAccessRequirement,
-} from "@ador/shared/features";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
+} from "@frostbite/shared/features";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { RegisteredHttpOperation } from "@frostbite/http/registered-operation";
 import type { ReactNode } from "react";
 import { collectHomeSections, type HomeSection } from "./home-sections.ts";
 import type { NavigationItem } from "./navigation.ts";

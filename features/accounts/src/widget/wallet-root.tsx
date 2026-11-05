@@ -1,8 +1,8 @@
 "use client";
 
 import { ShellSlotsProvider } from "@repo/ui/arcade";
-import { WalletProvider } from "@ador/wallet/client";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import { WalletProvider } from "@frostbite/wallet/client";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import type { ReactNode } from "react";
 
 import type { WalletCandidate } from "../wallet-config.ts";

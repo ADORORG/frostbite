@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { UnsignedTransaction } from "@ador/shared/chain";
+import type { UnsignedTransaction } from "@frostbite/shared/chain";
 
 import { chain, claimIntent, sign } from "../support/claims.ts";
 import { build, builder } from "../support/verification.ts";

@@ -1,4 +1,4 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 
 import {
   maxSatoshis,

@@ -1,4 +1,4 @@
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 
 import { createSessionMaterial } from "../application/session-material.ts";
 import { createOpaqueValue, sha256 } from "../domain/crypto.ts";

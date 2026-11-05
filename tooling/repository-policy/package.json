@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/shared": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/configs": "workspace:*",
     "typescript": "5.9.3",
     "zod": "4.5.4"

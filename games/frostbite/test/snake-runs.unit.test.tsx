@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import type { Result } from "@ador/game-sdk/protocol";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import type { Result } from "@frostbite/game-sdk/protocol";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it, vi } from "vitest";
 
 import type { CabinetHost } from "../src/cabinet/host.ts";

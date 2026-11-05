@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { ClaimsService } from "@ador/game-sdk/host";
+import type { ClaimsService } from "@frostbite/game-sdk/host";
 import { describe, expect, it, vi } from "vitest";
 
 import {

@@ -2,7 +2,7 @@ import {
   platformRoles,
   type AuthorizationPolicy,
   type PlatformRole,
-} from "@ador/shared/accounts";
+} from "@frostbite/shared/accounts";
 import {
   creatorAdmissionPolicyVersion,
   creatorApplicationDraftSchema,
@@ -15,11 +15,14 @@ import {
   type CreatorReviewGroup,
   type CreatorReviewPosition,
   type CreatorReviewSort,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { createHash } from "node:crypto";
 
-import { correlationIdSchema, idempotencyKeySchema } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import {
+  correlationIdSchema,
+  idempotencyKeySchema,
+} from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type {
   CreatorAdmissionRepository,

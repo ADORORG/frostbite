@@ -1,4 +1,4 @@
-import type { GameClient } from "@ador/game-sdk/client";
+import type { GameClient } from "@frostbite/game-sdk/client";
 
 // The game's own progression marks are camelCase (`firstWin`); a milestone's id on the platform is a slug
 // (`first-win`).

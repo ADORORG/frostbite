@@ -7,11 +7,11 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { correlationIdSchema } from "@ador/shared/http";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/database";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { eq } from "drizzle-orm";
 
 import { createDrizzleUploadIntentRepository } from "../../src/adapters/drizzle-repository.ts";

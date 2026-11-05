@@ -1,17 +1,17 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => undefined }),
 }));
 
-vi.mock("@ador/http/json-body", async (importOriginal) => {
+vi.mock("@frostbite/http/json-body", async (importOriginal) => {
   const original =
-    await importOriginal<typeof import("@ador/http/json-body")>();
+    await importOriginal<typeof import("@frostbite/http/json-body")>();
   return { ...original, readJsonBody: vi.fn(original.readJsonBody) };
 });
 
-import { readJsonBody } from "@ador/http/json-body";
+import { readJsonBody } from "@frostbite/http/json-body";
 import { GET, POST } from "../src/app/api/v1/[...segments]/route.ts";
 
 beforeAll(() => {

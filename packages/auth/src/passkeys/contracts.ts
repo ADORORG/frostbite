@@ -1,4 +1,4 @@
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import { z } from "zod";
 
 const base64UrlSchema = z

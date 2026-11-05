@@ -2,7 +2,7 @@ import {
   collectionItemSchema,
   collectionLimits,
   type CollectionItem,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 export interface AttributeRow {
   readonly trait: string;

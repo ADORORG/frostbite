@@ -1,7 +1,7 @@
 "use client";
 
-import type { ChainOption } from "@ador/shared/chain";
-import { collectionNewPath } from "@ador/shared/collections";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { collectionNewPath } from "@frostbite/shared/collections";
 import { ArcadeButton } from "@repo/ui/arcade";
 import { useMemo, useState } from "react";
 

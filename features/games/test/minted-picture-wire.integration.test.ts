@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import type { MintedPictureResult } from "@ador/game-claims";
-import { presentResponse } from "@ador/http/present";
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import { readQueryInput } from "@ador/http/request-input";
-import { mintedPictureHref } from "@ador/shared/games";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import type { MintedPictureResult } from "@frostbite/game-claims";
+import { presentResponse } from "@frostbite/http/present";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import { readQueryInput } from "@frostbite/http/request-input";
+import { mintedPictureHref } from "@frostbite/shared/games";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createGetMintedPictureOperation } from "../src/application/minted-operation.ts";

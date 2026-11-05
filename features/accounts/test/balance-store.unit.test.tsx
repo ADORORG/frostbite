@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ApiError, type Requester } from "@ador/client-http";
+import { ApiError, type Requester } from "@frostbite/client-http";
 
 import { createBalanceStore } from "../src/client/balance-store.ts";
 

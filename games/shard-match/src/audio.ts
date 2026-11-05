@@ -1,5 +1,5 @@
-import { commonEffects, tone } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import { commonEffects, tone } from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Shard Match's sound, as data: a bright, bouncing tune in C major over a walking bass, and an effect for each thing that happens, with a match
 // that rings higher the longer the chain it started. Nothing here is a file: the SDK plays it with the browser's audio.

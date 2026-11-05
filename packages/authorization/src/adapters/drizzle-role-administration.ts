@@ -1,5 +1,5 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { authUsers } from "@ador/database/schema/auth";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { authUsers } from "@frostbite/database/schema/auth";
 import { eq } from "drizzle-orm";
 
 import type { RoleAdministrationRepository } from "../application/role-administration.ts";

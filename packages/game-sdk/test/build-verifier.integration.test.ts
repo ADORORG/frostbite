@@ -25,7 +25,7 @@ const html =
   '<!doctype html><html><body><script src="main.js"></script></body></html>';
 // The rules a game publishes: add 1 to 3 to a counter until it reaches the target.
 const replaySource = `
-import type { GameVerifier } from "@ador/game-sdk/run-record";
+import type { GameVerifier } from "@frostbite/game-sdk/run-record";
 const rules: GameVerifier<{ count: number; target: number }> = {
   earned: ({ count, target }) => (count >= target ? ["reached"] : []),
   id: "counter",
@@ -66,7 +66,7 @@ async function makeGame(replay?: string) {
 const run = (code: string, record: unknown) => {
   const scope: Record<string, unknown> = {};
   runInNewContext(code, scope);
-  const replay = scope.__adorReplay as (text: string) => string;
+  const replay = scope.__frostbiteReplay as (text: string) => string;
   return JSON.parse(replay(JSON.stringify(record)));
 };
 
@@ -85,7 +85,7 @@ describe("publishing a game's rules", () => {
         (() => {
           const scope: Record<string, unknown> = {};
           runInNewContext(artifact.code, scope);
-          return scope.__adorSample;
+          return scope.__frostbiteSample;
         })(),
       ),
     );

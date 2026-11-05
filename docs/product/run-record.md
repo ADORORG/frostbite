@@ -20,7 +20,7 @@ game's own rules and see what it earned. That is the `replay-verified` level of 
 
 ## The record
 
-A strict JSON document, defined and validated by `@ador/game-sdk/run-record`:
+A strict JSON document, defined and validated by `@frostbite/game-sdk/run-record`:
 
 | Field                         | Meaning                                                                                                                                        |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,7 +51,7 @@ publishes its rules by having `src/replay.ts` (a default export of the `GameVeri
 one legal run). The SDK's build turns it into `verifier.js` and `verifier.json` (`{ bytes, id, sha256, version }`) beside the
 game. The game's manifest pins them (`verification: { replay: { id, sha256, version } }`, which needs the `run:submit`
 capability and at least one milestone with `verification: "replay-verified"`), and a test fails until the pin matches what the
-source builds. The platform loads the file by that digest (`@ador/game-verification/loader`): a file whose hash differs, whose
+source builds. The platform loads the file by that digest (`@frostbite/game-verification/loader`): a file whose hash differs, whose
 identity differs from the manifest's, or whose sample run does not verify is not loaded, and its game stays self-reported (the
 reason is logged at startup). The game's browser bundle is never executed on the server; only this file is.
 
@@ -102,7 +102,7 @@ seed other than the issued one is rejected without a replay, and a claim of a mi
 replay-verifiable is rejected without one; every submission that reaches a verdict spends the run; a run whose game's rules
 changed since it was issued is `stale` and spent; the canonical record is kept up to 64 KB for audit (retention of rejected
 ones is not implemented yet). Over HTTP: `POST /api/v1/games/runs/start` and `POST /api/v1/games/runs/submit` (signed in,
-same origin, rate limited, bodies read under a 1 MiB ceiling before parsing); the records and runs are in `ador.game_runs`.
+same origin, rate limited, bodies read under a 1 MiB ceiling before parsing); the records and runs are in `frostbite.game_runs`.
 
 Scope in this version: milestones earned once. Repeatable milestones and ones with a target stay self-reported. A game with
 **hidden information** (the layout of mines) stays peekable: see the limit below. The platform cannot detect that, so the page
@@ -165,6 +165,6 @@ says; nothing that carries more than the self-reported class of reward may depen
 
 ## Limits (typed policy)
 
-`maxInputs` and `maxRecordBytes` in `@ador/game-verification/policy`, never above the SDK's ceilings (5,000 and 65,536).
+`maxInputs` and `maxRecordBytes` in `@frostbite/game-verification/policy`, never above the SDK's ceilings (5,000 and 65,536).
 They bound the work before a replay starts; a verifier is expected to do work proportional to the inputs it is given, and
 a record has at most `maxInputs` of them.

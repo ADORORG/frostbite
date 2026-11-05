@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -276,7 +276,7 @@ export const broMariaGame = defineGame({
     replay: {
       id: "bro-maria",
       sha256:
-        "978eaf47a654fa9454476a6c48d5b04b5fc8fc276345a2e7a511fe0893276810",
+        "b201ef464c81f96beea4605f3b391ecc1bf22e22475c9a3bc9c6135275db878d",
       version: 2,
     },
   },

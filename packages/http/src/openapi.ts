@@ -6,12 +6,12 @@ import {
   idempotencyKeySchema,
   type ApplicationHttpErrorCode,
   type HttpMethod,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 import { z } from "zod";
 
 import type { HttpOperation } from "./operation.js";
 import { forbiddenMessage } from "./outcome.ts";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
 type JsonSchema = z.core.JSONSchema.JSONSchema;
 type OpenApiMethod = "delete" | "get" | "patch" | "post" | "put";

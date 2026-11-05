@@ -11,20 +11,20 @@ import {
   gameRuns,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
+} from "@frostbite/database";
 import {
   createStartGameRunOperation,
   createSubmitGameRunOperation,
-} from "@ador/feature-games/runs-operations";
-import { createGameRunsResolver } from "@ador/feature-games/runs-runtime";
-import { correlationIdSchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/feature-games/runs-operations";
+import { createGameRunsResolver } from "@frostbite/feature-games/runs-runtime";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import {
   adderManifest,
   adderMilestone,
   adderRecord,
   publishAdderGame,
-} from "@ador/test-kit/adder-game";
+} from "@frostbite/test-kit/adder-game";
 import {
   afterAll,
   afterEach,

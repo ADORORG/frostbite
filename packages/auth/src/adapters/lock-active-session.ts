@@ -1,5 +1,5 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { authSessions } from "@ador/database/schema/auth";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { authSessions } from "@frostbite/database/schema/auth";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 // Locks the session a sensitive change is made from, and says whether it may still make it: it is the user's, not

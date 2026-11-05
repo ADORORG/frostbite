@@ -51,9 +51,9 @@ config, inputs, claims }`. `inputs` is an ordered list of `{ type, ... }` steps 
 
 ## 4. Phases
 
-1. `@ador/game-sdk/run-record`: the record schema, limits, canonical JSON and a recorder a game can build a record
+1. `@frostbite/game-sdk/run-record`: the record schema, limits, canonical JSON and a recorder a game can build a record
    with.
-2. `@ador/game-verification` (platform): the verifier contract, a registry, the bounded replay, the digest.
+2. `@frostbite/game-verification` (platform): the verifier contract, a registry, the bounded replay, the digest.
 3. FROST·BITE's deterministic core (`games/frostbite/src/verifier`) and its registration.
 4. Conformance: every registered verifier must verify its own sample run and refuse the standard hostile records.
 5. Docs: the record specification, the findings, the follow-up tasks; mutation proof and gates.

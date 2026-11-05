@@ -1,11 +1,11 @@
-import type { ClaimView } from "@ador/game-claims";
+import type { ClaimView } from "@frostbite/game-claims";
 import {
   addressSchema,
   transactionSummarySchema,
   unsignedTransactionSchema,
-} from "@ador/shared/chain";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/chain";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 export const userId = uuidV7Schema.parse(
   "01890f0e-7c8a-7b3a-8a3e-0123456789ab",

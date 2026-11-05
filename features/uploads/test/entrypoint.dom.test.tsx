@@ -1,9 +1,9 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import {
   uploadDetailPath,
   uploadsNewPath,
   uploadsStudioPath,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 

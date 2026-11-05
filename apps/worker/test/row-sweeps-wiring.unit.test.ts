@@ -1,5 +1,5 @@
-import { defaultMaintenanceLoopPolicy } from "@ador/jobs/policy";
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { defaultMaintenanceLoopPolicy } from "@frostbite/jobs/policy";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import { describe, expect, it, vi } from "vitest";
 
 const drain = vi.hoisted(() => ({
@@ -7,7 +7,7 @@ const drain = vi.hoisted(() => ({
     async () => undefined,
   ),
 }));
-vi.mock("@ador/jobs/drain-loop", () => ({ runDrainLoop: drain.run }));
+vi.mock("@frostbite/jobs/drain-loop", () => ({ runDrainLoop: drain.run }));
 
 import { createWorkerRuntime } from "../src/runtime.ts";
 import { rowSweepLimits } from "./support/row-sweep-limits.ts";

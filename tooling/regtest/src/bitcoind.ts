@@ -1,5 +1,5 @@
 import { objectOf } from "./json.ts";
-import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
+import { jsonValueSchema, type JsonValue } from "@frostbite/shared/chain";
 
 export class BitcoindError extends Error {
   readonly code: number;

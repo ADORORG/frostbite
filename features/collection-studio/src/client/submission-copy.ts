@@ -1,7 +1,7 @@
 import {
   submissionStateLabels,
   type SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 export type SubmissionTone = "attention" | "ready" | "unavailable";
 

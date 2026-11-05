@@ -1,4 +1,4 @@
-import { expiredRowLimitsSchema } from "@ador/database";
+import { expiredRowLimitsSchema } from "@frostbite/database";
 import { expiredRowPolicy } from "@repo/configs/expired-rows";
 import { describe, expect, it } from "vitest";
 

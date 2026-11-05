@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChainFees } from "@ador/shared/chain";
+import type { ChainFees } from "@frostbite/shared/chain";
 import { useMemo } from "react";
 
 import { holdReading, type StatusPolling } from "../domain/freshness.ts";

@@ -1,4 +1,4 @@
-import { frequency } from "@ador/game-sdk/audio/tracks";
+import { frequency } from "@frostbite/game-sdk/audio/tracks";
 import { describe, expect, it } from "vitest";
 
 import { effects, joinSound, track } from "../src/audio.ts";

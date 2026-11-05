@@ -1,4 +1,4 @@
-import { collections } from "@ador/database";
+import { collections } from "@frostbite/database";
 import { describe, expect, it } from "vitest";
 
 import {

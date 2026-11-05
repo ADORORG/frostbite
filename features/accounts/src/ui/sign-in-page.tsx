@@ -1,5 +1,5 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { AppShell } from "@repo/ui/arcade";
 
 import { SignInSurface } from "../sign-in/sign-in-surface.tsx";

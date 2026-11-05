@@ -1,8 +1,8 @@
-# `@ador/feature-game-admin`
+# `@frostbite/feature-game-admin`
 
 Staff administration of games' rewards contracts: publish the templates, create a game's contract, define a milestone (with its
 drawing), pause and resume claims, review and sign each step, and the log of what was done. Decisions: ADR-018 Amendment 3 (no platform key; staff sign every step by hand; any staff member may
-pause and resume; every step logged). Service and table: `@ador/game-admin`. Plan: `docs/product/plan-g7-minting.md` (G7f).
+pause and resume; every step logged). Service and table: `@frostbite/game-admin`. Plan: `docs/product/plan-g7-minting.md` (G7f).
 
 ## Public API
 
@@ -31,7 +31,7 @@ Everything requires `game:administer` (`gameAdminCapability`), which the authori
 player claims so the two cannot disagree), the rewards plan (`configs/rewards-plan.ts`: the chain, which templates may be published,
 which a game and its collectibles are made from, the most a contract may be created to accept) and the sanitiser's limits.
 **Where templates and contracts are is not configuration**: it is recorded when the steps that put them there complete, and read from
-`ador.published_templates` and `ador.game_contracts`. With no node address set the pages open and say a step cannot be built.
+`frostbite.published_templates` and `frostbite.game_contracts`. With no node address set the pages open and say a step cannot be built.
 
 ## Behaviour worth knowing
 
@@ -59,7 +59,7 @@ which a game and its collectibles are made from, the most a contract may be crea
 
 ## Tests
 
-`pnpm --filter @ador/feature-game-admin test:unit` (presenter, operations, client, registration, the panel, the contract card, the templates panel and
+`pnpm --filter @frostbite/feature-game-admin test:unit` (presenter, operations, client, registration, the panel, the contract card, the templates panel and
 review against a fake API), `test:integration` (the operations over real PostgreSQL and the simulated chain: publish both templates, create
 a game's contract, then administer it), `test:coverage`. Browser, accessibility,
 keyboard, reduced-motion, responsive and visual behavior: `tests/e2e/tests/game-admin.spec.ts`.

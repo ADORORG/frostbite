@@ -1,4 +1,4 @@
-# `@ador/database`
+# `@frostbite/database`
 
 Server-only, provider-neutral PostgreSQL infrastructure for the platform.
 
@@ -7,7 +7,7 @@ Server-only, provider-neutral PostgreSQL infrastructure for the platform.
 - Strict database environment parsing and migration URL fallback.
 - Standard `pg` pool construction with explicit TLS and timeout policy.
 - Drizzle client construction and explicit migration application.
-- The shared `ador` PostgreSQL schema boundary.
+- The shared `frostbite` PostgreSQL schema boundary.
 - UUIDv7 auth user, wallet identity, challenge, and hashed-session tables.
 - `released_wallets`: a wallet an account removed, held until a time so another account cannot take it at once.
 - Durable upload-intent and private asset-observation tables with explicit processing state.
@@ -66,20 +66,20 @@ the committed migration to an empty database, exercise constraints and rollback,
 container. Docker is therefore required for these commands.
 
 ```bash
-pnpm --filter @ador/database env:check
-pnpm --filter @ador/database migration:check
-pnpm --filter @ador/database migration:apply
-pnpm --filter @ador/database typecheck
-pnpm --filter @ador/database test:unit
-pnpm --filter @ador/database test:integration
-pnpm --filter @ador/database test:coverage
+pnpm --filter @frostbite/database env:check
+pnpm --filter @frostbite/database migration:check
+pnpm --filter @frostbite/database migration:apply
+pnpm --filter @frostbite/database typecheck
+pnpm --filter @frostbite/database test:unit
+pnpm --filter @frostbite/database test:integration
+pnpm --filter @frostbite/database test:coverage
 ```
 
 ## Game contracts
 
-`ador.published_templates` and `ador.game_contracts` record where each template and each game's contract is on a chain, written in the
-transaction that completes the step that made it (`@ador/database/game-contracts`: `ContractStore` to read, `writeRecording` to write). A
-record is never updated: the tables refuse a second record for a template or game, and two at one address. `ador.game_admin_steps`
+`frostbite.published_templates` and `frostbite.game_contracts` record where each template and each game's contract is on a chain, written in the
+transaction that completes the step that made it (`@frostbite/database/game-contracts`: `ContractStore` to read, `writeRecording` to write). A
+record is never updated: the tables refuse a second record for a template or game, and two at one address. `frostbite.game_admin_steps`
 is the evidence each points to, and may not be deleted while a record does.
 
 ## Ownership

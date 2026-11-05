@@ -1,7 +1,7 @@
 import type { Readable } from "node:stream";
 
 import { z } from "zod";
-import type { ProviderId } from "@ador/shared/providers";
+import type { ProviderId } from "@frostbite/shared/providers";
 
 const objectKeySchema = z
   .string()

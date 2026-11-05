@@ -6,7 +6,7 @@ import {
   applyGameLaunchSettings,
   defineGames,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import { targetChains } from "./chains.ts";
 import { broMariaGame } from "./games/bro-maria.ts";

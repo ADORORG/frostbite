@@ -1,13 +1,16 @@
-import type { HttpOperation } from "@ador/http";
-import { idempotencyKeyConflict, unauthenticated } from "@ador/http/outcome";
+import type { HttpOperation } from "@frostbite/http";
+import {
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "@frostbite/http/outcome";
 import {
   createUploadIntentInputSchema,
   uploadIntentResponseSchema,
   uploadIntentRoutes,
   type CreateUploadIntentInput,
   type UploadIntentResponse,
-} from "@ador/shared/uploads";
-import type { createUploadIntentService } from "@ador/uploads";
+} from "@frostbite/shared/uploads";
+import type { createUploadIntentService } from "@frostbite/uploads";
 
 import { uploadFailure } from "./outcomes.ts";
 

@@ -1,4 +1,4 @@
-import { collectionLimits } from "@ador/shared/collections";
+import { collectionLimits } from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import {

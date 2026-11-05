@@ -1,4 +1,4 @@
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 const wallet = vi.hoisted(() => ({
@@ -8,14 +8,14 @@ const wallet = vi.hoisted(() => ({
   },
   allowed: [] as (readonly string[])[],
 }));
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useStepWallet: (allowed: readonly string[]) => {
     wallet.allowed.push(allowed);
     return wallet.current;
   },
 }));
 
-import { fieldByLabel } from "@ador/test-kit/dom";
+import { fieldByLabel } from "@frostbite/test-kit/dom";
 import {
   WalletGamePanel,
   WalletTemplatesPanel,

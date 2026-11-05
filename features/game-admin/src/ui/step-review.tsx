@@ -1,6 +1,6 @@
-import { NetworkFee } from "@ador/feature-chain-status/fee-picker";
-import { TransactionList } from "@ador/feature-chain-status/transaction";
-import type { GameAdminStep } from "@ador/shared/games";
+import { NetworkFee } from "@frostbite/feature-chain-status/fee-picker";
+import { TransactionList } from "@frostbite/feature-chain-status/transaction";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import { ActionProgress, ArcadeTextField, KeyValueList } from "@repo/ui/arcade";
 
 import {

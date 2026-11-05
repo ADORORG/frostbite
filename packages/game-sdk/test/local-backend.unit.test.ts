@@ -24,8 +24,8 @@ describe("the local backend", () => {
     await backend.saveProgress({ score: 2 }, new Date());
     expect(await backend.loadProgress()).toEqual({ score: 2 });
     expect([...s.map.keys()].sort()).toEqual([
-      "ador:game:tap-tower:progress",
-      "ador:game:tap-tower:progress-at",
+      "frostbite:game:tap-tower:progress",
+      "frostbite:game:tap-tower:progress-at",
     ]);
     const other = createLocalBackend({
       gameId: "other-game",
@@ -88,9 +88,9 @@ describe("the local backend", () => {
     "treats %s in storage as nothing rather than trusting or throwing on it",
     async (_why, raw) => {
       const s = storage();
-      s.map.set("ador:game:tap-tower:milestones", raw);
+      s.map.set("frostbite:game:tap-tower:milestones", raw);
       s.map.set(
-        "ador:game:tap-tower:progress",
+        "frostbite:game:tap-tower:progress",
         raw === "{nope" ? raw : "undefined",
       );
       const backend = createLocalBackend({

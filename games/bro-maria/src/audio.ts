@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Bro Maria's sound, as data: a bouncy loop in C major (a walking bass under a hopping tune, with a soft chord now and then), and an effect
 // for each thing that happens. Nothing here is a file: the SDK plays it with the browser's audio.

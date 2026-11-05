@@ -1,7 +1,7 @@
-import { createGameClient } from "@ador/game-sdk/client";
-import { createGameHost, type HostedGame } from "@ador/game-sdk/host";
-import type { JsonValue } from "@ador/game-sdk/protocol";
-import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
+import { createGameClient } from "@frostbite/game-sdk/client";
+import { createGameHost, type HostedGame } from "@frostbite/game-sdk/host";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
+import { createMemoryGameBackend } from "@frostbite/test-kit/memory-game-backend";
 import { describe, expect, it } from "vitest";
 
 import {

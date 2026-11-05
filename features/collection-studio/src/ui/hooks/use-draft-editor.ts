@@ -3,8 +3,8 @@ import type {
   CollectionDetail,
   CollectionDraft,
   CollectionItem,
-} from "@ador/shared/collections";
-import type { IdempotencyKey } from "@ador/shared/http";
+} from "@frostbite/shared/collections";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 
 import type { CollectionsClientServices } from "../../client/services.ts";
 import type { Failure } from "../../client/error-copy.ts";

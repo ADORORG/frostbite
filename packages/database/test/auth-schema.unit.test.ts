@@ -122,7 +122,7 @@ describe("authentication schema", () => {
   it("keeps wallet users independent of provider-specific tables", () => {
     const config = getTableConfig(authUsers);
     expect(config.name).toBe("auth_users");
-    expect(config.schema).toBe("ador");
+    expect(config.schema).toBe("frostbite");
     expect(config.columns.map((column) => column.name)).toEqual(
       expect.arrayContaining(["id", "email", "email_verified"]),
     );

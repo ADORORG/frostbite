@@ -2,12 +2,12 @@ import {
   freePort,
   startInngestRuntime,
   type InngestRuntime,
-} from "@ador/test-kit/inngest-runtime";
-import { startS3Runtime, type S3Runtime } from "@ador/test-kit/s3-runtime";
+} from "@frostbite/test-kit/inngest-runtime";
+import { startS3Runtime, type S3Runtime } from "@frostbite/test-kit/s3-runtime";
 import {
   startServiceProcess,
   type ServiceProcess,
-} from "@ador/test-kit/service-process";
+} from "@frostbite/test-kit/service-process";
 
 // Names of the two buckets the browser flows use. Fixed because nothing outside the run reads them.
 const privateBucket = "e2e-private-drafts";

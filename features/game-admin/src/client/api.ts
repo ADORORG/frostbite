@@ -2,7 +2,7 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
+} from "@frostbite/client-http";
 import {
   gameAdminRoutes,
   listGameAdminStepsResponseSchema,
@@ -20,7 +20,7 @@ import {
   type StartGameAdminStepResponse,
   type SubmitGameAdminStepInput,
   type SubmitGameAdminStepResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // How long a request about a step may take: starting one builds transactions and asks the chain their cost, so it is given longer
 // than a look.

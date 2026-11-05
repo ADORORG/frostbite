@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { gameIdSchema } from "./manifest.ts";
 
-// The most a seed can be: the run record carries a 32-bit seed (`@ador/game-sdk/run-record`).
+// The most a seed can be: the run record carries a 32-bit seed (`@frostbite/game-sdk/run-record`).
 export const gameRunSeedMax = 4_294_967_295;
 
 // Why a game that is signed in cannot be given a run right now: the platform holds no replay verifier for it, or the player

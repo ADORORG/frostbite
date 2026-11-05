@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { runnerRules } from "../../src/rules/index.ts";
 import { advanceTo } from "../../src/rules/tick.ts";

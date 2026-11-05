@@ -15,7 +15,7 @@ export {
   settle,
   textOf,
   unmountAll,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 
 export async function chooseFiles(
   container: HTMLElement,

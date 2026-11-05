@@ -1,4 +1,4 @@
-import { walletNetworks } from "@ador/shared/chain";
+import { walletNetworks } from "@frostbite/shared/chain";
 import { sql, type SQL } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 

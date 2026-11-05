@@ -1,4 +1,4 @@
-import { stepInt } from "@ador/game-sdk/seeded";
+import { stepInt } from "@frostbite/game-sdk/seeded";
 
 import { maxTicks } from "../../src/rules/constants.ts";
 import { hitOnce } from "../../src/rules/hit.ts";

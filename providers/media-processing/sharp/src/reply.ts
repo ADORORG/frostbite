@@ -1,7 +1,7 @@
 import type {
   ProcessImageInput,
   ProcessImageResult,
-} from "@ador/media/processing";
+} from "@frostbite/media/processing";
 
 import { decodeFrame, responseHeaderSchema } from "./protocol.ts";
 

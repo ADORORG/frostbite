@@ -1,9 +1,9 @@
-import { NetworkFee } from "@ador/feature-chain-status/fee-picker";
+import { NetworkFee } from "@frostbite/feature-chain-status/fee-picker";
 import {
   TransactionList,
   plainTransactionLabel,
-} from "@ador/feature-chain-status/transaction";
-import type { GameClaim } from "@ador/shared/games";
+} from "@frostbite/feature-chain-status/transaction";
+import type { GameClaim } from "@frostbite/shared/games";
 import {
   ActionProgress,
   ArcadeDialog,

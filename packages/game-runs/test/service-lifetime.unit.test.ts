@@ -1,4 +1,4 @@
-import { canonicalJson } from "@ador/game-sdk/run-record";
+import { canonicalJson } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import {

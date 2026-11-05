@@ -6,7 +6,7 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
+} from "@frostbite/database";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleGameSyncRepository } from "../../src/drizzle-repository.ts";

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { extname, relative } from "node:path";
 
 // An import that climbs three or more folders (`../../../x`) is hard to follow and breaks when a file moves. Reach other workspaces by their
-// package name (`@repo/configs/games`, `@ador/auth/test-fixtures`) and files inside the web app by `@/`.
+// package name (`@repo/configs/games`, `@frostbite/auth/test-fixtures`) and files inside the web app by `@/`.
 export const maximumParentSegments = 2;
 
 // The only deep relative imports left, each with the reason it cannot be a package import. An entry is removed when its reason goes.

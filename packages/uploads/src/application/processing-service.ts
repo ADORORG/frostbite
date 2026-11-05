@@ -1,20 +1,20 @@
 import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 
-import type { ImageProcessor } from "@ador/media/processing";
+import type { ImageProcessor } from "@frostbite/media/processing";
 import {
   parseObjectKey,
   type ObjectKey,
   type ObjectStoragePort,
-} from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
 import {
   derivativeMaxSide,
   derivativeKinds,
   type DerivativePolicy,
   type UploadPolicy,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import { readUpTo } from "./bounded-read.ts";
 import type {

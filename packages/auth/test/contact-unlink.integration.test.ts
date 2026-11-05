@@ -2,8 +2,8 @@ import {
   authSecurityEvents,
   authSessions,
   contactIdentities,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { sha256 } from "../src/domain/crypto.ts";

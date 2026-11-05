@@ -1,8 +1,8 @@
-import { failure, type HttpFailure } from "@ador/http/outcome";
+import { failure, type HttpFailure } from "@frostbite/http/outcome";
 import {
   accountOutcomes,
   type AccountOutcome,
-} from "@ador/shared/account-outcomes";
+} from "@frostbite/shared/account-outcomes";
 
 // The status classes an operation may answer with. A rate limit is answered by the platform before an operation runs, and an outcome
 // with no status class only happens in the browser, so neither can be built here.
@@ -13,7 +13,7 @@ type ServerOutcome = {
     : never;
 }[AccountOutcome];
 
-// A failure of an account operation, built from the catalogue (`@ador/shared/account-outcomes`): its status class and sentence are the
+// A failure of an account operation, built from the catalogue (`@frostbite/shared/account-outcomes`): its status class and sentence are the
 // catalogue's, and its reason travels in the error envelope so the page can choose its own words by it. `words` replaces the sentence only
 // where the server knows more than the catalogue (how long to wait).
 export function outcomeFailure(

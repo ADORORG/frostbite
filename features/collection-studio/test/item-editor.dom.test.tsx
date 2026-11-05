@@ -6,8 +6,8 @@ import {
   mount,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
-import { idempotencyKeySchema } from "@ador/shared/http";
+} from "@frostbite/test-kit/dom";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 

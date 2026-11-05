@@ -6,13 +6,13 @@ import { argumentProblem } from "../arguments.ts";
 import { devGameSchema } from "./config.ts";
 import { startDevHost, type DevHost } from "./server.ts";
 
-// `ador-game-dev <game-folder> [--game game.json] [--port 5173]`: opens a local test page for a game. `game.json` holds the parts of
+// `frostbite-game-dev <game-folder> [--game game.json] [--port 5173]`: opens a local test page for a game. `game.json` holds the parts of
 // the game's manifest the page needs (`id`, `capabilities`, `milestones`); by default it is the file of that name in the folder.
 export async function run(
   argv: readonly string[],
 ): Promise<{ readonly code: number; readonly host: DevHost | null }> {
   const usage =
-    "Usage: ador-game-dev <game-folder> [--game game.json] [--port 5173]";
+    "Usage: frostbite-game-dev <game-folder> [--game game.json] [--port 5173]";
   let parsed;
   try {
     parsed = parseArgs({
@@ -29,7 +29,7 @@ export async function run(
   const [folder] = positionals;
   if (folder === undefined || positionals.length > 1) {
     console.error(
-      "Usage: ador-game-dev <game-folder> [--game game.json] [--port 5173]",
+      "Usage: frostbite-game-dev <game-folder> [--game game.json] [--port 5173]",
     );
     return { code: 2, host: null };
   }

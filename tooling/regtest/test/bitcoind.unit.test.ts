@@ -40,13 +40,13 @@ describe("Bitcoin Core over JSON-RPC", () => {
       password: "p",
       url: "http://127.0.0.1:18443/",
       user: "u",
-      wallet: "ador",
+      wallet: "frostbite",
     });
     await core.call("getnewaddress", ["", "bech32"]);
     await core.call("getnewaddress");
     expect(send.mock.calls.map(([url]) => url)).toEqual([
-      "http://127.0.0.1:18443/wallet/ador",
-      "http://127.0.0.1:18443/wallet/ador",
+      "http://127.0.0.1:18443/wallet/frostbite",
+      "http://127.0.0.1:18443/wallet/frostbite",
     ]);
     expect(send.mock.calls.map(([, init]) => JSON.parse(init.body).id)).toEqual(
       [1, 2],

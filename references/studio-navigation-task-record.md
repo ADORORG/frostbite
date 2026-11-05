@@ -6,7 +6,7 @@ Branch `feat/studio-journey`. Baseline: the journey docs commits `608bd65`, `d63
 
 - Manifest contract: each navigation link names an `area` (`main`, `studio`, `admin`, `account`, `footer`)
   and may give an `order` (0-99, default 50).
-- `@ador/plugin-kit/navigation`: links in display order with their area; `markCurrent` marks the page
+- `@frostbite/plugin-kit/navigation`: links in display order with their area; `markCurrent` marks the page
   or section being shown (longest matching parent, never a sibling that shares a prefix).
 - `apps/web/src/server/navigation.ts`: the links for a visitor, for a signed-in person, and for a session
   on a public page, so the bar does not change between public and private pages. Failure falls back to

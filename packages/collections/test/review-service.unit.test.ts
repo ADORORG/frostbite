@@ -1,5 +1,5 @@
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { collectionReviewCapability } from "@ador/shared/collections";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import { collectionReviewCapability } from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import { createReviewService } from "../src/application/review-service.ts";

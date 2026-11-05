@@ -1,4 +1,4 @@
-import { contactCodes } from "@ador/database";
+import { contactCodes } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

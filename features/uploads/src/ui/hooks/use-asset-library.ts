@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { LibraryResponse } from "@ador/shared/uploads";
+import type { LibraryResponse } from "@frostbite/shared/uploads";
 
 import type { UploadsClientServices } from "../../client/browser-services.ts";
 import { nextLibraryRefreshDelay } from "../../client/library-refresh.ts";

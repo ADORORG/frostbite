@@ -1,4 +1,4 @@
-import type { GameAdminConfig } from "@ador/feature-game-admin";
+import type { GameAdminConfig } from "@frostbite/feature-game-admin";
 
 import { betaChain } from "./chains.ts";
 import { rewardsChain } from "./game-rewards.ts";

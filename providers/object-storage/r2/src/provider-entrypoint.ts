@@ -1,5 +1,5 @@
-import type { ProviderEntrypoint } from "@ador/plugin-kit/providers";
-import type { ObjectStorageProviderServices } from "@ador/object-storage";
+import type { ProviderEntrypoint } from "@frostbite/plugin-kit/providers";
+import type { ObjectStorageProviderServices } from "@frostbite/object-storage";
 
 import { parseR2Environment } from "./config.ts";
 import { createR2ObjectStorage } from "./create-adapter.ts";

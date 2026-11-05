@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { replayRecord } from "@ador/game-sdk/replay";
-import { runRecordSchema } from "@ador/game-sdk/run-record";
+import { replayRecord } from "@frostbite/game-sdk/replay";
+import { runRecordSchema } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import { frostbiteRules } from "../src/verifier/frostbite.ts";

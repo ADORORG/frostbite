@@ -1,5 +1,5 @@
 import { colour, themes } from "./palette.ts";
-import { block, wrap } from "@ador/game-sdk/pixels";
+import { block, wrap } from "@frostbite/game-sdk/pixels";
 
 // The sky and the mountains behind the level, which scroll more slowly than the ground, and the snow that falls in front of it.
 export const themeOf = (stage: number): (typeof themes)[number] =>

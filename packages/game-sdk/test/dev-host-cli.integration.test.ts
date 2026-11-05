@@ -43,13 +43,15 @@ describe("the command that opens the test page", () => {
   it("says how to use it when it is given no folder, or two", async () => {
     expect((await run([])).code).toBe(2);
     expect((await run([scratch, "other"])).code).toBe(2);
-    expect(errors.join("\n")).toContain("Usage: ador-game-dev <game-folder>");
+    expect(errors.join("\n")).toContain(
+      "Usage: frostbite-game-dev <game-folder>",
+    );
   });
 
   it("says how to use it for an option it does not know, or one given with no value", async () => {
     expect((await run([scratch, "--bogus"])).code).toBe(2);
     expect((await run([scratch, "--port"])).code).toBe(2);
-    expect(errors.join("\n")).toContain("Usage: ador-game-dev");
+    expect(errors.join("\n")).toContain("Usage: frostbite-game-dev");
   });
 
   it.each(["abc", "-1", "70000", "1.5"])(

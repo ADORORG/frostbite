@@ -7,9 +7,9 @@ import {
   platformRoleEvents,
   platformSetupLinks,
   walletIdentities,
-} from "@ador/database";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq } from "drizzle-orm";
 
 // What the tests of platform roles and setup links share: a database, a policy in which staff and admin need a wallet, a stand-in for the

@@ -1,12 +1,12 @@
 import {
   chainUnreachableWords,
   signatureMismatchWords,
-} from "@ador/shared/chain-step-words";
+} from "@frostbite/shared/chain-step-words";
 import {
   gameClaimRefusalReasons,
   gameClaimStates,
   gameClaimUnavailableReasons,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import {

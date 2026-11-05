@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { installReactTestEnvironment, mount } from "@ador/test-kit/dom";
+import { installReactTestEnvironment, mount } from "@frostbite/test-kit/dom";
 import { act } from "react";
 import { describe, expect, it } from "vitest";
 
@@ -39,7 +39,7 @@ describe("visibility", () => {
     await act(async () => {
       // Unmounting the whole tree is what removes it.
     });
-    const { unmountAll } = await import("@ador/test-kit/dom");
+    const { unmountAll } = await import("@frostbite/test-kit/dom");
     await unmountAll();
     expect(observers[0]?.disconnected).toBe(true);
     await frameAt(1200);

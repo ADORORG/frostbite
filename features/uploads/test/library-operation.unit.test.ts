@@ -1,9 +1,9 @@
-import { unauthenticated } from "@ador/http/outcome";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import {
   libraryResponseSchema,
   type LibraryResponse,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 import {

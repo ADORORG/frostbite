@@ -1,4 +1,4 @@
-import type { StartGameAdminStepResponse } from "@ador/shared/games";
+import type { StartGameAdminStepResponse } from "@frostbite/shared/games";
 import { vi } from "vitest";
 
 // An API whose start does not answer until the test lets it, so what the page shows while it waits can be looked at.

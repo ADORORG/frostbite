@@ -12,8 +12,8 @@ import {
   vi,
 } from "vitest";
 
-import { outcomeMessage } from "@ador/shared/account-outcomes";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 const browser = vi.hoisted(() => ({
   browserSupportsWebAuthn: vi.fn(() => true),

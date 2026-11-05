@@ -1,5 +1,5 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { chainOptionSchema } from "@ador/shared/chain";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createCollectionStudioFeature } from "../src/registration.ts";

@@ -12,10 +12,10 @@ import {
   type WalletChallengeResponse,
   type WalletUnlinkRequest,
   type WalletVerifyRequest,
-} from "@ador/auth";
-import type { HttpOperation, HttpOperationResult } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/auth";
+import type { HttpOperation, HttpOperationResult } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import {
   issueChallenge,

@@ -1,6 +1,6 @@
-import type { ClaimsService } from "@ador/game-sdk/host";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { GameClaimState, GameMilestone } from "@ador/shared/games";
+import type { ClaimsService } from "@frostbite/game-sdk/host";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { GameClaimState, GameMilestone } from "@frostbite/shared/games";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { createClaimsApi, type ClaimsApi } from "../client/claims-api.ts";

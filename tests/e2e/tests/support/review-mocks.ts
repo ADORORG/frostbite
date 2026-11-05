@@ -2,7 +2,7 @@ import {
   encodeActivityCursor,
   reviewActivityResponseSchema,
   reviewDetailResponseSchema,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import type { Page } from "@playwright/test";
 
 // Fixed review data for the visual and accessibility checks: the pages are real and their data is

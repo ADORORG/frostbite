@@ -3,7 +3,7 @@ import { z } from "zod";
 
 // The one conversation between a game and the page that hosts it. Versioned, every message validated on both
 // sides. A game cannot do anything the platform has not put in this list.
-export const gameChannel = "ador-game";
+export const gameChannel = "frostbite-game";
 export const protocolVersion = 1;
 
 export type JsonValue =

@@ -5,8 +5,8 @@ import { setTimeout as delay } from "node:timers/promises";
 const postgresImage = "postgres:18.6-alpine";
 const postgresPort = "5432/tcp";
 const postgresDataDirectory = "/var/lib/postgresql";
-const databaseName = "ador_test";
-const databaseUser = "ador_test";
+const databaseName = "frostbite_test";
+const databaseUser = "frostbite_test";
 
 // `volume` keeps the data in a named Docker volume that outlives the container; without it the data is in memory and is gone with the
 // container (what a test run wants).
@@ -91,7 +91,7 @@ export async function withDisposablePostgres(
   callback: (databaseUrl: string) => Promise<void>,
 ): Promise<void> {
   const password = randomUUID();
-  const containerName = `ador-postgres-${randomUUID()}`;
+  const containerName = `frostbite-postgres-${randomUUID()}`;
   let started = false;
   const removeSync = () => {
     if (!started) return;

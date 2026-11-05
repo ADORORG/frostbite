@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 
-import { signAs } from "@ador/auth/test-fixtures";
+import { signAs } from "@frostbite/auth/test-fixtures";
 
 declare global {
   interface Window {

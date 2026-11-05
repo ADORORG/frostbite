@@ -1,5 +1,5 @@
-import type { ImageProcessor } from "@ador/media/processing";
-import type { DerivativePolicy } from "@ador/shared/uploads";
+import type { ImageProcessor } from "@frostbite/media/processing";
+import type { DerivativePolicy } from "@frostbite/shared/uploads";
 
 import { createIsolatedImageProcessor } from "./isolated-processor.ts";
 import { createNodeWorkerLauncher } from "./process-launcher.ts";

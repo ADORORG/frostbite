@@ -1,5 +1,5 @@
-import type { createCreatorAdmissionService } from "@ador/creator-admission";
-import type { HttpOperation, HttpOperationResult } from "@ador/http";
+import type { createCreatorAdmissionService } from "@frostbite/creator-admission";
+import type { HttpOperation, HttpOperationResult } from "@frostbite/http";
 import {
   creatorApplicationDraftInputSchema,
   creatorApplicationEmptyInputSchema,
@@ -11,7 +11,7 @@ import {
   type CreatorApplicationEmptyInput,
   type CreatorApplicationResponse,
   type CreatorApplicationReviewInput,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 import { presentApplication } from "./present.ts";
 

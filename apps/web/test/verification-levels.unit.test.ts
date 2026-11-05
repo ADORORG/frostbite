@@ -1,5 +1,5 @@
-import { verificationLevels } from "@ador/game-sdk/protocol";
-import { gameMilestoneVerifications } from "@ador/shared/games";
+import { verificationLevels } from "@frostbite/game-sdk/protocol";
+import { gameMilestoneVerifications } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 // The SDK is published on its own and cannot import the platform's contracts, so the two lists of how a milestone can be

@@ -1,4 +1,4 @@
-import type { ChainConfig, FundingPolicy } from "@ador/shared/chain";
+import type { ChainConfig, FundingPolicy } from "@frostbite/shared/chain";
 
 import { nativeAsset } from "./bitcoin-alkanes/chains.ts";
 import {

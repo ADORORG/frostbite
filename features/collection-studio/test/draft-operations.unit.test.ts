@@ -1,7 +1,7 @@
-import type { CollectionSummaryRecord } from "@ador/collections";
+import type { CollectionSummaryRecord } from "@frostbite/collections";
 import { describe, expect, it, vi } from "vitest";
 
-import type { LibraryAsset } from "@ador/shared/uploads";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import type {
   AssetPreviews,
   CollectionService,

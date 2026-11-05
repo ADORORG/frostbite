@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 
-import { ObjectStorageError } from "@ador/object-storage/errors";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
 import { describe, expect, it } from "vitest";
 
 import { toStoredMetadata, toStoredObject } from "../src/metadata.ts";

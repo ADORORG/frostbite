@@ -1,10 +1,10 @@
-import { click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 // The real uploader is covered in the uploads feature. Here it is a button that "finishes an upload", so
 // what this component does with the result is tested on its own.
-vi.mock("@ador/feature-uploads/inline", () => ({
+vi.mock("@frostbite/feature-uploads/inline", () => ({
   InlineUpload: ({
     onUploaded,
     purpose,

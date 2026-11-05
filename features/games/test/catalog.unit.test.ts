@@ -1,4 +1,4 @@
-import { gameManifestHash } from "@ador/shared/games";
+import { gameManifestHash } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import {

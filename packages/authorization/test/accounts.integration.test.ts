@@ -8,9 +8,9 @@ import {
   parseDatabaseEnvironment,
   platformRoleAssignments,
   runMigrations,
-} from "@ador/database";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

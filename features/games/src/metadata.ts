@@ -2,8 +2,8 @@ import {
   clipDescription,
   privatePage,
   type PageMetadata,
-} from "@ador/plugin-kit/page-metadata";
-import { gameHref, gamesPath } from "@ador/shared/games";
+} from "@frostbite/plugin-kit/page-metadata";
+import { gameHref, gamesPath } from "@frostbite/shared/games";
 
 import type { GameCatalog, PublicGame } from "./domain/catalog.ts";
 

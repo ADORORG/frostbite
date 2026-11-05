@@ -8,13 +8,13 @@ import {
   parseDatabaseEnvironment,
   platformRoleAssignments,
   runMigrations,
-} from "@ador/database";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
+} from "@frostbite/database";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
 import type {
   CreatorApplicationDraft,
   CreatorReviewDecision,
-} from "@ador/shared/creator-admission";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleCreatorAdmissionRepository } from "../../src/adapters/drizzle-repository.ts";

@@ -1,6 +1,6 @@
-import { outcomeMessage } from "@ador/shared/account-outcomes";
-import type { RedeemResult } from "@ador/authorization";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import type { RedeemResult } from "@frostbite/authorization";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import {

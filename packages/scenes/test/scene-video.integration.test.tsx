@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 
-import { click, installReactTestEnvironment, mount } from "@ador/test-kit/dom";
+import {
+  click,
+  installReactTestEnvironment,
+  mount,
+} from "@frostbite/test-kit/dom";
 import { act, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";

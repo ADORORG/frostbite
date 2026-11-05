@@ -1,15 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
-import { presentResponse } from "@ador/http/present";
-import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
+import { presentResponse } from "@frostbite/http/present";
+import type { RegisteredHttpOperation } from "@frostbite/http/registered-operation";
 import {
   correlationHeaderName,
   idempotencyHeaderName,
-} from "@ador/shared/http";
-import { platformSessionCookieName } from "@ador/shared/auth";
+} from "@frostbite/shared/http";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
-import type { ActiveSession } from "@ador/auth";
+import type { ActiveSession } from "@frostbite/auth";
 
 import { logInternalError } from "./internal-error-log.ts";
 

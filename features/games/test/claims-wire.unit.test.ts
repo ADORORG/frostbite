@@ -1,5 +1,5 @@
-import { gameClaimSchema } from "@ador/shared/games";
-import { transactionSummarySchema } from "@ador/shared/chain";
+import { gameClaimSchema } from "@frostbite/shared/games";
+import { transactionSummarySchema } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { toWireClaim } from "../src/application/claims-operations.ts";

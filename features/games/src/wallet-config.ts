@@ -1,9 +1,9 @@
 import type {
   ChainStatusApi,
   StatusPolling,
-} from "@ador/feature-chain-status/api";
-import type { FeeSpeed } from "@ador/shared/chain";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/feature-chain-status/api";
+import type { FeeSpeed } from "@frostbite/shared/chain";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 // How the games pages relate to the wallet: the network a game's wallet is expected to be on. It belongs to the
 // platform's configuration, not to any game. Connecting a wallet is the header widget's job, not a page's.

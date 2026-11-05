@@ -1,7 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
+import { jsonValueSchema, type JsonValue } from "@frostbite/shared/chain";
 
 import { configFrom, parseArguments, type RegtestConfig } from "./config.ts";
 import { createGateway } from "./gateway.ts";

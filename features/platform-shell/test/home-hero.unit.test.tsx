@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { ScenesProvider } from "@ador/scenes/react";
-import { scenes } from "@ador/scenes/library";
-import { click, mount, textOf } from "@ador/test-kit/dom";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { scenes } from "@frostbite/scenes/library";
+import { click, mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { homeCopy } from "../src/domain/home-copy.ts";

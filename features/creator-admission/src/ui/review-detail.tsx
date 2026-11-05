@@ -3,7 +3,7 @@
 import {
   creatorApplicationStateLabels,
   creatorReviewPath,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { ArcadeActionButton, ArcadeButton, StatusLamp } from "@repo/ui/arcade";
 import { useState } from "react";
 

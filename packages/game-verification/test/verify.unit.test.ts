@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { canonicalJson, type RunRecord } from "@ador/game-sdk/run-record";
+import { canonicalJson, type RunRecord } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import { resolveVerificationPolicy } from "../src/policy.ts";

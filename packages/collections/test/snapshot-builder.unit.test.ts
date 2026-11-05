@@ -1,8 +1,8 @@
 import type {
   Collection,
   CollectionItemRow,
-} from "@ador/database/schema/collections";
-import { requestFingerprint } from "@ador/shared/http";
+} from "@frostbite/database/schema/collections";
+import { requestFingerprint } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
 import { buildSnapshot } from "../src/adapters/snapshot-builder.ts";

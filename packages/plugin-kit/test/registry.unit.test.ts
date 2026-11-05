@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { registerHttpOperation } from "@ador/http/registered-operation";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
 import {
   platformStatusInputSchema,
   platformStatusSchema,
-} from "@ador/shared/platform";
+} from "@frostbite/shared/platform";
 
 import {
   createFeatureRegistry,

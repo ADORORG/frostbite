@@ -1,7 +1,7 @@
 import type {
   SignedWorkflowEndpoint,
   WorkflowEndpointFactory,
-} from "@ador/jobs/provider-service";
+} from "@frostbite/jobs/provider-service";
 import { serve } from "inngest/edge";
 import type { Inngest } from "inngest";
 

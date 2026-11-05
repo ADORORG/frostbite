@@ -1,10 +1,10 @@
-import type { DomainEventEnvelope } from "@ador/events";
+import type { DomainEventEnvelope } from "@frostbite/events";
 import type {
   ClaimedOutboxEvent,
   OutboxDeliveryStore,
   OutboxRelayPolicy,
   WorkflowEventPublisher,
-} from "@ador/jobs";
+} from "@frostbite/jobs";
 import { describe, expect, it } from "vitest";
 
 import { createRelayPass } from "../src/relay.ts";

@@ -92,7 +92,7 @@ describe("the game player", () => {
         ?.textContent,
     ).toBe("1 of 2 reached");
     expect(
-      window.localStorage.getItem("ador:game:embedded-game:milestones"),
+      window.localStorage.getItem("frostbite:game:embedded-game:milestones"),
     ).toContain("first-level");
     act(() => h.root.unmount());
     h.root = createRoot(h.container);

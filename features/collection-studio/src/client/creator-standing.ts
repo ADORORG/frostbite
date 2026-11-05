@@ -3,13 +3,13 @@ import {
   collectionWizardHref,
   standingOf,
   type CollectionSummary,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   creatorApplicationPath,
   creatorStandingCopy,
   neverAppliedCopy,
   type CreatorApplicationState,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import type { ArcadeTone } from "@repo/ui/arcade";
 
 // What a person is told about their standing as a creator, and what they can do about it. The state

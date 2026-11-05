@@ -4,7 +4,7 @@ import {
   type OutboxRelayPolicy,
   type OutboxRelayResult,
   type WorkflowEventPublisher,
-} from "@ador/jobs";
+} from "@frostbite/jobs";
 
 export interface RelayDependencies {
   readonly clock: { now(): Date };

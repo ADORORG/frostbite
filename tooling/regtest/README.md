@@ -22,7 +22,7 @@ adapter uses (`esplora_blocks:tip:height`, `…:tip:hash`, `esplora_fee-estimate
 tooling/regtest/scripts/build-indexer.sh        # once; builds rockshrew-mono and the regtest alkanes.wasm (15 to 20 minutes)
 pnpm --filter @repo/regtest regtest up          # start everything, mine the first 101 blocks
 pnpm --filter @repo/regtest regtest status      # chain height and indexed height
-pnpm --filter @ador/chain test:regtest          # run the real lifecycle against it
+pnpm --filter @frostbite/chain test:regtest          # run the real lifecycle against it
 pnpm --filter @repo/regtest regtest down        # stop; add --wipe to forget the chain and the indexer's database
 ```
 

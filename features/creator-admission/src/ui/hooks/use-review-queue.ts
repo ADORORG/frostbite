@@ -3,7 +3,7 @@ import type {
   CreatorReviewQueueItem,
   CreatorReviewQueueResponse,
   CreatorReviewSort,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { useCallback, useState } from "react";
 
 import type { ReviewClientServices } from "../../client/services.ts";

@@ -1,4 +1,4 @@
-import { ObjectStorageError, parseObjectKey } from "@ador/object-storage";
+import { ObjectStorageError, parseObjectKey } from "@frostbite/object-storage";
 import { describe, expect, it } from "vitest";
 
 describe("public package boundary", () => {

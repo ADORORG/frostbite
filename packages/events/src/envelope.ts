@@ -1,4 +1,4 @@
-import { correlationIdSchema } from "@ador/shared/http";
+import { correlationIdSchema } from "@frostbite/shared/http";
 import { z } from "zod";
 
 export const eventIdSchema = z.uuid();

@@ -1,4 +1,4 @@
-import { gameManifestSchema } from "@ador/shared/games";
+import { gameManifestSchema } from "@frostbite/shared/games";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { targetChains } from "@repo/configs/chains";

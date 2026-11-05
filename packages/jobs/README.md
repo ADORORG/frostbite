@@ -1,4 +1,4 @@
-# `@ador/jobs`
+# `@frostbite/jobs`
 
 Provider-neutral asynchronous job contracts and relay policies.
 
@@ -18,12 +18,12 @@ real-PostgreSQL adapter tests.
 
 ## Workflow ports and policy
 
-`@ador/jobs/activities` is the provider-neutral activity contract (small statuses only).
-`@ador/jobs/asset-pipeline` is the workflow itself, `runAssetPipeline`, parameterized over a durable
+`@frostbite/jobs/activities` is the provider-neutral activity contract (small statuses only).
+`@frostbite/jobs/asset-pipeline` is the workflow itself, `runAssetPipeline`, parameterized over a durable
 `step` so any provider can run it: permanent file outcomes end the run, and only faults throw and are
-retried. `@ador/jobs/provider-service` defines the typed workflow capabilities a provider supplies, and
-`@ador/jobs/drain-loop` runs any bounded pass until stopped (immediately again after work, an idle delay
-after none, a backoff after a failure) and `@ador/jobs/relay-loop` applies it to the relay. `@ador/jobs/policy` holds the typed, overridable
+retried. `@frostbite/jobs/provider-service` defines the typed workflow capabilities a provider supplies, and
+`@frostbite/jobs/drain-loop` runs any bounded pass until stopped (immediately again after work, an idle delay
+after none, a backoff after a failure) and `@frostbite/jobs/relay-loop` applies it to the relay. `@frostbite/jobs/policy` holds the typed, overridable
 defaults for retries, media concurrency, relay batching, polling, and the slow maintenance loop.
 
 ## Ownership

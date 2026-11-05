@@ -3,12 +3,12 @@ import {
   refuse,
   tickNamed,
   withFields,
-} from "@ador/game-sdk/run-inputs";
+} from "@frostbite/game-sdk/run-inputs";
 import type {
   GameVerifier,
   RunInput,
   Stepped,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 
 import { dropAt } from "./drop.ts";
 import { maxTicks, verifierId, verifierVersion } from "./constants.ts";

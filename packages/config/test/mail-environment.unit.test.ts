@@ -4,7 +4,7 @@ import { parseMailEnvironment } from "../src/env/mail.ts";
 
 const app = {
   APP_ENV: "local",
-  NEXT_PUBLIC_APP_NAME: "Ador",
+  NEXT_PUBLIC_APP_NAME: "Frostbite",
   PUBLIC_BASE_URL: "http://localhost:3000",
 };
 const smtp = {

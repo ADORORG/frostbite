@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 
-import { ObjectStorageError } from "@ador/object-storage";
+import { ObjectStorageError } from "@frostbite/object-storage";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createR2ObjectStorage } from "../src/create-adapter.ts";

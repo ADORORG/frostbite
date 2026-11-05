@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { maxEnergy, lanes } from "../rules/constants.ts";
 import { multiplierOf } from "../feedback.ts";
@@ -13,7 +13,7 @@ import {
 } from "./layout.ts";
 import { colour, laneColours } from "./palette.ts";
 import type { View } from "./view.ts";
-import { byInput } from "@ador/game-sdk/touch";
+import { byInput } from "@frostbite/game-sdk/touch";
 
 // What is written over the screen: the stage, the score, the combo and its multiplier, the energy, the verdict on the last tap, the keys, a line
 // of news, and the cards before and after a run. All of it is on the canvas, so showing more of it never moves the page.

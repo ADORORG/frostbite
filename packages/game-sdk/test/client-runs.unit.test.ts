@@ -23,7 +23,7 @@ function pair() {
     listeners.forEach((l) =>
       l({
         data: {
-          channel: "ador-game",
+          channel: "frostbite-game",
           id: sent.at(-1)?.id,
           ok: true,
           result,

@@ -3,7 +3,10 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { adderManifest, publishAdderGame } from "@ador/test-kit/adder-game";
+import {
+  adderManifest,
+  publishAdderGame,
+} from "@frostbite/test-kit/adder-game";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createGameVerifiers } from "../src/node.ts";

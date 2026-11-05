@@ -1,5 +1,5 @@
 {
-  "name": "@ador/object-storage",
+  "name": "@frostbite/object-storage",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/plugin-kit": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {

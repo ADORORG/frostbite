@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { feeSpeeds, type FundingPolicy } from "@ador/shared/chain";
+import { feeSpeeds, type FundingPolicy } from "@frostbite/shared/chain";
 
 import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import {

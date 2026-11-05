@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { GameManifest } from "@ador/shared/games";
+import type { GameManifest } from "@frostbite/shared/games";
 
 import { loadGameVerifiers } from "./loader.ts";
 import { resolveVerificationPolicy } from "./policy.ts";

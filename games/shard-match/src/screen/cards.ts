@@ -1,11 +1,11 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import type { MatchState } from "../rules/state.ts";
 import { write } from "./hud.ts";
 import { sizeOf } from "./layout.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
-import { byInput } from "@ador/game-sdk/touch";
+import { byInput } from "@frostbite/game-sdk/touch";
 
 // The cards over the screen before a run and after it. Each line is its text, its colour and the size of its writing; the tall screen is narrower, so its
 // lines are shorter, and (being for a touch screen) say Start, not Enter.

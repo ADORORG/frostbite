@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { cellOpen } from "../rules/maze.ts";
 import { lit } from "../rules/light.ts";

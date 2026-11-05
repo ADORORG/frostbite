@@ -1,5 +1,5 @@
-import type { GameHostBackend } from "@ador/game-sdk/host";
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { GameHostBackend } from "@frostbite/game-sdk/host";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 
 // What a player's browser would keep for a game, held in memory, and open to failing on purpose. It is the
 // backend the conformance runs use, so a game is judged on how it talks to the platform and not on storage.

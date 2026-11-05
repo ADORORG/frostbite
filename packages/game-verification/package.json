@@ -1,5 +1,5 @@
 {
-  "name": "@ador/game-verification",
+  "name": "@frostbite/game-verification",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -21,12 +21,12 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/game-sdk": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/game-sdk": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

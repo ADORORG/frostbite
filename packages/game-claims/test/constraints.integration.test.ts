@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { gameMilestoneClaims } from "@ador/database";
+import { gameMilestoneClaims } from "@frostbite/database";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -193,7 +193,7 @@ describe("what the claims table refuses by itself", () => {
     const userId = await seedUser();
     await insert(base(userId));
     await database.execute(
-      `delete from ador.auth_users where id = '${userId}'`,
+      `delete from frostbite.auth_users where id = '${userId}'`,
     );
     expect(
       await database.select().from(gameMilestoneClaims),

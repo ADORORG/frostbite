@@ -26,7 +26,7 @@ versioned records rather than as literals in features.
 
 ## Dependencies
 
-`@ador/shared` for the shared schemas, `@ador/mail` for the mail settings types, and `zod`. Nothing in the platform reads `process.env`
+`@frostbite/shared` for the shared schemas, `@frostbite/mail` for the mail settings types, and `zod`. Nothing in the platform reads `process.env`
 outside this package and the framework entry points.
 
 ## Configuration

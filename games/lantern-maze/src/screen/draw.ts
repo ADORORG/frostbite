@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import type { MazeState } from "../rules/state.ts";
 import { cards, hud } from "./hud.ts";

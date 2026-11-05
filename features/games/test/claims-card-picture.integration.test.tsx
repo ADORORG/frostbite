@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { mintedPictureHref } from "@ador/shared/games";
-import { mount, settle } from "@ador/test-kit/dom";
+import { mintedPictureHref } from "@frostbite/shared/games";
+import { mount, settle } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { ClaimsCard } from "../src/ui/claims-card.tsx";

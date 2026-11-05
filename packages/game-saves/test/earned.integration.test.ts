@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import { authUsers, gameMilestoneUnlocks } from "@ador/database";
+import { authUsers, gameMilestoneUnlocks } from "@frostbite/database";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { hasEarnedMilestone } from "../src/earned.ts";
 import { database, environment, pool } from "./support/account-database.ts";
-import { runMigrations } from "@ador/database";
+import { runMigrations } from "@frostbite/database";
 
 beforeAll(async () => runMigrations(environment));
 afterAll(async () => pool.end());

@@ -5,7 +5,7 @@ import {
   passkeyFinishInputSchema,
   passkeyUnlinkInputSchema,
 } from "../src/index.ts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 const options = {
   challenge: "Y2hhbGxlbmdl",

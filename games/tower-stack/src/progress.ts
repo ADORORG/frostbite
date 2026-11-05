@@ -2,7 +2,7 @@ import {
   defaultSound,
   parseSound,
   type SoundSettings,
-} from "@ador/game-sdk/audio/settings";
+} from "@frostbite/game-sdk/audio/settings";
 
 // What the platform may be handed back as this game's saved progress: anything else is a fresh game. The best height is the game's own
 // note for the player; milestones are kept by the platform. The sound settings are kept beside it, since the frame has no storage.

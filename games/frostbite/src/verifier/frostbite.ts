@@ -1,4 +1,4 @@
-import { cabinet, combineCabinets } from "@ador/game-sdk/cabinets";
+import { cabinet, combineCabinets } from "@frostbite/game-sdk/cabinets";
 
 import {
   iceFieldGameId,

@@ -1,4 +1,7 @@
-import { maxRunInputs, maxRunRecordBytes } from "@ador/game-sdk/run-record";
+import {
+  maxRunInputs,
+  maxRunRecordBytes,
+} from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import {

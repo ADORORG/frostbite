@@ -1,6 +1,6 @@
-import type { SetupLinkService } from "@ador/authorization";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
+import type { SetupLinkService } from "@frostbite/authorization";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
 
 import { outcomeFailure } from "../application/outcomes.ts";
 

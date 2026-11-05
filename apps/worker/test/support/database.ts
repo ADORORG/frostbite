@@ -7,7 +7,7 @@ import {
   outboxEvents,
   parseDatabaseEnvironment,
   uploadIntents,
-} from "@ador/database";
+} from "@frostbite/database";
 
 // One reading of the real clock for every timestamp of the scenario. The database enforces ordering
 // between them (cleanup after expiry), and the pipeline compares them with the real time, so a fixed

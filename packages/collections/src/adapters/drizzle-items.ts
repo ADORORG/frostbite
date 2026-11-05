@@ -1,6 +1,6 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { collectionItems } from "@ador/database/schema/collections";
-import { collectionAssetPurposes } from "@ador/shared/collections";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { collectionItems } from "@frostbite/database/schema/collections";
+import { collectionAssetPurposes } from "@frostbite/shared/collections";
 import { and, count, eq, max } from "drizzle-orm";
 
 import type { CollectionRepository } from "../application/repository.ts";

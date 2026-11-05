@@ -1,10 +1,10 @@
 import {
   createAssetLibraryService,
   createDrizzleAssetLibraryRepository,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
 import type { UploadsContext } from "./context.ts";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
 
 export function createLibraryServiceResolver(
   resolveContext: () => Promise<UploadsContext>,

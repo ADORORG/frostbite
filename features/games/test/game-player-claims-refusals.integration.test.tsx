@@ -90,7 +90,7 @@ describe("when a claim cannot go ahead", () => {
   });
 
   it("says to sign in when there is no session, and that the platform could not be reached for any other failure", async () => {
-    const { ApiError } = await import("@ador/client-http");
+    const { ApiError } = await import("@frostbite/client-http");
     const signedOut = fakeApi({
       start: vi.fn(async () => {
         throw new ApiError("unauthorized", 401, "no");

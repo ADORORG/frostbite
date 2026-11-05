@@ -1,11 +1,11 @@
-import type { DecideResult, createReviewService } from "@ador/collections";
-import type { HttpOperation } from "@ador/http";
+import type { DecideResult, createReviewService } from "@frostbite/collections";
+import type { HttpOperation } from "@frostbite/http";
 import {
   failure,
   idempotencyKeyConflict,
   unauthenticated,
   invalidCursor,
-} from "@ador/http/outcome";
+} from "@frostbite/http/outcome";
 import {
   collectionReviewCapability,
   decodeActivityCursor,
@@ -25,15 +25,15 @@ import {
   type ReviewQueueInput,
   type ReviewQueueResponse,
   type ReviewSubmissionResponse,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import {
   presentActivity,
   presentQueueItem,
   presentReviewSubmission,
 } from "./present.ts";
-import type { createAssetLibraryService } from "@ador/uploads";
+import type { createAssetLibraryService } from "@frostbite/uploads";
 
 export type ReviewService = ReturnType<typeof createReviewService>;
 export type AssetPreviews = Pick<

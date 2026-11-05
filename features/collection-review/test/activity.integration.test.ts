@@ -3,10 +3,10 @@ import {
   reviewActivityResponseSchema,
   reviewDetailResponseSchema,
   reviewRoutes,
-} from "@ador/shared/collections";
-import { platformRoleAssignments } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import {} from "@ador/test-kit/creator-database";
+} from "@frostbite/shared/collections";
+import { platformRoleAssignments } from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import {} from "@frostbite/test-kit/creator-database";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import {

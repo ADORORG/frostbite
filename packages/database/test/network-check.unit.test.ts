@@ -1,4 +1,4 @@
-import { walletNetworks } from "@ador/shared/chain";
+import { walletNetworks } from "@frostbite/shared/chain";
 import { PgDialect, pgTable, text } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 

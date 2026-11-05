@@ -30,18 +30,18 @@ export interface RegtestConfig {
 
 export const defaultFlags = {
   "alkanes-wasm": "",
-  "bitcoind-container": "ador-regtest-bitcoind",
+  "bitcoind-container": "frostbite-regtest-bitcoind",
   "bitcoind-image": "ruimarinho/bitcoin-core:24",
-  "bitcoind-password": "ador-regtest-only",
+  "bitcoind-password": "frostbite-regtest-only",
   "bitcoind-port": "18443",
-  "bitcoind-user": "ador",
+  "bitcoind-user": "frostbite",
   "gateway-port": "18081",
   "indexer-binary": "",
   "indexer-log-level": "info",
   "indexer-port": "18080",
   "indexer-view-memory-floor-mb": "1024",
   "state-dir": "",
-  wallet: "ador",
+  wallet: "frostbite",
 } as const;
 
 export type FlagName = keyof typeof defaultFlags;

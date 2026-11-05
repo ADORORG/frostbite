@@ -24,8 +24,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/mail": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/mail": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "zod": "^4.5.4"
   },
   "devDependencies": {

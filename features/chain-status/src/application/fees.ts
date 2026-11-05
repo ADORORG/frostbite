@@ -1,4 +1,4 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   chainFeesInputSchema,
   chainFeesRoute,
@@ -7,7 +7,7 @@ import {
   quotesFor,
   targetBlocksOf,
   type ChainFees,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { ChainStatusConfig } from "../config.ts";
 

@@ -9,10 +9,10 @@ import {
   type WalletChallengeRequest,
   type WalletChallengeResponse,
   type WalletVerifyRequest,
-} from "@ador/auth";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/auth";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { issueChallenge, verificationFailure } from "./wallet-results.ts";
 import type { WalletAuthServices } from "./wallet-services.ts";

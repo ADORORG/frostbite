@@ -46,7 +46,7 @@ Procedure and rationale: `providers/object-storage/r2/README.md`.
 - [ ] Add a CORS rule on the **private** bucket:
       `AllowedOrigins: [<PUBLIC_BASE_URL origin>]`, `AllowedMethods: ["PUT"]`,
       `AllowedHeaders: ["content-type"]`, `MaxAgeSeconds: 3600`.
-- [ ] Run `pnpm --filter @ador/provider-object-storage-r2 smoke` (needs `PUBLIC_BASE_URL`).
+- [ ] Run `pnpm --filter @frostbite/provider-object-storage-r2 smoke` (needs `PUBLIC_BASE_URL`).
       A failing conditional-copy check is a **release blocker**.
 - [ ] Note: the public bucket and any asset domain are not used yet. Approved artwork is served through
       short-lived signed links from the private bucket (ADR-016).

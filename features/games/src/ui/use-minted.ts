@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import type { MintedMilestone } from "@ador/shared/games";
+import { ApiError } from "@frostbite/client-http";
+import type { MintedMilestone } from "@frostbite/shared/games";
 import { useEffect, useState } from "react";
 
 import { createMintedApi, type MintedApi } from "../client/minted-api.ts";

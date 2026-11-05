@@ -5,10 +5,10 @@ minutes unconfirmed: "delayed", never "failed"). Owner asked for a reusable inde
 
 ## What was built
 
-- **One rule** (`isDelayed`, `indexingHealth`, `lagOf`, `sentAtAfter`; `@ador/shared/chain/indexing`). Policy values in `rewardsPolicy.delay`
+- **One rule** (`isDelayed`, `indexingHealth`, `lagOf`, `sentAtAfter`; `@frostbite/shared/chain/indexing`). Policy values in `rewardsPolicy.delay`
   (`maxLagBlocks` 2, `maxUnsettledMs` 60 minutes), `indexingReadingMs` (15 s) and `indexingRefreshMs` (30 s).
 - **Reading the indexer:** `ChainObserver.indexing(chain)` (a new method on the neutral port; the bitcoin-alkanes adapter answers from the tip and
-  `metashrew_height`, the simulated chain says in sync). `@ador/chain/indexing`: `readIndexing` (null where the chain cannot be asked),
+  `metashrew_height`, the simulated chain says in sync). `@frostbite/chain/indexing`: `readIndexing` (null where the chain cannot be asked),
   `cacheIndexing` (one reading per chain per `ttl`, shared by callers in flight, failures never kept), `createDelayJudge` (one reading per chain
   with a wait on it, none when nothing waits; time alone where the chain cannot be asked).
 - **Send time:** `broadcast_at` on both tracked tables (migration `20261017195259_game_tracked_broadcast_at`, with a check that it is set exactly when

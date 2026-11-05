@@ -9,7 +9,7 @@ Pick the route that fits where you are. All three put the same folder in your pr
 
 | You have                                    | Run                                                                                                                       | Needs                |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| The SDK installed                           | `npx ador-game-skill install` (the command is the SDK's `bin` named `ador-game-skill`)                                    | The SDK package      |
+| The SDK installed                           | `npx frostbite-game-skill install` (the command is the SDK's `bin` named `frostbite-game-skill`)                          | The SDK package      |
 | A public GitHub repository for the platform | `npx skills add <link to skills/build-a-game>`, add `-a claude-code` to choose the agent and `-g` for all projects        | Node; no npm publish |
 | A checkout of the repository                | `node --experimental-strip-types packages/game-sdk/src/skill/bin.ts install --from skills/build-a-game` (no build needed) | The checkout         |
 

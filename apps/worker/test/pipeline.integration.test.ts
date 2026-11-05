@@ -5,10 +5,10 @@ import {
   outboxEvents,
   runMigrations,
   parseDatabaseEnvironment,
-} from "@ador/database";
-import type { OutboxDeliveryStore } from "@ador/jobs";
-import { defaultOutboxRelayPolicy } from "@ador/jobs/policy";
-import { waitFor } from "@ador/test-kit/inngest-runtime";
+} from "@frostbite/database";
+import type { OutboxDeliveryStore } from "@frostbite/jobs";
+import { defaultOutboxRelayPolicy } from "@frostbite/jobs/policy";
+import { waitFor } from "@frostbite/test-kit/inngest-runtime";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

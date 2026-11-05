@@ -3,7 +3,7 @@ import {
   creatorApplicationSchemaVersion,
   creatorApplicationStates,
   type CreatorApplicationDraft,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { sql } from "drizzle-orm";
 import {
   check,

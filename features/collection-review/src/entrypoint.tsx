@@ -1,14 +1,14 @@
-import { createUploadsContextResolver } from "@ador/feature-uploads/context";
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
+import { createUploadsContextResolver } from "@frostbite/feature-uploads/context";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
 import {
   collectionReviewActivityPath,
   collectionReviewCapability,
   collectionReviewDetailPath,
   collectionReviewQueuePath,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 import {
   createActivityOperation,

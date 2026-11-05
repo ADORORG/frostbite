@@ -1,15 +1,15 @@
-# `@ador/feature-games`
+# `@frostbite/feature-games`
 
 The public games catalog and game detail pages, the frame that plays an embedded game, and the API routes that save a
-signed-in player's progress and milestones and start and settle their replay-verified runs. A game is a manifest (`@ador/shared/games`); the host
-page connects it to the platform through `@ador/game-sdk`.
+signed-in player's progress and milestones and start and settle their replay-verified runs. A game is a manifest (`@frostbite/shared/games`); the host
+page connects it to the platform through `@frostbite/game-sdk`.
 
 ## Public API
 
 `createGamesFeature(games, chains, wallet, runs)` returns the feature registration: `/games`, `/games/[slug]`, and a
 "Games" navigation item, `POST /api/v1/games/sync` (authenticated; rate limited as `syncGameState`; the service is
-`@ador/game-saves`), and `POST /api/v1/games/runs/start` and `/submit` (authenticated; rate limited as `startGameRun` and
-`submitGameRun`; the service is `@ador/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
+`@frostbite/game-saves`), and `POST /api/v1/games/runs/start` and `/submit` (authenticated; rate limited as `startGameRun` and
+`submitGameRun`; the service is `@frostbite/game-runs`, with the verifiers loaded from the games' built files under `runs.playRoot`,
 `configs/game-runs.ts`). The games come from `configs/games.ts`, one line per game.
 
 Each game page declares its own title, summary and a share picture (`src/metadata.ts`); the games page is shared only when a game is
@@ -40,7 +40,7 @@ answers on every keystroke with no request: `domain/search-games.ts` is a pure f
 best first. Every word typed must be found, as the start of a word, in a game's title, tags, summary, description or milestone titles (case
 and accents ignored; "frostbite" finds FROST·BITE); a title or tag hit ranks above a summary hit, and a title that is the whole query first of
 all. Titles and tags forgive a slipped letter in a word of four letters or more (`domain/typo.ts`); text a game wrote does not. Kinds are
-the closed list `gameTags` (`@ador/shared/games`, `tags` in the manifest, one to four per game): chosen kinds match any of them, "Playable
+the closed list `gameTags` (`@frostbite/shared/games`, `tags` in the manifest, one to four per game): chosen kinds match any of them, "Playable
 now" narrows to games a player can open. A narrowed wall drops the featured first card and the place numbers.
 
 The query lives in the address (`?q=snow&tag=puzzle&playable=1`, `domain/game-query.ts` reads and writes it, trusting none of it): the
@@ -70,7 +70,7 @@ The platform core is not edited to add a game.
   route"; a valid one with no game is "Record not published".
 - A claim is signed by the player's own connected wallet, from the page and never by the game: `wallet-game-player.tsx`
   takes the signer from `useStepWallet(signingWallets)` (the same policy list staff steps use, `rewardsPolicy.signingWallets`),
-  The claim dialog lists the claim's transaction once it has one, linked to the explorer named by `GameWalletConfig.explorerTxUrl` (`betaChain.explorerTxUrl`), through the shared `@ador/feature-chain-status/transaction`.
+  The claim dialog lists the claim's transaction once it has one, linked to the explorer named by `GameWalletConfig.explorerTxUrl` (`betaChain.explorerTxUrl`), through the shared `@frostbite/feature-chain-status/transaction`.
   and the review opens in a dialog (`claim-dialog.tsx`) above the dock. Without a signer the dialog says which is missing: no
   wallet connected, or a connected wallet that cannot sign claims. The platform checks what was signed against what it built.
 - The feature performs no mint or on-chain operation of its own. For a game that declared the `wallet`
@@ -81,7 +81,7 @@ The platform core is not edited to add a game.
 
 ## Dependencies and configuration
 
-Depends on plugin contracts, `@ador/shared` (manifest schema, chain options), `@ador/wallet` (the wallet
+Depends on plugin contracts, `@frostbite/shared` (manifest schema, chain options), `@frostbite/wallet` (the wallet
 connection, mounted only for a game that declared `wallet`) and shared UI. `createGamesFeature` takes the wallet
 configuration (`GameWalletConfig`: network and the connection page's address) from `configs/wallet.ts`. It reads no
 environment value; where a game is played is supplied by the platform's configuration (`GAME_LAUNCHES`, applied

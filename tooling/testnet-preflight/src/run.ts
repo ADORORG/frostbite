@@ -2,9 +2,9 @@ import {
   createJsonRpc,
   createRpcNode,
   type FetchLike,
-} from "@ador/chain/bitcoin-alkanes";
+} from "@frostbite/chain/bitcoin-alkanes";
 
-import type { DelayPolicy } from "@ador/shared/chain";
+import type { DelayPolicy } from "@frostbite/shared/chain";
 
 import { betaChains } from "@repo/configs/beta-chains";
 import {

@@ -3,16 +3,16 @@ import { createHash } from "node:crypto";
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   creatorAdmissionEvents,
   creatorApplications,
-} from "@ador/database/schema/creator-admission";
+} from "@frostbite/database/schema/creator-admission";
 import {
   creatorReviewActions,
   type CreatorAdmissionAction,
-} from "@ador/shared/creator-admission";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 
 import type {

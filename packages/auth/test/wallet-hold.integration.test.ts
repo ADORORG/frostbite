@@ -1,5 +1,5 @@
-import { authSecurityEvents, authUsers } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { authSecurityEvents, authUsers } from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
 

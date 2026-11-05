@@ -1,9 +1,9 @@
-import { signedTransactionSchema } from "@ador/shared/chain";
+import { signedTransactionSchema } from "@frostbite/shared/chain";
 import {
   gameAdminCapability,
   gameAdminRoutes,
   gameAdminStartRefusals,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { publishSummary, staffId, view } from "./support/fixtures.ts";

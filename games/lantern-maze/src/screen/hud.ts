@@ -1,11 +1,11 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { lastFloor } from "../rules/constants.ts";
 import type { MazeState } from "../rules/state.ts";
 import { colour } from "./palette.ts";
 import { barHeight, screenHeight, screenWidth } from "./layout.ts";
 import type { View } from "./view.ts";
-import { byInput } from "@ador/game-sdk/touch";
+import { byInput } from "@frostbite/game-sdk/touch";
 
 // What is written over the screen: the floor, the oil, the key, the score, a line of news, and the cards before and after a run. All of it is
 // on the canvas, so showing more of it never moves the page.

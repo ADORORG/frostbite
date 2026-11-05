@@ -3,8 +3,8 @@ import {
   chainReference,
   type Address,
   type ChainRef,
-} from "@ador/shared/chain";
-import { InvalidAddressError, type AddressCodec } from "@ador/chain/ports";
+} from "@frostbite/shared/chain";
+import { InvalidAddressError, type AddressCodec } from "@frostbite/chain/ports";
 
 // The simulated family's address format deliberately shares nothing with Bitcoin's: `sim:<chain
 // reference>:<6 lowercase hex><2 hex check>`. The chain reference is part of the text, so an address

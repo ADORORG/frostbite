@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 
 // Responses copied from the public Subfrost mainnet node on 2026-10-16 (read-only calls), so the decoders are checked against
 // what the node really sends, not only against what this code expects.

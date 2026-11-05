@@ -1,12 +1,12 @@
-import type { IdempotencyKey } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { IdempotencyKey } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import type {
   CollectionDraft,
   CollectionImportProblem as ImportProblem,
   CollectionImportRow,
   CollectionItem,
   SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 export interface CollectionRecord extends CollectionDraft {
   readonly createdAt: Date;

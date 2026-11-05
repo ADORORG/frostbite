@@ -43,7 +43,7 @@ test("the game connects, and the platform remembers what it does across a reload
   await expect
     .poll(() =>
       page.evaluate(() =>
-        window.localStorage.getItem("ador:game:sdk-explorer:progress"),
+        window.localStorage.getItem("frostbite:game:sdk-explorer:progress"),
       ),
     )
     .toBe('{"calls":1}');

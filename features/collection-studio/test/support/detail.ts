@@ -1,6 +1,6 @@
-import type { CollectionDetail } from "@ador/shared/collections";
-import type { LibraryAsset } from "@ador/shared/uploads";
-import { libraryAssetFixture } from "@ador/test-kit/library-asset";
+import type { CollectionDetail } from "@frostbite/shared/collections";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
+import { libraryAssetFixture } from "@frostbite/test-kit/library-asset";
 
 import { id, signet } from "./stubs.ts";
 

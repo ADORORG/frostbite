@@ -4,10 +4,10 @@ import {
   collectionNewPath,
   collectionStudioPath,
   type CollectionSummary,
-} from "@ador/shared/collections";
-import { standingBadgeLabel } from "@ador/shared/creator-admission";
-import type { LibraryAsset } from "@ador/shared/uploads";
-import { uploadsStudioPath } from "@ador/shared/uploads";
+} from "@frostbite/shared/collections";
+import { standingBadgeLabel } from "@frostbite/shared/creator-admission";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
+import { uploadsStudioPath } from "@frostbite/shared/uploads";
 import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
 
 import { countByStanding } from "../../client/overview.ts";

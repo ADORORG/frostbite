@@ -1,14 +1,14 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   collectionImportResponseSchema,
   collectionImportRoute,
   importCollectionItemsInputSchema,
   type CollectionImportResponse,
   type ImportCollectionItemsInput,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
-import type { ImportRowReport } from "@ador/collections";
+import type { ImportRowReport } from "@frostbite/collections";
 import type { CollectionService } from "./dependencies.ts";
 import {
   commonFailures,

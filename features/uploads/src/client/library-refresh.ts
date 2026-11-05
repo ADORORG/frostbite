@@ -1,4 +1,4 @@
-import type { LibraryAsset } from "@ador/shared/uploads";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 import { isTerminalAsset } from "./asset-poller.ts";
 import type { UploadClientPolicy } from "./client-policy.ts";

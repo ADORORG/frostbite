@@ -2,13 +2,13 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { bundleVerifier } from "@ador/game-sdk/build";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
 
 // A made-up game, "tally", that the platform has never heard of: add 1 to 3 to a tally until it reaches the target. It is
 // built through the same path every game's rules take (src/replay.ts -> verifier.js), and nothing in the platform names it.
 // An input called "spin" never returns, to show what a game's own bug can do to a server.
 export const tallySource = `
-import type { GameVerifier } from "@ador/game-sdk/run-record";
+import type { GameVerifier } from "@frostbite/game-sdk/run-record";
 const rules: GameVerifier<{ count: number; target: number }> = {
   earned: ({ count, target }) => (count >= target ? ["reached"] : []),
   id: "tally",
@@ -54,4 +54,4 @@ export async function buildArtifact(source = tallySource) {
 
 // A script that publishes what an artifact must, written by hand, for the cases a build would not produce.
 export const handWritten = (replay: string, sample: string, meta: string) =>
-  `globalThis.__adorReplay = ${replay}; globalThis.__adorSample = ${JSON.stringify(sample)}; globalThis.__adorMeta = ${JSON.stringify(meta)};`;
+  `globalThis.__frostbiteReplay = ${replay}; globalThis.__frostbiteSample = ${JSON.stringify(sample)}; globalThis.__frostbiteMeta = ${JSON.stringify(meta)};`;

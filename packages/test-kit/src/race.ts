@@ -1,4 +1,4 @@
-import type { DatabaseClient, DatabaseTransaction } from "@ador/database";
+import type { DatabaseClient, DatabaseTransaction } from "@frostbite/database";
 import { expect } from "vitest";
 
 export const pause = (milliseconds: number) =>

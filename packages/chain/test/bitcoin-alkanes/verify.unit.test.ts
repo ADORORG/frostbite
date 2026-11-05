@@ -4,7 +4,7 @@ import {
   chainRefSchema,
   type SignedTransaction,
   type UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { family, sign, tamper } from "../support/claims.ts";
 import { build, builder } from "../support/verification.ts";

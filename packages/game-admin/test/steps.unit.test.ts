@@ -2,11 +2,11 @@ import {
   chainRefSchema,
   unsignedTransactionSchema,
   type TrackedState,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 import {
   nativeAsset,
   simulatedFamily,
-} from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/test-kit/simulated-chain-transaction";
 import { describe, expect, it } from "vitest";
 
 import { unreadableCreation } from "../src/completion.ts";

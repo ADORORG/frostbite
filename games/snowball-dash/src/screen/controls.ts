@@ -1,4 +1,4 @@
-import { attachKeys } from "@ador/game-sdk/controls";
+import { attachKeys } from "@frostbite/game-sdk/controls";
 
 // What the player's hands can do. One button does everything: Space, the up arrow, Enter or a touch on the screen. Pressed when no run is
 // going, it starts one (and that press does not hop, so a run never begins with a leap); during a run it is the hop, and how long it is held

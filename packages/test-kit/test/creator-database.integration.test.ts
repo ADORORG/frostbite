@@ -9,7 +9,7 @@ import {
   platformRoleAssignments,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

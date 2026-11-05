@@ -1,4 +1,4 @@
-# `@ador/feature-platform-shell`
+# `@frostbite/feature-platform-shell`
 
 The first registered platform feature. It owns the public shell capabilities currently rendered
 by the web application: primary navigation and the public landing page.
@@ -10,11 +10,11 @@ feature; this feature does not own a hard-coded product menu.
 ## Public API
 
 The package exports `platformShellFeature`, a validated registration consumed by
-`configs/features.ts`. Its entrypoint is lazy-loaded through `@ador/plugin-kit`. The
-`@ador/feature-platform-shell/status` subpath exposes the framework-neutral `/api/v1/platform`
+`configs/features.ts`. Its entrypoint is lazy-loaded through `@frostbite/plugin-kit`. The
+`@frostbite/feature-platform-shell/status` subpath exposes the framework-neutral `/api/v1/platform`
 operation.
 
-The home page (`/`) is a hero over a moving scene (`@ador/scenes`) followed by whatever parts the features contributed
+The home page (`/`) is a hero over a moving scene (`@frostbite/scenes`) followed by whatever parts the features contributed
 (`PageRenderContext.homeSections`): a rail of launches, of collections and of games today. A part that fails to draw is left out and
 reported (`home.section_failed`), so one rail cannot take the page down. The status panel states only what is true (the feature count,
 and launches as gated).
@@ -35,7 +35,7 @@ the accepted extraction target.
 
 ## Verification
 
-Run `pnpm --filter @ador/feature-platform-shell typecheck`, `test:unit`, `test:integration`, or
+Run `pnpm --filter @frostbite/feature-platform-shell typecheck`, `test:unit`, `test:integration`, or
 `test:coverage`. Platform engineering owns this foundation feature.
 
 ## Ownership

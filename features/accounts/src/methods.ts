@@ -3,8 +3,8 @@ import {
   emailMethod,
   passkeyMethod,
   walletMethod,
-} from "@ador/auth";
-import type { DatabaseTransaction } from "@ador/database/connection";
+} from "@frostbite/auth";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
 
 // The sign-in methods a deployment offers, composed once at the platform's configuration and used everywhere: the sign-in and account
 // pages, removing a method under the "keep one way in" rule, and deciding whether a platform role works (staff and admin need a

@@ -1,7 +1,7 @@
-# `@ador/feature-public-products`
+# `@frostbite/feature-public-products`
 
-Detachable public discovery surfaces for launches and creators. Games are `@ador/feature-games`. The collections catalog is
-`@ador/feature-public-collections`.
+Detachable public discovery surfaces for launches and creators. Games are `@frostbite/feature-games`. The collections catalog is
+`@frostbite/feature-public-collections`.
 
 ## Public API
 

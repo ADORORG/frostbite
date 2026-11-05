@@ -2,12 +2,12 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import { describe, expect, it, vi } from "vitest";
 
 import type { UploadsContext } from "../src/context.ts";
 import { createLibraryServiceResolver } from "../src/library-runtime.ts";
-import { unusedStorage } from "@ador/test-kit/storage-registry";
+import { unusedStorage } from "@frostbite/test-kit/storage-registry";
 
 const context: UploadsContext = {
   // The pool connects lazily, and nothing here runs a query.

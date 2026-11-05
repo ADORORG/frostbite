@@ -3,7 +3,7 @@ import type {
   SignedTransaction,
   UnsignedTransaction,
   VerificationResult,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { psbtFormat } from "../format.ts";
 import { callScript } from "../tx/call-script.ts";

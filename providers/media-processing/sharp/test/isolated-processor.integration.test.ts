@@ -20,7 +20,7 @@ const derivatives = [
   { kind: "preview", maxSide: 1_024 },
 ] as const;
 const limits = { maxDimension: 8_192, maxPixels: 40_000_000 };
-const directory = mkdtempSync(join(tmpdir(), "ador-worker-"));
+const directory = mkdtempSync(join(tmpdir(), "frostbite-worker-"));
 afterAll(() => rmSync(directory, { force: true, recursive: true }));
 
 function input(bytes: Uint8Array, width: number, height: number) {

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { ScenesProvider } from "@ador/scenes/react";
+import { ScenesProvider } from "@frostbite/scenes/react";
 import {
   button,
   click,
@@ -9,7 +9,7 @@ import {
   mount,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { act, useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 

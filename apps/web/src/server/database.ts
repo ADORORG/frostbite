@@ -3,7 +3,7 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   type DatabaseClient,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 
 let client: DatabaseClient | undefined;
 

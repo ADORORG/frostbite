@@ -1,6 +1,10 @@
 import { createContext, runInContext } from "node:vm";
 
-import { metaGlobal, replayGlobal, sampleGlobal } from "@ador/game-sdk/replay";
+import {
+  metaGlobal,
+  replayGlobal,
+  sampleGlobal,
+} from "@frostbite/game-sdk/replay";
 
 // What a loaded verifier artifact can do: replay a record given as text (the artifact's whole surface), say what its rules
 // are, and give the sample run it was published with.
@@ -23,7 +27,7 @@ export interface InProcessRunnerOptions {
   readonly replayTimeoutMs: number;
 }
 
-const input = "__adorInput";
+const input = "__frostbiteInput";
 
 // Runs an artifact in this process, in a V8 context of its own: its globals are its own, and a call is time limited. A
 // `node:vm` context is **not a security boundary** (code in it can reach the host through its own constructors), so this

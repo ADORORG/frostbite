@@ -6,7 +6,7 @@ import {
   type CreatorReviewGroup,
   type CreatorReviewQueueResponse,
   type CreatorReviewSort,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { ArcadeFilterTabs, ArcadeSelect } from "@repo/ui/arcade";
 
 // The choices that narrow and order the queue. Every group is offered with its size, so a reviewer can see

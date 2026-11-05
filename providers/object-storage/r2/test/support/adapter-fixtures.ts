@@ -1,4 +1,4 @@
-import { parseObjectKey } from "@ador/object-storage";
+import { parseObjectKey } from "@frostbite/object-storage";
 
 export const config = {
   accessKeyId: "access-key",

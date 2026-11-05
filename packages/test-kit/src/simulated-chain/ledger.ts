@@ -6,7 +6,7 @@ import type {
   ChainRef,
   Observation,
   TransactionRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { decodeSimulated } from "./transaction.ts";
 

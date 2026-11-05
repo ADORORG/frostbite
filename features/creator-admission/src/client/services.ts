@@ -1,4 +1,4 @@
-import { sameOriginFetch } from "@ador/client-http";
+import { sameOriginFetch } from "@frostbite/client-http";
 
 import { createCreatorReviewApi, type CreatorReviewApi } from "./review-api.ts";
 

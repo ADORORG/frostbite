@@ -1,13 +1,13 @@
-import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
-import type { GameSyncService } from "@ador/game-saves";
+import type { HttpOperation } from "@frostbite/http";
+import { failure, unauthenticated } from "@frostbite/http/outcome";
+import type { GameSyncService } from "@frostbite/game-saves";
 import {
   gameSyncRoute,
   syncGameStateInputSchema,
   syncGameStateResponseSchema,
   type SyncGameStateInput,
   type SyncGameStateResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // Saves a signed-in player's local state for a game to their account and returns the merged state. Naturally
 // idempotent (the merge changes nothing when replayed), so it takes no key: a retry after a lost answer is

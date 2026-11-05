@@ -12,7 +12,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/scenes": "workspace:*"
+    "@frostbite/scenes": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

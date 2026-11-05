@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import type { RunsService } from "@ador/game-sdk/host";
-import type { AccountPort } from "@ador/game-sdk/synced-backend";
+import type { RunsService } from "@frostbite/game-sdk/host";
+import type { AccountPort } from "@frostbite/game-sdk/synced-backend";
 import { describe, expect, it, vi } from "vitest";
 
 import {

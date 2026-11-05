@@ -1,6 +1,6 @@
 "use client";
 
-import { collectionReviewActivityPath } from "@ador/shared/collections";
+import { collectionReviewActivityPath } from "@frostbite/shared/collections";
 import { ArcadeButton, ArcadePanel, ArcadeSelect } from "@repo/ui/arcade";
 import { useState } from "react";
 

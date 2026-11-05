@@ -1,5 +1,9 @@
-import type { ClaimChainPorts } from "@ador/game-claims";
-import type { ChainRef, DelayPolicy, FundingPolicy } from "@ador/shared/chain";
+import type { ClaimChainPorts } from "@frostbite/game-claims";
+import type {
+  ChainRef,
+  DelayPolicy,
+  FundingPolicy,
+} from "@frostbite/shared/chain";
 
 // What the platform needs, beyond a game's manifest, to take a claim of one of its milestones: a chain it can build, send and watch
 // transactions on. A chain with no adapter that can take claims answers `null`, and the page says claims are not available. The

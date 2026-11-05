@@ -5,8 +5,8 @@ import {
   collectionSubmissionListSchema,
   collectionSubmissionResponseSchema,
   submissionRoutes,
-} from "@ador/shared/collections";
-import { seedCreatorUser } from "@ador/test-kit/creator-database";
+} from "@frostbite/shared/collections";
+import { seedCreatorUser } from "@frostbite/test-kit/creator-database";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import {

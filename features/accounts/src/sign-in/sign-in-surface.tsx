@@ -1,7 +1,7 @@
 "use client";
 
-import { returnTarget } from "@ador/shared/auth/sign-in-path";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import { returnTarget } from "@frostbite/shared/auth/sign-in-path";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { signInViews } from "./registry.ts";

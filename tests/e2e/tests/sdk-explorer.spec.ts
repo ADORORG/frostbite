@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { dockButton, openDock } from "./support/dock.ts";
 import { installFakeWallet } from "./support/fake-wallet.ts";
-import { testWallets } from "@ador/auth/test-fixtures";
+import { testWallets } from "@frostbite/auth/test-fixtures";
 import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 
 // The SDK explorer, played in the platform's isolated frame: every call of the game SDK answered by the real
@@ -177,7 +177,7 @@ test("a game that did not declare the wallet is refused it, in the real browser"
         window.addEventListener("message", listener);
         const send = (id: string, method: string, params: object) =>
           window.parent.postMessage(
-            { channel: "ador-game", id, method, params, version: 1 },
+            { channel: "frostbite-game", id, method, params, version: 1 },
             "*",
           );
         send("probe-0", "ready", { sdkVersion: 1 });

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { startDevHost, type DevHost } from "@ador/game-sdk/dev-host";
+import { startDevHost, type DevHost } from "@frostbite/game-sdk/dev-host";
 import { expect, test } from "@playwright/test";
 
 // The local test page a builder opens, in a real browser, with the repository's SDK explorer: the game runs in a sandboxed

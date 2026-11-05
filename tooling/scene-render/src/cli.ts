@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import { ambient, scenes } from "@ador/scenes/library";
+import { ambient, scenes } from "@frostbite/scenes/library";
 
 import { renderScene } from "./render.ts";
 

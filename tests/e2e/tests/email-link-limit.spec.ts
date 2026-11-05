@@ -1,7 +1,7 @@
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 
 import { expect, test } from "@playwright/test";
-import { readCapturedMail } from "@ador/mail";
+import { readCapturedMail } from "@frostbite/mail";
 
 import {
   addAddress,

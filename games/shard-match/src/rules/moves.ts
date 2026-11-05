@@ -1,4 +1,4 @@
-import { stepInt } from "@ador/game-sdk/seeded";
+import { stepInt } from "@frostbite/game-sdk/seeded";
 
 import { at, cellOf, kindOf, neighbour, runsOf, type Board } from "./board.ts";
 import { cells, columns } from "./constants.ts";

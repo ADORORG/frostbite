@@ -1,7 +1,7 @@
 import {
   assetRejectionReasonSchema,
   derivativeKindSchema,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { z } from "zod";
 
 // Frame: 4-byte big-endian header length, a JSON header, then the binary payload.

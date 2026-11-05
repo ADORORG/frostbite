@@ -23,7 +23,7 @@ function pair() {
     listeners.forEach((l) => l({ data, source: host }));
   const reply = (result: unknown) =>
     deliver({
-      channel: "ador-game",
+      channel: "frostbite-game",
       id: sent.at(-1)?.id,
       ok: true,
       result,
@@ -66,7 +66,7 @@ describe("the game's side of claims", () => {
     const heard: unknown[] = [];
     const stop = p.client.on("claim.changed", (data) => heard.push(data));
     const event = (data: unknown) => ({
-      channel: "ador-game",
+      channel: "frostbite-game",
       data,
       event: "claim.changed",
       version: 1,

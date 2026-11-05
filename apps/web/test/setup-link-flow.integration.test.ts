@@ -3,7 +3,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import {
   createDrizzleSetupLinks,
   createSetupLinkService,
-} from "@ador/authorization";
+} from "@frostbite/authorization";
 import {
   authUsers,
   createDatabaseClient,
@@ -14,11 +14,11 @@ import {
   platformSetupLinks,
   runMigrations,
   walletIdentities,
-} from "@ador/database";
-import { createHeldMethodKinds } from "@ador/feature-accounts";
-import { createRedeemSetupLinkOperation } from "@ador/feature-accounts/setup-operation";
-import { correlationIdSchema } from "@ador/shared/http";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createHeldMethodKinds } from "@frostbite/feature-accounts";
+import { createRedeemSetupLinkOperation } from "@frostbite/feature-accounts/setup-operation";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { authMethods } from "@repo/configs/auth-methods";

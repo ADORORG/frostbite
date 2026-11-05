@@ -1,5 +1,5 @@
 import { Transaction } from "bitcoinjs-lib";
-import type { ChainRef, TransactionIntent } from "@ador/shared/chain";
+import type { ChainRef, TransactionIntent } from "@frostbite/shared/chain";
 
 import { validateBitcoinAddress } from "../bitcoin/address.ts";
 import type { ContractGateway } from "../ports.ts";

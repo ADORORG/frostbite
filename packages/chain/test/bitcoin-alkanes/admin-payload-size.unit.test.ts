@@ -1,4 +1,4 @@
-import { maxAdminPayloadChars } from "@ador/shared/games";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { encodeBundle } from "../../src/bitcoin-alkanes/admin/bundle.ts";

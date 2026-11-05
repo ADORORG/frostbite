@@ -1,4 +1,4 @@
-import type { CorrelationId } from "@ador/shared/http";
+import type { CorrelationId } from "@frostbite/shared/http";
 
 import type { ActiveSession } from "../application/session-repository.ts";
 import {

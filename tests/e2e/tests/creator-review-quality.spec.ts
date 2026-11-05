@@ -1,7 +1,7 @@
 import {
   creatorReviewQueueResponseSchema,
   creatorReviewReadResponseSchema,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

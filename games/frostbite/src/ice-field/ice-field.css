@@ -1,4 +1,4 @@
-@import "@ador/game-sdk/audio/panel.css";
+@import "@frostbite/game-sdk/audio/panel.css";
 
 /* The ice-field cabinet. Classes only: the frame's policy allows no inline styles. Colours are the game's own tokens. */
 /* The launchers sit in one row (see cabinet/dock.ts), so each takes the room its words need and none can lie over another. */

@@ -5,7 +5,7 @@ import {
   type SignedTransaction,
   type TransactionIntent,
   type UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { psbtFormat } from "../../src/bitcoin-alkanes/format.ts";
 import type { NodeUtxo } from "../../src/bitcoin-alkanes/node/esplora.ts";

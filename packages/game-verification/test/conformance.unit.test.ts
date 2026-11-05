@@ -1,4 +1,4 @@
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import { runVerifierConformance } from "../src/conformance.ts";

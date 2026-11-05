@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { gameManifestSchema } from "@ador/shared/games";
+import { gameManifestSchema } from "@frostbite/shared/games";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {

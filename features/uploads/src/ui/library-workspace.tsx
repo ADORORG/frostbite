@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadsNewPath } from "@ador/shared/uploads";
+import { uploadsNewPath } from "@frostbite/shared/uploads";
 import { ArcadeButton } from "@repo/ui/arcade";
 import { useState } from "react";
 

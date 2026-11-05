@@ -1,6 +1,6 @@
 "use client";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import {

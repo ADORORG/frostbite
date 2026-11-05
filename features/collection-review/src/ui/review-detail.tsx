@@ -3,14 +3,14 @@
 import {
   collectionReviewQueuePath,
   submissionStateLabels,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeButton,
   ArcadePanel,
   StatusLamp,
 } from "@repo/ui/arcade";
-import type { IdempotencyKey } from "@ador/shared/http";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 import { useRef, useState } from "react";
 
 import {

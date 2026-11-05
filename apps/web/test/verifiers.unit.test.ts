@@ -2,10 +2,10 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { bundleVerifier } from "@ador/game-sdk/build";
-import { runVerifierConformance } from "@ador/game-verification/conformance";
-import { createGameVerifiers } from "@ador/game-verification/node";
-import { verifyRun } from "@ador/game-verification/verify";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
+import { runVerifierConformance } from "@frostbite/game-verification/conformance";
+import { createGameVerifiers } from "@frostbite/game-verification/node";
+import { verifyRun } from "@frostbite/game-verification/verify";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { frostbite } from "@repo/configs/games/frostbite";

@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 
 import { objectOf } from "./json.ts";
 import { BitcoindError, type Bitcoind } from "./bitcoind.ts";

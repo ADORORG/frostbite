@@ -37,7 +37,7 @@ export async function startInngestRuntime(input: {
   readonly image?: string;
   readonly readyTimeoutMs?: number;
 }): Promise<InngestRuntime> {
-  const containerName = `ador-inngest-${randomUUID()}`;
+  const containerName = `frostbite-inngest-${randomUUID()}`;
   const { eventKey, signingKey } = input;
   const guard = guardContainer(containerName, input.terminate);
   const stop = guard.stop;

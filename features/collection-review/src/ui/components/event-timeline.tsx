@@ -2,7 +2,7 @@ import {
   submissionActionPastLabels,
   submissionStateLabels,
   type ReviewEvent,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 // Every event of the submission, oldest first, with what only staff see: who acted, the reason code,
 // and the private notes. The creator sees none of this.

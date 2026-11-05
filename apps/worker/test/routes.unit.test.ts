@@ -1,4 +1,4 @@
-import type { Readiness } from "@ador/shared/readiness";
+import type { Readiness } from "@frostbite/shared/readiness";
 import { describe, expect, it } from "vitest";
 
 import { createWorkerRoutes } from "../src/routes.ts";

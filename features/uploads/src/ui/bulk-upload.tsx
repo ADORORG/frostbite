@@ -4,7 +4,7 @@ import {
   defaultUploadPolicy,
   uploadContentTypes,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import {
   ArcadeActionButton,
   ArcadeFileDrop,

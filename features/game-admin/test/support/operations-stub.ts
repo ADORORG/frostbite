@@ -1,4 +1,4 @@
-import type { GameAdminService } from "@ador/game-admin";
+import type { GameAdminService } from "@frostbite/game-admin";
 import { vi } from "vitest";
 
 import {

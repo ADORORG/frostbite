@@ -1,4 +1,4 @@
-import { submissionStates } from "@ador/shared/collections";
+import { submissionStates } from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import {

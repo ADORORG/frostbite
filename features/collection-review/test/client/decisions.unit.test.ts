@@ -3,7 +3,7 @@ import {
   reviewActions,
   reviewDecisionSchema,
   submissionStates,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import {

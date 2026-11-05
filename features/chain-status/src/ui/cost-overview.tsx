@@ -1,4 +1,4 @@
-import type { FeeDetail } from "@ador/shared/chain";
+import type { FeeDetail } from "@frostbite/shared/chain";
 
 import { costBreakdown } from "../domain/fee-copy.ts";
 

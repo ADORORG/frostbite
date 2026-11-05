@@ -1,4 +1,4 @@
-import { ApiError, type Requester } from "@ador/client-http";
+import { ApiError, type Requester } from "@frostbite/client-http";
 import { describe, expect, it, vi } from "vitest";
 
 import { failed } from "../src/client/outcome.ts";

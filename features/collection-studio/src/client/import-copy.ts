@@ -1,4 +1,4 @@
-import type { CollectionImportProblem } from "@ador/shared/collections";
+import type { CollectionImportProblem } from "@frostbite/shared/collections";
 
 // What a creator is told about a row the server could not accept, in the words of their file.
 export function describeImportProblem(

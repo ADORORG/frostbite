@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { decisionGateIdSchema } from "@ador/shared/features";
+import { decisionGateIdSchema } from "@frostbite/shared/features";
 
 const decisionIdSchema = z.string().regex(/^D\d{2}$/);
 const decisionFieldSchema = z.string().regex(/^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/);

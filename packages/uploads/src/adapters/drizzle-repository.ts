@@ -1,14 +1,14 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { enqueueOutboxEvent } from "@ador/database/outbox";
-import { authUsers } from "@ador/database/schema/auth";
-import { assets, uploadIntents } from "@ador/database/schema/uploads";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { enqueueOutboxEvent } from "@frostbite/database/outbox";
+import { authUsers } from "@frostbite/database/schema/auth";
+import { assets, uploadIntents } from "@frostbite/database/schema/uploads";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import {
   assetProcessingRequestedEvent,
   assetProcessingRequestedPayloadSchema,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { and, count, eq, gt } from "drizzle-orm";
 
 import type { UploadIntentRepository } from "../application/repository.ts";

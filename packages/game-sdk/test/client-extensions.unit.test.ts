@@ -21,14 +21,17 @@ function pair() {
   const client = createGameClient({ host, listenOn, timeoutMs: 500 });
   const reply = (result: unknown) =>
     deliver({
-      channel: "ador-game",
+      channel: "frostbite-game",
       id: sent.at(-1)?.id,
       ok: true,
       result,
       version: 1,
     });
   const event = (name: string, data: unknown, source: unknown = host) =>
-    deliver({ channel: "ador-game", data, event: name, version: 1 }, source);
+    deliver(
+      { channel: "frostbite-game", data, event: name, version: 1 },
+      source,
+    );
   return { client, deliver, event, host, listeners, reply, sent };
 }
 
@@ -66,7 +69,7 @@ describe("the wallet, the capabilities and the message", () => {
     const p = pair();
     const pending = p.client.wallet.get();
     p.deliver({
-      channel: "ador-game",
+      channel: "frostbite-game",
       error: { code: "permission_denied", message: "No." },
       id: p.sent.at(-1)?.id,
       ok: false,
@@ -170,7 +173,7 @@ describe("what the platform tells the game", () => {
     const handler = vi.fn();
     p.client.on("fullscreen.changed", handler);
     p.deliver({
-      channel: "ador-game",
+      channel: "frostbite-game",
       event: "fullscreen.changed",
       data: { active: true },
       version: 2,

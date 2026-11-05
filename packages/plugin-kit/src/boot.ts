@@ -1,9 +1,12 @@
-import type { FeatureManifest, RouteContribution } from "@ador/shared/features";
+import type {
+  FeatureManifest,
+  RouteContribution,
+} from "@frostbite/shared/features";
 import {
   assertDecisionGateOpen,
   type DecisionCatalog,
   type DecisionGateId,
-} from "@ador/shared/decisions";
+} from "@frostbite/shared/decisions";
 
 import type { FeatureRegistry } from "./registry.js";
 import type { ProviderRegistry } from "./provider-registry.js";

@@ -5,13 +5,13 @@ Findings: S56.
 
 ## What was built
 
-- **`@ador/game-sdk`:** the `milestones.claim` method and `claim.changed` event (capability `milestone:claim`), the claim states
+- **`@frostbite/game-sdk`:** the `milestones.claim` method and `claim.changed` event (capability `milestone:claim`), the claim states
   and reasons, `claimCallsPerMinute` policy, `ClaimsService` on the host's services, `client.milestones.claim`.
-- **`@ador/shared/games`:** `claims.ts`, the wire contracts and four routes (start, submit, refresh, list), plain text throughout.
-- **`@ador/game-claims`:** `start` takes the wallet as text and parses it for the game's chain; `playerClaimState` names a
+- **`@frostbite/shared/games`:** `claims.ts`, the wire contracts and four routes (start, submit, refresh, list), plain text throughout.
+- **`@frostbite/game-claims`:** `start` takes the wallet as text and parses it for the game's chain; `playerClaimState` names a
   lifecycle state for the player.
-- **`@ador/game-saves`:** `hasEarnedMilestone`.
-- **`@ador/feature-games`:** the four operations, the runtime (`claimableGameLookup` from the manifest and the configuration), the
+- **`@frostbite/game-saves`:** `hasEarnedMilestone`.
+- **`@frostbite/feature-games`:** the four operations, the runtime (`claimableGameLookup` from the manifest and the configuration), the
   page's claims port, the player's `claimsFor`; `configs/game-claims.ts` (nothing configured).
 - **Tests:** host, client and protocol; the wire contracts; the operations; the page port and the game page; the lookup; the earned
   query against real PostgreSQL; and `apps/web/test/game-claims-flow.integration.test.ts` driving the operations end to end
@@ -21,7 +21,7 @@ Findings: S56.
 
 - **Mutation proof:** 21 breaks across the host, protocol, operations, port, lookup and the earned query; the first run left 1
   alive (the claim limits passed to the service); a unit test of the lookup killed it.
-- **Coverage (statements / branches / functions / lines):** `@ador/game-sdk` 98.3/96.9/98.6/98.4; `@ador/game-claims` 98.9/94.0/100/99.4; `@ador/feature-games` 94.8/95.1/91.0/94.5; `@ador/shared` 99.0/99.1/98.0/98.9; `@game/sdk-explorer` 100/91.7/100/100. `pnpm test:coverage` passed for all 48 workspaces.
+- **Coverage (statements / branches / functions / lines):** `@frostbite/game-sdk` 98.3/96.9/98.6/98.4; `@frostbite/game-claims` 98.9/94.0/100/99.4; `@frostbite/feature-games` 94.8/95.1/91.0/94.5; `@frostbite/shared` 99.0/99.1/98.0/98.9; `@game/sdk-explorer` 100/91.7/100/100. `pnpm test:coverage` passed for all 48 workspaces.
 - `pnpm format:check`, `pnpm lint` (48 workspaces, repository policy), `pnpm typecheck`: passed.
 
 ## Not done

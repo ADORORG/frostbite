@@ -1,10 +1,10 @@
 import type {
   ApprovedCollectionSummary,
   ApprovedVersion,
-} from "@ador/collections";
-import { chainOptionSchema } from "@ador/shared/chain";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import { libraryAssetFixture } from "@ador/test-kit/library-asset";
+} from "@frostbite/collections";
+import { chainOptionSchema } from "@frostbite/shared/chain";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
+import { libraryAssetFixture } from "@frostbite/test-kit/library-asset";
 
 export const id = () => uuidV7Schema.parse(createUuidV7());
 export const signet = "bip122:00000008819873e925422c1ff0f99f7c";

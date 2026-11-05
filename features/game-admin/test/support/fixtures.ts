@@ -1,7 +1,7 @@
-import { chainRefSchema, type ContractRef } from "@ador/shared/chain";
-import { defineGame } from "@ador/shared/games";
-import type { StepView } from "@ador/game-admin";
-import { transactionSummarySchema } from "@ador/shared/chain";
+import { chainRefSchema, type ContractRef } from "@frostbite/shared/chain";
+import { defineGame } from "@frostbite/shared/games";
+import type { StepView } from "@frostbite/game-admin";
+import { transactionSummarySchema } from "@frostbite/shared/chain";
 
 import type { GameAdminConfig } from "../../src/config.ts";
 import { adminGames } from "../../src/game-info.ts";

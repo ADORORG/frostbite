@@ -252,7 +252,7 @@ export function mountDevPage(options: DevPageOptions) {
         "Saved progress",
         button("dev-reset", "Clear what the game saved", () => {
           for (const key of Object.keys(storage))
-            if (key.startsWith(`ador:game:${game.id}:`))
+            if (key.startsWith(`frostbite:game:${game.id}:`))
               storage.removeItem(key);
           say("✎", "cleared saved progress; reload the game");
           frame.setAttribute("src", src);

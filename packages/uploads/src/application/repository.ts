@@ -1,10 +1,13 @@
-import type { UploadContentType, UploadPurpose } from "@ador/shared/uploads";
-import type { IdempotencyKey } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { ObjectKey } from "@ador/object-storage/contracts";
-import type { DomainEventEnvelope } from "@ador/events";
-import type { ProviderId } from "@ador/shared/providers";
-import type { AssetProcessingState } from "@ador/shared/uploads";
+import type {
+  UploadContentType,
+  UploadPurpose,
+} from "@frostbite/shared/uploads";
+import type { IdempotencyKey } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { ObjectKey } from "@frostbite/object-storage/contracts";
+import type { DomainEventEnvelope } from "@frostbite/events";
+import type { ProviderId } from "@frostbite/shared/providers";
+import type { AssetProcessingState } from "@frostbite/shared/uploads";
 
 export interface UploadIntentView {
   readonly byteLength: number;

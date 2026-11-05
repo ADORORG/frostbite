@@ -4,7 +4,7 @@ import {
   submissionSchemaVersion,
   submissionStates,
   type SubmissionSnapshot,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { sql } from "drizzle-orm";
 import {
   check,

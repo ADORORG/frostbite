@@ -3,7 +3,7 @@ import {
   authUsers,
   contactCodes,
   contactIdentities,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

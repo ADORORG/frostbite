@@ -43,7 +43,7 @@ describe("saved values", () => {
 });
 
 describe("requests and responses", () => {
-  const base = { channel: "ador-game", id: "r1", version: 1 };
+  const base = { channel: "frostbite-game", id: "r1", version: 1 };
 
   it("take a request with any method name and parameters, to be checked once the method is known", () => {
     expect(
@@ -59,7 +59,7 @@ describe("requests and responses", () => {
     ["another version", { ...base, method: "ready", params: {}, version: 2 }],
     [
       "no id",
-      { channel: "ador-game", method: "ready", params: {}, version: 1 },
+      { channel: "frostbite-game", method: "ready", params: {}, version: 1 },
     ],
     ["an empty id", { ...base, id: "", method: "ready", params: {} }],
     ["a long id", { ...base, id: "x".repeat(65), method: "ready", params: {} }],
@@ -243,7 +243,7 @@ describe("the wallet and the events", () => {
 
   it("are not responses, so a game built before them ignores them", () => {
     const message = {
-      channel: "ador-game",
+      channel: "frostbite-game",
       data: { active: true },
       event: "fullscreen.changed",
       version: 1,

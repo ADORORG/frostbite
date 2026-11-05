@@ -1,9 +1,9 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import type {
   ReserveUploadIntentResult,
   UploadIntentRepository,
   createUploadIntentService as CreateUploadIntentService,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 type ServiceDependencies = Parameters<typeof CreateUploadIntentService>[0];
@@ -32,7 +32,7 @@ const runtimeMocks = vi.hoisted(() => ({
   }),
 }));
 
-vi.mock("@ador/uploads", () => ({
+vi.mock("@frostbite/uploads", () => ({
   createDrizzleUploadIntentRepository: runtimeMocks.createRepository,
   createUploadIntentService: runtimeMocks.createService,
 }));
@@ -41,7 +41,7 @@ import { createUploadsContextResolver } from "../src/context.ts";
 import {
   storageRegistry,
   unusedStorage,
-} from "@ador/test-kit/storage-registry";
+} from "@frostbite/test-kit/storage-registry";
 import { createUploadServiceResolver } from "../src/runtime.ts";
 
 describe("upload runtime", () => {

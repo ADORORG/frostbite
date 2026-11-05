@@ -1,4 +1,4 @@
-import { stepInt } from "@ador/game-sdk/seeded";
+import { stepInt } from "@frostbite/game-sdk/seeded";
 
 import { horizon, lastLevel } from "./constants.ts";
 import { levelAt, speedAt } from "./course.ts";

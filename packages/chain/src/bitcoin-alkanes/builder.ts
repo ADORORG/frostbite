@@ -2,7 +2,7 @@ import type {
   ChainRef,
   TransactionIntent,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { validateBitcoinAddress } from "../bitcoin/address.ts";
 import { isAdminIntent, isAdminOperation } from "./admin/action.ts";

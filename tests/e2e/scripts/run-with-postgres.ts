@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { withDisposablePostgres } from "@ador/database/test-postgres";
+import { withDisposablePostgres } from "@frostbite/database/test-postgres";
 
 import { captureMailEnvironment } from "../src/manual-stack.ts";
 import { normalizePlaywrightArguments } from "../src/playwright-arguments.ts";
@@ -41,7 +41,7 @@ await withDisposablePostgres(async (databaseUrl) => {
   await seed(databaseUrl);
   const { baseURL } = resolveE2EServerConfig(process.env.E2E_BASE_URL);
   // The emails the app "sends" land in a directory the specs read, so a test can enter the code it was sent.
-  const mailDirectory = await mkdtemp(join(tmpdir(), "ador-e2e-mail-"));
+  const mailDirectory = await mkdtemp(join(tmpdir(), "frostbite-e2e-mail-"));
   const baseEnvironment = {
     ...applicationEnvironment(databaseUrl, baseURL),
     ...captureMailEnvironment(mailDirectory),

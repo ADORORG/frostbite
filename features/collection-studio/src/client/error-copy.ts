@@ -1,4 +1,4 @@
-import { describeRequestFailure } from "@ador/client-http";
+import { describeRequestFailure } from "@frostbite/client-http";
 
 // What the person is told, and what the page should offer, for a failed request.
 export type FailureKind =

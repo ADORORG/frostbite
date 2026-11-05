@@ -1,7 +1,7 @@
-# `@ador/media`
+# `@frostbite/media`
 
 Pure structural validation of PNG, JPEG, and WebP bytes with no third-party dependencies
-(ADR-004, D07, W3-04). It depends only on the shared contract types in `@ador/shared`.
+(ADR-004, D07, W3-04). It depends only on the shared contract types in `@frostbite/shared`.
 
 ## Public API
 
@@ -33,16 +33,16 @@ framework code and performs no I/O.
 
 ## Processing port
 
-`@ador/media/processing` defines `ImageProcessor` and its typed `media-processing:image-derivatives`
+`@frostbite/media/processing` defines `ImageProcessor` and its typed `media-processing:image-derivatives`
 capability. It is the boundary between platform code and a decoder; the `sharp` implementation is the
-provider adapter `@ador/provider-media-processing-sharp` (ADR-013). This package stays decoder-free.
+provider adapter `@frostbite/provider-media-processing-sharp` (ADR-013). This package stays decoder-free.
 
 ## Invariants
 
 Parsers are written to return a rejection rather than throw: every length is checked against the
 buffer before it is used, and a seeded fuzz test (about 18,000 mutated and random inputs per run)
 fails on any thrown error. Every rejection maps to one reason code. Limits and the reason
-vocabulary come from `@ador/shared/uploads`; nothing is configured here.
+vocabulary come from `@frostbite/shared/uploads`; nothing is configured here.
 
 ## Tests
 

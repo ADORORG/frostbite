@@ -7,7 +7,7 @@ import {
   gameMilestoneUnlocks,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
+} from "@frostbite/database";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

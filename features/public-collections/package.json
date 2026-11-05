@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-public-collections",
+  "name": "@frostbite/feature-public-collections",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,19 +17,19 @@
     "test:coverage": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
-    "@ador/collections": "workspace:*",
-    "@ador/feature-uploads": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/scenes": "workspace:*",
-    "@ador/shared": "workspace:*",
-    "@ador/uploads": "workspace:*",
+    "@frostbite/collections": "workspace:*",
+    "@frostbite/feature-uploads": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/scenes": "workspace:*",
+    "@frostbite/shared": "workspace:*",
+    "@frostbite/uploads": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8"
   },
   "devDependencies": {
-    "@ador/database": "workspace:*",
-    "@ador/object-storage": "workspace:*",
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/object-storage": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

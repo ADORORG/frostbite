@@ -17,7 +17,7 @@ let client: S3Client;
 const containers = () =>
   spawnSync(
     "docker",
-    ["ps", "-a", "--filter", "name=ador-s3-", "--format", "{{.Names}}"],
+    ["ps", "-a", "--filter", "name=frostbite-s3-", "--format", "{{.Names}}"],
     { encoding: "utf8" },
   )
     .stdout.split("\n")
@@ -91,7 +91,7 @@ describe("the disposable S3 runtime", () => {
   it("fails and leaves no container behind when the image cannot start", async () => {
     const before = containers().length;
     await expect(
-      startS3Runtime({ buckets: [], image: "ador-test/does-not-exist:0" }),
+      startS3Runtime({ buckets: [], image: "frostbite-test/does-not-exist:0" }),
     ).rejects.toThrow("docker exited with code");
     expect(containers().length).toBe(before);
   }, 120_000);

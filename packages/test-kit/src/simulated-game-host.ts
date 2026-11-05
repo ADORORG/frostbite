@@ -8,13 +8,13 @@ import {
   type HostEvent,
   type HostServices,
   type RunsService,
-} from "@ador/game-sdk/host";
-import type { GameHostPolicy } from "@ador/game-sdk/policy";
+} from "@frostbite/game-sdk/host";
+import type { GameHostPolicy } from "@frostbite/game-sdk/policy";
 import type {
   EventMessage,
   JsonValue,
   Response,
-} from "@ador/game-sdk/protocol";
+} from "@frostbite/game-sdk/protocol";
 
 export interface SimulatedGame {
   // Closes the page the game ran in.

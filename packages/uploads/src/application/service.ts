@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import type { CorrelationId, IdempotencyKey } from "@ador/shared/http";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import type { CorrelationId, IdempotencyKey } from "@frostbite/shared/http";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
 import {
   createUploadIntentInputSchema,
   completeUploadIntentInputSchema,
@@ -13,7 +13,7 @@ import {
   resolveUploadPolicy,
   type CreateUploadIntentInput,
   type UploadPolicyOverrides,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { UploadIntentRepository } from "./repository.ts";
 

@@ -8,7 +8,7 @@ import type {
   ProcessImageInput,
   ProcessImageResult,
   ProducedDerivative,
-} from "@ador/media/processing";
+} from "@frostbite/media/processing";
 import sharp from "sharp";
 
 const lengthPrefixBytes = 4;

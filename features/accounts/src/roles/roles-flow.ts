@@ -1,5 +1,5 @@
-import type { Requester } from "@ador/client-http";
-import type { PlatformRole } from "@ador/shared/accounts";
+import type { Requester } from "@frostbite/client-http";
+import type { PlatformRole } from "@frostbite/shared/accounts";
 
 import { failedFrom, type Failed } from "../client/outcome.ts";
 import {

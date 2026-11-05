@@ -1,5 +1,5 @@
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
 import {
   libraryEmptyInputSchema,
   libraryOlderInputSchema,
@@ -9,8 +9,8 @@ import {
   type LibraryEmptyInput,
   type LibraryOlderInput,
   type LibraryResponse,
-} from "@ador/shared/uploads";
-import type { createAssetLibraryService } from "@ador/uploads";
+} from "@frostbite/shared/uploads";
+import type { createAssetLibraryService } from "@frostbite/uploads";
 
 type Service = Pick<ReturnType<typeof createAssetLibraryService>, "list">;
 

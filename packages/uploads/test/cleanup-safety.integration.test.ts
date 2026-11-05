@@ -1,6 +1,6 @@
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { uploadIntents } from "@ador/database";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { uploadIntents } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

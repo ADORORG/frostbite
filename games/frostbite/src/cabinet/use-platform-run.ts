@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 
 import type { CabinetRuns } from "./platform-run.ts";
 

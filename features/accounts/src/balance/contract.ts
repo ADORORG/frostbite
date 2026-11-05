@@ -1,4 +1,4 @@
-import { walletNetworkSchema } from "@ador/shared/chain";
+import { walletNetworkSchema } from "@frostbite/shared/chain";
 import { z } from "zod";
 
 // The one route that tells the widget a wallet's balance. Anyone may ask (an address is public and a visitor with a

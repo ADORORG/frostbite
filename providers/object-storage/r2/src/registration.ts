@@ -1,4 +1,4 @@
-import { defineProvider } from "@ador/plugin-kit/providers";
+import { defineProvider } from "@frostbite/plugin-kit/providers";
 import { r2ObjectStorageProviderId } from "./identity.ts";
 
 export const r2ObjectStorageProvider = defineProvider({

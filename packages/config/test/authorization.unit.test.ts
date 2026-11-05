@@ -1,9 +1,9 @@
 import {
   authorizationPolicySchema,
   manageRolesCapability,
-} from "@ador/shared/accounts";
-import { collectionReviewCapability } from "@ador/shared/collections";
-import { gameAdminCapability } from "@ador/shared/games";
+} from "@frostbite/shared/accounts";
+import { collectionReviewCapability } from "@frostbite/shared/collections";
+import { gameAdminCapability } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { authorizationPolicy } from "../src/policy/authorization.ts";

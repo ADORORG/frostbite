@@ -1,4 +1,4 @@
-import type { MailSender } from "@ador/mail";
+import type { MailSender } from "@frostbite/mail";
 import { z } from "zod";
 
 import { renderCodeEmail } from "./code-email.ts";

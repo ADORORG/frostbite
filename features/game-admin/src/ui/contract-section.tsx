@@ -1,4 +1,4 @@
-import { gameAdminPath } from "@ador/shared/games";
+import { gameAdminPath } from "@frostbite/shared/games";
 import {
   ArcadeActionButton,
   ArcadeTextField,

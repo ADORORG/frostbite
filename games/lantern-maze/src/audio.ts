@@ -1,5 +1,5 @@
-import { commonEffects, tone } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import { commonEffects, tone } from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Lantern Maze's sound, as data: a slow, low drip of a tune in A minor under a soft pad, and an effect for each thing that happens. The
 // page speeds the music up as the oil runs low. Nothing here is a file: the SDK plays it with the browser's audio.

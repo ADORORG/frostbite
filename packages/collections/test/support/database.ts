@@ -12,8 +12,8 @@ import {
   platformRoleAssignments,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
-import type { UploadPurpose } from "@ador/shared/uploads";
+} from "@frostbite/database";
+import type { UploadPurpose } from "@frostbite/shared/uploads";
 import {
   seedCreatorUser,
   seedPlatformUser,
@@ -21,7 +21,7 @@ import {
   setCreatorApplicationState,
   type CreatorApplicationState,
   type SeededAssetState,
-} from "@ador/test-kit/creator-database";
+} from "@frostbite/test-kit/creator-database";
 import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 

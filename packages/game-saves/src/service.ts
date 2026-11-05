@@ -2,7 +2,7 @@ import {
   mergeGameState,
   type GameState,
   type SyncGameStateInput,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import type { GameSyncRepository } from "./repository.ts";
 import {

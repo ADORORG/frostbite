@@ -1,6 +1,6 @@
-import { InlineUpload } from "@ador/feature-uploads/inline";
-import { pickRendition } from "@ador/feature-uploads/presentation";
-import type { LibraryAsset, UploadPurpose } from "@ador/shared/uploads";
+import { InlineUpload } from "@frostbite/feature-uploads/inline";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
+import type { LibraryAsset, UploadPurpose } from "@frostbite/shared/uploads";
 import { ArcadeMediaTile } from "@repo/ui/arcade";
 import { useId } from "react";
 

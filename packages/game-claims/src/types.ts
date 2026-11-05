@@ -1,4 +1,4 @@
-import type { ChainPorts } from "@ador/chain/ports";
+import type { ChainPorts } from "@frostbite/chain/ports";
 import type {
   Address,
   ChainRef,
@@ -7,12 +7,12 @@ import type {
   FundingPolicy,
   TransactionSummary,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type {
   mintedPictureContentTypes,
   mintedPictureUnavailableReasons,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import type { GameClaimRepository, StoredClaim } from "./repository.ts";
 

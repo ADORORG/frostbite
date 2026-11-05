@@ -1,8 +1,8 @@
 import type {
   CollectionImportResponse,
   CollectionImportRow,
-} from "@ador/shared/collections";
-import type { IdempotencyKey } from "@ador/shared/http";
+} from "@frostbite/shared/collections";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 import { useRef, useState } from "react";
 
 import type { CollectionsClientServices } from "../../client/services.ts";

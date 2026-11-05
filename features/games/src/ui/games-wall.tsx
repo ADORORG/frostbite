@@ -1,4 +1,4 @@
-import { gameHref } from "@ador/shared/games";
+import { gameHref } from "@frostbite/shared/games";
 import { ArcadeBadge, CoverCard, CoverGrid } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";

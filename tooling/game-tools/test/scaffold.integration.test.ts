@@ -12,8 +12,8 @@ import { execFile } from "node:child_process";
 import { join } from "node:path";
 import { promisify, stripVTControlCharacters } from "node:util";
 
-import { gameManifestSchema } from "@ador/shared/games";
-import { checkGameConformance } from "@ador/test-kit/game-conformance";
+import { gameManifestSchema } from "@frostbite/shared/games";
+import { checkGameConformance } from "@frostbite/test-kit/game-conformance";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {

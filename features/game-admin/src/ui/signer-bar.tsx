@@ -3,12 +3,12 @@
 import {
   FeeSpeedChip,
   useFeeQuotes,
-} from "@ador/feature-chain-status/fee-picker";
+} from "@frostbite/feature-chain-status/fee-picker";
 import type {
   ChainStatusApi,
   StatusPolling,
-} from "@ador/feature-chain-status/api";
-import type { FeeSpeed } from "@ador/shared/chain";
+} from "@frostbite/feature-chain-status/api";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import { Avatar, ArcadeTextField, shortenMiddle } from "@repo/ui/arcade";
 import { useState } from "react";
 

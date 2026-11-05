@@ -1,4 +1,4 @@
-import type { HomeSection } from "@ador/plugin-kit";
+import type { HomeSection } from "@frostbite/plugin-kit";
 
 import type { HomeSectionView } from "../ui/home.tsx";
 

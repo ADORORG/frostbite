@@ -3,7 +3,7 @@ import {
   type BetaNetwork,
   type ChainOption,
   type WalletNetwork,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 // CAIP-2 identifies a Bitcoin chain as `bip122:` plus the first 16 bytes (32 hex characters) of its
 // genesis block hash (https://namespaces.chainagnostic.org/bip122/caip2). Signet's genesis hash is

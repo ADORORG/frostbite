@@ -1,9 +1,9 @@
-import type { AssetPipelineActivities } from "@ador/jobs/activities";
-import type { WorkflowPolicy } from "@ador/jobs/policy";
+import type { AssetPipelineActivities } from "@frostbite/jobs/activities";
+import type { WorkflowPolicy } from "@frostbite/jobs/policy";
 import type {
   SignedWorkflowEndpoint,
   WorkflowEndpointFactory,
-} from "@ador/jobs/provider-service";
+} from "@frostbite/jobs/provider-service";
 
 // Builds the signed endpoint once from provider-neutral parts: the workflow provider's factory, the
 // application's activities, and the workflow policy. Nothing here knows which workflow provider is

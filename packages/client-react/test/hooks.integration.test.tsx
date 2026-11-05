@@ -1,7 +1,11 @@
 import { createServer, type Server } from "node:http";
 
-import { ApiError, createRequester, type FetchLike } from "@ador/client-http";
-import { button, click, mount, settle } from "@ador/test-kit/dom";
+import {
+  ApiError,
+  createRequester,
+  type FetchLike,
+} from "@frostbite/client-http";
+import { button, click, mount, settle } from "@frostbite/test-kit/dom";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 

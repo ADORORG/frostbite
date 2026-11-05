@@ -1,4 +1,4 @@
-import { decisionCatalogSchema } from "@ador/shared/decisions";
+import { decisionCatalogSchema } from "@frostbite/shared/decisions";
 
 export const decisionCatalog = decisionCatalogSchema.parse({
   version: 1,

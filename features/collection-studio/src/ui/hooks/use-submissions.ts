@@ -1,10 +1,10 @@
-import type { IdempotencyKey } from "@ador/shared/http";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 import { useCallback, useRef } from "react";
 
 import type { CollectionsClientServices } from "../../client/services.ts";
 import { useAction, type Action } from "./use-action.ts";
 import { useResource, type LoadedResource } from "./use-resource.ts";
-import type { CollectionSubmissionList } from "@ador/shared/collections";
+import type { CollectionSubmissionList } from "@frostbite/shared/collections";
 
 export interface Submissions extends Action {
   readonly list: LoadedResource<CollectionSubmissionList>;

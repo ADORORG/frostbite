@@ -1,4 +1,7 @@
-import { BuildRefusedError, ChainUnavailableError } from "@ador/chain/ports";
+import {
+  BuildRefusedError,
+  ChainUnavailableError,
+} from "@frostbite/chain/ports";
 
 import type { StartClaimResult } from "./types.ts";
 

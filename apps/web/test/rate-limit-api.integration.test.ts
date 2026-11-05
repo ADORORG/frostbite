@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import { parseDatabaseEnvironment, runMigrations } from "@ador/database";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import { parseDatabaseEnvironment, runMigrations } from "@frostbite/database";
 import {
   afterEach,
   beforeAll,

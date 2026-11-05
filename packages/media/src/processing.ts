@@ -1,7 +1,7 @@
 import type {
   AssetRejectionReason,
   DerivativeKind,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { ImageLimits } from "./contracts.ts";
 

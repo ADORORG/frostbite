@@ -1,4 +1,4 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import { ArcadeTicker } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";

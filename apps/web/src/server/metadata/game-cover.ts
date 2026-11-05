@@ -1,7 +1,7 @@
 import { readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 
-import { embeddedGameAssetPath } from "@ador/shared/games";
+import { embeddedGameAssetPath } from "@frostbite/shared/games";
 
 // The kinds of picture the card renderer can draw. A cover in another format (AVIF, WebP) is left out of the card, which is then drawn
 // without it, rather than failing the preview.

@@ -1,13 +1,13 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
-import { authSessions, authUsers } from "@ador/database/schema/auth";
+} from "@frostbite/database/connection";
+import { authSessions, authUsers } from "@frostbite/database/schema/auth";
 import {
   contactCodes,
   contactIdentities,
-} from "@ador/database/schema/contact-sign-in";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/contact-sign-in";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, asc, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 
 import type { ContactCodeRepository } from "./repository.ts";

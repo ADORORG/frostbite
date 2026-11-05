@@ -1,18 +1,18 @@
 "use client";
 
 import { Avatar } from "@repo/ui/arcade";
-import type { WalletConnectionClient } from "@ador/wallet/client";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletConnectionClient } from "@frostbite/wallet/client";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 import type { BalanceSnapshot } from "../client/balance-store.ts";
 import { BalanceLine } from "./balance-line.tsx";
 import { CopyAddress } from "./copy-address.tsx";
-import { outcomeMessage } from "@ador/shared/account-outcomes";
-import type { AccountOutcome } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import type { AccountOutcome } from "@frostbite/shared/account-outcomes";
 import {
   myMilestonesNavigationLabel,
   myMilestonesPath,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { networkName, shortAddress } from "./format.ts";
 import type { SessionState } from "./session-state.ts";
 

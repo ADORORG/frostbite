@@ -3,8 +3,8 @@ import {
   authUsers,
   walletChallenges,
   walletIdentities,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

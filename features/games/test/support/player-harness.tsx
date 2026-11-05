@@ -1,8 +1,8 @@
-import { gameChannel, protocolVersion } from "@ador/game-sdk/protocol";
-import type { AccountPort } from "@ador/game-sdk/synced-backend";
+import { gameChannel, protocolVersion } from "@frostbite/game-sdk/protocol";
+import type { AccountPort } from "@frostbite/game-sdk/synced-backend";
 import { act, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { installDialogShim } from "@ador/test-kit/dom";
+import { installDialogShim } from "@frostbite/test-kit/dom";
 import { afterEach, beforeAll, beforeEach, vi } from "vitest";
 
 import { GamePlayer } from "../../src/ui/game-player.tsx";

@@ -1,10 +1,10 @@
-import { assetDerivatives, assets } from "@ador/database";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { assetDerivatives, assets } from "@frostbite/database";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import {
   defaultDerivativePolicy,
   defaultUploadPolicy,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { createDrizzleAssetProcessingRepository } from "../src/adapters/drizzle-processing-repository.ts";

@@ -109,7 +109,9 @@ export async function findSkillViolations(
     for (const file of [resolve(directory, "SKILL.md"), ...references]) {
       const name = `${label}/${relative(directory, file)}`;
       const text = await readFile(file, "utf8");
-      if (brand !== "" && text.toLowerCase().includes(brand.toLowerCase()))
+      // A path in this repository is a path and not the platform's name: a game's folder may be called what the platform is called.
+      const prose = text.replace(repositoryPath, "");
+      if (brand !== "" && prose.toLowerCase().includes(brand.toLowerCase()))
         violations.push(
           `${name} names the platform ("${brand}"); say <sdk> and look the name up.`,
         );

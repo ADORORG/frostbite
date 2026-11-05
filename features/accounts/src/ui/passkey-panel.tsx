@@ -4,7 +4,7 @@ import {
   browserSupportsWebAuthn,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { createRequester, sameOriginFetch } from "@ador/client-http";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
 import { useState } from "react";
 import {
   ArcadeActionButton,

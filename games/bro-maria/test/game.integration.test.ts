@@ -1,7 +1,7 @@
-import { defaultSound } from "@ador/game-sdk/audio/settings";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { recordingRuns } from "@ador/test-kit/simulated-game-host";
+import { recordingRuns } from "@frostbite/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);

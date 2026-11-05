@@ -5,8 +5,8 @@ Branch `feat/game-generator-conformance`, stacked on `docs/adr-018-accepted` (`0
 
 ## What was built
 
-- `@ador/test-kit/simulated-game-host` (moved from `@ador/game-sdk/conformance`, with its tests and fixture) and
-  `@ador/test-kit/game-conformance`: `checkGameConformance({ folder, game })` returns what is wrong with a game
+- `@frostbite/test-kit/simulated-game-host` (moved from `@frostbite/game-sdk/conformance`, with its tests and fixture) and
+  `@frostbite/test-kit/game-conformance`: `checkGameConformance({ folder, game })` returns what is wrong with a game
   folder: page the frame cannot serve, script that does not bundle, never ready, any call the platform refused,
   anything thrown uncaught. Empty means conforming. `createMemoryGameBackend` is the backend it uses.
 - `apps/web/test/games-conformance.unit.test.ts`: runs it over every registered embedded game, and fails if a

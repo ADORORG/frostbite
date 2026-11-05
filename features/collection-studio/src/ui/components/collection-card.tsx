@@ -1,5 +1,8 @@
-import { collectionWizardHref, standingOf } from "@ador/shared/collections";
-import type { CollectionSummary } from "@ador/shared/collections";
+import {
+  collectionWizardHref,
+  standingOf,
+} from "@frostbite/shared/collections";
+import type { CollectionSummary } from "@frostbite/shared/collections";
 import { ArcadeBadge, ArcadeButton, ArcadeProgress } from "@repo/ui/arcade";
 
 import type { CoverPicture } from "../../client/covers.ts";

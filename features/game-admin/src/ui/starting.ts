@@ -1,4 +1,4 @@
-import type { GameAdminAction } from "@ador/shared/games";
+import type { GameAdminAction } from "@frostbite/shared/games";
 
 import { actionLabel } from "../domain/copy.ts";
 

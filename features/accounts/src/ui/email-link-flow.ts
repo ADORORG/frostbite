@@ -4,8 +4,8 @@ import {
   emailCodeRequestResponseSchema,
   emailCodeRoutes,
   emailLinkedResponseSchema,
-} from "@ador/auth";
-import type { Requester } from "@ador/client-http";
+} from "@frostbite/auth";
+import type { Requester } from "@frostbite/client-http";
 
 import { failedFrom, type Failed } from "../client/outcome.ts";
 

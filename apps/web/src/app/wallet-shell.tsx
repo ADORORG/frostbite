@@ -1,6 +1,6 @@
 "use client";
 
-import { WalletRoot } from "@ador/feature-accounts/widget";
+import { WalletRoot } from "@frostbite/feature-accounts/widget";
 import { useRouter } from "next/navigation";
 import type { ComponentProps } from "react";
 

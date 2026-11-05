@@ -1,11 +1,11 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
 import {
   gameAdminCapability,
   gameAdminDetailPath,
   gameAdminPath,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import {
   createListStepsOperation,

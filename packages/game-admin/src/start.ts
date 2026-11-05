@@ -1,5 +1,5 @@
-import type { UnsignedTransaction } from "@ador/shared/chain";
-import { maxAdminPayloadChars } from "@ador/shared/games";
+import type { UnsignedTransaction } from "@frostbite/shared/chain";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
 
 import {
   planDeploy,

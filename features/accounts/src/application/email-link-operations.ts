@@ -11,9 +11,9 @@ import {
   type EmailAddressesView,
   type EmailCodeRequest,
   type EmailCodeVerify,
-} from "@ador/auth";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
+} from "@frostbite/auth";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
 
 import { emailAddressesView } from "./email-addresses-view.ts";
 import { outcomeFailure } from "./outcomes.ts";

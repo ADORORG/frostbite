@@ -1,5 +1,5 @@
-import type { GameHost } from "@ador/game-sdk/host";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
+import type { GameHost } from "@frostbite/game-sdk/host";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
 import { useEffect, type RefObject } from "react";
 
 // Tells the game what happens around it: the wallet connecting or leaving, the tab being hidden or shown, and

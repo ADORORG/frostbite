@@ -1,6 +1,6 @@
 # Starter Game (template)
 
-The template `pnpm game:new <id>` copies into `games/<id>`; it is not a game of the platform and is never listed. It uses only `@ador/game-sdk/client`; it saves nothing itself and calls no address.
+The template `pnpm game:new <id>` copies into `games/<id>`; it is not a game of the platform and is never listed. It uses only `@frostbite/game-sdk/client`; it saves nothing itself and calls no address.
 
 ## Layout
 

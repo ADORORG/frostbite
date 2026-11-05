@@ -8,7 +8,7 @@ Canonical Alkanes revision: `62511e9371a3f9e448841140c51cfe428cfcb955`
 ## Delivered scope
 
 - A runtime-neutral TypeScript Leaf V1 schema, deterministic codec, strict decoder, and SHA-256
-  sorted-pair Merkle primitives under `@ador/shared/allowlists`.
+  sorted-pair Merkle primitives under `@frostbite/shared/allowlists`.
 - One shared JSON fixture covering P2TR/Bitcoin and P2WPKH/Alkane-shaped inputs.
 - An independent Rust spike codec and hash implementation that consumes the same fixture.
 - Root contract lint, typecheck, and test commands so the Rust evidence cannot silently drift.

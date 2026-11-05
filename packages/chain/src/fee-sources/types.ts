@@ -1,4 +1,8 @@
-import type { BetaNetwork, FeeApiFormat, FeeRate } from "@ador/shared/chain";
+import type {
+  BetaNetwork,
+  FeeApiFormat,
+  FeeRate,
+} from "@frostbite/shared/chain";
 
 // Where the rate to pay for a confirmation target comes from. A fee source answers for the targets it is asked about, or rejects: a rate
 // is never guessed and the node's own estimate is never substituted for one that could not be had.

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {

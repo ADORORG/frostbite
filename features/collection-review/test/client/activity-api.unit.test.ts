@@ -1,5 +1,5 @@
-import type { FetchLike } from "@ador/client-http";
-import { reviewRoutes } from "@ador/shared/collections";
+import type { FetchLike } from "@frostbite/client-http";
+import { reviewRoutes } from "@frostbite/shared/collections";
 import { describe, expect, it, vi } from "vitest";
 
 import { createReviewApi } from "../../src/client/review-api.ts";

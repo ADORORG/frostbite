@@ -7,7 +7,7 @@ import {
   gameRuns,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 

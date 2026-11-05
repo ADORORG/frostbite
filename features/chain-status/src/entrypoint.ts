@@ -1,5 +1,5 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
 
 import { createFeesOperation } from "./application/fees.ts";
 import { createIndexingOperation } from "./application/indexing.ts";

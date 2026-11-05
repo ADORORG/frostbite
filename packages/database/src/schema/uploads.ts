@@ -6,7 +6,7 @@ import {
   type AssetRejectionReason,
   uploadFileNameMaxLength,
   type UploadContentType,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { sql } from "drizzle-orm";
 import {
   bigint,

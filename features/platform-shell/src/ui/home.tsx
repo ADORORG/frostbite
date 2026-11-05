@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { AppShell } from "@repo/ui/arcade";
-import type { FeatureId } from "@ador/shared/features";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { FeatureId } from "@frostbite/shared/features";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import type { ReactNode } from "react";
 
 import { HomeHero } from "./home-hero.tsx";

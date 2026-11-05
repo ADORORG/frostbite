@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import type {
   AssetRejectionReason,
   UploadContentType,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { FormatParseResult, ImageLimits } from "./contracts.ts";
 import { parseJpeg } from "./jpeg.ts";

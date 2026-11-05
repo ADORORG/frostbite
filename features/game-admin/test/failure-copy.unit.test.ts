@@ -1,4 +1,4 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it } from "vitest";
 
 import { failureCopy, type StepRequest } from "../src/domain/failure-copy.ts";

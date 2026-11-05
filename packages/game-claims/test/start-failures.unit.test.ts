@@ -1,4 +1,7 @@
-import { BuildRefusedError, ChainUnavailableError } from "@ador/chain/ports";
+import {
+  BuildRefusedError,
+  ChainUnavailableError,
+} from "@frostbite/chain/ports";
 import { describe, expect, it } from "vitest";
 
 import { buildFailure, contractRefusal } from "../src/start-failures.ts";

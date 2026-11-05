@@ -4,7 +4,7 @@ import { createUploadsContextResolver } from "../src/context.ts";
 import {
   storageRegistry,
   unusedStorage,
-} from "@ador/test-kit/storage-registry";
+} from "@frostbite/test-kit/storage-registry";
 
 const environment = {
   DATABASE_ACQUIRE_TIMEOUT_MS: "1000",

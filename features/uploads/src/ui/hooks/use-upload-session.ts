@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
-import type { UploadPurpose } from "@ador/shared/uploads";
+import type { UploadPurpose } from "@frostbite/shared/uploads";
 
 import {
   runnerFor,

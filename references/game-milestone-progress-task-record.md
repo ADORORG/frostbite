@@ -29,7 +29,7 @@ toast with the count and the count in the dock.
   merge keeps the larger count and total.
 - Database: `game_milestone_unlocks.count` and the new `game_milestone_counters` table (migration
   `game_milestone_progress`), with bounds.
-- `@ador/game-saves`: `rules.ts` (`boundState`, `earnReached`), the service enforces them and refuses a total for an
+- `@frostbite/game-saves`: `rules.ts` (`boundState`, `earnReached`), the service enforces them and refuses a total for an
   unknown or target-less milestone (`no-target`); the repository reads and writes both tables.
 - SDK: protocol methods, policy `progressCallsPerMinute`, `host-milestones.ts` (handlers split out so `host.ts`
   stays under 300 lines; types moved to `host-types.ts`, re-exported from `host.ts`), local and synced backends keep

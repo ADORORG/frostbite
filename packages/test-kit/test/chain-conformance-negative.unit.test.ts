@@ -1,7 +1,7 @@
-import type { Observation, TransactionIntent } from "@ador/shared/chain";
+import type { Observation, TransactionIntent } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
-import type { ChainAdapter } from "@ador/chain/adapter";
+import type { ChainAdapter } from "@frostbite/chain/adapter";
 
 import {
   checkAddressCodec,

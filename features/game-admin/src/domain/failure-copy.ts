@@ -1,4 +1,4 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 
 // The five things the page asks the platform to do, named for what a failure of each can leave behind.
 export type StepRequest = "load" | "record" | "send" | "start";

@@ -15,7 +15,7 @@ deployed.
 
 ## What was built
 
-- `@ador/shared/collections`: the submission state machine (one exhaustive transition table), the
+- `@frostbite/shared/collections`: the submission state machine (one exhaustive transition table), the
   `collection:review` capability name, the review decision schema (feedback is required wherever the
   creator must be told why), the frozen snapshot schema, readiness rules, and the HTTP contracts for
   creators and staff.
@@ -23,13 +23,13 @@ deployed.
   state, one live submission per collection by partial unique index) and `collection_review_events`
   (append-only). Hand-written triggers make a submission immutable apart from its state and update time,
   forbid deletes, and make events append-only.
-- `@ador/collections`: `createSubmissionService` and `createReviewService` over two ports
+- `@frostbite/collections`: `createSubmissionService` and `createReviewService` over two ports
   (`SubmissionAuthoring`, `ReviewRepository`) and one PostgreSQL adapter.
-- `@ador/authorization/role-guard`: `holdsActivePlatformRole`, a shared-lock role check for domain
+- `@frostbite/authorization/role-guard`: `holdsActivePlatformRole`, a shared-lock role check for domain
   transactions.
-- `@ador/feature-collection-studio`: `submitCollection` and `listCollectionSubmissions`.
-- `@ador/feature-collection-review` (new, API only): the review queue, a submission in full, and decide.
-- Smaller: `@ador/http/outcome` (shared failure helper), `seedReadyCollection` and `seedPlatformUser`
+- `@frostbite/feature-collection-studio`: `submitCollection` and `listCollectionSubmissions`.
+- `@frostbite/feature-collection-review` (new, API only): the review queue, a submission in full, and decide.
+- Smaller: `@frostbite/http/outcome` (shared failure helper), `seedReadyCollection` and `seedPlatformUser`
   test fixtures, a repository-policy rule against runtime imports of the database package root.
 
 ## Decisions taken without the product owner (defaults, to be reviewed)

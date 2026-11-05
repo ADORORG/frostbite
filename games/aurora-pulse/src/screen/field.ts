@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { lanes, lookahead } from "../rules/constants.ts";
 import type { PulseState } from "../rules/state.ts";

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createRpcNode } from "../../src/bitcoin-alkanes/node/node.ts";
 import { inspectContract } from "../../src/bitcoin-alkanes/inspect.ts";
 import { createJsonRpc } from "../../src/bitcoin-alkanes/node/transport.ts";
-import { chainFamilyIdSchema, chainRefSchema } from "@ador/shared/chain";
+import { chainFamilyIdSchema, chainRefSchema } from "@frostbite/shared/chain";
 
 // Reads a real Alkanes node. Skipped unless a node URL is given (for example the public Subfrost mainnet endpoint), so the
 // suite never needs the network; run it to check the decoders still match what a live node sends.

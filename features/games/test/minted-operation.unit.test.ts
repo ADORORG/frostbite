@@ -2,13 +2,13 @@ import type {
   GameClaimsService,
   MintedClaim,
   MintedPictureResult,
-} from "@ador/game-claims";
+} from "@frostbite/game-claims";
 import {
   getMintedPictureFileSchema,
   getMintedPictureRoute,
   listMintedMilestonesResponseSchema,
   listMintedMilestonesRoute,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import {

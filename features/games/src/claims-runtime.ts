@@ -3,21 +3,24 @@ import { randomUUID } from "node:crypto";
 import {
   createDrizzleContractStore,
   type ContractStore,
-} from "@ador/database/game-contracts";
+} from "@frostbite/database/game-contracts";
 import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   createDrizzleGameClaimRepository,
   createGameClaimsService,
   type ClaimableGame,
-} from "@ador/game-claims";
-import { hasEarnedMilestone } from "@ador/game-saves";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import { chainRefSchema, contractRefSchema } from "@ador/shared/chain";
-import { rewardsInitialisation, type GameManifest } from "@ador/shared/games";
+} from "@frostbite/game-claims";
+import { hasEarnedMilestone } from "@frostbite/game-saves";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import { chainRefSchema, contractRefSchema } from "@frostbite/shared/chain";
+import {
+  rewardsInitialisation,
+  type GameManifest,
+} from "@frostbite/shared/games";
 
 import type { GameClaimsConfig } from "./claims-config.ts";
 

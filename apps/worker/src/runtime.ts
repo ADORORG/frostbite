@@ -6,29 +6,29 @@ import {
   removeExpiredRows,
   type ExpiredRowCounts,
   type ExpiredRowLimits,
-} from "@ador/database";
+} from "@frostbite/database";
 import {
   createDatabaseClient,
   createDatabasePool,
   databaseReadinessProbe,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   createUploadCleanupResolver,
   type UploadCleanupResult,
-} from "@ador/feature-uploads/cleanup";
-import { createAssetPipelineResolver } from "@ador/feature-uploads/pipeline";
-import { runReadiness } from "@ador/http/readiness";
-import { runDrainLoop } from "@ador/jobs/drain-loop";
+} from "@frostbite/feature-uploads/cleanup";
+import { createAssetPipelineResolver } from "@frostbite/feature-uploads/pipeline";
+import { runReadiness } from "@frostbite/http/readiness";
+import { runDrainLoop } from "@frostbite/jobs/drain-loop";
 import {
   defaultMaintenanceLoopPolicy,
   defaultOutboxRelayPolicy,
   defaultRelayLoopPolicy,
   resolveWorkflowPolicy,
-} from "@ador/jobs/policy";
-import { runOutboxRelayLoop } from "@ador/jobs/relay-loop";
-import { storageReadinessProbe } from "@ador/object-storage/readiness";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
+} from "@frostbite/jobs/policy";
+import { runOutboxRelayLoop } from "@frostbite/jobs/relay-loop";
+import { storageReadinessProbe } from "@frostbite/object-storage/readiness";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
 
 import { createCleanupPass } from "./cleanup.ts";
 import { createSignedEndpointResolver } from "./endpoint.ts";

@@ -1,9 +1,9 @@
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 
 import { expect, test } from "@playwright/test";
-import { authMethodsResponseSchema } from "@ador/auth";
+import { authMethodsResponseSchema } from "@frostbite/auth";
 
-import { testWallets } from "@ador/auth/test-fixtures";
+import { testWallets } from "@frostbite/auth/test-fixtures";
 import {
   addAddress,
   addressList,

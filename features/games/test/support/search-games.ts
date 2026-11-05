@@ -1,4 +1,4 @@
-import type { GameManifest } from "@ador/shared/games";
+import type { GameManifest } from "@frostbite/shared/games";
 
 import {
   createGameCatalog,

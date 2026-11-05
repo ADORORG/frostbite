@@ -5,7 +5,7 @@ import {
   windowStart,
   type RateLimitDecision,
   type RateLimitRequest,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 import { lt, sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "../connection/client.ts";

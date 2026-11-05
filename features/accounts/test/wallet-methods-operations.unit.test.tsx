@@ -1,6 +1,6 @@
 import { createWalletMethodsOperations } from "../src/application/wallet-methods-operations.ts";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import { describe, expect, it } from "vitest";
 
 import {

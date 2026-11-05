@@ -2,7 +2,7 @@ import {
   creatorAdmissionEventLabels,
   creatorApplicationStateLabels,
   type CreatorReviewDetail,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 // "2026-10-10 12:30 UTC": the time as it was recorded, the same on every machine.
 function formatTime(iso: string): string {

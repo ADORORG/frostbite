@@ -1,10 +1,10 @@
 "use client";
 
-import type { ChainOption } from "@ador/shared/chain";
-import type { CollectionDetail } from "@ador/shared/collections";
-import { collectionStudioPath } from "@ador/shared/collections";
-import { creatorApplicationPath } from "@ador/shared/creator-admission";
-import type { LibraryResponse } from "@ador/shared/uploads";
+import type { ChainOption } from "@frostbite/shared/chain";
+import type { CollectionDetail } from "@frostbite/shared/collections";
+import { collectionStudioPath } from "@frostbite/shared/collections";
+import { creatorApplicationPath } from "@frostbite/shared/creator-admission";
+import type { LibraryResponse } from "@frostbite/shared/uploads";
 import { ArcadeActionButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 import { useEffect, useRef, useState } from "react";
 

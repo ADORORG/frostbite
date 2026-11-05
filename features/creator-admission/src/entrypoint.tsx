@@ -1,13 +1,13 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import {
   creatorApplicationPath,
   creatorReviewDetailPath,
   creatorReviewPath,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 import { createCreatorApplicationOperations } from "./application/operations.ts";
 import { createCreatorReviewOperations } from "./application/review-operations.ts";

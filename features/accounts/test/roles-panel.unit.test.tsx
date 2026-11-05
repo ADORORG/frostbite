@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { failed } from "../src/client/outcome.ts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {

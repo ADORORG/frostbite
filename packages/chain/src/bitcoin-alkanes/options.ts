@@ -5,7 +5,7 @@ import {
   type FeeDetail,
   type FeeSpeed,
   type FeeSpeedPolicy,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import {
   alkaneIdLimit,

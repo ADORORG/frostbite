@@ -1,9 +1,9 @@
 import {
   createProviderRegistry,
   defineProvider,
-} from "@ador/plugin-kit/providers";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/plugin-kit/providers";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { describe, expect, it } from "vitest";
 
 import { createUploadCleanupResolver } from "../src/cleanup.ts";

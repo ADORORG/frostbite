@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { frostFor, goalOf, type MatchState } from "../rules/state.ts";
 import { praiseFrames, type Scene } from "./scene.ts";

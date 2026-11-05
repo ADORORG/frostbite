@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { creatorApplicationResponseSchema } from "@ador/shared/creator-admission";
+import { creatorApplicationResponseSchema } from "@frostbite/shared/creator-admission";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";

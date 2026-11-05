@@ -16,7 +16,7 @@ A game is a folder of reviewed source plus one manifest:
 - **Built by the platform.** A pull request adds source; CI builds it into static files served under the
   platform's own domain at `/play/<id>/index.html`, in a frame the browser cuts off (below). No binary is
   committed. Every game is reviewed before it is merged.
-- **Described by a manifest** (`defineGame`, `@ador/shared/games`): who it is, its version, the chain its
+- **Described by a manifest** (`defineGame`, `@frostbite/shared/games`): who it is, its version, the chain its
   future on-chain actions use, and the milestones it can report. A manifest that fails its checks stops the
   platform starting, so a mistake shows at once.
 
@@ -33,14 +33,14 @@ A game is a folder of reviewed source plus one manifest:
 4. **Open a pull request.** The checks in "Checks every game passes" must pass.
 
 ```ts
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 export const myGame = defineGame({
   schemaVersion: 1, // the manifest format
   id: "my-game",
   title: "My game",
   summary: "One sentence for the list.",
-  tags: ["arcade"], // one to four kinds from the platform's list (`gameTags` in `@ador/shared/games`); the games page searches and filters by them
+  tags: ["arcade"], // one to four kinds from the platform's list (`gameTags` in `@frostbite/shared/games`); the games page searches and filters by them
   description: "A longer text for the game's page.",
   version: "0.1.0", // the game's own release; a change to a milestone is a new version, never an edit
   network: "bip122:00000008819873e925422c1ff0f99f7c", // must be a chain the platform is configured for
@@ -68,7 +68,7 @@ export const myGame = defineGame({
 | `styles.css`  | The only stylesheet.                                                                               |
 | `assets/`     | Static files, copied as they are. Name them relative to the page (`assets/a.png`), never `/a.png`. |
 | `src/game.ts` | The rules, free of the page and the platform, so they are testable alone.                          |
-| `src/main.ts` | Draws and calls the platform through `@ador/game-sdk/client`. The bundle entry.                    |
+| `src/main.ts` | Draws and calls the platform through `@frostbite/game-sdk/client`. The bundle entry.               |
 | `test/`       | Unit tests for the rules, and an integration test that bundles the game and runs it (below).       |
 
 Only `index.html`, `styles.css`, `assets/` and the bundled `main.js` are published; tests and config never leave
@@ -87,16 +87,16 @@ gets a moving scene as its picture (never initials), and a game with a picture b
 picture. Conformance fails if a named file is missing from `assets/`. Use 16:9; the list crops to fit.
 
 To choose which scene the card shows, name it: `scene: "runner"`. Left out, the platform picks one from the game's id, so
-the card looks the same on every visit. The platform checks the name against the scenes it has (`@ador/scenes/library`) and
+the card looks the same on every visit. The platform checks the name against the scenes it has (`@frostbite/scenes/library`) and
 refuses to start with a game that names one it does not have, rather than ignoring it.
 
 ## Pieces to build on
 
 A game that plays on a seed and wants its milestones replay-checked can build on small modules of the SDK instead of writing its
-own: `@ador/game-sdk/seeded` (the seeded generator every rule must use), `@ador/game-sdk/run-inputs` (checking a run input's fields
-and tick, and refusing with a reason), `@ador/game-sdk/cabinet-runs` (how a cabinet reaches the platform's runs); a finished run is sent with `sendRun` from `@ador/game-sdk/play`, which says nothing to the player (how a run is checked is not part of playing), and
-`@ador/game-sdk/play` (reporting a milestone only if the manifest declares it, and starting and submitting runs). A pixel-art screen on a canvas also has `@ador/game-sdk/pixels` (`block`, `sprite`, `wrap`) and
-`@ador/game-sdk/fixed-step` (whole ticks from elapsed time, at the game's own rate). Frost Runner, Icicle Drop and Tower Stacker
+own: `@frostbite/game-sdk/seeded` (the seeded generator every rule must use), `@frostbite/game-sdk/run-inputs` (checking a run input's fields
+and tick, and refusing with a reason), `@frostbite/game-sdk/cabinet-runs` (how a cabinet reaches the platform's runs); a finished run is sent with `sendRun` from `@frostbite/game-sdk/play`, which says nothing to the player (how a run is checked is not part of playing), and
+`@frostbite/game-sdk/play` (reporting a milestone only if the manifest declares it, and starting and submitting runs). A pixel-art screen on a canvas also has `@frostbite/game-sdk/pixels` (`block`, `sprite`, `wrap`) and
+`@frostbite/game-sdk/fixed-step` (whole ticks from elapsed time, at the game's own rate). Frost Runner, Icicle Drop and Tower Stacker
 (`games/frost-runner`, `games/icicle-drop`, `games/tower-stack`) are three complete examples: pure seeded rules, a session that records the
 choices, a verifier with a sample run, and a manifest that pins its digest.
 
@@ -104,17 +104,17 @@ choices, a verifier with a sample run, and a manifest that pins its digest.
 
 Every game on the platform behaves the same way, and the SDK has the pieces so a game does not write them again:
 
-- **Sound** (`@ador/game-sdk/audio`): music and effects are data (a `Track` of looping note voices, an `Effect` of gliding tones or noise) that the
-  SDK plays with the browser's audio, so there are no sound files. `setUpSound` (`@ador/game-sdk/audio/setup`) makes the sound, puts the player's
+- **Sound** (`@frostbite/game-sdk/audio`): music and effects are data (a `Track` of looping note voices, an `Effect` of gliding tones or noise) that the
+  SDK plays with the browser's audio, so there are no sound files. `setUpSound` (`@frostbite/game-sdk/audio/setup`) makes the sound, puts the player's
   panel in a place the game gives it (bottom left of the foot, never floating over the game), silences a paused game and a hidden tab, and hands
-  back `sfx(name)`, `play(effect)`, `music(on)` and `tempo(scale)`. Import `@ador/game-sdk/audio/panel.css` in the game's stylesheet. A browser
+  back `sfx(name)`, `play(effect)`, `music(on)` and `tempo(scale)`. Import `@frostbite/game-sdk/audio/panel.css` in the game's stylesheet. A browser
   keeps a page silent until the player has pressed something, so the panel says "Sound starts when you press a key" until then, and says so when
   the browser has no audio. The frame has no storage, so the game keeps `SoundSettings` beside its own progress and reads it back with
   `parseSound`; it is saved whenever the player changes it.
-- **Keys** (`@ador/game-sdk/controls`): `attachKeys(window, keys, on)` with `standardKeys` gives Enter (and the numpad Enter) as `start` and P as
+- **Keys** (`@frostbite/game-sdk/controls`): `attachKeys(window, keys, on)` with `standardKeys` gives Enter (and the numpad Enter) as `start` and P as
   `pause`; a game adds its own and may take Space for pause only if Space is not its main action. Held keys do not repeat, Ctrl/Alt/Meta shortcuts
   and typing in a field are left to the browser. Enter must never throw away a run that is going.
-- **Pause and the loop** (`@ador/game-sdk/pause`, `@ador/game-sdk/run-loop`): `createPause` is the one place the screen, the sound and the clock agree
+- **Pause and the loop** (`@frostbite/game-sdk/pause`, `@frostbite/game-sdk/run-loop`): `createPause` is the one place the screen, the sound and the clock agree
   on whether the game is paused; `createRunLoop` runs a real-time game in whole ticks, asks for one animation frame at a time, stops the clock on a
   pause (the time paused is not counted), pauses a hidden tab, and refuses a second start while one is going. Pausing adds no input and no tick, so a
   paused run replays like any other.
@@ -122,7 +122,7 @@ Every game on the platform behaves the same way, and the SDK has the pieces so a
   (`visibility`, not `display: none`), buttons have a fixed minimum width so a changing label does not shift their neighbours, and the note, the
   earned list and the score row have heights that never grow. `tests/e2e/tests/tower-stack-layout.spec.ts` compares the boxes through a run; copy it
   for a new game.
-- **Tests without a speaker** (`@ador/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
+- **Tests without a speaker** (`@frostbite/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
   test can check that a game made a sound, stopped its music, or stayed quiet while paused.
 
 Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker, Bro Maria and Snowball Dash use all of it. FROST·BITE's two replayable cabinets use the sound and the
@@ -131,7 +131,7 @@ Enter key (SAT SNAKE also pauses); the rest of FROST·BITE keeps its own audio.
 ## Talking to the platform
 
 ```ts
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
 
 const client = createGameClient();
 await client.ready(); // first; the platform answers with the player's state
@@ -227,7 +227,7 @@ FROST·BITE came in this way (`games/frostbite`), and is the worked example:
   plan to refactor it; the repository policy skips that folder by name, and it may only shrink). New code is
   written to the usual rules.
 - `src/main.ts` gives the old code what it expects from the platform before it starts: React (bundled), a
-  `localStorage` (`@ador/game-sdk/storage-shim`: kept in memory, with the keys the game names saved through
+  `localStorage` (`@frostbite/game-sdk/storage-shim`: kept in memory, with the keys the game names saved through
   `progress.save`), and a way to report its own progress marks as milestones.
 - Anything the frame forbids is removed or replaced, not worked around: network calls and live-chain code were
   removed, CDN scripts and fonts were bundled, a page of tools that kept data in the browser was left out.
@@ -247,7 +247,7 @@ Sample game's "Run safety probe" button demonstrates this and is checked in a re
 A game that wants its milestones minted declares one more field in its manifest, `rewards: { templateId, templateVersion }`, naming
 the contract template it wants (today `game-rewards` at `1.0.0`; the platform's own list says which exist). Every milestone the
 game declares is then enabled in that contract, and the most times one address can claim it is the milestone's own policy: once,
-or the `maxCount` of a repeatable one (`milestoneClaimLimit`, `rewardsInitialisation` in `@ador/shared/games`). The optional
+or the `maxCount` of a repeatable one (`milestoneClaimLimit`, `rewardsInitialisation` in `@frostbite/shared/games`). The optional
 `milestone:claim` capability lets the game ask the platform to start a claim for a player; it needs `rewards`. The player's own
 wallet signs and the player pays the network fee. **Nothing mints yet**: the contract and the chain steps are task #73, and the
 page lists the capability as granted (the host answers it) while every claim is answered `not-supported` until they exist. Holding a token will mean "claimed", never "earned"
@@ -261,7 +261,7 @@ prize) may depend on a self-reported milestone.**
 
 A game can offer a stronger level, `replay-verified`, for milestones its rules can decide. It needs no platform change:
 
-1. Write the rules as a pure state machine (`GameVerifier`, `@ador/game-sdk/run-record`: `init(seed, config)`,
+1. Write the rules as a pure state machine (`GameVerifier`, `@frostbite/game-sdk/run-record`: `init(seed, config)`,
    `step(state, input)`, `earned(state)`; no clock, no `Math.random`, no I/O) and play through the same module.
 2. Add `src/replay.ts` to the game: a default export of the verifier and a named export `sample()` returning one legal
    run. `pnpm game:build` (the SDK's build) emits `verifier.js` and `verifier.json` beside the game.
@@ -272,7 +272,7 @@ A game can offer a stronger level, `replay-verified`, for milestones its rules c
    seed of their own, self-reported), record the run with `createRunRecorder`, and `client.run.submit(runId, record)` when
    it ends. The answer is `verified` (with the milestones earned), `rejected` or `refused`.
 
-A game with several replayable cabinets still publishes one verifier: `combineCabinets` (`@ador/game-sdk/cabinets`) takes
+A game with several replayable cabinets still publishes one verifier: `combineCabinets` (`@frostbite/game-sdk/cabinets`) takes
 each cabinet's rules (`cabinet(rules)`), and a record names its cabinet in `config.cabinet`. A real-time game ports to the same
 shape by making its rules count ticks instead of reading a clock, recording the player's choices with the tick each was made on,
 and letting the screen's timer drive the same step function (FROST·BITE's SAT SNAKE is the worked example,
@@ -295,14 +295,14 @@ platform plays itself are loaded today**; a game hosted elsewhere stays self-rep
 - `pnpm game:dev <id>` opens a local test page for the game: it frames the game in the same sandbox, builds it again on each
   reload, and lets you sign the player in and out, connect a fake wallet (and change its network), send the tab-hidden and
   full-screen events, take a claim through its states, and read a log of every call. Outside this repository, the SDK's
-  `ador-game-dev <folder>` does the same from a `game.json` of the game's id, capabilities and milestones. What the page does is
+  `frostbite-game-dev <folder>` does the same from a `game.json` of the game's id, capabilities and milestones. What the page does is
   made up; the platform's own rules decide what players get.
 - `pnpm test:e2e -- tests/game-host.spec.ts` plays SDK Explorer in a real browser through reload.
 
 ## Checks every game passes
 
 **Conformance, run automatically.** `apps/web/test/games-conformance.unit.test.ts` runs `checkGameConformance`
-(`@ador/test-kit/game-conformance`) over every registered embedded game, so nobody has to remember to ask: the page
+(`@frostbite/test-kit/game-conformance`) over every registered embedded game, so nobody has to remember to ask: the page
 must be one the frame can serve, the script must bundle, the game must tell the platform it is ready, the platform
 must never refuse what it asks (an undeclared milestone, a call too large or too fast), nothing may be thrown
 uncaught, and the cover files the manifest names must exist. The same test fails if a folder under `/games` is not registered, or a registered embedded game has no

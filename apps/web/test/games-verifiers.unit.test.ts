@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleVerifier } from "@ador/game-sdk/build";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const gamesDirectory = join(import.meta.dirname, "../../../games");

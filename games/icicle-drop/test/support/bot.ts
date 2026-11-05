@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { dropRules } from "../../src/rules/index.ts";
 import { startDrop, type DropState } from "../../src/rules/state.ts";

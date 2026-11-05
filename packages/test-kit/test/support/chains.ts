@@ -1,4 +1,7 @@
-import { chainRefSchema, type TransactionIntent } from "@ador/shared/chain";
+import {
+  chainRefSchema,
+  type TransactionIntent,
+} from "@frostbite/shared/chain";
 
 import type {
   ChainConformanceFixtures,

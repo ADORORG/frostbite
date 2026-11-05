@@ -3,19 +3,19 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   type DatabaseClient,
-} from "@ador/database/connection";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import { resolveUploadPolicy } from "@ador/shared/uploads";
+} from "@frostbite/database/connection";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import { resolveUploadPolicy } from "@frostbite/shared/uploads";
 import {
   createDrizzleUploadCleanupRepository,
   createUploadCleanupService,
   type UploadCleanupService,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
 import { systemClock } from "./clock.ts";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
 
-export type { UploadCleanupResult } from "@ador/uploads";
+export type { UploadCleanupResult } from "@frostbite/uploads";
 
 export interface UploadCleanupOptions {
   readonly clock?: () => Date;

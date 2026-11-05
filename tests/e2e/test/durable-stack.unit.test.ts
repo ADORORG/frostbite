@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { Docker } from "@ador/test-kit/durable-container";
+import type { Docker } from "@frostbite/test-kit/durable-container";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { confirmWipe } from "../src/confirm-wipe.ts";

@@ -1,5 +1,5 @@
-import { collectionStudioPath } from "@ador/shared/collections";
-import { uploadsStudioPath } from "@ador/shared/uploads";
+import { collectionStudioPath } from "@frostbite/shared/collections";
+import { uploadsStudioPath } from "@frostbite/shared/uploads";
 import { ArcadeButton, ArcadePanel } from "@repo/ui/arcade";
 
 import type { UploadSession } from "../hooks/use-upload-session.ts";

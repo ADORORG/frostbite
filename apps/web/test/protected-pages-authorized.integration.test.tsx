@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 // The wallet provider lives in the app's layout, which these tests do not render; the account page's wallets card reads the connection.
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useWalletChooser: () => ({ request: () => undefined }),
   useWalletConnection: () => ({
     address: "",

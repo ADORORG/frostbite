@@ -4,12 +4,12 @@ import {
   runMigrations,
   walletChallenges,
   type ExpiredRowCounts,
-} from "@ador/database";
+} from "@frostbite/database";
 import {
   contactCodeRow,
   walletChallengeRow,
-} from "@ador/database/test-expired-rows";
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+} from "@frostbite/database/test-expired-rows";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createWorkerRuntime } from "../src/runtime.ts";

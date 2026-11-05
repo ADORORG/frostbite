@@ -1,4 +1,4 @@
-import { assetProcessingRequestedEvent } from "@ador/shared/uploads";
+import { assetProcessingRequestedEvent } from "@frostbite/shared/uploads";
 import { eventType } from "inngest";
 import { z } from "zod";
 

@@ -81,7 +81,7 @@ describe("the notice when a milestone is reported", () => {
 
   it("does not announce a milestone the player already had", async () => {
     window.localStorage.setItem(
-      "ador:game:embedded-game:milestones",
+      "frostbite:game:embedded-game:milestones",
       JSON.stringify({
         "first-level": {
           unlockedAt: "2026-10-01T00:00:00.000Z",

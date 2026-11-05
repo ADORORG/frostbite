@@ -1,9 +1,9 @@
-import { pickRendition } from "@ador/feature-uploads/presentation";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
 import type {
   ReviewSubmission,
   SubmissionSnapshot,
-} from "@ador/shared/collections";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/shared/collections";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import { ArcadeBadge, ArcadeMediaTile } from "@repo/ui/arcade";
 
 type Item = SubmissionSnapshot["items"][number];

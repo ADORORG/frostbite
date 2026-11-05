@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { useEffect, useReducer, useRef, useState } from "react";
 
 import { IceBoard } from "./ice-board.tsx";

@@ -31,7 +31,7 @@ earned, claim pending, claimed and complete stay.
 
 ## 2. The interface (what a game may call)
 
-A small versioned protocol over `postMessage`, wrapped by a `@ador/game-sdk` package so a game just calls
+A small versioned protocol over `postMessage`, wrapped by a `@frostbite/game-sdk` package so a game just calls
 functions. Every message carries protocol version, request id and a payload validated on both sides; the host
 accepts messages only from the game's own frame.
 
@@ -92,7 +92,7 @@ records, never from token ownership.
 
 ## 6. Build order
 
-1. `@ador/game-sdk` and the host: frame with the headers above, the protocol, a conformance test with a
+1. `@frostbite/game-sdk` and the host: frame with the headers above, the protocol, a conformance test with a
    simulated game (this is GP-02/GP-03, now simpler); the game page plays a game through it.
 2. Local save and load; the progress limits.
 3. Account records and sync on sign-in, with the merge rules.

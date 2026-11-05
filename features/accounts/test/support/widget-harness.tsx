@@ -4,7 +4,7 @@ import { act, type ReactElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, beforeEach, vi, type Mock } from "vitest";
 
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 import type { SessionState } from "../../src/widget/session-state.ts";
 import { WalletWidget } from "../../src/widget/wallet-widget.tsx";
@@ -41,7 +41,7 @@ interface ConnectionMock {
 export const chooser: { dismiss: Mock; open: boolean; request: Mock } =
   mocks.chooser;
 export const connection: ConnectionMock = mocks.connection;
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   classifyWalletConnectionError: () => ({ kind: "failed", message: "x" }),
   useWalletChooser: () => mocks.chooser,
   hasRememberedWallet: () => mocks.remembered.value,

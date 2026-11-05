@@ -1,10 +1,10 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
 import {
   platformRoleAssignments,
   platformRoleEvents,
-} from "@ador/database/schema/accounts";
-import type { PlatformRole } from "@ador/shared/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/accounts";
+import type { PlatformRole } from "@frostbite/shared/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq, sql } from "drizzle-orm";
 
 import {

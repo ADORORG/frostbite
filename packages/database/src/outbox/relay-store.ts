@@ -1,5 +1,5 @@
-import { domainEventEnvelopeSchema } from "@ador/events";
-import type { ClaimedOutboxEvent, OutboxDeliveryStore } from "@ador/jobs";
+import { domainEventEnvelopeSchema } from "@frostbite/events";
+import type { ClaimedOutboxEvent, OutboxDeliveryStore } from "@frostbite/jobs";
 
 import type { DatabaseClient } from "../connection/client.ts";
 import type { OutboxEvent } from "../schema/outbox.ts";

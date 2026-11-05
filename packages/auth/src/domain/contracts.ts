@@ -1,9 +1,12 @@
 import type {
   BitcoinNetwork,
   ValidatedBitcoinAddress,
-} from "@ador/chain/bitcoin";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import { walletAuthActions, type WalletAuthAction } from "@ador/shared/auth";
+} from "@frostbite/chain/bitcoin";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import {
+  walletAuthActions,
+  type WalletAuthAction,
+} from "@frostbite/shared/auth";
 
 export { walletAuthActions, type WalletAuthAction };
 

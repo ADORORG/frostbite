@@ -18,7 +18,7 @@ describe("the client in a browser window", () => {
     });
     expect(sent.mock.calls[0]?.[1]).toBe("*");
     const answer = {
-      channel: "ador-game",
+      channel: "frostbite-game",
       id: "r1",
       ok: true,
       result: { signedIn: true, walletConnected: false },

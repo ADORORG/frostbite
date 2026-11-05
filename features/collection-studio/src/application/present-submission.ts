@@ -1,5 +1,5 @@
-import type { SubmissionRecord } from "@ador/collections";
-import type { CollectionSubmission } from "@ador/shared/collections";
+import type { SubmissionRecord } from "@frostbite/collections";
+import type { CollectionSubmission } from "@frostbite/shared/collections";
 
 // A submission as its creator sees it: the state, the frozen revision and hash, and each decision with
 // the feedback written for them. Reviewer identities, reason codes, and private notes never leave staff.

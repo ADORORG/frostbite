@@ -24,7 +24,7 @@ const state = vi.hoisted(() => ({
   network: "signet" as "mainnet" | "signet",
   requests: 0,
 }));
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useStepWallet: () => ({ address: "", sign: undefined }),
   useWalletChooser: () => ({
     request: () => {

@@ -14,16 +14,16 @@ is; and a repository rule keeps family code and vendor SDKs behind the adapter.
 
 ## What was built
 
-- `@ador/shared/chain`: CAIP-2 `ChainRef` and `ChainFamilyId`, capability names, `ChainConfig` (role,
+- `@frostbite/shared/chain`: CAIP-2 `ChainRef` and `ChainFamilyId`, capability names, `ChainConfig` (role,
   per-operation finality, release gate), addresses, assets, amounts, contract references, transaction
   intents (deploy, mint, transfer; cross-chain references refused), summaries, opaque unsigned and signed
   payloads, broadcast outcomes, observations, and the neutral transaction state machine. A compile-time
   check keeps the operations a chain needs a policy for equal to the operations an intent carries. JSON
   extensions are typed (`JsonValue`, no `unknown`) and depth-bounded.
-- `@ador/chain`: the ports (`AddressCodec`, `ChainReader`, `ContractGateway`, `TransactionBuilder`,
+- `@frostbite/chain`: the ports (`AddressCodec`, `ChainReader`, `ContractGateway`, `TransactionBuilder`,
   `Broadcaster`, `ChainObserver`), `ChainAdapter`, and `createChainRegistry`. `bitcoin-alkanes` provides
   the address codec and declares only `address:codec`.
-- `@ador/test-kit`: `defineChainAdapterConformance` and its plain-function checks, the simulated family
+- `@frostbite/test-kit`: `defineChainAdapterConformance` and its plain-function checks, the simulated family
   (`simulated-chain`, `simulated-chain-config`), run against both adapters.
 - `tooling/repository-policy`: chain-family code and vendor SDK imports are allowed only in
   `packages/chain/`, `packages/wallet/`, `providers/chain/`, conformance tests, and the recorded
@@ -72,7 +72,7 @@ load.
   adds the target-chain field, and must add the key through the environment contract.
 - `bigint` amounts do not serialise to JSON. The first HTTP or database consumer must define the wire
   form (decimal strings).
-- `packages/auth/` still imports `@ador/chain/bitcoin` directly; the exception ends with the
+- `packages/auth/` still imports `@frostbite/chain/bitcoin` directly; the exception ends with the
   network-to-chain migration (ADR-017 section 7), which waits for the W2-10B wallet evidence.
 - Cancellation and expiry states are not in the neutral state machine; W7-03 and W7-00 own them.
-- `zod` in test-kit uses the same caret range as `@ador/shared` (a known repository-wide pattern).
+- `zod` in test-kit uses the same caret range as `@frostbite/shared` (a known repository-wide pattern).

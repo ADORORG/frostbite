@@ -1,5 +1,5 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { contactIdentities } from "@ador/database/schema/contact-sign-in";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { contactIdentities } from "@frostbite/database/schema/contact-sign-in";
 import { and, eq } from "drizzle-orm";
 
 import type {

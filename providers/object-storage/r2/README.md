@@ -1,4 +1,4 @@
-# `@ador/provider-object-storage-r2`
+# `@frostbite/provider-object-storage-r2`
 
 Cloudflare R2 adapter for the platform-owned `ObjectStoragePort`.
 
@@ -31,7 +31,7 @@ Run `env:check`, `typecheck`, `test:unit`, `test:integration`, or `test:coverage
 
 ## Local development and the real-R2 checklist
 
-Locally and in tests the adapter talks to a disposable SeaweedFS (`@ador/test-kit/s3-runtime`). Plain `http`
+Locally and in tests the adapter talks to a disposable SeaweedFS (`@frostbite/test-kit/s3-runtime`). Plain `http`
 is accepted for `R2_ENDPOINT` only on a loopback address and only when `APP_ENV` is not `preview` or
 `production`; the endpoint then uses path-style addressing. Everything else must be `https`.
 
@@ -59,7 +59,7 @@ Before pointing an environment at real R2, in the Cloudflare dashboard:
    `PUBLIC_BASE_URL`, the origin the CORS rule must allow):
 
    ```sh
-   pnpm --filter @ador/provider-object-storage-r2 smoke
+   pnpm --filter @frostbite/provider-object-storage-r2 smoke
    ```
 
    It uploads and reads back one throwaway object through every supported path, verifies the CORS

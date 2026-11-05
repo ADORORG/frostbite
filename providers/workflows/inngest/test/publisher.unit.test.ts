@@ -1,4 +1,4 @@
-import { TerminalWorkflowDeliveryError } from "@ador/jobs";
+import { TerminalWorkflowDeliveryError } from "@frostbite/jobs";
 import { describe, expect, it } from "vitest";
 
 import { createInngestEventPublisher } from "../src/publisher.ts";

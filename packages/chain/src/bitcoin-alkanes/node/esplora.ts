@@ -1,4 +1,4 @@
-import type { FeeRate, JsonValue } from "@ador/shared/chain";
+import type { FeeRate, JsonValue } from "@frostbite/shared/chain";
 
 import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
 import { isRecord, listOf, recordOf, textOf, wholeNumberOf } from "./json.ts";
