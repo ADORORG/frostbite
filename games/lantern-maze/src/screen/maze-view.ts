@@ -3,7 +3,7 @@ import { block } from "@ador/game-sdk/pixels";
 import { cellOpen } from "../rules/maze.ts";
 import { lit } from "../rules/light.ts";
 import type { MazeState } from "../rules/state.ts";
-import { cell, originOf } from "./layout.ts";
+import { cell, originOf, zoomOf } from "./layout.ts";
 import { colour, floorByDistance } from "./palette.ts";
 
 // The cellar as the lantern shows it: cells never lit are black; cells lit before are dim, with their walls; cells lit now glow, brighter
@@ -51,27 +51,40 @@ function doorAt(
   if (!open) block(context, fill, x + 3, y + 3, 2, 2);
 }
 
+// Puts the page's origin at the maze's top left corner, drawn as large as the floor allows, so a cell is `cell` units wherever it is. The caller
+// puts the page back with `restore`.
+function placeMaze(
+  context: CanvasRenderingContext2D,
+  maze: MazeState["layout"]["maze"],
+): void {
+  const origin = originOf(maze.width, maze.height);
+  const zoom = zoomOf(maze.width, maze.height);
+  context.save();
+  context.translate(origin.x, origin.y);
+  context.scale(zoom, zoom);
+}
+
 export function mazeView(
   context: CanvasRenderingContext2D,
   state: MazeState,
 ): void {
   const { layout } = state;
   const { maze } = layout;
-  const origin = originOf(maze.width, maze.height);
   const lightNow = lit(maze, state.position, layout.sight);
+  placeMaze(context, maze);
   // The floor's footprint is shown from the start (how big the cellar is is no secret, only what is in it), in a dark that the lit cells stand out from.
   block(
     context,
     colour.footprint,
-    origin.x - 1,
-    origin.y - 1,
+    -1,
+    -1,
     maze.width * cell + 2,
     maze.height * cell + 2,
   );
   for (let at = 0; at < maze.open.length; at += 1) {
     if (state.seen[at] !== true) continue;
-    const x = origin.x + (at % maze.width) * cell;
-    const y = origin.y + Math.floor(at / maze.width) * cell;
+    const x = (at % maze.width) * cell;
+    const y = Math.floor(at / maze.width) * cell;
     const near = lightNow.get(at);
     block(
       context,
@@ -95,6 +108,7 @@ export function mazeView(
     if (at === layout.key && !state.hasKey) keyAt(context, x, y);
     if (state.flasks.includes(at)) flaskAt(context, x, y);
   }
+  context.restore();
 }
 
 // The lantern: a flame that flickers from one step to the next.
@@ -103,10 +117,11 @@ export function lantern(
   state: MazeState,
 ): void {
   const { maze } = state.layout;
-  const origin = originOf(maze.width, maze.height);
-  const x = origin.x + (state.position % maze.width) * cell;
-  const y = origin.y + Math.floor(state.position / maze.width) * cell;
+  placeMaze(context, maze);
+  const x = (state.position % maze.width) * cell;
+  const y = Math.floor(state.position / maze.width) * cell;
   const flicker = state.moves % 2;
   block(context, colour.flame, x + 2, y + 2 + flicker, 4, 4 - flicker);
   block(context, colour.flameHot, x + 3, y + 3 + flicker, 2, 2 - flicker);
+  context.restore();
 }

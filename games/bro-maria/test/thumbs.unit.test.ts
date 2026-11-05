@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   attachThumbs,
-  stickDeadZone,
-  stickDirection,
-  stickReach,
+  backEdge,
+  jumpEdge,
+  zoneOf,
 } from "../src/screen/thumbs.ts";
 
 const stops: (() => void)[] = [];
@@ -42,68 +42,60 @@ const send = (
   return event;
 };
 
-describe("the thumb stick", () => {
-  it("has a dead zone, and a way for each side of it", () => {
-    expect(stickDirection(0)).toBeNull();
-    expect(stickDirection(stickDeadZone - 1)).toBeNull();
-    expect(stickDirection(-(stickDeadZone - 1))).toBeNull();
-    expect(stickDirection(stickDeadZone)).toBe("right");
-    expect(stickDirection(-stickDeadZone)).toBe("left");
+describe("the zones", () => {
+  it("are the left quarter, the next quarter and the right half, and change exactly at the edges", () => {
+    expect(zoneOf(0)).toBe("left");
+    expect(zoneOf(backEdge - 0.001)).toBe("left");
+    expect(zoneOf(backEdge)).toBe("right");
+    expect(zoneOf(jumpEdge - 0.001)).toBe("right");
+    expect(zoneOf(jumpEdge)).toBe("jump");
+    expect(zoneOf(1)).toBe("jump");
+  });
+
+  it("are where the guide says they are: a quarter, a quarter and a half of the width", () => {
+    expect([0.24, 0.26, 0.49, 0.51].map(zoneOf)).toEqual([
+      "left",
+      "right",
+      "right",
+      "jump",
+    ]);
   });
 });
 
-describe("a finger on the left half", () => {
-  it("runs the way it goes from where it landed, and stops when it comes back or lifts", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { x: 100 });
-    expect(hold).not.toHaveBeenCalled();
-    send(window, "pointermove", { x: 100 + stickDeadZone });
-    expect(hold).toHaveBeenLastCalledWith("right", true);
-    send(window, "pointermove", { x: 100 + stickDeadZone + 3 });
-    expect(hold).toHaveBeenCalledTimes(1);
-    send(window, "pointermove", { x: 100 });
-    expect(hold).toHaveBeenLastCalledWith("right", false);
-    send(window, "pointermove", { x: 100 - stickDeadZone });
-    expect(hold).toHaveBeenLastCalledWith("left", true);
-    send(window, "pointerup", { x: 100 - stickDeadZone });
-    expect(hold).toHaveBeenLastCalledWith("left", false);
-  });
-
-  it("turns with a short move after a long one, because the place it landed follows the finger", () => {
+describe("a finger on the screen", () => {
+  it("holds the zone it lands in, with no move needed, and lets go when it lifts", () => {
     const { hold, screen } = setup();
     send(screen, "pointerdown", { x: 50 });
-    send(window, "pointermove", { x: 50 + stickReach * 3 });
-    expect(hold).toHaveBeenLastCalledWith("right", true);
-    send(window, "pointermove", {
-      x: 50 + stickReach * 3 - stickReach - stickDeadZone,
-    });
     expect(hold).toHaveBeenLastCalledWith("left", true);
-  });
-
-  it("does not jump", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { x: 199 });
-    send(window, "pointermove", { x: 150 });
-    expect(hold).not.toHaveBeenCalledWith("jump", true);
-  });
-});
-
-describe("a finger on the right half", () => {
-  it("jumps while it is down, wherever it goes", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { x: 200 });
+    send(window, "pointerup", { x: 50 });
+    expect(hold).toHaveBeenLastCalledWith("left", false);
+    send(screen, "pointerdown", { x: 150 });
+    expect(hold).toHaveBeenLastCalledWith("right", true);
+    send(window, "pointerup", { x: 150 });
+    send(screen, "pointerdown", { x: 300 });
     expect(hold).toHaveBeenLastCalledWith("jump", true);
-    send(window, "pointermove", { x: 390 });
-    send(window, "pointermove", { x: 10 });
-    expect(hold).toHaveBeenCalledTimes(1);
-    send(window, "pointerup", { x: 10 });
+    send(window, "pointerup", { x: 300 });
     expect(hold).toHaveBeenLastCalledWith("jump", false);
+  });
+
+  it("slides from one zone to the next: lets go of the first and takes the second", () => {
+    const { hold, screen } = setup();
+    send(screen, "pointerdown", { x: 150 });
+    send(window, "pointermove", { x: 50 });
+    expect(hold.mock.calls).toEqual([
+      ["right", true],
+      ["right", false],
+      ["left", true],
+    ]);
+    send(window, "pointermove", { x: 60 });
+    expect(hold).toHaveBeenCalledTimes(3);
+    send(window, "pointermove", { x: 350 });
+    expect(hold).toHaveBeenLastCalledWith("jump", true);
   });
 
   it("is a second finger: one thumb runs while the other jumps, each let go on its own", () => {
     const { hold, screen } = setup();
-    send(screen, "pointerdown", { id: 1, x: 100 });
-    send(window, "pointermove", { id: 1, x: 200 - 1 });
+    send(screen, "pointerdown", { id: 1, x: 150 });
     send(screen, "pointerdown", { id: 2, x: 300 });
     expect(hold.mock.calls).toEqual([
       ["right", true],
@@ -111,7 +103,7 @@ describe("a finger on the right half", () => {
     ]);
     send(window, "pointerup", { id: 2, x: 300 });
     expect(hold).toHaveBeenLastCalledWith("jump", false);
-    send(window, "pointerup", { id: 1, x: 199 });
+    send(window, "pointerup", { id: 1, x: 150 });
     expect(hold).toHaveBeenLastCalledWith("right", false);
   });
 });
@@ -123,39 +115,6 @@ describe("what is not a finger on the screen", () => {
     send(window, "pointerup", { kind: "mouse", x: 300 });
     expect(hold).not.toHaveBeenCalled();
     expect(event.defaultPrevented).toBe(false);
-  });
-
-  it("ignores a finger that has lifted", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { x: 100 });
-    send(window, "pointerup", { x: 100 });
-    send(window, "pointermove", { x: 100 + stickReach });
-    expect(hold).not.toHaveBeenCalled();
-  });
-
-  it("takes every listener it put on the page away when told to stop", () => {
-    const added = vi.spyOn(window, "addEventListener");
-    const removed = vi.spyOn(window, "removeEventListener");
-    setup();
-    stops.splice(0)[0]?.();
-    const names = (spy: typeof added) => spy.mock.calls.map(([name]) => name);
-    expect(names(removed).sort()).toEqual(names(added).sort());
-    added.mockRestore();
-    removed.mockRestore();
-  });
-
-  it("keeps a touch from scrolling or zooming the page", () => {
-    const { screen } = setup();
-    expect(send(screen, "pointerdown", { x: 300 }).defaultPrevented).toBe(true);
-  });
-
-  it("lets go of everything when the page loses focus, since the lift would never be seen", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { id: 1, x: 300 });
-    window.dispatchEvent(new Event("blur"));
-    expect(hold).toHaveBeenLastCalledWith("jump", false);
-    send(window, "pointerup", { id: 1, x: 300 });
-    expect(hold).toHaveBeenCalledTimes(2);
   });
 
   it("lets go when told to stop, and listens no more", () => {

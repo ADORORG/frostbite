@@ -23,13 +23,13 @@ afterEach(() => vi.unstubAllGlobals());
 describe("the cards of the cellar", () => {
   it("say Enter to a keyboard, before a run and after one", () => {
     stubPointer(false);
-    expect(said("ready")).toContain("ARROWS / WASD / SWIPE - ENTER TO LIGHT");
+    expect(said("ready")).toContain("ARROWS / WASD - ENTER TO LIGHT");
     expect(said("over")).toContain("ENTER FOR ANOTHER CELLAR");
   });
 
   it("say tap to a finger, before a run and after one, and never Enter", () => {
     stubPointer(true);
-    expect(said("ready")).toContain("SWIPE TO STEER - TAP TO LIGHT");
+    expect(said("ready")).toContain("TAP OR HOLD WHERE TO WALK - TAP TO LIGHT");
     expect(said("over")).toContain("TAP FOR ANOTHER CELLAR");
     expect(said("ready").join(" ")).not.toContain("ENTER");
     expect(said("over").join(" ")).not.toContain("ENTER");

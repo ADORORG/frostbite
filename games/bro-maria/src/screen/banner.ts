@@ -4,7 +4,7 @@ import { colour } from "./palette.ts";
 
 const font = '"Courier New", ui-monospace, monospace';
 
-function write(
+export function write(
   context: CanvasRenderingContext2D,
   text: string,
   x: number,

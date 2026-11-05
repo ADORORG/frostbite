@@ -23,6 +23,7 @@ import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
+import { lanternPoint } from "./screen/layout.ts";
 import type { View } from "./screen/view.ts";
 import { createMazeSession, type MazeSession } from "./session.ts";
 
@@ -242,11 +243,24 @@ async function connect(): Promise<void> {
 screen.width = screenWidth * canvasScale;
 screen.height = screenHeight * canvasScale;
 setText(totalOut, String(milestoneIds.length));
-attachControls(screen, {
-  move: choose,
-  pause: togglePause,
-  start: startFromKey,
-});
+attachControls(
+  screen,
+  {
+    move: choose,
+    pause: togglePause,
+    start: startFromKey,
+  },
+  () => {
+    const state = session?.state();
+    return state === undefined || state.ended
+      ? null
+      : lanternPoint(
+          state.layout.maze.width,
+          state.layout.maze.height,
+          state.position,
+        );
+  },
+);
 for (const direction of directions)
   pad
     .querySelector(`[data-direction="${direction}"]`)
