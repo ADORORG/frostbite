@@ -24,6 +24,7 @@
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
     "./service-process": "./src/service-process.ts",
+    "./touch-screen": "./src/touch-screen.ts",
     "./simulated-chain": "./src/simulated-chain/adapter.ts",
     "./simulated-chain-address": "./src/simulated-chain/address.ts",
     "./simulated-chain-config": "./src/simulated-chain/config.ts",

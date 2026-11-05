@@ -31,8 +31,11 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 - **A layout that does not move**: nothing under the player's thumb moves during a run. A button that is not offered keeps its place
   (`visibility: hidden`, not `display: none`); buttons have a fixed minimum width; the note, the earned list and the score row have
   heights that never grow; scores do not wrap.
-- **Touch**: a one-button game takes a tap on the canvas (and may have an on-screen button). A game that needs more than one key adds
-  on-screen buttons that appear on `@media (pointer: coarse)`, with `disabled` while no run is going.
+- **Touch**: the screen is the controller, with as few buttons as the game can do without (on a touch screen `phone.css` keeps only a pause
+  icon and two sound icons, over the screen). A one-button game takes a tap on the canvas; a game with directions takes swipes; a game with
+  run and jump takes a thumb stick on the left half and a hold on the right (see `games/bro-maria/src/screen/thumbs.ts`). Call
+  `attachTapToStart(screen, startButton)` so a tap on a waiting game starts a run, and say "TAP" where a keyboard is told "ENTER"
+  (`byInput`, or `touchLines` and the guide's own touch start line). Keep a button only where a gesture cannot do the job.
 - **Styles**: copy the stylesheet of the closest finished game and change its colours; it already has the steady layout, the sound
   panel's place, the `visibility` rule for hidden buttons and the touch rules. Do not write a layout from nothing.
 - **Plays without the platform**: a failed `ready()` or `run.start()` shows a note and the game still starts on a seed of its own

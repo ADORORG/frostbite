@@ -5,6 +5,7 @@ import { write } from "./hud.ts";
 import { sizeOf } from "./layout.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
+import { byInput } from "@ador/game-sdk/touch";
 
 // The cards over the screen before a run and after it. Each line is its text, its colour and the size of its writing; the tall screen is narrower, so its
 // lines are shorter, and (being for a touch screen) say Start, not Enter.
@@ -52,7 +53,7 @@ const ready = (shape: View["shape"]): readonly Line[] =>
         ["REACH EACH LEVEL'S GOAL IN THE SWAPS GIVEN", colour.cursor, 5],
         ["BREAK ALL THE FROST ON THE ICE LEVELS", colour.text, 5],
         ["4 MAKE A BOMB, 5 A STAR - CHAINS PAY MORE", colour.grab, 5],
-        ["ENTER TO START", colour.textDim, 5],
+        [byInput("ENTER TO START", "TAP TO START"), colour.textDim, 5],
       ];
 
 const over = (state: MatchState, view: View): readonly Line[] => {
@@ -83,7 +84,7 @@ const over = (state: MatchState, view: View): readonly Line[] => {
           6,
         ],
         best,
-        ["ENTER TO PLAY AGAIN", colour.cursor, 5],
+        [byInput("ENTER TO PLAY AGAIN", "TAP TO PLAY AGAIN"), colour.cursor, 5],
       ];
 };
 

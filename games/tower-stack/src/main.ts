@@ -4,6 +4,7 @@ import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
 import { createRunLoop } from "@ador/game-sdk/run-loop";
+import { attachTapToStart } from "@ador/game-sdk/touch-start";
 import {
   startNote,
   submitNote,
@@ -258,6 +259,7 @@ pauseButton.addEventListener(
   "click",
   () => void (loop.running() && pause.toggle()),
 );
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 void connect();

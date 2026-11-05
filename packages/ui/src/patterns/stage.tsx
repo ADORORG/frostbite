@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 export function ArcadeStage({
   bar,
   children,
+  exit,
   overlay,
   theatre = false,
 }: {
@@ -13,6 +14,9 @@ export function ArcadeStage({
   readonly bar: ReactNode;
   // The stage itself (a frame).
   readonly children: ReactNode;
+  // A way out that takes the bar's place while the stage covers the window (a touch screen: the game gets every pixel, and this is a
+  // small chip over its corner).
+  readonly exit?: ReactNode;
   // Things drawn over the stage's lower edge (a toast, a prompt).
   readonly overlay?: ReactNode;
   // The stage covers the whole window (the page steps out of its way); see the games' theatre mode.
@@ -20,7 +24,11 @@ export function ArcadeStage({
 }) {
   return (
     <div className="arcade-stage" data-theatre={theatre ? "true" : undefined}>
-      <div className="arcade-stage__bar">{bar}</div>
+      {exit !== undefined && theatre ? (
+        <div className="arcade-stage__exit">{exit}</div>
+      ) : (
+        <div className="arcade-stage__bar">{bar}</div>
+      )}
       <div className="arcade-stage__screen">{children}</div>
       {overlay === undefined ? null : (
         <div className="arcade-stage__overlay">{overlay}</div>

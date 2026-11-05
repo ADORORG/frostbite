@@ -220,7 +220,7 @@ test.describe("a phone held sideways", () => {
     test.skip(!supported, "This browser does not allow full screen.");
     await page
       .getByTestId("fullscreen-prompt")
-      .getByRole("button", { name: "Full screen" })
+      .getByRole("button", { name: "Play full screen" })
       .click();
     await expect
       .poll(() =>

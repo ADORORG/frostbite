@@ -28,6 +28,8 @@ import type { ClaimSigner } from "./use-claims.ts";
 import { usePlayerClaims } from "./use-player-claims.ts";
 import { GameBar } from "./game-bar.tsx";
 import { useFullscreen } from "./use-fullscreen.ts";
+import { useImmersive } from "./use-immersive.ts";
+import { touchScreenQuery, useMediaQuery } from "./use-media-query.ts";
 import { useTheatre } from "./use-theatre.ts";
 import { usePhoneLandscape } from "./use-phone-landscape.ts";
 import { useGameSession } from "./use-game-session.ts";
@@ -139,6 +141,9 @@ export function GamePlayer({
   }, [bindTelling, emitClaim]);
   const fullscreen = useFullscreen(frame);
   const theatre = useTheatre();
+  const immersive = useImmersive(fullscreen, theatre);
+  // On a touch screen two buttons (theatre and full screen) become one that does both, and the bar gives way to a small exit chip.
+  const touch = useMediaQuery(touchScreenQuery);
   const phoneLandscape = usePhoneLandscape();
   const [promptDismissed, setPromptDismissed] = useState(false);
   const prompt = phoneLandscape && !theatre.on && !promptDismissed;
@@ -201,11 +206,24 @@ export function GamePlayer({
     <>
       <ArcadeStage
         theatre={theatre.on}
+        exit={
+          touch ? (
+            <ArcadeActionButton
+              ariaLabel="Leave full screen"
+              onClick={immersive.leave}
+              size="small"
+              tone="pink"
+            >
+              ✕
+            </ArcadeActionButton>
+          ) : undefined
+        }
         bar={
           <GameBar
             back={back}
             connected={connected}
             fullscreen={fullscreen}
+            {...(touch ? { immersive } : {})}
             meta={meta}
             saveText={kept ? keptCopy[sync] : blockedCopy[sync]}
             theatre={theatre}
@@ -225,29 +243,17 @@ export function GamePlayer({
             {prompt ? (
               <div className="arcade-prompt" data-testid="fullscreen-prompt">
                 <p>
-                  Playing on a phone? Theatre or full screen gives the game the
-                  whole screen.
+                  Playing on a phone? Full screen gives the game every pixel.
                 </p>
                 <ArcadeActionButton
                   onClick={() => {
                     setPromptDismissed(true);
-                    theatre.toggle();
+                    immersive.enter();
                   }}
-                  tone="pink"
+                  tone="cyan"
                 >
-                  Theatre
+                  Play full screen
                 </ArcadeActionButton>
-                {fullscreen.supported ? (
-                  <ArcadeActionButton
-                    onClick={() => {
-                      setPromptDismissed(true);
-                      fullscreen.enter();
-                    }}
-                    tone="cyan"
-                  >
-                    Full screen
-                  </ArcadeActionButton>
-                ) : null}
                 <ArcadeActionButton
                   onClick={() => setPromptDismissed(true)}
                   tone="pink"

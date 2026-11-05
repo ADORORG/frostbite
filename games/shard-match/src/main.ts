@@ -3,6 +3,7 @@ import { createGameClient } from "@ador/game-sdk/client";
 import { createPause } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
 import { startNote } from "@ador/game-sdk/run-notes";
+import { attachTapToStart } from "@ador/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { tempoFor, toastFor } from "./feedback.ts";
@@ -260,9 +261,7 @@ const startFromKey = (): void => {
   if (!startButton.disabled && !going()) void begin();
 };
 
-function togglePause(): void {
-  if (going()) pause.toggle();
-}
+const togglePause = (): void => void (going() && pause.toggle());
 
 async function connect(): Promise<void> {
   try {
@@ -292,6 +291,7 @@ attachControls(
   () => view.shape,
 );
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 backdrop = startRun(localSeed());
