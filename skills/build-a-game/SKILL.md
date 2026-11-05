@@ -39,9 +39,8 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
 4. **Write the rules first, apart from the screen.** Pure and seeded: the same seed and inputs always give the same run. No clock,
    no `Math.random`, no I/O. See `references/game-pattern.md` and `references/milestones-and-verification.md`.
 5. **Add the screen, sound, keys, pause and a steady layout** with the SDK's pieces, never your own copies. See
-   `references/game-pattern.md` and `references/sdk-cheatsheet.md`. Build for a phone from the first screen, not at the end: import
-   `<sdk>/phone.css` and give the page the shared parts, so that on a touch screen the game fills the frame and the page does
-   not scroll. See "Phones and notes" below.
+   `references/game-pattern.md` and `references/sdk-cheatsheet.md`. Build for a phone from the first screen, not at the end: see
+   "Phones and notes" below.
 6. **Write the manifest** and the milestones. A new game is registered in three places: its manifest `configs/games/<id>.ts`, the
    list in `configs/games.ts` (both done by `game:new`), and the ordered list of ids in `apps/web/test/games-config.unit.test.ts`
    (which `game:new` does not touch: add the id yourself). See `references/milestones-and-verification.md`.
@@ -52,24 +51,23 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
 
 ## Phones and notes
 
-Most players are on a phone. A game that cannot be played there is not finished, whatever its tests say.
+Players open games on phones. A game that cannot be played there is not finished, whatever its tests say. These are the rules; the
+pieces to use and the files to copy are in `references/game-pattern.md` ("Touch", "Page skeleton").
 
-- **The screen is the controller.** On a touch screen the whole frame is the game: readouts are one thin line along the top, and only
-  pause and the two sound icons are drawn over the screen. Use `attachZones` (`<sdk>/touch-zones`) for taps, holds and
-  slides, and `attachTapToStart` to begin a run. It follows each finger by its own id, so two thumbs work; `fingersOnly` says whether a mouse counts too.
-  Do not put a pad of buttons under the screen: enough rows of buttons leave the screen no room to be seen. Keep a button only
-  where a gesture cannot do the job, and draw it over the screen.
-- **The page never scrolls on touch.** Import `<sdk>/phone.css` and use the shared page parts (`.bar`, the screen, `.foot`
-  with `#sound`, `#note` and the buttons). Chapter menus, score lists and cards belong behind a button, not in the page flow.
-- **One note, about how to play.** The note under the screen is one short line, and `byInput(keyboardLine, touchLine)` gives a finger
-  its own wording (a line that says "Enter" means nothing on a phone). The first screen has `touchLines` too. Never say how a run was
-  checked or whether it reached the platform: no seeds, no "claimed", no "not sent". How the game plays is all the player wants.
-- **Send the run and say nothing.** At the end of a run call `sendRun(play, runId, record)` (`<sdk>/play`). It drops a failure
-  quietly. If a game must say how its milestones are checked, that is a field in the manifest, not words on the screen.
-- **Prove it.** Each game's page test checks that a finished run is submitted once, with the run id and seed the platform gave
-  (`recordingRuns()` from the test kit's `simulated-game-host`). A test-only or practice run must be shown not to submit.
-- **Say what you could not check.** A phone-sized window in desktop DevTools does not switch on touch input: the full-frame touch layout only
-  appears with `(pointer: coarse)`. Say plainly that touch on a real phone was not tried unless it was.
+- **The screen is the controller.** On a touch screen the whole frame is the game: the readouts are one thin line along the top, pause and
+  the two sound icons sit in the top right corner, and the note shows at the foot (only while it has words). Fingers play the game
+  directly. Do not put a pad of buttons under the screen: enough rows of buttons leave the screen no room to be seen.
+- **The page never scrolls on touch.** Import `<sdk>/phone.css` and give the page the parts it lays out. Chapter menus, score lists and
+  cards belong behind a button, not in the page flow.
+- **One note, about how to play.** One short line, worded for a finger as well as for a keyboard. Never say how a run was checked or
+  whether it was sent: no seeds, no "claimed", no "not sent". How the game plays is all the player wants. If a game must
+  say how its milestones are checked, that is a field in the manifest, not words on the screen.
+- **Send the run and say nothing.** At the end of a run call `sendRun(play, runId, record)` (`<sdk>/play`).
+- **Prove it.** The game's integration test must show that a finished run is submitted once and that a test-only or practice run is
+  not (`references/test-and-launch.md`).
+- **Say what you could not check.** Resizing a desktop window does not switch on touch input, but the browser's device mode (a phone
+  profile in DevTools) does, so use it to see the touch layout (`(pointer: coarse)`) and the whole-screen controls. How it feels under a
+  thumb, and on the phone's own browser, only a real phone shows: say plainly that you did not try one unless you did.
 
 ## Rules that are never negotiable
 
