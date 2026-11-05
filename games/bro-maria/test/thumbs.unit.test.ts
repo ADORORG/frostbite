@@ -51,6 +51,15 @@ describe("the zones", () => {
     expect(zoneOf(jumpEdge)).toBe("jump");
     expect(zoneOf(1)).toBe("jump");
   });
+
+  it("are where the guide says they are: a quarter, a quarter and a half of the width", () => {
+    expect([0.24, 0.26, 0.49, 0.51].map(zoneOf)).toEqual([
+      "left",
+      "right",
+      "right",
+      "jump",
+    ]);
+  });
 });
 
 describe("a finger on the screen", () => {
