@@ -20,9 +20,11 @@ Run these in the platform's repository. A command that could not run is unverifi
 ## The page test
 
 `test/support/page.ts` in a finished game builds the game with the SDK's build, loads it into `runGameInSimulatedHost` (the test
-kit's `./simulated-game-host`: it takes `backend`, `game`, `html`, `script`, and returns the page's `window`, the `replies` the host
-sent and the `pushes` it made on its own) and installs fake audio. Copy it from the closest game and change the ids. jsdom prints
-"Not implemented: HTMLCanvasElement's getContext()" when a test draws on a canvas; it is harmless.
+kit's `./simulated-game-host`: it takes `backend`, `game`, `html`, `script` and optionally `services`, and returns the page's `window`,
+the `replies` the host sent and the `pushes` it made on its own) and installs fake audio. To see what a finished run sends, lend it
+`recordingRuns().runs` as `services: { runs }`, give the game the `run:submit` capability, and read `submitted` (each entry is a run id
+and its record). Copy the page from the closest game and change the ids. jsdom prints "Not implemented: HTMLCanvasElement's
+getContext()" when a test draws on a canvas; it is harmless.
 
 ## What a test must prove
 
@@ -32,12 +34,16 @@ sent and the `pushes` it made on its own) and installs fake audio. Copy it from 
   is decoration.
 - **Page:** keys, pause (a paused run adds no input and no tick), sound state, and a layout that does not move (compare element boxes
   through a run, as `tests/e2e/tests/tower-stack-layout.spec.ts` does).
-- **Honesty:** the page says "Connected" only when the platform answered; it says a milestone is replay-checked only when it was.
+- **Honesty:** the page says "Connected" only when the platform answered. It never claims how a milestone is checked: that is the
+  manifest's verification field, and the platform decides what players get.
 
 ## Before the pull request
 
 - `pnpm repository:check`: files under 300 lines, README present with an Ownership section, no duplicated user-facing sentences.
 - `pnpm typecheck`, `pnpm lint`, and the tests for the workspaces you touched.
+- The game's integration test submits a finished run once with the platform's run id and seed (`recordingRuns()`) and shows that a
+  test-only or practice run submits nothing. The touch test drives the screen with fingers (`attachZones`), not with buttons. Show
+  each test can fail: break the line it guards and watch it go red.
 - From `apps/web`: `npx vitest run --project unit test/games`. It runs three files: `games-config.unit.test.ts` (the ordered list of
   game ids: add yours), `games-verifiers.unit.test.ts` (the pinned digest) and `games-conformance.unit.test.ts`.
 - The conformance test (`apps/web/test/games-conformance.unit.test.ts`) runs over every registered embedded game: the page must be one
