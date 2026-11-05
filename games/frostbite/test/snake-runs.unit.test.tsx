@@ -35,7 +35,6 @@ function platform(
   const withRuns: CabinetHost = { milestone: host.milestone, runs };
   return { runs, withRuns };
 }
-const note = () => container.querySelector(".if-note")?.textContent ?? "";
 
 describe("a SAT SNAKE run on the platform's seed", () => {
   it("is played on the seed the platform gave, and says only how to play", async () => {
