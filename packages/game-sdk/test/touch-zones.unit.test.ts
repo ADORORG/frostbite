@@ -78,6 +78,32 @@ describe("a finger on the screen", () => {
     expect(enter.mock.calls).toEqual([["b"], ["a"]]);
   });
 
+  it("holds nothing where there is no zone, and takes the zone up again on coming back into one", () => {
+    const screen = document.createElement("canvas");
+    screen.getBoundingClientRect = () =>
+      ({ height: 200, left: 0, top: 0, width: 400 }) as DOMRect;
+    document.body.append(screen);
+    const enter = vi.fn();
+    const leave = vi.fn();
+    stops.push(
+      attachZones<"a">(screen, {
+        enter,
+        fingersOnly: true,
+        leave,
+        slide: true,
+        zoneAt: (where) => (where.x < 0.5 ? "a" : null),
+      }),
+    );
+    send(screen, "pointerdown", { x: 300 });
+    expect(enter).not.toHaveBeenCalled();
+    send(window, "pointermove", { x: 100 });
+    expect(enter.mock.calls).toEqual([["a"]]);
+    send(window, "pointermove", { x: 300 });
+    expect(leave.mock.calls).toEqual([["a"]]);
+    send(window, "pointerup", { x: 300 });
+    expect(leave).toHaveBeenCalledTimes(1);
+  });
+
   it("holds the zone it landed in when sliding is off", () => {
     const { enter, leave, screen } = setup({ slide: false });
     send(screen, "pointerdown", { x: 300 });

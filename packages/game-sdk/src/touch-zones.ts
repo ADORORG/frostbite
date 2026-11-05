@@ -13,7 +13,8 @@ export interface ZoneOptions<Zone> {
   readonly leave: (zone: Zone) => void;
   // A finger that slides from one zone to the next leaves the first and enters the second. Off, it holds the zone it landed in.
   readonly slide: boolean;
-  readonly zoneAt: (where: Where) => Zone;
+  // The zone at a point, or null where there is none (a finger there holds nothing).
+  readonly zoneAt: (where: Where) => Zone | null;
 }
 
 interface Finger<Zone> {
@@ -33,7 +34,7 @@ export function attachZones<Zone>(
     finger.held = next;
     if (next !== null) enter(next);
   };
-  const under = (event: PointerEvent): Zone => {
+  const under = (event: PointerEvent): Zone | null => {
     const box = screen.getBoundingClientRect();
     return zoneAt({
       x: (event.clientX - box.left) / box.width,

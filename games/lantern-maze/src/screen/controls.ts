@@ -79,15 +79,13 @@ export function attachControls(
       timer: window.setInterval(() => controls.move(direction), stepRepeatMs),
     };
   };
-  const stopTouch = attachZones<Direction | null>(screen, {
+  const stopTouch = attachZones<Direction>(screen, {
     enter: (direction) => {
-      if (direction === null) return;
       held.push(direction);
       walk(direction, true);
     },
     fingersOnly: false,
     leave: (direction) => {
-      if (direction === null) return;
       held.splice(held.indexOf(direction), 1);
       if (walking?.direction !== direction) return;
       const next = held.at(-1);
