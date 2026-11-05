@@ -2,13 +2,17 @@ import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { pauseCopy } from "@ador/game-sdk/pause";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
 
 // Lantern Maze's page, bundled and run against a simulated platform: the connection, the keys, the pad, the pause and the end of a run.
-async function opened(saved: Parameters<typeof play>[0] = { best: 0 }) {
-  const { stored, window } = await play(saved);
+async function opened(
+  saved: Parameters<typeof play>[0] = { best: 0 },
+  services: Parameters<typeof play>[2] = {},
+) {
+  const { stored, window } = await play(saved, {}, services);
   await settle();
   const el = (id: string) => window.document.getElementById(id);
   const press = (code: string) =>
@@ -99,7 +103,10 @@ describe("Lantern Maze's page", () => {
   });
 
   it("ends a run when the oil is gone, saves the best, and says nothing about the platform", async () => {
-    const { el, press, stored, window } = await opened();
+    const recorded = recordingRuns();
+    const { el, press, stored, window } = await opened(undefined, {
+      runs: recorded.runs,
+    });
     press("Enter");
     await settle(100);
     const codes = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
@@ -117,6 +124,9 @@ describe("Lantern Maze's page", () => {
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Light another");
     expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

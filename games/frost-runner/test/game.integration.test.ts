@@ -2,6 +2,7 @@ import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { describe, expect, it } from "vitest";
 import { afterEach } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -28,7 +29,12 @@ describe("Frost Runner, bundled and run against a simulated platform", () => {
   });
 
   it("starts a run, says how to play and nothing about the platform, and runs until the runner is stopped", async () => {
-    const { stored, window } = await play({ best: 0 });
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     await settle();
     window.document
       .getElementById("start")
@@ -48,6 +54,9 @@ describe("Frost Runner, bundled and run against a simulated platform", () => {
     expect(window.document.getElementById("note")?.textContent).not.toMatch(
       /platform|claim|seed/i,
     );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

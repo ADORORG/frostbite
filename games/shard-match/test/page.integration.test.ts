@@ -2,14 +2,18 @@ import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { pauseCopy } from "@ador/game-sdk/pause";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
 
 // Shard Match's page, bundled and run against a simulated platform: the connection, the keys, the pause and the end of a run. The board is
 // from a seed of the page's own, so these play it with every key: a swap that makes no line is refused and changes nothing.
-async function opened(saved: Parameters<typeof play>[0] = { best: 0 }) {
-  const { stored, window } = await play(saved);
+async function opened(
+  saved: Parameters<typeof play>[0] = { best: 0 },
+  services: Parameters<typeof play>[2] = {},
+) {
+  const { stored, window } = await play(saved, {}, services);
   await settle();
   const el = (id: string) => window.document.getElementById(id);
   const press = (code: string) =>
@@ -106,7 +110,10 @@ describe("Shard Match's page", () => {
   });
 
   it("ends a run when the swaps are used up, saves the best, and says nothing about the platform", async () => {
-    const { ended, el, press, stored, wander } = await opened();
+    const recorded = recordingRuns();
+    const { ended, el, press, stored, wander } = await opened(undefined, {
+      runs: recorded.runs,
+    });
     press("Enter");
     await settle(100);
     for (let at = 0; at < 800 && !ended(); at += 1) wander(1);
@@ -116,6 +123,9 @@ describe("Shard Match's page", () => {
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Play again");
     expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

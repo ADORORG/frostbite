@@ -1,6 +1,7 @@
 import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -40,7 +41,12 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
   });
 
   it("runs until the last life is lost, then keeps the best, and says nothing about the platform", async () => {
-    const { stored, window } = await play({ best: 0 });
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     window.Math.random = () => earlyPit;
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
@@ -60,6 +66,9 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
     expect(byId(window, "note")?.textContent).not.toMatch(
       /platform|claim|seed/i,
     );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

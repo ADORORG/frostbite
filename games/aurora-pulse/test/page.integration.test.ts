@@ -3,14 +3,18 @@ import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { pauseCopy } from "@ador/game-sdk/pause";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
 
 // Aurora Pulse's page, bundled and run against a simulated platform: the connection, the start, the lanes, the pause and the end of a run. The
 // chart is from a seed of the page's own, and the page runs on the real clock, so these look at what a tap and a pause do, not at a score.
-async function opened(saved: Parameters<typeof play>[0] = { best: 0 }) {
-  const { stored, window } = await play(saved);
+async function opened(
+  saved: Parameters<typeof play>[0] = { best: 0 },
+  services: Parameters<typeof play>[2] = {},
+) {
+  const { stored, window } = await play(saved, {}, services);
   const audio = installFakeAudio(window);
   await settle();
   const el = (id: string) => window.document.getElementById(id);
@@ -89,7 +93,10 @@ describe("Aurora Pulse's page", () => {
   });
 
   it("ends the run when the light goes out (a player who never taps), saves the best, and says nothing about the platform", async () => {
-    const { el, press, stored } = await opened();
+    const recorded = recordingRuns();
+    const { el, press, stored } = await opened(undefined, {
+      runs: recorded.runs,
+    });
     press("Enter");
     await settle(100);
     for (let at = 0; at < 600 && el("start")?.hasAttribute("hidden"); at += 1)
@@ -97,6 +104,9 @@ describe("Aurora Pulse's page", () => {
     expect(el("start")?.hasAttribute("hidden")).toBe(false);
     expect(el("start")?.textContent).toBe("Play again");
     expect(el("note")?.textContent).not.toMatch(/platform|claim|seed/i);
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({ best: 0, sound: defaultSound });
     expect(el("pause")?.hasAttribute("disabled")).toBe(true);
   }, 90_000);
