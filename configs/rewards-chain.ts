@@ -1,9 +1,12 @@
 import { join } from "node:path";
 
-import type { Aged } from "@ador/cache";
-import { cacheIndexing } from "@ador/chain/indexing";
-import { createStatusReadings } from "@ador/chain/status-readings";
-import { InvalidAddressError, type AddressBalance } from "@ador/chain/ports";
+import type { Aged } from "@frostbite/cache";
+import { cacheIndexing } from "@frostbite/chain/indexing";
+import { createStatusReadings } from "@frostbite/chain/status-readings";
+import {
+  InvalidAddressError,
+  type AddressBalance,
+} from "@frostbite/chain/ports";
 import {
   createConfiguredRegistry,
   feeCeiling,
@@ -11,7 +14,7 @@ import {
   type FeeSourceSettings,
   type FetchLike,
   type GetLike,
-} from "@ador/chain/configured";
+} from "@frostbite/chain/configured";
 import {
   chainRefSchema,
   type ChainConfig,
@@ -19,7 +22,7 @@ import {
   type FeeRate,
   type FundingPolicy,
   type IndexingStatus,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
 import { feeSourceStartupCheck } from "./rewards-startup.ts";

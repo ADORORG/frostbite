@@ -2,7 +2,7 @@ import type {
   GameVerifier,
   RunInput,
   Stepped,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 
 import { pickDistinct } from "./seeded.ts";
 

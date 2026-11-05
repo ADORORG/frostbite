@@ -12,10 +12,10 @@ approval is never presented as a launch, and a catalog that cannot be read is ne
 
 ## What was built
 
-- `@ador/collections`: `ApprovedVersionReader.listApprovedCollections` lists collections that currently
+- `@frostbite/collections`: `ApprovedVersionReader.listApprovedCollections` lists collections that currently
   have an approved version (approved submission and still-approved creator), newest approval first,
   reading each from its snapshot in SQL.
-- `@ador/feature-public-collections` (new): the list at `/collections` and a page at `/collections/[slug]`
+- `@frostbite/feature-public-collections` (new): the list at `/collections` and a page at `/collections/[slug]`
   (the slug is the collection id), as server components with no client JavaScript. An explicit
   allowlist (`public-model.ts`) copies every public field; images are the creator's processed derivatives
   signed for display, limited to assets frozen into the approved version.

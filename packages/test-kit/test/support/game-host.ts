@@ -1,9 +1,9 @@
-import type { HostedGame } from "@ador/game-sdk/host";
+import type { HostedGame } from "@frostbite/game-sdk/host";
 import {
   gameChannel,
   protocolVersion,
   type Response,
-} from "@ador/game-sdk/protocol";
+} from "@frostbite/game-sdk/protocol";
 
 export const game: HostedGame = {
   id: "tap-tower",

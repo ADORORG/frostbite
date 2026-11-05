@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Psbt } from "bitcoinjs-lib";
-import { chainRefSchema, type FundingPolicy } from "@ador/shared/chain";
+import { chainRefSchema, type FundingPolicy } from "@frostbite/shared/chain";
 
 import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import { createBroadcaster } from "../../src/bitcoin-alkanes/broadcaster.ts";

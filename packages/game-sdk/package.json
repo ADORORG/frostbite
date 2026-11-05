@@ -1,5 +1,5 @@
 {
-  "name": "@ador/game-sdk",
+  "name": "@frostbite/game-sdk",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -72,8 +72,8 @@
   "license": "UNLICENSED",
   "sideEffects": false,
   "bin": {
-    "ador-game-dev": "./dist/dev-host/bin.js",
-    "ador-game-skill": "./dist/skill/bin.js"
+    "frostbite-game-dev": "./dist/dev-host/bin.js",
+    "frostbite-game-skill": "./dist/skill/bin.js"
   },
   "files": [
     "dist",

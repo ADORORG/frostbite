@@ -50,7 +50,7 @@ and provider-failure tests. Completion must not claim media validation or public
   and the strict identifier-only processing payload are guarded by tests. Each deliberate defect
   produced the expected failure and was restored before the final gates.
 - The production E2E gate exposed a broad database-barrel import that evaluated migration filesystem
-  code in the standalone bundle. The repository now consumes an explicit `@ador/database/outbox`
+  code in the standalone bundle. The repository now consumes an explicit `@frostbite/database/outbox`
   subpath; the rebuilt standalone app and all browser tests then passed.
 
 The clean streak restarted after that repair:

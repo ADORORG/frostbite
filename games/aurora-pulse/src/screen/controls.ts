@@ -1,5 +1,5 @@
-import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
-import { attachZones } from "@ador/game-sdk/touch-zones";
+import { attachKeys, standardKeys } from "@frostbite/game-sdk/controls";
+import { attachZones } from "@frostbite/game-sdk/touch-zones";
 
 import { laneAt, screenWidth } from "./layout.ts";
 

@@ -14,14 +14,14 @@ import {
   simpleWebAuthnRegistrationAdapter,
   strictBip322Verifier,
   type MethodRegistry,
-} from "@ador/auth";
+} from "@frostbite/auth";
 import {
   createDrizzleSetupLinks,
   createSetupLinkService,
   type RoleRequirements,
   type SetupLinkService,
-} from "@ador/authorization";
-import { type DatabaseTransaction } from "@ador/database/connection";
+} from "@frostbite/authorization";
+import { type DatabaseTransaction } from "@frostbite/database/connection";
 import { randomBytes } from "node:crypto";
 
 import { createHeldMethodKinds } from "./held-method-kinds.ts";

@@ -1,5 +1,5 @@
-import type { DirectoryEntry } from "@ador/authorization";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { DirectoryEntry } from "@frostbite/authorization";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {

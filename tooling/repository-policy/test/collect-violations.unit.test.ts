@@ -103,7 +103,7 @@ const breakages: ReadonlyArray<readonly [string, Files, string]> = [
     "the import boundary policy",
     {
       [`${workspace}/src/boundary.ts`]:
-        'import { open } from "@ador/database";\nexport { open };\n',
+        'import { open } from "@frostbite/database";\nexport { open };\n',
     },
     `${workspace}/src/boundary.ts imports the database package root`,
   ],

@@ -1,4 +1,4 @@
-import { platformRoleAssignments } from "@ador/database";
+import { platformRoleAssignments } from "@frostbite/database";
 import { describe, expect, it } from "vitest";
 
 import {

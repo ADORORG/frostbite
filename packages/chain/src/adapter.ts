@@ -1,4 +1,4 @@
-import type { ChainFamilyId, ChainRef } from "@ador/shared/chain";
+import type { ChainFamilyId, ChainRef } from "@frostbite/shared/chain";
 
 import type { ChainPorts } from "./ports.ts";
 

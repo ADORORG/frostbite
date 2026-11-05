@@ -1,11 +1,11 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import {
   isAccountOutcome,
   outcomeMessage,
   type AccountOutcome,
-} from "@ador/shared/account-outcomes";
+} from "@frostbite/shared/account-outcomes";
 
-// A step that did not work, as a page tells it: which outcome of the catalogue (`@ador/shared/account-outcomes`) and its words. Every flow
+// A step that did not work, as a page tells it: which outcome of the catalogue (`@frostbite/shared/account-outcomes`) and its words. Every flow
 // returns this one shape for every failure, so no flow has a table of its own.
 export interface Failed {
   readonly kind: "failed";

@@ -96,7 +96,7 @@ describe("loading the verifiers games publish, with nothing about any game in th
     async (_name, answer) => {
       // A real build, wrapped so that one input makes it answer wrongly while the sample the platform checks it with is answered rightly.
       const built = await buildArtifact();
-      const code = `${built.code}\n{ const real = globalThis.__adorReplay; globalThis.__adorReplay = (record) => record.includes('"garble"') ? ${answer} : real(record); }`;
+      const code = `${built.code}\n{ const real = globalThis.__frostbiteReplay; globalThis.__frostbiteReplay = (record) => record.includes('"garble"') ? ${answer} : real(record); }`;
       const { registry } = await load([game(code)], { "tally-game": code });
       const sample = registry.find("tally-game")?.sample;
       expect(

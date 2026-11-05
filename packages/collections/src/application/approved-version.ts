@@ -1,5 +1,5 @@
-import type { SubmissionSnapshot } from "@ador/shared/collections";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { SubmissionSnapshot } from "@frostbite/shared/collections";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 // The version of a collection that may be shown or acted on as approved: a submission that is in the
 // approved state **and** whose creator is still an approved creator. Either half failing means there

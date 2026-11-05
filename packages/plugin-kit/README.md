@@ -1,4 +1,4 @@
-# `@ador/plugin-kit`
+# `@frostbite/plugin-kit`
 
 Explicit feature/provider registration, boot validation, dependency checking, and lazy loading.
 
@@ -6,19 +6,19 @@ Explicit feature/provider registration, boot validation, dependency checking, an
 
 - `defineFeature(registration)` validates one manifest at its declaration boundary.
 - `createFeatureRegistry(registrations)` creates an immutable public registry interface.
-- `@ador/plugin-kit/lazy` exports `memoizeUntilFailure`: build a feature's shared dependency on first use,
+- `@frostbite/plugin-kit/lazy` exports `memoizeUntilFailure`: build a feature's shared dependency on first use,
   share it, and forget a failed build so a later call can retry.
 - `FeatureRegistration` and `FeatureEntrypoint` define the plugin boundary.
 - Feature entrypoints own pages and framework-neutral HTTP operations; apps use generic dispatchers.
-- `@ador/plugin-kit/providers` defines and creates explicit provider registries.
-- `@ador/plugin-kit/boot` validates decision gates, provider requirements, pages, routes, and
+- `@frostbite/plugin-kit/providers` defines and creates explicit provider registries.
+- `@frostbite/plugin-kit/boot` validates decision gates, provider requirements, pages, routes, and
   operation IDs before serving.
-- `@ador/plugin-kit/navigation` filters validated manifest navigation for public, authenticated, or
+- `@frostbite/plugin-kit/navigation` filters validated manifest navigation for public, authenticated, or
   capability-authorized users, returns each link with its `area` in display `order`, and
   `markCurrent` marks the link for the page being shown (longest matching parent). Visibility never
   replaces destination authorization.
 
-- `@ador/plugin-kit/page-metadata` is what a page says to search engines and link previews, as plain data: a page's optional
+- `@frostbite/plugin-kit/page-metadata` is what a page says to search engines and link previews, as plain data: a page's optional
   `metadata` returns `shared` (title, description, optional picture path) or `private`. A page that declares none, a page behind
   sign-in, and a missing item are all `private`: told to stay out of search results and shown with no preview. `clipDescription`
   cuts at a word. A feature's optional `sitemapPaths` lists its public addresses; `registry.listSitemapPaths()` merges them.
@@ -45,14 +45,14 @@ side effects.
 - Navigation is manifest-owned and immutable; detaching a feature removes its links with its pages.
 - A feature may contribute a part of the landing page (`homeSections`: an id, an order, and a `render`). It declares the `home-section`
   capability exactly when it contributes one (the registry refuses a mismatch), ids are unique, `listHomeSections()` returns them lowest
-  order first, and the shell lays them out knowing nothing of what they show. Where each sits is `homeSectionOrder` in `@ador/shared/platform`.
+  order first, and the shell lays them out knowing nothing of what they show. Where each sits is `homeSectionOrder` in `@frostbite/shared/platform`.
 
 Removing the single registration entry from `configs/features.ts` removes that feature's pages and
 operations. Runtime filesystem discovery and feature-specific app routes are intentionally absent.
 
 ## Verification
 
-Run `pnpm --filter @ador/plugin-kit typecheck`, `test:unit`, `test:integration`, or
+Run `pnpm --filter @frostbite/plugin-kit typecheck`, `test:unit`, `test:integration`, or
 `test:coverage`. Platform engineering owns the registry contract.
 
 ## Ownership

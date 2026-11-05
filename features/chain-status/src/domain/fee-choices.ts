@@ -1,5 +1,5 @@
 import type { ChoiceOption } from "@repo/ui/arcade";
-import type { FeeQuoteView, FeeSpeed } from "@ador/shared/chain";
+import type { FeeQuoteView, FeeSpeed } from "@frostbite/shared/chain";
 
 import {
   costText,

@@ -1,4 +1,4 @@
-import { block, wrap } from "@ador/game-sdk/pixels";
+import { block, wrap } from "@frostbite/game-sdk/pixels";
 
 import { levelAt } from "../rules/course.ts";
 import type { RunState, Shard } from "../rules/types.ts";

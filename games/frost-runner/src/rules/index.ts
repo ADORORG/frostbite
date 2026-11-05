@@ -1,15 +1,15 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import {
   fieldsOf,
   refuse,
   tickNamed,
   withFields,
-} from "@ador/game-sdk/run-inputs";
+} from "@frostbite/game-sdk/run-inputs";
 import type {
   GameVerifier,
   RunInput,
   Stepped,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 
 import { maxTicks, verifierId, verifierVersion } from "./constants.ts";
 import { earnedBy } from "./milestones.ts";

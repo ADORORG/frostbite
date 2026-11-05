@@ -1,11 +1,11 @@
 import type {
   WalletChallengeRequest,
   WalletChallengeResponse,
-} from "@ador/auth";
-import { walletAuthUriPath } from "@ador/auth";
-import type { HttpFailure } from "@ador/http/outcome";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/auth";
+import { walletAuthUriPath } from "@frostbite/auth";
+import type { HttpFailure } from "@frostbite/http/outcome";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 import { outcomeFailure } from "./outcomes.ts";
 import type { WalletAuthServices } from "./wallet-services.ts";

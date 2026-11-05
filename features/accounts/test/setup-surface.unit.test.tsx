@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { ApiError, type Parser, type Requester } from "@ador/client-http";
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { ApiError, type Parser, type Requester } from "@frostbite/client-http";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {

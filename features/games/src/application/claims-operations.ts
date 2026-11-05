@@ -2,10 +2,10 @@ import {
   playerClaimState,
   type ClaimView,
   type GameClaimsService,
-} from "@ador/game-claims";
-import type { HttpOperation } from "@ador/http";
-import { signedTransactionSchema } from "@ador/shared/chain";
-import { unauthenticated } from "@ador/http/outcome";
+} from "@frostbite/game-claims";
+import type { HttpOperation } from "@frostbite/http";
+import { signedTransactionSchema } from "@frostbite/shared/chain";
+import { unauthenticated } from "@frostbite/http/outcome";
 import {
   listGameClaimsInputSchema,
   listGameClaimsResponseSchema,
@@ -29,7 +29,7 @@ import {
   type StartGameClaimResponse,
   type SubmitGameClaimInput,
   type SubmitGameClaimResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 type Service = () => Promise<GameClaimsService>;
 

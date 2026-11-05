@@ -1,4 +1,4 @@
-import { readinessSchema } from "@ador/shared/readiness";
+import { readinessSchema } from "@frostbite/shared/readiness";
 import { describe, expect, it, vi } from "vitest";
 
 import { GET } from "../src/app/api/ready/route.js";

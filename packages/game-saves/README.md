@@ -1,8 +1,8 @@
-# `@ador/game-saves`
+# `@frostbite/game-saves`
 
 A signed-in player's saved state for a game: the latest save and the milestones they earned. It owns the
-checks and the persistence; the HTTP route belongs to `@ador/feature-games`, and the merge rule belongs to
-`@ador/shared/games` (`mergeGameState`), so the page and the server cannot disagree about it.
+checks and the persistence; the HTTP route belongs to `@frostbite/feature-games`, and the merge rule belongs to
+`@frostbite/shared/games` (`mergeGameState`), so the page and the server cannot disagree about it.
 
 ## Public API
 
@@ -11,7 +11,7 @@ checks and the persistence; the HTTP route belongs to `@ador/feature-games`, and
   `synced`, `unknown-game`, `unknown-milestone`, `too-large`.
 - `createDrizzleGameSyncRepository(database)`: the PostgreSQL adapter for `GameSyncRepository`.
 - `recordVerifiedMilestones(transaction, { at, earned, gameId, userId })`: writes the milestones a replayed run earned as
-  `replay-verified`, in the caller's transaction (the run's settlement, in `@ador/game-runs`). It upgrades a milestone already
+  `replay-verified`, in the caller's transaction (the run's settlement, in `@frostbite/game-runs`). It upgrades a milestone already
   held, keeping its unlock time and count, never lowers a level, and does the same when applied again.
 
 ## Invariants
@@ -37,10 +37,10 @@ None of its own. The games and their milestones, and the size limit, are supplie
 
 ## Tests
 
-`pnpm --filter @ador/game-saves test:unit` (the service), `test:integration` (the adapter on real
+`pnpm --filter @frostbite/game-saves test:unit` (the service), `test:integration` (the adapter on real
 PostgreSQL, including two devices syncing at once), `test:coverage`.
 
 ## Ownership
 
 The games platform owner. A new verification level or a different merge rule is a migration and a change in
-`@ador/shared/games`, with an ADR-018 update.
+`@frostbite/shared/games`, with an ADR-018 update.

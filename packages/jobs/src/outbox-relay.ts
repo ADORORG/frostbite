@@ -1,7 +1,7 @@
 import {
   domainEventEnvelopeSchema,
   type DomainEventEnvelope,
-} from "@ador/events";
+} from "@frostbite/events";
 import { z } from "zod";
 
 export const outboxRelayPolicySchema = z

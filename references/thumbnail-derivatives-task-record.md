@@ -27,20 +27,20 @@ unit-testable, following the repository's port/provider standard.
 ## Delivered design
 
 - **Port and capability**: `ImageProcessor` and `media-processing:image-derivatives` in
-  `@ador/media/processing`, mirroring `@ador/object-storage`. No decoder in domain code.
+  `@frostbite/media/processing`, mirroring `@frostbite/object-storage`. No decoder in domain code.
 - **Provider adapter**: `providers/media-processing/sharp`, registered by one line in
   `configs/providers.ts`, like the R2 provider. `process-image.ts` is the only file importing `sharp`.
   Orchestration (`isolated-processor.ts`) depends on a `WorkerLauncher` port and an injectable
   scheduler; reply validation (`reply.ts`) and the frame protocol are pure. The Node launcher is the
   only code that spawns a process.
-- **Activity**: `createAssetProcessingService` in `@ador/uploads` (port-only, idempotent,
+- **Activity**: `createAssetProcessingService` in `@frostbite/uploads` (port-only, idempotent,
   content-hash verified, write-once content-addressed derivative keys, conditional transition).
   `AssetProcessingRepository` port plus a Drizzle adapter; shared bounded-read helper reused with
   validation.
 - **Persistence**: states `processed` and `unprocessable`, `processing_completed_at`, a restructured
   five-state `assets_validation_coherent` CHECK (its own module), an `asset_derivatives` table, four
   new reason codes, and migration `20261006082016_tranquil_night_thrasher`.
-- **Policy**: `DerivativePolicy` in `@ador/shared/uploads` with validated overrides.
+- **Policy**: `DerivativePolicy` in `@frostbite/shared/uploads` with validated overrides.
 - **Dependency**: ADR-013. The repository already resolved `sharp` 0.35.3 through Next.js, which carries
   a high advisory; a `pnpm` override now resolves every `sharp` to the single 0.35.5.
 
@@ -73,8 +73,8 @@ Root gates on the final code, run sequentially with no concurrent edits, all pas
 `format:check`, `typecheck`, `lint`, `test:unit`, `test:integration` (real PostgreSQL and real
 `sharp` worker processes), `test:coverage`, `db:check`, and `test:e2e` (114 passed, 6 existing
 WebAuthn skips). No code or test file changed after that run; only documentation did.
-Coverage: `@ador/provider-media-processing-sharp` 100% statements/branches/functions/lines;
-`@ador/media` 100%; `@ador/uploads` 99.52% statements and 97.87% branches; `@ador/shared` 100% and
+Coverage: `@frostbite/provider-media-processing-sharp` 100% statements/branches/functions/lines;
+`@frostbite/media` 100%; `@frostbite/uploads` 99.52% statements and 97.87% branches; `@frostbite/shared` 100% and
 97.72%; merged thresholds passed. Largest handwritten source/test file: 223 lines. The lockfile has a
 single `sharp` (0.35.5); no new deprecated package entered the graph.
 

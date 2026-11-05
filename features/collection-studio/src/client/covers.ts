@@ -1,5 +1,5 @@
-import { pickRendition } from "@ador/feature-uploads/presentation";
-import type { LibraryAsset } from "@ador/shared/uploads";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 // The small picture a card can show for a collection's cover.
 export interface CoverPicture {

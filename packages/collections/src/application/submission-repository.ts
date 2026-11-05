@@ -4,11 +4,11 @@ import type {
   SubmissionRequirement,
   SubmissionSnapshot,
   SubmissionState,
-} from "@ador/shared/collections";
-import type { PlatformRole } from "@ador/shared/accounts";
-import type { CreatorApplicationState } from "@ador/shared/creator-admission";
-import type { CorrelationId, IdempotencyKey } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import type { PlatformRole } from "@frostbite/shared/accounts";
+import type { CreatorApplicationState } from "@frostbite/shared/creator-admission";
+import type { CorrelationId, IdempotencyKey } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 export interface SubmissionDecisionRecord {
   readonly action: SubmissionAction;

@@ -2,7 +2,7 @@ import {
   describeUploadFormats,
   uploadOutcomes,
   type AssetRejectionReason,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { FileRejection } from "./file-checks.ts";
 

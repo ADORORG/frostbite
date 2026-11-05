@@ -15,11 +15,11 @@ timing hope.
 
 - Migration `20261010075232_collection_review_no_self_review`: a trigger on the review record refuses a
   decision event by the submission's creator and a submit event by anyone else.
-- `@ador/collections`: the approved-version guard. `findApprovedVersion` (display, no lock) and
+- `@frostbite/collections`: the approved-version guard. `findApprovedVersion` (display, no lock) and
   `lockApprovedVersion` (acting: shared locks on the approved submission then the creator's
   application, so a revocation or suspension in flight waits and a committed one is seen). `isApprovedCreatorNow`
   is the lock-free creator check.
-- `@ador/test-kit/race`: `holdTransaction` and `expectToWait`, replacing three hand-rolled copies.
+- `@frostbite/test-kit/race`: `holdTransaction` and `expectToWait`, replacing three hand-rolled copies.
 - Tests: self-review through every decision and directly in the database; the approved-version rules for
   every state and every creator state; approval versus a creator suspension or revocation in flight,
   reviewer role withdrawal in flight, revocation versus an acting caller, and a concurrent mix with no

@@ -2,7 +2,7 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
 
 import {
   runGameInSimulatedHost,
@@ -97,7 +97,7 @@ describe("a game built with the SDK, run against a simulated host", () => {
     const script = `
       const out = document.getElementById("out");
       const send = (id, method, params) =>
-        parent.postMessage({ channel: "ador-game", id, method, params, version: 1 }, "*");
+        parent.postMessage({ channel: "frostbite-game", id, method, params, version: 1 }, "*");
       addEventListener("message", (e) => {
         const d = e.data;
         if (d.event) out.textContent += " " + d.event + ":" + JSON.stringify(d.data);

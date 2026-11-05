@@ -1,5 +1,5 @@
-import { unauthenticated } from "@ador/http/outcome";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createPasskeyOperations } from "../src/application/passkey-operations.ts";

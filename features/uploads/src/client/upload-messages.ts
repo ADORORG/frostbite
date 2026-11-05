@@ -1,9 +1,9 @@
-import type { ApiErrorCode } from "@ador/client-http";
+import type { ApiErrorCode } from "@frostbite/client-http";
 import {
   isUploadOutcome,
   uploadOutcomeMessage,
   uploadOutcomes,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { assetRejectionCopy, describeFileRejection } from "./rejection-copy.ts";
 import type { FailureCause, UploadStage, UploadState } from "./upload-state.ts";
 

@@ -1,7 +1,7 @@
-import type { StartStepResult } from "@ador/game-admin";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
-import { signedTransactionSchema } from "@ador/shared/chain";
+import type { StartStepResult } from "@frostbite/game-admin";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { signedTransactionSchema } from "@frostbite/shared/chain";
 import {
   gameAdminCapability,
   gameAdminRoutes,
@@ -30,7 +30,7 @@ import {
   type StartGameAdminStepResponse,
   type SubmitGameAdminStepInput,
   type SubmitGameAdminStepResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import type { GameAdminRuntime } from "../runtime.ts";
 import { peopleOf, toWireStep } from "./present.ts";

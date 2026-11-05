@@ -1,5 +1,5 @@
-import { createVerifierRegistry } from "@ador/game-verification/registry";
-import type { GameManifest } from "@ador/shared/games";
+import { createVerifierRegistry } from "@frostbite/game-verification/registry";
+import type { GameManifest } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { createGameRunsResolver, gameRunLookup } from "../src/runs-runtime.ts";

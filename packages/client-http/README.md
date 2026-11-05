@@ -1,4 +1,4 @@
-# `@ador/client-http`
+# `@frostbite/client-http`
 
 The browser-side HTTP requester shared by every feature client. It sends one body-based operation to
 a platform route, parses the response with the route's shared schema, and turns failures into a typed
@@ -20,7 +20,7 @@ error, so features do not each reimplement fetch, envelope parsing, or retry cla
 
 ## Dependencies and configuration
 
-Depends on `@ador/shared` (routes, error envelope). No environment configuration.
+Depends on `@frostbite/shared` (routes, error envelope). No environment configuration.
 
 ## Verification
 

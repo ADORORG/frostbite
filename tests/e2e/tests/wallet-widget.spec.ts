@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { testWallets } from "@ador/auth/test-fixtures";
+import { testWallets } from "@frostbite/auth/test-fixtures";
 import {
   connectWallet,
   installFakeWallet,

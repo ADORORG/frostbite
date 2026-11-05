@@ -183,13 +183,13 @@ describe("what the page tells the game", () => {
     s.host.emit("fullscreen.changed", { active: true });
     expect(s.pushed).toEqual([
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { state: "paused" },
         event: "lifecycle.changed",
         version: 1,
       },
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { active: true },
         event: "fullscreen.changed",
         version: 1,

@@ -55,7 +55,7 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   built. Nothing of value may depend on a board.
 - **SDK-3:** progress counts live **in the account state, with a migration**: a target per milestone in the
   manifest, and the count synced and merged like saves. Status: decided, not built.
-- **SDK-8:** **publish to npm under `@ador`.** Still needed from the owner: confirmation that the `@ador` scope is
+- **SDK-8:** **publish to npm under `@frostbite`.** Still needed from the owner: confirmation that the `@frostbite` scope is
   owned, and the licence (the package says `UNLICENSED` until then; no licence is assumed).
 
 ### Follow-up decisions (2026-10-13, second survey)
@@ -137,12 +137,12 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
 - **Cap (SDK-3):** the **manifest sets a maximum per milestone** (reviewed by pull request); counts above it are
   ignored.
 - **Licence (SDK-8):** **MIT.** Still needed: the copyright holder's name for the LICENSE file, and confirmation
-  that the `@ador` npm scope is owned. The package stays private until both are given.
+  that the `@frostbite` npm scope is owned. The package stays private until both are given.
 
 ### Seventh survey (2026-10-13)
 
 - **Publisher (SDK-8):** the owner owns the GitHub organisation **ADORORG** (`github.com/ADORORG`). That is not the
-  npm scope: whether `@ador` exists and is owned on npm is **not confirmed**, and the licence holder name has not
+  npm scope: whether `@frostbite` exists and is owned on npm is **not confirmed**, and the licence holder name has not
   been stated exactly (ADORORG is the likely name). Both to confirm before the package is published.
 - **Verified milestones (G6):** **verified milestones unlock leaderboard entries**, read as: only replay-verified
   runs appear on boards. **This conflicts with the earlier decision** (global boards labelled self-reported) and
@@ -158,7 +158,7 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   SDK-2 (#54) now waits for G6 (#41). The self-reported board design above stays as the display design; only the
   admission rule changes. Build order becomes: SDK-F wallet widget, then G6, then SDK-2.
 - **npm (SDK-8):** publish under a **scope that matches the GitHub organisation (e.g. `@adororg`)**, holder
-  **ADORORG**, licence **MIT**. The workspace package is named `@ador/game-sdk`; publishing under another scope
+  **ADORORG**, licence **MIT**. The workspace package is named `@frostbite/game-sdk`; publishing under another scope
   means a rename (workspace-wide) or a published name that differs from the workspace name. Decide at publish time;
   the scope must also be created on npm by the owner.
 - **Wallet providers (SDK-F):** keep the **current 13 candidates**, detected wallets first.

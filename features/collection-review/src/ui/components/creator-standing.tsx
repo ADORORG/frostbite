@@ -1,5 +1,5 @@
-import type { ReviewSubmission } from "@ador/shared/collections";
-import { creatorStandingCopy } from "@ador/shared/creator-admission";
+import type { ReviewSubmission } from "@frostbite/shared/collections";
+import { creatorStandingCopy } from "@frostbite/shared/creator-admission";
 import { StatusLamp } from "@repo/ui/arcade";
 
 // The creator's standing now. An approval is refused for anyone who is not an approved creator, so a

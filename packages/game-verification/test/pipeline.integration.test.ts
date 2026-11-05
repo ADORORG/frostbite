@@ -1,4 +1,4 @@
-import { createRunRecorder } from "@ador/game-sdk/run-record";
+import { createRunRecorder } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import { createVerifierRegistry } from "../src/registry.ts";

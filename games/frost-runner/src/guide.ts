@@ -1,4 +1,4 @@
-import type { Guide } from "@ador/game-sdk/guide";
+import type { Guide } from "@frostbite/game-sdk/guide";
 
 // What the first screen says before the first run: the game, what the player does, and how to begin. It is drawn by the SDK over the idle screen.
 export const guide: Guide = {

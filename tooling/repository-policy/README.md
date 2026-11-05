@@ -9,7 +9,7 @@ Run `pnpm repository:check` for static policies, `pnpm decision:check` for the d
 and `pnpm repository:coverage` after workspace coverage reports exist. Root and CI commands invoke
 these gates automatically.
 
-The import-boundary policy also keeps chain-family code and vendor SDKs (`@ador/chain/bitcoin`,
+The import-boundary policy also keeps chain-family code and vendor SDKs (`@frostbite/chain/bitcoin`,
 `/bitcoin-alkanes`, `/alkanes`, `bitcoinjs-lib`, `@alkanes/*`, `@omnisat/*`) inside `packages/chain/`,
 `providers/chain/`, `packages/wallet/`, and conformance tests; `packages/auth/` is a recorded exception
 until sign-in moves to the neutral address codec (ADR-017). Everything else uses the neutral ports.

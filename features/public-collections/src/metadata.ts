@@ -2,8 +2,8 @@ import {
   clipDescription,
   privatePage,
   type PageMetadata,
-} from "@ador/plugin-kit/page-metadata";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/plugin-kit/page-metadata";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import type { PublicCatalog } from "./application/catalog.ts";
 import type { PublicCollection } from "./application/public-model.ts";

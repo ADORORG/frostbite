@@ -3,8 +3,8 @@ import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { Scene } from "@ador/scenes/engine";
-import { videoFiles, videoSpec } from "@ador/scenes/video";
+import type { Scene } from "@frostbite/scenes/engine";
+import { videoFiles, videoSpec } from "@frostbite/scenes/video";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { runEncoder } from "../src/encode.ts";

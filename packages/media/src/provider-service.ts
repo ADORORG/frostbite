@@ -1,8 +1,8 @@
-import type { ProviderServices } from "@ador/plugin-kit/providers";
+import type { ProviderServices } from "@frostbite/plugin-kit/providers";
 
 import type { ImageProcessor } from "./processing.ts";
 
-declare module "@ador/plugin-kit/providers" {
+declare module "@frostbite/plugin-kit/providers" {
   interface ProviderServices {
     readonly "media-processing:image-derivatives": ImageProcessor;
   }

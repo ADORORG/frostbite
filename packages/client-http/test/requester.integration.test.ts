@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
 
-import { idempotencyKeySchema } from "@ador/shared/http";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 

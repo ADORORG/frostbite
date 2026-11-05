@@ -11,7 +11,7 @@ One container image, built once (`deploy/Dockerfile`), run three ways. What a co
 | ------- | --------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
 | web     | the image's default: `migration:apply`, then `node ...standalone/server.js` | `GET /api/ready` | Public UI, studio, `/api/v1`. Applies pending migrations before it serves. One replica until qualified. |
 | worker  | `pnpm --filter worker start`                                                | `GET /ready`     | Outbox relay, cleanup and finished-row sweeps, the signed Inngest endpoint. Never migrates.             |
-| release | `pnpm --filter @ador/database migration:apply`                              | exits 0 or fails | Optional: the same migration by hand or as a platform's own step.                                       |
+| release | `pnpm --filter @frostbite/database migration:apply`                         | exits 0 or fails | Optional: the same migration by hand or as a platform's own step.                                       |
 
 Secrets and settings are never in the image. They come from the platform's environment at run time; the keys are the ones in
 `.env.production.example` (web) and `apps/worker/.env.example` (worker), which mirror the typed environment definition. The build
@@ -162,7 +162,7 @@ Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO c
 
 - The image builds (`docker build -f deploy/Dockerfile .`, about 5 minutes cold) and is 2.8 GB. It holds the full production `node_modules`
   and the worker's sources, because the worker and the migration run TypeScript from the workspace packages.
-- Release: `pnpm --filter @ador/database migration:apply` ran in the image and created the `ador` schema.
+- Release: `pnpm --filter @frostbite/database migration:apply` ran in the image and created the `frostbite` schema.
 - Web: started from the image, `/api/ready` answered 200 with database and object storage `ok`; the smoke test passed all 7 checks. With
   object storage stopped, `/api/ready` answered 503 and the smoke test failed and exited 1.
 - Worker: `pnpm --filter worker start` from the same image answered `/health` and `/ready` with 200.

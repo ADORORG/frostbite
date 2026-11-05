@@ -8,7 +8,7 @@ options; removing that line removes both pages and the navigation entry.
 ## What is shown, and what is not
 
 - Only collections that **currently have an approved version**: a submission in the approved state whose
-  creator is still an approved creator (`@ador/collections`, `ApprovedVersionReader`). A collection that
+  creator is still an approved creator (`@frostbite/collections`, `ApprovedVersionReader`). A collection that
   is submitted, in review, rejected, suspended, revoked, or whose creator was suspended or revoked, is
   reported as "Record not published", the same words as an identifier that never existed.
 - The page shows the **frozen version that was approved**, never the creator's current draft, so editing

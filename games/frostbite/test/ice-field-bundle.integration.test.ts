@@ -1,15 +1,15 @@
-import { replayRecord } from "@ador/game-sdk/replay";
+import { replayRecord } from "@frostbite/game-sdk/replay";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import { runRecordSchema } from "@ador/game-sdk/run-record";
-import type { HostServices } from "@ador/game-sdk/host";
-import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import { runRecordSchema } from "@frostbite/game-sdk/run-record";
+import type { HostServices } from "@frostbite/game-sdk/host";
+import { createMemoryGameBackend } from "@frostbite/test-kit/memory-game-backend";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+} from "@frostbite/test-kit/simulated-game-host";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { frostbiteRules } from "../src/verifier/frostbite.ts";

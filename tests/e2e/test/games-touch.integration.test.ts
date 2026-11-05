@@ -2,8 +2,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { buildGames } from "@ador/game-sdk/build";
-import { restartDelayMs } from "@ador/game-sdk/touch-start";
+import { buildGames } from "@frostbite/game-sdk/build";
+import { restartDelayMs } from "@frostbite/game-sdk/touch-start";
 import { chromium, devices, type Browser } from "@playwright/test";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

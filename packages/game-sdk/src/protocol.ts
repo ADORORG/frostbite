@@ -174,7 +174,7 @@ export const methods = {
         .strict(),
     ]),
   },
-  // Hands the platform the record of a run it issued (`@ador/game-sdk/run-record`). The platform replays it under the
+  // Hands the platform the record of a run it issued (`@frostbite/game-sdk/run-record`). The platform replays it under the
   // game's published rules: `verified` (and which milestones that earned), `rejected` (with why; the run is spent), or
   // `refused` (nothing was replayed). One record per run.
   "run.submit": {

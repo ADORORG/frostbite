@@ -1,11 +1,11 @@
-import { createDrizzleApprovedVersionReader } from "@ador/collections";
-import type { UploadsContext } from "@ador/feature-uploads/context";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import type { ChainOption } from "@ador/shared/chain";
+import { createDrizzleApprovedVersionReader } from "@frostbite/collections";
+import type { UploadsContext } from "@frostbite/feature-uploads/context";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   createAssetLibraryService,
   createDrizzleAssetLibraryRepository,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
 import { createPublicCatalog } from "./application/catalog.ts";
 

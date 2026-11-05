@@ -16,7 +16,7 @@ import {
   submit,
   submitted,
 } from "./support/submissions.ts";
-import { authUsers, creatorApplications } from "@ador/database";
+import { authUsers, creatorApplications } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 
 useCollectionDatabase();

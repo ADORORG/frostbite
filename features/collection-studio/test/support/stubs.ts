@@ -1,11 +1,11 @@
 import type {
   CollectionAggregate,
   CollectionItemRecord,
-} from "@ador/collections";
-import { chainRefSchema } from "@ador/shared/chain";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/collections";
+import { chainRefSchema } from "@frostbite/shared/chain";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import { vi } from "vitest";
 
 import type {

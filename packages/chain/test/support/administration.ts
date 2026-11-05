@@ -4,7 +4,7 @@ import type {
   SignedTransaction,
   TransactionIntent,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import {
   bundleFormat,

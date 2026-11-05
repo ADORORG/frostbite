@@ -1,4 +1,8 @@
-import type { ChainRef, Observation, TransactionRef } from "@ador/shared/chain";
+import type {
+  ChainRef,
+  Observation,
+  TransactionRef,
+} from "@frostbite/shared/chain";
 
 import type { ChainObserver } from "../ports.ts";
 import { formatAlkaneId } from "./node/alkane-id.ts";

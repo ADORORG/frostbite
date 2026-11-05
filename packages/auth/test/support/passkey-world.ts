@@ -10,8 +10,8 @@ import {
   passkeyCredentials,
   runMigrations,
   walletIdentities,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzlePasskeyRepository } from "../../src/passkeys/drizzle-repository.ts";

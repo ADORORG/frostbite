@@ -1,7 +1,7 @@
-import type { ActiveSession } from "@ador/auth";
-import type { AuthorizationDecision } from "@ador/authorization";
-import type { PageAccessRequirement } from "@ador/shared/features";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { ActiveSession } from "@frostbite/auth";
+import type { AuthorizationDecision } from "@frostbite/authorization";
+import type { PageAccessRequirement } from "@frostbite/shared/features";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 type ProtectedPageAccessRequirement = Exclude<
   PageAccessRequirement,

@@ -1,5 +1,5 @@
-import { GameHostError } from "@ador/game-sdk/client";
-import { methodNames } from "@ador/game-sdk/protocol";
+import { GameHostError } from "@frostbite/game-sdk/client";
+import { methodNames } from "@frostbite/game-sdk/protocol";
 import { describe, expect, it } from "vitest";
 
 import {

@@ -1,8 +1,8 @@
 import {
   createExpiringStore,
   type KeyValueStorage,
-} from "@ador/cache/expiring-store";
-import { ApiError, type Requester } from "@ador/client-http";
+} from "@frostbite/cache/expiring-store";
+import { ApiError, type Requester } from "@frostbite/client-http";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { balanceReadingSchema } from "../src/balance/contract.ts";
@@ -31,7 +31,7 @@ function browser() {
       cache: createExpiringStore({
         maxAgeMs: intervalMs,
         now: () => new Date(),
-        prefix: "ador:balance",
+        prefix: "frostbite:balance",
         schema: balanceReadingSchema,
         storage,
       }),
@@ -136,11 +136,11 @@ describe("the balance store with readings shared by the browser", () => {
     store.setTarget(mine);
     store.setOpen(true);
     await flush();
-    expect([...items.keys()]).toEqual(["ador:balance:signet:tb1qmine"]);
+    expect([...items.keys()]).toEqual(["frostbite:balance:signet:tb1qmine"]);
     store.setTarget(other);
     await flush();
     expect(store.snapshot().reading?.satoshis).toBe(8_000);
-    expect([...items.keys()]).toEqual(["ador:balance:signet:tb1qother"]);
+    expect([...items.keys()]).toEqual(["frostbite:balance:signet:tb1qother"]);
     store.setTarget(null);
     expect(items.size).toBe(0);
   });
@@ -162,7 +162,7 @@ describe("the balance store with readings shared by the browser", () => {
 
   it("ignores a stored reading that is not a balance", async () => {
     const { items, tab } = browser();
-    items.set("ador:balance:signet:tb1qmine", '{"readAt":0,"value":{}}');
+    items.set("frostbite:balance:signet:tb1qmine", '{"readAt":0,"value":{}}');
     const request = asks(answer(5_000));
     const store = tab(request);
     store.setTarget(mine);

@@ -8,7 +8,7 @@ import {
   createCapturingMailbox,
   readCapturedMail,
   type MailSender,
-} from "@ador/mail";
+} from "@frostbite/mail";
 import { afterEach } from "vitest";
 
 import { createEmailChannel } from "../../src/contacts/email-channel.ts";
@@ -44,7 +44,7 @@ afterEach(async () => {
 });
 
 export async function world(sender?: MailSender) {
-  const directory = await mkdtemp(join(tmpdir(), "ador-contact-"));
+  const directory = await mkdtemp(join(tmpdir(), "frostbite-contact-"));
   directories.push(directory);
   const mailbox = createCapturingMailbox({
     clock: () => clock.now,
@@ -52,7 +52,11 @@ export async function world(sender?: MailSender) {
     from: "login@example.org",
   });
   const channels = [
-    createEmailChannel({ appName: "Ador", policy, sender: sender ?? mailbox }),
+    createEmailChannel({
+      appName: "Frostbite",
+      policy,
+      sender: sender ?? mailbox,
+    }),
   ];
   const service = createContactCodeService({
     channels,

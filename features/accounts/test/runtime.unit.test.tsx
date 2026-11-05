@@ -41,15 +41,15 @@ const factories = vi.hoisted(() => ({
   })),
 }));
 
-vi.mock("@ador/authorization", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@ador/authorization")>()),
+vi.mock("@frostbite/authorization", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@frostbite/authorization")>()),
   createDrizzleRoleAdministration: factories.roleAdministrationRepository,
   createDrizzleRoleDirectory: factories.roleDirectoryRepository,
   createRoleAdministration: factories.roleAdministration,
   createRoleDirectory: factories.roleDirectory,
 }));
-vi.mock("@ador/mail", () => ({ createMailSender: factories.mailSender }));
-vi.mock("@ador/auth", () => ({
+vi.mock("@frostbite/mail", () => ({ createMailSender: factories.mailSender }));
+vi.mock("@frostbite/auth", () => ({
   createContactCodeService: factories.contactService,
   createContactLinkService: factories.linkService,
   createDrizzleContactLinkRepository: factories.linkRepository,
@@ -62,7 +62,7 @@ vi.mock("@ador/auth", () => ({
   simpleWebAuthnAuthenticationAdapter: "authentication-adapter",
   simpleWebAuthnRegistrationAdapter: "adapter",
 }));
-vi.mock("@ador/database/connection", () => ({
+vi.mock("@frostbite/database/connection", () => ({
   createDatabaseClient: factories.databaseClient,
   createDatabasePool: factories.databasePool,
   parseDatabaseEnvironment: factories.databaseEnvironment,

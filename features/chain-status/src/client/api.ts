@@ -2,7 +2,7 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
+} from "@frostbite/client-http";
 import {
   chainFeesRoute,
   chainFeesSchema,
@@ -10,7 +10,7 @@ import {
   chainIndexingSchema,
   type ChainFees,
   type ChainIndexing,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 export type { StatusPolling } from "../domain/freshness.ts";
 

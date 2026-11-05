@@ -1,4 +1,4 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import {
   collectionReviewActivityNavigationLabel,
   collectionReviewActivityPath,
@@ -6,7 +6,7 @@ import {
   collectionReviewDetailPath,
   collectionReviewNavigationLabel,
   collectionReviewQueuePath,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { authorizationPolicy } from "@repo/config/authorization";
 import { isValidElement } from "react";
 import { describe, expect, it } from "vitest";

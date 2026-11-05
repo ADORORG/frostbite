@@ -1,9 +1,9 @@
-import type { createCreatorAdmissionService } from "@ador/creator-admission";
+import type { createCreatorAdmissionService } from "@frostbite/creator-admission";
 import type {
   CreatorApplicationResponse,
   CreatorReviewDetail,
   CreatorReviewQueueItem,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 type Service = ReturnType<typeof createCreatorAdmissionService>;
 type ApplicationView = NonNullable<Awaited<ReturnType<Service["findMine"]>>>;

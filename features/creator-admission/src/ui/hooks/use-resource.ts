@@ -1,7 +1,7 @@
 import {
   useResource as useLoadedResource,
   type LoadedResource as Loaded,
-} from "@ador/client-react";
+} from "@frostbite/client-react";
 
 import { describeFailure, type Failure } from "../../client/error-copy.ts";
 

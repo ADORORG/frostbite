@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { providerIdSchema } from "@ador/shared/providers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 
 import { createUploadIntentService } from "../src/application/service.ts";
 import {

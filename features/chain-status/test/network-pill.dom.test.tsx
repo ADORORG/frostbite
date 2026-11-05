@@ -1,5 +1,5 @@
-import type { ChainIndexing } from "@ador/shared/chain";
-import { click, mount, textOf } from "@ador/test-kit/dom";
+import type { ChainIndexing } from "@frostbite/shared/chain";
+import { click, mount, textOf } from "@frostbite/test-kit/dom";
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
 

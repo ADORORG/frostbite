@@ -33,7 +33,7 @@ Package exports `./verifier` and `./verifier-sample` (the rules and the sample r
 
 ## Invariants
 
-- The rules use no clock, no `Math.random` and no I/O; a conformance test (`@ador/game-verification`) checks it.
+- The rules use no clock, no `Math.random` and no I/O; a conformance test (`@frostbite/game-verification`) checks it.
 - A change to the rules is a change to the digest in `configs/games/frostbite.ts`; a test in `apps/web` fails until they agree.
 - The cabinet uses classes only (the frame's policy forbids inline styles), writes only accepted inputs into the record, and
   never says a run is verified unless the platform replayed it.
@@ -54,4 +54,4 @@ The games platform owner.
 
 ## Sound and keys in the cabinets
 
-The two replayable cabinets (SAT SNAKE and the ice field) play music and effects through `@ador/game-sdk/audio`, with the shared sound panel at the foot of each cabinet. The player's choice is kept under `frostbite.sound.v1` in the game's own storage, which the platform saves. Enter starts a run from the cabinet (or starts another once one has ended) and never throws away a run that is going; in SAT SNAKE P and Space pause the snake. The original game keeps its own audio and keys (`src/legacy/audio.jsx`), which were not changed.
+The two replayable cabinets (SAT SNAKE and the ice field) play music and effects through `@frostbite/game-sdk/audio`, with the shared sound panel at the foot of each cabinet. The player's choice is kept under `frostbite.sound.v1` in the game's own storage, which the platform saves. Enter starts a run from the cabinet (or starts another once one has ended) and never throws away a run that is going; in SAT SNAKE P and Space pause the snake. The original game keeps its own audio and keys (`src/legacy/audio.jsx`), which were not changed.

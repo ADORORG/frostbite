@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // SAT SNAKE's sound, as data: a quick, tense loop in E minor, a tick for each turn, a bite for each cell the snake grows, and a crash.
 const bass = [

@@ -1,4 +1,4 @@
-# `@ador/auth`
+# `@frostbite/auth`
 
 Detachable, server-only Bitcoin wallet authentication, passkey linking, and session lifecycle logic.
 
@@ -34,7 +34,7 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
 - `createContactCodeService` (`src/contacts/`, with `createDrizzleContactCodeRepository`) signs a person in with a one-time code
   sent to a contact. It is the same for every channel: a `ContactChannel` says how a destination is written (`normalize`), how a
   code is delivered (`deliver`), and its policy (digits, lifetime, tries, resend cooldown, sends per window); `createEmailChannel`
-  is the email one (over the `MailSender` port of `@ador/mail`) and a text-message channel would be another. `request` normalizes
+  is the email one (over the `MailSender` port of `@frostbite/mail`) and a text-message channel would be another. `request` normalizes
   the destination, then issues under a per-destination lock (cooldown and window limits are decided where two requests together
   cannot both slip under them; a newer code replaces the older ones), sends it, and forgets the code if the send failed. `verify`
   counts a try before it compares (so tries cannot be dodged), checks the salted hash in constant time, then spends the code and
@@ -103,11 +103,11 @@ Docker is required for integration and coverage commands because they apply the 
 an isolated PostgreSQL 18 container.
 
 ```bash
-pnpm --filter @ador/auth typecheck
-pnpm --filter @ador/auth lint
-pnpm --filter @ador/auth test:unit
-pnpm --filter @ador/auth test:integration
-pnpm --filter @ador/auth test:coverage
+pnpm --filter @frostbite/auth typecheck
+pnpm --filter @frostbite/auth lint
+pnpm --filter @frostbite/auth test:unit
+pnpm --filter @frostbite/auth test:integration
+pnpm --filter @frostbite/auth test:coverage
 ```
 
 ## Ownership

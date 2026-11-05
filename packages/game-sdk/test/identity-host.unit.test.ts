@@ -64,7 +64,7 @@ describe("the host and the client", () => {
     host.emit("player.changed", { id: accountId, kind: "account" });
     expect(pushed).toEqual([
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { id: accountId, kind: "account" },
         event: "player.changed",
         version: 1,
@@ -107,7 +107,7 @@ describe("the host and the client", () => {
     for (const l of listeners)
       l({
         data: {
-          channel: "ador-game",
+          channel: "frostbite-game",
           id: sent.at(-1)?.id,
           ok: true,
           result: { id: accountId, kind: "account" },

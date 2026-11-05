@@ -5,10 +5,10 @@ import {
   walletChangedResponseSchema,
   walletSignedInResponseSchema,
   type AuthMethodsResponse,
-} from "@ador/auth";
-import { ApiError, type Parser, type Requester } from "@ador/client-http";
-import type { AccountOutcome } from "@ador/shared/account-outcomes";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/auth";
+import { ApiError, type Parser, type Requester } from "@frostbite/client-http";
+import type { AccountOutcome } from "@frostbite/shared/account-outcomes";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { outcomeOf } from "./outcome.ts";
 
 // What this module needs to know about the player's connected wallet: a narrow slice of the connection library's

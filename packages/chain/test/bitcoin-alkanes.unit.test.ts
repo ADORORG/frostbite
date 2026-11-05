@@ -1,4 +1,4 @@
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createBitcoinAlkanesAdapter } from "../src/bitcoin-alkanes/adapter.ts";

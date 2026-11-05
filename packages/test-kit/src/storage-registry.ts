@@ -1,12 +1,12 @@
 // Loads the `object-storage:s3-compatible` service typing into the provider registry.
-import type {} from "@ador/object-storage";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
+import type {} from "@frostbite/object-storage";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
 import {
   createProviderRegistry,
   defineProvider,
   type ProviderRegistry,
-} from "@ador/plugin-kit/providers";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/plugin-kit/providers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { vi } from "vitest";
 
 const unused = async (): Promise<never> => {

@@ -1,4 +1,4 @@
-import { chainOptionSchema } from "@ador/shared/chain";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import { afterEach } from "vitest";
 
 import { CollectionWizard } from "../../src/ui/collection-wizard.tsx";

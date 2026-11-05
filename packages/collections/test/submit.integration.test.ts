@@ -2,8 +2,8 @@ import {
   assets,
   collectionReviewEvents,
   collectionSubmissions,
-} from "@ador/database";
-import { requestFingerprint } from "@ador/shared/http";
+} from "@frostbite/database";
+import { requestFingerprint } from "@frostbite/shared/http";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

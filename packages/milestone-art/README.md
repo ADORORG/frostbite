@@ -1,4 +1,4 @@
-# `@ador/milestone-art`
+# `@frostbite/milestone-art`
 
 Cleans a builder's milestone drawing before it goes on chain. The drawing becomes part of a collectible that players hold and
 that pages show, so nothing the builder wrote is trusted: the drawing is read as a strict subset of SVG, every element,
@@ -31,7 +31,7 @@ links, scripts, styles, animation, `foreignObject`, comments, CDATA, doctypes, p
 
 ## Dependencies and tests
 
-No runtime dependencies. `pnpm --filter @ador/milestone-art test:unit | test:integration | test:coverage`. Platform engineering owns
+No runtime dependencies. `pnpm --filter @frostbite/milestone-art test:unit | test:integration | test:coverage`. Platform engineering owns
 this package; contract engineering owns the vector file.
 
 ## Ownership

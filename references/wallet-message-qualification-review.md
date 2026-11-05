@@ -63,19 +63,19 @@ release requires rate limits and challenge cleanup, not merely this internal tes
 
 Commands run from `the-well` (logs retained under `/tmp/wallet-qualification-*`):
 
-| Command                                        | Observed outcome                                                 |
-| ---------------------------------------------- | ---------------------------------------------------------------- |
-| `pnpm env:check`                               | Passed for 13 environment-consuming workspaces                   |
-| `pnpm typecheck`                               | Passed, including tests and Rust contract checks                 |
-| `pnpm lint`                                    | Passed, including Rust lint and repository policy                |
-| `pnpm format:check`                            | Passed                                                           |
-| `pnpm test:unit`                               | Passed for 27 workspaces                                         |
-| `pnpm test:integration`                        | Passed, including disposable PostgreSQL and Rust/WASM tests      |
-| `pnpm test:coverage`                           | Passed after scan-budget repair and Docker permission escalation |
-| `pnpm build`                                   | Passed                                                           |
-| `pnpm --filter @ador/database migration:check` | Passed; no schema drift                                          |
-| Full Playwright suite                          | 114 passed, six skipped; not physical extension evidence         |
-| `git diff --check`                             | Passed                                                           |
+| Command                                             | Observed outcome                                                 |
+| --------------------------------------------------- | ---------------------------------------------------------------- |
+| `pnpm env:check`                                    | Passed for 13 environment-consuming workspaces                   |
+| `pnpm typecheck`                                    | Passed, including tests and Rust contract checks                 |
+| `pnpm lint`                                         | Passed, including Rust lint and repository policy                |
+| `pnpm format:check`                                 | Passed                                                           |
+| `pnpm test:unit`                                    | Passed for 27 workspaces                                         |
+| `pnpm test:integration`                             | Passed, including disposable PostgreSQL and Rust/WASM tests      |
+| `pnpm test:coverage`                                | Passed after scan-budget repair and Docker permission escalation |
+| `pnpm build`                                        | Passed                                                           |
+| `pnpm --filter @frostbite/database migration:check` | Passed; no schema drift                                          |
+| Full Playwright suite                               | 114 passed, six skipped; not physical extension evidence         |
+| `git diff --check`                                  | Passed                                                           |
 
 Merged JavaScript/TypeScript coverage: 98.50% statements, 96.73% branches, 99.33% functions,
 99.15% lines. Rust coverage: 94.55% regions, 100% functions, 98.99% lines.

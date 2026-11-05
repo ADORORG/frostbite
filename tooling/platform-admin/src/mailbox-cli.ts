@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 
-import { readCapturedMail } from "@ador/mail";
+import { readCapturedMail } from "@frostbite/mail";
 
 import { formatMailbox, parseLimit } from "./mailbox.ts";
 

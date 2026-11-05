@@ -1,7 +1,7 @@
-import type { ApprovedVersionReader } from "@ador/collections";
-import type { ChainOption } from "@ador/shared/chain";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
-import type { LibraryAsset } from "@ador/shared/uploads";
+import type { ApprovedVersionReader } from "@frostbite/collections";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 import {
   presentCard,

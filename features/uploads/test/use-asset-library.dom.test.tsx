@@ -1,5 +1,5 @@
 import { act } from "react";
-import type { LibraryResponse } from "@ador/shared/uploads";
+import type { LibraryResponse } from "@frostbite/shared/uploads";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { resolveUploadClientPolicy } from "../src/client/client-policy.ts";

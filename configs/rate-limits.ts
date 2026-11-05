@@ -1,4 +1,4 @@
-import { rateLimitConfigSchema } from "@ador/shared/http";
+import { rateLimitConfigSchema } from "@frostbite/shared/http";
 
 const perMinute = (limit: number) => ({ limit, windowMs: 60_000 });
 

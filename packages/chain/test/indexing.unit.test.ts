@@ -2,7 +2,7 @@ import {
   chainRefSchema,
   type ChainRef,
   type IndexingStatus,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 import { describe, expect, it, vi } from "vitest";
 
 import {

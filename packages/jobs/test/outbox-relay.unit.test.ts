@@ -1,4 +1,4 @@
-import type { DomainEventEnvelope } from "@ador/events";
+import type { DomainEventEnvelope } from "@frostbite/events";
 import { describe, expect, it, vi } from "vitest";
 
 import {

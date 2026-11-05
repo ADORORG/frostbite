@@ -21,7 +21,7 @@ Branch `feat/replay-verification`, on top of `feat/wallet-widget`; baseline `d15
 
 - **The record** is a strict JSON document with logical-order inputs (no time), a 32-bit seed, game settings, a verifier id
   and version, and claims; canonical form (sorted keys, no whitespace), at most 5,000 inputs and 64 KB; SHA-256 digest of
-  the canonical text. It lives in `@ador/game-sdk/run-record`, with a recorder a game builds it with.
+  the canonical text. It lives in `@frostbite/game-sdk/run-record`, with a recorder a game builds it with.
 - **The verifier is platform code**, a pure state machine (`GameVerifier`, defined in the SDK so a game needs nothing from
   the platform to write one), registered one explicit line per game in `configs/verifiers.ts` together with a sample run.
   The game's browser bundle is never executed on the server.
@@ -37,9 +37,9 @@ Branch `feat/replay-verification`, on top of `feat/wallet-widget`; baseline `d15
 
 ## What was built
 
-- `@ador/game-sdk/run-record`: schema, limits, `canonicalJson`, `createRunRecorder`, the `GameVerifier` and `Stepped`
+- `@frostbite/game-sdk/run-record`: schema, limits, `canonicalJson`, `createRunRecorder`, the `GameVerifier` and `Stepped`
   types.
-- `@ador/game-verification` (new workspace): `defineVerifier`, `createVerifierRegistry`, `verifyRun`,
+- `@frostbite/game-verification` (new workspace): `defineVerifier`, `createVerifierRegistry`, `verifyRun`,
   `resolveVerificationPolicy`, `runVerifierConformance`.
 - `games/frostbite/src/verifier`: `seeded.ts` (32-bit LCG, `pickDistinct`), `ice-field.ts` (the rules and the game's own
   economy constants), `sample-run.ts` (a legal run built with the recorder); exported as `@game/frostbite/verifier` and
@@ -57,7 +57,7 @@ Branch `feat/replay-verification`, on top of `feat/wallet-widget`; baseline `d15
   apart from this record.
 - `pnpm format:check`, `pnpm lint` (45 workspaces, 1,394 files, repository policy included; it caught a 326-line test file,
   split) and `pnpm typecheck`: passed.
-- Coverage (statements / branches / functions / lines): `@ador/game-sdk` 98.4/98.1/98.4/98.5; `@ador/game-verification`
+- Coverage (statements / branches / functions / lines): `@frostbite/game-sdk` 98.4/98.1/98.4/98.5; `@frostbite/game-verification`
   100/96.1/100/100; `@game/frostbite` 100/96.7/100/100 (the verifier directory is in its coverage set); web unit tests 71
   passed, including `verifiers.unit.test.ts` (conformance for every registered verifier, manifest agreement, the sample
   verified, `first-cashout` refused, a glacier the icicles do not pay for refused, the seed binding, digest stability).

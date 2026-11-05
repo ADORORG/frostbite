@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { chainFamilyIdSchema, chainRefSchema } from "@ador/shared/chain";
+import { chainFamilyIdSchema, chainRefSchema } from "@frostbite/shared/chain";
 
 import { inspectContract } from "../../src/bitcoin-alkanes/inspect.ts";
 import { fakeNode } from "../support/nodes.ts";

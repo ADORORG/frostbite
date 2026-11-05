@@ -1,10 +1,10 @@
-import type { FetchLike } from "@ador/client-http";
-import type { FeeSpeed } from "@ador/shared/chain";
+import type { FetchLike } from "@frostbite/client-http";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import {
   gameClaimSchema,
   type GameClaim,
   type GameClaimUnavailableReason,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { createClaimsApi } from "../src/client/claims-api.ts";

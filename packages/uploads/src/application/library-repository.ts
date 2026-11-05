@@ -1,12 +1,12 @@
-import type { ObjectKey } from "@ador/object-storage/contracts";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { ObjectKey } from "@frostbite/object-storage/contracts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import type {
   AssetProcessingState,
   AssetRejectionReason,
   DerivativeKind,
   UploadContentType,
   UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 export interface LibraryDerivativeRecord {
   readonly contentType: UploadContentType;

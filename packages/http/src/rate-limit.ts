@@ -5,7 +5,7 @@ import {
   type RateLimitConfig,
   type RateLimitDecision,
   type RateLimiter,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 
 // A limiter that keeps its counts in this process. Right for tests and a single instance; counts are lost on
 // restart and are not shared between instances, which is why production uses the database one.

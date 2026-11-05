@@ -1,9 +1,9 @@
-import { installFakeAudio } from "@ador/game-sdk/audio/fake";
-import { defaultSound } from "@ador/game-sdk/audio/settings";
-import { pauseCopy } from "@ador/game-sdk/pause";
+import { installFakeAudio } from "@frostbite/game-sdk/audio/fake";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
+import { pauseCopy } from "@frostbite/game-sdk/pause";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { recordingRuns } from "@ador/test-kit/simulated-game-host";
+import { recordingRuns } from "@frostbite/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);

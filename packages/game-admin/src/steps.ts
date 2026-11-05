@@ -1,11 +1,14 @@
-import { createDelayJudge, type IndexingPorts } from "@ador/chain/indexing";
-import type { TransactionPart } from "@ador/chain/ports";
+import {
+  createDelayJudge,
+  type IndexingPorts,
+} from "@frostbite/chain/indexing";
+import type { TransactionPart } from "@frostbite/chain/ports";
 import {
   signedOf,
   type ChainRef,
   type DelayPolicy,
   type SignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { isUnreadableCreation } from "./completion.ts";
 import type { GameAdminDependencies, StoredStep, StepView } from "./types.ts";

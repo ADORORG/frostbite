@@ -1,18 +1,18 @@
-import { createAccountsFeature } from "@ador/feature-accounts";
-import { createChainStatusFeature } from "@ador/feature-chain-status";
-import { createPublicCollectionsFeature } from "@ador/feature-public-collections";
-import { createCollectionReviewFeature } from "@ador/feature-collection-review";
-import { createCollectionStudioFeature } from "@ador/feature-collection-studio";
-import { creatorAdmissionFeature } from "@ador/feature-creator-admission";
-import { platformShellFeature } from "@ador/feature-platform-shell";
-import { createGameAdminFeature } from "@ador/feature-game-admin";
-import { createGamesFeature } from "@ador/feature-games";
+import { createAccountsFeature } from "@frostbite/feature-accounts";
+import { createChainStatusFeature } from "@frostbite/feature-chain-status";
+import { createPublicCollectionsFeature } from "@frostbite/feature-public-collections";
+import { createCollectionReviewFeature } from "@frostbite/feature-collection-review";
+import { createCollectionStudioFeature } from "@frostbite/feature-collection-studio";
+import { creatorAdmissionFeature } from "@frostbite/feature-creator-admission";
+import { platformShellFeature } from "@frostbite/feature-platform-shell";
+import { createGameAdminFeature } from "@frostbite/feature-game-admin";
+import { createGamesFeature } from "@frostbite/feature-games";
 import {
   creatorsFeature,
   launchesFeature,
-} from "@ador/feature-public-products";
-import { createFeatureRegistry } from "@ador/plugin-kit";
-import { createUploadsFeature } from "@ador/feature-uploads";
+} from "@frostbite/feature-public-products";
+import { createFeatureRegistry } from "@frostbite/plugin-kit";
+import { createUploadsFeature } from "@frostbite/feature-uploads";
 import { authMethods } from "./auth-methods.ts";
 import { authorizationPolicy } from "./authorization.ts";
 import { balanceSource } from "./balance.ts";

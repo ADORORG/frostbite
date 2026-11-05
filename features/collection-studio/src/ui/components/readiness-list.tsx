@@ -2,7 +2,7 @@ import {
   submissionRequirementCopy,
   submissionRequirements,
   type SubmissionRequirement,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { ArcadeBadge } from "@repo/ui/arcade";
 
 // The three things a collection needs before it can be submitted, each marked ready or still needed,

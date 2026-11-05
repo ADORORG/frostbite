@@ -1,7 +1,10 @@
-import { assetRejectionReasons, uploadOutcomes } from "@ador/shared/uploads";
+import {
+  assetRejectionReasons,
+  uploadOutcomes,
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
-import type { ApiErrorCode } from "@ador/client-http";
+import type { ApiErrorCode } from "@frostbite/client-http";
 import {
   availableUploadActions,
   describeUploadState,

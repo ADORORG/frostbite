@@ -1,6 +1,6 @@
-import { createOpenApiDocument } from "@ador/http/openapi";
-import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
-import { platformApiInfo } from "@ador/shared/platform";
+import { createOpenApiDocument } from "@frostbite/http/openapi";
+import type { RegisteredHttpOperation } from "@frostbite/http/registered-operation";
+import { platformApiInfo } from "@frostbite/shared/platform";
 
 import { platformComposition } from "./platform";
 

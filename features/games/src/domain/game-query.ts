@@ -1,4 +1,4 @@
-import { gameTags, gameTagSchema, type GameTag } from "@ador/shared/games";
+import { gameTags, gameTagSchema, type GameTag } from "@frostbite/shared/games";
 
 // What a person asked the games page for: words to look for, kinds of game, and whether only playable ones. It lives in the address
 // (`?q=snow&tag=puzzle&playable=1`) so a result can be shared and survives a reload. This module is the

@@ -1,9 +1,9 @@
 import Fastify from "fastify";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { executeHttpOperation } from "@ador/http";
-import { correlationHeaderName } from "@ador/shared/http";
-import { platformStatusSchema } from "@ador/shared/platform";
+import { executeHttpOperation } from "@frostbite/http";
+import { correlationHeaderName } from "@frostbite/shared/http";
+import { platformStatusSchema } from "@frostbite/shared/platform";
 
 import { createPlatformStatusOperation } from "../src/application/platform-status.js";
 

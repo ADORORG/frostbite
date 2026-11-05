@@ -50,7 +50,7 @@ describe("the local backend's snapshot", () => {
 
   it("treats a save made before saves were dated as the oldest possible, not as none", () => {
     const s = storage();
-    s.map.set("ador:game:g:progress", JSON.stringify({ taps: 1 }));
+    s.map.set("frostbite:game:g:progress", JSON.stringify({ taps: 1 }));
     expect(
       createLocalBackend({ gameId: "g", storage: s.store }).snapshot().progress,
     ).toEqual({ savedAt: "1970-01-01T00:00:00.000Z", state: { taps: 1 } });
@@ -70,11 +70,11 @@ describe("the local backend's snapshot", () => {
 
   it("treats a corrupt save as none, and a corrupt date as undated", () => {
     const s = storage();
-    s.map.set("ador:game:g:progress", "{not json");
+    s.map.set("frostbite:game:g:progress", "{not json");
     const backend = createLocalBackend({ gameId: "g", storage: s.store });
     expect(backend.snapshot().progress).toBeNull();
-    s.map.set("ador:game:g:progress", "5");
-    s.map.set("ador:game:g:progress-at", '"yesterday"');
+    s.map.set("frostbite:game:g:progress", "5");
+    s.map.set("frostbite:game:g:progress-at", '"yesterday"');
     expect(backend.snapshot().progress?.savedAt).toBe(
       "1970-01-01T00:00:00.000Z",
     );

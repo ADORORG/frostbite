@@ -1,5 +1,5 @@
 {
-  "name": "@ador/http",
+  "name": "@frostbite/http",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/shared": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {

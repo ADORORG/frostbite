@@ -1,4 +1,4 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   addCollectionItemInputSchema,
   collectionItemChangeSchema,
@@ -11,8 +11,8 @@ import {
   type CollectionItemRemoved,
   type RemoveCollectionItemInput,
   type UpdateCollectionItemInput,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import type { CollectionService } from "./dependencies.ts";
 import {

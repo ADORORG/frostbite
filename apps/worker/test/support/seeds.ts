@@ -1,10 +1,13 @@
 import { randomUUID } from "node:crypto";
 
-import { authUsers, uploadIntents } from "@ador/database";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { correlationIdSchema, idempotencyKeySchema } from "@ador/shared/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { createDrizzleUploadIntentRepository } from "@ador/uploads";
+import { authUsers, uploadIntents } from "@frostbite/database";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import {
+  correlationIdSchema,
+  idempotencyKeySchema,
+} from "@frostbite/shared/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { createDrizzleUploadIntentRepository } from "@frostbite/uploads";
 
 import { database, now } from "./database.ts";
 import { memoryStorage, storageProviderId } from "./fakes.ts";

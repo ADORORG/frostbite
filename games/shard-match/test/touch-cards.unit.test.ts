@@ -1,4 +1,4 @@
-import { stubPointer } from "@ador/test-kit/touch-screen";
+import { stubPointer } from "@frostbite/test-kit/touch-screen";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { startRun } from "../src/rules/state.ts";

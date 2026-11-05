@@ -1,4 +1,4 @@
-import { defineProvider } from "@ador/plugin-kit/providers";
+import { defineProvider } from "@frostbite/plugin-kit/providers";
 
 export const laserEyesProvider = defineProvider({
   manifest: {

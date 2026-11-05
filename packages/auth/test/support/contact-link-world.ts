@@ -1,6 +1,6 @@
 // The link repository over a real database, and the helpers the link and unlink tests share.
-import { contactIdentities } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { contactIdentities } from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { expect } from "vitest";
 
 import { createDrizzleContactLinkRepository } from "../../src/contacts/drizzle-link-repository.ts";

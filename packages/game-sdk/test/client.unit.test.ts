@@ -24,7 +24,7 @@ describe("the client", () => {
     return { deliver, host, listenOn, listeners, sent };
   }
   const answer = (id: string, result: unknown) => ({
-    channel: "ador-game",
+    channel: "frostbite-game",
     id,
     ok: true,
     result,
@@ -41,7 +41,7 @@ describe("the client", () => {
     const pending = client.player.info();
     expect(p.sent).toEqual([
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         id: "r1",
         method: "player.info",
         params: {},
@@ -80,7 +80,7 @@ describe("the client", () => {
     const client = createGameClient({ host: p.host, listenOn: p.listenOn });
     const pending = client.milestones.unlock("nope");
     p.deliver({
-      channel: "ador-game",
+      channel: "frostbite-game",
       error: { code: "unknown_milestone", message: "No such milestone." },
       id: "r1",
       ok: false,

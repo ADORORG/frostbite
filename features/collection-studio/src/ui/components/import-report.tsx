@@ -1,4 +1,4 @@
-import type { CollectionImportRowReport } from "@ador/shared/collections";
+import type { CollectionImportRowReport } from "@frostbite/shared/collections";
 import { StatusLamp } from "@repo/ui/arcade";
 
 import { describeImportProblem } from "../../client/import-copy.ts";

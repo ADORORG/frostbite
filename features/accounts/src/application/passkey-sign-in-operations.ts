@@ -7,10 +7,10 @@ import {
   type PasskeySignInBeginResponse,
   type PasskeySignInFinishInput,
   type PasskeySignInService,
-} from "@ador/auth";
-import type { HttpOperation } from "@ador/http";
+} from "@frostbite/auth";
+import type { HttpOperation } from "@frostbite/http";
 import { outcomeFailure } from "./outcomes.ts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 // One answer for every way a passkey sign-in can fail (unknown or spent challenge, unknown credential, bad signature, a counter that
 // went backwards), so the response teaches a caller nothing about which accounts or credentials exist.

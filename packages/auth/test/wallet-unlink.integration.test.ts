@@ -3,8 +3,8 @@ import {
   authSessions,
   authUsers,
   releasedWallets,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";

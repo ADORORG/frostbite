@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import { frequency, type Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import { frequency, type Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Tower Stacker's sound, as data: a steady, hopeful loop in D minor that the page speeds up as the tower climbs, a thud for a block that
 // lands, a chime that climbs with the streak of perfect drops, and a tumble for the block that misses. Nothing here is a file: the SDK

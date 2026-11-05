@@ -1,8 +1,8 @@
 import type {
   BitcoinNetwork,
   ValidatedBitcoinAddress,
-} from "@ador/chain/bitcoin";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/chain/bitcoin";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type { WalletAuthAction } from "../domain/contracts.ts";
 

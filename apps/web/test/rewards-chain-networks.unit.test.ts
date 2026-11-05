@@ -1,4 +1,4 @@
-import { chainRefSchema, walletNetworks } from "@ador/shared/chain";
+import { chainRefSchema, walletNetworks } from "@frostbite/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it, vi } from "vitest";
 

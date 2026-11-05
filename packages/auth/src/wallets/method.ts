@@ -1,5 +1,5 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { walletIdentities } from "@ador/database/schema/auth";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { walletIdentities } from "@frostbite/database/schema/auth";
 import { eq } from "drizzle-orm";
 
 import { shortenAddress } from "./short-address.ts";

@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import {
   decisionCatalogSchema,
   type DecisionCatalog,
-} from "@ador/shared/decisions";
+} from "@frostbite/shared/decisions";
 
 export function renderDecisionGateReference(input: DecisionCatalog): string {
   const catalog = decisionCatalogSchema.parse(input);

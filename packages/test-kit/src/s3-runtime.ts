@@ -21,7 +21,7 @@ import {
 export const s3ImageReference =
   "chrislusf/seaweedfs:4.50@sha256:c2658820e763294a9e9de7b36c81e59b879e3459148351aee4e31a126ca64860";
 
-export const accessKeyId = "ador-local-access";
+export const accessKeyId = "frostbite-local-access";
 const readyAttempts = 60;
 const readyPollMs = 500;
 export const s3ContainerPort = 8333;
@@ -77,7 +77,7 @@ export async function waitUntilReady(endpoint: string): Promise<void> {
 }
 
 // The bucket made, written to and removed again to wake the store (see `prepareStore`).
-const warmUpBucket = "ador-warm-up";
+const warmUpBucket = "frostbite-warm-up";
 
 // Gets a store ready to use: makes the buckets that are not there yet (a store that kept its data from an earlier run already has them),
 // once it can take a write. SeaweedFS makes space for its first write only about 14 seconds after it starts (its master waits before it
@@ -118,7 +118,7 @@ export async function startS3Runtime(input: {
   readonly image?: string;
   readonly terminate?: (signal: NodeJS.Signals) => void;
 }): Promise<S3Runtime> {
-  const containerName = `ador-s3-${randomUUID()}`;
+  const containerName = `frostbite-s3-${randomUUID()}`;
   const secretAccessKey = randomUUID();
   const hostPort = input.hostPort ?? (await freePort());
   const endpoint = `http://127.0.0.1:${hostPort}`;

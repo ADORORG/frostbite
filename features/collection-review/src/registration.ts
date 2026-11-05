@@ -1,6 +1,6 @@
-import { defineFeature } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
+import { defineFeature } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
 import {
   collectionReviewActivityNavigationLabel,
   collectionReviewActivityPath,
@@ -9,7 +9,7 @@ import {
   collectionReviewNavigationLabel,
   collectionReviewQueuePath,
   reviewRoutes,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 const access = {
   capability: collectionReviewCapability,
@@ -66,7 +66,7 @@ export function createCollectionReviewFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-collection-review/entrypoint").then(
+      import("@frostbite/feature-collection-review/entrypoint").then(
         ({ createCollectionReviewEntrypoint }) =>
           createCollectionReviewEntrypoint(authorizationPolicy, providers),
       ),

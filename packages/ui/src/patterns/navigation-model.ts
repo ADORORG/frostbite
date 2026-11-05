@@ -1,5 +1,5 @@
 // How the shell groups the flat list of navigation links. The areas mirror the manifest's navigation
-// areas (`@ador/shared/features`); a link whose area is missing here fails to type-check where a page hands
+// areas (`@frostbite/shared/features`); a link whose area is missing here fails to type-check where a page hands
 // its navigation to the shell, so the two cannot drift.
 export type ShellArea = "account" | "admin" | "footer" | "main" | "studio";
 

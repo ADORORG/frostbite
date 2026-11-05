@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -178,7 +178,7 @@ export const snowballDashGame = defineGame({
     replay: {
       id: "snowball-dash",
       sha256:
-        "c0e3c5ed90418a446117d8f40cf18ee8b989138552113506bc2d01cace738992",
+        "0e1b4f8509ca89c037522d74b1947a4019d4ee2a91b403a6ab3618f128a6acaf",
       version: 2,
     },
   },

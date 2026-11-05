@@ -2,9 +2,9 @@ import {
   PermanentWorkflowError,
   runAssetPipeline,
   type AssetPipelineResult,
-} from "@ador/jobs/asset-pipeline";
-import type { AssetPipelineActivities } from "@ador/jobs/activities";
-import type { WorkflowPolicy } from "@ador/jobs/policy";
+} from "@frostbite/jobs/asset-pipeline";
+import type { AssetPipelineActivities } from "@frostbite/jobs/activities";
+import type { WorkflowPolicy } from "@frostbite/jobs/policy";
 import { NonRetriableError, type Inngest } from "inngest";
 
 import { assetProcessingRequested } from "./events.ts";

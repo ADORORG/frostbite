@@ -1,7 +1,7 @@
-import { createGameClient } from "@ador/game-sdk/client";
-import { jsonValueSchema } from "@ador/game-sdk/protocol";
-import { canonicalJson, type RunRecord } from "@ador/game-sdk/run-record";
-import { createPlatformStorage } from "@ador/game-sdk/storage-shim";
+import { createGameClient } from "@frostbite/game-sdk/client";
+import { jsonValueSchema } from "@frostbite/game-sdk/protocol";
+import { canonicalJson, type RunRecord } from "@frostbite/game-sdk/run-record";
+import { createPlatformStorage } from "@frostbite/game-sdk/storage-shim";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 

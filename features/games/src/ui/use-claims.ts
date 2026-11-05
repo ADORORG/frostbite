@@ -1,12 +1,12 @@
-import { ApiError } from "@ador/client-http";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { FeeSpeed } from "@ador/shared/chain";
+import { ApiError } from "@frostbite/client-http";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import type {
   GameClaim,
   GameClaimState,
   GameClaimUnavailableReason,
-} from "@ador/shared/games";
-import { walletRefusedCopy } from "@ador/wallet/client";
+} from "@frostbite/shared/games";
+import { walletRefusedCopy } from "@frostbite/wallet/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";

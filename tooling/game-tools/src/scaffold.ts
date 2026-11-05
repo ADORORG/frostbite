@@ -8,7 +8,7 @@ import {
 } from "node:fs/promises";
 import { join } from "node:path";
 
-import { gameIdSchema, gameManifestLimits } from "@ador/shared/games";
+import { gameIdSchema, gameManifestLimits } from "@frostbite/shared/games";
 
 // Where the pieces of a game live, so the same code works on the repository and on a copy of it in a test.
 export interface ScaffoldPaths {

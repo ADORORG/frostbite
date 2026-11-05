@@ -1,4 +1,4 @@
-import { createReadCache } from "@ador/cache";
+import { createReadCache } from "@frostbite/cache";
 import {
   isDelayed,
   isWaiting,
@@ -8,7 +8,7 @@ import {
   type FeeRate,
   type IndexingStatus,
   type TrackedState,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { ChainObserver } from "./ports.ts";
 

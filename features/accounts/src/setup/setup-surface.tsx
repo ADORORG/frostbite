@@ -4,8 +4,8 @@ import {
   createRequester,
   sameOriginFetch,
   type Requester,
-} from "@ador/client-http";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/client-http";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SignInSurface } from "../sign-in/sign-in-surface.tsx";

@@ -1,4 +1,4 @@
-import type { GameAdminStep } from "@ador/shared/games";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import { ArcadeActionButton, ArcadeBadge, Tile } from "@repo/ui/arcade";
 
 import { stateTone, stepCopy } from "../domain/copy.ts";

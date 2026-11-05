@@ -1,7 +1,7 @@
-import type { GameClaimsService } from "@ador/game-claims";
-import type { HttpOperation } from "@ador/http";
-import type { HttpCachePolicy } from "@ador/http/cache";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import type { GameClaimsService } from "@frostbite/game-claims";
+import type { HttpOperation } from "@frostbite/http";
+import type { HttpCachePolicy } from "@frostbite/http/cache";
+import { failure, unauthenticated } from "@frostbite/http/outcome";
 import {
   getMintedPictureInputSchema,
   getMintedPictureFileSchema,
@@ -14,7 +14,7 @@ import {
   type GetMintedPictureFile,
   type ListMintedMilestonesInput,
   type ListMintedMilestonesResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What the signed-in player has minted across games, newest first. The owner is the session, never a field of the request.
 export function createListMintedMilestonesOperation(

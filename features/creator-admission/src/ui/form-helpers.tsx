@@ -1,7 +1,7 @@
 import {
   creatorApplicationResponseSchema,
   type CreatorApplicationResponse,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 // Sends one of the creator admission routes (method and path come from the shared contract).
 export async function sendCreatorAdmissionRequest(

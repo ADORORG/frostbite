@@ -1,6 +1,6 @@
 import { feeSpeedQuestion } from "../src/domain/fee-copy.ts";
-import type { FeeSpeed } from "@ador/shared/chain";
-import { click, mount, settle, textOf } from "@ador/test-kit/dom";
+import type { FeeSpeed } from "@frostbite/shared/chain";
+import { click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import type { ChainStatusApi } from "../src/client/api.ts";

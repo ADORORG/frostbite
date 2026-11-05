@@ -1,5 +1,5 @@
-import type { RequestCodeResult } from "@ador/auth";
-import type { HttpFailure } from "@ador/http/outcome";
+import type { RequestCodeResult } from "@frostbite/auth";
+import type { HttpFailure } from "@frostbite/http/outcome";
 
 import { outcomeFailure } from "./outcomes.ts";
 

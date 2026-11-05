@@ -1,5 +1,5 @@
-import type { FetchLike } from "@ador/client-http";
-import { ApiError } from "@ador/client-http";
+import type { FetchLike } from "@frostbite/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it } from "vitest";
 
 import { createChainStatusApi, indexingTimeoutMs } from "../src/client/api.ts";

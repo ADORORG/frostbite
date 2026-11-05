@@ -50,11 +50,11 @@ creator, and that the transition is legal.
 
 ## Structure
 
-`src/application` (operations, presenters), `src/client` (typed API client on `@ador/client-http`, form
-parsing, failure copy, queue groups), `src/ui` (hooks bound to `@ador/client-react`, components, and the
+`src/application` (operations, presenters), `src/client` (typed API client on `@frostbite/client-http`, form
+parsing, failure copy, queue groups), `src/ui` (hooks bound to `@frostbite/client-react`, components, and the
 two page surfaces), `src/runtime.ts` (lazy service and preview resolvers over the uploads context).
 
-Rules and persistence live in `@ador/collections`; contracts in `@ador/shared/collections`. Error mapping:
+Rules and persistence live in `@frostbite/collections`; contracts in `@frostbite/shared/collections`. Error mapping:
 an unknown submission is 404, a reviewer without the role (or the creator themselves) is 403, an illegal
 move, a creator who is no longer approved, or an idempotency conflict is 409.
 

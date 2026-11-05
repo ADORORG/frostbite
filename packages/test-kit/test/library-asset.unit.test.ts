@@ -1,4 +1,4 @@
-import { libraryAssetSchema } from "@ador/shared/uploads";
+import { libraryAssetSchema } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { libraryAssetFixture } from "../src/library-asset.ts";

@@ -1,5 +1,5 @@
-import { GameHostError, type GameClient } from "@ador/game-sdk/client";
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import { GameHostError, type GameClient } from "@frostbite/game-sdk/client";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 
 // One thing the platform offers a game, as a button: what it is called, and how to call it. The explorer
 // exists to show a builder what each call returns, so every method the SDK has is here.
@@ -63,7 +63,7 @@ export const probes: readonly Probe[] = [
     id: "run-submit",
     label: "run.submit",
     // Submits a record for a run that was never issued, to show the shape of a refusal. A game submits the record of
-    // the run `run.start` gave it, built with `@ador/game-sdk/run-record`.
+    // the run `run.start` gave it, built with `@frostbite/game-sdk/run-record`.
     run: (client) => client.run.submit(neverIssuedRun, {}),
   },
   {

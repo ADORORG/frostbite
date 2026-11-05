@@ -1,5 +1,5 @@
-import { assetDerivatives, assets } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { assetDerivatives, assets } from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

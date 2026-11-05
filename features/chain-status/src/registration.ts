@@ -1,5 +1,5 @@
-import { defineFeature } from "@ador/plugin-kit";
-import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
+import { defineFeature } from "@frostbite/plugin-kit";
+import { chainFeesRoute, chainIndexingRoute } from "@frostbite/shared/chain";
 
 import type { ChainStatusConfig } from "./config.ts";
 
@@ -21,7 +21,7 @@ export function createChainStatusFeature(config: ChainStatusConfig) {
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-chain-status/entrypoint").then(
+      import("@frostbite/feature-chain-status/entrypoint").then(
         ({ createChainStatusEntrypoint }) =>
           createChainStatusEntrypoint(config),
       ),

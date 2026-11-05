@@ -6,20 +6,20 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
+} from "@frostbite/database";
 import {
   chainRefSchema,
   type Address,
   type CollectiblePreview,
   type TransactionIntent,
-} from "@ador/shared/chain";
-import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
-import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
+} from "@frostbite/shared/chain";
+import { simulatedAddress } from "@frostbite/test-kit/simulated-chain-address";
+import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
 import {
   nativeAsset,
   signSimulated,
   simulatedFamily,
-} from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/test-kit/simulated-chain-transaction";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleGameClaimRepository } from "../../src/drizzle-repository.ts";

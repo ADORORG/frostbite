@@ -1,4 +1,4 @@
-import type { ChainRef } from "@ador/shared/chain";
+import type { ChainRef } from "@frostbite/shared/chain";
 import { and, eq } from "drizzle-orm";
 
 import type { DatabaseClient } from "../connection/client.ts";

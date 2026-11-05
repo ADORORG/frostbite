@@ -1,8 +1,8 @@
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-import { stillTime, type Scene } from "@ador/scenes/engine";
-import { createRaster, framePlan, videoFiles } from "@ador/scenes/video";
+import { stillTime, type Scene } from "@frostbite/scenes/engine";
+import { createRaster, framePlan, videoFiles } from "@frostbite/scenes/video";
 
 import { runEncoder } from "./encode.ts";
 import { commandFor, encoders } from "./encoders.ts";

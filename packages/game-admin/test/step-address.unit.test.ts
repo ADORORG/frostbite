@@ -1,4 +1,4 @@
-import { trackedStates, type TrackedState } from "@ador/shared/chain";
+import { trackedStates, type TrackedState } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { stepsHoldAddress, type StepAddress } from "../src/plan.ts";

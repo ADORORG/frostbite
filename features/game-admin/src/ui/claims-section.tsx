@@ -1,4 +1,4 @@
-import type { GameAdminStep } from "@ador/shared/games";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import { ArcadeActionButton, SectionBlock } from "@repo/ui/arcade";
 
 import { shortTime } from "../domain/facts.ts";

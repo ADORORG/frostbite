@@ -19,7 +19,7 @@ import type {
   TransactionRef,
   UnsignedTransaction,
   VerificationResult,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 // The neutral chain ports (ADR-017 section 3). Each exists because the platform performs the
 // operation; there is no generic "call any method" escape hatch. Family concepts (Alkane ids,

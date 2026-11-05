@@ -2,7 +2,7 @@ import {
   cspReportMaxBytes,
   parseCspReport,
   type CspReport,
-} from "@ador/shared/csp-report";
+} from "@frostbite/shared/csp-report";
 
 // Reads a violation report from a request, or null when it is too large, empty, or not a report.
 export async function readCspReport(

@@ -1,7 +1,10 @@
 "use client";
 
-import { outcomeMessage } from "@ador/shared/account-outcomes";
-import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import {
+  useWalletChooser,
+  useWalletConnection,
+} from "@frostbite/wallet/client";
 import { ArcadeActionButton } from "@repo/ui/arcade";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";

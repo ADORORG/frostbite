@@ -1,4 +1,7 @@
-import { collectionReviewEvents, collectionSubmissions } from "@ador/database";
+import {
+  collectionReviewEvents,
+  collectionSubmissions,
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { failed } from "../src/client/outcome.ts";
 import { renderToStaticMarkup } from "react-dom/server";
 import { act } from "react";
@@ -14,7 +14,7 @@ import {
   vi,
 } from "vitest";
 
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 import { emailView } from "./support/email-view.ts";
 
@@ -26,7 +26,7 @@ const flow = vi.hoisted(() => ({
 }));
 vi.mock("../src/ui/email-link-flow.ts", () => flow);
 // The account page also holds the wallets card, which reads the wallet connection; there is none to read in a page rendered to text.
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useWalletChooser: () => ({ request: () => undefined }),
   useWalletConnection: () => ({
     address: "",

@@ -67,12 +67,12 @@ describe("the browser's own record", () => {
   it("reads a record written before milestones were counted as earned once, and a damaged total as none", async () => {
     const legacy = new Map([
       [
-        "ador:game:g:milestones",
+        "frostbite:game:g:milestones",
         JSON.stringify({
           old: { unlockedAt: at.toISOString(), verification: "self-reported" },
         }),
       ],
-      ["ador:game:g:counters", "not json"],
+      ["frostbite:game:g:counters", "not json"],
     ]);
     const backend = createLocalBackend({ gameId: "g", storage: store(legacy) });
     expect((await backend.milestones()).old?.count).toBe(1);
@@ -122,7 +122,7 @@ describe("the client", () => {
       listeners.forEach((l) =>
         l({
           data: {
-            channel: "ador-game",
+            channel: "frostbite-game",
             id: sent.at(-1)?.id,
             ok: true,
             result,

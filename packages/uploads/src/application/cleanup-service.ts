@@ -1,6 +1,6 @@
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { UploadPolicy } from "@ador/shared/uploads";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { UploadPolicy } from "@frostbite/shared/uploads";
 
 import type {
   AbandonedUpload,

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { mount } from "@ador/test-kit/dom";
+import { mount } from "@frostbite/test-kit/dom";
 import { standInInitials } from "@repo/ui/arcade";
 import { describe, expect, it } from "vitest";
 

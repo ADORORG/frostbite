@@ -6,9 +6,9 @@ behind a release gate; any admin may pause (logged); witness data uses a one-tim
 
 ## What it is
 
-The staff's steps, behind the same neutral ports as claims. Neutral part (`@ador/shared/chain`): operations `publish-template`,
+The staff's steps, behind the same neutral ports as claims. Neutral part (`@frostbite/shared/chain`): operations `publish-template`,
 `define-milestone`, `set-claims-paused` (and `deploy`, which makes a game); summary fields `claimLimit`, `contract`, `drawing {bytes,
-sha256}`, `paused`, `template {id, version, codeHash}`. Simulated chain (`@ador/test-kit`) builds and verifies all four.
+sha256}`, `paused`, `template {id, version, codeHash}`. Simulated chain (`@frostbite/test-kit`) builds and verifies all four.
 
 `bitcoin-alkanes` (`packages/chain/src/bitcoin-alkanes/admin/`), one purpose per module:
 `calls` (the contract calls), `action` (intent or summary to call: one source of truth for builder and verifier), `templates` (configured

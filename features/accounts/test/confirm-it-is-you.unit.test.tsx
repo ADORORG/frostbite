@@ -18,7 +18,7 @@ import {
   show,
 } from "./support/widget-harness.tsx";
 import { ConfirmItIsYou } from "../src/roles/confirm-it-is-you.tsx";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 
 const stepUp = {
   "/api/v1/auth/methods": () => methods([address]),

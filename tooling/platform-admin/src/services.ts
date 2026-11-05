@@ -1,12 +1,12 @@
 import {
   createDrizzleSetupLinks,
   createSetupLinkService,
-} from "@ador/authorization";
-import type { DatabaseClient } from "@ador/database/connection";
+} from "@frostbite/authorization";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   createHeldMethodKinds,
   type createAuthMethods,
-} from "@ador/feature-accounts/methods";
+} from "@frostbite/feature-accounts/methods";
 import { authorizationPolicy } from "@repo/config/authorization";
 import { setupLinkPolicy } from "@repo/config/setup-link";
 import { randomBytes } from "node:crypto";

@@ -1,4 +1,4 @@
-import type { Guide } from "@ador/game-sdk/guide";
+import type { Guide } from "@frostbite/game-sdk/guide";
 
 // The lines about the game, the same whatever the hands.
 const aboutTheGame = [

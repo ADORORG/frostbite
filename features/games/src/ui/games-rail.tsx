@@ -1,5 +1,5 @@
-import { SceneBackdrop } from "@ador/scenes/react";
-import { gameHref, gamesPath } from "@ador/shared/games";
+import { SceneBackdrop } from "@frostbite/scenes/react";
+import { gameHref, gamesPath } from "@frostbite/shared/games";
 import {
   ArcadeBadge,
   ArcadeEmptyState,

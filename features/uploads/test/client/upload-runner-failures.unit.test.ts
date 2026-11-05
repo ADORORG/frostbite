@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { TransferError } from "../../src/client/transfer.ts";
 import { attempt, setup } from "../support/runner-harness.ts";
 

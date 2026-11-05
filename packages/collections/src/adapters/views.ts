@@ -1,6 +1,6 @@
-import type { Collection, CollectionItemRow } from "@ador/database";
-import { chainRefTextSchema } from "@ador/shared/chain";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import type { Collection, CollectionItemRow } from "@frostbite/database";
+import { chainRefTextSchema } from "@frostbite/shared/chain";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import type {
   CollectionItemRecord,

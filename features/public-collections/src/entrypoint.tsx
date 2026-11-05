@@ -1,10 +1,10 @@
-import { createUploadsContextResolver } from "@ador/feature-uploads/context";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import type { ChainOption } from "@ador/shared/chain";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import { createUploadsContextResolver } from "@frostbite/feature-uploads/context";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
-import { homeSectionOrder } from "@ador/shared/platform";
+import { homeSectionOrder } from "@frostbite/shared/platform";
 
 import type { PublicCatalog } from "./application/catalog.ts";
 import {

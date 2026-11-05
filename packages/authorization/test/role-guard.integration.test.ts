@@ -5,9 +5,9 @@ import {
   parseDatabaseEnvironment,
   platformRoleAssignments,
   runMigrations,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { expectToWait, holdTransaction } from "@ador/test-kit/race";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { expectToWait, holdTransaction } from "@frostbite/test-kit/race";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

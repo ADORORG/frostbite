@@ -8,8 +8,8 @@ ids and game contracts in settings: "we have to deploy before we can figure out 
 - **Settings:** `REWARDS_CHAIN_RELEASE_GATE`, `REWARDS_TEMPLATE_IDS` and `REWARDS_CONTRACTS` are gone (definitions, all eight env files, parser,
   tests, runbook). Four remain: node address, fee ceiling, timeout, templates folder. The release gate is `signetReleaseGate` in
   `configs/rewards-policy.ts` (signet open; a mainnet record would be added closed).
-- **Where things are is recorded:** `ador.published_templates` and `ador.game_contracts` (migration `20261017010458_game_contracts`), written in
-  the same transaction that completes the step that made them (`@ador/database/game-contracts`). Never updated; unique per template/game and
+- **Where things are is recorded:** `frostbite.published_templates` and `frostbite.game_contracts` (migration `20261017010458_game_contracts`), written in
+  the same transaction that completes the step that made them (`@frostbite/database/game-contracts`). Never updated; unique per template/game and
   per address; the step that made each is kept as evidence (`ON DELETE RESTRICT`). `game_admin_steps` now takes steps that belong to no game
   (publishing a template) and steps that act on no contract yet (publishing, creating), with checks that keep each operation coherent.
 - **Neutral intent and summary:** `publish-template` carries `templateAt`; `deploy` carries `templateAt`, `collectibleAt`, `maxDrawingBytes`; the

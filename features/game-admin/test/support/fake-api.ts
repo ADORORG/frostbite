@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import type { GameAdminStep } from "@ador/shared/games";
+import { ApiError } from "@frostbite/client-http";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import { vi } from "vitest";
 
 import type { GameAdminApi } from "../../src/client/api.ts";

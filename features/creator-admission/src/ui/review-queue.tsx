@@ -3,7 +3,7 @@
 import {
   creatorReviewGroupLabels,
   type CreatorReviewGroup,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import {
   ArcadeActionButton,
   ArcadeEmptyState,

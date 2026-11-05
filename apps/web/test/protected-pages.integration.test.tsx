@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 // The wallet library needs the app's provider, which the layout supplies; this test renders a page on its own.
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useWalletChooser: () => ({ request: () => undefined }),
   useWalletConnection: () => ({
     address: "",

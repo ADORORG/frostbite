@@ -1,6 +1,6 @@
-import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+import { attachKeys, standardKeys } from "@frostbite/game-sdk/controls";
 
-import { attachZones } from "@ador/game-sdk/touch-zones";
+import { attachZones } from "@frostbite/game-sdk/touch-zones";
 
 import type { Direction } from "../rules/constants.ts";
 import { screenHeight, screenWidth } from "./layout.ts";

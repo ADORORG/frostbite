@@ -1,4 +1,4 @@
-import type { GameState } from "@ador/shared/games";
+import type { GameState } from "@frostbite/shared/games";
 
 // What a game's manifest says about one milestone that the account must hold it to.
 export interface MilestoneRule {

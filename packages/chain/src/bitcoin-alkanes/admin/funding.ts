@@ -1,4 +1,4 @@
-import type { TransactionIntent } from "@ador/shared/chain";
+import type { TransactionIntent } from "@frostbite/shared/chain";
 
 import type { BitcoinAddress } from "../../bitcoin/address.ts";
 import { gameRewardsOpcodes } from "../abi.ts";

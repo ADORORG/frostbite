@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
 
-import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
+import { jsonValueSchema, type JsonValue } from "@frostbite/shared/chain";
 
 import { isJsonObject } from "./json.ts";
 import { GatewayError, type Gateway } from "./gateway.ts";

@@ -20,7 +20,7 @@ name or avatar for now.
 - Database: `game_saves.player_id` (uuid, not null, random default, unique); migration `game_player_id`. Existing
   rows each get their own random id when the column is added.
 - Shared: the sync response is the state plus `playerId` (strict).
-- `@ador/game-saves`: the repository and service return `{ playerId, state }`.
+- `@frostbite/game-saves`: the repository and service return `{ playerId, state }`.
 - Sync route: answers with the id; the page's account port hands it over apart from the state.
 - SDK: `player.identity`, `player.changed`, `playerIdentitySchema`; backend `identity()`; the local backend keeps a
   random id per browser and game (a corrupt stored value is replaced); the synced backend answers with the account's

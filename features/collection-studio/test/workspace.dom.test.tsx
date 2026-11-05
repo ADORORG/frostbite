@@ -1,10 +1,10 @@
-import { ApiError } from "@ador/client-http";
-import { chainOptionSchema } from "@ador/shared/chain";
+import { ApiError } from "@frostbite/client-http";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import type {
   CollectionSummary,
   SubmissionState,
-} from "@ador/shared/collections";
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+} from "@frostbite/shared/collections";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { CollectionsWorkspace } from "../src/ui/collections-workspace.tsx";

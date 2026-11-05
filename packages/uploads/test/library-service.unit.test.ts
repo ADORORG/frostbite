@@ -1,10 +1,10 @@
 import {
   parseObjectKey,
   type ObjectStoragePort,
-} from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { unusedStorage } from "@ador/test-kit/storage-registry";
+} from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { unusedStorage } from "@frostbite/test-kit/storage-registry";
 import { describe, expect, it, vi } from "vitest";
 
 import type {

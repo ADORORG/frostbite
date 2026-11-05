@@ -6,9 +6,9 @@ import {
   platformRoleAssignments,
   uploadIntents,
   type DatabaseClient,
-} from "@ador/database";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import type { UploadPurpose } from "@ador/shared/uploads";
+} from "@frostbite/database";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
+import type { UploadPurpose } from "@frostbite/shared/uploads";
 import { eq } from "drizzle-orm";
 
 export type CreatorApplicationState =

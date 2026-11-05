@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { broRules } from "../../src/rules/index.ts";
 import { freshStage, startRun } from "../../src/rules/state.ts";

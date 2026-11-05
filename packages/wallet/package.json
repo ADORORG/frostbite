@@ -1,5 +1,5 @@
 {
-  "name": "@ador/wallet",
+  "name": "@frostbite/wallet",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -19,9 +19,9 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/chain": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/chain": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@omnisat/lasereyes-core": "0.0.85",
     "@omnisat/lasereyes-react": "0.0.80",
     "nanostores": "0.11.4",

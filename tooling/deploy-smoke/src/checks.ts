@@ -1,4 +1,4 @@
-import { readinessSchema } from "@ador/shared/readiness";
+import { readinessSchema } from "@frostbite/shared/readiness";
 
 export interface Context {
   readonly base: URL;

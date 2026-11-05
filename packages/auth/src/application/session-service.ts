@@ -1,5 +1,5 @@
 import type { ActiveSession, SessionRepository } from "./session-repository.ts";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import { sha256 } from "../domain/crypto.ts";
 
 export function createSessionService(dependencies: {

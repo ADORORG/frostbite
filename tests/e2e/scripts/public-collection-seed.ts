@@ -4,10 +4,10 @@ import {
   collectionSubmissions,
   collections,
   type DatabaseClient,
-} from "@ador/database";
-import { submissionSnapshotSchema } from "@ador/shared/collections";
-import { requestFingerprint } from "@ador/shared/http";
-import { seedUploadedAsset } from "@ador/test-kit/creator-database";
+} from "@frostbite/database";
+import { submissionSnapshotSchema } from "@frostbite/shared/collections";
+import { requestFingerprint } from "@frostbite/shared/http";
+import { seedUploadedAsset } from "@frostbite/test-kit/creator-database";
 
 import {
   creatorE2EFixtures,

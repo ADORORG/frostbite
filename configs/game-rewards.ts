@@ -8,7 +8,7 @@ import { createRewardsChain } from "./rewards-chain.ts";
 // The chain the platform builds, sends and watches transactions on, for players' claims and for staff's administration alike: one
 // place, so the two cannot disagree. It comes from the deployment's `REWARDS_*` settings (see `.env.example`); with no node address
 // set there is no chain, and claims and administration answer "not available". Where the games' contracts are is not here: it is
-// on record once staff have created each (`ador.game_contracts`).
+// on record once staff have created each (`frostbite.game_contracts`).
 const rewards = createRewardsChain(parseRewardsChainEnvironment(process.env), {
   fetch: (url, init) => fetch(url, init),
   get: (url, init) => fetch(url, init),

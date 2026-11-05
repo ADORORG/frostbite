@@ -1,11 +1,11 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import {
   resolveSubmissionTransition,
   type ReviewActivityItem,
   type ReviewDetailResponse,
   type ReviewQueueItem,
-} from "@ador/shared/collections";
-import { idempotencyKeySchema } from "@ador/shared/http";
+} from "@frostbite/shared/collections";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
 import { vi } from "vitest";
 
 import type { ReviewApi } from "../../src/client/review-api.ts";

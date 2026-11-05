@@ -50,9 +50,9 @@ than a product rewrite.
 
 ### Delivered
 
-- Added the provider-neutral `@ador/object-storage` port with validated exact keys, streamed bodies,
+- Added the provider-neutral `@frostbite/object-storage` port with validated exact keys, streamed bodies,
   stable errors, metadata lookup, private upload presigning, conditional publication, and deletion.
-- Added the detachable `@ador/provider-object-storage-r2` adapter, exact-pinned AWS SDK dependencies,
+- Added the detachable `@frostbite/provider-object-storage-r2` adapter, exact-pinned AWS SDK dependencies,
   explicit one-line registration, validated server-only configuration, and synchronized environment
   templates.
 - Qualified ordinary S3 operations against an exact-image-pinned disposable MinIO service and the

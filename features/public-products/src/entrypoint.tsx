@@ -1,6 +1,6 @@
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
 
-import { homeSectionOrder } from "@ador/shared/platform";
+import { homeSectionOrder } from "@frostbite/shared/platform";
 
 import {
   capabilitiesOf,

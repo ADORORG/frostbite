@@ -1,9 +1,9 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import type {
   GameVerifier,
   RunInput,
   Stepped,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 
 import {
   directions,

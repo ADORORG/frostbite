@@ -1,4 +1,4 @@
-import { isTouchScreen } from "@ador/game-sdk/touch";
+import { isTouchScreen } from "@frostbite/game-sdk/touch";
 
 import type { State } from "../rules/types.ts";
 import { write } from "./banner.ts";

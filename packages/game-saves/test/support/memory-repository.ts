@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { GameState } from "@ador/shared/games";
+import type { GameState } from "@frostbite/shared/games";
 
 import type { GameSyncRepository } from "../../src/repository.ts";
 

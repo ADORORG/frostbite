@@ -10,9 +10,9 @@ hand-written event or signing protocol would weaken correctness and drift from A
 
 ## Available foundation
 
-- `@ador/jobs` owns provider-neutral relay policy, retry classification, and publication/store
+- `@frostbite/jobs` owns provider-neutral relay policy, retry classification, and publication/store
   ports.
-- `@ador/database` adapts the transactional PostgreSQL outbox to the relay store port.
+- `@frostbite/database` adapts the transactional PostgreSQL outbox to the relay store port.
 - Domain events and business state remain independent of workflow-provider types.
 - No provider capability is registered and no environment key implies the adapter is operational.
 

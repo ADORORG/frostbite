@@ -1,11 +1,11 @@
-import type { NavigationContribution } from "@ador/shared/features";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { NavigationContribution } from "@frostbite/shared/features";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import {
   markCurrent,
   navigationForAudience,
   navigationForUser,
   type NavigationItem,
-} from "@ador/plugin-kit/navigation";
+} from "@frostbite/plugin-kit/navigation";
 
 import {
   resolvePageAccess,

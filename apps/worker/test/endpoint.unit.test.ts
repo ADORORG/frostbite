@@ -1,5 +1,5 @@
-import type { AssetPipelineActivities } from "@ador/jobs/activities";
-import type { WorkflowEndpointFactory } from "@ador/jobs/provider-service";
+import type { AssetPipelineActivities } from "@frostbite/jobs/activities";
+import type { WorkflowEndpointFactory } from "@frostbite/jobs/provider-service";
 import { describe, expect, it } from "vitest";
 
 import { createSignedEndpointResolver } from "../src/endpoint.ts";

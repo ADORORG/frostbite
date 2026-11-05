@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
-import { canonicalJson, runRecordSchema } from "@ador/game-sdk/run-record";
-import type { GameReplayVerifier } from "@ador/shared/games";
+import { canonicalJson, runRecordSchema } from "@frostbite/game-sdk/run-record";
+import type { GameReplayVerifier } from "@frostbite/shared/games";
 import { z } from "zod";
 
 import {

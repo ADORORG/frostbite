@@ -1,4 +1,4 @@
-import type { BetaNetwork } from "@ador/shared/chain";
+import type { BetaNetwork } from "@frostbite/shared/chain";
 import { parseBetaNetworkEnvironment } from "@repo/config/beta-network";
 import {
   parseRewardsChainEnvironment,

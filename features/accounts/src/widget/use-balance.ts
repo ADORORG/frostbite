@@ -1,7 +1,7 @@
 "use client";
 
-import { createExpiringStore } from "@ador/cache/expiring-store";
-import { createRequester, sameOriginFetch } from "@ador/client-http";
+import { createExpiringStore } from "@frostbite/cache/expiring-store";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { balanceReadingSchema } from "../balance/contract.ts";
@@ -46,7 +46,7 @@ export function useBalance(input: {
         cache: createExpiringStore({
           maxAgeMs: intervalMs,
           now: () => new Date(),
-          prefix: "ador:balance",
+          prefix: "frostbite:balance",
           schema: balanceReadingSchema,
           // Storage is the browser's: absent while rendering on the server, and possibly refused (a private window, blocked data).
           storage: browserStorage(),

@@ -1,22 +1,25 @@
-import { attachGameHost } from "@ador/game-sdk/attach";
+import { attachGameHost } from "@frostbite/game-sdk/attach";
 import {
   createGameHost,
   type GameHost,
   type HostedGame,
   type ClaimsService,
   type RunsService,
-} from "@ador/game-sdk/host";
-import type { VerificationLevel, WalletInfo } from "@ador/game-sdk/protocol";
-import type { GameClaimState } from "@ador/shared/games";
+} from "@frostbite/game-sdk/host";
+import type {
+  VerificationLevel,
+  WalletInfo,
+} from "@frostbite/game-sdk/protocol";
+import type { GameClaimState } from "@frostbite/shared/games";
 import {
   createLocalBackend,
   type KeyValueStorage,
-} from "@ador/game-sdk/local-backend";
+} from "@frostbite/game-sdk/local-backend";
 import {
   createSyncedBackend,
   type AccountPort,
   type SyncStatus,
-} from "@ador/game-sdk/synced-backend";
+} from "@frostbite/game-sdk/synced-backend";
 import {
   useCallback,
   useEffect,
@@ -57,7 +60,7 @@ function browserStorage(): {
 } {
   try {
     const { localStorage } = window;
-    localStorage.getItem("ador:probe");
+    localStorage.getItem("frostbite:probe");
     return { kept: true, storage: localStorage };
   } catch {
     const memory = new Map<string, string>();

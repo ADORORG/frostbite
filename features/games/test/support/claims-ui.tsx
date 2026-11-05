@@ -1,4 +1,4 @@
-import { gameClaimSchema, type GameClaim } from "@ador/shared/games";
+import { gameClaimSchema, type GameClaim } from "@frostbite/shared/games";
 import { vi } from "vitest";
 
 import type { ClaimsApi } from "../../src/client/claims-api.ts";

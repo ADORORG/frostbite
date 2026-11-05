@@ -1,8 +1,8 @@
-import { assets, uploadIntents } from "@ador/database";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+import { assets, uploadIntents } from "@frostbite/database";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

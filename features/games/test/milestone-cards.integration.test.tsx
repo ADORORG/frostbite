@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import type { GameClaim } from "@ador/shared/games";
+import type { GameClaim } from "@frostbite/shared/games";
 
 import { MilestoneList } from "../src/ui/milestone-list.tsx";
 import { claimAt } from "./support/claims-ui.tsx";

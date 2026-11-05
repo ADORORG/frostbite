@@ -1,5 +1,5 @@
-import { createDecodablePng } from "@ador/test-kit/png";
-import { libraryResponseSchema } from "@ador/shared/uploads";
+import { createDecodablePng } from "@frostbite/test-kit/png";
+import { libraryResponseSchema } from "@frostbite/shared/uploads";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

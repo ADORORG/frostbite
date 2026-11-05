@@ -1,5 +1,5 @@
-import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
-import { button, click, mount, textOf } from "@ador/test-kit/dom";
+import { ExplorerBoundary } from "@frostbite/feature-chain-status/transaction";
+import { button, click, mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { GameAdminPanel } from "../src/ui/game-admin-panel.tsx";

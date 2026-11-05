@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { trackedStates as lifecycleStates } from "@ador/shared/chain";
+import { trackedStates as lifecycleStates } from "@frostbite/shared/chain";
 
 import { playerClaimState } from "../src/player-state.ts";
 

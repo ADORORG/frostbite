@@ -1,5 +1,5 @@
-import type { IndexingStatus } from "@ador/shared/chain";
-import { chainIndexingSchema } from "@ador/shared/chain";
+import type { IndexingStatus } from "@frostbite/shared/chain";
+import { chainIndexingSchema } from "@frostbite/shared/chain";
 import { describe, expect, it, vi } from "vitest";
 
 import { createIndexingOperation } from "../src/application/indexing.ts";

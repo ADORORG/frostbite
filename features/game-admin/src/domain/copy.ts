@@ -1,15 +1,15 @@
-import { plainTransactionLabel } from "@ador/feature-chain-status/transaction";
+import { plainTransactionLabel } from "@frostbite/feature-chain-status/transaction";
 import {
   chainUnreachableWords,
   submitRefusalWords,
-} from "@ador/shared/chain-step-words";
+} from "@frostbite/shared/chain-step-words";
 import type { ArcadeTone } from "@repo/ui/arcade";
 import type {
   GameAdminAction,
   GameAdminStep,
   GameAdminStepState,
   StartGameAdminStepResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What each state means to staff, in plain words. Nothing here says a step is done before the network's records show it.
 export const stateCopy: Readonly<

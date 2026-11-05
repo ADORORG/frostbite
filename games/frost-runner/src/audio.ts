@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Frost Runner's sound, as data: a running groove in A minor (a walking bass under a bright arpeggio), and an effect for each thing
 // that happens. Nothing here is a file: the SDK plays it with the browser's audio.

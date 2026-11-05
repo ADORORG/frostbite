@@ -1,9 +1,9 @@
 "use client";
 
-import { signInHref } from "@ador/shared/auth/sign-in-path";
-import { gameHref, myMilestonesPath } from "@ador/shared/games";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
+import { signInHref } from "@frostbite/shared/auth/sign-in-path";
+import { gameHref, myMilestonesPath } from "@frostbite/shared/games";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
+import { ExplorerBoundary } from "@frostbite/feature-chain-status/transaction";
 import { ArcadeButton, ArcadeEmptyState, StatusLamp } from "@repo/ui/arcade";
 import { useState } from "react";
 

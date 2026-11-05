@@ -1,5 +1,5 @@
-import { ScenesProvider } from "@ador/scenes/react";
-import { WalletProvider } from "@ador/wallet/client";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { WalletProvider } from "@frostbite/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 

@@ -1,7 +1,7 @@
-import type { EmailAddressesView } from "@ador/auth";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { WalletNetwork } from "@ador/wallet/contracts";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { EmailAddressesView } from "@frostbite/auth";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import { ConsoleCard, ConsolePage } from "@repo/ui/arcade";
 
 import { EmailPanel } from "./email-panel.tsx";

@@ -1,4 +1,4 @@
-import type { FeaturePageContribution } from "@ador/plugin-kit";
+import type { FeaturePageContribution } from "@frostbite/plugin-kit";
 import { describe, expect, it, vi } from "vitest";
 
 import { declaredMetadata } from "../src/server/metadata/declared";

@@ -1,5 +1,5 @@
-import type { GameWalletConfig } from "@ador/feature-games";
-import type { WalletAuthConfig } from "@ador/feature-accounts";
+import type { GameWalletConfig } from "@frostbite/feature-games";
+import type { WalletAuthConfig } from "@frostbite/feature-accounts";
 
 import { betaChain } from "./chains.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";

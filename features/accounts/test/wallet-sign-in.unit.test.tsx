@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 

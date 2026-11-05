@@ -1,5 +1,5 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
-import { chainOptionSchema, type ChainOption } from "@ador/shared/chain";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
+import { chainOptionSchema, type ChainOption } from "@frostbite/shared/chain";
 import { isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";

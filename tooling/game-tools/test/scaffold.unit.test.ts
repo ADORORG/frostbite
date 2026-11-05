@@ -31,7 +31,7 @@ export const games = [
   // game:new adds games above this line.
 ];
 `;
-const manifestText = `import { defineGame } from "@ador/shared/games";
+const manifestText = `import { defineGame } from "@frostbite/shared/games";
 
 // Starter Game, the template. Its comment is about the template.
 export const starterGame = defineGame({ id: "starter-game", title: "Starter Game" });
@@ -184,7 +184,9 @@ describe("making a game", () => {
       'export const newGameGame = defineGame({ id: "new-game", title: "Brand New" });',
     );
     expect(
-      manifest.startsWith('import { defineGame } from "@ador/shared/games";'),
+      manifest.startsWith(
+        'import { defineGame } from "@frostbite/shared/games";',
+      ),
     ).toBe(true);
   });
 

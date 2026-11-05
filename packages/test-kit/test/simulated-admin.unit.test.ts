@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { TransactionIntent } from "@ador/shared/chain";
+import type { TransactionIntent } from "@frostbite/shared/chain";
 
 import { signSimulated } from "../src/simulated-chain/transaction.ts";
 import { funding, simulatedPorts } from "./support/chains.ts";

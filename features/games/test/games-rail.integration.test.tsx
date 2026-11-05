@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { ScenesProvider } from "@ador/scenes/react";
-import { defineGame } from "@ador/shared/games";
-import { mount, textOf } from "@ador/test-kit/dom";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { defineGame } from "@frostbite/shared/games";
+import { mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { createGameCatalog } from "../src/domain/catalog.ts";

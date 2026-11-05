@@ -1,6 +1,6 @@
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
-import { resolveDerivativePolicy } from "@ador/shared/uploads";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
+import { resolveDerivativePolicy } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { providerId } from "./support/images.ts";

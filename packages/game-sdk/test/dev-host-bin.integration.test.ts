@@ -46,7 +46,7 @@ describe("the command as a process", () => {
   it("says how to use it and stops with a failure when it is given nothing", async () => {
     const result = await command([], () => false);
     expect(result.code).toBe(2);
-    expect(result.error).toContain("Usage: ador-game-dev");
+    expect(result.error).toContain("Usage: frostbite-game-dev");
   });
 
   it("opens the test page for a game and prints where", async () => {

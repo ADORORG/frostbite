@@ -1,10 +1,10 @@
-import type { ContactLinkService } from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { ContactLinkService } from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 // The account page holds the wallets card, which reads the wallet connection; there is none to read in a page rendered to text.
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useWalletChooser: () => ({ request: () => undefined }),
   useWalletConnection: () => ({
     address: "",

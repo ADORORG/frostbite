@@ -8,7 +8,7 @@ first signet run needs, without spending coins.
 - `tooling/signet-preflight` (`@repo/signet-preflight`), run as `pnpm signet:preflight [--env <file>]`: five read-only checks (settings, template
   hashes, indexer lag, auth-token factory at `4:65517`, estimated publish fee against the ceiling), verdicts `PASS` / `FAIL` / `UNVERIFIED` /
   `SKIPPED`, exit code 0 / 1 / 2. Reuses the platform's own parser (`parseRewardsChainEnvironment`), `rewardsPolicy`, `createRpcNode`,
-  `indexingHealth` and the packing/hash functions (now exported from `@ador/chain/bitcoin-alkanes`: `packCode`, `sha256Hex`).
+  `indexingHealth` and the packing/hash functions (now exported from `@frostbite/chain/bitcoin-alkanes`: `packCode`, `sha256Hex`).
 - `tooling/repository-policy`: the tool is listed as an owner of chain-family imports (it checks one family's setup by purpose), with its allow-list test.
 - Runbook section "Checking the setup before the first signet run"; package README.
 
@@ -17,7 +17,7 @@ first signet run needs, without spending coins.
 - `@repo/signet-preflight`: typecheck, lint, `test:unit` (22), `test:integration` (2: the real command against a node on a local port), `test:coverage`
   100% statements, branches, functions and lines. 12 mutations of the guarded behaviours (comparison edges, fee rate target, witness discount,
   factory id and null case, hash comparison, exit codes, policy source, working directory) all failed a test, then were restored.
-- `@ador/chain` unit (251), `@repo/repository-policy` (31 unit; coverage 96.8% statements, 93.9% branches), `pnpm repository:check` (54 workspaces),
+- `@frostbite/chain` unit (251), `@repo/repository-policy` (31 unit; coverage 96.8% statements, 93.9% branches), `pnpm repository:check` (54 workspaces),
   `@repo/vitest-config` integration (3), `env:check` for the new package. Every new file is under 200 lines.
 - Run for real, 2026-10-18, against `https://signet.subfrost.io/v4/jsonrpc` with no template folder: settings PASS; templates FAIL (no files);
   indexer and factory UNVERIFIED ("no backend in sync (served 325681, chain tip 326891)"); fee UNVERIFIED with the quoted rate.

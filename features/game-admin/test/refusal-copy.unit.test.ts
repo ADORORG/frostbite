@@ -1,8 +1,8 @@
 import {
   chainUnreachableWords,
   signatureMismatchWords,
-} from "@ador/shared/chain-step-words";
-import { gameAdminSubmitRefusals } from "@ador/shared/games";
+} from "@frostbite/shared/chain-step-words";
+import { gameAdminSubmitRefusals } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import {

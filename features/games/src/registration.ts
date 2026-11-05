@@ -1,5 +1,5 @@
-import { defineFeature } from "@ador/plugin-kit";
-import type { ChainOption } from "@ador/shared/chain";
+import { defineFeature } from "@frostbite/plugin-kit";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   gamePagePath,
   gameSyncRoute,
@@ -15,7 +15,7 @@ import {
   gamesNavigationLabel,
   gamesPath,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import type { GameClaimsConfig } from "./claims-config.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
@@ -76,7 +76,7 @@ export function createGamesFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-games/entrypoint").then(
+      import("@frostbite/feature-games/entrypoint").then(
         ({ createGamesEntrypoint }) =>
           createGamesEntrypoint(games, chains, wallet, runs, claims),
       ),

@@ -1,6 +1,10 @@
-import type { createCreatorAdmissionService } from "@ador/creator-admission";
-import type { HttpOperation } from "@ador/http";
-import { failure, invalidCursor, unauthenticated } from "@ador/http/outcome";
+import type { createCreatorAdmissionService } from "@frostbite/creator-admission";
+import type { HttpOperation } from "@frostbite/http";
+import {
+  failure,
+  invalidCursor,
+  unauthenticated,
+} from "@frostbite/http/outcome";
 import {
   creatorApplicationRoutes,
   creatorReviewQueueInputSchema,
@@ -12,8 +16,8 @@ import {
   type CreatorReviewQueueInput,
   type CreatorReviewQueueResponse,
   type CreatorReviewReadResponse,
-} from "@ador/shared/creator-admission";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { presentQueueItem, presentReviewDetail } from "./present.ts";
 

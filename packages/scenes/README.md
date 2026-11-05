@@ -1,23 +1,23 @@
-# `@ador/scenes`
+# `@frostbite/scenes`
 
 The platform's looping pixel scenes: small animated backgrounds for sections and overlays for cards. Everything about them lives here and
 nowhere else. Pages import four things and know nothing else about how a scene is drawn or run.
 
 ## Public API
 
-- `@ador/scenes/react`
+- `@frostbite/scenes/react`
   - `ScenesProvider`: once, at the top of the app. Owns the one frame loop and decides whether scenes move.
   - `SceneBackdrop`: a section's moving background. A scene chosen at random on each visit (never the same as another backdrop on the
     page while others exist), or the one named by `sceneId`. Fills a positioned parent; the page adds its own scrim for text.
   - `SceneOverlay`: a card's overlay. The scene is chosen from the card's `seed` (so a card always looks the same), or named by `sceneId`.
   - `AnimationToggle`: the always-visible on/off switch.
-- `@ador/scenes/styles.css`: the few rules that place a scene in its box. Imported once by the app.
-- `@ador/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`), and `ambient`: scenes that are weather for a page
+- `@frostbite/scenes/styles.css`: the few rules that place a scene in its box. Imported once by the app.
+- `@frostbite/scenes/library`: the scenes themselves and the list of them (`scenes`, `defineScenes`), and `ambient`: scenes that are weather for a page
   (`snowfall`, behind the landing page's headline). They are held to the same tests and rendered to video like the others, but are never in
   the list a person steps through or that is drawn from at random for a card.
-- `@ador/scenes/engine`: the DOM-free parts (contract, drawing helpers, clock, picking, policy, preference, scheduler), for tooling that
+- `@frostbite/scenes/engine`: the DOM-free parts (contract, drawing helpers, clock, picking, policy, preference, scheduler), for tooling that
   renders scenes outside a page.
-- `@ador/scenes/video`: DOM-free parts of the video fallback: `createRaster` (a surface that draws into memory), `framePlan`, `videoFiles`,
+- `@frostbite/scenes/video`: DOM-free parts of the video fallback: `createRaster` (a surface that draws into memory), `framePlan`, `videoFiles`,
   `videoSpec`. Used by `tooling/scene-render`, which writes the files, and by the page, which asks for them by name.
 
 ## Layout
@@ -65,7 +65,7 @@ asset download; the content security policy is unchanged.
 
 ## Tests
 
-`pnpm --filter @ador/scenes test:unit | test:integration | test:coverage`. The unit tests drive the scheduler by hand, draw every scene
+`pnpm --filter @frostbite/scenes test:unit | test:integration | test:coverage`. The unit tests drive the scheduler by hand, draw every scene
 across its whole loop (finite numbers, nothing off screen, same picture every time, closes without a jump where it should), and check the
 size budgets. The integration tests run the React parts in jsdom with a stepped frame loop, recording canvases, a controllable
 intersection observer, and stubbed media queries.

@@ -3,17 +3,17 @@ import { randomUUID } from "node:crypto";
 import type {
   AssetProcessingStatus,
   AssetValidationStatus,
-} from "@ador/jobs/activities";
+} from "@frostbite/jobs/activities";
 import {
   freePort,
   startInngestRuntime,
   type InngestRuntime,
-} from "@ador/test-kit/inngest-runtime";
-import { runtimeApi } from "@ador/test-kit/inngest-runtime-api";
+} from "@frostbite/test-kit/inngest-runtime";
+import { runtimeApi } from "@frostbite/test-kit/inngest-runtime-api";
 import {
   serveFetchHandler,
   type ServedEndpoint,
-} from "@ador/test-kit/serve-fetch-handler";
+} from "@frostbite/test-kit/serve-fetch-handler";
 import { afterAll, beforeAll } from "vitest";
 
 import { createInngestClient } from "../../src/client.ts";

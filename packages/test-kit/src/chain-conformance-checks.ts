@@ -4,8 +4,8 @@ import {
   portCapabilities,
   portNames,
   type ChainAdapter,
-} from "@ador/chain/adapter";
-import { InvalidAddressError } from "@ador/chain/ports";
+} from "@frostbite/chain/adapter";
+import { InvalidAddressError } from "@frostbite/chain/ports";
 import {
   broadcastOutcomeSchema,
   observationSchema,
@@ -15,7 +15,7 @@ import {
   type SignedTransaction,
   type TransactionIntent,
   type UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 export interface ChainConformanceFixtures {
   readonly address: {

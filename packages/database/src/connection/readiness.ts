@@ -1,4 +1,4 @@
-import type { ReadinessProbe } from "@ador/shared/readiness";
+import type { ReadinessProbe } from "@frostbite/shared/readiness";
 import { sql, type SQL } from "drizzle-orm";
 
 // The database answers a trivial query. It proves the connection, the credentials and the pool, not the schema.

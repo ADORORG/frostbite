@@ -4,11 +4,14 @@ import type {
   ClaimsService,
   HostedGame,
   RunsService,
-} from "@ador/game-sdk/host";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { WalletNetwork } from "@ador/wallet/contracts";
-import type { GameMilestone } from "@ador/shared/games";
-import type { AccountPort, SyncStatus } from "@ador/game-sdk/synced-backend";
+} from "@frostbite/game-sdk/host";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
+import type { GameMilestone } from "@frostbite/shared/games";
+import type {
+  AccountPort,
+  SyncStatus,
+} from "@frostbite/game-sdk/synced-backend";
 import {
   ArcadeActionButton,
   ArcadeDock,

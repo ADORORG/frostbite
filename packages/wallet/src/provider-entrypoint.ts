@@ -1,4 +1,4 @@
-import type { ProviderEntrypoint } from "@ador/plugin-kit/providers";
+import type { ProviderEntrypoint } from "@frostbite/plugin-kit/providers";
 
 export const laserEyesProviderEntrypoint = {
   capabilities: ["wallet:connect", "wallet:message-sign", "wallet:psbt-sign"],

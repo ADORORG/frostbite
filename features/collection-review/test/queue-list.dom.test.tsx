@@ -1,4 +1,4 @@
-import { button, click, mount, textOf } from "@ador/test-kit/dom";
+import { button, click, mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { QueueList } from "../src/ui/components/queue-list.tsx";

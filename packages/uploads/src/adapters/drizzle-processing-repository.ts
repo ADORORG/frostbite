@@ -1,9 +1,9 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { assetDerivatives } from "@ador/database/schema/derivatives";
-import { assets } from "@ador/database/schema/uploads";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { assetDerivatives } from "@frostbite/database/schema/derivatives";
+import { assets } from "@frostbite/database/schema/uploads";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { and, asc, eq } from "drizzle-orm";
 
 import type {

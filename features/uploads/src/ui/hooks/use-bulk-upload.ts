@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
-import { defaultUploadPolicy, type UploadPurpose } from "@ador/shared/uploads";
+import {
+  defaultUploadPolicy,
+  type UploadPurpose,
+} from "@frostbite/shared/uploads";
 
 import {
   bulkReducer,

@@ -1,6 +1,6 @@
-import { scenes } from "@ador/scenes/library";
-import { requiredCapability } from "@ador/game-sdk/protocol";
-import type { ChainOption } from "@ador/shared/chain";
+import { scenes } from "@frostbite/scenes/library";
+import { requiredCapability } from "@frostbite/game-sdk/protocol";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   embeddedGameAssetPath,
   embeddedGamePath,
@@ -11,7 +11,7 @@ import {
   type GameTag,
   type GameManifest,
   type GameMilestone,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What a person is told about each thing a game may ask the host for. Only the ones the host protocol answers
 // (see `requiredCapability`) are granted, and only to a game the platform plays itself; the rest are

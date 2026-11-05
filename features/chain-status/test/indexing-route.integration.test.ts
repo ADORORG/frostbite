@@ -1,5 +1,5 @@
-import { executeHttpOperation } from "@ador/http";
-import { chainIndexingSchema } from "@ador/shared/chain";
+import { executeHttpOperation } from "@frostbite/http";
+import { chainIndexingSchema } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createIndexingOperation } from "../src/application/indexing.ts";

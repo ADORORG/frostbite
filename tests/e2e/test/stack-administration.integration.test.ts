@@ -6,21 +6,21 @@ import {
   createDatabasePool,
   platformRoleAssignments,
   walletIdentities,
-} from "@ador/database";
+} from "@frostbite/database";
 import {
   createAuthorizationService,
   createDrizzleAuthorizationRepository,
-} from "@ador/authorization";
+} from "@frostbite/authorization";
 import {
   createAuthMethods,
   createHeldMethodKinds,
-} from "@ador/feature-accounts/methods";
+} from "@frostbite/feature-accounts/methods";
 import { authorizationPolicy } from "@repo/config/authorization";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
 import { eq, inArray } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import { withDisposablePostgres } from "@ador/database/test-postgres";
+import { withDisposablePostgres } from "@frostbite/database/test-postgres";
 import { creatorE2EFixtures, seededEmails } from "../src/creator-fixtures.ts";
 import { seedAdministration, seedOnce } from "../scripts/stack-setup.ts";
 

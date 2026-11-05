@@ -1,4 +1,4 @@
-import type { GameMilestone } from "@ador/shared/games";
+import type { GameMilestone } from "@frostbite/shared/games";
 
 import {
   presentMilestone,

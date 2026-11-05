@@ -1,4 +1,4 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createWorkerRuntime } from "../src/runtime.ts";

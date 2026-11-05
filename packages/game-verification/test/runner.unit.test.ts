@@ -24,7 +24,7 @@ describe("the in-process runner", () => {
     const second = runner.load(handWritten("() => 'two'", "{}", meta));
     expect(first.replay("")).toBe("one");
     expect(second.replay("")).toBe("two");
-    expect(Reflect.has(globalThis, "__adorReplay")).toBe(false);
+    expect(Reflect.has(globalThis, "__frostbiteReplay")).toBe(false);
   });
 
   it("refuses a script that does not publish a verifier, naming nothing about it", () => {
@@ -32,7 +32,7 @@ describe("the in-process runner", () => {
       "",
       "var x = 1;",
       handWritten("'not a function'", "{}", meta),
-      "globalThis.__adorReplay = () => 'x'; globalThis.__adorMeta = '{}';",
+      "globalThis.__frostbiteReplay = () => 'x'; globalThis.__frostbiteMeta = '{}';",
       handWritten("() => 'x'", "{}", "null"),
       handWritten("() => 'x'", "{}", JSON.stringify({ id: 1, version: 1 })),
       handWritten("() => 'x'", "{}", JSON.stringify({ id: "x" })),

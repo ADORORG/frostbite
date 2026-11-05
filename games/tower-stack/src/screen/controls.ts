@@ -1,4 +1,4 @@
-import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+import { attachKeys, standardKeys } from "@frostbite/game-sdk/controls";
 
 // What the player's hands can do: drop the block, and the keys every game shares (Enter starts, P pauses). Space drops here, since the
 // drop is what the hand is on; Enter drops too once a run is going, which the page decides.

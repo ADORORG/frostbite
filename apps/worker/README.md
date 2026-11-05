@@ -14,9 +14,9 @@ It is a second deployable beside the web app and shares the platform's typed env
 - **Abandoned-upload cleanup.** A slow loop (five-minute idle delay, one-minute backoff after a
   failure; `defaultMaintenanceLoopPolicy`) removes the private objects of uploads that were never
   completed once their cleanup time has passed, and records it. Each pass logs what it found; failed
-  removals are logged and retried on later passes. See `@ador/uploads` for the rules.
+  removals are logged and retried on later passes. See `@frostbite/uploads` for the rules.
 - **Finished-row sweeps.** A second slow loop (the same `defaultMaintenanceLoopPolicy`) removes rows that have finished their work, from
-  `removeExpiredRows` in `@ador/database`, at most `expiredRowPolicy.batchSize` from each table per pass and again at once while a pass
+  `removeExpiredRows` in `@frostbite/database`, at most `expiredRowPolicy.batchSize` from each table per pass and again at once while a pass
   removed anything: expired wallet, passkey and passkey sign-in challenges; contact codes once they have expired **and** are older than the send limits'
   look-back (`contactCodeRetentionMs`, the send window: the limits count expired codes too, so an expired code inside the window is kept);
   delivered outbox rows older than `deliveredOutboxRetentionMs` (a week; failed, waiting and in-flight rows are never removed). A pass that
@@ -50,7 +50,7 @@ Start with `pnpm --filter worker start` (reads `apps/worker/.env.local` when pre
 ## Operations
 
 Tuning (batch size, lease, retry bounds, polling delays, retries, media concurrency) is typed policy in
-`@ador/jobs/policy`, not environment; how long finished rows are kept and how many a sweep removes is
+`@frostbite/jobs/policy`, not environment; how long finished rows are kept and how many a sweep removes is
 `expiredRowPolicy` in `configs/expired-rows.ts`. The signed endpoint needs the Inngest keys and base URL; the relay
 needs the same provider settings plus PostgreSQL. A missing or invalid provider setting fails on first
 use, is logged, and does not stop the process. Each media run buffers up to the upload size cap plus

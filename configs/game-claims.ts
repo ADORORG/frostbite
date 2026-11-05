@@ -1,4 +1,4 @@
-import type { GameClaimsConfig } from "@ador/feature-games";
+import type { GameClaimsConfig } from "@frostbite/feature-games";
 
 import { rewardsChain } from "./game-rewards.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";

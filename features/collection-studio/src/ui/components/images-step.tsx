@@ -1,4 +1,4 @@
-import type { LibraryResponse } from "@ador/shared/uploads";
+import type { LibraryResponse } from "@frostbite/shared/uploads";
 import { ArcadeActionButton, StatusLamp } from "@repo/ui/arcade";
 
 import type { DraftFormValues } from "../../client/draft-form.ts";

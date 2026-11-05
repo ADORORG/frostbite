@@ -1,4 +1,4 @@
-import { replayRecord } from "@ador/game-sdk/replay";
+import { replayRecord } from "@frostbite/game-sdk/replay";
 import { describe, expect, it, vi } from "vitest";
 
 import { createIceFieldSession } from "../src/ice-field/session.ts";

@@ -1,6 +1,9 @@
-import { idempotencyKeySchema, type IdempotencyKey } from "@ador/shared/http";
+import {
+  idempotencyKeySchema,
+  type IdempotencyKey,
+} from "@frostbite/shared/http";
 
-import { sameOriginFetch } from "@ador/client-http";
+import { sameOriginFetch } from "@frostbite/client-http";
 
 import { createUploadsApi, type UploadsApi } from "./api-client.ts";
 import {

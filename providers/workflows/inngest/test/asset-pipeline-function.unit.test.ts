@@ -1,7 +1,7 @@
 import {
   PermanentWorkflowError,
   WorkflowFaultError,
-} from "@ador/jobs/asset-pipeline";
+} from "@frostbite/jobs/asset-pipeline";
 import { NonRetriableError } from "inngest";
 import { describe, expect, it } from "vitest";
 

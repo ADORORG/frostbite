@@ -1,4 +1,4 @@
-import { gameAdminStepStates } from "@ador/shared/games";
+import { gameAdminStepStates } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { stateTone, stepCopy } from "../src/domain/copy.ts";

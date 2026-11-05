@@ -1,4 +1,4 @@
-import { collections } from "@ador/database";
+import { collections } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 
 import { database, repository, seedAsset, seedUser } from "./database.ts";

@@ -1,4 +1,4 @@
-import { gameAdminStepSchema } from "@ador/shared/games";
+import { gameAdminStepSchema } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { peopleOf, toWireStep } from "../src/application/present.ts";

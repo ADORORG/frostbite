@@ -37,7 +37,7 @@ are rejected."**
 | Unauthenticated                  | acceptance (401 for an anonymous create); `uploads.spec.ts` (401 on the library; the page requires a session)           |
 | Cross-site request               | acceptance (403 without the application origin)                                                                         |
 | Another user's upload or library | acceptance(-api) > intent creation, completion, and processing are idempotent, and another user cannot reach the upload |
-| Adversarial media (below the UI) | `@ador/media` adversarial and validation tests; the isolated processor's hostile-input tests                            |
+| Adversarial media (below the UI) | `@frostbite/media` adversarial and validation tests; the isolated processor's hostile-input tests                       |
 
 Gate: **"Processing is idempotent and retryable."**
 
@@ -58,7 +58,7 @@ Gate: **"Processing is idempotent and retryable."**
 ## Gaps the mapping exposed and closed
 
 - The browser flows only ever uploaded a PNG; JPEG and WebP now run through the page (new tiny fixtures in
-  `@ador/test-kit/images`, produced once with the pinned `sharp` and verified against their own headers).
+  `@frostbite/test-kit/images`, produced once with the pinned `sharp` and verified against their own headers).
 - Nothing end to end proved that the application never receives image bytes; it now does.
 - No API-level negative tests existed for anonymous callers, a missing origin, an unsupported type, or an
   oversized declaration, and no test showed storage refusing more bytes than declared.
@@ -88,7 +88,7 @@ tests; the ownership one needed the new live-intent test.
 
 - Real R2 is still unverified; this suite runs against the S3 stand-in.
 - Oversized-dimension and mismatched-type cases use the shared PNG fixtures; the exhaustive hostile-media
-  matrix lives in `@ador/media`, not the browser run.
+  matrix lives in `@frostbite/media`, not the browser run.
 
 ## Verification evidence (final tree, 2026-10-09)
 

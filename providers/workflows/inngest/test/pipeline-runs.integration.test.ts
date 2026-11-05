@@ -1,4 +1,4 @@
-import { waitFor } from "@ador/test-kit/inngest-runtime";
+import { waitFor } from "@frostbite/test-kit/inngest-runtime";
 import { describe, expect, it } from "vitest";
 
 import {

@@ -1,4 +1,4 @@
-import { createAuthMethods } from "@ador/feature-accounts";
+import { createAuthMethods } from "@frostbite/feature-accounts";
 
 import { mailSettings } from "./mail.ts";
 

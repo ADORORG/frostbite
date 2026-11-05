@@ -1,4 +1,4 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import { ArcadeButton, ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 
 import { collectionsPath } from "../paths.ts";

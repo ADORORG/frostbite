@@ -7,9 +7,9 @@ import {
   authUsers,
   createDatabaseClient,
   createDatabasePool,
-} from "@ador/database";
-import { runDocker } from "@ador/test-kit/docker";
-import { findContainer, wipe } from "@ador/test-kit/durable-container";
+} from "@frostbite/database";
+import { runDocker } from "@frostbite/test-kit/docker";
+import { findContainer, wipe } from "@frostbite/test-kit/durable-container";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { withDurablePostgres } from "../src/durable-stack.ts";
@@ -19,8 +19,8 @@ import { seedOnce } from "../scripts/stack-setup.ts";
 // Real Docker, with names of its own, so a stack that is running on this machine is never touched.
 const id = randomUUID().slice(0, 8);
 const names = {
-  container: `ador-test-keep-${id}`,
-  volume: `ador-test-keep-${id}-data`,
+  container: `frostbite-test-keep-${id}`,
+  volume: `frostbite-test-keep-${id}-data`,
 };
 let directory = "";
 beforeEach(async () => {

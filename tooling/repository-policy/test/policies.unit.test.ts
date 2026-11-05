@@ -90,19 +90,19 @@ describe("source policies", () => {
   it("rejects private and runtime-specific imports", async () => {
     const [root, file] = await temporaryFile(
       "packages/shared/src/auth.ts",
-      'import Next from "next";\nexport { value } from "@ador/example/src/value";\n',
+      'import Next from "next";\nexport { value } from "@frostbite/example/src/value";\n',
     );
     await expect(findBoundaryViolations(root, [file])).resolves.toEqual([
       "packages/shared/src/auth.ts imports runtime-specific dependency next.",
-      "packages/shared/src/auth.ts imports private module @ador/example/src/value.",
-      "packages/shared/src/auth.ts imports runtime-specific dependency @ador/example/src/value.",
+      "packages/shared/src/auth.ts imports private module @frostbite/example/src/value.",
+      "packages/shared/src/auth.ts imports runtime-specific dependency @frostbite/example/src/value.",
     ]);
   });
 
   it("allows shared domains to import another public shared domain", async () => {
     const [root, file] = await temporaryFile(
       "packages/shared/src/features.ts",
-      'import { httpMethodSchema } from "@ador/shared/http";\nvoid httpMethodSchema;\n',
+      'import { httpMethodSchema } from "@frostbite/shared/http";\nvoid httpMethodSchema;\n',
     );
     await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
   });
@@ -118,14 +118,14 @@ describe("source policies", () => {
   it("keeps library and feature code off the database package root at runtime", async () => {
     const [root, source] = await temporaryFile(
       "packages/example/src/adapter.ts",
-      'import { runMigrations } from "@ador/database";\nvoid runMigrations;\n',
+      'import { runMigrations } from "@frostbite/database";\nvoid runMigrations;\n',
     );
     await expect(findBoundaryViolations(root, [source])).resolves.toEqual([
-      "packages/example/src/adapter.ts imports the database package root; import a subpath such as @ador/database/connection.",
+      "packages/example/src/adapter.ts imports the database package root; import a subpath such as @frostbite/database/connection.",
     ]);
     const [featureRoot, feature] = await temporaryFile(
       "features/example/src/adapter.ts",
-      'export { runMigrations } from "./local.ts";\nimport { runMigrations as run } from "@ador/database";\nvoid run;\n',
+      'export { runMigrations } from "./local.ts";\nimport { runMigrations as run } from "@frostbite/database";\nvoid run;\n',
     );
     await expect(
       findBoundaryViolations(featureRoot, [feature]),
@@ -136,23 +136,23 @@ describe("source policies", () => {
     const allowed: readonly [string, string][] = [
       [
         "packages/example/src/types.ts",
-        'import type { DatabaseClient } from "@ador/database";\nexport type Client = DatabaseClient;\n',
+        'import type { DatabaseClient } from "@frostbite/database";\nexport type Client = DatabaseClient;\n',
       ],
       [
         "packages/example/src/subpath.ts",
-        'import { collections } from "@ador/database/schema/collections";\nvoid collections;\n',
+        'import { collections } from "@frostbite/database/schema/collections";\nvoid collections;\n',
       ],
       [
         "packages/example/test/support.ts",
-        'import { runMigrations } from "@ador/database";\nvoid runMigrations;\n',
+        'import { runMigrations } from "@frostbite/database";\nvoid runMigrations;\n',
       ],
       [
         "apps/worker/src/runtime.ts",
-        'import { createOutboxDeliveryStore } from "@ador/database";\nvoid createOutboxDeliveryStore;\n',
+        'import { createOutboxDeliveryStore } from "@frostbite/database";\nvoid createOutboxDeliveryStore;\n',
       ],
       [
         "packages/test-kit/src/seed.ts",
-        'import { authUsers } from "@ador/database";\nvoid authUsers;\n',
+        'import { authUsers } from "@frostbite/database";\nvoid authUsers;\n',
       ],
     ];
     for (const [path, contents] of allowed) {
@@ -163,8 +163,8 @@ describe("source policies", () => {
 
   it("keeps chain-family code and vendor SDKs behind the adapter", async () => {
     const imports = [
-      'import { validateBitcoinAddress } from "@ador/chain/bitcoin";',
-      'import { createBitcoinAlkanesAdapter } from "@ador/chain/bitcoin-alkanes";',
+      'import { validateBitcoinAddress } from "@frostbite/chain/bitcoin";',
+      'import { createBitcoinAlkanesAdapter } from "@frostbite/chain/bitcoin-alkanes";',
       'import { address } from "bitcoinjs-lib";',
       'import { Provider } from "@alkanes/ts-sdk";',
       'import { useLaserEyes } from "@omnisat/lasereyes-react";',
@@ -176,7 +176,7 @@ describe("source policies", () => {
     const violations = await findBoundaryViolations(root, [file]);
     expect(violations).toHaveLength(imports.length);
     expect(violations[0]).toBe(
-      "features/uploads/src/chain.ts imports chain-family code @ador/chain/bitcoin; use the neutral chain ports.",
+      "features/uploads/src/chain.ts imports chain-family code @frostbite/chain/bitcoin; use the neutral chain ports.",
     );
   });
 
@@ -198,7 +198,7 @@ describe("source policies", () => {
   it("allows the neutral chain ports everywhere", async () => {
     const [root, file] = await temporaryFile(
       "features/collections/src/chain.ts",
-      'import { createChainRegistry } from "@ador/chain/registry";\nimport type { AddressCodec } from "@ador/chain/ports";\nimport { chainRefSchema } from "@ador/shared/chain";\nvoid createChainRegistry;\nvoid chainRefSchema;\n',
+      'import { createChainRegistry } from "@frostbite/chain/registry";\nimport type { AddressCodec } from "@frostbite/chain/ports";\nimport { chainRefSchema } from "@frostbite/shared/chain";\nvoid createChainRegistry;\nvoid chainRefSchema;\n',
     );
     await expect(findBoundaryViolations(root, [file])).resolves.toEqual([]);
   });

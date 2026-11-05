@@ -2,14 +2,14 @@ import {
   platformRoles,
   type AuthorizationPolicy,
   type PlatformRole,
-} from "@ador/shared/accounts";
+} from "@frostbite/shared/accounts";
 import {
   collectionReviewCapability,
   reviewDecisionSchema,
   type ReviewDecision,
   type SubmissionState,
-} from "@ador/shared/collections";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
 
 import { mutationContext, type RequestContext } from "./submission-context.ts";
 import type {

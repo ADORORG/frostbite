@@ -1,5 +1,5 @@
-import { GameHostError, type GameClient } from "@ador/game-sdk/client";
-import { pauseCopy, type Pause } from "@ador/game-sdk/pause";
+import { GameHostError, type GameClient } from "@frostbite/game-sdk/client";
+import { pauseCopy, type Pause } from "@frostbite/game-sdk/pause";
 
 // What the page says when it could not connect (the platform's own reason if it gave one), and that the game can still be played.
 export const refusalNote = (error: unknown): string =>

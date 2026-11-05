@@ -7,7 +7,7 @@ import {
   runMigrations,
   walletChallenges,
   walletIdentities,
-} from "@ador/database";
+} from "@frostbite/database";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createDrizzleSessionRepository } from "../src/adapters/drizzle-session-repository.ts";

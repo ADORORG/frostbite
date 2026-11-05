@@ -1,5 +1,5 @@
-import { contractRefSchema } from "@ador/shared/chain";
-import { defineGame } from "@ador/shared/games";
+import { contractRefSchema } from "@frostbite/shared/chain";
+import { defineGame } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { claimableGameLookup } from "../src/claims-runtime.ts";

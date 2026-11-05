@@ -1,4 +1,7 @@
-import { maxRunInputs, maxRunRecordBytes } from "@ador/game-sdk/run-record";
+import {
+  maxRunInputs,
+  maxRunRecordBytes,
+} from "@frostbite/game-sdk/run-record";
 import { z } from "zod";
 
 // What the platform allows of a run record it is asked to replay, as typed policy: changing a value is a

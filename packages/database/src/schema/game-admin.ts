@@ -1,4 +1,4 @@
-import { maxAdminPayloadChars } from "@ador/shared/games";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
 import { sql } from "drizzle-orm";
 import { check, index, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 

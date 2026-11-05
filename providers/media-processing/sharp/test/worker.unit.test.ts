@@ -1,4 +1,4 @@
-import { derivativeKinds } from "@ador/shared/uploads";
+import { derivativeKinds } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import {

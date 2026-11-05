@@ -1,5 +1,5 @@
 import * as React from "react";
-import { canonicalJson, type RunRecord } from "@ador/game-sdk/run-record";
+import { canonicalJson, type RunRecord } from "@frostbite/game-sdk/run-record";
 
 // What a finished run leaves: a summary and the record itself, in a text box to select and copy (the frame has no
 // clipboard permission). The record is the canonical text the platform measures and hashes.

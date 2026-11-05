@@ -1,4 +1,4 @@
-import { defineFeature } from "@ador/plugin-kit";
+import { defineFeature } from "@frostbite/plugin-kit";
 import {
   gameAdminCapability,
   gameAdminDetailPath,
@@ -6,7 +6,7 @@ import {
   gameAdminPath,
   gameAdminRoutes,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import type { GameAdminConfig } from "./config.ts";
 
@@ -57,7 +57,7 @@ export function createGameAdminFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-game-admin/entrypoint").then(
+      import("@frostbite/feature-game-admin/entrypoint").then(
         ({ createGameAdminEntrypoint }) =>
           createGameAdminEntrypoint(games, config),
       ),

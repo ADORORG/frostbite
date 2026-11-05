@@ -1,5 +1,5 @@
-import { defineFeature } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
+import { defineFeature } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
 import {
   libraryOlderRoute,
   libraryRoute,
@@ -8,7 +8,7 @@ import {
   uploadsNewPath,
   uploadsNavigationLabel,
   uploadsStudioPath,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 export function createUploadsFeature(providers: ProviderRegistry) {
   return defineFeature({
@@ -46,7 +46,7 @@ export function createUploadsFeature(providers: ProviderRegistry) {
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-uploads/entrypoint").then(
+      import("@frostbite/feature-uploads/entrypoint").then(
         ({ createUploadsEntrypoint }) => createUploadsEntrypoint(providers),
       ),
   });

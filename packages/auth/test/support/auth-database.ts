@@ -8,8 +8,8 @@ import {
   runMigrations,
   walletChallenges,
   walletIdentities,
-} from "@ador/database";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleWalletAuthRepository } from "../../src/adapters/drizzle-wallet-auth-repository.ts";

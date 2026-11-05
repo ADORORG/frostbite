@@ -80,7 +80,7 @@ describe("a repeatable milestone, on the page", () => {
 
   it("does not announce what the player already had when the game starts", async () => {
     window.localStorage.setItem(
-      "ador:game:embedded-game:milestones",
+      "frostbite:game:embedded-game:milestones",
       JSON.stringify({
         "a-win": {
           count: 2,

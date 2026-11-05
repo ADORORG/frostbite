@@ -3,7 +3,7 @@ import {
   collectionImportRowSchema,
   collectionLimits,
   type CollectionImportRow,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 import { detectDelimiter, parseCsv } from "./csv.ts";
 import { itemFieldMessages } from "./item-form.ts";

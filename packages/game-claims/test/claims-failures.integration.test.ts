@@ -1,4 +1,4 @@
-import { gameMilestoneClaims } from "@ador/database";
+import { gameMilestoneClaims } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

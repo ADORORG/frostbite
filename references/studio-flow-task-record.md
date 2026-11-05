@@ -6,12 +6,12 @@ Branch `feat/studio-flow`, stacked on `feat/studio-journey`. Baseline: `392a216`
 
 - **Standing**: a collection's list entry carries the state of its latest submission; the five standings
   (draft, in review, needs changes, approved, closed) and their words are defined once in
-  `@ador/shared/collections` (`standing.ts`).
+  `@frostbite/shared/collections` (`standing.ts`).
 - **Overview and create are separate pages**: `/studio/collections` is cards with filters by standing and
   counts, next action per card, and an empty state; `/studio/collections/new` is one short form with a way
   back. New design-system pieces: filter tabs, empty state, card, callout, disclosure styles.
 - **Images upload in place**: each image slot in the wizard has a fixed-purpose uploader
-  (`@ador/feature-uploads/inline`); a processed upload refetches the library, puts it in place, and
+  (`@frostbite/feature-uploads/inline`); a processed upload refetches the library, puts it in place, and
   chooses the new image. The uploads page offers "Use it in a collection" after a processed upload.
 - **Studio home** (`/studio`, moved from the accounts feature to the studio feature): where the person
   stands as a creator, collections by standing, images, and one next step.

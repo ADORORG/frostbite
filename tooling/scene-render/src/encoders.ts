@@ -1,5 +1,5 @@
-import { sceneHeight, sceneWidth } from "@ador/scenes/engine";
-import { videoSpec } from "@ador/scenes/video";
+import { sceneHeight, sceneWidth } from "@frostbite/scenes/engine";
+import { videoSpec } from "@frostbite/scenes/video";
 
 // One output of the renderer: how to turn the stream of raw frames into a file. Each is one `ffmpeg` command line, built here as data so
 // a test can read it and the runner needs no knowledge of codecs.

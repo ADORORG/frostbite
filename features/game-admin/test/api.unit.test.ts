@@ -1,5 +1,5 @@
-import type { FetchLike } from "@ador/client-http";
-import { gameAdminRoutes } from "@ador/shared/games";
+import type { FetchLike } from "@frostbite/client-http";
+import { gameAdminRoutes } from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { createGameAdminApi } from "../src/client/api.ts";

@@ -1,4 +1,4 @@
-import type { LibraryAsset } from "@ador/shared/uploads";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 export const assetId = "018f22f2-9c1a-7b21-8c45-000000000001";
 export const intentId = "018f22f2-9c1a-7b21-8c45-000000000002";

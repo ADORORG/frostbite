@@ -1,13 +1,13 @@
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
 import {
   completeUploadIntentInputSchema,
   completedUploadResponseSchema,
   uploadIntentRoutes,
   type CompleteUploadIntentInput,
   type CompletedUploadResponse,
-} from "@ador/shared/uploads";
-import type { createUploadIntentService } from "@ador/uploads";
+} from "@frostbite/shared/uploads";
+import type { createUploadIntentService } from "@frostbite/uploads";
 
 import { uploadFailure } from "./outcomes.ts";
 

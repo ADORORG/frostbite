@@ -15,7 +15,7 @@ decisions are in `docs/product/game-sdk-roadmap.md` (surveys 4-11).
   answers are 200 with `ready` or `unavailable` (no new HTTP codes).
 - **One mount for the whole app.** The layout wraps every page in `WalletRoot` (connection library, header widget,
   chooser dialog); `@repo/ui` gets a generic header slot so no page repeats it. The chooser's open/close state lives in
-  `@ador/wallet/client` (`useWalletChooser`), so a game asks for it without importing the accounts feature.
+  `@frostbite/wallet/client` (`useWalletChooser`), so a game asks for it without importing the accounts feature.
 - **The wallet library now loads on every page** (accepted by "every page"). **Measured: its chunk is about 604 KB
   gzipped**, the largest in the app by far. Follow-up task #59 (lazy-load it).
 - **`wallet.connect()`** is an additive protocol method behind the `wallet` capability and a `connectCallsPerMinute`
@@ -34,12 +34,12 @@ decisions are in `docs/product/game-sdk-roadmap.md` (surveys 4-11).
 
 - `@repo/ui`: `Avatar` (deterministic 5x5 mirrored grid from any text), `ArcadeDialog` (controlled), `ShellSlotsProvider`
   and the header slot in `AppShell`, widget styles.
-- `@ador/wallet`: chooser state in `WalletProvider`.
+- `@frostbite/wallet`: chooser state in `WalletProvider`.
 - `features/accounts`: balance contract, operation, source port, client store (`idle|loading|ready|refreshing|stale|
 unavailable|failed`, 60 s only while the menu is open, answers for a replaced wallet dropped), `WalletRoot`,
   `WalletWidget`, `WalletMenu`, balance line, linked wallets, copy, chooser dialog; `balanceRefreshMs` in the wallet
   config; rate limit `getWalletBalance` 30 a minute.
-- `@ador/game-sdk` and `features/games`: `wallet.connect` in protocol, host, client and the page; the dock's wallet
+- `@frostbite/game-sdk` and `features/games`: `wallet.connect` in protocol, host, client and the page; the dock's wallet
   card opens the app's chooser and shows the mismatch; the SDK explorer has a probe.
 - Docs: plan, interface doc, onboarding, SDK/accounts/wallet READMEs, preview checklist, ledger note.
 
@@ -53,8 +53,8 @@ unavailable|failed`, 60 s only while the menu is open, answers for a replaced wa
   game card mismatch). The working tree was identical before and after. The guard changed by the policy fix
   (`accepts`) was re-checked separately.
 - `pnpm format:check`, `pnpm lint` (44 workspaces, 1362 files, repository policy included) and `pnpm typecheck`: passed.
-- Coverage (statements / branches / functions / lines): `@repo/ui` 99.4/98.6/100/100; `@ador/wallet` 100 on all four;
-  `@ador/game-sdk` 98.3/98.0/98.3/98.4; `features/accounts` 95.6/96.4/92.9/95.8; `features/games` 98.7/96.0/97.9/99.1;
+- Coverage (statements / branches / functions / lines): `@repo/ui` 99.4/98.6/100/100; `@frostbite/wallet` 100 on all four;
+  `@frostbite/game-sdk` 98.3/98.0/98.3/98.4; `features/accounts` 95.6/96.4/92.9/95.8; `features/games` 98.7/96.0/97.9/99.1;
   SDK explorer 100/91.7/100/100; `apps/web` 96.9/96.6/96.0/97.5.
 - e2e: the full suite, run without updating baselines after regenerating them: 372 passed, 0 failed, 92 skipped
   (project-specific skips). New: `wallet-widget.spec.ts` (every public page, reconnect and disconnect, balance asked
@@ -71,7 +71,7 @@ unavailable|failed`, 60 s only while the menu is open, answers for a replaced wa
 1. **After a reload the button said "Account" instead of the wallet.** The connection library waits about 1.5 s after
    load before it reconnects to the last wallet (it waits for extensions), then waits for the extension, so for a
    moment there really is no connected wallet. The button now says "Reconnecting wallet…" while the library has a
-   remembered wallet (`hasRememberedWallet`, in `@ador/wallet/client`, reads the library's own `defaultWallet` key) and
+   remembered wallet (`hasRememberedWallet`, in `@frostbite/wallet/client`, reads the library's own `defaultWallet` key) and
    until `reconnectWaitMs` (10 s, in `configs/wallet.ts`) runs out. My e2e wallet answered instantly, so it could not
    show this; the fake wallet now has a delay option and the e2e checks the label and then the address.
 2. **Signing out on `/account` kept showing the session.** Pages are rendered on the server and the widget changed only

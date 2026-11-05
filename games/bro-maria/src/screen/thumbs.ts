@@ -1,4 +1,4 @@
-import { attachZones } from "@ador/game-sdk/touch-zones";
+import { attachZones } from "@frostbite/game-sdk/touch-zones";
 
 import type { Controls } from "../rules/types.ts";
 

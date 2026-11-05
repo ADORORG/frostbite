@@ -5,13 +5,13 @@ import {
   hasRememberedWallet,
   useWalletChooser,
   useWalletConnection,
-} from "@ador/wallet/client";
-import { signInPath } from "@ador/shared/auth/sign-in-path";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/wallet/client";
+import { signInPath } from "@frostbite/shared/auth/sign-in-path";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
-import type { AccountOutcome } from "@ador/shared/account-outcomes";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
+import type { AccountOutcome } from "@frostbite/shared/account-outcomes";
 
 import { signOut } from "../client/sign-out.ts";
 import type { WalletCandidate } from "../wallet-config.ts";

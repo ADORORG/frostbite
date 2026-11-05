@@ -1,13 +1,13 @@
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
   connectToPlatform,
   type PlatformPlay,
   sendRun,
-} from "@ador/game-sdk/play";
-import { byInput } from "@ador/game-sdk/touch";
-import { attachTapToStart } from "@ador/game-sdk/touch-start";
+} from "@frostbite/game-sdk/play";
+import { byInput } from "@frostbite/game-sdk/touch";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { stepSounds, tempoFor } from "./feedback.ts";

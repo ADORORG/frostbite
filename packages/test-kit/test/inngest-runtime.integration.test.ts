@@ -74,7 +74,14 @@ describe("the disposable Inngest runtime", () => {
     const name = () =>
       spawnSync(
         "docker",
-        ["ps", "-a", "--filter", "name=ador-inngest", "--format", "{{.Names}}"],
+        [
+          "ps",
+          "-a",
+          "--filter",
+          "name=frostbite-inngest",
+          "--format",
+          "{{.Names}}",
+        ],
         { encoding: "utf8" },
       )
         .stdout.split("\n")
@@ -88,7 +95,14 @@ describe("the disposable Inngest runtime", () => {
   const containers = () =>
     spawnSync(
       "docker",
-      ["ps", "-a", "--filter", "name=ador-inngest", "--format", "{{.Names}}"],
+      [
+        "ps",
+        "-a",
+        "--filter",
+        "name=frostbite-inngest",
+        "--format",
+        "{{.Names}}",
+      ],
       { encoding: "utf8" },
     )
       .stdout.split("\n")
@@ -100,7 +114,7 @@ describe("the disposable Inngest runtime", () => {
       startInngestRuntime({
         appPort: await freePort(),
         hostPort: await freePort(),
-        image: "ador-test/does-not-exist:0",
+        image: "frostbite-test/does-not-exist:0",
         retryIntervalSeconds: 1,
         ...keys,
       }),

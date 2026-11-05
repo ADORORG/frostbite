@@ -7,8 +7,8 @@ import {
   type ContactCodePolicy,
   type ContactCodeService,
   type ContactLinkService,
-} from "@ador/auth";
-import { createMailSender, type MailSettings } from "@ador/mail";
+} from "@frostbite/auth";
+import { createMailSender, type MailSettings } from "@frostbite/mail";
 import {
   parseAuthSessionEnvironment,
   parseEnvironment,

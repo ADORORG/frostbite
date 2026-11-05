@@ -1,5 +1,5 @@
 import type { BrowserContext } from "@playwright/test";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
 export type E2ESessionContext = Pick<
   BrowserContext,

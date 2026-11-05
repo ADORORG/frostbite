@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 
-import { createNodeRequestListener } from "@ador/http/node-adapter";
+import { createNodeRequestListener } from "@frostbite/http/node-adapter";
 
 import { expiredRowPolicy } from "@repo/configs/expired-rows";
 import { providerRegistry } from "@repo/configs/providers";

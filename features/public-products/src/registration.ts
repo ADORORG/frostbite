@@ -1,4 +1,4 @@
-import { defineFeature } from "@ador/plugin-kit";
+import { defineFeature } from "@frostbite/plugin-kit";
 
 import {
   capabilitiesOf,
@@ -32,7 +32,7 @@ function productFeature(catalog: ProductCatalog) {
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-public-products/entrypoint").then(
+      import("@frostbite/feature-public-products/entrypoint").then(
         ({ createPublicProductEntrypoint }) =>
           createPublicProductEntrypoint(catalog),
       ),

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { installFakeAudio } from "@ador/game-sdk/audio/fake";
+import { installFakeAudio } from "@frostbite/game-sdk/audio/fake";
 import { act } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 

@@ -1,5 +1,5 @@
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type {

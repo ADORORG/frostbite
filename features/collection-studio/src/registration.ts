@@ -1,6 +1,6 @@
-import { defineFeature } from "@ador/plugin-kit";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import type { ChainOption } from "@ador/shared/chain";
+import { defineFeature } from "@frostbite/plugin-kit";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   collectionImportRoute,
   collectionNewPath,
@@ -10,7 +10,7 @@ import {
   collectionWizardPath,
   studioHomePath,
   submissionRoutes,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 // The routes, listed in a fixed order so the manifest is stable.
 const routes = [
@@ -72,7 +72,7 @@ export function createCollectionStudioFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-collection-studio/entrypoint").then(
+      import("@frostbite/feature-collection-studio/entrypoint").then(
         ({ createCollectionStudioEntrypoint }) =>
           createCollectionStudioEntrypoint(providers, targetChains),
       ),

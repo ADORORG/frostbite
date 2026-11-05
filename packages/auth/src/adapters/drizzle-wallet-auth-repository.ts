@@ -5,19 +5,19 @@ import {
   walletChallenges,
   walletIdentities,
   type WalletChallenge,
-} from "@ador/database/schema/auth";
-import { releasedWallets } from "@ador/database/schema/wallet-release";
+} from "@frostbite/database/schema/auth";
+import { releasedWallets } from "@frostbite/database/schema/wallet-release";
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
-import { isWalletNetwork } from "@ador/shared/chain";
+} from "@frostbite/database/connection";
+import { validateBitcoinAddress } from "@frostbite/chain/bitcoin";
+import { isWalletNetwork } from "@frostbite/shared/chain";
 import {
   createUuidV7,
   uuidV7Schema,
   type UuidV7,
-} from "@ador/shared/identifiers";
+} from "@frostbite/shared/identifiers";
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 
 import { sha256 } from "../domain/crypto.ts";

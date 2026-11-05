@@ -1,4 +1,4 @@
-import type { PlatformRole } from "@ador/shared/accounts";
+import type { PlatformRole } from "@frostbite/shared/accounts";
 
 // Who holds platform roles, and finding a person to give one to. For administrators only (the caller checks); it shows what an administrator
 // needs to be sure it is the right person and nothing more: a name taken from a sign-in method the account holds, the roles, and whether

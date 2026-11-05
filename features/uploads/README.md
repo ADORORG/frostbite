@@ -5,8 +5,8 @@ listing) and two studio pages: `/studio/uploads` (the library, filtered by purpo
 "Use in a collection" link) `/studio/uploads/new` (adding an image) and `/studio/uploads/[assetId]` (one image in full). Registration receives the platform provider registry
 explicitly, so removing its one line detaches the routes, the page, and storage use.
 
-The feature validates HTTP input through `@ador/shared/uploads`, delegates persistence and signing to
-`@ador/uploads`, and imports no R2 implementation. Completion exposes only the pending asset ID and
+The feature validates HTTP input through `@frostbite/shared/uploads`, delegates persistence and signing to
+`@frostbite/uploads`, and imports no R2 implementation. Completion exposes only the pending asset ID and
 state; it does not claim validation or publication.
 
 Configuration uses the shared typed upload policy. Run `env:check`, `typecheck`, `test:unit`,
@@ -14,17 +14,17 @@ Configuration uses the shared typed upload policy. Run `env:check`, `typecheck`,
 
 ## Presentation helpers
 
-`@ador/feature-uploads/context` exports `createUploadsContextResolver`, the database and storage an
+`@frostbite/feature-uploads/context` exports `createUploadsContextResolver`, the database and storage an
 uploads-backed feature needs (collection studio and collection review use it instead of repeating it).
-`@ador/feature-uploads/presentation` exports the pure helpers that explain a `LibraryAsset` to a person
+`@frostbite/feature-uploads/presentation` exports the pure helpers that explain a `LibraryAsset` to a person
 (`assetBadge`, `assetNote`, `pickRendition`, `describeDimensions`), so other studio pages that show the
 creator's images describe them in the same words.
 
-`@ador/feature-uploads/inline` exports `InlineUpload`, a client component that uploads one image for a
+`@frostbite/feature-uploads/inline` exports `InlineUpload`, a client component that uploads one image for a
 fixed purpose inside another page (the collection wizard's image slots). It reports the asset only once it
 is processed; refused or still-processing images are not offered for use.
 
-`@ador/feature-uploads/bulk` exports `BulkUpload`, a client component that uploads many images of one purpose
+`@frostbite/feature-uploads/bulk` exports `BulkUpload`, a client component that uploads many images of one purpose
 at once. Every file is sent under its own name (kept with the asset as `fileName`, so a list of items can name
 its images) and has its own idempotency key and state, so one failure never stops the others. The batch keeps
 at most as many unfinished uploads as the server allows per person (`activeIntentLimitPerUser`) and at most
@@ -34,15 +34,15 @@ each image once it is processed, and `onSettled` once when the batch comes to re
 
 ## Asset pipeline composition
 
-`@ador/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and
+`@frostbite/feature-uploads/pipeline` exports `createAssetPipelineResolver`, which composes the validation and
 processing activities from the typed `object-storage:s3-compatible` and
 `media-processing:image-derivatives` capabilities and returns provider-neutral activities for a workflow
 host. A failed composition is not cached; the host may pass its own database client and clock.
 
 ## Abandoned-upload cleanup
 
-`@ador/feature-uploads/cleanup` exports `createUploadCleanupResolver`, which composes
-`@ador/uploads`'s cleanup service from the typed `object-storage:s3-compatible` capability and
+`@frostbite/feature-uploads/cleanup` exports `createUploadCleanupResolver`, which composes
+`@frostbite/uploads`'s cleanup service from the typed `object-storage:s3-compatible` capability and
 returns it lazily (a failed composition is not cached). The worker runs it periodically; see the
 package README for the rules and the access policy for private drafts.
 
@@ -61,11 +61,11 @@ bearer-URL trade-offs and the plan to migrate to a streaming route.
 
 The page is organized so each layer can be replaced or tested alone:
 
-- `src/client/` is framework-free: `api-client` (typed routes on the shared `@ador/client-http` requester), `file-checks`, `transfer` (an
+- `src/client/` is framework-free: `api-client` (typed routes on the shared `@frostbite/client-http` requester), `file-checks`, `transfer` (an
   `ObjectTransfer` port with an XHR implementation for progress), `upload-state` (a pure reducer),
   `upload-runner` (resumable orchestration), `asset-poller`, `library-refresh`, copy modules
   (`rejection-copy`, `upload-messages`, `asset-presentation`, `purpose-labels`; a failure the server named is told in the words of
-  `uploadOutcomes` in `@ador/shared/uploads`, by its reason, and the status class's words are only the fallback), `client-policy`, and
+  `uploadOutcomes` in `@frostbite/shared/uploads`, by its reason, and the status class's words are only the fallback), `client-policy`, and
   `browser-services` (the one bundle of browser dependencies; tests inject fakes).
 - `src/ui/hooks/` connects that logic to React (`use-upload-session`, `use-asset-library`).
 - `src/ui/components/` holds small presentational components (`upload-form`, `upload-feedback`,

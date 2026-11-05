@@ -1,7 +1,7 @@
-import type { Readiness } from "@ador/shared/readiness";
+import type { Readiness } from "@frostbite/shared/readiness";
 
 import { livenessPath, readinessPath, workflowEndpointPath } from "./config.ts";
-import type { SignedWorkflowEndpoint } from "@ador/jobs/provider-service";
+import type { SignedWorkflowEndpoint } from "@frostbite/jobs/provider-service";
 
 const notFound = () => Response.json({ error: "not_found" }, { status: 404 });
 

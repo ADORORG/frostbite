@@ -3,7 +3,7 @@ import {
   defaultUploadPolicy,
   uploadContentTypes,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { ArcadeFileDrop, ArcadeSelect } from "@repo/ui/arcade";
 
 import { purposeOptions } from "../../client/purpose-labels.ts";

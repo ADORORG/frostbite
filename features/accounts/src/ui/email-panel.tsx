@@ -1,8 +1,8 @@
 "use client";
 
-import type { EmailAddressesView } from "@ador/auth";
-import { createRequester, sameOriginFetch } from "@ador/client-http";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import type { EmailAddressesView } from "@frostbite/auth";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import {
   ArcadeActionButton,
   ConsoleCard,

@@ -1,5 +1,5 @@
 {
-  "name": "@ador/provider-media-processing-sharp",
+  "name": "@frostbite/provider-media-processing-sharp",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,9 +16,9 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/media": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/media": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "sharp": "0.35.5",
     "zod": "4.5.4"
   },

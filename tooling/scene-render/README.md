@@ -1,6 +1,6 @@
 # `@repo/scene-render`
 
-Renders the platform's scenes (`@ador/scenes`, the pickable ones and the ambient ones such as the landing page's snow) to video files, for browsers that cannot draw them. Developer tooling: not shipped, and
+Renders the platform's scenes (`@frostbite/scenes`, the pickable ones and the ambient ones such as the landing page's snow) to video files, for browsers that cannot draw them. Developer tooling: not shipped, and
 nothing in the platform imports it.
 
 ## Public API
@@ -15,7 +15,7 @@ command (the root script supplies it).
 
 ## How it works
 
-- The frames are the scene's own: `framePlan` (from `@ador/scenes/video`) spreads a whole number of frames evenly over the loop, and
+- The frames are the scene's own: `framePlan` (from `@frostbite/scenes/video`) spreads a whole number of frames evenly over the loop, and
   `createRaster` is a surface that draws into memory, so nothing needs a browser. A video is the scene, not a likeness of it.
 - Each output is one `ffmpeg` command (`src/encoders.ts`, as data), fed raw frames on its input (`src/encode.ts`). The 160 x 90 picture is
   enlarged four times with no smoothing so pixels stay square.
@@ -27,7 +27,7 @@ command (the root script supplies it).
 
 ## Invariants
 
-- Output names come from `videoFiles` (`@ador/scenes/video`), the same function the page uses to ask for them.
+- Output names come from `videoFiles` (`@frostbite/scenes/video`), the same function the page uses to ask for them.
 - Rendering is repeatable: a file from an earlier run is replaced.
 
 ## Test commands

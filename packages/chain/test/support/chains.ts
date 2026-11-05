@@ -2,7 +2,7 @@ import {
   chainFamilyIdSchema,
   chainRefSchema,
   type ChainConfig,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { ChainAdapter } from "../../src/adapter.ts";
 import {

@@ -1,4 +1,4 @@
-import { correlationIdSchema } from "@ador/shared/http";
+import { correlationIdSchema } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
 import {

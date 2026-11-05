@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema } from "@frostbite/shared/chain";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {

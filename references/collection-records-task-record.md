@@ -13,21 +13,21 @@ rules hold in the database, not only in the API, and the whole path ran on real 
 
 ## What was built
 
-- `@ador/shared/collections`: draft and item schemas, engineering limits, the asset purposes a draft may
-  reference, and the HTTP contract of seven operations. `@ador/shared/http` gained `requestFingerprint`
-  (key-order-independent digest). `@ador/shared/chain` gained `chainOptionSchema` (a projection of
+- `@frostbite/shared/collections`: draft and item schemas, engineering limits, the asset purposes a draft may
+  reference, and the HTTP contract of seven operations. `@frostbite/shared/http` gained `requestFingerprint`
+  (key-order-independent digest). `@frostbite/shared/chain` gained `chainOptionSchema` (a projection of
   `ChainConfig` that needs no confirmation policy) and text variants of the chain schemas.
 - Database: `collections` and `collection_items` with a revision counter, CAIP-2 target chain,
   per-creator and per-collection idempotency keys, and CHECK constraints for every stored limit
   (migration `20261009223255_illegal_swordsman`).
-- `@ador/collections` (new): the service and the PostgreSQL repository.
-- `@ador/feature-collection-studio` (new): the authenticated API (create, list, read, save, add, update,
+- `@frostbite/collections` (new): the service and the PostgreSQL repository.
+- `@frostbite/feature-collection-studio` (new): the authenticated API (create, list, read, save, add, update,
   and remove item), registered in `configs/features.ts`; `configs/chains.ts` supplies the target chains.
-- `@ador/uploads`: `getMany` presents the creator's own assets by id, so previews reuse the library's
+- `@frostbite/uploads`: `getMany` presents the creator's own assets by id, so previews reuse the library's
   signing.
-- Test infrastructure: `@ador/test-kit` gained `storage-registry` (moved from the uploads tests) and
-  `creator-database` (shared seeding); `memoizeUntilFailure` moved to `@ador/plugin-kit/lazy`;
-  `createDatabaseFromEnvironment` in `@ador/database`.
+- Test infrastructure: `@frostbite/test-kit` gained `storage-registry` (moved from the uploads tests) and
+  `creator-database` (shared seeding); `memoizeUntilFailure` moved to `@frostbite/plugin-kit/lazy`;
+  `createDatabaseFromEnvironment` in `@frostbite/database`.
 
 ## Decisions taken without the product owner (defaults, to be reviewed)
 
@@ -57,8 +57,8 @@ killed by removing the advisory lock; the owner filter in `getMany` is killed by
 
 `env:check`, `format:check`, `typecheck`, `lint`, `test:unit`, `test:integration`, `test:coverage`
 (merged thresholds pass), `db:check`, and `build` exit 0 and the full `test:e2e` passed. File lengths are
-within 300 (repository policy passed). Coverage: `@ador/collections` 98.2 % lines and 94.0 % branches;
-`@ador/feature-collection-studio` 100 %; the unreached lines are four "row is missing" guards after an
+within 300 (repository policy passed). Coverage: `@frostbite/collections` 98.2 % lines and 94.0 % branches;
+`@frostbite/feature-collection-studio` 100 %; the unreached lines are four "row is missing" guards after an
 `INSERT ... RETURNING`, impossible by construction and kept for type narrowing.
 
 ## Findings and limits

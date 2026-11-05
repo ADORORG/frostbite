@@ -1,4 +1,4 @@
-import type { ApprovedVersionReader } from "@ador/collections";
+import type { ApprovedVersionReader } from "@frostbite/collections";
 import { describe, expect, it, vi } from "vitest";
 
 import {

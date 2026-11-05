@@ -1,4 +1,4 @@
-import { ObjectStorageError } from "@ador/object-storage/errors";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
 
 interface ProviderErrorShape {
   readonly $metadata?: { readonly httpStatusCode?: number };

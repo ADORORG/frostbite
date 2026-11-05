@@ -4,7 +4,7 @@ import { runStorageSmoke } from "./smoke-checks.ts";
 
 // Verifies a real R2 (or any S3-compatible) deployment with the configured credentials. It writes one
 // throwaway object, reads it back every supported way, and deletes it. Run it with the same
-// environment the application will use: `pnpm --filter @ador/provider-object-storage-r2 smoke`.
+// environment the application will use: `pnpm --filter @frostbite/provider-object-storage-r2 smoke`.
 const environment = process.env;
 const config = parseR2Environment(environment);
 const publicBaseUrl = environment.PUBLIC_BASE_URL;

@@ -6,7 +6,7 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 
 import { creatorE2EFixtures } from "../../src/creator-fixtures.ts";

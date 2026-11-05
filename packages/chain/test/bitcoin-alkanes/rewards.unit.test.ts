@@ -4,7 +4,7 @@ import {
   chainRefSchema,
   type ChainRef,
   type ContractRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import {
   collectibleOpcodes,

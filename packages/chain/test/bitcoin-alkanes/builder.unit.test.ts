@@ -1,6 +1,6 @@
 import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
-import { chainRefSchema, type FundingPolicy } from "@ador/shared/chain";
+import { chainRefSchema, type FundingPolicy } from "@frostbite/shared/chain";
 
 import { BuildRefusedError } from "../../src/bitcoin-alkanes/build-refused.ts";
 import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";

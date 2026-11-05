@@ -1,4 +1,4 @@
-import type { GameState } from "@ador/shared/games";
+import type { GameState } from "@frostbite/shared/games";
 
 // Where a player's saved state for a game lives. `change` is the only write: it hands the stored state to
 // `decide` while holding the player's rows for that game, stores what `decide` returns, and returns it, so

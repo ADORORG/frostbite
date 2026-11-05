@@ -1,9 +1,9 @@
 import { Readable } from "node:stream";
 
-import type { ImageProcessor } from "@ador/media/processing";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { providerIdSchema } from "@ador/shared/providers";
+import type { ImageProcessor } from "@frostbite/media/processing";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { providerIdSchema } from "@frostbite/shared/providers";
 
 export const storageProviderId = providerIdSchema.parse("test-object-storage");
 

@@ -1,4 +1,4 @@
-import type { BalanceSource } from "@ador/feature-accounts";
+import type { BalanceSource } from "@frostbite/feature-accounts";
 
 import { betaChain } from "./chains.ts";
 import { followedRewardsChain } from "./game-rewards.ts";

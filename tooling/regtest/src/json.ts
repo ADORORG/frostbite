@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 
 export type JsonObject = { readonly [key: string]: JsonValue };
 

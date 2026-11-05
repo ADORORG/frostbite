@@ -12,8 +12,8 @@ import {
   createDatabasePool,
   platformRoleAssignments,
   walletIdentities,
-} from "@ador/database";
-import { creatorApplicationFixture } from "@ador/test-kit/creator-database";
+} from "@frostbite/database";
+import { creatorApplicationFixture } from "@frostbite/test-kit/creator-database";
 
 import {
   approvedCreators,

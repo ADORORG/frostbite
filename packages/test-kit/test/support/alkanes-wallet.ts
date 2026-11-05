@@ -2,9 +2,9 @@ import { Psbt } from "bitcoinjs-lib";
 import type {
   SignedTransaction,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
-import type { AlkanesNode } from "@ador/chain/bitcoin-alkanes";
+import type { AlkanesNode } from "@frostbite/chain/bitcoin-alkanes";
 
 // The BIP 173 example address: a P2WPKH wallet whose public key is the secp256k1 generator, so a test can finalize an input with
 // a syntactically valid signature without a signing library. Nothing here is a real signature.

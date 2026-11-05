@@ -2,8 +2,8 @@ import {
   providerManifestSchema,
   type ProviderId,
   type ProviderManifest,
-} from "@ador/shared/providers";
-import type { ProviderCapability } from "@ador/shared/features";
+} from "@frostbite/shared/providers";
+import type { ProviderCapability } from "@frostbite/shared/features";
 
 export interface ProviderEntrypoint {
   readonly capabilities: readonly ProviderCapability[];

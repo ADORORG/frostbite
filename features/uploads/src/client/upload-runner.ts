@@ -1,8 +1,11 @@
-import type { IdempotencyKey } from "@ador/shared/http";
-import { uploadFileNameSchema, type LibraryAsset } from "@ador/shared/uploads";
+import type { IdempotencyKey } from "@frostbite/shared/http";
+import {
+  uploadFileNameSchema,
+  type LibraryAsset,
+} from "@frostbite/shared/uploads";
 
 import { waitForAsset, type PollResult } from "./asset-poller.ts";
-import { isRetryableApiError, ApiError } from "@ador/client-http";
+import { isRetryableApiError, ApiError } from "@frostbite/client-http";
 import type { UploadsApi } from "./api-client.ts";
 import type { UploadClientPolicy } from "./client-policy.ts";
 import type { CheckedFile } from "./file-checks.ts";

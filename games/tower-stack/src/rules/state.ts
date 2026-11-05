@@ -1,4 +1,4 @@
-import { startState, stepInt, stepSeed } from "@ador/game-sdk/seeded";
+import { startState, stepInt, stepSeed } from "@frostbite/game-sdk/seeded";
 
 import { baseWidth, fieldWidth } from "./constants.ts";
 import { rangeOf } from "./block.ts";

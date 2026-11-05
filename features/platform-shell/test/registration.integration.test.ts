@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createFeatureRegistry } from "@ador/plugin-kit";
+import { createFeatureRegistry } from "@frostbite/plugin-kit";
 
 import { platformShellFeature } from "../src/registration.js";
 

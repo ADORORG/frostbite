@@ -1,5 +1,8 @@
-import type { AuthorizationPolicy, PlatformRole } from "@ador/shared/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type {
+  AuthorizationPolicy,
+  PlatformRole,
+} from "@frostbite/shared/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import type { AuthorizationRepository } from "../src/application/repository.ts";

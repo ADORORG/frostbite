@@ -1,6 +1,6 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { platformSetupLinks } from "@ador/database/schema/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { platformSetupLinks } from "@frostbite/database/schema/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq, isNull } from "drizzle-orm";
 
 import type { SetupLinkRepository } from "../application/setup-link.ts";

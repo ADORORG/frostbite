@@ -1,4 +1,4 @@
-import type { CapturedMail } from "@ador/mail";
+import type { CapturedMail } from "@frostbite/mail";
 
 // What the person testing is shown of the messages the capture transport kept: when, to whom, and the message itself, newest first. A
 // local mailbox has no one else to read it, so the text (and with it the code) is printed whole.

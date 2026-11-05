@@ -1,5 +1,5 @@
-import { createDecodablePng } from "@ador/test-kit/png";
-import { collectionDetailSchema } from "@ador/shared/collections";
+import { createDecodablePng } from "@frostbite/test-kit/png";
+import { collectionDetailSchema } from "@frostbite/shared/collections";
 import { expect, type APIRequestContext } from "@playwright/test";
 
 import {

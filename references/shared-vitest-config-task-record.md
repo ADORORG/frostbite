@@ -29,7 +29,7 @@ projects in jsdom under a root `environment: node`, and the first output made th
 
 ## Found on the full coverage run
 
-`@ador/test-kit` failed its own branch threshold (88.65% against 90.01%) with a config that resolves identically to the old one,
+`@frostbite/test-kit` failed its own branch threshold (88.65% against 90.01%) with a config that resolves identically to the old one,
 so the failure predates this change: two fixtures added with the claim path (`adder-game.ts`, `memory-game-backend.ts`) were
 only exercised from other packages' suites. Tests were added in the package (`memory-game-backend.unit.test.ts`,
 `adder-game.integration.test.ts`; 6 mutations, all killed); branches are now 96.9%.

@@ -1,4 +1,4 @@
-import type { MintedMilestone } from "@ador/shared/games";
+import type { MintedMilestone } from "@frostbite/shared/games";
 
 import type { PublicCover, PublicGame } from "./catalog.ts";
 import { mintedDay } from "./minted-view.ts";

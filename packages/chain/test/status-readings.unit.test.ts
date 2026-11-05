@@ -1,4 +1,4 @@
-import { chainRefSchema, type IndexingStatus } from "@ador/shared/chain";
+import { chainRefSchema, type IndexingStatus } from "@frostbite/shared/chain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ChainObserver } from "../src/ports.ts";

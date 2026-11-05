@@ -1,12 +1,12 @@
 import {
   chainUnreachableWords,
   submitRefusalWords,
-} from "@ador/shared/chain-step-words";
+} from "@frostbite/shared/chain-step-words";
 import type {
   GameClaim,
   GameClaimState,
   GameClaimUnavailableReason,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What a person is told about a claim, in one place. It never says "minted" or "claimed" before the chain's indexed state agrees:
 // `claimed` is only "confirmed" and says it is not complete yet.

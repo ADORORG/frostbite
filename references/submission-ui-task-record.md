@@ -14,17 +14,17 @@ reduced-motion, and visual coverage, and nothing here publishes or deploys anyth
 
 ## What was built
 
-- Creator side (`@ador/feature-collection-studio`): the review step shows a readiness checklist, the
+- Creator side (`@frostbite/feature-collection-studio`): the review step shows a readiness checklist, the
   newest submission's state in plain words with reviewer feedback, a warning when the draft has moved on
   since the submitted version, and one submit control that only submits the saved version.
   `useSubmissions` holds the idempotency key until a submission succeeds and replaces it when the
   revision changes. Client rules: `submission-progress.ts` and `submission-copy.ts`.
-- Staff side (`@ador/feature-collection-review`, now a UI feature): `/admin/collection-reviews` (queue
+- Staff side (`@frostbite/feature-collection-review`, now a UI feature): `/admin/collection-reviews` (queue
   in three groups) and `/admin/collection-reviews/[submissionId]` (the frozen version with images, the
   decision form, the history). The read operation returns signed previews of the submission's own images.
-- `@ador/client-react` (new): `useResource` and `useAction`, extracted so features share one
+- `@frostbite/client-react` (new): `useResource` and `useAction`, extracted so features share one
   implementation; the studio now uses them.
-- `@ador/feature-uploads/context`: the one database-and-storage context resolver, replacing copies.
+- `@frostbite/feature-uploads/context`: the one database-and-storage context resolver, replacing copies.
 - `@repo/ui`: radio and checkbox labels lay out beside their control (radios had been full-width), and
   `.arcade-facts` for label and value lists.
 - Shared: staff routes and labels (`submissionStateLabels`, `reviewActionLabels`), the detail response

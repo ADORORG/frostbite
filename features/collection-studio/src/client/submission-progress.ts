@@ -4,7 +4,7 @@ import {
   type CollectionSubmission,
   type SubmissionRequirement,
   missingSubmissionRequirements,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 // What the creator can do about submitting, from the collection and its latest submission. This
 // mirrors the server's rules to explain them in advance; the server stays the authority.

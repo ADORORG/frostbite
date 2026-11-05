@@ -45,8 +45,8 @@ claims config now takes an optional `clock` (production leaves it out) and the t
 
 - `pnpm format:check`, `pnpm lint` (48 workspaces), `pnpm typecheck` (48/48), `pnpm repository:check` (48 workspaces, 1648 files): pass.
 - `pnpm test:coverage`: 47 of 48 workspaces passed on the first run; the 48th, `web`, failed on the clock fault above and passes after the
-  fix (32 files, 174 tests). `@ador/chain` 85 unit tests plus the live test (4, run with `ALKANES_LIVE_NODE_URL` against the public
-  Subfrost mainnet node, all pass; skipped otherwise), `@ador/test-kit` conformance now also runs the real adapter's rewards reader.
+  fix (32 files, 174 tests). `@frostbite/chain` 85 unit tests plus the live test (4, run with `ALKANES_LIVE_NODE_URL` against the public
+  Subfrost mainnet node, all pass; skipped otherwise), `@frostbite/test-kit` conformance now also runs the real adapter's rewards reader.
   `pnpm contracts:coverage` and `pnpm repository:coverage` (merged, above 90% lines and branches): pass.
 - `pnpm --filter web build`: exit 0. The full e2e run was not repeated: no page, route or browser code changed (the only app change is a
   test).

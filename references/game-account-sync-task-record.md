@@ -6,7 +6,7 @@ on their account and follow them to another browser; a signed-out player's stay 
 ## Decisions (owner away; defaults taken and logged)
 
 - **Merge rule:** the newest save wins, a tie keeps the stored one, every milestone from both sides is kept with
-  its earliest unlock time. One pure function, `mergeGameState` in `@ador/shared/games`, used by the server (the
+  its earliest unlock time. One pure function, `mergeGameState` in `@frostbite/shared/games`, used by the server (the
   page only sends state), so it can be replaced in one place. "Highest score wins" was not chosen: it needs a game
   to define what better means.
 - **A save dated beyond a 5-minute clock skew is ignored, not clamped.** Found by e2e: clamping to "now" moved the
@@ -17,14 +17,14 @@ on their account and follow them to another browser; a signed-out player's stay 
 
 ## What was built
 
-- `@ador/shared/games/sync`: contracts, route `POST /api/v1/games/sync` (`syncGameState`), merge rule.
-- `@ador/database`: `game_saves`, `game_milestone_unlocks` + migration `20261012063250_game_saves`.
-- `@ador/game-saves` (new): service (game listed, milestone declared, size, merge) and the PostgreSQL adapter
+- `@frostbite/shared/games/sync`: contracts, route `POST /api/v1/games/sync` (`syncGameState`), merge rule.
+- `@frostbite/database`: `game_saves`, `game_milestone_unlocks` + migration `20261012063250_game_saves`.
+- `@frostbite/game-saves` (new): service (game listed, milestone declared, size, merge) and the PostgreSQL adapter
   (rows locked `FOR UPDATE`, JSON `null` kept as a save).
-- `@ador/feature-games`: the authenticated operation, lazy runtime, rate limit `syncGameState` 120/min, the
+- `@frostbite/feature-games`: the authenticated operation, lazy runtime, rate limit `syncGameState` 120/min, the
   client account port (401 = signed out, other failures = pending, 5 s timeout), a status line that says only
   what is true (`account` / `local` / `pending`).
-- `@ador/game-sdk`: local backend dates saves and exports/replaces a snapshot; `createSyncedBackend` reconciles
+- `@frostbite/game-sdk`: local backend dates saves and exports/replaces a snapshot; `createSyncedBackend` reconciles
   once before the game's first read, then sends the whole local state after each change, one request at a time.
 
 ## Bugs found by the new tests

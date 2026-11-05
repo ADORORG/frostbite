@@ -1,5 +1,5 @@
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import { validateBitcoinAddress } from "@frostbite/chain/bitcoin";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import {

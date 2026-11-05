@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-platform-shell",
+  "name": "@frostbite/feature-platform-shell",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,15 +16,15 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/http": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/scenes": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/scenes": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "@types/node": "^26.4.0",

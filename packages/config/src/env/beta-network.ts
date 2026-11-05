@@ -1,4 +1,4 @@
-import { betaNetworkSchema, type BetaNetwork } from "@ador/shared/chain";
+import { betaNetworkSchema, type BetaNetwork } from "@frostbite/shared/chain";
 
 // The test network this deployment runs the beta on. Blank means signet, the documented beta network (ADR-008); a value the platform
 // has no chain record for stops boot, since a wallet, a game or a node on another network would otherwise be trusted silently.

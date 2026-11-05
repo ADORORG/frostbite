@@ -2,8 +2,8 @@ import {
   authorizationPolicySchema,
   capabilitySchema,
   type AuthorizationPolicy,
-} from "@ador/shared/accounts";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/accounts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import { effectiveRoles, requiresMethods } from "./effective-roles.ts";
 import type { AuthorizationRepository } from "./repository.ts";

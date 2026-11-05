@@ -1,10 +1,10 @@
 import { Readable } from "node:stream";
 
-import { ObjectStorageError } from "@ador/object-storage/errors";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
 import type {
   StoredObject,
   StoredObjectMetadata,
-} from "@ador/object-storage/contracts";
+} from "@frostbite/object-storage/contracts";
 
 export interface ProviderMetadata {
   readonly Body?: object;

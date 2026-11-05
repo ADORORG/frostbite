@@ -1,4 +1,7 @@
-import { createDelayJudge, type IndexingPorts } from "@ador/chain/indexing";
+import {
+  createDelayJudge,
+  type IndexingPorts,
+} from "@frostbite/chain/indexing";
 
 import type { StoredClaim } from "./repository.ts";
 import type { ClaimView, GameClaimsDependencies } from "./types.ts";

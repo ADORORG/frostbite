@@ -1,10 +1,10 @@
-import type { Collection, CollectionItemRow } from "@ador/database";
+import type { Collection, CollectionItemRow } from "@frostbite/database";
 import {
   submissionSchemaVersion,
   submissionSnapshotSchema,
   type SubmissionSnapshot,
-} from "@ador/shared/collections";
-import { chainRefTextSchema } from "@ador/shared/chain";
+} from "@frostbite/shared/collections";
+import { chainRefTextSchema } from "@frostbite/shared/chain";
 
 import { itemRecord } from "./views.ts";
 import type { ValidAsset } from "./guards.ts";

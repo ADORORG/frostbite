@@ -2,10 +2,10 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   walletChallenges,
-} from "@ador/database";
-import { walletChallengeRow } from "@ador/database/test-expired-rows";
-import { freePort, waitFor } from "@ador/test-kit/inngest-runtime";
-import { startServiceProcess } from "@ador/test-kit/service-process";
+} from "@frostbite/database";
+import { walletChallengeRow } from "@frostbite/database/test-expired-rows";
+import { freePort, waitFor } from "@frostbite/test-kit/inngest-runtime";
+import { startServiceProcess } from "@frostbite/test-kit/service-process";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { database } from "./support/database.ts";

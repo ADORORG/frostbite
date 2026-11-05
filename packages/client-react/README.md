@@ -1,4 +1,4 @@
-# `@ador/client-react`
+# `@frostbite/client-react`
 
 The two React hooks every browser feature needs, extracted so none reimplements them: loading a value
 and acting on the server.

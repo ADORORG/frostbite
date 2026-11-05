@@ -4,7 +4,7 @@ import {
   ArcadePanel,
   StatusLamp,
 } from "@repo/ui/arcade";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import type { ProductCatalog } from "../domain/catalog.ts";
 

@@ -11,9 +11,9 @@ describe("the landing page's rail of collections, over the real database", () =>
   it("is declared as a section of the landing page, after games and before launches", async () => {
     const { createPublicCollectionsEntrypoint } =
       await import("../src/entrypoint.tsx");
-    const { homeSectionOrder } = await import("@ador/shared/platform");
+    const { homeSectionOrder } = await import("@frostbite/shared/platform");
     const { storageRegistry, unusedStorage } =
-      await import("@ador/test-kit/storage-registry");
+      await import("@frostbite/test-kit/storage-registry");
     const { chains } = await import("./support/fixtures.ts");
     const entrypoint = createPublicCollectionsEntrypoint(
       storageRegistry(() => unusedStorage),

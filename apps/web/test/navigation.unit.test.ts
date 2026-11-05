@@ -1,6 +1,6 @@
-import type { ActiveSession } from "@ador/auth";
-import type { NavigationContribution } from "@ador/shared/features";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { ActiveSession } from "@frostbite/auth";
+import type { NavigationContribution } from "@frostbite/shared/features";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PageAccessDependencies } from "../src/server/auth/page-access.ts";

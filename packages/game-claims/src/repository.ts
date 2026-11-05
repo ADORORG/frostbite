@@ -4,7 +4,7 @@ import type {
   ContractRef,
   TransactionState,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 // The neutral transaction states, and `expired` for a claim built and never signed in time.
 export type ClaimState = TransactionState | "expired";

@@ -11,8 +11,8 @@ import {
   runMigrations,
   walletChallenges,
   walletIdentities,
-} from "@ador/database";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 

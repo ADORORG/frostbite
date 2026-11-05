@@ -46,8 +46,8 @@ PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the s
 until Ctrl+C. It builds the web app first (every start; Next reuses its cache, `--no-build` skips it), then
 prints the address, the pages worth visiting, and which rewards chain it is on.
 
-- **The data is kept.** The stack's PostgreSQL and S3 store (SeaweedFS) are containers named `ador-stack-postgres` and
-  `ador-stack-s3` with their data in Docker volumes (`ador-stack-postgres-data`, `ador-stack-s3-data`). Ctrl+C
+- **The data is kept.** The stack's PostgreSQL and S3 store (SeaweedFS) are containers named `frostbite-stack-postgres` and
+  `frostbite-stack-s3` with their data in Docker volumes (`frostbite-stack-postgres-data`, `frostbite-stack-s3-data`). Ctrl+C
   stops them and keeps them; the next `pnpm stack` starts them again, applies any new migrations, and seeds the people and
   sample content only if they are not there. The passwords they were made with are in `.stack-data/secrets.json` (ignored by
   git, owner-readable). `pnpm stack --fresh` deletes the containers, volumes and passwords first, after you type `delete`

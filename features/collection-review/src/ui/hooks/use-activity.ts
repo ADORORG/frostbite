@@ -1,7 +1,7 @@
 import type {
   ReviewActivityItem,
   ReviewActivityResponse,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { useCallback, useState } from "react";
 
 import type { ReviewClientServices } from "../../client/services.ts";

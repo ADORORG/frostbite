@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { chainOptionSchema } from "@ador/shared/chain";
+import { ApiError } from "@frostbite/client-http";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import {
   button,
   click,
@@ -8,7 +8,7 @@ import {
   settle,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { NewCollectionWorkspace } from "../src/ui/new-collection-workspace.tsx";

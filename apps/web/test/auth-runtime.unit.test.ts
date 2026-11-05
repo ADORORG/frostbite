@@ -15,22 +15,22 @@ const factories = vi.hoisted(() => ({
   }),
 }));
 
-vi.mock("@ador/auth", () => ({
+vi.mock("@frostbite/auth", () => ({
   createDrizzleSessionRepository: factories.sessionRepository,
   createSessionService: factories.sessionService,
 }));
 // The sign-in methods are the accounts feature's; this test is about how the adapters are put together, not which methods exist.
-vi.mock("@ador/feature-accounts", () => ({
+vi.mock("@frostbite/feature-accounts", () => ({
   createHeldMethodKinds: factories.heldKinds,
 }));
 vi.mock("@repo/configs/auth-methods", () => ({
   authMethods: { list: "the-method-registry" },
 }));
-vi.mock("@ador/authorization", () => ({
+vi.mock("@frostbite/authorization", () => ({
   createAuthorizationService: factories.authorizationService,
   createDrizzleAuthorizationRepository: factories.authorizationRepository,
 }));
-vi.mock("@ador/database/connection", () => ({
+vi.mock("@frostbite/database/connection", () => ({
   createDatabaseClient: factories.client,
   createDatabasePool: factories.pool,
   parseDatabaseEnvironment: factories.environment,

@@ -1,6 +1,6 @@
-import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import { gameAdminHref } from "@ador/shared/games";
+import { ExplorerBoundary } from "@frostbite/feature-chain-status/transaction";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
+import { gameAdminHref } from "@frostbite/shared/games";
 import {
   ArcadeBadge,
   ArcadeEmptyState,

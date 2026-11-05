@@ -20,12 +20,12 @@ The studio home and the collections pages read the caller's creator standing (th
 contract) and say why instead of offering a form that would be refused; if the standing cannot be read,
 the server decides. Standing words and next steps are pure and tested (`src/client/creator-standing.ts`);
 a collection's standing (draft, in review, needs changes, approved, closed) comes from the state of its
-latest submission and is defined once in `@ador/shared/collections`.
+latest submission and is defined once in `@frostbite/shared/collections`.
 
 All wizard state is server-side, so a creator resumes on the first unfinished step from any device.
 Unsaved edits overlay the saved draft; a stale revision shows a conflict notice with a reload. Images
 are chosen from the creator's processed library and uploaded in place: each image slot has an uploader
-for its purpose (`@ador/feature-uploads/inline`), and a processed upload refreshes the library and is
+for its purpose (`@frostbite/feature-uploads/inline`), and a processed upload refreshes the library and is
 chosen, so the creator never leaves the step. Nothing is published or sent to a chain, and the page says
 so.
 
@@ -45,15 +45,15 @@ Layout: `src/client` (typed API client on `@repo/client-http`, form parsing, err
 | `submitCollection` | `POST /api/v1/collection-submissions` | Idempotency key required; names `expectedRevision` |
 | `listCollectionSubmissions` | `GET /api/v1/collection-submissions/list?collectionId=` | The creator's own submissions with decisions |
 
-Submitting freezes the collection (see `@ador/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with its history: when it was submitted and what each decision was, with the
+Submitting freezes the collection (see `@frostbite/collections`). The wizard's review step shows what the collection still needs, offers "Submit for review" (or "Submit again" after changes were requested) only for the saved version, and shows each submission's state with its history: when it was submitted and what each decision was, with the
 reviewers' feedback (never who decided or the private notes). Refusals:
 not ready (400, naming what is missing), a stale revision, a submission already in review, or one closed
 for good (409), another creator's collection (404), a creator no longer approved (403).
 
 Item operations return the collection's new `revision`, which the next draft save must name.
 
-Persistence and rules are in `@ador/collections`; this feature validates input through
-`@ador/shared/collections`, maps each outcome to one stable HTTP error, and presents records. Previews
+Persistence and rules are in `@frostbite/collections`; this feature validates input through
+`@frostbite/shared/collections`, maps each outcome to one stable HTTP error, and presents records. Previews
 come from the uploads library service (`getMany`), so image states and short-lived signed renditions
 (ADR-016) are produced in one place. Signed URLs are bearer capabilities that expire; never store them.
 

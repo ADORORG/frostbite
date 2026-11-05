@@ -6,7 +6,7 @@ import {
   Popover,
   StatusDot,
 } from "@repo/ui/arcade";
-import type { ChainIndexing } from "@ador/shared/chain";
+import type { ChainIndexing } from "@frostbite/shared/chain";
 
 import {
   lampFor,

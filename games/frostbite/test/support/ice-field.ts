@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 
 import {
   cells,

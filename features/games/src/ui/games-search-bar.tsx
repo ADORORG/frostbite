@@ -1,6 +1,6 @@
 "use client";
 
-import { gameTagLabels, gameTags, type GameTag } from "@ador/shared/games";
+import { gameTagLabels, gameTags, type GameTag } from "@frostbite/shared/games";
 import {
   ArcadeActionButton,
   ArcadeTextField,

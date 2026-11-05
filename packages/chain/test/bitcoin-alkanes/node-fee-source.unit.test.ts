@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { ChainUnavailableError } from "../../src/ports.ts";

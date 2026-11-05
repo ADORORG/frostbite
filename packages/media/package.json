@@ -1,5 +1,5 @@
 {
-  "name": "@ador/media",
+  "name": "@frostbite/media",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*"
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

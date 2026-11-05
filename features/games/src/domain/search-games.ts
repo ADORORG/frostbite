@@ -1,4 +1,4 @@
-import { gameTagLabels } from "@ador/shared/games";
+import { gameTagLabels } from "@frostbite/shared/games";
 
 import type { PublicGame } from "./catalog.ts";
 import { isEmptyQuery, type GameQuery } from "./game-query.ts";

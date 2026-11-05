@@ -1,4 +1,4 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/headers", () => ({

@@ -1,6 +1,10 @@
-import { defineFeature } from "@ador/plugin-kit";
-import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
-import { manageRolesCapability } from "@ador/shared/accounts";
+import { defineFeature } from "@frostbite/plugin-kit";
+import {
+  emailCodeRoutes,
+  passkeyRoutes,
+  walletAuthRoutes,
+} from "@frostbite/auth";
+import { manageRolesCapability } from "@frostbite/shared/accounts";
 
 import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
@@ -107,7 +111,7 @@ export function createAccountsFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-accounts/entrypoint").then(
+      import("@frostbite/feature-accounts/entrypoint").then(
         ({ createAccountsEntrypoint }) =>
           createAccountsEntrypoint({
             balanceSource,

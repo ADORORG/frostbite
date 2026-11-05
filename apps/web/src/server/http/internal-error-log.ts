@@ -1,4 +1,4 @@
-import type { InternalErrorReport } from "@ador/http";
+import type { InternalErrorReport } from "@frostbite/http";
 
 const maxStackFrames = 8;
 

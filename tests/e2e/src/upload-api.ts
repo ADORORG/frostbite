@@ -1,9 +1,9 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import {
   completedUploadResponseSchema,
   libraryResponseSchema,
   uploadIntentResponseSchema,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 export const intentsPath = "/api/v1/uploads/intents";
 export const completePath = "/api/v1/uploads/intents/complete";

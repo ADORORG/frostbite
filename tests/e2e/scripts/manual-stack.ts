@@ -3,9 +3,9 @@ import { readFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import { resolve } from "node:path";
 
-import { createDatabaseClient, createDatabasePool } from "@ador/database";
+import { createDatabaseClient, createDatabasePool } from "@frostbite/database";
 
-import { startDurableS3Runtime } from "@ador/test-kit/s3-durable";
+import { startDurableS3Runtime } from "@frostbite/test-kit/s3-durable";
 
 import {
   formatStackGuide,

@@ -1,4 +1,4 @@
-import type { ApplicationHttpErrorCode } from "@ador/shared/http";
+import type { ApplicationHttpErrorCode } from "@frostbite/shared/http";
 
 import type { HttpOperationResult } from "./operation.ts";
 

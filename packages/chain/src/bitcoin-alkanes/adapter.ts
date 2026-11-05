@@ -2,7 +2,7 @@ import {
   chainFamilyIdSchema,
   chainNamespace,
   type ChainRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { portCapabilities, portNames, type ChainAdapter } from "../adapter.ts";
 import {

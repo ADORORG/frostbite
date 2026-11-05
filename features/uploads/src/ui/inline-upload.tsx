@@ -4,7 +4,7 @@ import {
   defaultUploadPolicy,
   uploadContentTypes,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { ArcadeFileDrop } from "@repo/ui/arcade";
 import { useCallback, useRef, useState } from "react";
 

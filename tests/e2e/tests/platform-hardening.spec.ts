@@ -1,4 +1,4 @@
-import { readinessSchema } from "@ador/shared/readiness";
+import { readinessSchema } from "@frostbite/shared/readiness";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

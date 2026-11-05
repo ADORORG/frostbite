@@ -1,7 +1,7 @@
-import { databaseReadinessProbe } from "@ador/database/connection";
-import { runReadiness } from "@ador/http/readiness";
-import { storageReadinessProbe } from "@ador/object-storage/readiness";
-import type { Readiness } from "@ador/shared/readiness";
+import { databaseReadinessProbe } from "@frostbite/database/connection";
+import { runReadiness } from "@frostbite/http/readiness";
+import { storageReadinessProbe } from "@frostbite/object-storage/readiness";
+import type { Readiness } from "@frostbite/shared/readiness";
 
 import { platformComposition } from "@repo/configs/platform";
 import { getDatabase } from "./database";

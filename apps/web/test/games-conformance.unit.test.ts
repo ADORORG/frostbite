@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 
-import { checkGameConformance } from "@ador/test-kit/game-conformance";
+import { checkGameConformance } from "@frostbite/test-kit/game-conformance";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const gamesDirectory = join(import.meta.dirname, "../../../games");

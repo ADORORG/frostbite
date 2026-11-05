@@ -1,6 +1,6 @@
-import { creatorStandingCopy } from "@ador/shared/creator-admission";
-import { ApiError } from "@ador/client-http";
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { creatorStandingCopy } from "@frostbite/shared/creator-admission";
+import { ApiError } from "@frostbite/client-http";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { ActivityList } from "../src/ui/components/activity-list.tsx";

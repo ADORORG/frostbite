@@ -1,8 +1,8 @@
-import type { ChainOption } from "@ador/shared/chain";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   collectionStudioPath,
   collectionWizardHref,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { ArcadeActionButton, ArcadeButton, ArcadePanel } from "@repo/ui/arcade";
 import { useRef, useState } from "react";
 

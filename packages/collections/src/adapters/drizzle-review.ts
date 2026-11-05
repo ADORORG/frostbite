@@ -1,12 +1,12 @@
-import { holdsActivePlatformRole } from "@ador/authorization/role-guard";
-import type { DatabaseClient } from "@ador/database/connection";
+import { holdsActivePlatformRole } from "@frostbite/authorization/role-guard";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   collectionReviewEvents,
   collectionSubmissions,
-} from "@ador/database/schema/collection-submissions";
-import { collections } from "@ador/database/schema/collections";
-import { resolveSubmissionTransition } from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/collection-submissions";
+import { collections } from "@frostbite/database/schema/collections";
+import { resolveSubmissionTransition } from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { asc, eq, inArray } from "drizzle-orm";
 
 import type { ReviewRepository } from "../application/submission-repository.ts";

@@ -5,13 +5,13 @@ import ts from "typescript";
 const runtimeNeutralSharedImports = new Set(["@noble/hashes/sha2.js", "zod"]);
 
 // Chain-family code and vendor SDKs (ADR-017 section 2). Everything outside the places below reaches
-// a chain only through the neutral ports (`@ador/chain/ports`, `/registry`, `/adapter`) and
-// `@ador/shared/chain`.
+// a chain only through the neutral ports (`@frostbite/chain/ports`, `/registry`, `/adapter`) and
+// `@frostbite/shared/chain`.
 const familySpecificImports = [
-  "@ador/chain/alkanes",
-  "@ador/chain/bitcoin",
-  "@ador/chain/bitcoin-alkanes",
-  "@ador/chain/wallet-signing",
+  "@frostbite/chain/alkanes",
+  "@frostbite/chain/bitcoin",
+  "@frostbite/chain/bitcoin-alkanes",
+  "@frostbite/chain/wallet-signing",
   "bitcoinjs-lib",
 ];
 const familySpecificPrefixes = ["@alkanes/", "@omnisat/"];
@@ -76,7 +76,7 @@ function moduleSpecifiers(
 // The database package root also exports the migration runner, which reads files relative to its own
 // location and breaks inside a bundled server. Library and feature code imports the narrow subpaths;
 // a type-only import is erased and harmless. Test support and apps are not bundled that way.
-const databaseRoot = "@ador/database";
+const databaseRoot = "@frostbite/database";
 const databaseRootExempt = ["packages/test-kit/", "packages/database/"];
 
 function mustAvoidDatabaseRoot(relativePath: string): boolean {
@@ -123,7 +123,7 @@ export async function findBoundaryViolations(
       importsDatabaseRootAtRuntime(contents, file)
     )
       violations.push(
-        `${path} imports the database package root; import a subpath such as @ador/database/connection.`,
+        `${path} imports the database package root; import a subpath such as @frostbite/database/connection.`,
       );
     const imports = moduleSpecifiers(contents, file);
     for (const imported of imports) {
@@ -147,7 +147,7 @@ export async function findBoundaryViolations(
         isSharedSource(path) &&
         !imported.startsWith(".") &&
         !runtimeNeutralSharedImports.has(imported) &&
-        !imported.startsWith("@ador/shared/")
+        !imported.startsWith("@frostbite/shared/")
       ) {
         violations.push(
           `${path} imports runtime-specific dependency ${imported}.`,

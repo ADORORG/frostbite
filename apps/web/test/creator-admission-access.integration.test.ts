@@ -1,6 +1,6 @@
-import { forbiddenMessage } from "@ador/http/outcome";
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { forbiddenMessage } from "@frostbite/http/outcome";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const resolvePageAccess = vi.hoisted(() => vi.fn());

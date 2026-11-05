@@ -1,4 +1,8 @@
-import { authSecurityEvents, authSessions, contactCodes } from "@ador/database";
+import {
+  authSecurityEvents,
+  authSessions,
+  contactCodes,
+} from "@frostbite/database";
 import { and, eq, isNull } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

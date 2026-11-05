@@ -14,10 +14,10 @@
     "test:coverage": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
-    "@ador/authorization": "workspace:*",
-    "@ador/database": "workspace:*",
-    "@ador/feature-accounts": "workspace:*",
-    "@ador/mail": "workspace:*",
+    "@frostbite/authorization": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/feature-accounts": "workspace:*",
+    "@frostbite/mail": "workspace:*",
     "@repo/config": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4"
   },

@@ -2,7 +2,7 @@ import {
   collectionReviewHref,
   submissionStateLabels,
   type ReviewQueueResponse,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeBadge,

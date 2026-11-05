@@ -1,5 +1,5 @@
-import { collectionSubmissions } from "@ador/database";
-import { expectToWait, holdTransaction } from "@ador/test-kit/race";
+import { collectionSubmissions } from "@frostbite/database";
+import { expectToWait, holdTransaction } from "@frostbite/test-kit/race";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

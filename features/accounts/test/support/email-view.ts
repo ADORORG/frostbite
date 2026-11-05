@@ -1,4 +1,4 @@
-import type { EmailAddressesView } from "@ador/auth";
+import type { EmailAddressesView } from "@frostbite/auth";
 
 // The account's email addresses as the page is given them, from just the addresses: each added a day apart from 1 October 2026 (the first
 // the oldest), and room for `maximum` of them.

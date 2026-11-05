@@ -64,8 +64,8 @@ describe("the backend that syncs with the account", () => {
 
   it("sends what the browser held, to be merged", async () => {
     const map = new Map<string, string>();
-    map.set("ador:game:g:progress", "5");
-    map.set("ador:game:g:progress-at", JSON.stringify(at.toISOString()));
+    map.set("frostbite:game:g:progress", "5");
+    map.set("frostbite:game:g:progress-at", JSON.stringify(at.toISOString()));
     const sync = vi.fn<AccountPort["sync"]>(async () => ({
       kind: "synced",
       playerId: accountPlayer,

@@ -1,9 +1,9 @@
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript, checkGameHtml } from "@ador/game-sdk/build";
-import type { HostedGame } from "@ador/game-sdk/host";
-import type { GameCover } from "@ador/shared/games";
+import { bundleGameScript, checkGameHtml } from "@frostbite/game-sdk/build";
+import type { HostedGame } from "@frostbite/game-sdk/host";
+import type { GameCover } from "@frostbite/shared/games";
 
 import { createMemoryGameBackend } from "./memory-game-backend.ts";
 import { runGameInSimulatedHost } from "./simulated-game-host.ts";

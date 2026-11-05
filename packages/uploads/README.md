@@ -1,4 +1,4 @@
-# `@ador/uploads`
+# `@frostbite/uploads`
 
 Provider-neutral application and persistence boundary for durable direct uploads.
 
@@ -27,7 +27,7 @@ processing event. Replays return that same asset without another storage lookup.
 
 `createAssetValidationService.validate({ assetId })` is a provider-neutral, idempotent activity. It
 streams the private object under a read cap equal to the declared size, validates the bytes with
-`@ador/media`, and conditionally records one terminal outcome (`validated` with SHA-256, detected
+`@frostbite/media`, and conditionally records one terminal outcome (`validated` with SHA-256, detected
 type, dimensions, validator version, and the entity tag of the exact bytes hashed; or `rejected`
 with a stable reason). A repeated or concurrent run returns the persisted winner. Storage failures
 throw before any state change, so the asset stays `pending-validation` and retryable. Provider

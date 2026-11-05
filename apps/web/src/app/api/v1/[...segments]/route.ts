@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 
-import { forbiddenMessage } from "@ador/http/outcome";
-import { readRequestInput } from "@ador/http/request-input";
-import { platformSessionCookieName } from "@ador/shared/auth";
-import type { ActiveSession } from "@ador/auth";
+import { forbiddenMessage } from "@frostbite/http/outcome";
+import { readRequestInput } from "@frostbite/http/request-input";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
+import type { ActiveSession } from "@frostbite/auth";
 import { parseEnvironment } from "@repo/config/env";
 import { getOpenApiDocument, resolveApiOperation } from "@repo/configs/api";
 import { logAuthUnavailable } from "@/server/http/internal-error-log";

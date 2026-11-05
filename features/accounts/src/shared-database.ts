@@ -2,7 +2,7 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 
 let sharedDatabase: ReturnType<typeof createDatabaseClient> | undefined;
 

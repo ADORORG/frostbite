@@ -3,13 +3,13 @@ import {
   reviewQueueResponseSchema,
   reviewRoutes,
   reviewSubmissionResponseSchema,
-} from "@ador/shared/collections";
-import {} from "@ador/database";
-import {} from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import {} from "@frostbite/database";
+import {} from "@frostbite/shared/identifiers";
 import {
   seedCreatorUser,
   setCreatorApplicationState,
-} from "@ador/test-kit/creator-database";
+} from "@frostbite/test-kit/creator-database";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import {

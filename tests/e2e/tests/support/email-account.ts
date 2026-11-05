@@ -8,10 +8,10 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database";
-import { readCapturedMail } from "@ador/mail";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { emailAddressesResponseSchema } from "@ador/auth";
+} from "@frostbite/database";
+import { readCapturedMail } from "@frostbite/mail";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { emailAddressesResponseSchema } from "@frostbite/auth";
 
 import { useE2ESession } from "../../src/session.ts";
 

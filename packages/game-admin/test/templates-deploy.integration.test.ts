@@ -2,7 +2,7 @@ import {
   gameAdminSteps,
   gameContracts,
   publishedTemplates,
-} from "@ador/database";
+} from "@frostbite/database";
 import { and, eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

@@ -1,11 +1,11 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   creatorApplications,
   creatorApplicationSnapshots,
-} from "@ador/database/schema/creator-admission";
-import { authUsers } from "@ador/database/schema/auth";
-import { platformRoleAssignments } from "@ador/database/schema/accounts";
-import { resolveCreatorAdmissionTransition } from "@ador/shared/creator-admission";
+} from "@frostbite/database/schema/creator-admission";
+import { authUsers } from "@frostbite/database/schema/auth";
+import { platformRoleAssignments } from "@frostbite/database/schema/accounts";
+import { resolveCreatorAdmissionTransition } from "@frostbite/shared/creator-admission";
 import { and, desc, eq, inArray } from "drizzle-orm";
 
 import type {

@@ -1,4 +1,4 @@
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
 
 import { earned, restore, tap, type GameState } from "./game.ts";
 

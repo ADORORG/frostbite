@@ -1,7 +1,7 @@
 import {
   createProviderRegistry,
   defineProvider,
-} from "@ador/plugin-kit/providers";
+} from "@frostbite/plugin-kit/providers";
 import { describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 

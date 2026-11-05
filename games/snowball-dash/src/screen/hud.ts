@@ -1,6 +1,6 @@
 import { maxMultiplier, levelLength } from "../rules/constants.ts";
 import type { RunState } from "../rules/types.ts";
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { colour } from "./palette.ts";
 import { screenHeight, screenWidth } from "./layout.ts";

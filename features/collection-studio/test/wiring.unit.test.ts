@@ -1,6 +1,6 @@
-import { createDatabaseFromEnvironment } from "@ador/database/connection";
-import { chainOptionSchema } from "@ador/shared/chain";
-import { unusedStorage } from "@ador/test-kit/storage-registry";
+import { createDatabaseFromEnvironment } from "@frostbite/database/connection";
+import { chainOptionSchema } from "@frostbite/shared/chain";
+import { unusedStorage } from "@frostbite/test-kit/storage-registry";
 import { describe, expect, it, vi } from "vitest";
 
 import {

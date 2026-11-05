@@ -1,8 +1,8 @@
 import {
   collectionReviewEvents,
   platformRoleAssignments,
-} from "@ador/database";
-import { requestFingerprint } from "@ador/shared/http";
+} from "@frostbite/database";
+import { requestFingerprint } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
 import {

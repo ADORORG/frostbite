@@ -8,4 +8,4 @@ export const scale = 0.5;
 // Units of the rules' world to pixels of the screen.
 export const px = (units: number): number => Math.round(units * scale);
 
-export { block, sprite, wrap } from "@ador/game-sdk/pixels";
+export { block, sprite, wrap } from "@frostbite/game-sdk/pixels";

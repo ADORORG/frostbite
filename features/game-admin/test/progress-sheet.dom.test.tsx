@@ -1,4 +1,4 @@
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { TemplatesPanel } from "../src/ui/templates-panel.tsx";

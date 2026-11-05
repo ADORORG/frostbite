@@ -7,7 +7,7 @@ import {
   type ReviewAction,
   type ReviewDecision,
   type SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 // The audit reason recorded with each action. A decision is judged on its feedback; the code only
 // groups decisions for later reporting, so the reviewer is not asked to invent one.

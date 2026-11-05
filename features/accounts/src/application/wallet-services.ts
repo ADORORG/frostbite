@@ -2,7 +2,7 @@ import type {
   createSessionService,
   createWalletAuthService,
   createWalletMethodsService,
-} from "@ador/auth";
+} from "@frostbite/auth";
 
 // What the wallet operations need, as one value, so they are built from it and tested with stand-ins.
 export interface WalletAuthServices {

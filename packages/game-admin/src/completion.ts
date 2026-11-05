@@ -1,6 +1,6 @@
-import { indexed, moveTo } from "@ador/shared/chain";
+import { indexed, moveTo } from "@frostbite/shared/chain";
 
-import type { Recording } from "@ador/database/game-contracts";
+import type { Recording } from "@frostbite/database/game-contracts";
 import type { StepChange, StoredStep } from "./types.ts";
 
 // What a creation that confirmed but whose address could not be read says; it is how that failure is told from a reverted one, so

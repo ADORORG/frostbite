@@ -1,5 +1,5 @@
-import { unusedStorage } from "@ador/test-kit/storage-registry";
-import { createDatabaseFromEnvironment } from "@ador/database/connection";
+import { unusedStorage } from "@frostbite/test-kit/storage-registry";
+import { createDatabaseFromEnvironment } from "@frostbite/database/connection";
 import { authorizationPolicy } from "@repo/config/authorization";
 import { describe, expect, it, vi } from "vitest";
 

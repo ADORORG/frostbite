@@ -1,4 +1,4 @@
-import type { ExpiredRowCounts } from "@ador/database";
+import type { ExpiredRowCounts } from "@frostbite/database";
 
 export interface RowSweepDependencies {
   readonly clock: () => Date;

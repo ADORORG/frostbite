@@ -75,11 +75,11 @@ export function createLocalBackend(options: {
   readonly storage: KeyValueStorage;
 }): LocalBackend {
   const { gameId, storage } = options;
-  const progressKey = `ador:game:${gameId}:progress`;
-  const savedAtKey = `ador:game:${gameId}:progress-at`;
-  const milestonesKey = `ador:game:${gameId}:milestones`;
-  const playerKey = `ador:game:${gameId}:player-id`;
-  const countersKey = `ador:game:${gameId}:counters`;
+  const progressKey = `frostbite:game:${gameId}:progress`;
+  const savedAtKey = `frostbite:game:${gameId}:progress-at`;
+  const milestonesKey = `frostbite:game:${gameId}:milestones`;
+  const playerKey = `frostbite:game:${gameId}:player-id`;
+  const countersKey = `frostbite:game:${gameId}:counters`;
   const newId = options.newId ?? (() => globalThis.crypto.randomUUID());
 
   function read<Output>(key: string, schema: z.ZodType<Output>): Output | null {

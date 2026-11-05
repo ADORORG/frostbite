@@ -1,4 +1,4 @@
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { createSessionService } from "../src/application/session-service.ts";

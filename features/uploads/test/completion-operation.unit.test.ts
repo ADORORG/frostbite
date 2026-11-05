@@ -1,7 +1,7 @@
-import { unauthenticated } from "@ador/http/outcome";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { uploadOutcomes } from "@ador/shared/uploads";
-import type { CompleteIntentResult } from "@ador/uploads";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { uploadOutcomes } from "@frostbite/shared/uploads";
+import type { CompleteIntentResult } from "@frostbite/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 import { createCompleteUploadIntentOperation } from "../src/application/completion-operation.ts";

@@ -1,6 +1,6 @@
 import { banner } from "./banner.ts";
 import { touchHints } from "./touch-hints.ts";
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import {
   groundRow,

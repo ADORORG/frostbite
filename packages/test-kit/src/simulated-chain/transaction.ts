@@ -10,8 +10,8 @@ import {
   type TransactionIntent,
   type UnsignedTransaction,
   type VerificationResult,
-} from "@ador/shared/chain";
-import type { TransactionBuilder } from "@ador/chain/ports";
+} from "@frostbite/shared/chain";
+import type { TransactionBuilder } from "@frostbite/chain/ports";
 
 export const simulatedFamily = chainFamilyIdSchema.parse("simulated");
 export const simulatedAdapterVersion = "1.0.0";

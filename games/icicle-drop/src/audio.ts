@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import { frequency, type Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import { frequency, type Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Icicle Drop's sound, as data: a calm, glassy loop in C major (a slow bass and pad under a sparse bell tune), a soft tick for a slide, a
 // chime that rises with the biggest tile for a join. Nothing here is a file: the SDK plays it with the browser's audio.

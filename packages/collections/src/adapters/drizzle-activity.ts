@@ -1,11 +1,11 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { authUsers } from "@ador/database/schema/auth";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { authUsers } from "@frostbite/database/schema/auth";
 import {
   collectionReviewEvents,
   collectionSubmissions,
-} from "@ador/database/schema/collection-submissions";
-import { collections } from "@ador/database/schema/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/collection-submissions";
+import { collections } from "@frostbite/database/schema/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { desc, eq, sql } from "drizzle-orm";
 
 import type { ReviewRepository } from "../application/submission-repository.ts";

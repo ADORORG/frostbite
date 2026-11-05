@@ -1,4 +1,4 @@
-import type { GameState } from "@ador/shared/games";
+import type { GameState } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { boundState, earnReached, type MilestoneRules } from "../src/rules.ts";

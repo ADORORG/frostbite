@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Effect } from "@ador/game-sdk/audio/effects";
-import { setUpSound, type GameSound } from "@ador/game-sdk/audio/setup";
-import type { SoundSettings } from "@ador/game-sdk/audio/settings";
-import type { Track } from "@ador/game-sdk/audio/tracks";
-import { createPause, type Pause } from "@ador/game-sdk/pause";
+import type { Effect } from "@frostbite/game-sdk/audio/effects";
+import { setUpSound, type GameSound } from "@frostbite/game-sdk/audio/setup";
+import type { SoundSettings } from "@frostbite/game-sdk/audio/settings";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
+import { createPause, type Pause } from "@frostbite/game-sdk/pause";
 
 import { soundKey } from "../platform/storage-keys.ts";
 

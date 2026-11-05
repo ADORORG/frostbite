@@ -1,5 +1,5 @@
-import type { FeeDetail, FeeSpeed } from "@ador/shared/chain";
-import { feeAtRate } from "@ador/shared/chain";
+import type { FeeDetail, FeeSpeed } from "@frostbite/shared/chain";
+import { feeAtRate } from "@frostbite/shared/chain";
 
 // How the fee speeds are named and told, in the platform's words. Waits are estimates and are always said as "about"; a rate is the
 // chain's quote at the moment shown, which moves.

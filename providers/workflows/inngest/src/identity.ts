@@ -1,4 +1,4 @@
-import { providerIdSchema } from "@ador/shared/providers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 
 export const inngestWorkflowProviderId =
   providerIdSchema.parse("inngest-workflows");

@@ -63,7 +63,7 @@ export async function startDevHost(options: {
 }): Promise<DevHost> {
   const game = devGameSchema.parse(options.game);
   const directory = resolve(options.directory);
-  const scratch = await mkdtemp(join(tmpdir(), "ador-dev-host-"));
+  const scratch = await mkdtemp(join(tmpdir(), "frostbite-dev-host-"));
   const built = join(scratch, "play", game.id);
   const client = await bundleClient();
   const config: DevConfig = { game, src: `/play/${game.id}/index.html` };

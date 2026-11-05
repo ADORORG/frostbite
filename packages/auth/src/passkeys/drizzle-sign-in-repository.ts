@@ -1,7 +1,10 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { authSessions, passkeyCredentials } from "@ador/database/schema/auth";
-import { passkeySignInChallenges } from "@ador/database/schema/passkey-sign-in";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import {
+  authSessions,
+  passkeyCredentials,
+} from "@frostbite/database/schema/auth";
+import { passkeySignInChallenges } from "@frostbite/database/schema/passkey-sign-in";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import { authenticatorTransportSchema } from "./contracts.ts";

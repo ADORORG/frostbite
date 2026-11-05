@@ -2,9 +2,9 @@ import type {
   CollectionDraft,
   CollectionImportRow,
   CollectionItem,
-} from "@ador/shared/collections";
-import { chainRefSchema } from "@ador/shared/chain";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { chainRefSchema } from "@frostbite/shared/chain";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 
 export const now = new Date("2026-10-09T12:00:00.000Z");
 

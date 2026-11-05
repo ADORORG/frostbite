@@ -1,5 +1,5 @@
-import { creatorReviewReasonCodes } from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { creatorReviewReasonCodes } from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ReviewerForm } from "../src/ui/reviewer-form.tsx";

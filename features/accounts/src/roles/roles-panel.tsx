@@ -1,7 +1,7 @@
 "use client";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
-import { platformRoles, type PlatformRole } from "@ador/shared/accounts";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
+import { platformRoles, type PlatformRole } from "@frostbite/shared/accounts";
 import {
   ArcadeActionButton,
   SectionBlock,

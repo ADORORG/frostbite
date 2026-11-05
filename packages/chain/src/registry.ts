@@ -4,7 +4,7 @@ import {
   type ChainConfig,
   type ChainFamilyId,
   type ChainRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import {
   portCapabilities,

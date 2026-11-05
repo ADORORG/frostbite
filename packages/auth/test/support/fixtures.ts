@@ -1,4 +1,4 @@
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { Signer } from "bip322-js";
 
 export const walletPrivateKey =

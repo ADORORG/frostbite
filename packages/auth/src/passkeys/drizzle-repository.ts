@@ -1,14 +1,14 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   authSecurityEvents,
   authSessions,
   passkeyChallenges,
   passkeyCredentials,
-} from "@ador/database/schema/auth";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/auth";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { lockActiveSession } from "../adapters/lock-active-session.ts";

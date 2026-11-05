@@ -79,7 +79,7 @@ export interface VerifierArtifact {
 const replaySource = fileURLToPath(new URL("./replay.ts", import.meta.url));
 // The name a verifier entry imports the SDK's wrapper by; the build points it at the SDK's own copy, so a game needs no
 // dependency or import for it.
-const replaySpecifier = "@ador/game-sdk/replay";
+const replaySpecifier = "@frostbite/game-sdk/replay";
 
 // A game that has `src/replay.ts` publishes its rules for the platform to replay runs with. That module exports the rules
 // (`export default`, a `GameVerifier`) and one legal sample run (`export function sample()`); this bundles them with the SDK's

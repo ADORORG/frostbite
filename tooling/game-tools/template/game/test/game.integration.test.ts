@@ -1,13 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
+} from "@frostbite/test-kit/simulated-game-host";
+import { defaultGameHostPolicy } from "@frostbite/game-sdk/policy";
 import { afterEach, describe, expect, it } from "vitest";
 
 const root = join(import.meta.dirname, "..");

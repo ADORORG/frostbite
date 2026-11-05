@@ -5,8 +5,8 @@ import {
   settle,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
-import type { ListGameAdminTemplatesResponse } from "@ador/shared/games";
+} from "@frostbite/test-kit/dom";
+import type { ListGameAdminTemplatesResponse } from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { FeeSettingsBoundary } from "../src/ui/fee-settings.tsx";

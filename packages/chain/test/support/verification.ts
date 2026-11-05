@@ -1,4 +1,4 @@
-import { type FundingPolicy } from "@ador/shared/chain";
+import { type FundingPolicy } from "@frostbite/shared/chain";
 
 import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
 import {

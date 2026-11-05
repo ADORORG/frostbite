@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 
 import { laserEyesProvider } from "../src/registration.js";
 

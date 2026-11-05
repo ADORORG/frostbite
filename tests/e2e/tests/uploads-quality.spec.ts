@@ -1,4 +1,4 @@
-import { uploadsNewPath, uploadsStudioPath } from "@ador/shared/uploads";
+import { uploadsNewPath, uploadsStudioPath } from "@frostbite/shared/uploads";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

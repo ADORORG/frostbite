@@ -1,5 +1,5 @@
-import { replayRecord } from "@ador/game-sdk/replay";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import { replayRecord } from "@frostbite/game-sdk/replay";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import {

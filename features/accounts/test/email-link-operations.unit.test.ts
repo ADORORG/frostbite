@@ -1,6 +1,6 @@
-import { accountOutcomes } from "@ador/shared/account-outcomes";
-import type { ContactLinkService } from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
+import type { ContactLinkService } from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createEmailLinkOperations } from "../src/application/email-link-operations.ts";

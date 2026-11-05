@@ -8,8 +8,8 @@ import {
   type ContactCodeService,
   type EmailCodeRequest,
   type EmailCodeVerify,
-} from "@ador/auth";
-import type { HttpOperation } from "@ador/http";
+} from "@frostbite/auth";
+import type { HttpOperation } from "@frostbite/http";
 import {
   codeNotVerified,
   codeRequestFailure,

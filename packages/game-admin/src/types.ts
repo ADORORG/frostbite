@@ -1,4 +1,4 @@
-import type { ChainPorts, TransactionPart } from "@ador/chain/ports";
+import type { ChainPorts, TransactionPart } from "@frostbite/chain/ports";
 import type {
   ChainFamilyId,
   ChainRef,
@@ -9,9 +9,12 @@ import type {
   TrackedState,
   TransactionSummary,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
-import type { ContractStore, Recording } from "@ador/database/game-contracts";
+import type {
+  ContractStore,
+  Recording,
+} from "@frostbite/database/game-contracts";
 
 // What staff do through this package. On a game that has a contract: define a milestone, pause or resume claims. Before it has one:
 // publish a template (once for every game) and create the game's contract from it.

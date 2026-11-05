@@ -34,7 +34,7 @@ Upload window 15 minutes; unclaimed private objects eligible for removal 24 hour
   change. They stay untouched for the matching provider.
 - **Progress is "removed", not "claimed".** The worker loop treats a pass as work only when something
   was removed, so a failing store is retried after the idle delay instead of in a tight loop.
-- **One generic drain loop** (`@ador/jobs/drain-loop`) now serves both the outbox relay and the cleanup;
+- **One generic drain loop** (`@frostbite/jobs/drain-loop`) now serves both the outbox relay and the cleanup;
   `runOutboxRelayLoop` is a thin wrapper with unchanged behavior and tests.
 - **One memoizing helper** (`memoizeUntilFailure`) replaces four copies of the "build once, forget a
   failure" pattern in the uploads feature.
@@ -51,8 +51,8 @@ worker. Staff or reviewer access to frozen submissions is deliberately not defin
 
 - Policy `cleanupBatchSize` (default 50, range 1–500); migration adding `abandoned`, `object_removed_at`,
   a coherence CHECK, and a partial index for the sweep.
-- `@ador/uploads`: `UploadCleanupRepository` (port), `createUploadCleanupService`, and the Drizzle
-  adapter; `@ador/feature-uploads/cleanup` composes it lazily from the storage capability.
+- `@frostbite/uploads`: `UploadCleanupRepository` (port), `createUploadCleanupService`, and the Drizzle
+  adapter; `@frostbite/feature-uploads/cleanup` composes it lazily from the storage capability.
 - Worker: `runCleanup` beside `runRelay`, started from `main.ts`; the pass itself is `createCleanupPass`
   (`src/cleanup.ts`, beside `relay.ts`) so the "progress is what was removed" rule is unit-tested; each pass
   logs its counts, and failures are logged with intent ids and messages only.

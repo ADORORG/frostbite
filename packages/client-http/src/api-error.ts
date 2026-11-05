@@ -1,4 +1,4 @@
-import type { HttpErrorCode } from "@ador/shared/http";
+import type { HttpErrorCode } from "@frostbite/shared/http";
 
 // `network`: the request never produced a response. `invalid-response`: it did, but not in the
 // documented shape, so nothing in it is trusted.

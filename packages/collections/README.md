@@ -1,13 +1,13 @@
-# `@ador/collections`
+# `@frostbite/collections`
 
 Creator-owned collection drafts: the draft record, its ordered items, and the rules that keep them
 consistent. It owns persistence and invariants; HTTP and presentation belong to
-`@ador/feature-collection-studio`. Nothing here is public, and nothing here is a deployment.
+`@frostbite/feature-collection-studio`. Nothing here is public, and nothing here is a deployment.
 
 ## Public API
 
 - `createCollectionService` validates drafts and items with the shared schemas
-  (`@ador/shared/collections`), checks the target chain against the enabled chains it was given, builds
+  (`@frostbite/shared/collections`), checks the target chain against the enabled chains it was given, builds
   a fingerprint of each retryable request, and delegates to the repository port.
 - `createDrizzleCollectionRepository` is the PostgreSQL adapter for `CollectionRepository`.
 - `createSubmissionService` (creator: submit a collection for review, list its submissions) and
@@ -60,7 +60,7 @@ consistent. It owns persistence and invariants; HTTP and presentation belong to
 - **One live submission per collection** (a partial unique index). A new submission is possible only
   when the previous one ended in `changes-requested`; `rejected` and `revoked` close the collection for
   good (an approved version's later revision is a later task).
-- **Review states** are in `@ador/shared/collections` (`resolveSubmissionTransition`): submitted,
+- **Review states** are in `@frostbite/shared/collections` (`resolveSubmissionTransition`): submitted,
   under-review, approved, changes-requested, rejected, suspended, revoked.
 - **Deciding** checks, inside the decision's transaction: the reviewer holds an active reviewer role
   (shared lock, so a withdrawal waits), the reviewer is **not the creator**, the transition is legal, and
@@ -106,7 +106,7 @@ does not publish or deploy anything: publication and deployment are separate, la
 ## Configuration
 
 None of its own. The composition root supplies the clock, id source, list limit, the enabled chains,
-and a database client. Limits are the shared engineering bounds in `@ador/shared/collections`.
+and a database client. Limits are the shared engineering bounds in `@frostbite/shared/collections`.
 
 ## Tests
 

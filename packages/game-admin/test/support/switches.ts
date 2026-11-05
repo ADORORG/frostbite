@@ -1,4 +1,4 @@
-import type { TransactionIntent } from "@ador/shared/chain";
+import type { TransactionIntent } from "@frostbite/shared/chain";
 
 // The switches a test flips to make the simulated chain and its node misbehave. The fixture reads them on every call and puts them back
 // before each test.

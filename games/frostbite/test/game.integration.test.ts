@@ -1,12 +1,12 @@
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
-import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import { defaultGameHostPolicy } from "@frostbite/game-sdk/policy";
+import { createMemoryGameBackend } from "@frostbite/test-kit/memory-game-backend";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+} from "@frostbite/test-kit/simulated-game-host";
 import { readFile } from "node:fs/promises";
 import { afterEach, describe, expect, it } from "vitest";
 

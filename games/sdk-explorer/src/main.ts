@@ -1,5 +1,5 @@
-import { createGameClient } from "@ador/game-sdk/client";
-import { eventNames, type JsonValue } from "@ador/game-sdk/protocol";
+import { createGameClient } from "@frostbite/game-sdk/client";
+import { eventNames, type JsonValue } from "@frostbite/game-sdk/protocol";
 
 import { attempt, describeEvent, describeOutcome, probes } from "./probes.ts";
 import { checkSandbox, pageActions } from "./sandbox.ts";

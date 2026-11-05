@@ -1,6 +1,6 @@
-import { assetDerivatives, assets } from "@ador/database";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { assetDerivatives, assets } from "@frostbite/database";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { createDrizzleAssetProcessingRepository } from "../src/adapters/drizzle-processing-repository.ts";

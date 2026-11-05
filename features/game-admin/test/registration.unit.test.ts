@@ -3,7 +3,7 @@ import {
   gameAdminDetailPath,
   gameAdminNavigationLabel,
   gameAdminPath,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { isValidElement } from "react";
 import { describe, expect, it } from "vitest";
 

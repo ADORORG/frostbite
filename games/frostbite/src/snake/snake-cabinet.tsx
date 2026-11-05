@@ -1,6 +1,6 @@
 import * as React from "react";
-import { pauseCopy } from "@ador/game-sdk/pause";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import { pauseCopy } from "@frostbite/game-sdk/pause";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { useEffect, useReducer, useRef, useState } from "react";
 
 import type { CabinetHost } from "../cabinet/host.ts";

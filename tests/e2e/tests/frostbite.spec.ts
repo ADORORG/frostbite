@@ -7,7 +7,7 @@ import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 // nothing from the network, gets a storage the platform keeps, and is cut off like every game. Desktop only: the
 // game's interior is animated, so these steps drive and assert it rather than comparing pictures of it.
 const frameSelector = '[data-testid="game-frame"]';
-const progressKey = "ador:game:frostbite:progress";
+const progressKey = "frostbite:game:frostbite:progress";
 
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Desktop only.");

@@ -1,6 +1,6 @@
-import { chainOptionSchema, chainRefSchema } from "@ador/shared/chain";
-import type { CollectionDraft } from "@ador/shared/collections";
-import { collectionLimits } from "@ador/shared/collections";
+import { chainOptionSchema, chainRefSchema } from "@frostbite/shared/chain";
+import type { CollectionDraft } from "@frostbite/shared/collections";
+import { collectionLimits } from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import { createCollectionService } from "../src/application/service.ts";

@@ -1,12 +1,12 @@
-import type { StatusPolling } from "@ador/feature-chain-status/api";
-import type { AdminChainPorts, RewardsPlan } from "@ador/game-admin";
-import type { DrawingPolicy } from "@ador/milestone-art";
+import type { StatusPolling } from "@frostbite/feature-chain-status/api";
+import type { AdminChainPorts, RewardsPlan } from "@frostbite/game-admin";
+import type { DrawingPolicy } from "@frostbite/milestone-art";
 import type {
   ChainRef,
   DelayPolicy,
   FeeSpeed,
   FundingPolicy,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 // What the platform needs, beyond a game's manifest, to administer its rewards contract: a chain it can build, send and watch
 // transactions on, what it has decided about publishing templates and creating contracts, and the limits a milestone's drawing is

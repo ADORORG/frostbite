@@ -2,12 +2,12 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
+} from "@frostbite/client-http";
 import {
   listMintedMilestonesResponseSchema,
   listMintedMilestonesRoute,
   type ListMintedMilestonesResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import { claimRequestTimeoutMs } from "./claims-api.ts";
 

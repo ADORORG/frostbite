@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { bomb, kindSlots, star } from "../rules/constants.ts";
 import { colour, frostColour, kindColours, kindShades } from "./palette.ts";

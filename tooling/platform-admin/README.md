@@ -23,7 +23,7 @@ The person who opens the link signs in with the account that will administer the
 - A link is valid for `setupLinkPolicy.lifetimeMs`, works once, and stops working when another is made.
 - No link is made while a working administrator exists.
 - The rules (which methods an administrator needs, the policy version, the lifetime) are the platform's own, imported from
-  `@repo/config`; the sign-in method registry is the platform's (`@ador/feature-accounts/methods`).
+  `@repo/config`; the sign-in method registry is the platform's (`@frostbite/feature-accounts/methods`).
 
 ## Where to run it
 
@@ -34,7 +34,7 @@ production image carries no dev dependencies.
 
 ## Dependencies
 
-`@ador/authorization` (the service and its database adapter), `@ador/database`, `@ador/feature-accounts/methods`, `@repo/config`.
+`@frostbite/authorization` (the service and its database adapter), `@frostbite/database`, `@frostbite/feature-accounts/methods`, `@repo/config`.
 
 ## Configuration
 

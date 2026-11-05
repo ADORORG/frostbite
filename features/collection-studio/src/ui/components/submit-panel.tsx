@@ -1,4 +1,4 @@
-import { submissionRequirementCopy } from "@ador/shared/collections";
+import { submissionRequirementCopy } from "@frostbite/shared/collections";
 import { ArcadeActionButton, StatusLamp } from "@repo/ui/arcade";
 
 import type { SubmitAvailability } from "../../client/submission-progress.ts";

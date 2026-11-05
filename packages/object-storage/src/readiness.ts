@@ -1,4 +1,4 @@
-import type { ReadinessProbe } from "@ador/shared/readiness";
+import type { ReadinessProbe } from "@frostbite/shared/readiness";
 
 import { parseObjectKey, type ObjectStoragePort } from "./contracts.ts";
 
