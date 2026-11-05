@@ -3,11 +3,16 @@ import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
 import { attachZones } from "@ador/game-sdk/touch-zones";
 
 import type { Direction } from "../rules/constants.ts";
-import { cell, screenHeight, screenWidth } from "./layout.ts";
+import { screenHeight, screenWidth } from "./layout.ts";
 
 interface Point {
   readonly x: number;
   readonly y: number;
+}
+
+// Where the lantern is on the screen, and how wide its cell is there.
+interface Lantern extends Point {
+  readonly size: number;
 }
 
 // What the player's hands can do: step the lantern (with the keys, or by a finger on the screen), start a run (Enter) and pause (P or Space, since Space has no other use here).
@@ -32,18 +37,17 @@ const keys = {
 
 // A finger on the screen steers the lantern: the lantern walks toward it, one step now and then one every `stepRepeatMs` while it stays down,
 // and turns as the finger moves round it. A tap is a step; a finger held to one side is a walk; a drag is a turn. A finger on the lantern
-// itself (within `restRadius` screen pixels of its middle) is no way at all.
+// itself (within half a cell of its middle) is no way at all.
 export const stepRepeatMs = 150;
-export const restRadius = cell / 2;
 
 // The way from the lantern to a finger, or null when the finger is on the lantern. Both are in screen pixels.
 export function steerDirection(
-  lantern: Point,
+  lantern: Lantern,
   finger: Point,
 ): Direction | null {
   const dx = finger.x - lantern.x;
   const dy = finger.y - lantern.y;
-  if (Math.max(Math.abs(dx), Math.abs(dy)) < restRadius) return null;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < lantern.size / 2) return null;
   if (Math.abs(dx) >= Math.abs(dy)) return dx > 0 ? "right" : "left";
   return dy > 0 ? "down" : "up";
 }
@@ -53,7 +57,7 @@ export function steerDirection(
 export function attachControls(
   screen: HTMLElement,
   controls: Controls,
-  lantern: () => Point | null,
+  lantern: () => Lantern | null,
 ): () => void {
   const stopKeys = attachKeys(window, keys, (action, phase) => {
     if (phase !== "down") return;

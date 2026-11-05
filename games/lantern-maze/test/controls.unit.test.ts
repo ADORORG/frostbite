@@ -3,13 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   attachControls,
-  restRadius,
   stepRepeatMs,
   steerDirection,
 } from "../src/screen/controls.ts";
 import { screenHeight, screenWidth } from "../src/screen/layout.ts";
 
-const lantern = { x: 80, y: 45 };
+const lantern = { size: 8, x: 80, y: 45 };
+const restRadius = lantern.size / 2;
 
 describe("steering", () => {
   it("is the way from the lantern to the finger along the longer side, and nothing on the lantern itself", () => {
@@ -27,6 +27,15 @@ describe("steering", () => {
     expect(
       steerDirection(lantern, { x: 80, y: 45 - restRadius + 0.1 }),
     ).toBeNull();
+  });
+});
+
+describe("steering on a larger maze", () => {
+  it("rests within half a cell of the lantern, however wide a cell is drawn", () => {
+    const wide = { size: 16, x: 80, y: 45 };
+    expect(steerDirection(wide, { x: 80 + 6, y: 45 })).toBeNull();
+    expect(steerDirection(wide, { x: 80 + 8, y: 45 })).toBe("right");
+    expect(steerDirection(lantern, { x: 80 + 6, y: 45 })).toBe("right");
   });
 });
 
