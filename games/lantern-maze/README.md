@@ -21,7 +21,7 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 
 ## How it plays
 
-- **Keys:** the arrows or WASD step the lantern, or swipe the screen (a pad appears on a touch screen). Enter starts a run and never throws
+- **Keys:** the arrows or WASD step the lantern, or a finger on the screen: the lantern walks toward it, a step for a tap and a walk for a hold (`src/screen/controls.ts`; no buttons on a touch screen). Enter starts a run and never throws
   one away; P or Space pauses.
 - **A floor:** a maze carved from the run's seed and the floor number, 7 by 5 cells on the first floor and 15 by 9 from the tenth. From the
   fifth floor some walls are taken out, so there are loops. The lantern lights cells within 4 steps along the passages, then 3, 2 and 1.

@@ -14,3 +14,16 @@ export const originOf = (
   x: Math.floor((screenWidth - width * cell) / 2),
   y: barHeight + Math.floor((screenHeight - barHeight - height * cell) / 2),
 });
+
+// The middle of the lantern's cell on the screen, in screen pixels, for the lantern in cell `position` of a maze `width` by `height` cells.
+export const lanternPoint = (
+  width: number,
+  height: number,
+  position: number,
+): { readonly x: number; readonly y: number } => {
+  const origin = originOf(width, height);
+  return {
+    x: origin.x + (position % width) * cell + cell / 2,
+    y: origin.y + Math.floor(position / width) * cell + cell / 2,
+  };
+};

@@ -146,7 +146,7 @@ export function cards(
     card(context, [
       ["AURORA PULSE", colour.perfect, 10],
       ["TAP EACH NOTE AS IT MEETS THE LINE", colour.text, 5],
-      ["KEYS D F J K, ARROWS, OR TAP A QUARTER", colour.great, 5],
+      ["KEYS D F J K, ARROWS, OR TAP A LANE", colour.great, 5],
       [byInput("ENTER TO START", "TAP TO START"), colour.textDim, 5],
     ]);
   if (view.phase === "over")

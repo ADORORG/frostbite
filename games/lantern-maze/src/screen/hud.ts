@@ -137,8 +137,8 @@ export function cards(
       ["EVERY STEP BURNS OIL", colour.flask, 6],
       [
         byInput(
-          "ARROWS / WASD / SWIPE - ENTER TO LIGHT",
-          "SWIPE TO STEER - TAP TO LIGHT",
+          "ARROWS / WASD - ENTER TO LIGHT",
+          "TAP OR HOLD WHERE TO WALK - TAP TO LIGHT",
         ),
         colour.cyan,
         5,

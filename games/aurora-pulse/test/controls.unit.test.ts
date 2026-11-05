@@ -2,17 +2,32 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { attachControls, laneOfTouch } from "../src/screen/controls.ts";
-import { laneAt, noteY, hitY, topY } from "../src/screen/layout.ts";
+import {
+  fieldX,
+  hitY,
+  laneAt,
+  laneWidth,
+  laneX,
+  noteY,
+  screenWidth,
+  topY,
+} from "../src/screen/layout.ts";
 
 describe("the screen's measures", () => {
-  it("cuts the width in four lanes for a touch, whatever size the screen is shown at, and keeps the edges in the end lanes", () => {
-    expect([0, 39, 40, 79, 80, 119, 120, 159, 200, -5].map(laneAt)).toEqual([
-      0, 0, 1, 1, 2, 2, 3, 3, 3, 0,
+  it("puts a touch on the lane that is drawn there, and the margins on the lane beside them", () => {
+    const lane = (index: number) => laneX(index) + laneWidth / 2;
+    expect([0, 1, 2, 3].map((index) => laneAt(lane(index)))).toEqual([
+      0, 1, 2, 3,
     ]);
-    expect(
-      [100, 100 + 87, 100 + 88, 100 + 351].map((x) => laneOfTouch(352, 100, x)),
-    ).toEqual([0, 0, 1, 3]);
-    expect(laneOfTouch(640, 0, 480)).toBe(3);
+    expect([0, fieldX - 1, laneX(1) - 1, laneX(1)].map(laneAt)).toEqual([
+      0, 0, 0, 1,
+    ]);
+    expect([laneX(4) - 1, laneX(4), screenWidth, 400, -5].map(laneAt)).toEqual([
+      3, 3, 3, 3, 0,
+    ]);
+    expect(laneOfTouch(0.49)).toBe(1);
+    expect(laneOfTouch(0.5)).toBe(2);
+    expect(laneOfTouch(1)).toBe(3);
   });
 
   it("puts a note on the line when it is due, at the top when it comes in, and under the line once it has gone by", () => {

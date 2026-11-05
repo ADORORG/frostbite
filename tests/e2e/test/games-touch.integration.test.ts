@@ -79,10 +79,10 @@ describe("a tap on a waiting game", () => {
   }
 });
 
-// Bro Maria has no buttons on a touch screen: a drag on the left half runs, a hold on the right half jumps. Run right for a moment and the
-// coins in the way are taken, which is on the score.
+// Bro Maria has no buttons on a touch screen: the screen is cut in three, and a thumb holds what is under it (the left quarter runs back, the
+// next quarter runs forward, the right half jumps). Hold forward for a moment and the coins in the way are taken, which is on the score.
 describe("a thumb on Bro Maria", () => {
-  it("runs the hero the way it is dragged", async () => {
+  it("runs the hero forward while a thumb is held on the forward zone, with no drag needed", async () => {
     const hosted = await serveGame(join(outRoot, "bro-maria"));
     const context = await browser.newContext({
       ...devices["iPhone 13"],
@@ -110,16 +110,11 @@ describe("a thumb on Bro Maria", () => {
       await page.waitForTimeout(1000);
       expect(await score()).toBe(0);
       const touch = await context.newCDPSession(page);
-      const at = (x: number) => [{ id: 1, x, y: frame.height * 0.6 }];
+      // Forward is the second quarter of the screen's width.
       await touch.send("Input.dispatchTouchEvent", {
-        touchPoints: at(100),
+        touchPoints: [{ id: 1, x: frame.width * 0.375, y: frame.height * 0.6 }],
         type: "touchStart",
       });
-      for (let step = 1; step <= 6; step += 1)
-        await touch.send("Input.dispatchTouchEvent", {
-          touchPoints: at(100 + step * 20),
-          type: "touchMove",
-        });
       await page.waitForFunction(
         () => Number(document.querySelector("#score")?.textContent) > 0,
       );

@@ -11,5 +11,8 @@ export const guide: Guide = {
   lines: ["ARROWS OR A D: RUN   SPACE OR UP: JUMP", ...aboutTheGame],
   start: "ENTER TO START",
   title: "BRO MARIA",
-  touchLines: ["DRAG ON THE LEFT: RUN   HOLD THE RIGHT: JUMP", ...aboutTheGame],
+  touchLines: [
+    "HOLD LEFT: BACK   NEXT: FORWARD   RIGHT HALF: JUMP",
+    ...aboutTheGame,
+  ],
 };

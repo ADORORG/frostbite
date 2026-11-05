@@ -8,6 +8,7 @@ export interface Drawn {
 }
 
 export interface Written {
+  readonly alpha: number;
   readonly fill: string;
   readonly text: string;
   readonly x: number;
@@ -27,9 +28,20 @@ export function surface() {
     },
     fillStyle: "" as string | object,
     fillText(text: string, x: number, y: number) {
-      written.push({ fill: String(context.fillStyle), text, x, y });
+      written.push({
+        alpha: context.globalAlpha,
+        fill: String(context.fillStyle),
+        text,
+        x,
+        y,
+      });
     },
     font: "",
+    globalAlpha: 1,
+    restore() {
+      context.globalAlpha = 1;
+    },
+    save() {},
     textAlign: "",
     textBaseline: "",
   };
