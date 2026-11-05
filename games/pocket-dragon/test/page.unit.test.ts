@@ -97,12 +97,12 @@ describe("the player's hands", () => {
 
   it("hold a touch button while a finger is on it, and let everything go when the page is left", () => {
     const handed = hands();
-    const fire = document.querySelector('[data-hold="fire"]');
-    if (fire === null) throw new Error("no fire button");
-    touch(fire, "pointerdown");
-    expect(handed.hold).toHaveBeenLastCalledWith("fire", true);
-    touch(fire, "pointerup");
-    expect(handed.hold).toHaveBeenLastCalledWith("fire", false);
+    const vision = document.querySelector('[data-hold="vision"]');
+    if (vision === null) throw new Error("no vision button");
+    touch(vision, "pointerdown");
+    expect(handed.hold).toHaveBeenLastCalledWith("vision", true);
+    touch(vision, "pointerup");
+    expect(handed.hold).toHaveBeenLastCalledWith("vision", false);
     touch(document.body, "pointerdown");
     expect(handed.hold).toHaveBeenCalledTimes(2);
     window.dispatchEvent(new Event("blur"));
@@ -194,7 +194,7 @@ describe("the page's view", () => {
     expect(element("banked", "strong").textContent).toBe("9");
   });
 
-  it("opens the quest and the levels reached, offers each level's touch buttons, and lists what was earned", () => {
+  it("opens the quest and the levels reached, names the thumbs' zones and offers each level's touch buttons, and lists what was earned", () => {
     const view = createView();
     view.chapters("castle", { ...freshProgress, unlocked: 2 }, false);
     const [quest, hills, castle, woods] = buttonsIn(document, "[data-chapter]");
@@ -210,19 +210,24 @@ describe("the page's view", () => {
     expect(woods?.querySelector("span")?.textContent).toBe("🔒");
     expect(quest?.title).toContain("All three levels");
     expect(woods?.title).toContain("Clear the level before");
+    const offered = () =>
+      buttonsIn(document, "#touch button[data-for]")
+        .filter((button) => !button.hidden)
+        .map((button) => button.textContent.trim());
     view.level("woods");
-    expect(element("act", "button").textContent).toBe("Use");
+    expect(element("thumb-act", "span").textContent).toBe("Use");
+    expect(element("thumb-fire", "span").textContent).toBe("Fire");
     expect(element("screen", "canvas").getAttribute("aria-label")).toContain(
       "maze",
     );
-    const hidden = () =>
-      buttonsIn(document, "#pad [hidden]").map((button) => button.dataset.hold);
-    expect(hidden()).toEqual(["charm"]);
-    const evade = document.querySelector('#pad [data-hold="evade"]');
-    expect(evade?.textContent).toBe("Fly up");
+    expect(offered()).toEqual(["Bag"]);
+    view.level("nursery");
+    expect(element("thumb-act", "span").textContent).toBe("Dance");
+    expect(element("thumb-fire", "span").textContent).toBe("Paint");
+    expect(offered()).toEqual(["Ink", "Clear"]);
     view.level("castle");
-    expect(hidden()).toEqual(["vision", "help"]);
-    expect(evade?.textContent).toBe("Evade");
+    expect(element("thumb-act", "span").textContent).toBe("Talk");
+    expect(offered()).toEqual(["Bag"]);
     view.chapters("woods", freshProgress, true);
     expect(
       buttonsIn(document, "[data-chapter]").every((button) => button.disabled),
@@ -236,11 +241,20 @@ describe("the page's view", () => {
         (item) => item.textContent,
       ),
     ).toEqual(["First egg", "mystery"]);
+    const touchButtons = () => buttonsIn(document, "#touch button");
+    view.running(false);
+    expect(touchButtons().every((button) => button.disabled)).toBe(true);
     view.running(true);
     expect(element("start", "button").hidden).toBe(true);
-    expect(
-      buttonsIn(document, "#pad button").some((button) => button.disabled),
-    ).toBe(false);
+    expect(element("menu", "button").disabled).toBe(true);
+    expect(touchButtons().some((button) => button.disabled)).toBe(false);
+    element("bag-items", "div").hidden = false;
+    view.running(false);
+    expect(element("bag-items", "div").hidden).toBe(true);
+    expect(element("bag", "button").getAttribute("aria-expanded")).toBe(
+      "false",
+    );
+    expect(element("menu", "button").disabled).toBe(false);
   });
 
   it("lists the Hall of Fame best first, and says how to get in while it is empty", () => {

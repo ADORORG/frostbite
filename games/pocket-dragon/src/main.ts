@@ -3,11 +3,6 @@ import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
 import { createRunLoop } from "@ador/game-sdk/run-loop";
-import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
 
 import { effects, trackOf, tracks } from "./audio.ts";
 import {
@@ -19,11 +14,15 @@ import { factsOf, type LastRun } from "./card/content.ts";
 import { instructions } from "./guide.ts";
 import { createCardPanel, noteMarks } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
-import { attachHands, playOfKey } from "./page/hands.ts";
+import { attachHands, playOfKey, type Action } from "./page/hands.ts";
 import { createIdleRuns, startPlay } from "./page/plays.ts";
 import type { PlayRun, Shown } from "./page/runs.ts";
+import { sendRun } from "./page/send.ts";
 import { settle } from "./page/settle.ts";
+import { attachTapToStart } from "./page/tap-start.ts";
 import { attachTestMode, testNote, testOverNote } from "./page/test-panel.ts";
+import { attachThumbs } from "./page/thumbs.ts";
+import { attachTouchPanel } from "./page/touch-panel.ts";
 import { createView, pickedFrom } from "./page/view.ts";
 import {
   freshProgress,
@@ -45,7 +44,9 @@ const pauseButton = element("pause", "button");
 const picker = element("chapters", "nav");
 const shareButton = element("share", "button");
 const nurseryButton = element("nursery", "button");
+const stage = element("stage", "div");
 const view = createView();
+const touch = attachTouchPanel(element("main", "main"));
 
 let play: PlatformPlay | null = null;
 let progress: Progress = freshProgress;
@@ -116,6 +117,7 @@ function choose(id: PlayId): void {
 
 pause.subscribe((paused) => {
   pauseButton.textContent = paused ? pauseCopy.resume : pauseCopy.pause;
+  pauseButton.dataset.paused = String(paused);
   if (paused) {
     heldNote = note.textContent;
     note.textContent = pauseCopy.paused;
@@ -144,17 +146,8 @@ async function finish(finished: PlayRun): Promise<void> {
   view.fame(progress.fame);
   show();
   startButton.textContent = finished.id === chosen ? "Play again" : "Start run";
-  if (runId === null || play === null) {
-    note.textContent = news + submitNote(null);
-    return;
-  }
-  const sent = runId;
-  note.textContent = news + submitNote({ kind: "pending" });
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  note.textContent = news + submitNote(settled);
+  note.textContent = news;
+  await sendRun(play, runId, record);
 }
 
 const loop = createRunLoop({
@@ -181,7 +174,7 @@ async function startRealRun(): Promise<PlayRun> {
   const started = await play?.runs.start().catch(() => null);
   const ready = started?.status === "started" ? started : null;
   runId = ready?.runId ?? null;
-  note.textContent = startNote(started ?? null, instructions[chosen]);
+  note.textContent = instructions(chosen);
   return startPlay(chosen, ready?.seed ?? localSeed(), (id) => {
     sound.sfx("milestone");
     play?.report(id);
@@ -191,6 +184,7 @@ async function startRealRun(): Promise<PlayRun> {
 
 const begin = (nursery = false): Promise<void> =>
   loop.launch(async () => {
+    touch.closeMenu();
     visit = nursery ? nurseryRun(localSeed()) : null;
     if (visit !== null) {
       runId = null;
@@ -244,17 +238,24 @@ async function connect(): Promise<void> {
 const togglePause = (): void => void (loop.running() && pause.toggle());
 // No dialog is open over the page.
 const free = (): boolean => !card.isOpen() && !testMode.isOpen();
-// The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume.
+// The controls are let go of and held even while paused, so a key let go of during a pause is not held on resume. During a run every key
+// and thumb goes to it; between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise, and 4 opens the Sky Nursery once won.
+function hold(action: Action, on: boolean): void {
+  if (loop.running()) run?.hold(action, on);
+  const pick = playOfKey(action);
+  if (!loop.running() && free() && on && pick !== undefined) choose(pick);
+  if (on && action === "hot4" && nurseryOpen() && free()) void begin(true);
+}
+const canStart = (): boolean => !startButton.disabled && free();
 attachHands(document.body, {
-  // During a run every key goes to it; between runs, 0 chooses the whole quest and 1, 2 and 3 a level to practise.
-  hold(action, on) {
-    if (loop.running()) run?.hold(action, on);
-    const pick = playOfKey(action);
-    if (!loop.running() && free() && on && pick !== undefined) choose(pick);
-    if (on && action === "hot4" && nurseryOpen() && free()) void begin(true);
-  },
+  hold,
   pause: togglePause,
-  start: () => void (!startButton.disabled && free() && begin()),
+  start: () => void (canStart() && begin()),
+});
+attachThumbs(stage, hold);
+attachTapToStart(stage, {
+  canStart: () => !loop.running() && canStart() && !touch.menuOpen(),
+  start: () => void begin(),
 });
 picker.addEventListener("click", (event) => {
   const id = pickedFrom(event);

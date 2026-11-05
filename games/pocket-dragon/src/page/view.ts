@@ -1,7 +1,7 @@
 import { drawGuide } from "@ador/game-sdk/guide";
 
 import { chapterTitles } from "../chapters.ts";
-import { guides } from "../guide.ts";
+import { guideFor } from "../guide.ts";
 import { isOpen, type FameEntry, type Progress } from "../progress.ts";
 import { playIds, type PlayId } from "../rules/constants.ts";
 import { clockOf } from "../score.ts";
@@ -10,9 +10,9 @@ import { createDepthView, type DepthView } from "../three/stage.ts";
 import { buttonsIn, element } from "./elements.ts";
 import type { PlayRun, Shown } from "./runs.ts";
 
-// What the page shows: the screen, the counts above it, the quest and levels to choose from, the touch buttons, the milestones earned
-// and the Hall of Fame. Every
-// place a number or a word changes has a place of its own that never grows, so nothing under the player's thumb moves.
+// What the page shows: the screen, the counts above it, the quest and levels to choose from, the thumb marks and touch buttons over the
+// screen, the milestones earned and the Hall of Fame. Every place a number or a word changes has a place of its own that never grows, so
+// nothing under the player's thumb moves.
 export const logicalWidth = 256;
 export const logicalHeight = 144;
 // The screen is drawn at twice its size, so its words are sharp.
@@ -37,55 +37,17 @@ const actWords: Readonly<Record<Shown, string>> = {
   woods: "Use",
 };
 
-// The touch buttons each level offers; the others keep their place but are not shown. Every level has the backpack's three foods.
-const foods = ["berry", "mushroom", "pineapple"] as const;
-const padOf: Readonly<Record<Shown, readonly string[]>> = {
-  castle: [
-    "left",
-    "right",
-    "up",
-    "down",
-    "act",
-    "fire",
-    "quick",
-    "evade",
-    "charm",
-    ...foods,
-  ],
-  hills: ["left", "right", "down", "act", "fire", ...foods],
-  nursery: [
-    "left",
-    "right",
-    "up",
-    "down",
-    "act",
-    "fire",
-    "quick",
-    "evade",
-    "charm",
-  ],
-  woods: [
-    "left",
-    "right",
-    "up",
-    "down",
-    "act",
-    "fire",
-    "evade",
-    "quick",
-    "vision",
-    "help",
-    ...foods,
-  ],
+// What the right thumb's two zones are called in each level (`thumbs.ts`), and which of the touch buttons over the screen each level offers
+// (a button's `data-for` names its levels; one marked `data-outside` is offered in the woods only out of the maze).
+const fireWords: Readonly<Record<Shown, string>> = {
+  castle: "Fire",
+  hills: "Fire",
+  nursery: "Paint",
+  woods: "Fire",
 };
-// Some buttons mean something else on some screens: the castle's challenge buttons fly Glitchy up and down out of the maze, and in the
-// Sky Nursery change the paint's colour, wipe the sky and paint.
-const padWords: Readonly<Record<string, Partial<Record<Shown, string>>>> = {
-  charm: { castle: "Charm", nursery: "Clear" },
-  evade: { castle: "Evade", nursery: "Ink +", woods: "Fly up" },
-  fire: { castle: "Fire", nursery: "Paint" },
-  quick: { castle: "Quick", nursery: "Ink -", woods: "Fly down" },
-};
+const offered = (button: HTMLElement, level: Shown, outside: boolean) =>
+  (button.dataset.for ?? "").split(" ").includes(level) &&
+  (!("outside" in button.dataset) || outside);
 
 export function createView() {
   const screen = element("screen", "canvas");
@@ -110,9 +72,22 @@ export function createView() {
   const startButton = element("start", "button");
   const pauseButton = element("pause", "button");
   const shareButton = element("share", "button");
-  const pad = element("pad", "div");
+  const touch = element("touch", "div");
+  const bag = element("bag", "button");
+  const bagItems = element("bag-items", "div");
+  const menu = element("menu", "button");
+  const thumbAct = element("thumb-act", "span");
+  const thumbFire = element("thumb-fire", "span");
+  const again = element("thumb-again", "span");
   const picker = element("chapters", "nav");
-  const actButton = element("act", "button");
+  // The level on the screen, whether Glitchy is out of the woods' maze, and whether a run is going: what the touch buttons offer.
+  let shown: Shown = "hills";
+  let outside = false;
+  let playing = false;
+  const offer = (): void => {
+    for (const button of buttonsIn(touch, "button[data-for]"))
+      button.hidden = !offered(button, shown, outside);
+  };
   const fameList = element("fame", "ol");
   const fameNote = element("fame-note", "p");
   screen.width = logicalWidth * scale;
@@ -132,8 +107,13 @@ export function createView() {
         if (valueOut !== undefined)
           valueOut.textContent = testing && label === "Time" ? none : value;
       });
-      if (context === null) return;
+      again.hidden = idle || playing;
       const woods = run.depth();
+      if ((woods !== null) !== outside) {
+        outside = woods !== null;
+        offer();
+      }
+      if (context === null) return;
       if (woods !== null && depth === undefined) depth = createDepthView(world);
       const layered = woods !== null && depth !== null && depth !== undefined;
       world.hidden = !layered;
@@ -143,7 +123,8 @@ export function createView() {
       context.imageSmoothingEnabled = false;
       run.draw(context, layered);
       if (testing) drawTestMark(context);
-      if (idle) drawGuide(context, logicalWidth, logicalHeight, guides[run.id]);
+      if (idle)
+        drawGuide(context, logicalWidth, logicalHeight, guideFor(run.id));
     },
     // What is chosen (the quest or a level), and which levels are open to practise.
     chapters(chosen: PlayId, progress: Progress, running: boolean): void {
@@ -165,17 +146,13 @@ export function createView() {
           number.textContent = open ? String(playIds.indexOf(id)) : "🔒";
       }
     },
-    // The level on the screen: what the screen shows, and what the touch buttons mean in it.
+    // The level on the screen: what the screen shows, what the right thumb's zones are called in it, and its touch buttons.
     level(level: Shown): void {
+      shown = level;
       screen.setAttribute("aria-label", screenWords[level]);
-      actButton.textContent = actWords[level];
-      for (const button of buttonsIn(pad, "button[data-hold]")) {
-        const hold = button.dataset.hold ?? "";
-        button.hidden = !padOf[level].includes(hold);
-        const words = padWords[hold];
-        if (words !== undefined)
-          button.textContent = words[level] ?? words.castle ?? "";
-      }
+      thumbAct.textContent = actWords[level];
+      thumbFire.textContent = fireWords[level];
+      offer();
     },
     // The Hall of Fame: the best won quests, best first.
     fame(entries: readonly FameEntry[]): void {
@@ -207,10 +184,15 @@ export function createView() {
       shareButton.disabled = on;
     },
     running(on: boolean): void {
+      playing = on;
       startButton.hidden = on;
       pauseButton.disabled = !on;
       shareButton.disabled = on || testing;
-      for (const button of buttonsIn(pad, "button")) button.disabled = !on;
+      menu.disabled = on;
+      for (const button of buttonsIn(touch, "button")) button.disabled = !on;
+      if (on) return;
+      bagItems.hidden = true;
+      bag.setAttribute("aria-expanded", "false");
     },
   };
 }

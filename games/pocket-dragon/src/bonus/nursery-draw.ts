@@ -1,5 +1,6 @@
 import { block, sprite } from "@ador/game-sdk/pixels";
 
+import { byInput } from "../page/input.ts";
 import { egg } from "../screen/hills-things.ts";
 import { spriteScaled } from "../screen/kit-sprites.ts";
 import { colour, friendColours } from "../screen/palette.ts";
@@ -210,7 +211,10 @@ function nurseryWords(
   context.fillRect(0, 133, 256, 11);
   write(
     context,
-    "SPACE DANCE  F PAINT  Q/E INK  C CLEAR  RAINBOW: OUT",
+    byInput(
+      "SPACE DANCE  F PAINT  Q/E INK  C CLEAR  RAINBOW: OUT",
+      "RIGHT THUMB: DANCE, PAINT   INK, CLEAR   RAINBOW: OUT",
+    ),
     128,
     135,
     6,

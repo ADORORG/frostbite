@@ -1,27 +1,50 @@
 import type { Guide } from "@ador/game-sdk/guide";
 
+import { byInput } from "./page/input.ts";
 import type { PlayId } from "./rules/constants.ts";
 
-// What the first screen of the quest and of each level says before a run: which it is, what the player does, and how to begin. It is drawn by the SDK
-// over the chapter's idle screen. `instructions` is the same advice in a sentence, for the note under the screen when a run begins.
-export const guides: Readonly<Record<PlayId, Guide>> = {
+// What the first screen of the quest and of each level says before a run: which it is, what the player does, and how to begin. It is drawn by
+// the SDK over the chapter's idle screen. A touch screen gets its own lines (thumbs on the screen, the Bag button) and is told to tap; the
+// SDK's guide gains `touchLines` in the owners' newer `dev`, and this moves to it then. `instructions` is the same advice in one short line,
+// for the note under the screen when a run begins.
+export interface ChapterGuide extends Guide {
+  readonly touchLines: readonly string[];
+  readonly touchStart: string;
+}
+
+const backpackKeys = "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE";
+const backpackBag = "BAG BUTTON: BERRY, MUSHROOM, PINEAPPLE";
+
+export const guides: Readonly<Record<PlayId, ChapterGuide>> = {
   castle: {
     lines: [
       "ARROWS: WALK   SPACE: TALK AND OPEN   F: FIRE",
       "BUILD THE GUILD, SAVE THE EGGS, STORM THE CASTLE",
-      "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE",
+      backpackKeys,
     ],
     start: "ENTER TO PRACTISE LEVEL 2",
     title: "THE GUILD AND THE CASTLE",
+    touchLines: [
+      "LEFT THUMB: WALK   RIGHT THUMB: TALK AND FIRE",
+      "BUILD THE GUILD, SAVE THE EGGS, STORM THE CASTLE",
+      backpackBag,
+    ],
+    touchStart: "TAP TO PRACTISE LEVEL 2",
   },
   hills: {
     lines: [
       "ARROWS: RUN   SPACE OR UP: JUMP   DOWN: DIG IN",
       "F: FIRE   WINGS: JUMP IN THE AIR TO FLY",
-      "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE",
+      backpackKeys,
     ],
     start: "ENTER TO PRACTISE LEVEL 1",
     title: "EGG HILLS",
+    touchLines: [
+      "LEFT THUMB: RUN, PUSH UP TO JUMP, DOWN TO DIG",
+      "RIGHT THUMB: JUMP AND FIRE, AS MARKED",
+      backpackBag,
+    ],
+    touchStart: "TAP TO PRACTISE LEVEL 1",
   },
   quest: {
     lines: [
@@ -31,31 +54,62 @@ export const guides: Readonly<Record<PlayId, Guide>> = {
     ],
     start: "ENTER TO START THE QUEST",
     title: "GLITCHY'S QUEST",
+    touchLines: [
+      "EGG HILLS, THEN THE CASTLE, THEN THE WOODS IN 3D",
+      "HEARTS AND BACKPACK CARRY ON, ONE CLOCK",
+      "LEVELS BUTTON: PRACTISE ONE LEVEL",
+    ],
+    touchStart: "TAP TO START THE QUEST",
   },
   woods: {
     lines: [
       "MAZE: UP/DOWN WALK  LEFT/RIGHT TURN  F: FIRE",
       "OUTSIDE: E/Q FLY  V FROST VISION  H SPARKY",
-      "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE",
+      backpackKeys,
     ],
     start: "ENTER TO PRACTISE LEVEL 3",
     title: "THE WHISPERING WOODS",
+    touchLines: [
+      "MAZE: LEFT THUMB WALKS AND TURNS, RIGHT FIRES",
+      "OUTSIDE: FLY, VISION AND SPARKY BUTTONS",
+      backpackBag,
+    ],
+    touchStart: "TAP TO PRACTISE LEVEL 3",
   },
 };
 
-const backpack =
-  " Your backpack keeps what you find: B eats a berry for fire that reaches farther, R rolls a mushroom's glitch blast, and G eats a pineapple to grow big, so the next bump only shrinks you.";
+// The first screen's card for the way the player plays.
+export function guideFor(id: PlayId): Guide {
+  const guide = guides[id];
+  return byInput<Guide>(guide, {
+    lines: guide.touchLines,
+    start: guide.touchStart,
+    title: guide.title,
+  });
+}
 
-export const instructions: Readonly<Record<PlayId, string>> = {
-  castle:
-    "Arrows walk, space talks and opens, F breathes fire. By day, help four friends join your guild and search the houses for gear and clues; by night, save the eggs from DeFu's guards; in winter, storm the castle. In a challenge: 1 to 5 shows, Q quick cheer, E evade, C charm." +
-    backpack,
-  hills:
-    "Arrows or A and D run, space or up jumps, F breathes fire, down digs into a burrow. Take the wings to fly and the bubble for a forcefield, bounce a spring into the sky, and beat DeFu's ghost dragons to unseal each portal." +
-    backpack,
-  quest:
-    "The whole quest in one run: Egg Hills, then the Guild and the Castle, then the Whispering Woods. Your hearts and your backpack carry from level to level, and the clock never stops.",
-  woods:
-    "In the maze, up and down walk, left and right turn, and F breathes fire: read three clue stones and find four launcher parts to open the moon gate. Outside, the arrows walk, F breathes fire, and space frees caged dragons, opens chests for three rocket keys and fits them into DeFu's rocket once her factory's valves are broken. Dodge her laser and shockwave. Out of the maze, E flies up (low, then soaring over the trees) and Q flies down, and V spends 10 metaplasma on frost vision: the world slows to half speed and three futures show where each way leads. H sends Sparky, the tiny glowing atom who joins you there, into a nook too small for a dragon to bring back what hides in it." +
-    backpack,
+const questLine =
+  "Three levels on one clock: your hearts and your backpack carry on.";
+
+// One short line for each, for a keyboard and for thumbs; the guide and the README say the rest.
+const lines: Readonly<
+  Record<PlayId, { readonly keys: string; readonly thumbs: string }>
+> = {
+  castle: {
+    keys: "Arrows walk, space talks and opens, F breathes fire; in a challenge, 1 to 5, Q, E and C pick a move.",
+    thumbs: "Left thumb walks; right thumb talks, opens and breathes fire.",
+  },
+  hills: {
+    keys: "Arrows run, space or up jumps, down digs in, F breathes fire; B, R and G use the backpack.",
+    thumbs: "Left thumb runs, jumps and digs; right thumb jumps and fires.",
+  },
+  quest: { keys: questLine, thumbs: questLine },
+  woods: {
+    keys: "Arrows walk and turn, F fires, space uses; outside, E and Q fly, V sees futures, H sends Sparky.",
+    thumbs:
+      "Left thumb walks; right thumb uses and fires; outside, the buttons fly.",
+  },
 };
+
+export const instructions = (id: PlayId): string =>
+  byInput(lines[id].keys, lines[id].thumbs);

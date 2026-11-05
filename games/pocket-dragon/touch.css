@@ -1,0 +1,220 @@
+/* On a touch screen (a phone or a tablet) the game is played with thumbs on the screen itself (`src/page/thumbs.ts`): one thin line of
+   readouts along the top with the levels, pause and sound buttons at its end, then the screen with the thumb marks and the few buttons a
+   level needs laid over it, then one short note. Nothing scrolls. The chapter menu is behind the levels button. A mouse and keyboard keep
+   the page as `styles.css` lays it out (and a narrow window as the SDK's phone sheet does). The rules start `html body main` so they win
+   over the SDK's phone sheet. */
+.thumbs,
+.touch,
+#menu {
+  display: none;
+}
+
+/* A narrow window with a mouse: the SDK's sheet lays it out; the chapters go where a touch pad would be, and the Hall of Fame waits. */
+@media (max-width: 46rem) and (orientation: portrait) {
+  body main #chapters {
+    grid-area: pad;
+    margin-block-start: 0.25rem;
+  }
+  body main .fame {
+    display: none;
+  }
+}
+@media (orientation: landscape) and (max-height: 32rem) {
+  body main #chapters {
+    grid-area: pad;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+}
+
+@media (pointer: coarse) {
+  html,
+  body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  html body main {
+    grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "readouts menu pause sound"
+      "screen screen screen screen"
+      "note note note note";
+    gap: 0.25rem 0.375rem;
+    padding: 0.25rem 0.375rem 0.375rem;
+  }
+  html body main .bar,
+  html body main .foot,
+  html body main .foot .actions {
+    display: contents;
+  }
+  html body main header,
+  html body main .foot #start,
+  html body main .foot #share,
+  html body main > section,
+  html body main > .fame,
+  html body main #chapters {
+    display: none;
+  }
+  html body main .bar .score {
+    grid-area: readouts;
+    align-self: center;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  html body main .bar .score > span {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  html body main .bar .score strong {
+    min-inline-size: 0;
+  }
+  html body main .bar .score .best {
+    display: none;
+  }
+  /* The levels, pause and the two sound switches: small square buttons with a sign for a word (the word stays for a screen reader). */
+  html body main .foot #menu {
+    grid-area: menu;
+    display: block;
+  }
+  html body main .foot #pause {
+    grid-area: pause;
+  }
+  html body main .foot #sound {
+    grid-area: sound;
+    margin: 0;
+  }
+  html body main .foot #menu,
+  html body main .foot #pause,
+  html body main .foot #sound button {
+    inline-size: 2rem;
+    min-inline-size: 0;
+    block-size: 2rem;
+    min-block-size: 0;
+    padding: 0;
+    box-shadow: none;
+    font-size: 0;
+    line-height: 1;
+  }
+  html body main .foot #menu::before,
+  html body main .foot #pause::before,
+  html body main .foot #sound button::before {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  html body main .foot #menu::before {
+    content: "☰";
+  }
+  html body main .foot #pause::before {
+    content: "❚❚";
+    font-size: 0.75rem;
+  }
+  html body main .foot #pause[data-paused="true"]::before {
+    content: "▶";
+  }
+  html body main .foot #sound .sound-panel {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    inline-size: auto;
+  }
+  html body main .foot #sound button[data-sound="music"]::before {
+    content: "♪";
+  }
+  html body main .foot #sound button[data-sound="effects"]::before {
+    content: "FX";
+    font-size: 0.75rem;
+  }
+  html body main .foot #sound button[aria-pressed="false"] {
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+  html body main .foot #sound input[type="range"],
+  html body main .foot #sound .sound-panel__hint {
+    display: none;
+  }
+  html body main .foot #note {
+    grid-area: note;
+    block-size: auto;
+    max-block-size: 2.4em;
+    margin: 0;
+    overflow: hidden;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  /* The menu, open: the chapters over the screen, and the player's card in the line along the top. */
+  html body main[data-menu="open"] #chapters {
+    grid-area: screen;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: rgb(12 6 32 / 0.94);
+  }
+  html body main[data-menu="open"] .bar .score {
+    display: none;
+  }
+  html body main[data-menu="open"] .foot #share {
+    grid-area: readouts;
+    display: block;
+    align-self: center;
+    justify-self: start;
+    block-size: 2rem;
+    min-block-size: 0;
+    padding: 0 0.75rem;
+    box-shadow: none;
+    font-size: 0.8125rem;
+  }
+  /* The screen's box is the row's: what is laid over it cannot make it taller, and nothing in it scrolls. */
+  html body main .stage {
+    grid-area: screen;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    overflow: clip;
+    container: stage / size;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  html body main .stage .thumbs,
+  html body main .stage .touch {
+    position: relative;
+    display: block;
+    grid-area: 1 / 1;
+    pointer-events: none;
+  }
+}
+
+/* Held upright, the line along the top has room for the level's three counts; the score is told when the run ends, and the screen shows
+   the metaplasma. Held on its side, the line is thinner still, so the screen has the height. */
+@media (pointer: coarse) and (orientation: portrait) {
+  html body main .bar .score .points,
+  html body main .bar .score .plasma {
+    display: none;
+  }
+}
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 32rem) {
+  html body main {
+    padding-block: 0.125rem 0.25rem;
+  }
+  html body main .bar .score {
+    font-size: 0.6875rem;
+  }
+  html body main .foot #menu,
+  html body main .foot #pause,
+  html body main .foot #sound button {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+  }
+}

@@ -12,7 +12,7 @@ import { clockOf } from "../score.ts";
 import type { PlayRun } from "./runs.ts";
 
 // What a finished run changes: the saved progress (the best score, the metaplasma banked, the levels it opened to practise, a won
-// quest's place in the Hall of Fame), the card's note of the run, and what the page says of it before what the platform says.
+// quest's place in the Hall of Fame), the card's note of the run, and what the page says of it.
 export interface Settled {
   readonly lastRun: LastRun;
   readonly news: string;
@@ -26,6 +26,7 @@ const levelName = (id: ChapterId): string =>
 // The last level (the tuple is three long, so this is typed as the level itself).
 const lastLevel = chapterIds[2];
 
+// One or two sentences: how the run went, and a level it opened.
 function newsOf(
   finished: PlayRun,
   opened: ChapterId | null,
@@ -33,16 +34,25 @@ function newsOf(
 ): string {
   const open =
     opened === null
-      ? ""
-      : `${levelName(opened)} is open to practise: ${chapterTitles[opened]}! `;
+      ? []
+      : [`${levelName(opened)} is open to practise: ${chapterTitles[opened]}!`];
   const fame = finished.fame();
-  if (fame !== null)
-    return `You won the whole quest in ${clockOf(fame.ticks)}! ${rank === null ? "" : `Hall of Fame: number ${String(rank)}! `}${open}`;
-  if (finished.id === "quest")
-    return `The quest ended in ${chapterTitles[finished.level()]}. ${open}`;
-  return finished.cleared().includes(lastLevel)
-    ? "You cleared the last level! Now try the whole quest against the clock. "
-    : open;
+  const said =
+    fame !== null
+      ? [
+          `You won the whole quest in ${clockOf(fame.ticks)}!`,
+          ...(rank === null ? [] : [`Hall of Fame: number ${String(rank)}!`]),
+        ]
+      : finished.id === "quest"
+        ? [`The quest ended in ${chapterTitles[finished.level()]}.`]
+        : finished.cleared().includes(lastLevel)
+          ? [
+              "You cleared the last level! Now try the whole quest against the clock.",
+            ]
+          : [
+              `${chapterTitles[finished.level()]}: ${finished.score().toLocaleString("en-US")} points.`,
+            ];
+  return [...said, ...open].join(" ");
 }
 
 export function settle(before: Progress, finished: PlayRun): Settled {

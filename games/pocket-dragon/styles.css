@@ -1,6 +1,9 @@
 @import "@ador/game-sdk/audio/panel.css";
+@import "@ador/game-sdk/phone.css";
 @import "./card.css";
 @import "./test.css";
+@import "./touch.css";
+@import "./thumbs.css";
 
 /* Glitchy's colours, as on the screen: mint, lavender, hot pink, cyan and cream on a night-purple world. */
 :root {
@@ -260,28 +263,5 @@ button[hidden] {
   * {
     animation: none !important;
     transition: none !important;
-  }
-}
-
-/* The touch buttons are for a screen with no keyboard: they are there only where the main pointer is a finger. */
-.pad {
-  display: none;
-  grid-template-columns: repeat(4, 1fr) 1.5fr 1.5fr;
-  grid-auto-rows: auto;
-  gap: 0.5rem;
-}
-@media (pointer: coarse) {
-  .pad {
-    display: grid;
-  }
-  .pad button {
-    min-inline-size: 0;
-    min-block-size: 3.5rem;
-    padding: 0.5rem;
-    touch-action: none;
-    user-select: none;
-  }
-  .chapters button {
-    font-size: 0.8125rem;
   }
 }

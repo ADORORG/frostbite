@@ -30,7 +30,7 @@ describe("the secret Sky Nursery on the page", () => {
     game.press("Digit4");
     await settle(30);
     expect(game.text("note")).toBe(nurseryNote);
-    expect(game.byId("act")?.textContent).toBe("Dance");
+    expect(game.text("thumb-act")).toBe("Dance");
     expect(game.byId("nursery")?.hasAttribute("disabled")).toBe(true);
   });
 });

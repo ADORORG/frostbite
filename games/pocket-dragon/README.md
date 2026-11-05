@@ -165,12 +165,18 @@ opens a chest, fits a key or launches an egg (and skips a scene); in the castle 
 walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
 move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
 charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack; out of the maze in the
-woods E flies up, Q flies down, V turns on frost vision and H sends Sparky (on a touch screen: Fly up, Fly down, Vision and Sparky). Enter starts a run, P
-pauses, and between runs 0 chooses the whole quest, 1, 2 and 3 a level open to practise, and (once the quest is won) 4 visits the secret
-Sky Nursery. On a touch screen
-there are buttons for the actions the level on the screen uses (in the quest they change with the level). M and N turn the music and the
-effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space
-to press, Escape to close), so none of them start a run.
+woods E flies up, Q flies down, V turns on frost vision and H sends Sparky. Enter starts a run, P pauses, and between runs 0 chooses the
+whole quest, 1, 2 and 3 a level open to practise, and (once the quest is won) 4 visits the secret Sky Nursery. M and N turn the music and
+the effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or
+Space to press, Escape to close), so none of them start a run.
+
+On a touch screen the thumbs play on the screen itself (`src/page/thumbs.ts`), each finger followed on its own. The left half is a
+stick: pushed any of eight ways from its marked middle, it holds that way (up jumps in Egg Hills). The right half acts (jump, talk, use or
+dance) and fires (or paints), as marked: side by side under the picture on a phone held upright, one above the other held on its side. A
+tap starts a run. **Bag** opens the backpack's three foods; out of the woods' maze **Fly ▲**, **Fly ▼**, **Vision** and **Sparky** are
+buttons over the screen, and in the Sky Nursery **Ink** and **Clear**. A cheer challenge is played with the stick and the act side. A thin
+line along the top holds the counts, the levels button (☰: the chapters and the player's card), pause and the sound switches; nothing
+scrolls. `touch.css` and `thumbs.css` lay out a touch screen, and the SDK's `phone.css` a narrow window with a mouse.
 
 ## Layout
 
@@ -213,9 +219,10 @@ src/three/          the woods outside the maze in 3D with three.js: parts (shape
 src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
                     layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
                     trophies (the shelf), badges (the levels) and poster (the whole picture)
-src/page/           the page: the keys and touch buttons, a level's run and the quest's run as the page sees them (runs, quest-run),
-                    settle (what a finished run changes), what is shown around the screen (view, with the Hall of Fame), and
-                    card-panel (making, saving and sharing a card); its styles are in `card.css`
+src/page/           the page: keys (hands) and thumbs (zones, thumbs, tap-start, touch-panel, input; see `DECISIONS.md`), a level's
+                    run and the quest's (runs, quest-run), settle (what a finished run changes), send (a finished run to the platform,
+                    once), what is shown around the screen (view, with the Hall of Fame) and card-panel; styles in `card.css`,
+                    `touch.css` and `thumbs.css`
 src/bonus/          the secret Sky Nursery: nursery (its own small seeded state machine), nursery-draw, nursery-run (a visit as
                     the page plays it, counting for nothing) and cards (its three cards to share)
 src/main.ts         joins the page to the platform (progress, milestones, runs) and runs it on the SDK's run loop
@@ -236,7 +243,8 @@ compactly to stay inside a record's 64 KB: one `keys` input holds up to sixty-fo
 (`"12R30r0J"`: right pressed on tick 12, let go on tick 42, jump pressed on tick 42). The quest plays each level with that level's own
 rules, so a level plays the same in the quest as alone; between levels the dimension shifts for three seconds, when nothing is taken,
 and the next level starts with every control let go of. A whole quest won by the test bots is about 3 KB and replays in a tenth of a
-second. The platform gives a run its seed and, on `run.submit`, replays the record; a
+second. The platform gives a run its seed and, on `run.submit`, replays the record (the page sends a finished run once, under the id the
+platform gave it, and drops a failure quietly; a test run and the Sky Nursery send nothing); a
 milestone the replay earns is held as replay-verified, which shows the run followed the rules, not that a person played it. The
 verifier's SHA-256 is pinned in `configs/games/pocket-dragon.ts`; changing any level's rules changes the digest, and a test fails until
 the pin and `verifierVersion` are updated together. The metaplasma banked is kept by the page with the rest of the progress; the rules
@@ -278,10 +286,14 @@ level still ends. Nobody has played it as a person yet.
 
 ## Tests
 
-`pnpm --filter @game/pocket-dragon test:unit` (the rules, the stages, the quest, the screen and the page's parts), `test:integration`
-(bundles the page and plays it against a simulated platform, including a quest on the platform's seed that is sent back and replayed),
-`test:coverage`. The 3D view is tested without WebGL: its models, their animation, the camera's paths and the world set from a state
-are plain three.js objects, and the renderer is stood in for; how it looks was checked in a browser.
+`pnpm --filter @game/pocket-dragon test:unit` (the rules, the screen and the page's parts, the thumbs driven by pointer events among them),
+`test:integration` (the bundled page against a simulated platform: each level and the quest sent once under the platform's run and seed,
+test mode and the Sky Nursery sending nothing, a quest played by thumbs), `test:coverage`. Runs played to their end get their animation
+frames at once (`fastFrames`). The 3D view is tested without WebGL, as plain three.js objects; how it looks was checked in a browser.
+
+## Decisions
+
+The owners' decisions (three.js, test mode's key hash, the milestones) and the SDK stand-ins are in `DECISIONS.md`.
 
 ## Ownership
 

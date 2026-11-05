@@ -237,7 +237,10 @@ describe("the tunes, effects and guides", () => {
       expect(tracks[id].voices.length).toBeGreaterThan(0);
     for (const id of playIds) {
       expect(guides[id].lines).toHaveLength(3);
-      expect(instructions[id].length).toBeGreaterThan(40);
+      expect(guides[id].touchLines).toHaveLength(3);
+      expect(guides[id].touchStart).toMatch(/^TAP TO /u);
+      expect(instructions(id).length).toBeGreaterThan(40);
+      expect(instructions(id).length).toBeLessThan(110);
     }
     expect(Object.keys(effects).length).toBeGreaterThan(30);
     const hills = startHills(1);

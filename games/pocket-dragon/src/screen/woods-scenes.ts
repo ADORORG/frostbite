@@ -62,7 +62,7 @@ const scripts: Readonly<Record<SceneId, readonly Line[]>> = {
     {
       who: "sparky",
       words:
-        "BZZT! HI, GLITCHY, I'M SPARKY! I CAN ZIP INTO NOOKS TOO SMALL FOR A DRAGON. PRESS H!",
+        "BZZT! HI, GLITCHY, I'M SPARKY! I CAN ZIP INTO NOOKS TOO SMALL FOR A DRAGON. PRESS H, OR TAP SPARKY!",
     },
     { who: "glitchy", words: "LOOK! DEFU'S OUTPOST, AND DRAGONS IN CAGES!" },
     {

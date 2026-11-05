@@ -6,6 +6,7 @@ import { replayRecord } from "@ador/game-sdk/replay";
 import type { RunRecord } from "@ador/game-sdk/run-record";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { instructions } from "../src/guide.ts";
 import { pocketDragonRules } from "../src/rules/index.ts";
 import { createQuestSession } from "../src/quest-session.ts";
 import { sampleRun } from "../src/sample-run.ts";
@@ -76,7 +77,7 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     ]);
     expect(chapters[0]?.getAttribute("data-chapter")).toBe("quest");
     expect(chapters[0]?.getAttribute("aria-pressed")).toBe("true");
-    for (const button of game.window.document.querySelectorAll("#pad button"))
+    for (const button of game.window.document.querySelectorAll("#touch button"))
       expect(button.hasAttribute("disabled")).toBe(true);
     expect(game.text("stat-0-label")).toBe("Time");
   });
@@ -100,7 +101,7 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     expect(pressed()).toBe("castle");
     expect(game.text("stat-0-label")).toBe("Guild");
     expect(game.text("best")).toBe("4200");
-    expect(game.byId("act")?.textContent).toBe("Talk");
+    expect(game.text("thumb-act")).toBe("Talk");
     game.press("Digit1");
     expect(game.text("stat-0-label")).toBe("Eggs");
     expect(game.text("best")).toBe("9");
@@ -108,8 +109,8 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     expect(pressed()).toBe("quest");
   });
 
-  it("plays a run on the platform's seed, sends the record when it ends, and says what the platform made of it", async () => {
-    const sent: unknown[] = [];
+  it("plays a run on the platform's seed, sends the record once under the platform's run when it ends, and tells how it went", async () => {
+    const sent: { record: RunRecord; runId: string }[] = [];
     const game = await play(
       null,
       {},
@@ -120,8 +121,8 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
           seed: quickLoss,
           status: "started",
         }),
-        submit: async (_runId, record) => {
-          sent.push(record);
+        submit: async (runId, record) => {
+          sent.push({ record: record as RunRecord, runId });
           const replayed = replayRecord(pocketDragonRules, record as RunRecord);
           return replayed.ok
             ? { earned: [...replayed.earned], status: "verified" }
@@ -132,47 +133,40 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     await settle();
     game.click("start");
     await settle(150);
-    expect(game.text("note")).toContain("The platform will check this run");
+    expect(game.text("note")).toBe(instructions("quest"));
     expect(game.running()).toBe(true);
     game.press("ArrowRight");
     await whileRunning(game, 200);
     expect(game.running()).toBe(false);
     await settle(200);
     expect(sent).toHaveLength(1);
-    expect(sent[0]).toMatchObject({
+    expect(sent[0]?.runId).toBe("run-1");
+    expect(sent[0]?.record).toMatchObject({
       config: { cabinet: "quest" },
       seed: quickLoss,
     });
     expect(game.text("note")).toContain("The quest ended in Egg Hills.");
-    expect(game.text("note")).toContain("The platform checked this run.");
     expect(game.text("stat-1")).toBe("0");
     expect(game.byId("start")?.textContent).toBe("Play again");
     expect(game.stored.progress).toMatchObject({ unlocked: 1 });
   }, 40_000);
 
-  it("plays on a seed of its own when the platform offers no runs, and says the milestones are its own report", async () => {
+  it("plays on a seed of its own when the platform offers no runs, with the touch buttons of the level it is in", async () => {
     const game = await play();
     await settle();
     game.click("start");
     await settle(150);
-    expect(game.text("note")).toContain("local seed");
+    expect(game.text("note")).toBe(instructions("quest"));
     expect(game.byId("pause")?.hasAttribute("disabled")).toBe(false);
     const offered = [
-      ...game.window.document.querySelectorAll("#pad button"),
+      ...game.window.document.querySelectorAll("#touch button[data-for]"),
     ].filter((button) => !button.hasAttribute("hidden"));
-    expect(offered.map((button) => button.getAttribute("data-hold"))).toEqual([
-      "down",
-      "left",
-      "right",
-      "act",
-      "fire",
-      "berry",
-      "mushroom",
-      "pineapple",
-    ]);
-    expect(offered.every((button) => !button.hasAttribute("disabled"))).toBe(
-      true,
-    );
+    expect(offered.map((button) => button.id)).toEqual(["bag"]);
+    expect(
+      [...game.window.document.querySelectorAll("#touch button")].every(
+        (button) => !button.hasAttribute("disabled"),
+      ),
+    ).toBe(true);
     expect(
       game.window.document
         .querySelector("[data-chapter]")

@@ -1,6 +1,7 @@
 import { installFakeAudio } from "@ador/game-sdk/audio/fake";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { instructions } from "../src/guide.ts";
 import { closeGame, play, settle, whileRunning } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -64,7 +65,7 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     await settle(100);
     game.press("Digit1");
     expect(chosen()).toBe("castle");
-    expect(game.text("note")).toContain("four friends");
+    expect(game.text("note")).toBe(instructions("castle"));
   });
 
   it("pauses on P: the page says so, the sound stops, and it carries on after", async () => {
@@ -128,7 +129,7 @@ describe("Pocket Dragon's keys, pause, chapters and sound", () => {
     const ended = game.audio.oscillators.length;
     await settle(600);
     expect(game.audio.oscillators).toHaveLength(ended);
-    expect(game.text("note")).toContain("your own claim");
+    expect(game.text("note")).toBe("The quest ended in Egg Hills.");
   }, 40_000);
 
   it("opens the player's card between runs, keeps Enter and the chapter keys from the game while it is open, and closes on Escape", async () => {

@@ -120,3 +120,38 @@ export async function whileRunning(
 ): Promise<void> {
   for (let at = 0; at < most && game.running(); at += 1) await settle(100);
 }
+
+type Page = Awaited<ReturnType<typeof play>>;
+
+// Frames as fast as a run can take them: each animation frame the page asks for comes at once, a second later on its clock (so it plays the
+// most ticks a frame may), and every sixty-fourth waits for the page's timers, so a run of fifteen minutes is played in a moment.
+export function fastFrames(game: Page): void {
+  let clock = 0;
+  let frames = 0;
+  game.window.requestAnimationFrame = (callback) => {
+    frames += 1;
+    const next = () => callback((clock += 1_000));
+    if (frames % 64 === 0) setTimeout(next, 0);
+    else queueMicrotask(next);
+    return frames;
+  };
+}
+
+// A finger on the page's screen as a phone sends it, on a stage laid out 390 wide and 470 high at the page's corner.
+export function thumbs(game: Page) {
+  const stage = game.byId("stage");
+  if (stage === null) throw new Error("no stage");
+  stage.getBoundingClientRect = () =>
+    game.window.DOMRect.fromRect({ height: 470, width: 390, x: 0, y: 0 });
+  return (type: string, finger: number, x: number, y: number) =>
+    stage.dispatchEvent(
+      new game.window.PointerEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y,
+        pointerId: finger,
+        pointerType: "touch",
+      }),
+    );
+}

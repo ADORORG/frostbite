@@ -151,7 +151,7 @@ describe("a finished run, settled", () => {
       won: true,
     });
     expect(after.news).toBe(
-      "You won the whole quest in 8:20! Hall of Fame: number 1! Level 3 is open to practise: The Whispering Woods! ",
+      "You won the whole quest in 8:20! Hall of Fame: number 1! Level 3 is open to practise: The Whispering Woods!",
     );
     expect(after.lastRun).toEqual({
       chapter: "woods",
@@ -171,7 +171,7 @@ describe("a finished run, settled", () => {
       full,
       finished("quest", { fame: () => fame, won: () => true }),
     );
-    expect(low.news).toBe("You won the whole quest in 8:20! ");
+    expect(low.news).toBe("You won the whole quest in 8:20!");
     expect(low.progress.fame).toEqual(full.fame);
     expect(low.lastRun.rank).toBeUndefined();
   });
@@ -183,7 +183,7 @@ describe("a finished run, settled", () => {
     );
     expect(after.opened).toBe("castle");
     expect(after.news).toBe(
-      "The quest ended in The Guild and the Castle. Level 2 is open to practise: The Guild and the Castle! ",
+      "The quest ended in The Guild and the Castle. Level 2 is open to practise: The Guild and the Castle!",
     );
     expect(after.lastRun).toMatchObject({ outcome: "lost", quest: true });
   });
@@ -194,6 +194,9 @@ describe("a finished run, settled", () => {
       finished("hills", { cleared: () => ["hills"] }),
     );
     expect(hills.opened).toBe("castle");
+    expect(hills.news).toBe(
+      "Egg Hills: 12,000 points. Level 2 is open to practise: The Guild and the Castle!",
+    );
     expect(hills.lastRun).toMatchObject({ outcome: "cleared", quest: false });
     expect(hills.progress.best.hills).toBe(12_000);
     const woods = settle(
@@ -202,10 +205,13 @@ describe("a finished run, settled", () => {
     );
     expect(woods.opened).toBeNull();
     expect(woods.news).toBe(
-      "You cleared the last level! Now try the whole quest against the clock. ",
+      "You cleared the last level! Now try the whole quest against the clock.",
     );
     const lost = settle(freshProgress, finished("hills"));
-    expect(lost).toMatchObject({ news: "", opened: null });
+    expect(lost).toMatchObject({
+      news: "Egg Hills: 12,000 points.",
+      opened: null,
+    });
     expect(lost.lastRun.outcome).toBe("lost");
   });
 });

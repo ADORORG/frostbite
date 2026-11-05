@@ -10,6 +10,7 @@ import {
   stages,
   tile,
 } from "../rules/hills/constants.ts";
+import { byInput } from "../page/input.ts";
 import { solidAt } from "../rules/hills/collide.ts";
 import { sectionOf, sectionSpan } from "../rules/hills/secrets.ts";
 import type { HillsState } from "../rules/hills/types.ts";
@@ -212,7 +213,15 @@ function banner(context: CanvasRenderingContext2D, state: HillsState): void {
     "left",
   );
   if (state.hasFire && state.boss.started < 0)
-    write(context, "FIRE: F OR X", width - 4, 4, 7, colour.fireHot, "right");
+    write(
+      context,
+      byInput("FIRE: F OR X", "FIRE: RIGHT THUMB"),
+      width - 4,
+      4,
+      7,
+      colour.fireHot,
+      "right",
+    );
   const since = state.tick - state.stageStart;
   if (since < bannerTicks) {
     write(

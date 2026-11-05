@@ -1,0 +1,154 @@
+/* The marks for the thumbs and the buttons a level needs, laid over the screen on a touch screen (`touch.css` shows them). They go where the
+   zones are (`src/page/thumbs.ts`): the picture keeps its 16:9 shape inside the stage; on a stage taller than that it sits at the top and
+   the thumbs have the room under it, the stick on the left and the act and fire marks on the right; on a wider stage the picture is in the
+   middle, with the stick in the room to its left and the marks in the room to its right. The level's buttons are a row under the picture,
+   or a column at the right edge. */
+@media (pointer: coarse) {
+  html body main .stage canvas {
+    object-position: 50% 0;
+  }
+  html body main .stage .thumbs {
+    --picture: min(100cqh, 100cqw * 9 / 16);
+    --thumbs-y: calc((var(--picture) + 100cqh) / 2);
+  }
+  html body main .thumbs > * {
+    position: absolute;
+    translate: -50% -50%;
+    box-sizing: border-box;
+  }
+  html body main .thumbs .thumb-stick {
+    top: var(--thumbs-y);
+    left: 25cqw;
+    inline-size: clamp(4rem, 34cqw, 8rem);
+    aspect-ratio: 1;
+    border: 0.1875rem dashed rgb(91 234 198 / 0.5);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(91 234 198 / 0.4) 0 16%,
+      transparent 17%
+    );
+  }
+  html body main .thumbs .thumb-act,
+  html body main .thumbs .thumb-fire {
+    top: var(--thumbs-y);
+    display: grid;
+    place-items: center;
+    inline-size: clamp(3.5rem, 20cqw, 5.5rem);
+    aspect-ratio: 1;
+    border: 0.1875rem solid;
+    border-radius: 50%;
+    background: rgb(29 17 64 / 0.55);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  html body main .thumbs .thumb-act {
+    left: 87.5cqw;
+    border-color: rgb(255 216 77 / 0.65);
+    color: var(--gold);
+  }
+  html body main .thumbs .thumb-fire {
+    left: 62.5cqw;
+    border-color: rgb(255 95 210 / 0.65);
+    color: var(--pink);
+  }
+  html body main .thumbs .thumb-again {
+    top: calc(var(--picture) / 2);
+    left: 50cqw;
+    padding: 0.375rem 0.875rem;
+    border: 0.125rem solid var(--gold);
+    border-radius: 999px;
+    background: rgb(12 6 32 / 0.85);
+    color: var(--gold);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  html body main .thumbs .thumb-again[hidden] {
+    display: none;
+  }
+  html body main .stage .touch {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    box-sizing: border-box;
+    padding: calc(min(100cqh, 100cqw * 9 / 16) + 0.25rem) 0.25rem 0;
+  }
+  html body main .touch button,
+  html body main .touch .bag-items {
+    pointer-events: auto;
+  }
+  html body main .touch button {
+    block-size: 2.5rem;
+    min-block-size: 0;
+    min-inline-size: 0;
+    padding: 0 0.625rem;
+    background: rgb(29 17 64 / 0.85);
+    box-shadow: none;
+    font-size: 0.8125rem;
+    touch-action: none;
+  }
+  html body main .touch button[hidden],
+  html body main .touch .bag-items[hidden] {
+    display: none;
+  }
+  /* The Bag, open: its three foods take the other buttons' places, before it. */
+  html body main .touch .bag-items {
+    display: flex;
+    flex-direction: inherit;
+    flex-wrap: inherit;
+    gap: 0.25rem;
+    order: -1;
+  }
+  html body main .touch:has(.bag-items:not([hidden])) > button:not(#bag) {
+    display: none;
+  }
+  html body main .touch .bag-items button {
+    border-color: var(--gold);
+  }
+}
+
+@container stage (min-aspect-ratio: 16 / 9) {
+  html body main .stage canvas {
+    object-position: 50% 50%;
+  }
+  html body main .stage .thumbs {
+    --room: max(0px, (100cqw - 100cqh * 16 / 9) / 2);
+    --side: max(var(--room) / 2, 12.5cqw);
+  }
+  html body main .thumbs .thumb-stick {
+    top: 50cqh;
+    left: var(--side);
+    inline-size: clamp(3.5rem, 70cqh, 7rem);
+  }
+  html body main .thumbs .thumb-act,
+  html body main .thumbs .thumb-fire {
+    left: calc(100cqw - var(--side) - 4.5rem);
+    inline-size: clamp(2.75rem, 34cqh, 4.5rem);
+    font-size: 0.625rem;
+    letter-spacing: 0;
+  }
+  html body main .thumbs .thumb-act {
+    top: 25cqh;
+  }
+  html body main .thumbs .thumb-fire {
+    top: 75cqh;
+  }
+  html body main .thumbs .thumb-again {
+    top: 50cqh;
+  }
+  html body main .stage .touch {
+    flex-direction: column;
+    align-content: flex-end;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 0.25rem;
+  }
+  html body main .touch button {
+    block-size: 2.25rem;
+    padding: 0 0.5rem;
+  }
+}

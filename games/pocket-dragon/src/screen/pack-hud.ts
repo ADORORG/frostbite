@@ -2,22 +2,27 @@ import { block, sprite } from "@ador/game-sdk/pixels";
 
 import { blazeTicks, itemList, type Item, type Powers } from "../rules/kit.ts";
 import { kitIcons, kitKey } from "./kit-sprites.ts";
+import { byInput } from "../page/input.ts";
 import { colour } from "./palette.ts";
 import { write } from "./text.ts";
 
 // The backpack on the screen, the same in every level: a little column at the right edge with each food and how many there are (dim when
 // there are none), a flame bar beside it while a berry's blaze lasts, and BIG under it while Glitchy is big. It shows once there is
-// anything in the backpack. A line comes up near the top as a food goes in (with its key), is used, or takes a bump.
+// anything in the backpack. A line comes up near the top as a food goes in (with its key, or the Bag on a touch screen), is used, or
+// takes a bump.
 export const packX = 234;
 export const packY = 58;
 export const newsTicks = 150;
 // The line about the backpack goes under the counts at the top of the screen, clear of Glitchy in every level.
 export const newsY = 28;
 
-const packedWords: Readonly<Record<Item, string>> = {
-  berry: "A BERRY! B FOR LONGER FIRE",
-  mushroom: "A MUSHROOM! R TO ROLL A GLITCH BLAST",
-  pineapple: "A PINEAPPLE! G TO GROW BIG",
+const packedWords: Readonly<Record<Item, readonly [string, string]>> = {
+  berry: ["A BERRY! B FOR LONGER FIRE", "A BERRY IN THE BAG: LONGER FIRE"],
+  mushroom: [
+    "A MUSHROOM! R TO ROLL A GLITCH BLAST",
+    "A MUSHROOM IN THE BAG: A GLITCH BLAST",
+  ],
+  pineapple: ["A PINEAPPLE! G TO GROW BIG", "A PINEAPPLE IN THE BAG: GROW BIG"],
 };
 const usedWords: Readonly<Record<Item, string>> = {
   berry: "BLAZING FIRE!",
@@ -38,7 +43,7 @@ export function packWords(
   if (news === null || tick - news.tick >= newsTicks) return null;
   const text =
     news.what === "packed"
-      ? packedWords[news.item]
+      ? byInput(...packedWords[news.item])
       : news.what === "used"
         ? usedWords[news.item]
         : "THE PINEAPPLE TOOK THE BUMP!";
