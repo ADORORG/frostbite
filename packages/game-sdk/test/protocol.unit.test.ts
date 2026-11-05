@@ -218,10 +218,11 @@ describe("the wallet and the events", () => {
       expect(walletInfoSchema.safeParse(wallet).success).toBe(false);
   });
 
-  it("know five events, each with strict data", () => {
+  it("know six events, each with strict data", () => {
     expect(eventNames.sort()).toEqual([
       "claim.changed",
       "fullscreen.changed",
+      "key.forwarded",
       "lifecycle.changed",
       "player.changed",
       "wallet.changed",

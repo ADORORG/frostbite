@@ -15,7 +15,7 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock/progress/counts`,
   `player.info`, `player.identity` (an opaque per-game id; `player.changed` when it changes on sign-in), `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability), `wallet.connect` (asks the platform to open its wallet chooser; the same capability),
   `milestones.claim` (asks the platform to start a claim of an earned milestone; needs `milestone:claim`; `claim.changed` tells how it goes), `run.start` and `run.submit` (replay-verified runs: a platform seed, then one record per run; the `run:submit` capability), `capabilities.get`, `ui.toast`, and `on(event, handler)` for what the platform tells the game
-  (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`). Failures surface as `GameHostError` with a stable
+  (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`; and `key.forwarded`, which the client plays back as a key event on `window`, so a game hears keys pressed before the player clicked into it). Failures surface as `GameHostError` with a stable
   code (including `permission_denied` for a capability the game did not declare).
 - `./host`: `createGameHost()` for the platform page (`services` lend it a wallet, a way to open the wallet chooser and a place to show a toast;
   `push` and `emit` send events). `./attach`: `attachGameHost()` connects it to a frame. A message is handled only when its

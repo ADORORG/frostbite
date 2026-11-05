@@ -117,6 +117,7 @@ describe("the capabilities answer", () => {
     expect(result?.events.sort()).toEqual([
       "claim.changed",
       "fullscreen.changed",
+      "key.forwarded",
       "lifecycle.changed",
       "player.changed",
       "wallet.changed",

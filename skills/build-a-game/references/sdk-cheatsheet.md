@@ -51,7 +51,7 @@ const stop = client.on("lifecycle.changed", ({ state }) => {}); // "paused" when
 - A `repeatable` milestone needs `maxCount`; read counts with `milestones.counts()`.
 - `milestones.claim(id)` needs the `milestone:claim` capability, which needs `rewards` in the manifest. Claims are signed by the
   player's own wallet in the platform's page; the game never sees a wallet, signature or transaction.
-- Events: `wallet.changed`, `claim.changed`, `lifecycle.changed`, `fullscreen.changed`, `player.changed`.
+- Events: `wallet.changed`, `claim.changed`, `lifecycle.changed`, `fullscreen.changed`, `player.changed`, `key.forwarded`. The last needs no code: the SDK replays it as an ordinary key event on `window`, so keys pressed before the player clicks into the game reach `attachKeys` like any other.
 - A method or event that exists never changes shape; new abilities are new methods.
 
 ## Signatures the rules need

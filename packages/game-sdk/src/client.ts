@@ -1,6 +1,8 @@
+import { replayForwardedKey } from "./forwarded-keys.ts";
 import {
   eventMessageSchema,
   events,
+  forwardedKeySchema,
   gameChannel,
   methods,
   protocolVersion,
@@ -133,6 +135,8 @@ export function createGameClient(
     readonly host?: {
       postMessage(message: unknown, targetOrigin: string): void;
     };
+    // Where a key the page forwards is played back: the game's window.
+    readonly keyTarget?: Pick<EventTarget, "dispatchEvent">;
     readonly listenOn?: MessageSource;
     readonly timeoutMs?: number;
   } = {},
@@ -140,6 +144,7 @@ export function createGameClient(
   const host = options.host ?? globalThis.parent;
   const listenOn = options.listenOn ?? windowMessages(globalThis.window);
   const timeoutMs = options.timeoutMs ?? 10_000;
+  const keyTarget = options.keyTarget ?? globalThis.window;
   let counter = 0;
   const createId = options.createId ?? (() => `r${String((counter += 1))}`);
   const waiting = new Map<
@@ -158,6 +163,11 @@ export function createGameClient(
     const name = event as EventName;
     const parsed = events[name].safeParse(message.data.data);
     if (!parsed.success) return;
+    // `parsed` is the event's own data, checked above; for a key it is a key.
+    if (name === "key.forwarded") {
+      const key = forwardedKeySchema.safeParse(parsed.data);
+      if (key.success) replayForwardedKey(keyTarget, key.data);
+    }
     // Handlers are stored by event name and registered through `on`, which ties each to that name's data type;
     // `parsed` has just been checked against the same name, so the data is what every handler there expects.
     for (const handler of handlers.get(name) ?? [])
