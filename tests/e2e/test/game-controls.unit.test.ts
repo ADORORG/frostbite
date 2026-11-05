@@ -22,6 +22,7 @@ const box = (
   y,
 });
 const good: Controls = {
+  spoken: [],
   hud: { h: 20, name: "hud", w: 300, x: 60, y: 4 },
   targets: [box("music", 600, 4), box("effects", 650, 4), box("pause", 700, 4)],
 };
@@ -32,16 +33,24 @@ describe("what a thumb can use on a game page", () => {
   });
 
   it("accepts a page with nothing to press and no readouts", () => {
-    expect(controlProblems({ hud: null, targets: [] }, frame)).toEqual([]);
+    expect(
+      controlProblems({ hud: null, spoken: [], targets: [] }, frame),
+    ).toEqual([]);
+  });
+
+  it("refuses an icon that a screen reader would read out as text", () => {
+    expect(controlProblems({ ...good, spoken: ["pause"] }, frame)).toEqual([
+      "pause's icon would be read out as text",
+    ]);
   });
 
   it("refuses more than the few that are allowed", () => {
     const many = Array.from({ length: maximumTargets + 1 }, (_, index) =>
       box(`b${String(index)}`, index * 100, 100),
     );
-    expect(controlProblems({ hud: null, targets: many }, frame)).toEqual([
-      expect.stringContaining(`at most ${String(maximumTargets)}`),
-    ]);
+    expect(
+      controlProblems({ hud: null, spoken: [], targets: many }, frame),
+    ).toEqual([expect.stringContaining(`at most ${String(maximumTargets)}`)]);
   });
 
   it("refuses a target under the size, on either side, and accepts one at it", () => {
@@ -59,14 +68,21 @@ describe("what a thumb can use on a game page", () => {
       x: 200,
       y: 0,
     };
-    expect(controlProblems({ hud: null, targets: [wide] }, frame)).toEqual([
+    expect(
+      controlProblems({ hud: null, spoken: [], targets: [wide] }, frame),
+    ).toEqual([
       `slim is 100x${String(minimumTarget - 1)}, under ${String(minimumTarget)}`,
     ]);
-    expect(controlProblems({ hud: null, targets: [tall] }, frame)).toEqual([
+    expect(
+      controlProblems({ hud: null, spoken: [], targets: [tall] }, frame),
+    ).toEqual([
       `narrow is ${String(minimumTarget - 1)}x100, under ${String(minimumTarget)}`,
     ]);
     expect(
-      controlProblems({ hud: null, targets: [box("exact", 0, 0)] }, frame),
+      controlProblems(
+        { hud: null, spoken: [], targets: [box("exact", 0, 0)] },
+        frame,
+      ),
     ).toEqual([]);
   });
 
@@ -78,14 +94,15 @@ describe("what a thumb can use on a game page", () => {
         right: box(name, frame.width - minimumTarget + 1, 100),
         top: box(name, 100, -1),
       }[name] as Box;
-      expect(controlProblems({ hud: null, targets: [at] }, frame)).toEqual([
-        `${name} is outside the frame`,
-      ]);
+      expect(
+        controlProblems({ hud: null, spoken: [], targets: [at] }, frame),
+      ).toEqual([`${name} is outside the frame`]);
     }
     expect(
       controlProblems(
         {
           hud: null,
+          spoken: [],
           targets: [
             box(
               "corner",
@@ -104,6 +121,7 @@ describe("what a thumb can use on a game page", () => {
       controlProblems(
         {
           hud: null,
+          spoken: [],
           targets: [box("a", 0, 0), box("b", minimumTarget - 1, 0)],
         },
         frame,
@@ -111,7 +129,11 @@ describe("what a thumb can use on a game page", () => {
     ).toEqual(["a overlaps b"]);
     expect(
       controlProblems(
-        { hud: null, targets: [box("a", 0, 0), box("b", minimumTarget, 0)] },
+        {
+          hud: null,
+          spoken: [],
+          targets: [box("a", 0, 0), box("b", minimumTarget, 0)],
+        },
         frame,
       ),
     ).toEqual([]);
@@ -119,6 +141,7 @@ describe("what a thumb can use on a game page", () => {
       controlProblems(
         {
           hud: null,
+          spoken: [],
           targets: [box("a", 0, 0), box("b", 0, minimumTarget - 1)],
         },
         frame,
@@ -129,10 +152,16 @@ describe("what a thumb can use on a game page", () => {
   it("refuses a target on the readouts, and accepts one beside them", () => {
     const hud: Box = { h: 20, name: "hud", w: 100, x: 100, y: 0 };
     expect(
-      controlProblems({ hud, targets: [box("on", 150, 10)] }, frame),
+      controlProblems(
+        { hud, spoken: [], targets: [box("on", 150, 10)] },
+        frame,
+      ),
     ).toEqual(["on overlaps the readouts"]);
     expect(
-      controlProblems({ hud, targets: [box("beside", 200, 0)] }, frame),
+      controlProblems(
+        { hud, spoken: [], targets: [box("beside", 200, 0)] },
+        frame,
+      ),
     ).toEqual([]);
   });
 });

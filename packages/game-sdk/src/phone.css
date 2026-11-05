@@ -139,6 +139,8 @@
     /* The words stay for a screen reader; what is seen is the icon. */
     font-size: 0;
   }
+  /* Each icon is a drawing, not a word: the second `content` (where a browser has it) gives it no text, so a screen reader says the button's name
+     and not the shape. */
   :root body main .actions button::before,
   :root body main #sound .sound-panel button::before {
     font-size: 1.125rem;
@@ -146,13 +148,16 @@
   }
   :root body main #pause::before {
     content: "\275A\275A";
+    content: "\275A\275A" / "";
     letter-spacing: -0.15em;
   }
   :root body main #sound button[data-sound="music"]::before {
     content: "\266A";
+    content: "\266A" / "";
   }
   :root body main #sound button[data-sound="effects"]::before {
     content: "\2726";
+    content: "\2726" / "";
   }
   :root body main #sound .sound-panel {
     inline-size: auto;

@@ -6,6 +6,8 @@ import type { Box } from "./game-layout.ts";
 // with taps and swipes on the screen itself, so what is left to touch is a corner of small icons, and none may crowd another.
 export interface Controls {
   readonly hud: Box | null;
+  // The targets whose icon (drawn with generated content) would be read out as text, because it has no empty alternative.
+  readonly spoken: readonly string[];
   readonly targets: readonly Box[];
 }
 
@@ -22,10 +24,14 @@ const measure = `(() => {
     return r.width > 0 && r.height > 0 && style.display !== "none" && style.visibility !== "hidden";
   };
   const boxOf = (el, name) => { const r = el.getBoundingClientRect(); return { h: round(r.height), name, w: round(r.width), x: round(r.left), y: round(r.top) }; };
-  const targets = [...document.querySelectorAll("button, input, a[href]")].filter(seen)
-    .map((el) => boxOf(el, el.id || el.getAttribute("data-sound") || el.getAttribute("aria-label") || el.tagName.toLowerCase()));
+  const nameOf = (el) => el.id || el.getAttribute("data-sound") || el.getAttribute("aria-label") || el.tagName.toLowerCase();
+  const pressable = [...document.querySelectorAll("button, input, a[href]")].filter(seen);
+  const targets = pressable.map((el) => boxOf(el, nameOf(el)));
+  const spoken = pressable
+    .filter((el) => { const c = getComputedStyle(el, "::before").content; return c !== "none" && c !== "normal" && c !== '""' && !c.includes(' / "'); })
+    .map(nameOf);
   const hud = document.querySelector(".score, .meter");
-  return { hud: hud && seen(hud) ? boxOf(hud, "hud") : null, targets };
+  return { hud: hud && seen(hud) ? boxOf(hud, "hud") : null, spoken, targets };
 })()`;
 
 export async function measureControls(page: Page): Promise<Controls> {
@@ -43,7 +49,9 @@ export function controlProblems(
   frame: { readonly height: number; readonly width: number },
 ): string[] {
   const problems: string[] = [];
-  const { hud, targets } = controls;
+  const { hud, spoken, targets } = controls;
+  for (const name of spoken)
+    problems.push(`${name}'s icon would be read out as text`);
   if (targets.length > maximumTargets)
     problems.push(
       `${String(targets.length)} things to press (${targets.map(({ name }) => name).join(", ")}), at most ${String(maximumTargets)}`,

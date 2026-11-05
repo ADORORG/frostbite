@@ -39,6 +39,7 @@ Shared, test-only helpers. Production code never imports this package.
 - `@ador/test-kit/race` — `holdTransaction` (open a transaction, take a lock or make a change, keep it open)
   and `expectToWait` (prove an operation is blocked by it, then let it commit), the shared way to test that
   a change in flight makes another operation wait and then see it.
+- `@ador/test-kit/touch-screen` — `stubPointer(coarse)`: a Node page whose main pointer is a finger or a mouse, for a game's drawing tests.
 - `@ador/test-kit/dom` — React Testing Library helpers for jsdom suites (render with cleanup, typed
   fetch stubs, storage reset) shared by every feature's `unit-dom` project.
 - `@ador/test-kit/serve-fetch-handler` — serves a fetch-style handler over HTTP and records each exchange.

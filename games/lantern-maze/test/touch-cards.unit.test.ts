@@ -1,3 +1,4 @@
+import { stubPointer } from "@ador/test-kit/touch-screen";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { startRun } from "../src/rules/state.ts";
@@ -17,23 +18,17 @@ const said = (phase: View["phase"]): string[] => {
   draw(s.context, startRun(9), view(phase));
   return s.written.map(({ text }) => text);
 };
-const screen = (coarse: boolean) =>
-  vi.stubGlobal("window", {
-    matchMedia: (query: string) => ({
-      matches: coarse && query === "(pointer: coarse)",
-    }),
-  });
 afterEach(() => vi.unstubAllGlobals());
 
 describe("the cards of the cellar", () => {
   it("say Enter to a keyboard, before a run and after one", () => {
-    screen(false);
+    stubPointer(false);
     expect(said("ready")).toContain("ARROWS / WASD / SWIPE - ENTER TO LIGHT");
     expect(said("over")).toContain("ENTER FOR ANOTHER CELLAR");
   });
 
   it("say tap to a finger, before a run and after one, and never Enter", () => {
-    screen(true);
+    stubPointer(true);
     expect(said("ready")).toContain("SWIPE TO STEER - TAP TO LIGHT");
     expect(said("over")).toContain("TAP FOR ANOTHER CELLAR");
     expect(said("ready").join(" ")).not.toContain("ENTER");
