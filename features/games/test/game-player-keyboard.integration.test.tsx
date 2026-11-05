@@ -25,9 +25,18 @@ const press = (type: "keydown" | "keyup", code: string, init = {}) => {
   act(() => void document.body.dispatchEvent(event));
   return event;
 };
+const isEventMessage = (
+  message: unknown,
+): message is { data: unknown; event: string } =>
+  typeof message === "object" &&
+  message !== null &&
+  "event" in message &&
+  typeof message.event === "string" &&
+  "data" in message;
 const forwardedTo = (reply: { mock: { calls: unknown[][] } }) =>
   reply.mock.calls
-    .map(([message]) => message as { data?: unknown; event?: string })
+    .map(([message]) => message)
+    .filter(isEventMessage)
     .filter(({ event }) => event === "key.forwarded")
     .map(({ data }) => data);
 
@@ -92,26 +101,28 @@ describe("the keyboard in a game on the page", () => {
     expect(forwardedTo(reply)).toEqual([]);
   });
 
+  it("leaves the keys to an open dialog, so its text still scrolls with the arrows", async () => {
+    const { reply } = await connected();
+    const dialog = document.createElement("dialog");
+    document.body.append(dialog);
+    dialog.setAttribute("open", "");
+    const arrow = press("keydown", "ArrowDown");
+    dialog.remove();
+    expect(forwardedTo(reply)).toEqual([]);
+    expect(arrow.defaultPrevented).toBe(false);
+  });
+
   it("stops listening when the player leaves the page: every key listener it added is removed", async () => {
-    const added: [string, unknown][] = [];
-    const removed: [string, unknown][] = [];
-    const add = document.addEventListener.bind(document);
-    const remove = document.removeEventListener.bind(document);
-    vi.spyOn(document, "addEventListener").mockImplementation(
-      (type: string, listener: unknown, options?: unknown) => {
-        if (type.startsWith("key")) added.push([type, listener]);
-        add(type, listener as EventListener, options as boolean);
-      },
-    );
-    vi.spyOn(document, "removeEventListener").mockImplementation(
-      (type: string, listener: unknown, options?: unknown) => {
-        if (type.startsWith("key")) removed.push([type, listener]);
-        remove(type, listener as EventListener, options as boolean);
-      },
-    );
+    const add = vi.spyOn(document, "addEventListener");
+    const remove = vi.spyOn(document, "removeEventListener");
     await connected();
+    const added = add.mock.calls.filter(([type]) => type.startsWith("key"));
     expect(added.map(([type]) => type).sort()).toEqual(["keydown", "keyup"]);
     act(() => h.root.unmount());
-    expect(removed).toEqual(expect.arrayContaining(added));
+    const removed = remove.mock.calls.filter(([type]) =>
+      type.startsWith("key"),
+    );
+    for (const [type, listener] of added)
+      expect(removed.some(([t, l]) => t === type && l === listener)).toBe(true);
   });
 });

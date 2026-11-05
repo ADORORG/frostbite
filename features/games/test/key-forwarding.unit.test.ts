@@ -90,4 +90,15 @@ describe("the keys the page forwards to the game", () => {
       forwardedKeyOf(press("Enter", { defaultPrevented: true }), document.body),
     ).toBeNull();
   });
+
+  it("keeps the keys for an open dialog, even when a click on its text left nothing focused", () => {
+    const dialog = document.createElement("dialog");
+    document.body.append(dialog);
+    dialog.setAttribute("open", "");
+    expect(forwardedKeyOf(press("ArrowDown"), document.body)).toBeNull();
+    dialog.remove();
+    expect(forwardedKeyOf(press("ArrowDown"), document.body)?.code).toBe(
+      "ArrowDown",
+    );
+  });
 });

@@ -28,9 +28,10 @@ const recordKeys = (frame: FrameLocator) =>
     window.addEventListener("keydown", (event) => seen.push(event.code));
   }, seenKeys);
 const heard = (frame: FrameLocator) =>
-  frame
-    .locator("body")
-    .evaluate((_body, name) => Reflect.get(window, name) as string[], seenKeys);
+  frame.locator("body").evaluate((_body, name) => {
+    const value: unknown = Reflect.get(window, name);
+    return Array.isArray(value) ? value.map(String) : [];
+  }, seenKeys);
 
 for (const id of games)
   test(`${id} hears Enter once it is connected, with no click`, async ({
