@@ -7,7 +7,7 @@ import {
 
 const base = {
   APP_ENV: "local",
-  NEXT_PUBLIC_APP_NAME: "Frostbit",
+  NEXT_PUBLIC_APP_NAME: "Frostbite",
   PUBLIC_BASE_URL: "https://platform.example.com",
 };
 const frostbite = (setting: object) => JSON.stringify({ frostbite: setting });
