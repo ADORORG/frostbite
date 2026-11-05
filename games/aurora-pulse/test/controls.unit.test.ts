@@ -116,6 +116,21 @@ describe("the player's hands", () => {
     expect(handlers.lane.mock.calls).toEqual([[0], [3]]);
   });
 
+  it("plays the lane a finger landed on once, and not again as the finger slides across the others", () => {
+    const { handlers, screen } = setup();
+    const send = (type: string, x: number) => {
+      const event = new MouseEvent(type, { bubbles: true, clientX: x });
+      Object.assign(event, { pointerId: 1, pointerType: "touch" });
+      (type === "pointerdown" ? screen : window).dispatchEvent(event);
+    };
+    document.body.append(screen);
+    send("pointerdown", 10);
+    send("pointermove", 320);
+    send("pointermove", 630);
+    send("pointerup", 630);
+    expect(handlers.lane.mock.calls).toEqual([[0]]);
+  });
+
   it("stops listening when told to", () => {
     const screen = document.createElement("canvas");
     const handlers = { lane: vi.fn(), pause: vi.fn(), start: vi.fn() };

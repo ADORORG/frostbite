@@ -9,7 +9,9 @@ import { backEdge, jumpEdge } from "./thumbs.ts";
 // thumb without reading anything. It only draws; nothing reads it.
 export const hintTicks = 300;
 const hintSize = 8;
-const hintBottom = 14;
+// How faint the names are, so the game shows through them.
+export const hintAlpha = 0.6;
+export const hintBottom = 14;
 
 export function touchHints(
   context: CanvasRenderingContext2D,
@@ -25,7 +27,7 @@ export function touchHints(
     ["JUMP", jumpEdge, 1],
   ] as const;
   context.save();
-  context.globalAlpha = 0.6;
+  context.globalAlpha = hintAlpha;
   for (const [text, from, to] of zones)
     write(
       context,

@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { onFlat } from "./support/states.ts";
 import { surface } from "./support/canvas.ts";
-import { hintTicks, touchHints } from "../src/screen/touch-hints.ts";
+import {
+  hintAlpha,
+  hintBottom,
+  hintTicks,
+  touchHints,
+} from "../src/screen/touch-hints.ts";
 import { backEdge, jumpEdge } from "../src/screen/thumbs.ts";
 
 const width = 256;
@@ -24,7 +29,10 @@ describe("naming the zones for a thumb", () => {
     expect(say("< BACK")[1]?.x).toBe((backEdge / 2) * width);
     expect(say("FORWARD >")[1]?.x).toBe(((backEdge + jumpEdge) / 2) * width);
     expect(say("JUMP")[1]?.x).toBe(((jumpEdge + 1) / 2) * width);
-    for (const { alpha } of written) expect(alpha).toBeLessThan(1);
+    for (const { alpha } of written) expect(alpha).toBe(hintAlpha);
+    // At the foot of the screen, where a thumb is, and not over the stage's number in the middle.
+    for (const { y } of written)
+      expect([height - hintBottom, height - hintBottom + 1]).toContain(y);
   });
 
   it("stops once the moments are over, and is silent for a keyboard", () => {

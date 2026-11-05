@@ -64,24 +64,35 @@ export function attachControls(
     if (action === "start" || action === "pause") controls[action]();
     else controls.move(action);
   });
+  // The ways the fingers on the screen steer, in the order they began, and the walk that follows the latest of them.
+  const held: Direction[] = [];
   let walking: { direction: Direction; timer: number } | null = null;
   const stop = (): void => {
     if (walking !== null) window.clearInterval(walking.timer);
     walking = null;
   };
+  const walk = (direction: Direction, stepNow: boolean): void => {
+    stop();
+    if (stepNow) controls.move(direction);
+    walking = {
+      direction,
+      timer: window.setInterval(() => controls.move(direction), stepRepeatMs),
+    };
+  };
   const stopTouch = attachZones<Direction | null>(screen, {
     enter: (direction) => {
       if (direction === null) return;
-      stop();
-      controls.move(direction);
-      walking = {
-        direction,
-        timer: window.setInterval(() => controls.move(direction), stepRepeatMs),
-      };
+      held.push(direction);
+      walk(direction, true);
     },
     fingersOnly: false,
     leave: (direction) => {
-      if (walking?.direction === direction) stop();
+      if (direction === null) return;
+      held.splice(held.indexOf(direction), 1);
+      if (walking?.direction !== direction) return;
+      const next = held.at(-1);
+      if (next === undefined) stop();
+      else walk(next, false);
     },
     slide: true,
     zoneAt: ({ x, y }) => {

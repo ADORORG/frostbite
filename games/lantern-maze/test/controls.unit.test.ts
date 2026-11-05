@@ -77,6 +77,7 @@ describe("the player's hands", () => {
     type: string,
     at: { x: number; y: number },
     id = 1,
+    kind = "touch",
   ) => {
     const event = new MouseEvent(type, {
       bubbles: true,
@@ -84,7 +85,7 @@ describe("the player's hands", () => {
       clientX: at.x,
       clientY: at.y,
     });
-    Object.assign(event, { pointerId: id, pointerType: "touch" });
+    Object.assign(event, { pointerId: id, pointerType: kind });
     target.dispatchEvent(event);
   };
 
@@ -157,6 +158,53 @@ describe("the player's hands", () => {
     touch(window, "pointerup", { x: 140, y: 45 }, 1);
     choose.mockClear();
     vi.advanceTimersByTime(stepRepeatMs);
+    expect(choose.mock.calls).toEqual([["up"]]);
+  });
+
+  it("steers for a mouse as well as for a finger, since the page has no other way to steer with one", () => {
+    vi.useFakeTimers();
+    const { screen, choose } = setup();
+    touch(screen, "pointerdown", { x: 140, y: 45 }, 1, "mouse");
+    expect(choose.mock.calls).toEqual([["right"]]);
+    touch(window, "pointerup", { x: 140, y: 45 }, 1, "mouse");
+  });
+
+  it("keeps walking while one of two fingers steering the same way is still down", () => {
+    vi.useFakeTimers();
+    const { screen, choose } = setup();
+    touch(screen, "pointerdown", { x: 140, y: 45 }, 1);
+    touch(screen, "pointerdown", { x: 150, y: 45 }, 2);
+    touch(window, "pointerup", { x: 140, y: 45 }, 1);
+    choose.mockClear();
+    vi.advanceTimersByTime(stepRepeatMs * 2);
+    expect(choose.mock.calls).toEqual([["right"], ["right"]]);
+    touch(window, "pointerup", { x: 150, y: 45 }, 2);
+    choose.mockClear();
+    vi.advanceTimersByTime(stepRepeatMs * 2);
+    expect(choose).not.toHaveBeenCalled();
+  });
+
+  it("goes back to the way the other finger steers when the latest one lets go, without a step of its own", () => {
+    vi.useFakeTimers();
+    const { screen, choose } = setup();
+    touch(screen, "pointerdown", { x: 140, y: 45 }, 1);
+    touch(screen, "pointerdown", { x: 80, y: 5 }, 2);
+    choose.mockClear();
+    touch(window, "pointerup", { x: 80, y: 5 }, 2);
+    expect(choose).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(stepRepeatMs);
+    expect(choose.mock.calls).toEqual([["right"]]);
+  });
+
+  it("does not disturb the walk when a finger that is not the one being followed lets go", () => {
+    vi.useFakeTimers();
+    const { screen, choose } = setup();
+    touch(screen, "pointerdown", { x: 140, y: 45 }, 1);
+    touch(screen, "pointerdown", { x: 80, y: 5 }, 2);
+    choose.mockClear();
+    vi.advanceTimersByTime(stepRepeatMs - 50);
+    touch(window, "pointerup", { x: 140, y: 45 }, 1);
+    vi.advanceTimersByTime(60);
     expect(choose.mock.calls).toEqual([["up"]]);
   });
 
