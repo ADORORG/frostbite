@@ -116,6 +116,16 @@ describe("running the encoder", () => {
     ).rejects.toThrow("no-such-encoder could not start");
   });
 
+  it("does not wait for frames to be taken by an encoder that never started, and leaves no unhandled error", async () => {
+    const chunk = new Uint8Array(64 * 1024);
+    function* frames(): Generator<Uint8Array> {
+      for (let index = 0; index < 1_000; index += 1) yield chunk;
+    }
+    await expect(
+      runEncoder(["-version"], frames(), "no-such-encoder"),
+    ).rejects.toThrow("no-such-encoder could not start");
+  }, 10_000);
+
   it("says what the encoder said when it refuses its arguments", async () => {
     await expect(
       runEncoder(["-hide_banner", "-loglevel", "error", "-nope"], []),

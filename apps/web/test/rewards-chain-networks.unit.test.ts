@@ -8,15 +8,15 @@ import {
   bitcoinSignetChainId,
   bitcoinTestnet4ChainId,
   targetChains,
-} from "../../../configs/chains.ts";
+} from "@repo/configs/chains";
 import {
   chainConfig,
   createRewardsChain,
   type RewardsPlatform,
-} from "../../../configs/rewards-chain.ts";
-import { rewardsPlan } from "../../../configs/rewards-plan.ts";
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
-import { walletAuthConfig } from "../../../configs/wallet.ts";
+} from "@repo/configs/rewards-chain";
+import { rewardsPlan } from "@repo/configs/rewards-plan";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
+import { walletAuthConfig } from "@repo/configs/wallet";
 
 const environment: RewardsChainEnvironment = {
   feeSource: { adapter: "mempool", fallbackSatPerVb: null },
@@ -117,9 +117,9 @@ describe("BETA_NETWORK", () => {
     if (value === undefined) vi.unstubAllEnvs();
     else vi.stubEnv("BETA_NETWORK", value);
     try {
-      const chains = await import("../../../configs/chains.ts");
-      const wallet = await import("../../../configs/wallet.ts");
-      const plan = await import("../../../configs/rewards-plan.ts");
+      const chains = await import("@repo/configs/chains");
+      const wallet = await import("@repo/configs/wallet");
+      const plan = await import("@repo/configs/rewards-plan");
       return { chains, plan, wallet };
     } finally {
       vi.unstubAllEnvs();

@@ -13,6 +13,10 @@ import {
   applyMigrations,
   migrationsDirectory,
 } from "../src/migrations/apply.ts";
+import {
+  createScratchDatabase,
+  dropScratchDatabase,
+} from "./support/scratch-database.ts";
 
 const environment = parseDatabaseEnvironment(process.env);
 const admin = createDatabasePool(environment);
@@ -35,13 +39,12 @@ async function folderUpTo(lastApplied: string): Promise<string> {
 }
 
 beforeAll(async () => {
-  await admin.query(`drop database if exists ${databaseName}`);
-  await admin.query(`create database ${databaseName}`);
+  await createScratchDatabase(admin, databaseName);
 });
 
 afterAll(async () => {
   await pool.end();
-  await admin.query(`drop database if exists ${databaseName} with (force)`);
+  await dropScratchDatabase(admin, databaseName);
   await admin.end();
   await Promise.all(
     staging.map((folder) => rm(folder, { force: true, recursive: true })),

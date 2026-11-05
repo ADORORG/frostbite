@@ -25,13 +25,13 @@ multipart upload, lifecycle cleanup, public URL construction, and media policy b
 
 Cloudflare's destination-conditional `CopyObject` header is an R2 extension currently documented as
 beta, so deployment qualification against R2 remains a release requirement. Platform engineering
-owns this provider. Integration and coverage scripts start an exact-image-pinned disposable MinIO
+owns this provider. Integration and coverage scripts start an exact-image-pinned disposable SeaweedFS
 service for standard S3 protocol conformance; the R2-only copy extension uses a wire-level harness.
 Run `env:check`, `typecheck`, `test:unit`, `test:integration`, or `test:coverage`.
 
 ## Local development and the real-R2 checklist
 
-Locally and in tests the adapter talks to a disposable MinIO (`@ador/test-kit/s3-runtime`). Plain `http`
+Locally and in tests the adapter talks to a disposable SeaweedFS (`@ador/test-kit/s3-runtime`). Plain `http`
 is accepted for `R2_ENDPOINT` only on a loopback address and only when `APP_ENV` is not `preview` or
 `production`; the endpoint then uses path-style addressing. Everything else must be `https`.
 

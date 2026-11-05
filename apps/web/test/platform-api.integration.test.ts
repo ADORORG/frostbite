@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { httpErrorEnvelopeSchema } from "@ador/shared/http";
 import { platformStatusSchema } from "@ador/shared/platform";
 
-import { resolveApiOperation } from "../../../configs/api";
-import { featureRegistry } from "../../../configs/features";
+import { resolveApiOperation } from "@repo/configs/api";
+import { featureRegistry } from "@repo/configs/features";
 import { GET, POST } from "../src/app/api/v1/[...segments]/route.js";
 
 const routeContext = { params: Promise.resolve({ segments: ["platform"] }) };

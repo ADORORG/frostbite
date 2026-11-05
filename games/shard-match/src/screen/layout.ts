@@ -1,9 +1,19 @@
 import { columns, rows } from "../rules/constants.ts";
 
 // The screen is drawn small, on a grid of whole pixels, and scaled up by `canvasScale`. The board is on the left, `cell` pixels to a shard, and
-// the writing is in a column on the right.
+// the writing is in a column on the right (the "wide" screen, for a window wider than it is tall). On a phone held upright that column would
+// make the board tiny, so the screen is "tall" instead: the same board in the same place, with the writing in rows below it.
+export type Shape = "tall" | "wide";
 export const screenWidth = 160;
 export const screenHeight = 90;
+const tallHeight = 108;
+const tallWidth = 90;
+export const sizeOf = (
+  shape: Shape,
+): { readonly height: number; readonly width: number } =>
+  shape === "tall"
+    ? { height: tallHeight, width: tallWidth }
+    : { height: screenHeight, width: screenWidth };
 export const canvasScale = 4;
 export const cell = 10;
 export const boardX = 5;

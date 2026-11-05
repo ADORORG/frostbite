@@ -21,6 +21,21 @@ ends in `.`, `?` or `!`) is written in more than one place in production source 
 once and share it. Duplicates that existed when the check was added are in `sentence-baseline.json`; the check refuses a baseline that allows
 more copies than there are, so it can only shrink. After removing a duplicate, run `pnpm --filter @repo/repository-policy update-sentence-baseline`.
 
+## Coverage reaches the merge job
+
+`src/workflow-policy.ts` fails `repository:check` when a workspace's `coverage` folder is not listed under the `path:` of an upload step in
+`.github/workflows/ci.yml`. CI passes the reports from the test jobs to the merge job as artifacts, so a workspace that is not listed
+fails the merged coverage check minutes into a run, although every test passed (this happened when `configs` became a workspace).
+
+## Running CI's jobs on this machine
+
+`pnpm ci:local` runs the steps of the jobs in `.github/workflows/ci.yml` (read from the file, so it cannot drift from CI) the way the runner does: `CI=true`, the
+browsers installed by the workflow's own step into `.ci-local/browsers` (so a browser your machine happens to have cannot hide a missing install),
+and sharded jobs once per shard. Default jobs: `static`, `typecheck`, `tests`, `game-simulations`, `coverage-merge`, `e2e`; name others with
+`--job <id>` (repeatable; `contracts` needs Rust). A step's output is in `.ci-local/logs`. `sudo` steps (system packages) are skipped and
+`--with-deps` is dropped: install those yourself. It cannot reproduce the runner's fonts or a different operating system, so a pixel-exact
+expectation can still pass here and fail there: guards compare with a tolerance for that reason.
+
 ## Skills stay true
 
 `src/skill-policy.ts` checks every `skills/<name>/` folder: SKILL.md exists, names itself the folder's name, has a description of up to

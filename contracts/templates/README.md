@@ -92,8 +92,11 @@ Another chain adapts its own contract to the same ports; nothing above the adapt
 ## Commands
 
 From the repository root: `pnpm contracts:lint`, `pnpm contracts:typecheck`, `pnpm contracts:test`
-(builds both contracts, runs `rewards-core` natively and the harness, then checks the code hashes), and
-`pnpm contracts:coverage`. Directly: `contracts/templates/ci.sh lint|typecheck|hashes|test|coverage` and
+(builds both contracts, runs `rewards-core` natively and the harness), and
+`pnpm contracts:coverage`. `pnpm contracts:hashes` rebuilds both and fails unless the hashes equal `release.json`; it is not part of
+`contracts:test` or CI, because the same source builds to different bytes with another operating system or compiler (see
+`docs/operations/deployment.md`), so it only means something on the machine that made the release. CI instead checks that the kept
+`released/` files equal `release.json` (`repository:check`). Directly: `contracts/templates/ci.sh lint|typecheck|hashes|test|coverage` and
 `contracts/templates/build.sh [--check|--write]`.
 
 Needs `wasm-bindgen-test-runner` 0.2.100 and `cargo-llvm-cov` 0.6.21.
@@ -107,6 +110,6 @@ instead. A change to a contract needs a harness test and a mutation check.
 
 A deployed template's code hash must not change. Any change to contract code, `rewards-core`,
 `responder-kit`, the lockfile or the profile changes `release.json`: bump the template version, add
-new ABI files, and run `build.sh --write`. `pnpm contracts:test` fails on a changed hash.
+new ABI files, and run `build.sh --write`. `pnpm contracts:hashes` (on the release machine) fails on a changed hash.
 
 Owners: product and contract engineering.

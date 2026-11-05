@@ -11,15 +11,26 @@ import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
 import type { ReactNode } from "react";
 import { collectHomeSections, type HomeSection } from "./home-sections.ts";
 import type { NavigationItem } from "./navigation.ts";
+import type { PageMetadata } from "./page-metadata.ts";
+import { dynamicSegmentCount, matchPage } from "./page-match.ts";
 
 export type { HomeSection } from "./home-sections.ts";
+export type { PageMetadata } from "./page-metadata.ts";
 
 export interface FeaturePageContribution {
   readonly access: PageAccessRequirement;
+  // What the page tells a search engine or a link preview. A page that declares none is `private`: kept out of search results.
+  readonly metadata?: (
+    context: PageMetadataContext,
+  ) => PageMetadata | Promise<PageMetadata>;
   readonly path: `/${string}`;
   readonly render: (
     context: PageRenderContext,
   ) => ReactNode | Promise<ReactNode>;
+}
+
+export interface PageMetadataContext {
+  readonly params: Readonly<Record<string, string>>;
 }
 
 export interface PageRenderContext {
@@ -47,6 +58,10 @@ export interface FeatureEntrypoint {
   readonly version: string;
   readonly operations?: readonly RegisteredHttpOperation[];
   readonly pages?: readonly FeaturePageContribution[];
+  // The addresses of this feature's pages that are worth listing in the sitemap: public, shared, and existing right now. A page it
+  // does not list can still be visited; it is only not offered to crawlers.
+  readonly sitemapPaths?: () =>
+    readonly `/${string}`[] | Promise<readonly `/${string}`[]>;
 }
 
 export interface FeatureRegistration {
@@ -60,35 +75,11 @@ export interface FeatureRegistry {
   // Every feature's parts of the landing page, in the order they are shown.
   listHomeSections(): Promise<readonly HomeSection[]>;
   listNavigation(): readonly NavigationContribution[];
+  // Every feature's sitemap addresses, each once, in a stable order.
+  listSitemapPaths(): Promise<readonly `/${string}`[]>;
   load(id: FeatureId): Promise<FeatureEntrypoint>;
   loadAll(): Promise<readonly FeatureEntrypoint[]>;
   resolvePage(path: string): Promise<ResolvedFeaturePage | undefined>;
-}
-
-function matchPage(
-  page: FeaturePageContribution,
-  path: string,
-): ResolvedFeaturePage | undefined {
-  const templateSegments = page.path.split("/");
-  const pathSegments = path.split("/");
-  if (templateSegments.length !== pathSegments.length) return undefined;
-  const params: Record<string, string> = {};
-  for (let index = 0; index < templateSegments.length; index += 1) {
-    const template = templateSegments[index];
-    const value = pathSegments[index];
-    if (template === value) continue;
-    if (!template || !value) return undefined;
-    if (template.startsWith("[") && template.endsWith("]")) {
-      params[template.slice(1, -1)] = value;
-      continue;
-    }
-    return undefined;
-  }
-  return { page, params: Object.freeze(params) };
-}
-
-function dynamicSegmentCount(path: string): number {
-  return path.split("/").filter((segment) => segment.startsWith("[")).length;
 }
 
 function freezeManifest(manifest: FeatureManifest): FeatureManifest {
@@ -266,6 +257,12 @@ export function createFeatureRegistry(
           manifest.navigation.map((item) => item),
         ),
       ),
+    listSitemapPaths: async () => {
+      const lists = await Promise.all(
+        (await loadAll()).map(({ sitemapPaths }) => sitemapPaths?.() ?? []),
+      );
+      return Object.freeze([...new Set(lists.flat())].sort());
+    },
     load,
     loadAll,
     resolvePage: async (path) => {

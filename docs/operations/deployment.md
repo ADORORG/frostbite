@@ -85,6 +85,11 @@ Written from the Coolify docs; not run on Coolify yet.
   app in the Inngest dashboard; requests are verified with `INNGEST_SIGNING_KEY`). One replica.
 - **Environment:** the keys in `.env.production.example` (web) and `apps/worker/.env.example` (worker), as Coolify environment variables
   at run time. `PUBLIC_BASE_URL` is the exact https origin; `TRUSTED_PROXY_HOPS` counts Coolify's proxy (probably 1).
+- **Things that stopped the first Coolify deploy** (all met on a real deployment): the compose application needs _Connect to Predefined
+  Network_ on, or the web container cannot resolve Coolify's Postgres by name (`EAI_AGAIN`, the migration fails, the container restarts);
+  `INNGEST_DEV` must be set to `false`; the R2 API token must be _Object Read & Write_ on both buckets (a token scoped to other buckets
+  gives `403` on the readiness probe, shown only as "the object-storage provider request failed"); comments inside the compose YAML blocks
+  can be rejected by Coolify's parser; a 4 GB server needs swap to survive a build, which the prebuilt image avoids.
 - The first administrator's setup link is made by an operator command that must reach the database (task DOC-2).
 
 ### Prebuilt image
@@ -104,8 +109,26 @@ builds `deploy/Dockerfile` once on GitHub and pushes `ghcr.io/<owner>/<repo>` (l
    is empty. The values stay in Coolify at run time; the image holds no secrets. Do not set `REWARDS_TEMPLATES_DIR`: the image sets it.
 5. Deploy. A new version is the same single redeploy, with a new `IMAGE` tag if you pin one.
 
-The workflow does not run the Verify checks: merge to `dev` or `main` only what Verify has passed. Deploy a `sha-` tag, not `dev`, when you
-want a version you can roll back to.
+### Deploy on every push
+
+After the image is pushed, `publish-image.yml` calls Coolify's deploy API for the application of the pushed branch, so a push to `dev` or
+`main` redeploys that branch's application. The compose file sets `pull_policy: always`, because the `dev` tag keeps its name while its content
+changes. In the repository settings (Settings, Secrets and variables, Actions):
+
+- Secret `COOLIFY_URL`: the **https** address of Coolify (the step refuses anything else, so the token is never sent in the clear).
+- Secret `COOLIFY_TOKEN`: a Coolify API token (Keys & Tokens, API tokens) allowed to deploy; the API must be enabled in Coolify's settings.
+  One Coolify server, so both are shared by every branch.
+- Variable `COOLIFY_APP_UUID_DEV`: the UUID of the compose application that runs the `dev` image.
+- Variable `COOLIFY_APP_UUID_MAIN`: the UUID of the compose application that runs the `main` image.
+
+The variable name is `COOLIFY_APP_UUID_` plus the branch name in capitals (any other character becomes `_`). A branch without its variable is
+published and not deployed. Each branch has its own Coolify application, so its environment (database, buckets, `PUBLIC_BASE_URL`, keys) is set
+in that application in Coolify; nothing environment-specific is stored in GitHub. Set the `IMAGE` variable of each application to its own branch
+tag (`ghcr.io/adororg/frostbite:dev` or `:main`). Coolify's own GitHub webhook is not used: it fires on the push, before the image exists.
+
+**Deploys wait for Verify.** On a push to `dev` or `main`, `ci.yml` runs all the Verify checks, and only when they pass does it call
+`publish-image.yml` (build and publish the image once, then deploy). A pull request also builds the image, as a check. A failing commit is neither published nor deployed, and the previous version keeps
+running. Starting "Publish image" by hand skips that check. Deploy a `sha-` tag, not `dev`, when you want a version you can roll back to.
 
 ## Checklist before the first real deployment
 
@@ -114,7 +137,7 @@ passkeys). Not yet done there: backups and a restore drill, uptime monitoring an
 
 ## Status (what was and was not verified)
 
-Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO containers (placeholder credentials, `APP_ENV=local`):
+Checked on 2026-10-29, on one machine, against throwaway Postgres 18 and MinIO containers (later replaced by SeaweedFS in the tests) (placeholder credentials, `APP_ENV=local`):
 
 - The image builds (`docker build -f deploy/Dockerfile .`, about 5 minutes cold) and is 2.8 GB. It holds the full production `node_modules`
   and the worker's sources, because the worker and the migration run TypeScript from the workspace packages.

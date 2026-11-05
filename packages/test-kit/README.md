@@ -8,7 +8,7 @@ Shared, test-only helpers. Production code never imports this package.
 - `@ador/test-kit/inngest-runtime-api` — reads events and runs through the server's REST API. Inngest
   keeps every concurrent duplicate event record but starts one run per event id, and a run reads
   `Failed` from its first failed attempt while retries are pending, so statuses are read with care.
-- `@ador/test-kit/s3-runtime` — `startS3Runtime` starts the pinned MinIO image on a loopback port with
+- `@ador/test-kit/s3-runtime` — `startS3Runtime` starts the pinned SeaweedFS image on a loopback port with
   per-run credentials, the named buckets, and CORS for the given browser origins. It is the local
   stand-in for R2 in tests and the browser e2e run. `@ador/test-kit/docker` holds the shared container
   helpers (`runDocker`, `guardContainer`, `freePort`, `containerLogs`).

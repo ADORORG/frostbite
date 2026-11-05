@@ -1,10 +1,11 @@
 name: Publish image
 
 # Builds deploy/Dockerfile once and pushes it to the GitHub Container Registry, so a small server only pulls the image and never builds it
-# (docs/operations/deployment.md, "Prebuilt image"). It does not run the Verify workflow: merge only what Verify passes.
+# (docs/operations/deployment.md, "Prebuilt image"), then asks Coolify to deploy it. The Verify workflow (ci.yml) calls this on a push to
+# main or dev once its own jobs have passed, so a commit that fails Verify is neither published nor deployed. Run by hand (workflow_dispatch)
+# it skips that check: use it only to republish a commit already known to be good.
 on:
-  push:
-    branches: [main, dev]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -55,3 +56,28 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Deploys the image just pushed. It does nothing until the repository has the secrets COOLIFY_URL (the https address of Coolify) and
+      # COOLIFY_TOKEN (an API token allowed to deploy) and the variables COOLIFY_APP_UUID and COOLIFY_DEPLOY_BRANCH (the branch whose
+      # image that application runs), so a fork or a branch that is not deployed only publishes.
+      - name: Ask Coolify to deploy the new image
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          REPOSITORY_VARIABLES: ${{ toJSON(vars) }}
+        run: |
+          # One Coolify application per branch: the variable COOLIFY_APP_UUID_<BRANCH> (dev -> COOLIFY_APP_UUID_DEV) names it.
+          variable="COOLIFY_APP_UUID_$(printf '%s' "$GITHUB_REF_NAME" | tr 'a-z' 'A-Z' | tr -c 'A-Z0-9\n' '_')"
+          COOLIFY_APP_UUID="$(printf '%s' "$REPOSITORY_VARIABLES" | jq -r --arg name "$variable" '.[$name] // empty')"
+          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_APP_UUID" ]; then
+            echo "Not deploying: Coolify is not configured for the branch $GITHUB_REF_NAME ($variable is not set). The image is published."
+            exit 0
+          fi
+          case "$COOLIFY_URL" in
+            https://*) ;;
+            *) echo "::error::COOLIFY_URL must start with https:// so the token is not sent in the clear."; exit 1 ;;
+          esac
+          # Coolify's deploy endpoint takes POST (a GET is refused with 405); uuid and force stay query parameters.
+          curl --fail-with-body --silent --show-error --max-time 60 --request POST \
+            --header "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            "${COOLIFY_URL%/}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}&force=false"

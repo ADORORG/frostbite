@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./bitcoin": "./src/bitcoin/verifier.ts",
-    "./contracts": "./src/domain/contracts.ts"
+    "./contracts": "./src/domain/contracts.ts",
+    "./test-fixtures": "./test/support/fixtures.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

@@ -10,8 +10,11 @@
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:e2e": "node --experimental-strip-types scripts/run-with-postgres.ts",
+    "test:visual": "E2E_VISUAL=1 node --experimental-strip-types scripts/run-with-postgres.ts",
+    "test:visual:update": "E2E_VISUAL=1 node --experimental-strip-types scripts/run-with-postgres.ts --update-snapshots=changed",
     "stack": "node --experimental-strip-types scripts/manual-stack.ts",
-    "audit:game": "node --experimental-strip-types scripts/audit-game.ts"
+    "audit:game": "node --experimental-strip-types scripts/audit-game.ts",
+    "stack:https": "node --experimental-strip-types scripts/stack-https.ts"
   },
   "devDependencies": {
     "@ador/auth": "workspace:*",

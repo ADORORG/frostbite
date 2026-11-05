@@ -1,8 +1,8 @@
 import type { MatchState } from "./state.ts";
 
 // Every milestone this game can earn, each decided by the state of a run alone (so a replay can decide it too). The ids are the ones in the
-// game's manifest, which holds their words. There are forty: the first swap, and ladders of score, level, the longest chain one swap set
-// going, the longest line, bombs and stars made, bombs fired, shards cleared, the most one swap scored, and swaps made.
+// game's manifest, which holds their words. There are forty: the first swap, and ladders of score, levels cleared, the longest chain one swap set
+// going, the longest line, bombs and stars made, bombs fired, shards cleared, the most one swap scored, and frost broken.
 export interface Ladder {
   readonly of: (state: MatchState) => number;
   readonly prefix: string;
@@ -15,15 +15,15 @@ export const ladders: readonly Ladder[] = [
     prefix: "score",
     steps: [1_000, 2_500, 5_000, 10_000, 20_000, 40_000, 80_000, 300_000],
   },
-  { of: (s) => s.level, prefix: "level", steps: [2, 4, 6, 9, 13, 18] },
+  { of: (s) => s.levelsCleared, prefix: "levels", steps: [1, 3, 5, 8, 12, 16] },
   { of: (s) => s.bestChain, prefix: "chain", steps: [2, 3, 4, 5, 7] },
   { of: (s) => s.bestLine, prefix: "line", steps: [4, 5, 6] },
   { of: (s) => s.bombsMade, prefix: "bombs", steps: [1, 6, 20] },
   { of: (s) => s.starsMade, prefix: "stars", steps: [1, 6] },
   { of: (s) => s.bombsFired, prefix: "blasts", steps: [1, 12] },
-  { of: (s) => s.cleared, prefix: "shards", steps: [50, 200, 600, 1_500] },
+  { of: (s) => s.cleared, prefix: "shards", steps: [50, 200, 600] },
+  { of: (s) => s.frostBroken, prefix: "frost", steps: [25, 100, 300] },
   { of: (s) => s.bestSwap, prefix: "swap", steps: [200, 500, 1_000, 3_000] },
-  { of: (s) => s.swaps, prefix: "swaps", steps: [40, 150] },
 ];
 
 export const idOf = (prefix: string, step: number): string =>

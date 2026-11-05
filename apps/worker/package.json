@@ -19,7 +19,8 @@
     "@ador/jobs": "workspace:*",
     "@ador/object-storage": "workspace:*",
     "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*"
+    "@ador/shared": "workspace:*",
+    "@repo/configs": "workspace:*"
   },
   "devDependencies": {
     "@ador/events": "workspace:*",

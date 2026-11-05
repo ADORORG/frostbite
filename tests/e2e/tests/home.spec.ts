@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
+import { siteNavigation } from "./support/site-navigation.ts";
 
 test("shows only honest foundation-stage launchpad controls", async ({
   page,
@@ -46,8 +47,8 @@ test("navigates to the games catalog, which lists FROST·BITE as playable on the
   await expect(page).toHaveURL(/\/games$/);
   await expect(page.getByRole("heading", { name: "Games" })).toBeVisible();
   await expect(
-    page.getByRole("article", { name: "FROST·BITE" }).getByText("Playable"),
-  ).toBeVisible();
+    page.getByRole("link", { name: "View FROST·BITE" }),
+  ).toContainText("Playable");
 });
 
 test("keeps shell navigation keyboard-accessible at every viewport", async ({
@@ -60,9 +61,8 @@ test("keeps shell navigation keyboard-accessible at every viewport", async ({
   await expect(skipLink).toBeFocused();
   await skipLink.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
-  await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }),
-  ).toBeVisible();
+  // The links are in the bar where there is room for it, and in the Menu where there is not.
+  await expect(await siteNavigation(page)).toBeVisible();
 });
 
 test("removes decorative scanlines when reduced motion is requested", async ({

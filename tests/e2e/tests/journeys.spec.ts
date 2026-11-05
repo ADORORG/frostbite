@@ -6,6 +6,7 @@ import {
 } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
 import { loadFonts } from "./support/quality.ts";
+import { accountLink, siteLink } from "./support/site-navigation.ts";
 
 // One journey per kind of person, each started once at the home page and then followed by clicking only: after
 // the first load, typing an address is refused, so a page that cannot be reached from another fails here
@@ -13,8 +14,6 @@ import { loadFonts } from "./support/quality.ts";
 // viewport; the narrow ones prove the same links are reachable there. Desktop and mobile also keep a picture of
 // the top bar with the account menu open, which is where the role shows.
 
-const bar = (page: Page) =>
-  page.getByRole("navigation", { name: "Primary navigation" });
 const more = (page: Page) => page.getByRole("navigation", { name: "More" });
 const sidebar = (page: Page, name: string) =>
   page.getByRole("navigation", { name });
@@ -54,9 +53,7 @@ test("a visitor follows the public catalogs and finds the way to connect", async
   page,
 }) => {
   await begin(page, baseURL);
-  await bar(page)
-    .getByRole("link", { name: "Collections", exact: true })
-    .click();
+  await (await siteLink(page, "Collections")).click();
   await expect(page).toHaveURL(/\/collections$/u);
   await page
     .getByRole("link", { name: `View ${publicCollection.name}` })
@@ -67,7 +64,7 @@ test("a visitor follows the public catalogs and finds the way to connect", async
   // The way back is on the page.
   await page.getByRole("link", { name: "Browse collections" }).click();
   await expect(page).toHaveURL(/\/collections$/u);
-  await bar(page).getByRole("link", { name: "Games", exact: true }).click();
+  await (await siteLink(page, "Games")).click();
   await expect(page).toHaveURL(/\/games$/u);
   await more(page).getByRole("link", { name: "Launches", exact: true }).click();
   await expect(page).toHaveURL(/\/launches$/u);
@@ -83,7 +80,7 @@ test("someone who never applied is led from the studio to the application and ba
   page,
 }) => {
   await begin(page, baseURL, creatorE2EFixtures.visualUser.sessionToken);
-  await bar(page).getByRole("link", { name: "Studio", exact: true }).click();
+  await (await siteLink(page, "Studio")).click();
   await heading(page, "Creator studio");
   await sidebar(page, "Studio sections")
     .getByRole("link", { name: "Collections", exact: true })
@@ -95,7 +92,7 @@ test("someone who never applied is led from the studio to the application and ba
   await heading(page, "Apply to create");
   await breadcrumb(page).getByRole("link", { name: "Studio" }).click();
   await heading(page, "Creator studio");
-  await bar(page).getByRole("link", { name: "Account", exact: true }).click();
+  await (await accountLink(page)).click();
   await heading(page, "Account");
   await pictureOfTheBar(page, "applicant");
 });
@@ -109,7 +106,7 @@ test("an approved creator reaches collections, uploads and their application", a
     baseURL,
     creatorE2EFixtures.collectionQualityList.sessionToken,
   );
-  await bar(page).getByRole("link", { name: "Studio", exact: true }).click();
+  await (await siteLink(page, "Studio")).click();
   await heading(page, "Creator studio");
   const studio = sidebar(page, "Studio sections");
   await studio.getByRole("link", { name: "Collections", exact: true }).click();
@@ -143,7 +140,7 @@ test("a reviewer moves between the review queues and never sees the console", as
   page,
 }) => {
   await begin(page, baseURL, creatorE2EFixtures.reviewer.sessionToken);
-  await bar(page).getByRole("link", { name: "Admin", exact: true }).click();
+  await (await siteLink(page, "Admin")).click();
   await heading(page, "Collection reviews");
   const admin = sidebar(page, "Admin sections");
   await admin
@@ -176,7 +173,7 @@ test("staff without the reviewer role see their console and no review links", as
   page,
 }) => {
   await begin(page, baseURL, creatorE2EFixtures.staff.sessionToken);
-  await bar(page).getByRole("link", { name: "Admin", exact: true }).click();
+  await (await siteLink(page, "Admin")).click();
   await heading(page, "Admin console");
   // Staff have one area now: the rewards contracts of games.
   await expect(page.getByText("No staff areas yet")).toHaveCount(0);
@@ -186,7 +183,7 @@ test("staff without the reviewer role see their console and no review links", as
   await expect(page.getByRole("link", { name: "Creator reviews" })).toHaveCount(
     0,
   );
-  await bar(page).getByRole("link", { name: "Account", exact: true }).click();
+  await (await accountLink(page)).click();
   await heading(page, "Account");
   await pictureOfTheBar(page, "staff");
 });

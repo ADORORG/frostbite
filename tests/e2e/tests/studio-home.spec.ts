@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { useE2ESession } from "../src/session.ts";
+import { siteLink } from "./support/site-navigation.ts";
 
 // The studio's front page as each kind of person finds it, reached and used by clicking only.
 
@@ -17,10 +18,7 @@ test("a person who never applied is told so, sent to the application, and not of
     creatorE2EFixtures.visualUser.sessionToken,
   );
   await page.goto("/");
-  await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .getByRole("link", { name: "Studio", exact: true })
-    .click();
+  await (await siteLink(page, "Studio")).click();
   await expect(
     page.getByRole("heading", { name: "Not a creator yet" }),
   ).toBeVisible();
@@ -61,10 +59,7 @@ test("an approved creator is pointed to their first collection and reaches the f
     creatorE2EFixtures.collectionQualityList.sessionToken,
   );
   await page.goto("/");
-  await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .getByRole("link", { name: "Studio", exact: true })
-    .click();
+  await (await siteLink(page, "Studio")).click();
   await expect(
     page.getByRole("heading", { name: "Approved creator" }),
   ).toBeVisible();

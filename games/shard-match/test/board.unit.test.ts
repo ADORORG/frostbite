@@ -131,11 +131,32 @@ describe("settling", () => {
     expect(first.state).not.toBe(12345);
   });
 
+  it("says how far each shard fell: the rows it dropped, and for a new shard the rows it came down from above", () => {
+    const board = quiet();
+    const gone = new Set([cellOf(2, 7), cellOf(2, 6), cellOf(5, 0)]);
+    const { drops } = settle(board, gone, 5, 1);
+    expect(drops[cellOf(2, 7)]).toBe(2);
+    expect(drops[cellOf(2, 6)]).toBe(2);
+    expect(drops[cellOf(2, 5)]).toBe(2);
+    expect(drops[cellOf(2, 0)]).toBe(2);
+    expect(drops[cellOf(2, 1)]).toBe(2);
+    expect(drops[cellOf(5, 0)]).toBe(1);
+    expect(drops[cellOf(5, 1)]).toBe(0);
+    expect(drops[cellOf(0, 3)]).toBe(0);
+    const [first, second] = [
+      settle(board, new Set([cellOf(1, 7), cellOf(1, 6)]), 5, 1).drops,
+      settle(board, new Set([cellOf(1, 6)]), 5, 1).drops,
+    ];
+    expect(first[cellOf(1, 0)]).toBe(2);
+    expect(second[cellOf(1, 0)]).toBe(1);
+  });
+
   it("fills only with the kinds asked for, and does not touch the generator when nothing is cleared", () => {
     const filled = settle(quiet(), new Set([0, 1, 2, 3, 4, 5, 6, 7]), 3, 99);
     for (let x = 0; x < 8; x += 1) expect(filled.board[x]).toBeLessThan(3);
     expect(settle(quiet(), new Set(), 5, 99)).toEqual({
       board: quiet(),
+      drops: Array.from({ length: cells }, () => 0),
       state: 99,
     });
   });

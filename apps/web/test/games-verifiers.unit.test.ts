@@ -12,7 +12,7 @@ async function registeredGames() {
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
   vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
   vi.stubEnv("GAME_LAUNCHES", "");
-  return (await import("../../../configs/games.ts")).games;
+  return (await import("@repo/configs/games")).games;
 }
 const exists = (path: string) =>
   stat(path).then(

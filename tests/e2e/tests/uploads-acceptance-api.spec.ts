@@ -9,6 +9,7 @@ import {
   completePath,
   createIntent,
   errorCode,
+  get,
   intentOf,
   intentsPath,
   libraryOf,
@@ -194,28 +195,31 @@ test("paging back through the library needs a session and a well-formed cursor, 
 }) => {
   const cursor = "1760000000000.0198a000-0000-7000-8000-000000000001";
   const anonymous = await browser.newContext({ baseURL });
-  const refused = await post(anonymous.request, baseURL, olderAssetsPath, {
+  const refused = await get(anonymous.request, olderAssetsPath, {
     before: cursor,
   });
   expect(refused.status()).toBe(401);
   await anonymous.close();
 
   await signIn(page, baseURL, creatorE2EFixtures.acceptanceApiOther);
-  const noOrigin = await page.request.post(olderAssetsPath, {
-    data: { before: cursor },
-  });
-  expect(noOrigin.status()).toBe(403);
-  for (const bad of [
+  // The page after a cursor is a read: a GET with the cursor in the query. The old POST route is gone.
+  expect(
+    (
+      await post(page.request, baseURL, olderAssetsPath, { before: cursor })
+    ).status(),
+  ).toBe(405);
+  const malformed: Record<string, string>[] = [
     {},
     { before: "yesterday" },
     { before: cursor, userId: "x" },
-  ]) {
-    const response = await post(page.request, baseURL, olderAssetsPath, bad);
+  ];
+  for (const bad of malformed) {
+    const response = await get(page.request, olderAssetsPath, bad);
     expect(response.status()).toBe(400);
     expect(await errorCode(response)).toBe("invalid_request");
   }
   // A cursor for the far future still lists only this person's own assets, of which a fresh account has none.
-  const page2 = await post(page.request, baseURL, olderAssetsPath, {
+  const page2 = await get(page.request, olderAssetsPath, {
     before: "9999999999999.0198a000-0000-7000-8000-000000000001",
   });
   expect(page2.status()).toBe(200);

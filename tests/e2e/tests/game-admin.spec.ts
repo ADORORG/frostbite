@@ -23,12 +23,10 @@ test("staff see the templates, none published, and the games with rewards", asyn
   await expect(
     page.getByRole("heading", { level: 1, name: "Game rewards" }),
   ).toBeVisible();
-  await expect(
-    page.getByText("game-rewards@1.0.0 — Not published"),
-  ).toBeVisible();
-  await expect(
-    page.getByText("milestone-collectible@1.0.0 — Not published"),
-  ).toBeVisible();
+  for (const template of ["game-rewards@1.0.0", "milestone-collectible@1.0.0"])
+    await expect(page.locator(`[data-template="${template}"]`)).toContainText(
+      "Not published",
+    );
   await expect(
     page.getByText("No template has been published yet."),
   ).toBeVisible();
@@ -50,8 +48,9 @@ test("a template cannot be published without a network, and the page says so", a
     name: "Publish game-rewards@1.0.0",
   });
   await expect(publish).toBeDisabled();
+  // A step cannot be prepared without the address of the wallet that will sign it.
   await page.getByLabel("Wallet address").fill("tb1qexamplewalletaddress");
-  await expect(publish).toBeDisabled();
+  await expect(publish).toBeEnabled();
   // There is no address to type: the platform chooses where the code goes.
   await expect(page.getByLabel("Address for game-rewards@1.0.0")).toHaveCount(
     0,

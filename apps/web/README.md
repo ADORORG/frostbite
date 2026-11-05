@@ -47,6 +47,18 @@ build. Shared domain logic belongs in a domain-specific package rather than in t
   `TRUSTED_PROXY_HOPS` to match the proxies in front of the app), then by person; the policy is
   `configs/rate-limits.ts`; counts are in the database.
 
+## Search and link previews (SEO-1)
+
+- `src/server/metadata` builds the tags: `site.ts` reads the public origin and the name from validated configuration (never the
+  internal address behind the proxy), `next-metadata.ts` makes the site-wide defaults and one page's tags, `declared.ts` decides what
+  a resolved page may say (only a public page that declares metadata is shared; everything else is `noindex` with no preview).
+  `layout.tsx` and the page catch-all use `generateMetadata`, so the tags are in the server-rendered HTML a crawler reads.
+- `/share-image` (the site's picture) and `/games/[id]/share-image` (a game's) are 1200x630 PNGs drawn with `next/og` from
+  `share-card.tsx`, whose colours mirror `packages/ui/src/tokens.css` (a unit test fails on drift). A game id that is not registered is
+  a bare 404. `robots.txt` and `sitemap.xml` are made per request from the public routes the features list.
+- Not yet checked against the platforms' own debuggers (Facebook Sharing Debugger, X card preview, LinkedIn Post Inspector): that
+  needs a deployed address.
+
 ## Ownership
 
 Platform front end.

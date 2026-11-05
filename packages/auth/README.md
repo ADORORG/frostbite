@@ -43,7 +43,7 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
   account's addresses for the method registry (standard assurance, can sign in). Routes: `POST /api/v1/email/sign-in/request` and
   `/verify`, both public.
 - `createContactLinkService` (with `createDrizzleContactLinkRepository`) adds an address to the signed-in account and removes one. Adding needs
-  a recent sign-in and the code sent to the new address (`request` asks the code service for a *link* code that belongs to the account;
+  a recent sign-in and the code sent to the new address (`request` asks the code service for a _link_ code that belongs to the account;
   `confirm` counts the try and checks the code without spending it; `completeLink` spends it with the change, in one transaction under
   the address's lock and from a session that is still recent). An address another account holds is refused after the code has proved the
   mailbox, the code is spent, and nothing moves and nothing says whose it is (ADR-021 point 5). Removing needs a recent sign-in and

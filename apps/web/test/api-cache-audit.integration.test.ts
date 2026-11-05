@@ -6,7 +6,7 @@ vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => undefined }),
 }));
 
-import { platformComposition } from "../../../configs/platform";
+import { platformComposition } from "@repo/configs/platform";
 import { GET } from "../src/app/api/v1/[...segments]/route.js";
 
 async function operations() {

@@ -49,7 +49,7 @@ describe("the disposable S3 runtime", () => {
     expect(runtime.endpoint).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
     await client.send(new HeadBucketCommand({ Bucket: "drafts" }));
     await client.send(new HeadBucketCommand({ Bucket: "public" }));
-    expect(await runtime.logs()).toContain("API:");
+    expect(await runtime.logs()).toContain("S3 read filer buckets dir");
   });
 
   it("answers a browser preflight for a presigned upload from the allowed origin only", async () => {

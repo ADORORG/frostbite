@@ -6,11 +6,11 @@ import {
 
 import type { DelayPolicy } from "@ador/shared/chain";
 
-import { betaChains } from "../../../configs/beta-chains.ts";
+import { betaChains } from "@repo/configs/beta-chains";
 import {
   defaultFeeTargetBlocks,
   rewardsPolicy,
-} from "../../../configs/rewards-policy.ts";
+} from "@repo/configs/rewards-policy";
 import { chainName, checkChain } from "./checks/chain.ts";
 import { checkConfiguration } from "./checks/configuration.ts";
 import { checkFee, feeName } from "./checks/fee.ts";

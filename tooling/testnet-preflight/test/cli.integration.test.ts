@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { betaChains } from "../../../configs/beta-chains.ts";
-import { defaultFeeTargetBlocks } from "../../../configs/rewards-policy.ts";
+import { betaChains } from "@repo/configs/beta-chains";
+import { defaultFeeTargetBlocks } from "@repo/configs/rewards-policy";
 
 const run = promisify(execFile);
 const servers: Server[] = [];

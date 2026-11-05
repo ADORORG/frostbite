@@ -70,8 +70,6 @@ export async function discoverWorkspaces(
   const directories: string[] = [];
 
   for (const pattern of patterns) {
-    if (!pattern.includes("*"))
-      throw new Error(`Unsupported workspace pattern: ${pattern}`);
     directories.push(...(await expandPattern(root, pattern)));
   }
 

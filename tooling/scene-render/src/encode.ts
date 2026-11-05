@@ -27,11 +27,24 @@ export async function runEncoder(
         );
     });
   });
+  // `finished` can settle while frames are still being written (the encoder never started, or stopped), and nothing then reads the pipe:
+  // the writer must not wait for a drain that will not come. Its reason is raised below; this copy only says that it has settled.
+  let stopped = false;
+  const settled = finished.then(
+    () => {
+      stopped = true;
+    },
+    () => {
+      stopped = true;
+    },
+  );
   // A pipe that closes early (the encoder stopped) is reported by `finished`, with the reason; the write error is only its echo.
   child.stdin.on("error", () => undefined);
   try {
     for (const chunk of chunks) {
-      if (!child.stdin.write(chunk)) await once(child.stdin, "drain");
+      if (stopped) break;
+      if (!child.stdin.write(chunk))
+        await Promise.race([once(child.stdin, "drain"), settled]);
     }
   } catch {
     // Reported by `finished`.

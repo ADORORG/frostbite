@@ -28,6 +28,8 @@ export function surface() {
         y,
       });
     },
+    beginPath: () => undefined,
+    clip: () => undefined,
     fillStyle: "",
     fillText(text: string) {
       written.push({
@@ -39,7 +41,11 @@ export function surface() {
     font: "",
     globalAlpha: 1,
     imageSmoothingEnabled: true,
+    rect: () => undefined,
+    restore: () => undefined,
+    save: () => undefined,
     setTransform: () => undefined,
+    translate: () => undefined,
     textAlign: "left",
     textBaseline: "alphabetic",
   };

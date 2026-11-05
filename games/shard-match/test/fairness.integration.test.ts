@@ -70,7 +70,7 @@ describe("the game, played whole", () => {
       schemaVersion: 1 as const,
       seed,
       verifier: "shard-match",
-      verifierVersion: 1,
+      verifierVersion: 2,
     });
     for (const [result, seed] of [
       [randoms[0], seeds[0]],

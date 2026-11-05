@@ -2,7 +2,7 @@ import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
 
 import { type Direction } from "../rules/constants.ts";
 import { neighbour } from "../rules/board.ts";
-import { cellAt, screenHeight, screenWidth } from "./layout.ts";
+import { cellAt, sizeOf, type Shape } from "./layout.ts";
 
 // What the player's hands can do. The arrows or WASD move a cursor over the board; Space picks up the shard under it, and an arrow then swaps
 // it that way; a tap picks a shard up and a tap on its neighbour swaps them; a drag from a shard to its neighbour swaps them. Enter starts a run
@@ -42,10 +42,12 @@ export function cellUnder(
   },
   clientX: number,
   clientY: number,
+  shape: Shape = "wide",
 ): number {
+  const { height, width } = sizeOf(shape);
   return cellAt(
-    ((clientX - rect.left) * screenWidth) / rect.width,
-    ((clientY - rect.top) * screenHeight) / rect.height,
+    ((clientX - rect.left) * width) / rect.width,
+    ((clientY - rect.top) * height) / rect.height,
   );
 }
 
@@ -60,6 +62,7 @@ export function directionBetween(from: number, to: number): number {
 export function attachControls(
   screen: HTMLElement,
   controls: Controls,
+  shape: () => Shape = () => "wide",
 ): () => void {
   const stopKeys = attachKeys(window, keys, (action, phase) => {
     if (phase !== "down") return;
@@ -73,6 +76,7 @@ export function attachControls(
       screen.getBoundingClientRect(),
       event.clientX,
       event.clientY,
+      shape(),
     );
   };
   const onUp = (event: PointerEvent): void => {
@@ -83,6 +87,7 @@ export function attachControls(
       screen.getBoundingClientRect(),
       event.clientX,
       event.clientY,
+      shape(),
     );
     const direction = directionBetween(start, end);
     if (end === start || end < 0) controls.tap(start);

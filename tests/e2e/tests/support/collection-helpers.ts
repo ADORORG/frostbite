@@ -8,6 +8,7 @@ import {
   completePath,
   createIntent,
   intentOf,
+  get,
   libraryOf,
   post,
 } from "../../src/upload-api.ts";
@@ -77,6 +78,9 @@ export const create = (
   key: string,
   body: object,
 ) => post(request, baseURL, draftsPath, body, { "idempotency-key": key });
+// The creator's own draft with its items, read by id.
+export const readDraft = (request: APIRequestContext, collectionId: string) =>
+  get(request, readPath, { collectionId });
 // A response body is `unknown` (untrusted) until the shared contract accepts it, as in `upload-api.ts`.
 export const detailOf = async (response: { json(): Promise<unknown> }) =>
   collectionDetailSchema.parse(await response.json());

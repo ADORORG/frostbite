@@ -3,3 +3,6 @@ games/frostbite/src/legacy/
 
 # Written by contracts/templates/build.sh (the template code hashes); never edited by hand.
 contracts/templates/release.json
+
+# Written by the migration generator (drizzle-kit); never edited or reformatted by hand.
+packages/database/migrations/*/snapshot.json

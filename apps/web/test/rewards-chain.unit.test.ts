@@ -2,14 +2,14 @@ import { chainRefSchema, type TransactionIntent } from "@ador/shared/chain";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 import { describe, expect, it, vi } from "vitest";
 
-import { betaChain } from "../../../configs/chains.ts";
+import { betaChain } from "@repo/configs/chains";
 import {
   chainConfig,
   createRewardsChain,
   type RewardsPlatform,
-} from "../../../configs/rewards-chain.ts";
-import { rewardsPlan } from "../../../configs/rewards-plan.ts";
-import { rewardsPolicy } from "../../../configs/rewards-policy.ts";
+} from "@repo/configs/rewards-chain";
+import { rewardsPlan } from "@repo/configs/rewards-plan";
+import { rewardsPolicy } from "@repo/configs/rewards-policy";
 
 // The chain this deployment runs on (configs/chains.ts), whichever test network that is.
 const beta = chainRefSchema.parse(betaChain.chain.chainId);
@@ -80,9 +80,9 @@ describe("the rewards chain", () => {
 
   it("is configured but not offered while the policy keeps the release gate closed", async () => {
     vi.resetModules();
-    vi.doMock("../../../configs/rewards-policy.ts", async (original) => {
+    vi.doMock("@repo/configs/rewards-policy", async (original) => {
       const real =
-        await original<typeof import("../../../configs/rewards-policy.ts")>();
+        await original<typeof import("@repo/configs/rewards-policy")>();
       return {
         ...real,
         rewardsPolicy: {
@@ -92,7 +92,7 @@ describe("the rewards chain", () => {
       };
     });
     try {
-      const closed = await import("../../../configs/rewards-chain.ts");
+      const closed = await import("@repo/configs/rewards-chain");
       expect(closed.chainConfig().releaseGate).toBe("closed");
       expect(
         closed
@@ -100,7 +100,7 @@ describe("the rewards chain", () => {
           ?.chain(beta),
       ).toBeNull();
     } finally {
-      vi.doUnmock("../../../configs/rewards-policy.ts");
+      vi.doUnmock("@repo/configs/rewards-policy");
       vi.resetModules();
     }
   });

@@ -1,4 +1,5 @@
 @import "@ador/game-sdk/audio/panel.css";
+@import "@ador/game-sdk/phone.css";
 
 :root {
   color-scheme: dark;
@@ -158,7 +159,8 @@ canvas {
 }
 button {
   min-height: 2.75rem;
-  min-inline-size: 7.5rem;
+  /* Wide enough for every label a button takes ("Start run", "Roll again") in any fallback font, so the label changing never resizes it. */
+  min-inline-size: 9rem;
   padding: 0.5rem 1.25rem;
   border: 0.125rem solid #38e8ff;
   border-radius: 0.5rem;

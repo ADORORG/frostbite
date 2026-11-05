@@ -59,6 +59,21 @@ describe("workspace discovery", () => {
     ]);
   });
 
+  it("accepts a directory named in full, not only a glob", async () => {
+    const root = await repository(
+      "configs",
+      { name: "@repo/configs" },
+      "configs",
+    );
+    expect(await discoverWorkspaces(root)).toEqual([
+      {
+        directory: resolve(root, "configs"),
+        name: "@repo/configs",
+        scripts: {},
+      },
+    ]);
+  });
+
   it("rejects unsupported nested globs", async () => {
     const root = await repository("packages/**", { name: "example" });
     await expect(discoverWorkspaces(root)).rejects.toThrow(

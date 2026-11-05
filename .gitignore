@@ -54,3 +54,6 @@ yarn-error.log*
 # Local regtest state and built indexer (tooling/regtest)
 tooling/regtest/.regtest/
 tooling/regtest/.signet/
+
+# pnpm ci:local: logs and the browsers it installs
+.ci-local/

@@ -5,7 +5,7 @@ import { matchRules } from "../src/rules/index.ts";
 import { legalMoves } from "../src/rules/moves.ts";
 import { sampleRun } from "../src/sample-run.ts";
 import { createMatchSession } from "../src/session.ts";
-import { greedyPlayer, play } from "./support/bots.ts";
+import { greedyPlayer, play, randomPlayer } from "./support/bots.ts";
 
 describe("a session", () => {
   it("records the swaps the rules accept, and refuses one that makes no line without recording it", () => {
@@ -45,16 +45,17 @@ describe("a session", () => {
     expect(ids).toContain("first-swap");
   });
 
+  // Plays a whole run to its end: about 2 s alone, and many times that on a busy CI machine, so it has the time the other long tests have.
   it("does not close a run twice, nor one that ended itself", () => {
     const session = createMatchSession({ seed: 2 });
     const first = session.record();
     expect(session.record().inputs).toEqual(first.inputs);
     expect(first.inputs).toEqual([{ type: "end" }]);
     const over = createMatchSession({ seed: 3 });
-    for (const { cell, to } of play(3, greedyPlayer).swaps) over.swap(cell, to);
+    for (const { cell, to } of play(3, randomPlayer).swaps) over.swap(cell, to);
     expect(over.state().cause).toBe("out");
     expect(over.record().inputs.at(-1)).not.toEqual({ type: "end" });
-  });
+  }, 60_000);
 });
 
 describe("the sample run", () => {

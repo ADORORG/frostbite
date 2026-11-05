@@ -66,6 +66,7 @@ x-healthcheck: &healthcheck
 services:
   web:
     image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
+    pull_policy: always
     restart: unless-stopped
     environment:
       <<: *environment
@@ -82,6 +83,7 @@ services:
 
   worker:
     image: ${IMAGE:-ghcr.io/adororg/frostbite:dev}
+    pull_policy: always
     command: ["pnpm", "--filter", "worker", "start"]
     restart: unless-stopped
     environment:

@@ -32,6 +32,30 @@ export function resolveStackServer(
   );
 }
 
+// The address the front door listens on. Loopback by default, because the stack's sign-in picker lets anyone who reaches it become any of
+// the people below; `STACK_HOST=0.0.0.0` (with `STACK_BASE_URL` set to this machine's address) opens it to the local network, for a phone.
+export const defaultStackHost = "127.0.0.1";
+
+export function resolveStackHost(
+  environment: NodeJS.ProcessEnv = process.env,
+): string {
+  const host = environment.STACK_HOST?.trim();
+  return host === undefined || host === "" ? defaultStackHost : host;
+}
+
+// Files holding a certificate and its key (`STACK_TLS_CERT`, `STACK_TLS_KEY`), to serve HTTPS. Both or neither; one alone is a mistake worth
+// stopping for.
+export function resolveStackTls(
+  environment: NodeJS.ProcessEnv = process.env,
+): { readonly cert: string; readonly key: string } | null {
+  const cert = environment.STACK_TLS_CERT?.trim() ?? "";
+  const key = environment.STACK_TLS_KEY?.trim() ?? "";
+  if (cert === "" && key === "") return null;
+  if (cert === "" || key === "")
+    throw new Error("STACK_TLS_CERT and STACK_TLS_KEY must be set together.");
+  return { cert, key };
+}
+
 export interface StackActor {
   readonly goal: string;
   readonly id: string;
@@ -42,7 +66,7 @@ export interface StackActor {
 }
 
 // The people worth being, in the order a tour makes sense. Their sessions are fixed fixture tokens in a
-// throwaway database on this machine only; the server is bound to the loopback address.
+// throwaway database on this machine only; the front door is bound to the loopback address unless STACK_HOST opens it.
 export const stackActors: readonly StackActor[] = [
   {
     id: "creator",
@@ -139,7 +163,7 @@ export function formatStackGuide(input: {
   lines.push(
     "",
     "The database and the stored files are kept in Docker volumes when you stop the stack (Ctrl+C), and are there next time.",
-    "`pnpm stack --fresh` deletes them (after asking) and starts over. Storage is local MinIO, not R2. The rewards chain, if the line",
+    "`pnpm stack --fresh` deletes them (after asking) and starts over. Storage is local SeaweedFS, not R2. The rewards chain, if the line",
     "below names one, is real: what is sent to it stays there whatever happens to this stack.",
     "",
   );

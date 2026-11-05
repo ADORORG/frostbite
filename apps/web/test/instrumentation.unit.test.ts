@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const checked = vi.fn<() => Promise<void>>();
-vi.mock("../../../configs/game-rewards", () => ({
+vi.mock("@repo/configs/game-rewards", () => ({
   checkRewardsChainAtStartup: checked,
 }));
 

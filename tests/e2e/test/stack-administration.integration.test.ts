@@ -20,7 +20,7 @@ import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
 import { eq, inArray } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
-import { withDisposablePostgres } from "../../../packages/database/test/support/postgres-container.ts";
+import { withDisposablePostgres } from "@ador/database/test-postgres";
 import { creatorE2EFixtures, seededEmails } from "../src/creator-fixtures.ts";
 import { seedAdministration, seedOnce } from "../scripts/stack-setup.ts";
 

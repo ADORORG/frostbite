@@ -26,7 +26,8 @@ describe("the milestones", () => {
       (n: number) => Parameters<typeof withCounts>[0]
     > = {
       score: (n) => ({ score: n }),
-      level: (n) => ({ level: n }),
+      levels: (n) => ({ levelsCleared: n }),
+      frost: (n) => ({ frostBroken: n }),
       chain: (n) => ({ bestChain: n }),
       line: (n) => ({ bestLine: n }),
       bombs: (n) => ({ bombsMade: n }),
@@ -34,7 +35,6 @@ describe("the milestones", () => {
       blasts: (n) => ({ bombsFired: n }),
       shards: (n) => ({ cleared: n }),
       swap: (n) => ({ bestSwap: n }),
-      swaps: (n) => ({ swaps: n }),
     };
     expect(Object.keys(counts).sort()).toEqual(
       ladders.map(({ prefix }) => prefix).sort(),

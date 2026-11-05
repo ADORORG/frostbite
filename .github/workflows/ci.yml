@@ -3,7 +3,7 @@ name: Verify
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, dev]
 
 permissions:
   contents: read
@@ -12,32 +12,26 @@ concurrency:
   group: verify-${{ github.ref }}
   cancel-in-progress: true
 
+# Verify is several jobs that run side by side, so a commit waits for the slowest one rather than for all of them in turn. Every job is a
+# required check; the publish job at the bottom starts only when all of them passed.
+#
+# Pictures are not compared here: a screenshot gate cost more than it caught and failed on machine differences, not on bugs. The browser tests
+# still check behaviour, accessibility, keyboard and layout on every viewport. Pixel baselines run on demand in visual.yml.
 jobs:
-  verify:
+  # Cheap checks that fail fastest. Lint includes the contracts' clippy, which builds them for WebAssembly.
+  static:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6.0.2
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.8
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
 
-      - name: Install Node.js
-        uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Rust coverage tool
-        run: cargo install cargo-llvm-cov --version 0.6.21 --locked
-
-      - name: Install Rust WebAssembly target
-        run: rustup target add wasm32-unknown-unknown
+      - name: Set up Rust
+        uses: ./.github/actions/setup-rust
 
       - name: Verify environment contracts
         run: pnpm env:check
@@ -51,46 +45,216 @@ jobs:
       - name: Verify lint and repository policies
         run: pnpm lint
 
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Set up Rust
+        uses: ./.github/actions/setup-rust
+
       - name: Verify types
         run: pnpm typecheck
 
-      - name: Run unit tests
-        run: pnpm test:unit
+  # Unit and integration tests run once, under coverage (test:coverage runs both suites), instead of once plain and again for coverage.
+  # Shard Match is held out and run beside this job: its fairness test plays whole games with bots when the file loads, which alone takes
+  # longer than all the other workspaces together at the same concurrency.
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      # ffmpeg (with ffprobe): the scene videos are rendered and checked with it (deploy/Dockerfile installs it too).
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
+      # The games' layout guard (tests/e2e) builds every game and measures it in a real browser.
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Verify database migrations
         run: pnpm migration:check
 
-      - name: Run integration tests
-        run: pnpm test:integration
+      - name: Run unit and integration tests with coverage
+        run: pnpm exec turbo run test:coverage --concurrency=2 --filter='!@game/shard-match'
 
-      - name: Run and merge coverage
-        run: pnpm test:coverage
-
-      - name: Build production artifacts
-        run: pnpm build
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Run browser tests
-        run: pnpm test:e2e
-
+      # The paths span the repository, so they upload with their folders (coverage-merge downloads them back in place).
       - name: Retain coverage reports
         if: always()
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: coverage-reports
           path: |
             coverage
+            configs/coverage
             apps/*/coverage
             features/*/coverage
+            games/*/coverage
             packages/*/coverage
-            contracts/target/llvm-cov-target/lcov.info
+            providers/*/*/coverage
             tests/*/coverage
             tooling/*/coverage
           if-no-files-found: error
 
+  game-simulations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Run Shard Match tests with coverage
+        run: pnpm --filter @game/shard-match test:coverage
+
+      - name: Retain coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: coverage-shard-match
+          path: games/shard-match/coverage
+          if-no-files-found: error
+
+  # The merged coverage threshold covers every workspace, so it is checked once both test jobs have reported.
+  coverage-merge:
+    needs: [tests, game-simulations]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: coverage-reports
+          path: .
+
+      - name: Download Shard Match coverage
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: coverage-shard-match
+          path: games/shard-match/coverage
+
+      - name: Merge coverage and check the thresholds
+        run: pnpm repository:coverage
+
+  # The contract tests run in WebAssembly under wasm-bindgen-test-runner; its version must equal the wasm-bindgen in contracts/Cargo.lock.
+  # The native tests and the coverage threshold are quick and run here; the WebAssembly harness takes most of the time and is shared
+  # between the contracts-harness jobs below.
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Set up Rust
+        uses: ./.github/actions/setup-rust
+        with:
+          tools: cargo-llvm-cov@0.6.21,wasm-bindgen@0.2.100
+
+      - name: Run native contract tests
+        run: pnpm contracts:test:spikes && bash contracts/templates/ci.sh core
+
+      - name: Run contract coverage
+        run: pnpm contracts:coverage
+
+      - name: Retain contract coverage
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: contracts-coverage
+          path: contracts/target/llvm-cov-target/lcov.info
+          if-no-files-found: error
+
+  # ci.sh gives each shard every fifth harness test file, in name order, so a new file is run without a change here. Five shards is
+  # the count that brings the longest (milestones, about 3.5 minutes) close to the rest.
+  contracts-harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Set up Rust
+        uses: ./.github/actions/setup-rust
+        with:
+          tools: wasm-bindgen@0.2.100
+
+      - name: Run contract harness tests (shard ${{ matrix.shard }} of 5)
+        run: bash contracts/templates/ci.sh harness ${{ matrix.shard }} 5
+
+  # Production build, then the browser tests on the built app. Split into shards that run side by side, each with its own database and services.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Build production artifacts
+        run: pnpm exec turbo run build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run browser tests (shard ${{ matrix.shard }} of 3)
+        run: pnpm --filter @repo/e2e test:e2e -- --shard=${{ matrix.shard }}/3
+
+      - name: Retain the browser test report
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: tests/e2e/playwright-report
+          if-no-files-found: ignore
+
+  # Proves the image builds before a pull request merges. On a push the publish job below builds the same image, so it is not built twice.
   image:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -103,3 +267,15 @@ jobs:
 
       - name: Check the release tooling is in the image and needs no download
         run: docker run --rm --network none the-well:ci pnpm --version
+
+  # Only a push to a deployed branch, and only once the checks above passed: build and publish the image, then deploy it. A failing
+  # build stops the deploy the same way a failing check does.
+  publish:
+    if: github.event_name == 'push'
+    needs:
+      [static, typecheck, coverage-merge, contracts, contracts-harness, e2e]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-image.yml
+    secrets: inherit

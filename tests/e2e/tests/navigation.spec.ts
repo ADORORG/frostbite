@@ -2,10 +2,13 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { walletButton } from "./support/fake-wallet.ts";
+import {
+  accountLink,
+  siteLink,
+  siteNavigation,
+} from "./support/site-navigation.ts";
 import { useE2ESession } from "../src/session.ts";
 
-const bar = (page: Page) =>
-  page.getByRole("navigation", { name: "Primary navigation" });
 const more = (page: Page) => page.getByRole("navigation", { name: "More" });
 
 test("a visitor reaches every public surface by clicking, and is offered nothing private", async ({
@@ -13,7 +16,7 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
 }) => {
   await page.goto("/");
   // The bar is short: the public catalogs. No private areas, no account page. The wallet widget sits beside it.
-  await expect(bar(page).getByRole("link")).toHaveText([
+  await expect((await siteNavigation(page)).getByRole("link")).toHaveText([
     "Collections",
     "Games",
   ]);
@@ -23,14 +26,18 @@ test("a visitor reaches every public surface by clicking, and is offered nothing
   await expect(page.getByRole("link", { name: "Account" })).toHaveCount(0);
 
   const destinations = [
-    [bar, "Collections", /\/collections$/],
-    [bar, "Games", /\/games$/],
-    [more, "Launches", /\/launches$/],
-    [more, "Creators", /\/creators$/],
+    ["site", "Collections", /\/collections$/],
+    ["site", "Games", /\/games$/],
+    ["more", "Launches", /\/launches$/],
+    ["more", "Creators", /\/creators$/],
   ] as const;
   for (const [where, label, destination] of destinations) {
     await page.goto("/");
-    await where(page).getByRole("link", { name: label, exact: true }).click();
+    await (
+      where === "site"
+        ? await siteLink(page, label)
+        : more(page).getByRole("link", { name: label, exact: true })
+    ).click();
     await expect(page).toHaveURL(destination);
     // Collections shows whatever has been approved and Games the registered games; the other catalogs
     // have nothing published yet.
@@ -59,11 +66,9 @@ test("a signed-in person keeps their links on public pages and finds the account
     creatorE2EFixtures.visualUser.sessionToken,
   );
   await page.goto("/collections");
-  await expect(
-    bar(page).getByRole("link", { name: "Studio", exact: true }),
-  ).toBeVisible();
+  await expect(await siteLink(page, "Studio")).toBeVisible();
   await expect(page.getByRole("link", { name: "Admin" })).toHaveCount(0);
-  await bar(page).getByRole("link", { name: "Account", exact: true }).click();
+  await (await accountLink(page)).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(
     page.getByRole("heading", { exact: true, name: "Account" }),
@@ -82,7 +87,7 @@ test("a signed-in creator moves through the studio by its sidebar, with a way ba
     creatorE2EFixtures.visualUser.sessionToken,
   );
   await page.goto("/");
-  await bar(page).getByRole("link", { name: "Studio", exact: true }).click();
+  await (await siteLink(page, "Studio")).click();
   await expect(
     page.getByRole("heading", { name: "Creator studio" }),
   ).toBeVisible();
@@ -116,7 +121,7 @@ test("staff without the reviewer role reach the admin console and see no review 
   if (baseURL === undefined) throw new Error("Expected configured base URL");
   await useE2ESession(context, baseURL, creatorE2EFixtures.staff.sessionToken);
   await page.goto("/");
-  await bar(page).getByRole("link", { name: "Admin", exact: true }).click();
+  await (await siteLink(page, "Admin")).click();
   await expect(
     page.getByRole("heading", { name: "Admin console" }),
   ).toBeVisible();
@@ -143,7 +148,7 @@ test("a reviewer's Admin entry opens a page they may use, and the sidebar lists 
     creatorE2EFixtures.reviewer.sessionToken,
   );
   await page.goto("/account");
-  await bar(page).getByRole("link", { name: "Admin", exact: true }).click();
+  await (await siteLink(page, "Admin")).click();
   // The reviewer has no admin overview, so the entry opens the review queue rather than a refusal.
   await expect(
     page.getByRole("heading", { name: "Collection reviews" }),

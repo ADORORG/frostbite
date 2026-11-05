@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { testWallets } from "../../../packages/auth/test/support/fixtures.ts";
+import { testWallets } from "@ador/auth/test-fixtures";
 import {
   connectWallet,
   installFakeWallet,
@@ -74,7 +74,10 @@ test("shows the connected wallet, reconnects after a reload, and forgets it when
   await page.reload();
   await expect(walletButton(page)).toContainText(wallet.address.slice(0, 6));
   const menu = await openWalletMenu(page);
-  await expect(menu).toContainText(wallet.address);
+  // The widget shows the short form of the address: its start and its end.
+  await expect(menu).toContainText(
+    `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`,
+  );
   await expect(menu).toContainText("Not signed in.");
   await menu.getByRole("button", { name: "Disconnect wallet" }).click();
   await expect(walletButton(page)).toHaveText("Connect wallet");
@@ -83,32 +86,31 @@ test("shows the connected wallet, reconnects after a reload, and forgets it when
   await expect(walletButton(page)).toHaveText("Connect wallet");
 });
 
-test("asks for the balance only while the menu is open, and says honestly that there is no data source", async ({
+test("asks for the balance once the wallet is connected, not again on opening the menu, and says honestly that there is no data source", async ({
   page,
 }) => {
   await installFakeWallet(page, wallet);
-  const balanceRequests: string[] = [];
+  const balanceRequests: URL[] = [];
   page.on("request", (request) => {
-    if (new URL(request.url()).pathname === "/api/v1/wallet/balance")
-      balanceRequests.push(request.url());
+    const url = new URL(request.url());
+    if (url.pathname === "/api/v1/wallet/balance") balanceRequests.push(url);
   });
   await page.goto("/");
   await connectWallet(page, wallet);
-  await page.waitForTimeout(500);
-  expect(balanceRequests).toEqual([]);
+  // One read, with the address and network in the query string.
+  await expect.poll(() => balanceRequests.length).toBe(1);
+  expect(Object.fromEntries(balanceRequests[0]?.searchParams ?? [])).toEqual({
+    address: wallet.address,
+    network: "signet",
+  });
   const menu = await openWalletMenu(page);
   await expect(menu).toContainText(
     "Balance unavailable: no data source is configured.",
   );
   // No figure stands in for the missing balance.
-  await expect(menu.locator(".wallet-menu__balance")).not.toContainText(
-    /BTC|sats/u,
-  );
+  await expect(menu.locator(".wallet-balance")).not.toContainText(/BTC|sats/u);
+  // Opening the menu does not ask again; the refresh button does.
   expect(balanceRequests).toHaveLength(1);
-  expect(JSON.parse(balanceRequests[0] ?? "{}")).toEqual({
-    address: wallet.address,
-    network: "signet",
-  });
   await menu.getByRole("button", { name: "Refresh balance" }).click();
   await expect.poll(() => balanceRequests.length).toBe(2);
 });

@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: new URL("../..", import.meta.url).pathname,
   poweredByHeader: false,
   transpilePackages: [
+    "@repo/configs",
     "@ador/feature-platform-shell",
     "@ador/http",
     "@ador/plugin-kit",

@@ -1,4 +1,4 @@
-import { drawGuide } from "@ador/game-sdk/guide";
+import { createGuideLayer } from "@ador/game-sdk/guide-layer";
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
@@ -43,6 +43,8 @@ const client = createGameClient();
 const status = element("status", "p");
 const note = element("note", "p");
 const screen = element("screen", "canvas");
+// The first-screen card is drawn over the screen at the pixels of the display, so it stays sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const scoreOut = element("score", "strong");
 const coinsOut = element("coins", "strong");
 const livesOut = element("lives", "strong");
@@ -88,7 +90,7 @@ function show(): void {
   stageOut.textContent = String(state?.stage ?? 1);
   if (context === null) return;
   draw(context, state ?? waiting.state());
-  if (session === null) drawGuide(context, screenWidth, screenHeight, guide);
+  guideLayer.show(session === null ? guide : null);
 }
 
 function listEarned(ids: readonly string[]): void {

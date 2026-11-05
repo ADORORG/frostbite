@@ -2,7 +2,7 @@ import { packageVitestConfig } from "@repo/vitest-config";
 
 export default packageVitestConfig({
   coverage: {
-    exclude: ["src/check.ts", "src/check-coverage.ts"],
+    exclude: ["src/check.ts", "src/check-coverage.ts", "src/ci-local.ts"],
     include: ["src/**/*.ts"],
   },
   // The integration suite parses every workspace source under coverage, alongside Turbo workers,

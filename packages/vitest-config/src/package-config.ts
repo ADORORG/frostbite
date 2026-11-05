@@ -13,6 +13,9 @@ const coverageReporters = ["text", "json-summary", "lcov"];
 /** The integration suites of database-backed packages are slower than the five-second default. */
 export const databaseTestTimeoutMs = 15_000;
 
+/** Integration suites whose tests start a container of their own (a database to migrate and seed) need longer still, most of all on a cold CI runner. */
+export const containerTestTimeoutMs = 60_000;
+
 /** jsdom suites render whole React trees; on a busy machine they exceed the five-second default without being wrong. */
 export const domTestTimeoutMs = 15_000;
 
@@ -63,6 +66,11 @@ export function packageVitestConfig(options: PackageVitestOptions) {
   const threshold = options.coverage.threshold ?? defaultCoverageThreshold;
   const environment = options.environment;
   const withEnvironment = environment === undefined ? {} : { environment };
+  // A project does not inherit the top-level `resolve`, so the aliases are given to each project too.
+  const aliases =
+    options.tsconfigPaths === true
+      ? { resolve: { tsconfigPaths: true as const } }
+      : {};
   return defineConfig({
     ...(options.react === true ? { plugins: [react()] } : {}),
     ...(options.tsconfigPaths === true
@@ -86,6 +94,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
       ...(options.fileParallelism === false ? { fileParallelism: false } : {}),
       projects: [
         {
+          ...aliases,
           test: {
             include: [`test/**/*.unit.test.${unit}`],
             name: "unit",
@@ -97,6 +106,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
           ? []
           : [
               {
+                ...aliases,
                 test: {
                   environment: "jsdom" as const,
                   include: ["test/**/*.dom.test.{ts,tsx}"],
@@ -107,6 +117,7 @@ export function packageVitestConfig(options: PackageVitestOptions) {
               },
             ]),
         {
+          ...aliases,
           test: {
             include: [`test/**/*.integration.test.${integration}`],
             name: "integration",

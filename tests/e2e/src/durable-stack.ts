@@ -6,7 +6,7 @@ import {
   createPostgresContainerArguments,
   postgresUrl,
   waitForPostgres,
-} from "../../../packages/database/test/support/postgres-container.ts";
+} from "@ador/database/test-postgres";
 import {
   ensureRunning,
   findContainer,
@@ -22,7 +22,7 @@ export const durableStack = {
     container: "ador-stack-postgres",
     volume: "ador-stack-postgres-data",
   },
-  s3: { container: "ador-stack-minio", volume: "ador-stack-minio-data" },
+  s3: { container: "ador-stack-s3", volume: "ador-stack-s3-data" },
 } as const;
 
 export interface StackSecrets {

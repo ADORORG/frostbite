@@ -27,7 +27,11 @@ export async function loadFonts(page: Page) {
 }
 
 export async function closeMatrix(page: Page, name: string) {
-  // A picture still loading would make the screenshot depend on timing.
+  // A picture still loading would make the screenshot depend on timing. An image the page loads lazily, below the fold, never
+  // starts on a short screen, so it is asked for now.
+  await page.evaluate(() => {
+    for (const image of document.images) image.loading = "eager";
+  });
   await page.waitForFunction(() =>
     [...document.images].every((image) => image.complete),
   );

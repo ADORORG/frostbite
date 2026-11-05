@@ -9,6 +9,7 @@
     "./audio/panel": "./src/audio/panel.ts",
     "./audio/setup": "./src/audio/setup.ts",
     "./audio/panel.css": "./src/audio/panel.css",
+    "./phone.css": "./src/phone.css",
     "./audio/fake": "./src/audio/fake.ts",
     "./audio/effects": "./src/audio/effects.ts",
     "./audio/settings": "./src/audio/settings.ts",
@@ -24,6 +25,7 @@
     "./local-backend": "./src/local-backend.ts",
     "./pause": "./src/pause.ts",
     "./guide": "./src/guide.ts",
+    "./guide-layer": "./src/guide-layer.ts",
     "./pixels": "./src/pixels.ts",
     "./play": "./src/play.ts",
     "./policy": "./src/policy.ts",
@@ -44,7 +46,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
-    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('src/phone.css','dist/phone.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
     "prepack": "pnpm run build:package"
   },
   "dependencies": {
@@ -96,6 +98,7 @@
         "default": "./dist/audio/panel.js"
       },
       "./audio/panel.css": "./dist/audio/panel.css",
+      "./phone.css": "./dist/phone.css",
       "./audio/fake": {
         "types": "./dist/audio/fake.d.ts",
         "default": "./dist/audio/fake.js"
@@ -155,6 +158,10 @@
       "./guide": {
         "types": "./dist/guide.d.ts",
         "default": "./dist/guide.js"
+      },
+      "./guide-layer": {
+        "types": "./dist/guide-layer.d.ts",
+        "default": "./dist/guide-layer.js"
       },
       "./pixels": {
         "types": "./dist/pixels.d.ts",
