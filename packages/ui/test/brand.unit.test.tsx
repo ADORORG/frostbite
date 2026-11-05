@@ -19,6 +19,6 @@ describe("the platform's mark", () => {
     expect(renderToStaticMarkup(<BrandMark />)).toBe(
       renderToStaticMarkup(<BrandMark />),
     );
-    expect(productName).toBe("Frostbit");
+    expect(productName).toBe("Frostbite");
   });
 });

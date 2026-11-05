@@ -21,7 +21,7 @@ import { games } from "@repo/configs/games";
 beforeEach(() => {
   vi.stubEnv("APP_ENV", "test");
   vi.stubEnv("PUBLIC_BASE_URL", "https://play.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbite");
 });
 afterEach(() => vi.unstubAllEnvs());
 

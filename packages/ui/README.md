@@ -1,6 +1,6 @@
 # `@repo/ui`
 
-Shared Frostbit design-system package. It owns semantic visual tokens, accessible primitives,
+Shared Frostbite design-system package. It owns semantic visual tokens, accessible primitives,
 arcade components, and platform patterns derived from the immutable standalone arcade reference.
 
 ## Public API

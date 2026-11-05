@@ -11,13 +11,13 @@ import {
 } from "../src/server/metadata/next-metadata";
 import { readSiteIdentity } from "../src/server/metadata/site";
 
-const site = { name: "Frostbit", origin: "https://play.example.com" };
+const site = { name: "Frostbite", origin: "https://play.example.com" };
 
 describe("the site's identity", () => {
   beforeEach(() => {
     vi.stubEnv("APP_ENV", "production");
     vi.stubEnv("PUBLIC_BASE_URL", "https://play.example.com/some/path?x=1");
-    vi.stubEnv("NEXT_PUBLIC_APP_NAME", " Frostbit ");
+    vi.stubEnv("NEXT_PUBLIC_APP_NAME", " Frostbite ");
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -40,10 +40,10 @@ describe("the site-wide metadata", () => {
 
   it("titles every page with the site's name and has a default title", () => {
     expect(base.title).toEqual({
-      default: "Frostbit | Play, earn, collect on Bitcoin",
-      template: "%s | Frostbit",
+      default: "Frostbite | Play, earn, collect on Bitcoin",
+      template: "%s | Frostbite",
     });
-    expect(base.applicationName).toBe("Frostbit");
+    expect(base.applicationName).toBe("Frostbite");
   });
 
   it("carries a large-image preview with the default picture's size and words", () => {
@@ -57,7 +57,7 @@ describe("the site-wide metadata", () => {
           width: 1200,
         },
       ],
-      siteName: "Frostbit",
+      siteName: "Frostbite",
       type: "website",
     });
   });

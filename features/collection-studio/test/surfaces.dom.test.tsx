@@ -41,7 +41,7 @@ describe("collection pages", () => {
     );
     expect(markup).toContain("<h1>Collections</h1>");
     expect(markup).toContain('<p class="arcade-eyebrow">Studio</p>');
-    expect(markup).toContain("<span>Frostbit</span>");
+    expect(markup).toContain("<span>Frostbite</span>");
     expect(markup).toContain("Skip to main content");
     expect(markup).not.toContain("NO CHAIN ACTION");
     expect(markup).toContain('href="/studio/collections"');
