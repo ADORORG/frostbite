@@ -47,14 +47,10 @@ test("signed out, it is played on its own seed and the milestone is the game's r
   await expectConnectedToPlatform(page);
   const game = page.frameLocator(frameSelector);
   await startRun(game);
-  await expect(game.locator(".if-status")).toContainText(
-    "Sign in to have the platform check a run.",
-  );
+  await expect(game.locator(".if-status")).not.toContainText("platform");
   await winABoard(game);
   await game.getByRole("button", { name: "End run" }).click();
-  await expect(game.locator(".if-note")).toContainText(
-    "was not sent to the platform",
-  );
+  await expect(game.locator(".if-note")).toHaveCount(0);
   // The platform, not the game, shows the milestone, as the game's own report.
   await openDock(page, "Milestones");
   const milestone = page.locator('[data-milestone="first-win"]');
@@ -76,12 +72,10 @@ test("signed in, the platform replays the run and holds the milestone as replay-
   const game = page.frameLocator(frameSelector);
   await startRun(game);
   await winABoard(game);
-  await expect(game.locator(".if-status")).not.toContainText("local seed");
+  await expect(game.locator(".if-status")).not.toContainText("platform");
 
   await game.getByRole("button", { name: "End run" }).click();
-  await expect(game.locator(".if-note")).toHaveText(
-    "The platform checked this run. Earned: first-win.",
-  );
+  await expect(game.locator(".if-note")).toHaveCount(0);
 
   // The page shows the account's record: replay-checked, with what that does and does not show.
   await openDock(page, "Milestones");

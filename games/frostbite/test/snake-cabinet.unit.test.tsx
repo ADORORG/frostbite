@@ -46,9 +46,10 @@ describe("the SAT SNAKE screen", () => {
     expect(container.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it("starts a run on a local seed and says its milestones are the game's own report", async () => {
+  it("starts a run and says how to play, nothing about the platform", async () => {
     await startRun(seed);
-    expect(status()).toContain("This run is on a local seed");
+    expect(status()).toContain("Steer with");
+    expect(status()).not.toMatch(/platform|claim|seed/i);
     expect(stat("Length")).toBe("3");
     expect(stat("Moves")).toBe("0");
     expect(
@@ -106,9 +107,7 @@ describe("the SAT SNAKE screen", () => {
       earned: [],
       ok: true,
     });
-    expect(container.querySelector(".if-note")?.textContent).toContain(
-      "not sent to the platform",
-    );
+    expect(container.querySelector(".if-note")).toBeNull();
   });
 
   it("stops the clock once the run has ended", async () => {

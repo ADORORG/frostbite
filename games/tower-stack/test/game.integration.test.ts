@@ -1,6 +1,7 @@
 import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { byId, closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -20,12 +21,20 @@ describe("Tower Stacker, bundled and run against a simulated platform", () => {
     expect(byId(window, "best")?.textContent).toBe("41");
   });
 
-  it("starts a run on a seed of its own, says the run is its own report, and runs until a drop misses", async () => {
-    const { stored, window } = await play({ best: 0 });
+  it("starts a run, says how to play and nothing about the platform, and runs until a drop misses", async () => {
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
-    expect(byId(window, "note")?.textContent).toContain("local seed");
+    expect(byId(window, "note")?.textContent).toContain("Space drops");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
     expect(byId(window, "drop")?.hasAttribute("disabled")).toBe(false);
     // Dropping on whatever tick the click lands on, the tower narrows until a drop misses it.
     for (
@@ -39,7 +48,12 @@ describe("Tower Stacker, bundled and run against a simulated platform", () => {
     const start = byId(window, "start");
     expect(start?.textContent).toBe("Run again");
     expect(start?.hasAttribute("hidden")).toBe(false);
-    expect(byId(window, "note")?.textContent).toContain("your own claim");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

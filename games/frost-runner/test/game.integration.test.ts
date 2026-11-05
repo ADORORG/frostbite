@@ -2,6 +2,7 @@ import { defaultSound } from "@ador/game-sdk/audio/settings";
 import { describe, expect, it } from "vitest";
 import { afterEach } from "vitest";
 
+import { recordingRuns } from "@ador/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -27,15 +28,21 @@ describe("Frost Runner, bundled and run against a simulated platform", () => {
     expect(window.document.getElementById("best")?.textContent).toBe("321");
   });
 
-  it("starts a run on a seed of its own, says the run is its own report, and runs until the runner is stopped", async () => {
-    const { stored, window } = await play({ best: 0 });
+  it("starts a run, says how to play and nothing about the platform, and runs until the runner is stopped", async () => {
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     await settle();
     window.document
       .getElementById("start")
       ?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
     const note = window.document.getElementById("note")?.textContent ?? "";
-    expect(note).toContain("local seed");
+    expect(note).toContain("Space jumps");
+    expect(note).not.toMatch(/platform|claim|seed/i);
     expect(
       window.document.getElementById("jump")?.hasAttribute("disabled"),
     ).toBe(false);
@@ -44,9 +51,12 @@ describe("Frost Runner, bundled and run against a simulated platform", () => {
     const start = window.document.getElementById("start");
     expect(start?.textContent).toBe("Run again");
     expect(start?.hasAttribute("hidden")).toBe(false);
-    expect(window.document.getElementById("note")?.textContent).toContain(
-      "your own claim",
+    expect(window.document.getElementById("note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
     );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

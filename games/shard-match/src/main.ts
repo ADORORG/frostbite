@@ -1,13 +1,16 @@
 import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient } from "@ador/game-sdk/client";
 import { createPause } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { startNote } from "@ador/game-sdk/run-notes";
+import {
+  connectToPlatform,
+  sendRun,
+  type PlatformPlay,
+} from "@ador/game-sdk/play";
 import { attachTapToStart } from "@ador/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { tempoFor, toastFor } from "./feedback.ts";
-import { followPause, loadTitles, refusalNote, submitRun } from "./submit.ts";
+import { followPause, loadTitles, refusalNote } from "./submit.ts";
 import { boxes, listEarned, setText } from "./dom.ts";
 import { hintFor, watchIdle } from "./hint.ts";
 import { createPlayback } from "./playback.ts";
@@ -149,7 +152,7 @@ async function finish(finished: MatchSession): Promise<void> {
   saveProgress();
   show();
   startButton.textContent = "Play again";
-  await submitRun(play, runId, record, (text) => setText(note, text));
+  await sendRun(play, runId, record);
 }
 
 function swap(cell: number, direction: number): void {
@@ -219,13 +222,7 @@ async function begin(): Promise<void> {
   const started = await play?.runs.start().catch(() => null);
   const ready = started?.status === "started" ? started : null;
   runId = ready?.runId ?? null;
-  setText(
-    note,
-    startNote(
-      started ?? null,
-      "Swap neighbouring shards to line up three or more.",
-    ),
-  );
+  setText(note, "Swap neighbours to line up three.");
   session = createMatchSession({
     onEarned: (id) => {
       sound.sfx("milestone");

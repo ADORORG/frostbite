@@ -48,11 +48,8 @@ export function IceField({
     launcher.current?.focus();
   };
   const start = async () => {
-    // A run on the platform's seed when the platform gives one; otherwise the browser's own, reported as such.
-    const { note, seed } = await platformRun.begin(
-      newSeed,
-      "Pick a tile. A mine ends the board.",
-    );
+    // A run on the platform's seed when the platform gives one; otherwise the browser's own.
+    const { seed } = await platformRun.begin(newSeed);
     setSession(
       createIceFieldSession({
         onEarned: (milestone) => host.milestone(markOf(milestone)),
@@ -62,7 +59,7 @@ export function IceField({
     sound.sfx("start");
     sound.music(true);
     setPhase("playing");
-    setMessage(note);
+    setMessage("Pick a tile. A mine ends the board.");
     // The button that was pressed is gone, and the keys need somewhere to land.
     panel.current?.focus();
   };
@@ -195,11 +192,7 @@ export function IceField({
             </div>
           ) : null}
           {phase === "ended" && record !== null ? (
-            <RecordView
-              onAgain={() => void start()}
-              record={record}
-              submit={platformRun.submitted}
-            />
+            <RecordView onAgain={() => void start()} record={record} />
           ) : null}
           {phase === "playing" ? null : (
             <p aria-live="polite" className="if-status" role="status">

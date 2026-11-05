@@ -1,12 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  followPause,
-  loadTitles,
-  refusalNote,
-  submitRun,
-} from "../src/submit.ts";
+import { followPause, loadTitles, refusalNote } from "../src/submit.ts";
 import { boxes, element, listEarned, setText } from "../src/dom.ts";
 import { hintAfterMs, hintFor, watchIdle } from "../src/hint.ts";
 import { legalMoves } from "../src/rules/moves.ts";
@@ -146,29 +141,5 @@ describe("the page's small helpers", () => {
       },
     } as unknown as Parameters<typeof loadTitles>[0];
     expect(await loadTitles(broken)).toEqual(new Map());
-  });
-
-  it("sends a run's record when a run was issued and the platform answered, and says what became of it", async () => {
-    const said: string[] = [];
-    const record = { claims: [] } as unknown as Parameters<typeof submitRun>[2];
-    await submitRun(null, null, record, (t) => void said.push(t));
-    expect(said).toHaveLength(1);
-    const play = {
-      runs: { submit: vi.fn(async () => ({ status: "accepted" })) },
-    } as unknown as Parameters<typeof submitRun>[0];
-    const sent: string[] = [];
-    await submitRun(play, "run-1", record, (t) => void sent.push(t));
-    expect(sent).toHaveLength(2);
-    expect(sent[0]).not.toBe(sent[1]);
-    const failing = {
-      runs: {
-        submit: async () => {
-          throw new Error("down");
-        },
-      },
-    } as unknown as Parameters<typeof submitRun>[0];
-    const lost: string[] = [];
-    await submitRun(failing, "run-1", record, (t) => void lost.push(t));
-    expect(lost).toHaveLength(2);
   });
 });

@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { bundleGameScript } from "@ador/game-sdk/build";
+import type { HostServices } from "@ador/game-sdk/host";
 import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
 import type { JsonValue } from "@ador/game-sdk/protocol";
 import {
@@ -21,6 +22,7 @@ const milestone = (id: string, title: string) => ({
   title,
 });
 const manifest = {
+  capabilities: ["run:submit"],
   id: "frost-runner",
   milestones: milestoneIds.map((id) => milestone(id, id)),
 };
@@ -36,6 +38,7 @@ export const closeGame = (): void => running?.close();
 export async function play(
   saved?: { best: number; sound?: JsonValue },
   answers: Partial<Backend> = {},
+  services: HostServices = {},
 ) {
   const stored: {
     progress: JsonValue | null;
@@ -85,6 +88,7 @@ export async function play(
       unlockCallsPerMinute: 600,
     },
     script,
+    services,
   });
   return { stored, window: running.window };
 }

@@ -14,8 +14,8 @@ client-only: no network, no server of its own, nothing that touches a chain. The
   name) and the storage keys the game persists.
 - `src/ice-field/`: the **ice-field cabinet**, new compliant code beside the legacy game: a 5x5 field of frost tiles, played
   through the same rules the platform replays, recording its run as it goes. Signed in, it plays on a run the platform issued
-  (`run.start`) and submits the record at "End run" (`run.submit`); otherwise it plays on a local seed and says its milestones
-  are the game's own report.
+  (`run.start`) and submits the record at "End run" (`run.submit`); otherwise it plays on a seed of its own (its milestones are the game's own report, and the cabinet says nothing
+  about it: how a run is checked is not part of playing).
 - `src/snake/`: the **SAT SNAKE cabinet**, the real-time snake game ported to a fixed-step simulation (a timer calls the rules'
   `moveOnce` each tick; only the player's turns and the tick of each are recorded). Same launcher/panel pattern as the ice
   field; its mines are in plain view. The milestone is `snake-ten`.
