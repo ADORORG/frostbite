@@ -17,7 +17,11 @@ export function useTheatre() {
       document.removeEventListener("keydown", leave);
     };
   }, [on]);
-  return { on, toggle: () => setOn((current) => !current) };
+  return {
+    on,
+    set: setOn,
+    toggle: () => setOn((current) => !current),
+  };
 }
 
 export type Theatre = ReturnType<typeof useTheatre>;

@@ -1,15 +1,17 @@
 import { ArcadeActionButton, StatusDot } from "@repo/ui/arcade";
 import type { ReactNode } from "react";
 
+import type { Immersive } from "./use-immersive.ts";
 import type { Theatre } from "./use-theatre.ts";
 
 // The one slim line above the game: the way back, the title and small facts, whether the game is connected to the platform and where
 // the progress is kept (their words are in the title text and hidden on a narrow screen, never dropped), and the two ways to give the
-// game more room. Everything stays on one line so the game keeps the rest of the screen.
+// game more room (on a touch screen, one button that does both). Everything stays on one line so the game keeps the rest of the screen.
 export function GameBar({
   back,
   connected,
   fullscreen,
+  immersive,
   meta,
   saveText,
   theatre,
@@ -22,6 +24,8 @@ export function GameBar({
     readonly refused: boolean;
     readonly supported: boolean;
   };
+  // Set on a touch screen: the one button that gives the game everything, in place of theatre and full screen.
+  readonly immersive?: Immersive;
   readonly meta?: ReactNode;
   // Where the progress is, said only as far as it is true.
   readonly saveText: string;
@@ -56,23 +60,35 @@ export function GameBar({
             ? "Press Esc to leave theatre."
             : "Press Esc to leave full screen."}
         </span>
-        <ArcadeActionButton
-          ariaLabel={theatre.on ? "Leave theatre" : "Theatre"}
-          onClick={theatre.toggle}
-          size="small"
-          tone="pink"
-        >
-          {theatre.on ? "Leave theatre" : "Theatre"}
-        </ArcadeActionButton>
-        {fullscreen.supported ? (
+        {immersive === undefined ? (
+          <>
+            <ArcadeActionButton
+              ariaLabel={theatre.on ? "Leave theatre" : "Theatre"}
+              onClick={theatre.toggle}
+              size="small"
+              tone="pink"
+            >
+              {theatre.on ? "Leave theatre" : "Theatre"}
+            </ArcadeActionButton>
+            {fullscreen.supported ? (
+              <ArcadeActionButton
+                onClick={fullscreen.enter}
+                size="small"
+                tone="cyan"
+              >
+                Full screen
+              </ArcadeActionButton>
+            ) : null}
+          </>
+        ) : (
           <ArcadeActionButton
-            onClick={fullscreen.enter}
+            onClick={immersive.enter}
             size="small"
             tone="cyan"
           >
-            Full screen
+            Play full screen
           </ArcadeActionButton>
-        ) : null}
+        )}
       </span>
     </>
   );
