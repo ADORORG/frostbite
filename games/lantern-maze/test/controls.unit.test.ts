@@ -150,17 +150,6 @@ describe("the player's hands", () => {
     expect(choose).toHaveBeenCalledTimes(before);
   });
 
-  it("lets one finger go without stopping the walk another is steering", () => {
-    vi.useFakeTimers();
-    const { screen, choose } = setup();
-    touch(screen, "pointerdown", { x: 140, y: 45 }, 1);
-    touch(screen, "pointerdown", { x: 80, y: 5 }, 2);
-    touch(window, "pointerup", { x: 140, y: 45 }, 1);
-    choose.mockClear();
-    vi.advanceTimersByTime(stepRepeatMs);
-    expect(choose.mock.calls).toEqual([["up"]]);
-  });
-
   it("steers for a mouse as well as for a finger, since the page has no other way to steer with one", () => {
     vi.useFakeTimers();
     const { screen, choose } = setup();

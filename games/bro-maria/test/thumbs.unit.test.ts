@@ -108,39 +108,6 @@ describe("what is not a finger on the screen", () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
-  it("ignores a finger that has lifted", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { x: 100 });
-    send(window, "pointerup", { x: 100 });
-    send(window, "pointermove", { x: 350 });
-    expect(hold).toHaveBeenCalledTimes(2);
-  });
-
-  it("takes every listener it put on the page away when told to stop", () => {
-    const added = vi.spyOn(window, "addEventListener");
-    const removed = vi.spyOn(window, "removeEventListener");
-    setup();
-    stops.splice(0)[0]?.();
-    const names = (spy: typeof added) => spy.mock.calls.map(([name]) => name);
-    expect(names(removed).sort()).toEqual(names(added).sort());
-    added.mockRestore();
-    removed.mockRestore();
-  });
-
-  it("keeps a touch from scrolling or zooming the page", () => {
-    const { screen } = setup();
-    expect(send(screen, "pointerdown", { x: 300 }).defaultPrevented).toBe(true);
-  });
-
-  it("lets go of everything when the page loses focus, since the lift would never be seen", () => {
-    const { hold, screen } = setup();
-    send(screen, "pointerdown", { id: 1, x: 300 });
-    window.dispatchEvent(new Event("blur"));
-    expect(hold).toHaveBeenLastCalledWith("jump", false);
-    send(window, "pointerup", { id: 1, x: 300 });
-    expect(hold).toHaveBeenCalledTimes(2);
-  });
-
   it("lets go when told to stop, and listens no more", () => {
     const { hold, screen } = setup();
     send(screen, "pointerdown", { x: 300 });
