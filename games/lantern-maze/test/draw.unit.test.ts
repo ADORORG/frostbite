@@ -162,15 +162,13 @@ describe("the writing", () => {
     expect(shown("over", 5)).toBe(false);
   });
 
-  it("covers the cellar with a card before a run and after one, saying how it ended", () => {
+  it("covers the cellar with a card after a run, saying how it ended", () => {
     const text = (s: ReturnType<typeof surface>) =>
       s.written.map(({ text: t }) => t);
     const ready = surface();
     draw(ready.context, startRun(9), view("ready"));
-    expect(text(ready)).toContain("LANTERN MAZE");
-    const running = surface();
-    draw(running.context, startRun(9), view("running"));
-    expect(text(running)).not.toContain("LANTERN MAZE");
+    // The first-screen card is the SDK's, drawn over the screen at the display's pixels; the canvas itself carries none.
+    expect(text(ready)).not.toContain("LANTERN MAZE");
     for (const [cause, said] of [
       ["dark", "THE LANTERN WENT OUT"],
       ["escaped", "YOU ESCAPED THE CELLAR"],

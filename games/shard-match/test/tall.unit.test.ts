@@ -118,16 +118,7 @@ describe("the tall screen", () => {
     expect(lit(news)).not.toContain("FROST 5 LEFT");
   });
 
-  it("has cards of shorter lines that say Start, not Enter", () => {
-    const ready = surface();
-    draw(ready.context, startRun(9), view("ready"));
-    const lines = lit(ready);
-    expect(lines).toContain("PRESS START");
-    expect(lines.join(" ")).not.toContain("ENTER");
-    // Every line fits the narrow screen at the size it is written in.
-    expect(Math.max(...lines.map((text) => text.length))).toBeLessThanOrEqual(
-      23,
-    );
+  it("has a card after a run of shorter lines that says Start, not Enter", () => {
     const over = surface();
     draw(
       over.context,

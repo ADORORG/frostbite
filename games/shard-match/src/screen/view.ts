@@ -17,3 +17,15 @@ export interface View {
   readonly shape: Shape;
   readonly toast: string | null;
 }
+
+// What the screen shows before the first run: nothing picked up, the cursor on the first cell, the wide screen.
+export const firstView: View = {
+  best: 0,
+  cursor: 0,
+  grab: -1,
+  hint: [],
+  newBest: false,
+  phase: "ready",
+  shape: "wide",
+  toast: null,
+};

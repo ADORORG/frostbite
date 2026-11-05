@@ -156,9 +156,9 @@ describe("the writing", () => {
     expect(ofColour(gone.drawn, "#123456")).toHaveLength(0);
   });
 
-  it("covers the board with a card before a run and after one, saying how it ended", () => {
-    expect(texts(draw0(startRun(9), view("ready")))).toContain("SHARD MATCH");
-    expect(texts(draw0(startRun(9), view("running")))).not.toContain(
+  it("covers the board with a card after a run, saying how it ended", () => {
+    // The first-screen card is the SDK's, drawn over the screen at the display's pixels; the canvas itself carries none.
+    expect(texts(draw0(startRun(9), view("ready")))).not.toContain(
       "SHARD MATCH",
     );
     const over = draw0(

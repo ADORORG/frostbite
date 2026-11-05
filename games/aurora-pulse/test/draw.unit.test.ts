@@ -189,9 +189,9 @@ describe("the writing", () => {
     ).not.toContain("Stage 4");
   });
 
-  it("covers the field with a card before a run and after one, saying how it ended", () => {
-    expect(texts(drawn(startRun(9), view("ready")))).toContain("AURORA PULSE");
-    expect(texts(drawn(startRun(9), view("running")))).not.toContain(
+  it("covers the field with a card after a run, saying how it ended", () => {
+    // The first-screen card is the SDK's, drawn over the screen at the display's pixels; the canvas itself carries none.
+    expect(texts(drawn(startRun(9), view("ready")))).not.toContain(
       "AURORA PULSE",
     );
     for (const [cause, said] of [

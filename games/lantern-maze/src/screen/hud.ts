@@ -130,20 +130,6 @@ export function cards(
   state: MazeState,
   view: View,
 ): void {
-  if (view.phase === "ready")
-    card(context, [
-      ["LANTERN MAZE", colour.flameHot, 10],
-      ["FIND THE KEY, REACH THE DOOR", colour.text, 6],
-      ["EVERY STEP BURNS OIL", colour.flask, 6],
-      [
-        byInput(
-          "ARROWS / WASD - ENTER TO LIGHT",
-          "TAP OR HOLD WHERE TO WALK - TAP TO LIGHT",
-        ),
-        colour.cyan,
-        5,
-      ],
-    ]);
   if (view.phase === "over")
     card(context, [
       [

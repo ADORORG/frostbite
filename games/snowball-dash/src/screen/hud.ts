@@ -93,14 +93,7 @@ export function cards(
   state: RunState,
   view: View,
 ): void {
-  if (view.phase === "ready")
-    card(context, [
-      ["SNOWBALL DASH", colour.cyan, 10],
-      ["TAP, HOLD FOR HIGHER", colour.text, 6],
-      ["CLOSE CALLS BUILD YOUR SCORE", colour.snowDark, 6],
-      ["ENTER, SPACE OR TAP TO ROLL", colour.yellow, 6],
-    ]);
-  else if (view.phase === "over")
+  if (view.phase === "over")
     card(context, [
       [
         state.cause === "fell" ? "INTO THE CREVASSE" : "RUN OVER",

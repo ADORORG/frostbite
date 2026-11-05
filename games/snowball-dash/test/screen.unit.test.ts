@@ -166,10 +166,9 @@ describe("what is written over the screen", () => {
     ).not.toContain("5,000 points");
   });
 
-  it("has a card before the first run that says how to play", () => {
+  it("leaves the card before the first run to the SDK, which draws it at the display's pixels", () => {
     const text = said(painted(bare(), { ...running, phase: "ready" }));
-    expect(text).toContain("SNOWBALL DASH");
-    expect(text).toContain("ENTER, SPACE OR TAP TO ROLL");
+    expect(text).not.toContain("SNOWBALL DASH");
   });
 
   it("has a card after a run with the score, the best, and how it ended", () => {

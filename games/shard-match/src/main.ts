@@ -1,5 +1,6 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient } from "@frostbite/game-sdk/client";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 import { createPause } from "@frostbite/game-sdk/pause";
 import {
   connectToPlatform,
@@ -9,6 +10,7 @@ import {
 import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
+import { guide } from "./guide.ts";
 import { tempoFor, toastFor } from "./feedback.ts";
 import { followPause, loadTitles, refusalNote } from "./submit.ts";
 import { boxes, listEarned, setText } from "./dom.ts";
@@ -31,7 +33,7 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
-import type { View } from "./screen/view.ts";
+import { firstView, type View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the network.
@@ -46,6 +48,8 @@ const {
   screen,
 } = page;
 const { start: startButton, status, total: totalOut } = page;
+// The first-screen card is drawn over the screen at the pixels of the display, so it stays sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -58,16 +62,7 @@ let earnedCount = 0;
 let lastInput = Date.now();
 // The idle screen's board.
 let backdrop = startRun(1);
-let view: View = {
-  best: 0,
-  cursor: 0,
-  grab: -1,
-  hint: [],
-  newBest: false,
-  phase: "ready",
-  shape: "wide",
-  toast: null,
-};
+let view: View = firstView;
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 const pause = createPause();
@@ -104,6 +99,7 @@ function show(): void {
       ? 0
       : playing.after.score - playing.before.score - playing.after.lastGain;
   draw(context, shown(), view, playback.scene(), bonus);
+  guideLayer.show(view.phase === "ready" ? guide : null);
 }
 
 // The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).

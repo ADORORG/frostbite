@@ -1,5 +1,6 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
   connectToPlatform,
@@ -10,6 +11,7 @@ import { createRunLoop } from "@frostbite/game-sdk/run-loop";
 import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
+import { guide } from "./guide.ts";
 import { pulseSounds } from "./feedback.ts";
 import {
   freshProgress,
@@ -52,6 +54,8 @@ const totalOut = element("total", "span");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
+// The first-screen card is drawn over the screen at the pixels of the display, so it stays sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -81,7 +85,9 @@ const sound = setUpSound({
 });
 
 function show(): void {
-  if (context !== null) draw(context, session?.state() ?? backdrop, view);
+  if (context === null) return;
+  draw(context, session?.state() ?? backdrop, view);
+  guideLayer.show(view.phase === "ready" ? guide : null);
 }
 
 function addEarned(id: string): void {

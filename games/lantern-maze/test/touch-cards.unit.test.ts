@@ -6,7 +6,8 @@ import { draw } from "../src/screen/draw.ts";
 import type { View } from "../src/screen/view.ts";
 import { surface } from "./support/canvas.ts";
 
-// The cards name what starts a run: Enter for a keyboard, a tap for a finger (a phone has no Enter).
+// The card after a run names what starts the next: Enter for a keyboard, a tap for a finger (a phone has no Enter). The card before the
+// first run is the SDK's (guide.unit.test.ts).
 const view = (phase: View["phase"]): View => ({
   best: 0,
   newBest: false,
@@ -21,17 +22,14 @@ const said = (phase: View["phase"]): string[] => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("the cards of the cellar", () => {
-  it("say Enter to a keyboard, before a run and after one", () => {
+  it("say Enter to a keyboard after a run", () => {
     stubPointer(false);
-    expect(said("ready")).toContain("ARROWS / WASD - ENTER TO LIGHT");
     expect(said("over")).toContain("ENTER FOR ANOTHER CELLAR");
   });
 
-  it("say tap to a finger, before a run and after one, and never Enter", () => {
+  it("say tap to a finger after a run, and never Enter", () => {
     stubPointer(true);
-    expect(said("ready")).toContain("TAP OR HOLD WHERE TO WALK - TAP TO LIGHT");
     expect(said("over")).toContain("TAP FOR ANOTHER CELLAR");
-    expect(said("ready").join(" ")).not.toContain("ENTER");
     expect(said("over").join(" ")).not.toContain("ENTER");
   });
 });

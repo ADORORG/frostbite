@@ -34,28 +34,6 @@ function card(
   });
 }
 
-const ready = (shape: View["shape"]): readonly Line[] =>
-  shape === "tall"
-    ? [
-        ["SHARD MATCH", colour.grab, 9],
-        ["SWAP TWO SHARDS TO", colour.text, 5],
-        ["LINE UP THREE OR MORE", colour.text, 5],
-        ["BEAT EACH LEVEL'S GOAL", colour.cursor, 5],
-        ["IN THE SWAPS GIVEN", colour.cursor, 5],
-        ["BREAK THE FROST", colour.text, 5],
-        ["ON THE ICE LEVELS", colour.text, 5],
-        ["4 MAKE A BOMB, 5 A STAR", colour.grab, 5],
-        ["PRESS START", colour.textDim, 6],
-      ]
-    : [
-        ["SHARD MATCH", colour.grab, 10],
-        ["SWAP TWO SHARDS: LINE UP THREE OR MORE", colour.text, 5],
-        ["REACH EACH LEVEL'S GOAL IN THE SWAPS GIVEN", colour.cursor, 5],
-        ["BREAK ALL THE FROST ON THE ICE LEVELS", colour.text, 5],
-        ["4 MAKE A BOMB, 5 A STAR - CHAINS PAY MORE", colour.grab, 5],
-        [byInput("ENTER TO START", "TAP TO START"), colour.textDim, 5],
-      ];
-
 const over = (state: MatchState, view: View): readonly Line[] => {
   const tall = view.shape === "tall";
   const best: Line = [
@@ -93,6 +71,5 @@ export function cards(
   state: MatchState,
   view: View,
 ): void {
-  if (view.phase === "ready") card(context, view, ready(view.shape));
   if (view.phase === "over") card(context, view, over(state, view));
 }
