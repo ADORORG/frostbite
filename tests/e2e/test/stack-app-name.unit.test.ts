@@ -8,6 +8,10 @@ describe("the name the stack calls the platform", () => {
     expect(appNameFrom("NEXT_PUBLIC_APP_NAME=  Frostbite  ", {})).toBe(
       "Frostbite",
     );
+    // A quoted value keeps its spaces when the file is read, so this is the case that needs the name's own trim.
+    expect(appNameFrom('NEXT_PUBLIC_APP_NAME="  Frostbite  "', {})).toBe(
+      "Frostbite",
+    );
   });
   it("is the shell's when both are set", () => {
     expect(
