@@ -63,8 +63,8 @@ jobs:
         run: pnpm typecheck
 
   # Unit and integration tests run once, under coverage (test:coverage runs both suites), instead of once plain and again for coverage.
-  # Shard Match is held out and run beside this job: its fairness test plays whole games with bots (a minute plain, about four under coverage), which
-  # is still longer than most workspaces together at the same concurrency.
+  # Shard Match is held out and run beside this job: its fairness test plays whole games with bots (about a minute plain; the workspace takes about four
+  # minutes under coverage), too long to share this job's concurrency.
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30

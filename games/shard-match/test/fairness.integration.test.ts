@@ -21,6 +21,7 @@ const seeds = [1, 2, 3, 4, 5, 6].map((seed) => seed * 7_919);
 // and the 500th swap, and the 500th swap is in level 27. The gate plays 600 so that the milestones are not on its edge; the planner costs
 // about 0.12 s a swap (the others are a second or two each), so the whole 1,200-swap run, which reaches level 49, is kept for
 // `SHARD_MATCH_LONG=1` and is not part of the gate.
+const plannerSeed = seeds[0] ?? 1;
 const plannerSwaps = 600;
 const longPlannerSwaps = 1_200;
 const long = process.env["SHARD_MATCH_LONG"] === "1";
@@ -29,11 +30,11 @@ let randoms: Result[] = [];
 let greedy: Result[] = [];
 let planner: Result;
 
-// Played once, before the first test, and not when the file is loaded, so a run that selects other tests does not pay for them.
+// Played once, before the first test, and not when the file is loaded, so a run that selects none of this file's tests (a name filter) does not pay for them.
 beforeAll(() => {
   randoms = seeds.map((seed) => play(seed, randomPlayer));
   greedy = seeds.slice(0, 4).map((seed) => play(seed, greedyPlayer));
-  planner = play(seeds[0] ?? 1, plannerPlayer, plannerSwaps);
+  planner = play(plannerSeed, plannerPlayer, plannerSwaps);
 }, 300_000);
 
 describe("the game, played whole", () => {
@@ -67,7 +68,7 @@ describe("the game, played whole", () => {
   it.runIf(long)(
     "still does not run out in twice the swaps",
     () => {
-      const whole = play(seeds[0] ?? 1, plannerPlayer, longPlannerSwaps);
+      const whole = play(plannerSeed, plannerPlayer, longPlannerSwaps);
       expect(whole.state.ended).toBe(false);
       expect(whole.state.level).toBeGreaterThan(40);
     },
@@ -101,7 +102,7 @@ describe("the game, played whole", () => {
     for (const [result, seed] of [
       [randoms[0], seeds[0]],
       [greedy[1], seeds[1]],
-      [planner, seeds[0]],
+      [planner, plannerSeed],
     ] as const) {
       if (result === undefined || seed === undefined)
         throw new Error("no result");
