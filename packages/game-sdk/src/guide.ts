@@ -1,4 +1,5 @@
 import { block } from "./pixels.ts";
+import { byInput, isTouchScreen } from "./touch.ts";
 
 // The card every game shows on its first screen, before the first run: what the game is called, what the player does (a line for each key or
 // touch), and how to begin. It is drawn over whatever the screen shows, in the platform's colours and a small monospace type scaled to the
@@ -9,6 +10,8 @@ export interface Guide {
   // The line that says how to begin: "ENTER TO START".
   readonly start: string;
   readonly title: string;
+  // What a touch screen is told instead of `lines`, for a game whose hands are different there (the keys name keys no phone has).
+  readonly touchLines?: readonly string[];
 }
 
 const font = '"Courier New", ui-monospace, monospace';
@@ -51,6 +54,16 @@ function write(
   context.fillText(text, x, y);
 }
 
+// How a touch screen is told to begin, in place of what a keyboard is told ("ENTER TO START"): there is no key to press.
+export const touchStartLine = "TAP TO START";
+export const startLineFor = (keyboardLine: string): string =>
+  byInput(keyboardLine, touchStartLine);
+
+export const linesFor = (guide: Guide): readonly string[] =>
+  isTouchScreen() && guide.touchLines !== undefined
+    ? guide.touchLines
+    : guide.lines;
+
 // Draws the card over a screen `width` by `height` (in the units the screen is drawn in): the screen dimmed, the title, the lines, the start.
 export function drawGuide(
   context: CanvasRenderingContext2D,
@@ -61,7 +74,8 @@ export function drawGuide(
   context.globalAlpha = 0.84;
   block(context, back, 0, 0, width, height);
   context.globalAlpha = 1;
-  const rows = guide.lines.length + 2;
+  const lines = linesFor(guide);
+  const rows = lines.length + 2;
   const step = (height * 0.86) / (rows + 1);
   const wanted = step * 0.62;
   const draw = (
@@ -74,10 +88,8 @@ export function drawGuide(
     write(context, text, width / 2, height * 0.07 + step * row, fill, size);
   };
   draw(guide.title, 0, colours.title, 1.5);
-  guide.lines.forEach((line, index) =>
-    draw(line, index + 1.3, colours.line, 1),
-  );
-  draw(guide.start, guide.lines.length + 1.9, colours.start, 1);
+  lines.forEach((line, index) => draw(line, index + 1.3, colours.line, 1));
+  draw(startLineFor(guide.start), lines.length + 1.9, colours.start, 1);
 }
 
 // The same card for a game whose screen is made of page elements and not a canvas: fills `into` (a box laid over the screen) with the title, the
@@ -85,13 +97,13 @@ export function drawGuide(
 export function fillGuide(into: HTMLElement, guide: Guide): void {
   const title = into.ownerDocument.createElement("h2");
   title.textContent = guide.title;
-  const lines = guide.lines.map((line) => {
+  const lines = linesFor(guide).map((line) => {
     const item = into.ownerDocument.createElement("p");
     item.textContent = line;
     return item;
   });
   const start = into.ownerDocument.createElement("p");
   start.className = "guide-start";
-  start.textContent = guide.start;
+  start.textContent = startLineFor(guide.start);
   into.replaceChildren(title, ...lines, start);
 }

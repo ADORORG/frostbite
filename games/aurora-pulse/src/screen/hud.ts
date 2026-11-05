@@ -13,6 +13,7 @@ import {
 } from "./layout.ts";
 import { colour, laneColours } from "./palette.ts";
 import type { View } from "./view.ts";
+import { byInput } from "@ador/game-sdk/touch";
 
 // What is written over the screen: the stage, the score, the combo and its multiplier, the energy, the verdict on the last tap, the keys, a line
 // of news, and the cards before and after a run. All of it is on the canvas, so showing more of it never moves the page.
@@ -146,7 +147,7 @@ export function cards(
       ["AURORA PULSE", colour.perfect, 10],
       ["TAP EACH NOTE AS IT MEETS THE LINE", colour.text, 5],
       ["KEYS D F J K, ARROWS, OR TAP A QUARTER", colour.great, 5],
-      ["ENTER TO START", colour.textDim, 5],
+      [byInput("ENTER TO START", "TAP TO START"), colour.textDim, 5],
     ]);
   if (view.phase === "over")
     card(context, [
@@ -165,6 +166,6 @@ export function cards(
         colour.perfect,
         6,
       ],
-      ["ENTER TO PLAY AGAIN", colour.great, 5],
+      [byInput("ENTER TO PLAY AGAIN", "TAP TO PLAY AGAIN"), colour.great, 5],
     ]);
 }

@@ -2,26 +2,28 @@
 
 Import from `<sdk>/<module>`. Each module below is a separate export.
 
-| Module                          | Use it for                                                                                                       |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `client`                        | `createGameClient()` and `GameHostError`: every call to the platform.                                            |
-| `play`                          | `connectToPlatform(client)`: reports a milestone only if the manifest declares it; starts and submits runs.      |
-| `seeded`                        | The seeded generator every rule must use instead of `Math.random`.                                               |
-| `run-inputs`                    | Checking a run input's fields and tick, and refusing with a reason (`withFields`, `tickNamed`, `refuse`).        |
-| `run-record`                    | `GameVerifier`, `createRunRecorder`: the rules as a state machine and the record of a run.                       |
-| `run-notes`                     | What to tell the player about starting and submitting a run (`startNote`, `submitNote`).                         |
-| `fixed-step`                    | Whole ticks from elapsed time at the game's own rate.                                                            |
-| `run-loop`                      | `createRunLoop`: one animation frame at a time, whole ticks, pause and hidden-tab handling, one start at a time. |
-| `pause`                         | `createPause`, `pauseCopy`: the one place the screen, sound and clock agree the game is paused.                  |
-| `controls`                      | `attachKeys`, `standardKeys`: Enter starts, P pauses; ignores repeats, Ctrl/Alt/Meta and typing in fields.       |
-| `audio/setup`                   | `setUpSound`: sound with the player's panel, silenced while paused or hidden.                                    |
-| `audio/effects`, `audio/tracks` | Music and effects as data (`tone`, `commonEffects`, `Track`).                                                    |
-| `audio/settings`                | `defaultSound`, `parseSound`, `SoundSettings`: keep beside the game's progress.                                  |
-| `audio/panel.css`               | Import in the game's stylesheet.                                                                                 |
-| `audio/fake`                    | `installFakeAudio(window)`: tests without a speaker.                                                             |
-| `pixels`                        | `block`, `sprite`, `wrap` for pixel-art on a canvas.                                                             |
-| `cabinets`                      | `combineCabinets`: several replayable cabinets in one verifier.                                                  |
-| `build`                         | Bundles the game and emits `verifier.js` and `verifier.json`.                                                    |
+| Module                          | Use it for                                                                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `client`                        | `createGameClient()` and `GameHostError`: every call to the platform.                                                              |
+| `play`                          | `connectToPlatform(client)`: reports a milestone only if the manifest declares it; starts and submits runs.                        |
+| `seeded`                        | The seeded generator every rule must use instead of `Math.random`.                                                                 |
+| `run-inputs`                    | Checking a run input's fields and tick, and refusing with a reason (`withFields`, `tickNamed`, `refuse`).                          |
+| `run-record`                    | `GameVerifier`, `createRunRecorder`: the rules as a state machine and the record of a run.                                         |
+| `run-notes`                     | What to tell the player about starting and submitting a run (`startNote`, `submitNote`).                                           |
+| `fixed-step`                    | Whole ticks from elapsed time at the game's own rate.                                                                              |
+| `run-loop`                      | `createRunLoop`: one animation frame at a time, whole ticks, pause and hidden-tab handling, one start at a time.                   |
+| `pause`                         | `createPause`, `pauseCopy`: the one place the screen, sound and clock agree the game is paused.                                    |
+| `controls`                      | `attachKeys`, `standardKeys`: Enter starts, P pauses; ignores repeats, Ctrl/Alt/Meta and typing in fields.                         |
+| `touch-start`                   | `attachTapToStart(screen, startButton)`: on a touch screen a tap on a waiting game starts a run (Start run is out of sight there). |
+| `touch`                         | `isTouchScreen()`, `byInput(keyLine, touchLine)`: say "TAP" to a finger and "ENTER" to a keyboard.                                 |
+| `audio/setup`                   | `setUpSound`: sound with the player's panel, silenced while paused or hidden.                                                      |
+| `audio/effects`, `audio/tracks` | Music and effects as data (`tone`, `commonEffects`, `Track`).                                                                      |
+| `audio/settings`                | `defaultSound`, `parseSound`, `SoundSettings`: keep beside the game's progress.                                                    |
+| `audio/panel.css`               | Import in the game's stylesheet.                                                                                                   |
+| `audio/fake`                    | `installFakeAudio(window)`: tests without a speaker.                                                                               |
+| `pixels`                        | `block`, `sprite`, `wrap` for pixel-art on a canvas.                                                                               |
+| `cabinets`                      | `combineCabinets`: several replayable cabinets in one verifier.                                                                    |
+| `build`                         | Bundles the game and emits `verifier.js` and `verifier.json`.                                                                      |
 
 ## Talking to the platform
 

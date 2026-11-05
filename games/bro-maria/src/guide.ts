@@ -9,4 +9,9 @@ export const guide: Guide = {
   ],
   start: "ENTER TO START",
   title: "BRO MARIA",
+  touchLines: [
+    "DRAG ON THE LEFT: RUN   HOLD THE RIGHT: JUMP",
+    "LAND ON SLIMES, BUMP CRATES, GRAB COINS",
+    "CLEAR SIX STAGES, EACH HARDER - LANTERNS KEEP YOUR PLACE",
+  ],
 };

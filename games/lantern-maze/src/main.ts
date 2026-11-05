@@ -2,6 +2,7 @@ import { setUpSound } from "@ador/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@ador/game-sdk/client";
 import { createPause, pauseCopy } from "@ador/game-sdk/pause";
 import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import { attachTapToStart } from "@ador/game-sdk/touch-start";
 import {
   startNote,
   submitNote,
@@ -251,6 +252,7 @@ for (const direction of directions)
     .querySelector(`[data-direction="${direction}"]`)
     ?.addEventListener("click", () => choose(direction));
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 backdrop = startRun(localSeed());

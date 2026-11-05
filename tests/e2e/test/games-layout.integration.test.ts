@@ -7,6 +7,7 @@ import { chromium, devices, type Browser } from "@playwright/test";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { serveGame } from "../src/game-hosting.ts";
+import { controlProblems, measureControls } from "../src/game-controls.ts";
 import {
   layoutDifferences,
   parseSavedLayouts,
@@ -37,6 +38,11 @@ const notPhoneChecked = new Set(["frostbite"]);
 const phones = [
   { height: 520, name: "portrait", width: 390 },
   { height: 198, name: "landscape", width: 750 },
+] as const;
+// The same phone with the platform's bar out of the way (the whole window, which is what playing full screen gives), as it is held.
+const phonesFull = [
+  { height: 760, name: "portrait full screen", width: 390 },
+  { height: 360, name: "landscape full screen", width: 750 },
 ] as const;
 const desktops = [
   { height: 800, name: "1280x800", width: 1280 },
@@ -100,6 +106,35 @@ describe("on a phone", () => {
           problems.push(
             `${name}'s screen is ${String(canvas?.w)}x${String(canvas?.h)} in ${String(size.width)}x${String(size.height)}`,
           );
+      }
+      expect(problems).toEqual([]);
+    }, 180_000);
+  }
+});
+
+describe("on a touch screen the page is played with the screen, and what is left to press is a few small icons", () => {
+  for (const size of [...phones, ...phonesFull]) {
+    it(`${size.name}: no more than three icons, each a thumb wide, none on another or on the readouts`, async () => {
+      const problems: string[] = [];
+      for (const name of names.filter((n) => !notPhoneChecked.has(n))) {
+        const hosted = await serveGame(join(outRoot, name));
+        const context = await browser.newContext({
+          ...devices["iPhone 13"],
+          viewport: size,
+        });
+        try {
+          const page = await context.newPage();
+          await page.goto(hosted.url, { waitUntil: "load" });
+          await page.waitForTimeout(800);
+          for (const problem of controlProblems(
+            await measureControls(page),
+            size,
+          ))
+            problems.push(`${name}: ${problem}`);
+        } finally {
+          await context.close();
+          await hosted.close();
+        }
       }
       expect(problems).toEqual([]);
     }, 180_000);

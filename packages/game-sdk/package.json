@@ -37,7 +37,9 @@
     "./run-record": "./src/run-record.ts",
     "./seeded": "./src/seeded.ts",
     "./storage-shim": "./src/storage-shim.ts",
-    "./synced-backend": "./src/synced-backend.ts"
+    "./synced-backend": "./src/synced-backend.ts",
+    "./touch": "./src/touch.ts",
+    "./touch-start": "./src/touch-start.ts"
   },
   "scripts": {
     "env:check": "node --experimental-strip-types ../config/src/env/check-files.ts",
@@ -46,7 +48,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
-    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('src/phone.css','dist/phone.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('src/phone.css','dist/phone.css'); require('node:fs').cpSync('src/phone-frame.css','dist/phone-frame.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
     "prepack": "pnpm run build:package"
   },
   "dependencies": {
@@ -210,6 +212,14 @@
       "./synced-backend": {
         "types": "./dist/synced-backend.d.ts",
         "default": "./dist/synced-backend.js"
+      },
+      "./touch": {
+        "types": "./dist/touch.d.ts",
+        "default": "./dist/touch.js"
+      },
+      "./touch-start": {
+        "types": "./dist/touch-start.d.ts",
+        "default": "./dist/touch-start.js"
       }
     }
   },

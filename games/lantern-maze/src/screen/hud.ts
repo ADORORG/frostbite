@@ -5,6 +5,7 @@ import type { MazeState } from "../rules/state.ts";
 import { colour } from "./palette.ts";
 import { barHeight, screenHeight, screenWidth } from "./layout.ts";
 import type { View } from "./view.ts";
+import { byInput } from "@ador/game-sdk/touch";
 
 // What is written over the screen: the floor, the oil, the key, the score, a line of news, and the cards before and after a run. All of it is
 // on the canvas, so showing more of it never moves the page.
@@ -134,7 +135,14 @@ export function cards(
       ["LANTERN MAZE", colour.flameHot, 10],
       ["FIND THE KEY, REACH THE DOOR", colour.text, 6],
       ["EVERY STEP BURNS OIL", colour.flask, 6],
-      ["ARROWS / WASD / SWIPE - ENTER TO LIGHT", colour.cyan, 5],
+      [
+        byInput(
+          "ARROWS / WASD / SWIPE - ENTER TO LIGHT",
+          "SWIPE TO STEER - TAP TO LIGHT",
+        ),
+        colour.cyan,
+        5,
+      ],
     ]);
   if (view.phase === "over")
     card(context, [
@@ -153,6 +161,10 @@ export function cards(
         colour.flameHot,
         6,
       ],
-      ["ENTER FOR ANOTHER CELLAR", colour.cyan, 5],
+      [
+        byInput("ENTER FOR ANOTHER CELLAR", "TAP FOR ANOTHER CELLAR"),
+        colour.cyan,
+        5,
+      ],
     ]);
 }
