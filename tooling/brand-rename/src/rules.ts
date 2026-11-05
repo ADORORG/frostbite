@@ -24,8 +24,8 @@ export function buildRules(brand: NewBrand): readonly Rule[] {
       `(?<![${beforeWord}])${oldBrand.scope}(?![${beforeWord}-])`,
       brand.scope,
     ),
-    // `ador-game`, `ador-stack-postgres`, `ador-session`, `__Host-ador-session`, `ador-drafts`.
-    rule("hyphenated names", `(?<![${beforeWord}])${word}-`, `${brand.slug}-`),
+    // `ador-game`, `ador-stack-postgres`, `ador-session`, `__Host-ador-session`, `ador-drafts`; not `@ador-labs`, which is another scope.
+    rule("hyphenated names", `(?<![${beforeWord}@])${word}-`, `${brand.slug}-`),
     // `ador:game:<id>:progress`, `ador:balance`.
     rule(
       "storage keys",

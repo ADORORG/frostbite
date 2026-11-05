@@ -8,7 +8,7 @@ import {
 import { act, useState } from "react";
 import { describe, expect, it } from "vitest";
 
-import { SceneBackdrop, SceneOverlay } from "../src/react/index.ts";
+import { SceneBackdrop, SceneOverlay, SceneStage } from "../src/react/index.ts";
 import { blocks } from "../src/library/blocks.ts";
 import { installBrowser } from "./support/browser.ts";
 import { canvases, frameAt as frameAtOf, stage } from "./support/stage.tsx";
@@ -25,7 +25,6 @@ describe("a scene shown on its own", () => {
     browser.surfaceOf(canvases(container)[0] ?? null)?.drawn;
 
   it("is drawn by the stage it is given to, and nothing is drawn before there is one", async () => {
-    const { SceneStage } = await import("../src/react/index.ts");
     const empty = await mount(stage(<SceneStage scene={null} />));
     expect(canvases(empty)).toHaveLength(0);
     expect(

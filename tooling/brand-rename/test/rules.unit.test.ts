@@ -23,6 +23,11 @@ describe("the rewrite rules", () => {
       "publish under `@frostbite`.",
     ],
     ["a hyphenated name", "ador-stack-postgres", "frostbite-stack-postgres"],
+    [
+      "a hyphenated name that begins a longer word",
+      "someone's ador-able",
+      "someone's frostbite-able",
+    ],
     ["a protocol channel", 'channel: "ador-game"', 'channel: "frostbite-game"'],
     [
       "a cookie with a prefix",
@@ -90,13 +95,14 @@ describe("the rewrite rules", () => {
     "an adorable thing",
     "adorn the page",
     "Adorn",
-    "someone's ador-able",
     "a/path/ador/segment",
     "foo-ador",
+    "@ador-labs/x",
+    "images/ador.png",
+    "pkg.ador.table",
+    "foo-ador.bar",
   ])("leaves %j alone", (text) => {
-    const expected =
-      text === "someone's ador-able" ? "someone's frostbite-able" : text;
-    expect(rewrite(text)).toBe(expected);
+    expect(rewrite(text)).toBe(text);
   });
 
   it("is safe to run twice: the second run changes nothing", () => {
@@ -134,6 +140,8 @@ describe("finding what a rename missed", () => {
     ["an identifier", "const adorReplay = 1"],
     ["a name in a path", "a/path/ador/segment"],
     ["a name after an underscore", "ADOR_OTHER_CONSTANT"],
+    ["a different scope that starts with it", "import '@ador-labs/x'"],
+    ["a file name", "images/ador.png"],
     ["a constant that is not versioned", "ADOR_CLAIM_ACTION"],
   ])("reports %s", (_what, text) => {
     expect(findLeftovers(text)).toHaveLength(1);

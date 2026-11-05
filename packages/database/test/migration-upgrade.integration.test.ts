@@ -1,6 +1,4 @@
-import { mkdtemp, readdir, rm, symlink } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { readdir } from "node:fs/promises";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -13,6 +11,7 @@ import {
   applyMigrations,
   migrationsDirectory,
 } from "../src/migrations/apply.ts";
+import { folderUpTo, removeFolders } from "./support/migration-folders.ts";
 import {
   createScratchDatabase,
   dropScratchDatabase,
@@ -26,18 +25,6 @@ scratch.pathname = `/${databaseName}`;
 const pool = createDatabasePool(environment, scratch.toString());
 const staging: string[] = [];
 
-// A database as an earlier release left it: only the migrations up to and including `lastApplied`.
-async function folderUpTo(lastApplied: string): Promise<string> {
-  const folder = await mkdtemp(join(tmpdir(), "migrations-upto-"));
-  staging.push(folder);
-  for (const name of (await readdir(migrationsDirectory)).sort()) {
-    if (name <= lastApplied) {
-      await symlink(join(migrationsDirectory, name), join(folder, name), "dir");
-    }
-  }
-  return folder;
-}
-
 beforeAll(async () => {
   await createScratchDatabase(admin, databaseName);
 });
@@ -46,9 +33,7 @@ afterAll(async () => {
   await pool.end();
   await dropScratchDatabase(admin, databaseName);
   await admin.end();
-  await Promise.all(
-    staging.map((folder) => rm(folder, { force: true, recursive: true })),
-  );
+  await removeFolders(staging);
 });
 
 describe("upgrading a database made by an earlier release", () => {
@@ -58,7 +43,7 @@ describe("upgrading a database made by an earlier release", () => {
     const database = createDatabaseClient(pool);
     await applyMigrations(
       database,
-      await folderUpTo("20261004173305_massive_living_mummy"),
+      await folderUpTo("20261004173305_massive_living_mummy", staging),
     );
     const before = await pool.query<{ enumlabel: string }>(
       `select e.enumlabel from pg_enum e join pg_type t on t.oid = e.enumtypid where t.typname = 'upload_intent_state'`,
