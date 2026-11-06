@@ -68,6 +68,10 @@ main {
   justify-content: flex-end;
   gap: 0.5rem;
 }
+/* "Start run" becomes "New run" when a run starts: the button keeps its width, so the controls beside it do not move. */
+.foot .actions #start {
+  min-inline-size: 8rem;
+}
 h1,
 h2,
 p {
