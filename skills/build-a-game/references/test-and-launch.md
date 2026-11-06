@@ -46,8 +46,9 @@ getContext()" when a test draws on a canvas; it is harmless.
   tapping `#screen` after `restartDelayMs` (from `<sdk>/touch-start`), watch only the controls that have a box (`boundingBox() !== null`; Playwright
   calls a `display: contents` element visible), and see a run end from `#pause` going disabled. Show
   each test can fail: break the line it guards and watch it go red.
-- From `apps/web`: `npx vitest run --project unit test/games`. It runs three files: `games-config.unit.test.ts` (the ordered list of
-  game ids: add yours), `games-verifiers.unit.test.ts` (the pinned digest) and `games-conformance.unit.test.ts`.
+- From `apps/web`: `npx vitest run --project unit test/games`. It runs three files: `games-config.unit.test.ts` (each game is listed once and
+  passes the manifest schema; nothing to add for a new game), `games-verifiers.unit.test.ts` (the pinned digest) and
+  `games-conformance.unit.test.ts`.
 - The conformance test (`apps/web/test/games-conformance.unit.test.ts`) runs over every registered embedded game: the page must be one
   the frame can serve, the script must bundle, the game must tell the platform it is ready, nothing may be refused or thrown, and the
   cover files must exist. It fails if a folder under `games/` is not registered.

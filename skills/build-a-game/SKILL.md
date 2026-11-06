@@ -41,9 +41,9 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
 5. **Add the screen, sound, keys, pause and a steady layout** with the SDK's pieces, never your own copies. See
    `references/game-pattern.md` and `references/sdk-cheatsheet.md`. Build for a phone from the first screen, not at the end: see
    "Phones and notes" below.
-6. **Write the manifest** and the milestones. A new game is registered in three places: its manifest `configs/games/<id>.ts`, the
-   list in `configs/games.ts` (both done by `game:new`), and the ordered list of ids in `apps/web/test/games-config.unit.test.ts`
-   (which `game:new` does not touch: add the id yourself). See `references/milestones-and-verification.md`.
+6. **Write the manifest** and the milestones. A new game is registered in two places, both written by `game:new`: its manifest
+   `configs/games/<id>.ts` and the list in `configs/games.ts`. No test needs its id added; the conformance test fails if a folder
+   under `games/` is not registered. See `references/milestones-and-verification.md`.
 7. **Test, run, check.** See `references/test-and-launch.md`. Do not call the game finished until every command listed there has
    run and you have reported what each printed.
 8. **Hand over.** Summarise what was built, what was run and its output, what was not verified (how it looks and sounds, touch on a

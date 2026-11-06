@@ -1,7 +1,5 @@
 import {
-  cp,
   mkdir,
-  mkdtemp,
   readdir,
   readFile,
   rm,
@@ -17,6 +15,10 @@ import { checkGameConformance } from "@frostbite/test-kit/game-conformance";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  makeScaffoldWorkspace,
+  type ScaffoldWorkspace,
+} from "./support/scaffold-workspace.ts";
+import {
   exportNameOf,
   ScaffoldError,
   scaffoldGame,
@@ -25,36 +27,19 @@ import {
 
 const run = promisify(execFile);
 const vitest = join(import.meta.dirname, "../node_modules/.bin/vitest");
-const repository = join(import.meta.dirname, "../../..");
-const skipped = new Set(["node_modules", "coverage", ".turbo"]);
 let workspace = "";
-const paths = () => ({
-  gamesDirectory: join(workspace, "games"),
-  manifestDirectory: join(workspace, "configs/games"),
-  registryFile: join(workspace, "configs/games.ts"),
-  templateDirectory: join(workspace, "template/game"),
-  templateManifestFile: join(workspace, "template/manifest.ts"),
-});
+let made: ScaffoldWorkspace | undefined;
+const paths = () => {
+  if (made === undefined) throw new Error("No workspace yet");
+  return made.paths;
+};
 
-// A copy of the parts of the repository a new game touches, inside this package so the game's imports resolve.
 beforeEach(async () => {
-  workspace = await mkdtemp(join(import.meta.dirname, "..", ".tmp-"));
-  await cp(
-    join(repository, "tooling/game-tools/template"),
-    join(workspace, "template"),
-    {
-      filter: (source) => !skipped.has(source.split("/").pop() ?? ""),
-      recursive: true,
-    },
-  );
+  made = await makeScaffoldWorkspace();
+  workspace = made.root;
+  // A build leaves a coverage folder in the template; copying must leave it behind.
   await mkdir(join(workspace, "template/game/coverage"));
   await writeFile(join(workspace, "template/game/coverage/x.json"), "{}");
-  await mkdir(join(workspace, "configs/games"), { recursive: true });
-  for (const file of ["games.ts", "chains.ts", "beta-chains.ts"])
-    await cp(
-      join(repository, "configs", file),
-      join(workspace, "configs", file),
-    );
 });
 afterEach(() => rm(workspace, { force: true, recursive: true }));
 
