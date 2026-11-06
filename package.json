@@ -55,6 +55,7 @@
     "test:visual": "pnpm build && pnpm --filter @repo/e2e test:visual",
     "test:visual:update": "pnpm build && pnpm --filter @repo/e2e test:visual:update",
     "ci:local": "pnpm --filter @repo/repository-policy ci:local --",
+    "hooks:install": "git config core.hooksPath .githooks",
     "repository:check": "pnpm --filter @repo/repository-policy check",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
     "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",

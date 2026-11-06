@@ -42,6 +42,18 @@ and sharded jobs once per shard. Default jobs: `static`, `typecheck`, `tests`, `
 `--with-deps` is dropped: install those yourself. It cannot reproduce the runner's fonts or a different operating system, so a pixel-exact
 expectation can still pass here and fail there: guards compare with a tolerance for that reason.
 
+### What a green local run does not cover
+
+`pnpm ci:local` does not run `contracts` (needs Rust), `image` (a Docker build, pull requests only) or `publish` (a push to `main`/`dev` after everything else
+passed): those run only on GitHub. It also cannot reproduce the runner's fonts or operating system. A green local run is therefore not the whole of Verify;
+read the jobs it names when it finishes.
+
+### Before a push
+
+`pnpm hooks:install` (once per clone) points git at `.githooks/`. Its `pre-push` runs `pnpm ci:local --job static --job typecheck`, the fast jobs, and prints
+that `tests`, `game-simulations`, `coverage-merge` and `e2e` were not run: run them with `pnpm ci:local` before a push that changes behaviour, a game's
+layout or its touch controls. `git push --no-verify` skips the hook for one push.
+
 ## Skills stay true
 
 `src/skill-policy.ts` checks every `skills/<name>/` folder: SKILL.md exists, names itself the folder's name, has a description of up to
