@@ -191,3 +191,40 @@
     touch-action: manipulation;
   }
 }
+
+/* The few action buttons a game draws over its screen (`touch-buttons.ts`): a cluster in the bottom right corner, clear of the safe area, one
+   thumb's width each. Only the buttons take touches; a finger anywhere else is a finger on the screen. Not shown to a mouse, which has the keys. */
+:root body main .touch-buttons {
+  display: none;
+}
+@media (pointer: coarse) {
+  :root body main > .touch-buttons {
+    grid-area: 1 / 1;
+    z-index: 2;
+    align-self: end;
+    justify-self: end;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    max-inline-size: 11rem;
+    margin-block-end: max(0.75rem, env(safe-area-inset-bottom));
+    margin-inline-end: max(0.75rem, env(safe-area-inset-right));
+    pointer-events: none;
+  }
+  :root body main > .touch-buttons button {
+    box-sizing: border-box;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    min-inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+    padding: 0;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 55%);
+    box-shadow: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    pointer-events: auto;
+    touch-action: none;
+  }
+}

@@ -40,6 +40,7 @@
     "./synced-backend": "./src/synced-backend.ts",
     "./touch": "./src/touch.ts",
     "./touch-start": "./src/touch-start.ts",
+    "./touch-buttons": "./src/touch-buttons.ts",
     "./touch-zones": "./src/touch-zones.ts"
   },
   "scripts": {
@@ -217,6 +218,10 @@
       "./touch": {
         "types": "./dist/touch.d.ts",
         "default": "./dist/touch.js"
+      },
+      "./touch-buttons": {
+        "types": "./dist/touch-buttons.d.ts",
+        "default": "./dist/touch-buttons.js"
       },
       "./touch-zones": {
         "types": "./dist/touch-zones.d.ts",
