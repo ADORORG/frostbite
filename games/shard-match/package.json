@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:coverage": "vitest run --config vitest.config.ts --coverage --exclude test/fairness.integration.test.ts",
+    "test:simulation": "vitest run --config vitest.config.ts test/fairness.integration.test.ts"
   },
   "dependencies": {
     "@frostbite/game-sdk": "workspace:*"
