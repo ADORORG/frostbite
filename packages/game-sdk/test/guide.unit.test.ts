@@ -162,6 +162,24 @@ describe("the line that says how to begin", () => {
     );
   });
 
+  it("is \"TAP TO START\" where the game's touch line is blank, on the canvas card, the page's card and by itself", () => {
+    touch(true);
+    for (const blank of ["", "   "]) {
+      const card = { ...guide, touchStart: blank };
+      expect(startLineFor("ENTER TO START", blank)).toBe(touchStartLine);
+      const r = recorder();
+      drawGuide(r.context, 320, 180, card);
+      expect(r.texts.map(({ text }) => text)).toContain(touchStartLine);
+      const box = document.createElement("div");
+      fillGuide(box, card);
+      expect(box.querySelector(".guide-start")?.textContent).toBe(
+        touchStartLine,
+      );
+    }
+    touch(false);
+    expect(startLineFor("ENTER TO START", "")).toBe("ENTER TO START");
+  });
+
   it("is the one the canvas card writes", () => {
     touch(true);
     const r = recorder();
