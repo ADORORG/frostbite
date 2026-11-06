@@ -173,6 +173,9 @@ describe("making a game", () => {
     expect(readme).toContain("# Brand New");
     expect(readme).toContain("configs/games/new-game.ts");
     expect(readme).toContain("pnpm --filter @game/new-game test:unit");
+    // The repository's policy asks of a workspace's README: at least a dozen lines, and an Ownership section.
+    expect(readme.split("\n").length).toBeGreaterThanOrEqual(12);
+    expect(readme).toContain("## Ownership");
   });
 
   it("writes the manifest with a comment of its own, not the template's", async () => {

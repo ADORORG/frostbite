@@ -45,12 +45,12 @@ async function step(number: number): Promise<string> {
   return text.slice(start, end);
 }
 
-const pathsIn = (text: string) =>
-  [
-    ...text.matchAll(
-      /`((?:apps|configs|games|packages|tests|tooling)\/[^`\s]+)`/gu,
-    ),
-  ].map(([, path]) => (path ?? "").replace("<id>", id));
+const repositoryPaths =
+  /`((?:apps|configs|games|packages|tests|tooling)\/[^`\s]+)`/gu;
+const pathsIn = (text: string, pattern: RegExp = repositoryPaths) =>
+  [...text.matchAll(pattern)].map(([, path]) =>
+    (path ?? "").replace("<id>", id),
+  );
 
 describe("the build-a-game skill and a freshly scaffolded game", () => {
   it("registers a game in exactly the places the skill names", async () => {
@@ -70,15 +70,22 @@ describe("the build-a-game skill and a freshly scaffolded game", () => {
     expect(changed.sort()).toEqual(pathsIn(await step(6)).sort());
   });
 
-  it("leaves the starter files the skill tells the builder to replace", async () => {
+  it("leaves the files the skill says a new game has, and a verifier whose digest is already pinned", async () => {
     if (workspace === undefined) throw new Error("No workspace");
     const { root, paths } = workspace;
     await scaffoldGame({ id, paths });
     const folder = join(root, "games", id);
     const made = (await files(folder)).map((file) => relative(folder, file));
-    expect(await step(3)).toContain("src/game.ts");
-    expect(made).toEqual(
-      expect.arrayContaining(["src/game.ts", "test/game.unit.test.ts"]),
+    const named = pathsIn(await step(3), /`((?:src|test)\/[^`\s]+)`/gu);
+    expect(named.length).toBeGreaterThan(3);
+    for (const path of named)
+      expect(made.some((file) => file.startsWith(path))).toBe(true);
+    expect(made).toContain("src/replay.ts");
+    const manifest = await readFile(
+      join(root, `configs/games/${id}.ts`),
+      "utf8",
     );
+    expect(manifest).not.toContain("0".repeat(64));
+    expect(manifest).toMatch(/sha256:\s*"[0-9a-f]{64}"/u);
   });
 });

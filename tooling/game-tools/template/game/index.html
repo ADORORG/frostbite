@@ -8,13 +8,36 @@
   </head>
   <body>
     <main>
-      <h1>Starter Game</h1>
-      <p id="status">Connecting to the platform…</p>
-      <p>Score: <strong id="score">0</strong></p>
-      <button id="tap" type="button" disabled>Tap</button>
-      <button id="probe" type="button">Run safety probe</button>
-      <ul id="unlocked" aria-label="Milestones you have unlocked"></ul>
-      <pre id="probe-result" aria-live="polite"></pre>
+      <div class="bar">
+        <header>
+          <h1>Starter Game</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Caught <strong id="score">0</strong></span>
+          <span>Best <strong id="best">0</strong></span>
+        </p>
+      </div>
+      <canvas
+        id="screen"
+        width="160"
+        height="90"
+        role="img"
+        aria-label="The game screen: a marker sweeping along a lane with a bright zone to catch it in"
+      ></canvas>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+          <button id="catch" type="button" disabled>Catch</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
     </main>
     <script src="main.js"></script>
   </body>

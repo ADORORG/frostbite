@@ -10,6 +10,7 @@ import { execFile } from "node:child_process";
 import { join } from "node:path";
 import { promisify, stripVTControlCharacters } from "node:util";
 
+import { bundleVerifier } from "@frostbite/game-sdk/build";
 import { gameManifestSchema } from "@frostbite/shared/games";
 import { checkGameConformance } from "@frostbite/test-kit/game-conformance";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -98,6 +99,20 @@ describe("making a new game from the template", () => {
     const text = await read("configs/games/river-run.ts");
     expect(text).not.toContain("starter");
     expect(text).toContain("started from the template");
+  });
+
+  it("pins the digest of the verifier the new game builds, so the platform's verifier check passes with no edit", async () => {
+    await scaffoldGame({ id: "river-run", paths: paths(), title: "River Run" });
+    const built = await bundleVerifier(join(workspace, "games/river-run"));
+    const module = (await import(
+      join(workspace, "configs/games/river-run.ts")
+    )) as { riverRunGame: { verification?: { replay: unknown } } };
+    expect(built).not.toBeNull();
+    expect(module.riverRunGame.verification?.replay).toEqual({
+      id: "river-run",
+      sha256: built?.sha256,
+      version: 1,
+    });
   });
 
   it("registers the game once, above the markers, and keeps the markers for the next one", async () => {
