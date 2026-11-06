@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { AxeBuilder } from "@axe-core/playwright";
 import { siteNavigation } from "./support/site-navigation.ts";
+import { fixtureGame } from "./support/fixture-game.ts";
 
 test("shows only honest foundation-stage launchpad controls", async ({
   page,
@@ -38,7 +39,7 @@ test("serves the arcade design stylesheet in the production build", async ({
   expect(stylesheetStatuses).not.toContain(404);
 });
 
-test("navigates to the games catalog, which lists FROST·BITE as playable on the platform", async ({
+test("navigates to the games catalog, which lists the fixture game as playable on the platform", async ({
   page,
 }) => {
   await page.goto("/");
@@ -47,7 +48,7 @@ test("navigates to the games catalog, which lists FROST·BITE as playable on the
   await expect(page).toHaveURL(/\/games$/);
   await expect(page.getByRole("heading", { name: "Games" })).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "View FROST·BITE" }),
+    page.getByRole("link", { name: `View ${fixtureGame.title}` }),
   ).toContainText("Playable");
 });
 
@@ -129,9 +130,9 @@ test("serves every public catalog and validates detail identifiers", async ({
   ).toBeVisible();
   await page.goto("/collections/Not-A-Collection");
   await expect(page.getByText("Invalid identifier")).toBeVisible();
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expect(
-    page.getByRole("heading", { level: 2, name: "FROST·BITE" }).first(),
+    page.getByRole("heading", { level: 2, name: fixtureGame.title }).first(),
   ).toBeVisible();
   await page.goto("/games/not-registered");
   await expect(page.getByText("Record not published")).toBeVisible();

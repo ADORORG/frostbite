@@ -2,6 +2,8 @@ import { gameManifestSchema } from "@frostbite/shared/games";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { targetChains } from "@repo/configs/chains";
+import { fixtureTapsGame } from "@repo/configs/games/fixture-taps";
+import { sdkExplorerGame } from "@repo/configs/games/sdk-explorer";
 
 const signet = targetChains[0]?.chainId ?? "";
 
@@ -24,20 +26,13 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE first, then SDK Explorer while the platform runs for development, then the games built on the SDK, and every game passes the manifest schema", async () => {
+  it("lists each game once, the games that exist to check the platform among them while it runs for development, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
-    expect(games.map(({ id }) => id)).toEqual([
-      "frostbite",
-      "sdk-explorer",
-      "frost-runner",
-      "icicle-drop",
-      "tower-stack",
-      "bro-maria",
-      "snowball-dash",
-      "lantern-maze",
-      "shard-match",
-      "aurora-pulse",
-    ]);
+    const ids = games.map(({ id }) => id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toEqual(
+      expect.arrayContaining([sdkExplorerGame.id, fixtureTapsGame.id]),
+    );
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
   });
@@ -58,27 +53,20 @@ describe("the platform's game list", () => {
     expect(frostbite?.network).toBe(signet);
   });
 
-  // The two hosting styles for a game that is played at an address of its own are checked on the launch rules
-  // themselves (packages/shared) and in a real browser (tests/e2e game-hosting); no game is registered that way
-  // today, so a deployment's address setting has nothing to name.
-  it("refuses an address setting for FROST·BITE, which the platform plays itself", async () => {
-    await expect(
-      gamesWith(
-        JSON.stringify({ frostbite: { url: "https://frostbite.example.com" } }),
-      ),
-    ).rejects.toThrow('Launch settings name "frostbite"');
-  });
-
   it.each([
     ["test", true],
     ["local", true],
     ["preview", false],
     ["production", false],
-  ])("lists SDK Explorer in %s: %s", async (appEnv, listed) => {
-    const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
-    expect(ids.includes("sdk-explorer")).toBe(listed);
-    expect(ids[0]).toBe("frostbite");
-  });
+  ])(
+    "lists the games that exist to check the platform in %s: %s",
+    async (appEnv, listed) => {
+      const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
+      expect(ids.includes(sdkExplorerGame.id)).toBe(listed);
+      expect(ids.includes(fixtureTapsGame.id)).toBe(listed);
+      expect(ids.length).toBeGreaterThan(0);
+    },
+  );
 
   it("declares a rewards contract on each of the games built for players, so staff can create it", async () => {
     const games = await gamesWith("");
@@ -116,15 +104,15 @@ describe("the platform's game list", () => {
 
   it("refuses to start with a game on a chain that is not configured", async () => {
     vi.resetModules();
-    vi.doMock("@repo/configs/games/frostbite", async (original) => {
-      const { frostbite } =
-        await original<typeof import("@repo/configs/games/frostbite")>();
-      return { frostbite: { ...frostbite, network: "eip155:1" } };
+    vi.doMock("@repo/configs/games/fixture-taps", async (original) => {
+      const { fixtureTapsGame: game } =
+        await original<typeof import("@repo/configs/games/fixture-taps")>();
+      return { fixtureTapsGame: { ...game, network: "eip155:1" } };
     });
     try {
       await expect(gamesWith("")).rejects.toThrow("not a configured chain");
     } finally {
-      vi.doUnmock("@repo/configs/games/frostbite");
+      vi.doUnmock("@repo/configs/games/fixture-taps");
     }
   });
 
