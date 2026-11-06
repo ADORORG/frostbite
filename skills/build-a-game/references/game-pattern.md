@@ -51,7 +51,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
   that canvas up and blurs the writing, on a phone worst of all. Give the game a `guide.ts` (a `Guide`: `title`, `lines`, `start`, and
   `touchLines` where a phone is told something else), lay it over the screen with `createGuideLayer(screen)` from
   `<sdk>/guide-layer`, and `show(guide)` while the game is waiting to begin and `show(null)` once a run starts. The card after a run is a
-  `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight`) the same layer shows: `show(resultOf(state, view))`, where
+  `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) the same layer shows: `show(resultOf(state, view))`, where
   the game's `resultOf` returns null unless the run is over.
 - **Plays without the platform**: a failed `ready()` only changes the status line, a failed `run.start()` says nothing, and the game
   still starts on a seed of its own (its milestones are then self-reported).

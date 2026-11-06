@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   drawCard,
+  bestLine,
   drawResult,
+  resultWeight,
   fittedSize,
   glyphWidth,
   widestShare,
@@ -76,6 +78,23 @@ describe("the card after a run", () => {
     const { fills, texts } = shown(256, 144, { rows: [] });
     expect(fills).toHaveLength(1);
     expect(texts).toEqual([]);
+  });
+});
+
+describe("what a card says of the best", () => {
+  it("is the best so far, or that this run made a new one", () => {
+    expect(bestLine(900, false)).toBe("BEST 900");
+    expect(bestLine(900, true)).toBe("NEW BEST!");
+  });
+});
+
+describe("the weights of a card's rows", () => {
+  it("make the heading largest and the line that says how to go again smallest, in that order", () => {
+    const { detail, heading, line, prompt } = resultWeight;
+    expect([heading, detail, line, prompt]).toEqual(
+      [...[heading, detail, line, prompt]].sort((a, b) => b - a),
+    );
+    expect(new Set([heading, detail, line, prompt]).size).toBe(4);
   });
 });
 

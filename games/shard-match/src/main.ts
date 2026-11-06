@@ -10,7 +10,6 @@ import {
 import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
-import { guide } from "./guide.ts";
 import { tempoFor, toastFor } from "./feedback.ts";
 import { followPause, loadTitles, refusalNote } from "./submit.ts";
 import { boxes, listEarned, setText } from "./dom.ts";
@@ -33,7 +32,7 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
-import { resultOf } from "./screen/result.ts";
+import { cardOf } from "./screen/result.ts";
 import { firstView, type View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
@@ -49,7 +48,7 @@ const {
   screen,
 } = page;
 const { start: startButton, status, total: totalOut } = page;
-// The first-screen card is drawn over the screen at the pixels of the display, so it stays sharp when the small screen is scaled up.
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
 const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
@@ -99,8 +98,9 @@ function show(): void {
     playing === null
       ? 0
       : playing.after.score - playing.before.score - playing.after.lastGain;
-  draw(context, shown(), view, playback.scene(), bonus);
-  guideLayer.show(view.phase === "ready" ? guide : resultOf(shown(), view));
+  const state = shown();
+  draw(context, state, view, playback.scene(), bonus);
+  guideLayer.show(cardOf(state, view));
 }
 
 // The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).

@@ -11,7 +11,6 @@ import { createRunLoop } from "@frostbite/game-sdk/run-loop";
 import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
-import { guide } from "./guide.ts";
 import { tempoAt, worldSounds } from "./feedback.ts";
 import { multiplierOf } from "./screen/hud.ts";
 import {
@@ -27,7 +26,7 @@ import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
-import { resultOf } from "./screen/result.ts";
+import { cardOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
@@ -59,7 +58,7 @@ const totalOut = element("total", "span");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
-// The first-screen card is drawn over the screen at the pixels of the display, so it stays sharp when the small screen is scaled up.
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
 const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
@@ -97,7 +96,7 @@ function show(): void {
   if (context === null) return;
   const state = session?.state() ?? backdrop;
   draw(context, state, view);
-  guideLayer.show(view.phase === "ready" ? guide : resultOf(state, view));
+  guideLayer.show(cardOf(state, view));
 }
 
 function addEarned(id: string): void {

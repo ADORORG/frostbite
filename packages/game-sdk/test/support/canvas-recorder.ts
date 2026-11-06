@@ -45,6 +45,7 @@ export function recorder() {
     },
     textAlign: "",
     textBaseline: "",
+    // A test double: the few members the cards use, of the many the real interface has.
   } as unknown as CanvasRenderingContext2D;
   return { context, fills, texts };
 }

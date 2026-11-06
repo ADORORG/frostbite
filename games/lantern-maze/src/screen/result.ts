@@ -1,7 +1,13 @@
-import type { ResultCard } from "@frostbite/game-sdk/guide";
+import {
+  bestLine,
+  type Card,
+  resultWeight,
+  type ResultCard,
+} from "@frostbite/game-sdk/guide";
 import { byInput } from "@frostbite/game-sdk/touch";
 
 import type { MazeState } from "../rules/state.ts";
+import { guide } from "../guide.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -20,23 +26,27 @@ export const resultOf = (state: MazeState, view: View): ResultCard | null =>
           {
             colour: colour.danger,
             text: state.cause === null ? "RUN OVER" : reasons[state.cause],
-            weight: 1.5,
+            weight: resultWeight.heading,
           },
           {
             colour: colour.text,
             text: `FLOORS ${String(state.floorsCleared)}   SCORE ${String(state.score)}`,
-            weight: 1.2,
+            weight: resultWeight.detail,
           },
           {
             colour: colour.flameHot,
-            text: view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-            weight: 1,
+            text: bestLine(view.best, view.newBest),
+            weight: resultWeight.line,
           },
           {
             colour: colour.cyan,
             text: byInput("ENTER FOR ANOTHER CELLAR", "TAP FOR ANOTHER CELLAR"),
-            weight: 0.9,
+            weight: resultWeight.prompt,
           },
         ],
       }
     : null;
+
+// What is over the screen: the first-screen card while the game waits to begin, the card after a run once it is over, and nothing while a run goes.
+export const cardOf = (state: MazeState, view: View): Card | null =>
+  view.phase === "ready" ? guide : resultOf(state, view);

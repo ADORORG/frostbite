@@ -1,7 +1,14 @@
-import type { ResultCard, ResultRow } from "@frostbite/game-sdk/guide";
+import {
+  bestLine,
+  type Card,
+  resultWeight,
+  type ResultCard,
+  type ResultRow,
+} from "@frostbite/game-sdk/guide";
 import { byInput } from "@frostbite/game-sdk/touch";
 
 import type { MatchState } from "../rules/state.ts";
+import { guide } from "../guide.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -12,13 +19,13 @@ export const resultOf = (state: MatchState, view: View): ResultCard | null => {
   if (view.phase !== "over") return null;
   const best: ResultRow = {
     colour: colour.grab,
-    text: view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-    weight: 1,
+    text: bestLine(view.best, view.newBest),
+    weight: resultWeight.line,
   };
   const heading: ResultRow = {
     colour: colour.danger,
     text: state.cause === "spent" ? "WHAT A RUN!" : "OUT OF SWAPS",
-    weight: 1.5,
+    weight: resultWeight.heading,
   };
   const levels = `LEVELS ${String(state.levelsCleared)}`;
   const score = `SCORE ${String(state.score)}`;
@@ -26,26 +33,34 @@ export const resultOf = (state: MatchState, view: View): ResultCard | null => {
     ? {
         rows: [
           heading,
-          { colour: colour.text, text: levels, weight: 1.1 },
-          { colour: colour.text, text: score, weight: 1.1 },
+          { colour: colour.text, text: levels, weight: resultWeight.detail },
+          { colour: colour.text, text: score, weight: resultWeight.detail },
           best,
           {
             colour: colour.cursor,
             text: "PRESS START TO PLAY AGAIN",
-            weight: 0.8,
+            weight: resultWeight.prompt,
           },
         ],
       }
     : {
         rows: [
           heading,
-          { colour: colour.text, text: `${levels}   ${score}`, weight: 1.2 },
+          {
+            colour: colour.text,
+            text: `${levels}   ${score}`,
+            weight: resultWeight.detail,
+          },
           best,
           {
             colour: colour.cursor,
             text: byInput("ENTER TO PLAY AGAIN", "TAP TO PLAY AGAIN"),
-            weight: 0.9,
+            weight: resultWeight.prompt,
           },
         ],
       };
 };
+
+// What is over the screen: the first-screen card while the game waits to begin, the card after a run once it is over, and nothing while a run goes.
+export const cardOf = (state: MatchState, view: View): Card | null =>
+  view.phase === "ready" ? guide : resultOf(state, view);

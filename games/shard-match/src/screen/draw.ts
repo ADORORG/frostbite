@@ -31,7 +31,7 @@ const resting = (state: MatchState): readonly Piece[] =>
   }));
 
 // Draws the screen: the back, the board (a faint chequer under the shards), the shards where they are, the confetti, the hint, the cursor, the
-// writing, the praise and the cards, in that order. `state` is what the writing says, `scene` what a swap's playback shows (the pieces
+// writing and the praise, in that order. `state` is what the writing says, `scene` what a swap's playback shows (the pieces
 // moving), or null at rest. It draws and decides nothing, and it makes nothing the page has to lay out again.
 export function draw(
   context: CanvasRenderingContext2D,

@@ -6,8 +6,8 @@ import { colour } from "./palette.ts";
 import { screenWidth } from "./layout.ts";
 import type { View } from "./view.ts";
 
-// What is written over the screen: the score and the multiplier, the best, how far through the level the snowball is, a line of news, and
-// and the writing that helps. All of it is on the canvas, so showing more of it never moves the page.
+// What is written over the screen: the score and the multiplier, the best, how far through the level the snowball is, and a line of
+// news. All of it is on the canvas, so showing more of it never moves the page.
 const font = '"Courier New", ui-monospace, monospace';
 
 function write(

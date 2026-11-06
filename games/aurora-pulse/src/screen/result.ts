@@ -1,7 +1,13 @@
-import type { ResultCard } from "@frostbite/game-sdk/guide";
+import {
+  bestLine,
+  type Card,
+  resultWeight,
+  type ResultCard,
+} from "@frostbite/game-sdk/guide";
 import { byInput } from "@frostbite/game-sdk/touch";
 
 import { stageAt, type PulseState } from "../rules/state.ts";
+import { guide } from "../guide.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -17,23 +23,27 @@ export const resultOf = (state: PulseState, view: View): ResultCard | null =>
               state.cause === "finished"
                 ? "TRACK COMPLETE"
                 : "THE LIGHT WENT OUT",
-            weight: 1.5,
+            weight: resultWeight.heading,
           },
           {
             colour: colour.text,
             text: `STAGE ${String(stageAt(state.tick))}   SCORE ${String(state.score)}`,
-            weight: 1.2,
+            weight: resultWeight.detail,
           },
           {
             colour: colour.perfect,
-            text: view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-            weight: 1,
+            text: bestLine(view.best, view.newBest),
+            weight: resultWeight.line,
           },
           {
             colour: colour.great,
             text: byInput("ENTER TO PLAY AGAIN", "TAP TO PLAY AGAIN"),
-            weight: 0.9,
+            weight: resultWeight.prompt,
           },
         ],
       }
     : null;
+
+// What is over the screen: the first-screen card while the game waits to begin, the card after a run once it is over, and nothing while a run goes.
+export const cardOf = (state: PulseState, view: View): Card | null =>
+  view.phase === "ready" ? guide : resultOf(state, view);

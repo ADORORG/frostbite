@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { startRun } from "../src/rules/state.ts";
 import { colour } from "../src/screen/palette.ts";
-import { resultOf } from "../src/screen/result.ts";
+import { guide } from "../src/guide.ts";
+import { cardOf, resultOf } from "../src/screen/result.ts";
 import type { View } from "../src/screen/view.ts";
 
 // The card after a run is the SDK's, drawn over the screen at the display's pixels; the game says what is on it.
@@ -48,5 +49,17 @@ describe("the card after a run", () => {
     expect(said("hit", { newBest: true })).toContain("NEW BEST!");
     expect(said("hit", { newBest: true })).not.toContain("BEST 100");
     expect(said("hit")).not.toContain("NEW BEST!");
+  });
+});
+
+describe("what is over the screen", () => {
+  it("is the first-screen card before a run, the card after a run once it is over, and nothing while a run goes", () => {
+    const state = startRun(9);
+    expect(cardOf(state, view({ phase: "ready" }))).toBe(guide);
+    expect(cardOf(state, view({ phase: "over" }))).toEqual(
+      resultOf(state, view({ phase: "over" })),
+    );
+    expect(cardOf(state, view({ phase: "over" }))).not.toBeNull();
+    expect(cardOf(state, view({ phase: "running" }))).toBeNull();
   });
 });
