@@ -2,9 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
 import { closeMatrix, skipToMain } from "./support/quality.ts";
+import { fixtureGame } from "./support/fixture-game.ts";
 
 // Layout, keyboard, reduced-motion, accessibility and visual coverage of the public games pages on every
-// viewport project. The platform lists FROST·BITE, which it plays itself in the isolated frame, so the pages
+// viewport project. The platform lists the fixture game, which it plays itself in the isolated frame, so the pages
 // are checked with a game that can be played (the picture of the page leaves the frame's inside out: the
 // game's own animation is not the platform's to baseline).
 
@@ -19,28 +20,30 @@ test("the games list closes the experience-quality matrix", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "Games" }),
   ).toBeVisible();
-  const card = page.getByRole("link", { name: "View FROST·BITE" });
+  const card = page.getByRole("link", { name: `View ${fixtureGame.title}` });
   await expect(card).toBeVisible();
   await expect(card).toContainText("Playable");
   await skipToMain(page);
-  await page.getByRole("link", { name: "View FROST·BITE" }).focus();
+  await page.getByRole("link", { name: `View ${fixtureGame.title}` }).focus();
   await expect(
-    page.getByRole("link", { name: "View FROST·BITE" }),
+    page.getByRole("link", { name: `View ${fixtureGame.title}` }),
   ).toBeFocused();
   await closeMatrix(page, "games-list.png");
 });
 
 test("a game's page closes the experience-quality matrix", async ({ page }) => {
   await page.goto("/games");
-  await page.getByRole("link", { name: "View FROST·BITE" }).click();
-  await expect(page).toHaveURL(/\/games\/frostbite$/u);
+  await page.getByRole("link", { name: `View ${fixtureGame.title}` }).click();
+  await expect(page).toHaveURL(new RegExp(`${fixtureGame.href}$`, "u"));
   await expect(
-    page.getByRole("heading", { level: 2, name: "FROST·BITE" }).first(),
+    page.getByRole("heading", { level: 2, name: fixtureGame.title }).first(),
   ).toBeVisible();
   await expect(page.locator('[data-testid="game-frame"]')).toBeAttached();
   // It is played here, not at another address, and nothing is declared that the platform cannot honour.
   await expect(page.getByRole("link", { name: /^Play/u })).toHaveCount(0);
-  await expect(page.getByText("Submit a finished run")).toBeAttached();
+  await expect(
+    page.getByText("This game does not ask the platform for anything."),
+  ).toBeAttached();
   // The digest changes whenever the manifest does, which is its job; the baseline is of the layout.
   await page
     .getByText(/^Declarations digest:/u)
@@ -48,7 +51,7 @@ test("a game's page closes the experience-quality matrix", async ({ page }) => {
       (node) => (node.textContent = "Declarations digest: 0000000000000000"),
     );
   // The baseline is the platform's layout around the game; the game inside the frame animates and is checked on
-  // its own (frostbite.spec.ts), so the frame is left blank here.
+  // its own (each game checks its own page), so the frame is left blank here.
   await page.addStyleTag({
     content: '[data-testid="game-frame"]{visibility:hidden}',
   });

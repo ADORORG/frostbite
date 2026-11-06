@@ -30,8 +30,10 @@ const fixture = resolve(
   "../fixtures/games-desktop-layout.json",
 );
 const update = process.env.UPDATE_GAME_LAYOUT === "1";
-// Not games played on a screen of their own: a developer tool, and the original cabinets, which draw into a page of their own at run time.
-const skipped = new Set(["sdk-explorer"]);
+// Not games played on a screen of their own: a developer tool, the original cabinets, which draw into a page of their own at run time, and the
+// fixture game, a plain starter page that exists so that tests have "a game" (it is not made to fit a phone, and a change to make it so would
+// change every test that uses it).
+const skipped = new Set(["sdk-explorer", "fixture-taps"]);
 const notPhoneChecked = new Set(["frostbite"]);
 
 // The frame the platform gives a game on an iPhone 13 held upright and on its side (measured in the platform's own page).

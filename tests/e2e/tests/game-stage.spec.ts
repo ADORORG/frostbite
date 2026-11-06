@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { openDock } from "./support/dock.ts";
 import { expectConnectedToPlatform } from "./support/platform-connection.ts";
+import { fixtureGame } from "./support/fixture-game.ts";
 
 // The game page built as a game screen: the game on nearly the whole screen under a slim bar that holds its
 // title, a dock of sections at the foot that opens over the game, a notice when a milestone is reported, and an
@@ -29,7 +30,7 @@ const box = async (page: Page, selector: string) => {
 test("the page is the game on nearly the whole screen, with its title in the bar and a dock at the foot", async ({
   page,
 }) => {
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
   const bar = await box(page, ".arcade-stage__bar");
   const stage = await box(page, frameSelector);
@@ -37,8 +38,12 @@ test("the page is the game on nearly the whole screen, with its title in the bar
   const viewport = page.viewportSize();
   if (viewport === null) throw new Error("No viewport");
   // The title and the small facts are in the bar over the game, not a block of their own.
-  await expect(page.locator(".arcade-stage__bar h2")).toHaveText("FROST·BITE");
-  await expect(page.locator(".arcade-stage__facts")).toContainText("v0.4.0");
+  await expect(page.locator(".arcade-stage__bar h2")).toHaveText(
+    fixtureGame.title,
+  );
+  await expect(page.locator(".arcade-stage__facts")).toContainText(
+    `v${fixtureGame.version}`,
+  );
   await expect(page.locator(".arcade-stage-head")).toHaveCount(0);
   expect(bar.y + bar.height).toBeLessThanOrEqual(stage.y + 2);
   // Where the page is taller than the screen the dock is pulled up over the game's foot to stay in view; where
@@ -57,7 +62,7 @@ test("the page is the game on nearly the whole screen, with its title in the bar
 test("the dock is closed until asked, opens one section over the game without moving it, and goes back", async ({
   page,
 }) => {
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
   const before = await placeOnPage(page, frameSelector);
   await expect(page.getByRole("region", { name: "About" })).toBeHidden();
@@ -74,7 +79,7 @@ test("the dock is closed until asked, opens one section over the game without mo
   await page.getByRole("button", { name: "What it asks for" }).click();
   await expect(
     page.getByRole("region", { name: "What it asks for" }),
-  ).toContainText("Submit a finished run");
+  ).toContainText("This game does not ask the platform for anything.");
   await expect(about).toBeHidden();
   await page.getByRole("button", { name: "Hide" }).click();
   await expect(page.locator(".arcade-dock__panel:not([hidden])")).toHaveCount(
@@ -85,7 +90,7 @@ test("the dock is closed until asked, opens one section over the game without mo
 test("Escape closes the dock and keeps the focus on its button", async ({
   page,
 }) => {
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
   await openDock(page, "About");
   await page.keyboard.press("Escape");
@@ -97,7 +102,7 @@ test("Escape closes the dock and keeps the focus on its button", async ({
 
 test("clicking into the game closes the dock", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "One check is enough.");
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
   await openDock(page, "Milestones");
   await page.locator(frameSelector).click({ position: { x: 40, y: 40 } });
@@ -113,7 +118,7 @@ test.describe("a short screen", () => {
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "One check is enough.");
-    await page.goto("/games/frostbite");
+    await page.goto(fixtureGame.href);
     await expectConnectedToPlatform(page);
     const stage = await box(page, ".arcade-stage");
     expect(stage.y + stage.height).toBeLessThanOrEqual(560);
@@ -123,7 +128,7 @@ test.describe("a short screen", () => {
 });
 
 test("has a way back to the list in the bar", async ({ page }) => {
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await page
     .locator(".arcade-stage__bar")
     .getByRole("link", { name: "All games" })
@@ -138,7 +143,7 @@ test("the bar sits directly under the site header on a large screen, with Full s
     testInfo.project.name !== "desktop" && testInfo.project.name !== "wide",
     "Large screens only.",
   );
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
   const bar = await box(page, ".arcade-stage__bar");
   const header = await box(page, ".app-header");
@@ -153,7 +158,7 @@ test("the bar does not stick on a small screen, where the header is tall", async
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "Small screens only.");
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expect(page.locator(".arcade-stage__bar")).toHaveCSS(
     "position",
     "static",
@@ -163,35 +168,28 @@ test("the bar does not stick on a small screen, where the header is tall", async
 test("a milestone the game reports is announced over the game, and the notice goes away", async ({
   page,
 }) => {
-  await page.goto("/games/frostbite");
+  await page.goto(fixtureGame.href);
   await expectConnectedToPlatform(page);
-  const frame = page
-    .frames()
-    .find((candidate) =>
-      candidate.url().endsWith("/play/frostbite/index.html"),
-    );
-  if (frame === undefined) throw new Error("No game frame");
   const notice = page.getByTestId("milestone-toast");
   await expect(notice).toHaveText("");
-  await frame.evaluate(() => {
-    (
-      window as unknown as { FrostbiteHost: { milestone(m: string): void } }
-    ).FrostbiteHost.milestone("firstWin");
-  });
-  await expect(notice).toHaveText("First win reached");
+  for (let tap = 0; tap < fixtureGame.tapsForFirstMilestone; tap += 1)
+    await page.frameLocator(frameSelector).locator("#tap").click();
+  await expect(notice).toHaveText(
+    `${fixtureGame.firstMilestone.title} reached`,
+  );
   await expect(notice).toHaveText("", { timeout: 9_000 });
   await expect(
     page.getByRole("button", { name: /^Milestones/u }),
-  ).toContainText("1/4");
+  ).toContainText(`1/${String(fixtureGame.milestones.length)}`);
   await openDock(page, "Milestones");
   await expect(page.getByTestId("milestone-summary")).toHaveText(
-    "1 of 4 reached",
+    `1 of ${String(fixtureGame.milestones.length)} reached`,
   );
   // Seen again after a reload, it is not announced as new.
   await page.reload();
   await expect(
     page.getByRole("button", { name: /^Milestones/u }),
-  ).toContainText("1/4");
+  ).toContainText(`1/${String(fixtureGame.milestones.length)}`);
   await expect(page.getByTestId("milestone-toast")).toHaveText("");
 });
 

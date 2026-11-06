@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
 import { signIn } from "../src/upload-helpers.ts";
+import { fixtureGame } from "./support/fixture-game.ts";
 
 // What a deployment relies on, checked on the built app with real services: it says whether it is ready, every
 // response carries its security headers, and no page breaks the content security policy it reports against.
@@ -72,7 +73,7 @@ test("pages and the studio break no part of the policy they report against, exce
       page.locator("main, [role=main], #main-content").first(),
     ).toBeVisible();
   };
-  for (const path of ["/", "/games", "/games/frostbite", "/collections"])
+  for (const path of ["/", "/games", fixtureGame.href, "/collections"])
     await visit(path);
   await signIn(page, baseURL, creatorE2EFixtures.collectionWizardCreator);
   for (const path of [

@@ -9,7 +9,7 @@ describe("@repo/configs", () => {
   const modules = listConfigModules(directory);
 
   it("has the modules the platform is composed from", () => {
-    for (const name of ["platform", "games", "features", "games/frostbite"])
+    for (const name of ["platform", "games", "features", "games/fixture-taps"])
       expect(modules).toContain(name);
   });
 

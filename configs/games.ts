@@ -11,6 +11,7 @@ import {
 import { targetChains } from "./chains.ts";
 import { broMariaGame } from "./games/bro-maria.ts";
 import { frostbite } from "./games/frostbite.ts";
+import { fixtureTapsGame } from "./games/fixture-taps.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 import { frostRunnerGame } from "./games/frost-runner.ts";
 import { icicleDropGame } from "./games/icicle-drop.ts";
@@ -23,7 +24,9 @@ import { auroraPulseGame } from "./games/aurora-pulse.ts";
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
 function developmentGames(): GameManifest[] {
-  return developmentGamesEnabled(process.env) ? [sdkExplorerGame] : [];
+  return developmentGamesEnabled(process.env)
+    ? [sdkExplorerGame, fixtureTapsGame]
+    : [];
 }
 
 // The games the platform lists: one line per game. A game is added here and nowhere else; the catalog and the
