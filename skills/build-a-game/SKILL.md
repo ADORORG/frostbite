@@ -32,10 +32,12 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
    they differ in meaning, not only in name.
    If nobody can be asked, choose sensible defaults, write the title, summary and milestone list down as a **draft for the owner to
    approve**, and say so in the manifest comment and in your report. The owner approves a game's words and milestones; you do not.
-3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. This gives a minimal
-   starter (a tap counter with `src/game.ts`), not the finished pattern: delete its `src/game.ts` and test, and build the layers in
-   `references/game-pattern.md`, copying the shape of the closest finished game (`references/worked-example.md`). Never start from an
-   empty folder. Outside the repository, copy that structure by hand.
+3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. This gives a small
+   finished game in the pattern of `references/game-pattern.md`: seeded rules (`src/rules/`), a session that records the run
+   (`src/session.ts`), the screen, the two cards (`src/guide.ts`, `src/screen/result.ts`), sound, keys, pause, a replay verifier
+   (`src/replay.ts`) and the tests that prove them, already registered and passing. Replace the rules first, then the drawing, the
+   words and the milestones; keep the layers and the wiring in `src/main.ts`. Never start from an empty folder. Outside the
+   repository, copy that structure by hand (`references/worked-example.md`).
 4. **Write the rules first, apart from the screen.** Pure and seeded: the same seed and inputs always give the same run. No clock,
    no `Math.random`, no I/O. See `references/game-pattern.md` and `references/milestones-and-verification.md`.
 5. **Add the screen, sound, keys, pause and a steady layout** with the SDK's pieces, never your own copies. See

@@ -3,7 +3,7 @@
 Status: ADR-018 Amendment 1 (client-only games) is accepted. This describes what works today (2026-10-12): the manifest, the catalog and game page, the client-only host
 (isolated frame, SDK, local and account saving, milestones as self-reported). Minting and the replay-verified level
 do **not** exist yet; the last section says what each needs.
-The template is `tooling/game-tools/template` (a small starter game). Start from it with `pnpm game:new`; do not start from nothing.
+The template is `tooling/game-tools/template` (a small finished game: rules, session, screen, cards, sound, keys, pause, a replay verifier and their tests). Start from it with `pnpm game:new`; do not start from nothing.
 
 A coding agent can do the steps below for you: see `docs/product/build-a-game-with-an-agent.md` for the skill and how to install it.
 
@@ -25,11 +25,11 @@ A game is a folder of reviewed source plus one manifest:
 1. **Run `pnpm game:new <id> [--title "My Game"]`, then `pnpm install`.** It copies `tooling/game-tools/template/game` to
    `games/<id>` (package `@game/<id>`), writes `configs/games/<id>.ts` and adds the game's import and list entry
    to `configs/games.ts`, above the `game:new` markers. `<id>` is lower-case words joined by hyphens; it is the
-   page address and every record's key. The new game already passes the conformance check. (By hand: copy the
+   page address and every record's key. The new game already passes the conformance check and the verifier pin. (By hand: copy the
    folder, rename the package, write the manifest, add the two registry lines.)
 2. **Write the game** in `src/` (see "What the folder holds").
 3. **Edit the manifest** in `configs/games/<id>.ts`: `launch: { mode: "embedded" }`, and the milestones, whose ids
-   must be ones the game's code unlocks. Add the id to the ordered list in `apps/web/test/games-config.unit.test.ts` too (`game:new` does not yet). Pin the verifier digest last, with `apps/web/test/games-verifiers.unit.test.ts`. Nothing else in the platform is edited.
+   must be ones the game's code unlocks. When the rules change, `apps/web/test/games-verifiers.unit.test.ts` prints the digest to pin in the manifest. Nothing else in the platform is edited.
 4. **Open a pull request.** The checks in "Checks every game passes" must pass.
 
 ```ts

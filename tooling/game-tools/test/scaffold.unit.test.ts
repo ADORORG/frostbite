@@ -119,6 +119,25 @@ describe("refusing before writing anything", () => {
     expect(await read("configs/games.ts")).toBe(registryText);
   });
 
+  it("leaves nothing behind when the manifest pins a verifier the game does not have", async () => {
+    await writeFile(
+      paths.templateManifestFile,
+      `${manifestText}// sha256: "${"0".repeat(64)}"\n`,
+    );
+    expect(await failure("pinless")).toMatchObject({
+      message: expect.stringContaining("has no src/replay.ts"),
+    });
+    expect(await exists(join(paths.gamesDirectory, "pinless"))).toBe(false);
+    expect(await exists(join(paths.manifestDirectory, "pinless.ts"))).toBe(
+      false,
+    );
+    expect(await read("configs/games.ts")).toBe(registryText);
+    // And the author can try again, since nothing is in the way.
+    expect(await failure("pinless")).toMatchObject({
+      message: expect.stringContaining("has no src/replay.ts"),
+    });
+  });
+
   it.each([
     ["the import anchor", "// game:new adds imports above this line."],
     ["the game anchor", "// game:new adds games above this line."],
@@ -173,6 +192,9 @@ describe("making a game", () => {
     expect(readme).toContain("# Brand New");
     expect(readme).toContain("configs/games/new-game.ts");
     expect(readme).toContain("pnpm --filter @game/new-game test:unit");
+    // The repository's policy asks of a workspace's README: at least a dozen lines, and an Ownership section.
+    expect(readme.split("\n").length).toBeGreaterThanOrEqual(12);
+    expect(readme).toContain("## Ownership");
   });
 
   it("writes the manifest with a comment of its own, not the template's", async () => {
