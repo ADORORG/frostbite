@@ -48,7 +48,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
   only where a gesture cannot do the job, and draw it over the screen, never in rows under it.
 - **The note**: one short line under the screen, worded with `byInput` for a keyboard and for a finger, and never about how a run was
   checked (the rule is in `SKILL.md`, "Phones and notes").
-- **Styles**: copy the stylesheet of the closest finished game and change its colours; it already has the steady layout, the sound
+- **Styles**: keep the starter's stylesheet and change its colours (a game that differs from the starter copies the stylesheet of the closest finished game); it already has the steady layout, the sound
   panel's place, the `visibility` rule for hidden buttons and the touch rules. Do not write a layout from nothing.
 - **Sharp cards**: never write the first-screen card (title, how to play, how to begin) or the card after a run (score, best) on the game's own canvas: the page scales
   that canvas up and blurs the writing, on a phone worst of all. Give the game a `guide.ts` (a `Guide`: `title`, `lines`, `start`, and
