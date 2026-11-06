@@ -61,7 +61,7 @@ is not known.
 ## Tests
 
 `pnpm --filter @game/shard-match test:unit`, `test:integration` (the bundled page against a simulated platform, and the whole-game fairness tests,
-about a minute: the planner plays 600 swaps, and the last milestone comes by its 500th), `test:coverage` (above 90%), `typecheck`, `lint`.
+about a minute: the planner plays 600 swaps, and the last milestone comes by its 500th), `test:coverage` (above 90%; it leaves the fairness file out, which adds nothing to coverage and runs three times slower instrumented), `test:simulation` (the fairness file alone, plain), `typecheck`, `lint`.
 `SHARD_MATCH_LONG=1 pnpm --filter @game/shard-match test:integration` also plays the planner's whole 1,200 swaps (about two more minutes).
 
 ## Ownership
