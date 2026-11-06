@@ -7,7 +7,7 @@
 export const maxTouchButtons = 4;
 
 export interface TouchButton {
-  // What a screen reader says, and what the button shows.
+  // What a screen reader says, and what the button shows: a word or two, since the button is a thumb wide.
   readonly label: string;
   // The action begins (a finger lands, or Enter or Space on a focused button).
   readonly press: () => void;
@@ -15,12 +15,14 @@ export interface TouchButton {
   readonly release: () => void;
 }
 
-// Draws the buttons into `parent` (the element that holds the screen) and listens for them. Returns a function that removes them and lets go
-// of every button held.
+// Draws the buttons into `parent`, which is the page's `main` (the element `phone.css` lays out, and that holds the screen), and listens for
+// them. Returns a function that removes them and lets go of every button held.
 export function attachTouchButtons(
   parent: HTMLElement,
   buttons: readonly TouchButton[],
 ): () => void {
+  if (parent.tagName !== "MAIN")
+    throw new Error("The touch buttons go in the page's main element.");
   if (buttons.length === 0 || buttons.length > maxTouchButtons)
     throw new Error(
       `A game has 1 to ${String(maxTouchButtons)} touch buttons, not ${String(buttons.length)}.`,
@@ -39,6 +41,8 @@ export function attachTouchButtons(
     element.textContent = button.label;
     element.setAttribute("aria-label", button.label);
     element.addEventListener("pointerdown", (event) => {
+      // A finger, a pen or the main button of a mouse; not the others (a right click is not a press).
+      if (event.button !== 0) return;
       event.preventDefault();
       element.setPointerCapture(event.pointerId);
       fingers.set(event.pointerId, which);

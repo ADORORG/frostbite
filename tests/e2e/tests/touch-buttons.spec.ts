@@ -43,9 +43,7 @@ const logOf = (page: Page) =>
   });
 
 test.describe("on a touch screen", () => {
-  test.beforeEach(({}, info) => {
-    test.skip(info.project.name !== "mobile", "a touch profile only");
-  });
+  test.skip(({ hasTouch }) => !hasTouch, "a touch profile only");
 
   test("the buttons are a thumb wide, inside the screen, and the screen is still the whole frame with the page not scrolling", async ({
     page,
@@ -66,12 +64,64 @@ test.describe("on a touch screen", () => {
       );
     }
     const screen = await page.locator("canvas").boundingBox();
+    for (const button of await buttons.all()) {
+      const box = await button.boundingBox();
+      expect(box?.x).toBeGreaterThanOrEqual(screen?.x ?? 0);
+      expect(box?.y).toBeGreaterThanOrEqual(screen?.y ?? 0);
+      expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+        (screen?.x ?? 0) + (screen?.width ?? 0),
+      );
+      expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(
+        (screen?.y ?? 0) + (screen?.height ?? 0),
+      );
+      // The cluster is in the lower right half, over the screen, and not in its way at the top.
+      expect((box?.x ?? 0) + (box?.width ?? 0) / 2).toBeGreaterThan(
+        (screen?.width ?? 0) / 2,
+      );
+      expect((box?.y ?? 0) + (box?.height ?? 0) / 2).toBeGreaterThan(
+        (screen?.height ?? 0) / 2,
+      );
+    }
     expect(screen?.width).toBeCloseTo(view?.width ?? 0, 0);
     expect(screen?.height).toBeCloseTo(view?.height ?? 0, 0);
     const scrolls = await page.evaluate(
       () => document.documentElement.scrollHeight > window.innerHeight,
     );
     expect(scrolls).toBe(false);
+  });
+
+  test("the empty space inside the cluster belongs to the screen: a finger there is a finger on the screen", async ({
+    page,
+  }) => {
+    await open(page);
+    const cluster = await page.locator(".touch-buttons").boundingBox();
+    const boxes = await Promise.all(
+      (await page.locator(".touch-buttons button").all()).map((button) =>
+        button.boundingBox(),
+      ),
+    );
+    const inside = (x: number, y: number, box: (typeof boxes)[number]) =>
+      box !== null &&
+      x >= box.x &&
+      x <= box.x + box.width &&
+      y >= box.y &&
+      y <= box.y + box.height;
+    // A point in the cluster's own box that no button covers (the gap between two, or the corner a short row leaves).
+    let gap: { x: number; y: number } | null = null;
+    for (
+      let y = cluster?.y ?? 0;
+      gap === null && y < (cluster?.y ?? 0) + (cluster?.height ?? 0);
+      y += 2
+    )
+      for (
+        let x = cluster?.x ?? 0;
+        gap === null && x < (cluster?.x ?? 0) + (cluster?.width ?? 0);
+        x += 2
+      )
+        if (!boxes.some((box) => inside(x, y, box))) gap = { x, y };
+    expect(gap).not.toBeNull();
+    await page.touchscreen.tap(gap?.x ?? 0, gap?.y ?? 0);
+    await expect.poll(() => logOf(page)).toEqual(["screen"]);
   });
 
   test("two thumbs hold two buttons at once, and a finger on the screen is a finger on the screen, not on a button", async ({
@@ -104,16 +154,25 @@ test.describe("on a touch screen", () => {
     await expect
       .poll(() => logOf(page))
       .toEqual(["press Fire", "press Next", "release Next", "release Fire"]);
+    // A tap well clear of the cluster in the lower right: on the screen itself.
     await page.touchscreen.tap(30, 300);
-    await expect.poll(() => logOf(page)).toContain("screen");
-    expect(await logOf(page)).not.toContain("press Help");
+    await expect
+      .poll(() => logOf(page))
+      .toEqual([
+        "press Fire",
+        "press Next",
+        "release Next",
+        "release Fire",
+        "screen",
+      ]);
   });
 });
 
 test("a mouse is not shown the buttons: it has the keys", async ({
   page,
-}, info) => {
-  test.skip(info.project.name !== "desktop", "a mouse profile only");
+  hasTouch,
+}) => {
+  test.skip(hasTouch, "a mouse profile only");
   await open(page);
   await expect(page.locator(".touch-buttons")).toBeHidden();
 });
