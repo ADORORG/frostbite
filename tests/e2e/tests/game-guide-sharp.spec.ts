@@ -55,3 +55,23 @@ for (const id of games)
     await page.keyboard.press("Enter");
     await expect.poll(() => layerOf(frame)).toMatchObject({ shown: false });
   });
+
+// The card after a run is the same layer: Snowball Dash, left to roll with no input, hits a rock, and its result card then has the display's pixels.
+test("snowball-dash's card after a run has the display's pixels", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.goto("/games/snowball-dash");
+  await expectConnectedToPlatform(page);
+  const frame = page.frameLocator(frameSelector);
+  await expect.poll(() => layerOf(frame)).toMatchObject({ shown: true });
+  await page.keyboard.press("Enter");
+  await expect.poll(() => layerOf(frame)).toMatchObject({ shown: false });
+  await expect
+    .poll(() => layerOf(frame), { timeout: 60_000 })
+    .toMatchObject({ shown: true });
+  const layer = await layerOf(frame);
+  expect(layer?.pixels).toBeGreaterThanOrEqual(
+    Math.round((layer?.cssWidth ?? 0) * ratio) - 1,
+  );
+});

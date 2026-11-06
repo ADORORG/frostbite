@@ -162,32 +162,19 @@ describe("the writing", () => {
     expect(shown("over", 5)).toBe(false);
   });
 
-  it("covers the cellar with a card after a run, saying how it ended", () => {
-    const text = (s: ReturnType<typeof surface>) =>
-      s.written.map(({ text: t }) => t);
-    const ready = surface();
-    draw(ready.context, startRun(9), view("ready"));
-    // The first-screen card is the SDK's, drawn over the screen at the display's pixels; the canvas itself carries none.
-    expect(text(ready)).not.toContain("LANTERN MAZE");
-    for (const [cause, said] of [
-      ["dark", "THE LANTERN WENT OUT"],
-      ["escaped", "YOU ESCAPED THE CELLAR"],
-      ["spent", "YOUR LEGS GAVE OUT"],
-      [null, "RUN OVER"],
-    ] as const) {
-      const over = surface();
+  it("leaves both cards, before a run and after it, to the SDK: the canvas carries none", () => {
+    const text = (phase: "over" | "ready") => {
+      const s = surface();
       draw(
-        over.context,
-        { ...startRun(9), cause, floorsCleared: 3, score: 450 },
-        view("over", { best: 900 }),
+        s.context,
+        { ...startRun(9), cause: "dark", floorsCleared: 3, score: 450 },
+        view(phase, { best: 900, newBest: true }),
       );
-      expect(text(over)).toEqual(
-        expect.arrayContaining([said, "FLOORS 3   SCORE 450", "BEST 900"]),
-      );
-    }
-    const best = surface();
-    draw(best.context, startRun(9), view("over", { newBest: true }));
-    expect(text(best)).toContain("NEW BEST!");
+      return s.written.map(({ text: t }) => t);
+    };
+    expect(text("ready")).not.toContain("LANTERN MAZE");
+    expect(text("over")).not.toContain("THE LANTERN WENT OUT");
+    expect(text("over")).not.toContain("NEW BEST!");
   });
 });
 

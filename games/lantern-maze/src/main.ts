@@ -26,6 +26,7 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { lanternPoint } from "./screen/layout.ts";
+import { resultOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createMazeSession, type MazeSession } from "./session.ts";
 
@@ -95,8 +96,9 @@ const going = (): boolean => {
 
 function show(): void {
   if (context === null) return;
-  draw(context, session?.state() ?? backdrop, view);
-  guideLayer.show(view.phase === "ready" ? guide : null);
+  const state = session?.state() ?? backdrop;
+  draw(context, state, view);
+  guideLayer.show(view.phase === "ready" ? guide : resultOf(state, view));
 }
 
 function addEarned(id: string): void {

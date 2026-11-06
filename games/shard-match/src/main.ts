@@ -33,6 +33,7 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
+import { resultOf } from "./screen/result.ts";
 import { firstView, type View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
@@ -99,7 +100,7 @@ function show(): void {
       ? 0
       : playing.after.score - playing.before.score - playing.after.lastGain;
   draw(context, shown(), view, playback.scene(), bonus);
-  guideLayer.show(view.phase === "ready" ? guide : null);
+  guideLayer.show(view.phase === "ready" ? guide : resultOf(shown(), view));
 }
 
 // The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).

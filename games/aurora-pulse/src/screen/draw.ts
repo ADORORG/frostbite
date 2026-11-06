@@ -2,14 +2,14 @@ import { block } from "@frostbite/game-sdk/pixels";
 
 import type { PulseState } from "../rules/state.ts";
 import { aurora, lanesView } from "./field.ts";
-import { cards, hud } from "./hud.ts";
+import { hud } from "./hud.ts";
 import { canvasScale, screenHeight, screenWidth } from "./layout.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
 export { canvasScale, screenHeight, screenWidth } from "./layout.ts";
 
-// Draws a state: the whole screen, every time, in the same order (the back, the aurora, the lanes and their notes, the writing, the cards). It
+// Draws a state: the whole screen, every time, in the same order (the back, the aurora, the lanes and their notes, the writing). It
 // draws and decides nothing, and it makes nothing the page has to lay out again.
 export function draw(
   context: CanvasRenderingContext2D,
@@ -22,5 +22,4 @@ export function draw(
   aurora(context, state);
   lanesView(context, state);
   hud(context, state, view);
-  cards(context, state, view);
 }

@@ -2,7 +2,6 @@ import { block } from "@frostbite/game-sdk/pixels";
 
 import { cells } from "../rules/constants.ts";
 import type { MatchState } from "../rules/state.ts";
-import { cards } from "./cards.ts";
 import { banner, praise, side, strip } from "./hud.ts";
 import {
   boardX,
@@ -98,5 +97,4 @@ export function draw(
     praise(context, scene);
     if (scene.banner) banner(context, state.level - 1, bonus);
   }
-  cards(context, state, view);
 }

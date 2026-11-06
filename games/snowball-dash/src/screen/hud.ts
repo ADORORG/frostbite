@@ -3,11 +3,11 @@ import type { RunState } from "../rules/types.ts";
 import { block } from "@frostbite/game-sdk/pixels";
 
 import { colour } from "./palette.ts";
-import { screenHeight, screenWidth } from "./layout.ts";
+import { screenWidth } from "./layout.ts";
 import type { View } from "./view.ts";
 
 // What is written over the screen: the score and the multiplier, the best, how far through the level the snowball is, a line of news, and
-// the cards before and after a run. All of it is on the canvas, so showing more of it never moves the page.
+// and the writing that helps. All of it is on the canvas, so showing more of it never moves the page.
 const font = '"Courier New", ui-monospace, monospace';
 
 function write(
@@ -66,46 +66,4 @@ export function hud(
       7,
       "center",
     );
-}
-
-function card(
-  context: CanvasRenderingContext2D,
-  lines: readonly (readonly [string, string, number])[],
-): void {
-  context.globalAlpha = 0.6;
-  block(context, colour.pit, 0, 0, screenWidth, screenHeight);
-  context.globalAlpha = 1;
-  lines.forEach(([text, fill, size], index) =>
-    write(
-      context,
-      text,
-      screenWidth / 2,
-      18 + index * 12,
-      fill,
-      size,
-      "center",
-    ),
-  );
-}
-
-export function cards(
-  context: CanvasRenderingContext2D,
-  state: RunState,
-  view: View,
-): void {
-  if (view.phase === "over")
-    card(context, [
-      [
-        state.cause === "fell" ? "INTO THE CREVASSE" : "RUN OVER",
-        colour.danger,
-        10,
-      ],
-      [`SCORE ${String(state.score)}`, colour.text, 8],
-      [
-        view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-        colour.yellow,
-        7,
-      ],
-      ["ENTER, SPACE OR TAP TO ROLL AGAIN", colour.snowDark, 6],
-    ]);
 }

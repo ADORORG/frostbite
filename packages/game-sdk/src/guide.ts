@@ -14,6 +14,21 @@ export interface Guide {
   readonly touchLines?: readonly string[];
 }
 
+// The card a game shows after a run: a heading, then what the run came to, then how to go again. The same card layer shows it, so it is as
+// sharp as the first-screen card. A row is its text, its colour (from the game's own palette) and its weight, the share of the usual size it is
+// written at (the heading is heavier than the rest).
+export interface ResultRow {
+  readonly colour: string;
+  readonly text: string;
+  readonly weight: number;
+}
+export interface ResultCard {
+  readonly rows: readonly ResultRow[];
+}
+
+// What the card layer can show: the first-screen card or the card after a run.
+export type Card = Guide | ResultCard;
+
 const font = '"Courier New", ui-monospace, monospace';
 const back = "#0c0620";
 const colours = {
@@ -90,6 +105,34 @@ export function drawGuide(
   draw(guide.title, 0, colours.title, 1.5);
   lines.forEach((line, index) => draw(line, index + 1.3, colours.line, 1));
   draw(startLineFor(guide.start), lines.length + 1.9, colours.start, 1);
+}
+
+// Draws the card after a run over a screen `width` by `height`: the screen dimmed, then the rows from the top, each fitted to the screen.
+export function drawResult(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  card: ResultCard,
+): void {
+  context.globalAlpha = 0.84;
+  block(context, back, 0, 0, width, height);
+  context.globalAlpha = 1;
+  const step = (height * 0.86) / (card.rows.length + 1);
+  card.rows.forEach(({ colour, text, weight }, index) => {
+    const size = fittedSize(text, step * 0.62 * weight, width);
+    write(context, text, width / 2, height * 0.07 + step * index, colour, size);
+  });
+}
+
+// Draws whichever card there is.
+export function drawCard(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  card: Card,
+): void {
+  if ("rows" in card) drawResult(context, width, height, card);
+  else drawGuide(context, width, height, card);
 }
 
 // The same card for a game whose screen is made of page elements and not a canvas: fills `into` (a box laid over the screen) with the title, the
