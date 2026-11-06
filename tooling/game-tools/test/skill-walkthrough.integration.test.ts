@@ -72,10 +72,10 @@ describe("the build-a-game skill and a freshly scaffolded game", () => {
 
   it("leaves the starter files the skill tells the builder to replace", async () => {
     if (workspace === undefined) throw new Error("No workspace");
-    await scaffoldGame({ id, paths: workspace.paths });
-    const made = (await files(join(workspace.root, "games", id))).map((file) =>
-      relative(join(workspace?.root ?? "", "games", id), file),
-    );
+    const { root, paths } = workspace;
+    await scaffoldGame({ id, paths });
+    const folder = join(root, "games", id);
+    const made = (await files(folder)).map((file) => relative(folder, file));
     expect(await step(3)).toContain("src/game.ts");
     expect(made).toEqual(
       expect.arrayContaining(["src/game.ts", "test/game.unit.test.ts"]),
