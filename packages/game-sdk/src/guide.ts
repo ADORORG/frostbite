@@ -12,8 +12,8 @@ export interface Guide {
   readonly title: string;
   // What a touch screen is told instead of `lines`, for a game whose hands are different there (the keys name keys no phone has).
   readonly touchLines?: readonly string[];
-  // The line that says how to begin on a touch screen, for a game that begins something particular ("TAP TO PRACTISE LEVEL 2"). Without it a touch
-  // screen is told "TAP TO START".
+  // The line that says how to begin on a touch screen, for a game that begins something particular ("TAP TO PRACTISE LEVEL 2"). Without it (or with a blank
+  // one) a touch screen is told "TAP TO START".
   readonly touchStart?: string;
 }
 
@@ -90,10 +90,17 @@ function write(
 
 // How a touch screen is told to begin, in place of what a keyboard is told ("ENTER TO START"): there is no key to press.
 export const touchStartLine = "TAP TO START";
+// A touch line that is missing or blank (a game that gave none, or an empty one) is "TAP TO START": a start line of nothing tells the player nothing.
 export const startLineFor = (
   keyboardLine: string,
-  touchLine: string = touchStartLine,
-): string => byInput(keyboardLine, touchLine);
+  touchLine?: string,
+): string =>
+  byInput(
+    keyboardLine,
+    touchLine === undefined || touchLine.trim() === ""
+      ? touchStartLine
+      : touchLine,
+  );
 
 export const linesFor = (guide: Guide): readonly string[] =>
   isTouchScreen() && guide.touchLines !== undefined
