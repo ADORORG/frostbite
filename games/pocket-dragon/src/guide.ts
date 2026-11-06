@@ -1,21 +1,16 @@
 import type { Guide } from "@frostbite/game-sdk/guide";
+import { byInput } from "@frostbite/game-sdk/touch";
 
-import { byInput } from "./page/input.ts";
 import type { PlayId } from "./rules/constants.ts";
 
-// What the first screen of the quest and of each level says before a run: which it is, what the player does, and how to begin. It is drawn by
-// the SDK over the chapter's idle screen. A touch screen gets its own lines (thumbs on the screen, the Bag button) and is told to tap; the
-// SDK's guide gains `touchLines` in the owners' newer `dev`, and this moves to it then. `instructions` is the same advice in one short line,
-// for the note under the screen when a run begins.
-export interface ChapterGuide extends Guide {
-  readonly touchLines: readonly string[];
-  readonly touchStart: string;
-}
-
+// What the first screen of the quest and of each level says before a run: which it is, what the player does, and how to begin. The SDK
+// draws it over the chapter's idle screen, sharp, on a layer of its own (`page/view.ts`), and on a touch screen it says the touch lines
+// (thumbs on the screen, the Levels and Bag tab) and the touch start instead. `instructions` is the same advice in one short line, for
+// the note under the screen when a run begins.
 const backpackKeys = "BACKPACK: B BERRY  R MUSHROOM  G PINEAPPLE";
-const backpackBag = "BAG BUTTON: BERRY, MUSHROOM, PINEAPPLE";
+const backpackBag = "BAG TAB: BERRY, MUSHROOM, PINEAPPLE";
 
-export const guides: Readonly<Record<PlayId, ChapterGuide>> = {
+export const guides: Readonly<Record<PlayId, Guide>> = {
   castle: {
     lines: [
       "ARROWS: WALK   SPACE: TALK AND OPEN   F: FIRE",
@@ -57,7 +52,7 @@ export const guides: Readonly<Record<PlayId, ChapterGuide>> = {
     touchLines: [
       "EGG HILLS, THEN THE CASTLE, THEN THE WOODS IN 3D",
       "HEARTS AND BACKPACK CARRY ON, ONE CLOCK",
-      "LEVELS BUTTON: PRACTISE ONE LEVEL",
+      "LEVELS TAB: PRACTISE ONE LEVEL",
     ],
     touchStart: "TAP TO START THE QUEST",
   },
@@ -77,16 +72,6 @@ export const guides: Readonly<Record<PlayId, ChapterGuide>> = {
     touchStart: "TAP TO PRACTISE LEVEL 3",
   },
 };
-
-// The first screen's card for the way the player plays.
-export function guideFor(id: PlayId): Guide {
-  const guide = guides[id];
-  return byInput<Guide>(guide, {
-    lines: guide.touchLines,
-    start: guide.touchStart,
-    title: guide.title,
-  });
-}
 
 const questLine =
   "Three levels on one clock: your hearts and your backpack carry on.";

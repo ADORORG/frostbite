@@ -77,8 +77,10 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     ]);
     expect(chapters[0]?.getAttribute("data-chapter")).toBe("quest");
     expect(chapters[0]?.getAttribute("aria-pressed")).toBe("true");
-    for (const button of game.window.document.querySelectorAll("#touch button"))
-      expect(button.hasAttribute("disabled")).toBe(true);
+    // Between runs the tab offers Levels, not the Bag, and no place has its buttons in the corner.
+    expect(game.byId("menu")?.hasAttribute("hidden")).toBe(false);
+    expect(game.byId("bag")?.hasAttribute("disabled")).toBe(true);
+    expect(game.window.document.querySelector(".touch-buttons")).toBeNull();
     expect(game.text("stat-0-label")).toBe("Time");
   });
 
@@ -151,22 +153,19 @@ describe("Pocket Dragon, bundled and run against a simulated platform", () => {
     expect(game.stored.progress).toMatchObject({ unlocked: 1 });
   }, 40_000);
 
-  it("plays on a seed of its own when the platform offers no runs, with the touch buttons of the level it is in", async () => {
+  it("plays on a seed of its own when the platform offers no runs, with the Bag of the level it is in", async () => {
     const game = await play();
     await settle();
     game.click("start");
     await settle(150);
     expect(game.text("note")).toBe(instructions("quest"));
     expect(game.byId("pause")?.hasAttribute("disabled")).toBe(false);
-    const offered = [
-      ...game.window.document.querySelectorAll("#touch button[data-for]"),
-    ].filter((button) => !button.hasAttribute("hidden"));
-    expect(offered.map((button) => button.id)).toEqual(["bag"]);
-    expect(
-      [...game.window.document.querySelectorAll("#touch button")].every(
-        (button) => !button.hasAttribute("disabled"),
-      ),
-    ).toBe(true);
+    const offered = ["menu", "bag"].filter(
+      (id) => game.byId(id)?.hasAttribute("hidden") === false,
+    );
+    expect(offered).toEqual(["bag"]);
+    expect(game.byId("bag")?.hasAttribute("disabled")).toBe(false);
+    expect(game.window.document.querySelector(".touch-buttons")).toBeNull();
     expect(
       game.window.document
         .querySelector("[data-chapter]")

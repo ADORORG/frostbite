@@ -79,11 +79,12 @@ describe("the screen of Egg Hills", () => {
     expect(drawnWith(drawHills, cheered).drawn).not.toEqual(
       drawnWith(drawHills, busy).drawn,
     );
+    // Cleared, the level says so (the quest shows it while it shifts to the next level); a lost run is told by the card after it.
     expect(
       drawnWith(drawHills, { ...busy, finishTick: 300 }).texts(),
     ).toContain("EGG HILLS CLEARED!");
-    expect(drawnWith(drawHills, { ...busy, over: true }).texts()).toContain(
-      "OUT OF HEARTS",
+    expect(drawnWith(drawHills, { ...busy, over: true }).texts()).toEqual(
+      drawnWith(drawHills, busy).texts(),
     );
   });
 

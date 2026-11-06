@@ -1,7 +1,7 @@
 # Pocket Dragon: decisions for the owners
 
-What the review on PR #1 asked to have decided, with what the game does now. Each item says what is proposed and what is wanted from
-the owners. Items 1 to 3 need an answer before the game is listed; items 4 and 5 are notes.
+What the reviews on PR #1 asked to have decided, with what the game does now. Each item says what is proposed and what is wanted from
+the owners. Items 1 to 4 need an answer before the game is listed; item 5 is a note.
 
 ## 1. three.js for the woods in 3D (proposed: keep it)
 
@@ -77,35 +77,34 @@ There are forty milestones, the platform's most, all decided by run state alone.
 and described in the README. The titles and the summary are a draft. **Wanted:** the owner's sign-off on the list, its titles and its
 words once the game has been played on a phone. Changing a milestone after it is published is not allowed, so this has to happen first.
 
-## 4. Touch helpers standing in for the SDK's (until the owners' `dev` is pushed)
+## 4. Levels and the Bag on a phone (proposed: one tab, kept in sight)
 
-The review names SDK helpers that are not on GitHub's `dev` yet: GitHub's `dev` is at `c2b38ec` (Nov 4), and this branch has merged it.
-The game has small stand-ins for them, each in one place and named after the SDK's:
+**What.** The latest review asks how the levels menu and the Bag fit the phone guard's limit of three things to press, or whether they
+move onto the screen or into `attachTouchButtons`. The game keeps both, as one tab in the bottom left corner that is always in sight:
+**Levels** between runs (the quest and the levels on a sheet over the screen, with Share card), and **Bag** during a run that has a
+backpack (its three foods slide out beside it). The two handles share one place, so nothing moves when one takes over from the other,
+and neither is inside the screen, so a finger on them never reaches the thumbs. Everything else is the SDK's: its zones, tap to start,
+the first-screen card and the card after a run on the guide layer, the icons of `phone.css`, and its touch buttons for the woods outside
+the maze (fly up, fly down, frost vision, Sparky) and the Sky Nursery (ink, clear).
 
-| Stand-in in the game                            | The SDK's                              | What it does                                          |
-| ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
-| `src/page/zones.ts` `attachZones`               | `@frostbite/game-sdk/touch-zones`           | zones on the screen, followed for each finger         |
-| `src/page/tap-start.ts` `attachTapToStart`      | `@frostbite/game-sdk/touch-start`           | a tap starts a run                                    |
-| `src/page/input.ts` `byInput`                   | `@frostbite/game-sdk/touch`                 | the words for a keyboard or a finger                  |
-| `touchLines` and `touchStart` in `src/guide.ts` | `touchLines` in `@frostbite/game-sdk/guide` | the first screen's lines for thumbs, and TAP TO START |
-| `src/page/send.ts` `sendRun`                    | `sendRun` in `@frostbite/game-sdk/play`     | sends a finished run once and drops a failure quietly |
+**Against the guard.** It measures a page as it loads. Pause is shown once there is a run to pause (while it is disabled it is hidden,
+and its place is kept), so at load there are three: the two sound switches and Levels. During a run there are four (pause, the sound
+switches and the Bag), and out of the woods' maze eight, with the SDK's four touch buttons, the most it allows.
 
-The game no longer imports `@frostbite/game-sdk/run-notes`, which the newer `dev` removes. Once that `dev` is pushed:
+**Why not elsewhere.** The levels are chosen between runs only. The foods are three actions on top of the right thumb's two, so as zones
+on the screen they would take the thumbs' room, and out of the maze the four touch buttons are taken by flying, vision and Sparky.
 
-1. Switch these imports to the SDK's.
-2. Delete the stand-ins.
-3. Add `tags: ["platformer", "action", "strategy"]` to `configs/games/pocket-dragon.ts`. The manifest's schema on today's `dev` is strict
-   and has no `tags` yet, so adding it now would fail the build.
+**Wanted:** whether four things to press during a run (eight out of the maze) is acceptable. If the guard should hold during a run too,
+the Bag would become one touch button that uses the foods in turn, and Levels would stay as it is.
 
 ## 5. The size of the PR (proposed: one PR, described by feature)
 
-The game is new, so nearly all of the 245 files are new files under `games/pocket-dragon`. Outside it there are only these:
+The game is new, so nearly all of its files are new files under `games/pocket-dragon`. Outside it there are only these:
 
 - the manifest, `configs/games/pocket-dragon.ts`
 - one line in `configs/games.ts`
-- one line in `apps/web/test/games-config.unit.test.ts`
-- the lockfile entries for three.js
-- the desktop layout fixture for the games' layout guard
+- the lockfile entries for three.js and the game's two workspace packages
+- the game's two entries in the desktop layout fixture for the games' layout guard
 
 The later features each touch the rules of all three levels and the quest. The backpack, flying, frost vision, Sparky, the Sky Nursery,
 test mode and the cards are examples. Splitting them out would mean reviewing pieces that only work together. The PR description now

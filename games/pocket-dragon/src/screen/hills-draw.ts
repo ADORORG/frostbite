@@ -1,4 +1,5 @@
 import { block, wrap } from "@frostbite/game-sdk/pixels";
+import { byInput } from "@frostbite/game-sdk/touch";
 
 import {
   arenaX,
@@ -10,7 +11,6 @@ import {
   stages,
   tile,
 } from "../rules/hills/constants.ts";
-import { byInput } from "../page/input.ts";
 import { solidAt } from "../rules/hills/collide.ts";
 import { sectionOf, sectionSpan } from "../rules/hills/secrets.ts";
 import type { HillsState } from "../rules/hills/types.ts";
@@ -241,10 +241,9 @@ function banner(context: CanvasRenderingContext2D, state: HillsState): void {
       colour.white,
     );
   }
+  // Cleared, the level says so while the quest shifts to the next one; a lost run is told by the card over the screen once it is over.
   if (state.finishTick !== null)
     write(context, "EGG HILLS CLEARED!", width / 2, 50, 14, colour.gold);
-  else if (state.over)
-    write(context, "OUT OF HEARTS", width / 2, 50, 14, colour.white);
 }
 
 export function drawHills(

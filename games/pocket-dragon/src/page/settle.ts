@@ -15,6 +15,8 @@ import type { PlayRun } from "./runs.ts";
 // quest's place in the Hall of Fame), the card's note of the run, and what the page says of it.
 export interface Settled {
   readonly lastRun: LastRun;
+  // Whether the run beat the best of its play (a run that scores nothing beats nothing).
+  readonly newBest: boolean;
   readonly news: string;
   // A level the run opened to practise, or null.
   readonly opened: ChapterId | null;
@@ -82,6 +84,7 @@ export function settle(before: Progress, finished: PlayRun): Settled {
       stats: finished.stats(),
       trophies: finished.earned(),
     },
+    newBest: finished.score() > before.best[finished.id],
     news: newsOf(finished, opened, rank),
     opened,
     progress: placed?.progress ?? progress,

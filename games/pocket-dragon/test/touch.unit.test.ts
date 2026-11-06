@@ -1,23 +1,23 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { attachTapToStart, settleMs, tapMs } from "../src/page/tap-start.ts";
 import {
   attachThumbs,
   createHeld,
+  footShare,
   restShare,
+  sideHeight,
   stickMiddle,
   thumbAt,
   upright,
 } from "../src/page/thumbs.ts";
-import { attachZones } from "../src/page/zones.ts";
 
-// Thumbs on the screen, driven the way a phone drives them: pointer events, one finger at a time or several at once.
+// Thumbs on the screen, driven the way a phone drives them: pointer events, one finger at a time or several at once. The fingers are
+// followed by the SDK's zones (`@frostbite/game-sdk/touch-zones`); where the zones are, and what each holds, is the game's.
 const stops: (() => void)[] = [];
 let stage: HTMLDivElement;
 beforeEach(() => {
-  document.body.innerHTML =
-    '<div id="stage"><canvas></canvas><button type="button">Bag</button></div>';
+  document.body.innerHTML = '<div id="stage"><canvas></canvas></div>';
   const found = document.getElementById("stage");
   if (!(found instanceof HTMLDivElement)) throw new Error("no stage");
   stage = found;
@@ -36,26 +36,28 @@ const finger = (
   id: number,
   x: number,
   y: number,
-  options: { readonly on?: Element; readonly pointerType?: string } = {},
+  pointerType = "touch",
 ) =>
-  (options.on ?? stage.querySelector("canvas") ?? stage).dispatchEvent(
+  (stage.querySelector("canvas") ?? stage).dispatchEvent(
     new PointerEvent(type, {
       bubbles: true,
       cancelable: true,
       clientX: x,
       clientY: y,
       pointerId: id,
-      pointerType: options.pointerType ?? "touch",
+      pointerType,
     }),
   );
 
 describe("where a thumb is", () => {
   it("is a stick of eight ways on the left, with a resting middle, and act and fire on the right", () => {
-    // Upright: the picture is 390 by 219 at the top, and the stick's middle is halfway down the room under it.
+    // Upright: the picture is 390 by 219 at the top, and the stick's middle is halfway down the room under it, less the foot kept for
+    // the tab in the corner.
     expect(upright(390, 470)).toBe(true);
     const middle = stickMiddle(390, 470);
     expect(middle.x).toBeCloseTo(97.5);
-    expect(middle.y).toBeCloseTo((390 / (16 / 9) + 470) / 2);
+    expect(middle.y).toBeCloseTo((390 / (16 / 9) + 470 * (1 - footShare)) / 2);
+    expect(middle.y).toBeCloseTo(332.9, 1);
     const at = (dx: number, dy: number) =>
       thumbAt(middle.x + dx, middle.y + dy, 390, 470);
     expect(at(0, 0)).toBeNull();
@@ -95,11 +97,16 @@ describe("where a thumb is", () => {
 
   it("on a stage held on its side, has the stick in the room left of the picture and acts above and fires below", () => {
     expect(upright(750, 150)).toBe(false);
-    // The picture is 267 wide in the middle, leaving 242 either side: the stick is in the middle of the left room.
+    // The picture is 267 wide in the middle, leaving 242 either side: the stick is in the middle of the left room, above halfway down.
     const middle = stickMiddle(750, 150);
-    expect(middle).toEqual({ x: (750 - 150 * (16 / 9)) / 4, y: 75 });
-    expect(thumbAt(middle.x - 30, 75, 750, 150)).toBe("left");
+    expect(middle).toEqual({
+      x: (750 - 150 * (16 / 9)) / 4,
+      y: 150 * sideHeight,
+    });
+    expect(middle.y).toBe(60);
+    expect(thumbAt(middle.x - 30, 60, 750, 150)).toBe("left");
     expect(thumbAt(middle.x, 10, 750, 150)).toBe("up");
+    expect(thumbAt(middle.x, 120, 750, 150)).toBe("down");
     // A box just wider than the picture: the stick is an eighth of the way in.
     expect(stickMiddle(400, 220).x).toBe(50);
     expect(thumbAt(375, 74, 750, 150)).toBe("act");
@@ -149,20 +156,36 @@ describe("thumbs on the screen", () => {
     expect(hold.mock.calls).toHaveLength(12);
   });
 
-  it("leave a mouse and a press on a button over the screen alone, and stop listening when told", () => {
+  it("take only fingers (a mouse and a pen have the keys), and stop listening when told", () => {
     const hold = vi.fn();
     const stop = attachThumbs(stage, hold);
-    finger("pointerdown", 1, 360, 300, { pointerType: "mouse" });
-    const bag = stage.querySelector("button");
-    if (bag === null) throw new Error("no button");
-    finger("pointerdown", 2, 360, 300, { on: bag });
+    finger("pointerdown", 1, 360, 300, "mouse");
+    finger("pointerdown", 2, 360, 300, "pen");
     expect(hold).not.toHaveBeenCalled();
-    finger("pointerdown", 3, 360, 300, { pointerType: "pen" });
+    finger("pointerdown", 3, 360, 300);
     expect(hold).toHaveBeenLastCalledWith("act", true);
     stop();
     expect(hold).toHaveBeenLastCalledWith("act", false);
     finger("pointerdown", 4, 360, 300);
     expect(hold).toHaveBeenCalledTimes(2);
+  });
+
+  it("are cut by the box's own shape, wherever it is on the page", () => {
+    const hold = vi.fn();
+    stops.push(attachThumbs(stage, hold));
+    vi.spyOn(stage, "getBoundingClientRect").mockReturnValue(
+      DOMRect.fromRect({ height: 150, width: 750, x: 20, y: 10 }),
+    );
+    // On its side the right half acts above halfway down and fires below it.
+    finger("pointerdown", 1, 20 + 700, 10 + 40);
+    finger("pointerdown", 2, 20 + 700, 10 + 110);
+    const middle = stickMiddle(750, 150);
+    finger("pointerdown", 3, 20 + middle.x, 10 + middle.y - 40);
+    expect(hold.mock.calls).toEqual([
+      ["act", true],
+      ["fire", true],
+      ["up", true],
+    ]);
   });
 
   it("keep an action held while any finger holds it", () => {
@@ -181,71 +204,5 @@ describe("thumbs on the screen", () => {
       ["up", false],
       ["left", false],
     ]);
-  });
-
-  it("pass the zone and the box to the zones' sums, measured from the surface's corner", () => {
-    const at = vi.fn(() => null);
-    stops.push(attachZones(stage, { at, enter: vi.fn(), leave: vi.fn() }));
-    finger("pointerdown", 1, 30, 100);
-    expect(at).toHaveBeenCalledWith(30, 60, 390, 470);
-  });
-});
-
-describe("a tap on the screen", () => {
-  const tapping = (canStart: () => boolean) => {
-    let now = 10_000;
-    const start = vi.fn();
-    stops.push(attachTapToStart(stage, { canStart, now: () => now, start }));
-    const tap = (id: number, held = 100, moved = 0) => {
-      finger("pointerdown", id, 100, 100);
-      now += held;
-      finger("pointerup", id, 100 + moved, 100);
-    };
-    return {
-      start,
-      tap,
-      wait: (ms: number) => void (now += ms),
-    };
-  };
-
-  it("starts a run when one may start, and only with a quick, short touch of a finger", () => {
-    const { start, tap } = tapping(() => true);
-    tap(1);
-    expect(start).toHaveBeenCalledTimes(1);
-    tap(2, tapMs + 1);
-    tap(3, 100, 40);
-    finger("pointerdown", 4, 100, 100, { pointerType: "mouse" });
-    finger("pointerup", 4, 100, 100, { pointerType: "mouse" });
-    finger("pointerdown", 5, 100, 100);
-    finger("pointercancel", 5, 100, 100);
-    finger("pointerup", 5, 100, 100);
-    const bag = stage.querySelector("button");
-    if (bag === null) throw new Error("no button");
-    finger("pointerdown", 6, 100, 100, { on: bag });
-    finger("pointerup", 6, 100, 100, { on: bag });
-    expect(start).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not start the next run with a thumb from the last one, nor while a run may not start", () => {
-    let going = true;
-    const { start, tap, wait } = tapping(() => !going);
-    tap(1);
-    expect(start).not.toHaveBeenCalled();
-    // A finger down as the run ends, lifted after.
-    finger("pointerdown", 2, 100, 100);
-    going = false;
-    finger("pointerup", 2, 100, 100);
-    expect(start).not.toHaveBeenCalled();
-    wait(settleMs - 200);
-    tap(3);
-    expect(start).not.toHaveBeenCalled();
-    wait(settleMs);
-    tap(4);
-    expect(start).toHaveBeenCalledTimes(1);
-    // One that came down while a run could start, lifted after one began.
-    finger("pointerdown", 5, 100, 100);
-    going = true;
-    finger("pointerup", 5, 100, 100);
-    expect(start).toHaveBeenCalledTimes(1);
   });
 });

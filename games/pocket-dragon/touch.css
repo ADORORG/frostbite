@@ -1,11 +1,10 @@
-/* On a touch screen (a phone or a tablet) the game is played with thumbs on the screen itself (`src/page/thumbs.ts`): one thin line of
-   readouts along the top with the levels, pause and sound buttons at its end, then the screen with the thumb marks and the few buttons a
-   level needs laid over it, then one short note. Nothing scrolls. The chapter menu is behind the levels button. A mouse and keyboard keep
-   the page as `styles.css` lays it out (and a narrow window as the SDK's phone sheet does). The rules start `html body main` so they win
-   over the SDK's phone sheet. */
-.thumbs,
-.touch,
-#menu {
+/* On a touch screen (a phone or a tablet) the game is played on the screen itself (`src/page/thumbs.ts`), laid out by the SDK's phone sheet:
+   the screen is the whole frame, the readouts are a thin line along the top, pause and the two sound switches are icons in the top right
+   corner, the note is at the foot, and the buttons of a place (out of the woods' maze, in the Sky Nursery) are in the bottom right corner
+   (`src/page/extras.ts`). What this adds: the screen starts under the line of readouts, so they never cover the picture; the thumb marks
+   (`thumbs.css`); the tab in the bottom left corner (`src/page/tab.ts`), Levels between runs and the Bag during one; and the quest and
+   levels as a sheet over the screen while Levels is open. A mouse and keyboard keep the page as `styles.css` lays it out. */
+.tab {
   display: none;
 }
 
@@ -33,188 +32,198 @@
     overflow: hidden;
     overscroll-behavior: none;
   }
-  html body main {
-    grid-template-columns: minmax(0, 1fr) repeat(3, auto);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "readouts menu pause sound"
-      "screen screen screen screen"
-      "note note note note";
-    gap: 0.25rem 0.375rem;
-    padding: 0.25rem 0.375rem 0.375rem;
-  }
-  html body main .bar,
-  html body main .foot,
-  html body main .foot .actions {
-    display: contents;
-  }
-  html body main header,
-  html body main .foot #start,
-  html body main .foot #share,
-  html body main > section,
-  html body main > .fame,
-  html body main #chapters {
+  /* The title, the connection note and the metaplasma banked are for a mouse's page (the screen shows the metaplasma). */
+  :root body main .bar header,
+  :root body main #chapters {
     display: none;
   }
-  html body main .bar .score {
-    grid-area: readouts;
-    align-self: center;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    gap: 0.625rem;
-    min-inline-size: 0;
-    overflow: hidden;
-    font-size: 0.75rem;
-    white-space: nowrap;
-  }
-  html body main .bar .score > span {
+  /* Each count is one pill, with its label inside it (not a pill in a pill). The best is told on the card after a run. */
+  :root body main .score span span {
     padding: 0;
-    border: 0;
+    border-radius: 0;
     background: none;
   }
-  html body main .bar .score strong {
+  :root body main .score strong {
     min-inline-size: 0;
   }
-  html body main .bar .score .best {
+  :root body main .score .best {
     display: none;
   }
-  /* The levels, pause and the two sound switches: small square buttons with a sign for a word (the word stays for a screen reader). */
-  html body main .foot #menu {
-    grid-area: menu;
-    display: block;
+  /* Pause is there once there is a run to pause; until then its place is kept, empty, so nothing moves when it comes. */
+  :root body main #pause:disabled {
+    visibility: hidden;
   }
-  html body main .foot #pause {
-    grid-area: pause;
+  :root body main #pause[data-paused="true"]::before {
+    content: "\25B6";
+    content: "\25B6" / "";
+    letter-spacing: 0;
   }
-  html body main .foot #sound {
-    grid-area: sound;
-    margin: 0;
-  }
-  html body main .foot #menu,
-  html body main .foot #pause,
-  html body main .foot #sound button {
-    inline-size: 2rem;
-    min-inline-size: 0;
-    block-size: 2rem;
-    min-block-size: 0;
-    padding: 0;
-    box-shadow: none;
-    font-size: 0;
-    line-height: 1;
-  }
-  html body main .foot #menu::before,
-  html body main .foot #pause::before,
-  html body main .foot #sound button::before {
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  html body main .foot #menu::before {
-    content: "☰";
-  }
-  html body main .foot #pause::before {
-    content: "❚❚";
-    font-size: 0.75rem;
-  }
-  html body main .foot #pause[data-paused="true"]::before {
-    content: "▶";
-  }
-  html body main .foot #sound .sound-panel {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 0.375rem;
-    inline-size: auto;
-  }
-  html body main .foot #sound button[data-sound="music"]::before {
-    content: "♪";
-  }
-  html body main .foot #sound button[data-sound="effects"]::before {
-    content: "FX";
-    font-size: 0.75rem;
-  }
-  html body main .foot #sound button[aria-pressed="false"] {
-    opacity: 0.45;
-    text-decoration: line-through;
-  }
-  html body main .foot #sound input[type="range"],
-  html body main .foot #sound .sound-panel__hint {
-    display: none;
-  }
-  html body main .foot #note {
-    grid-area: note;
-    block-size: auto;
-    max-block-size: 2.4em;
-    margin: 0;
-    overflow: hidden;
-    font-size: 0.75rem;
-    line-height: 1.2;
-  }
-  /* The menu, open: the chapters over the screen, and the player's card in the line along the top. */
-  html body main[data-menu="open"] #chapters {
-    grid-area: screen;
-    z-index: 3;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-content: center;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    background: rgb(12 6 32 / 0.94);
-  }
-  html body main[data-menu="open"] .bar .score {
-    display: none;
-  }
-  html body main[data-menu="open"] .foot #share {
-    grid-area: readouts;
-    display: block;
-    align-self: center;
-    justify-self: start;
-    block-size: 2rem;
-    min-block-size: 0;
-    padding: 0 0.75rem;
-    box-shadow: none;
-    font-size: 0.8125rem;
-  }
-  /* The screen's box is the row's: what is laid over it cannot make it taller, and nothing in it scrolls. */
-  html body main .stage {
-    grid-area: screen;
+  /* The screen, under the line of readouts. The picture keeps its shape: in the middle of the room when the room is wider than it, and
+     at the top of it when it is taller (the thumbs have the room under it). The card over it is the picture's size. */
+  :root body main > .stage {
+    margin-block-start: calc(max(0.25rem, env(safe-area-inset-top)) + 1.375rem);
     grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     overflow: clip;
     container: stage / size;
-    touch-action: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
   }
-  html body main .stage .thumbs,
-  html body main .stage .touch {
-    position: relative;
-    display: block;
+  :root body main > .stage > canvas {
+    align-self: start;
+    justify-self: center;
+    inline-size: min(100cqw, 100cqh * 16 / 9);
+    block-size: auto;
+    aspect-ratio: 16 / 9;
+  }
+  @container stage (min-aspect-ratio: 16 / 9) {
+    :root body main > .stage > canvas {
+      align-self: center;
+    }
+  }
+  /* The tab: one handle in the bottom left corner, a thumb tall, against the edge like a drawer's; the Bag's foods come out beside it.
+     The Levels and Bag handles share one place, and the one not offered keeps it, unseen. */
+  :root body main > .tab {
     grid-area: 1 / 1;
+    z-index: 4;
+    align-self: end;
+    justify-self: start;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-end: max(0.75rem, env(safe-area-inset-bottom));
+    margin-inline-start: env(safe-area-inset-left);
     pointer-events: none;
+  }
+  :root body main .tab button {
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  :root body main .tab > #menu,
+  :root body main .tab > #bag {
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    inline-size: 5rem;
+    min-inline-size: 0;
+    block-size: 2.75rem;
+    min-block-size: 0;
+    padding: 0 0.5rem 0 0.625rem;
+    border-inline-start: 0;
+    border-radius: 0 1.375rem 1.375rem 0;
+    background: rgb(29 17 64 / 0.9);
+    box-shadow: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-align: start;
+  }
+  :root body main .tab > #menu::after,
+  :root body main .tab > #bag::after {
+    content: "\203A";
+    content: "\203A" / "";
+    display: inline-block;
+    float: inline-end;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  :root body main .tab > [aria-expanded="true"]::after {
+    rotate: 180deg;
+  }
+  :root body main .tab > .bag-items {
+    grid-area: 1 / 2;
+    display: flex;
+    gap: 0.5rem;
+  }
+  :root body main .tab > .bag-items[hidden] {
+    display: none;
+  }
+  :root body main .tab .bag-items button {
+    box-sizing: border-box;
+    inline-size: 3.25rem;
+    min-inline-size: 0;
+    block-size: 2.75rem;
+    min-block-size: 0;
+    padding: 0;
+    border-color: var(--gold);
+    background: rgb(29 17 64 / 0.9);
+    box-shadow: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    touch-action: none;
+  }
+  /* While the Bag is open its foods have the foot of the screen; the note waits. */
+  :root body main:has(#bag[aria-expanded="true"]) #note {
+    visibility: hidden;
+  }
+  /* The note is at the foot beside the tab (held upright) or under the picture (on its side); where the buttons of a place take the corner
+     it waits, as the screen says what to do there. */
+  :root body main #note {
+    justify-self: end;
+    max-inline-size: min(32rem, 100% - 6.25rem);
+    margin-inline-end: max(0.5rem, env(safe-area-inset-right));
+  }
+  :root body main:has(> .touch-buttons) #note {
+    display: none;
+  }
+  /* Levels, open: the quest and the levels on a sheet over the screen (a tap beside them closes it), and the player's card in the bottom
+     right corner, across from the tab. */
+  :root body main[data-menu="open"] #chapters {
+    grid-area: 1 / 1;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: minmax(0, 18rem);
+    place-content: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 3.5rem 0.75rem 4rem;
+    background: rgb(12 6 32 / 0.94);
+  }
+  :root body main[data-menu="open"] #chapters button {
+    min-block-size: 2.75rem;
+    font-size: 0.9375rem;
+  }
+  :root body main[data-menu="open"] .actions {
+    z-index: 4;
+  }
+  :root body main[data-menu="open"] .actions #share {
+    position: fixed;
+    inset-block-end: max(0.75rem, env(safe-area-inset-bottom));
+    inset-inline-end: max(0.75rem, env(safe-area-inset-right));
+    display: block;
+    inline-size: auto;
+    block-size: 2.75rem;
+    padding: 0 1rem;
+    border-radius: 1.375rem;
+    box-shadow: none;
+    font-size: 0.875rem;
   }
 }
 
-/* Held upright, the line along the top has room for the level's three counts; the score is told when the run ends, and the screen shows
-   the metaplasma. Held on its side, the line is thinner still, so the screen has the height. */
+/* Held upright, the line of readouts is under the icons, so the screen starts lower; there the line has room for the level's counts,
+   and the score is told on the card after a run. */
 @media (pointer: coarse) and (orientation: portrait) {
-  html body main .bar .score .points,
-  html body main .bar .score .plasma {
+  :root body main > .stage {
+    margin-block-start: calc(max(0.25rem, env(safe-area-inset-top)) + 4.375rem);
+  }
+  :root body main .score .points,
+  :root body main .score .plasma {
     display: none;
   }
 }
-@media (pointer: coarse) and (orientation: landscape) and (max-height: 32rem) {
-  html body main {
-    padding-block: 0.125rem 0.25rem;
+/* On its side the note is under the picture, as wide as it, and the sheet of levels has two columns. */
+@media (pointer: coarse) and (orientation: landscape) {
+  :root body main #note {
+    justify-self: center;
+    max-inline-size: min(
+      32rem,
+      (100dvh - max(0.25rem, env(safe-area-inset-top)) - 1.375rem) * 16 / 9 -
+        1rem
+    );
+    margin-inline-end: 0;
   }
-  html body main .bar .score {
-    font-size: 0.6875rem;
+  :root body main[data-menu="open"] #chapters {
+    grid-template-columns: repeat(2, minmax(0, 14.5rem));
+    gap: 0.375rem 0.5rem;
+    padding: 0.5rem 6rem;
   }
-  html body main .foot #menu,
-  html body main .foot #pause,
-  html body main .foot #sound button {
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
+  :root body main[data-menu="open"] #chapters button {
+    font-size: 0.875rem;
   }
 }

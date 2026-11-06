@@ -1,8 +1,8 @@
 import { block, sprite } from "@frostbite/game-sdk/pixels";
+import { byInput } from "@frostbite/game-sdk/touch";
 
 import { blazeTicks, itemList, type Item, type Powers } from "../rules/kit.ts";
 import { kitIcons, kitKey } from "./kit-sprites.ts";
-import { byInput } from "../page/input.ts";
 import { colour } from "./palette.ts";
 import { write } from "./text.ts";
 

@@ -1,6 +1,6 @@
 import { block, sprite } from "@frostbite/game-sdk/pixels";
+import { byInput } from "@frostbite/game-sdk/touch";
 
-import { byInput } from "../page/input.ts";
 import { egg } from "../screen/hills-things.ts";
 import { spriteScaled } from "../screen/kit-sprites.ts";
 import { colour, friendColours } from "../screen/palette.ts";

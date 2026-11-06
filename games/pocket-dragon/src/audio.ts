@@ -1,4 +1,8 @@
-import { commonEffects, tone, type Effect } from "@frostbite/game-sdk/audio/effects";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
 import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 import { moreEffects } from "./audio-more.ts";

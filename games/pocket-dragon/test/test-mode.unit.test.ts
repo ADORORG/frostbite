@@ -146,10 +146,6 @@ describe("test runs", () => {
       drawQuest(context, now, false, true);
     expect(drawnWith(drawQuest, state).texts()).toContain("0:10");
     expect(drawnWith(testDraw, state).texts()).not.toContain("0:10");
-    const won = { ...state, finishTick: 600 };
-    expect(drawnWith(testDraw, won).texts()).toContain(
-      "A TEST RUN: NOTHING WAS COUNTED",
-    );
     const maze = startWoods(3);
     const testWoods = (context: CanvasRenderingContext2D, now: WoodsState) =>
       drawWoods(context, now, false, true);

@@ -137,10 +137,13 @@ export function fastFrames(game: Page): void {
   };
 }
 
-// A finger on the page's screen as a phone sends it, on a stage laid out 390 wide and 470 high at the page's corner.
+// A finger on the page's screen as a phone sends it, on a stage laid out 390 wide and 470 high at the page's corner. The page is told its
+// main pointer is a finger, as a phone's browser says.
 export function thumbs(game: Page) {
   const stage = game.byId("stage");
   if (stage === null) throw new Error("no stage");
+  game.window.matchMedia = (query: string) =>
+    ({ matches: query === "(pointer: coarse)" }) as MediaQueryList;
   stage.getBoundingClientRect = () =>
     game.window.DOMRect.fromRect({ height: 470, width: 390, x: 0, y: 0 });
   return (type: string, finger: number, x: number, y: number) =>

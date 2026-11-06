@@ -887,14 +887,14 @@
     },
     {
       "h": 0,
-      "name": "span#thumb-again.thumb-again",
+      "name": "div#tab.tab",
       "w": 0,
       "x": 0,
       "y": 0
     },
     {
       "h": 0,
-      "name": "div#touch.touch",
+      "name": "button#menu",
       "w": 0,
       "x": 0,
       "y": 0
@@ -975,13 +975,6 @@
       "w": 126,
       "x": 1142,
       "y": 621
-    },
-    {
-      "h": 0,
-      "name": "button#menu",
-      "w": 0,
-      "x": 0,
-      "y": 0
     },
     {
       "h": 20,
@@ -2452,14 +2445,14 @@
     },
     {
       "h": 0,
-      "name": "span#thumb-again.thumb-again",
+      "name": "div#tab.tab",
       "w": 0,
       "x": 0,
       "y": 0
     },
     {
       "h": 0,
-      "name": "div#touch.touch",
+      "name": "button#menu",
       "w": 0,
       "x": 0,
       "y": 0
@@ -2540,13 +2533,6 @@
       "w": 126,
       "x": 1302,
       "y": 721
-    },
-    {
-      "h": 0,
-      "name": "button#menu",
-      "w": 0,
-      "x": 0,
-      "y": 0
     },
     {
       "h": 20,

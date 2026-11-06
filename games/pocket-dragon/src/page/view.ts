@@ -1,18 +1,24 @@
-import { drawGuide } from "@frostbite/game-sdk/guide";
+import { cardFor, type Phase } from "@frostbite/game-sdk/card";
+import type { ResultCard } from "@frostbite/game-sdk/guide";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 
 import { chapterTitles } from "../chapters.ts";
-import { guideFor } from "../guide.ts";
+import { guides } from "../guide.ts";
 import { isOpen, type FameEntry, type Progress } from "../progress.ts";
 import { playIds, type PlayId } from "../rules/constants.ts";
 import { clockOf } from "../score.ts";
 import { drawTestMark } from "../screen/test-mark.ts";
 import { createDepthView, type DepthView } from "../three/stage.ts";
 import { buttonsIn, element } from "./elements.ts";
+import { createExtras, extrasFor } from "./extras.ts";
+import type { Action } from "./hands.ts";
 import type { PlayRun, Shown } from "./runs.ts";
+import { attachTab } from "./tab.ts";
 
-// What the page shows: the screen, the counts above it, the quest and levels to choose from, the thumb marks and touch buttons over the
-// screen, the milestones earned and the Hall of Fame. Every place a number or a word changes has a place of its own that never grows, so
-// nothing under the player's thumb moves.
+// What the page shows: the screen with its card (the first-screen card before a run, the card after one), the counts above it, the quest
+// and levels to choose from, and on a touch screen the thumb marks, the Levels and Bag tab and the buttons of the place Glitchy is in; the
+// milestones earned and the Hall of Fame. Every place a number or a word changes has a place of its own that never grows, so nothing under
+// the player's thumb moves.
 export const logicalWidth = 256;
 export const logicalHeight = 144;
 // The screen is drawn at twice its size, so its words are sharp.
@@ -37,21 +43,26 @@ const actWords: Readonly<Record<Shown, string>> = {
   woods: "Use",
 };
 
-// What the right thumb's two zones are called in each level (`thumbs.ts`), and which of the touch buttons over the screen each level offers
-// (a button's `data-for` names its levels; one marked `data-outside` is offered in the woods only out of the maze).
+// What the right thumb's two zones are called in each level (`thumbs.ts`).
 const fireWords: Readonly<Record<Shown, string>> = {
   castle: "Fire",
   hills: "Fire",
   nursery: "Paint",
   woods: "Fire",
 };
-const offered = (button: HTMLElement, level: Shown, outside: boolean) =>
-  (button.dataset.for ?? "").split(" ").includes(level) &&
-  (!("outside" in button.dataset) || outside);
 
-export function createView() {
+export interface ViewOptions {
+  // What a touch button over the screen holds (`extras.ts`).
+  readonly hold?: (action: Action, on: boolean) => void;
+}
+
+export function createView({ hold = () => undefined }: ViewOptions = {}) {
+  const main = element("main", "main");
   const screen = element("screen", "canvas");
   const context = screen.getContext("2d");
+  const layer = createGuideLayer(screen);
+  const tab = attachTab(main);
+  const extras = createExtras(main, hold);
   const world = element("world", "canvas");
   const testBadge = element("test-badge", "div");
   // In the admin's test mode nothing is counted, so the counts that would be are not shown.
@@ -72,21 +83,19 @@ export function createView() {
   const startButton = element("start", "button");
   const pauseButton = element("pause", "button");
   const shareButton = element("share", "button");
-  const touch = element("touch", "div");
-  const bag = element("bag", "button");
-  const bagItems = element("bag-items", "div");
-  const menu = element("menu", "button");
   const thumbAct = element("thumb-act", "span");
   const thumbFire = element("thumb-fire", "span");
-  const again = element("thumb-again", "span");
   const picker = element("chapters", "nav");
-  // The level on the screen, whether Glitchy is out of the woods' maze, and whether a run is going: what the touch buttons offer.
+  // The level on the screen, whether Glitchy is out of the woods' maze, and whether a run is going: what the tab and the corner offer
+  // (the Levels between runs; during one the Bag, where there is a backpack, and the buttons of the place).
   let shown: Shown = "hills";
   let outside = false;
   let playing = false;
+  // The card after the run that is over, until the next one starts.
+  let result: ResultCard | null = null;
   const offer = (): void => {
-    for (const button of buttonsIn(touch, "button[data-for]"))
-      button.hidden = !offered(button, shown, outside);
+    tab.offer(playing, shown !== "nursery");
+    extras.show(playing ? extrasFor(shown, outside) : null);
   };
   const fameList = element("fame", "ol");
   const fameNote = element("fame-note", "p");
@@ -94,7 +103,8 @@ export function createView() {
   screen.height = logicalHeight * scale;
 
   return {
-    // The run (or its idle screen, with the guide over it) and the counts that go with it.
+    // The run (or its idle screen) and the counts that go with it; over the screen, the first-screen card while it is idle and the card
+    // after a run once one is over (`over`).
     draw(run: PlayRun, idle: boolean, best: number, banked: number): void {
       scoreOut.textContent = testing ? none : String(idle ? 0 : run.score());
       bestOut.textContent = testing ? none : String(best);
@@ -107,7 +117,8 @@ export function createView() {
         if (valueOut !== undefined)
           valueOut.textContent = testing && label === "Time" ? none : value;
       });
-      again.hidden = idle || playing;
+      const phase: Phase = idle ? "ready" : playing ? "running" : "over";
+      layer.show(cardFor(phase, guides[run.id], () => result));
       const woods = run.depth();
       if ((woods !== null) !== outside) {
         outside = woods !== null;
@@ -123,8 +134,6 @@ export function createView() {
       context.imageSmoothingEnabled = false;
       run.draw(context, layered);
       if (testing) drawTestMark(context);
-      if (idle)
-        drawGuide(context, logicalWidth, logicalHeight, guideFor(run.id));
     },
     // What is chosen (the quest or a level), and which levels are open to practise.
     chapters(chosen: PlayId, progress: Progress, running: boolean): void {
@@ -146,7 +155,7 @@ export function createView() {
           number.textContent = open ? String(playIds.indexOf(id)) : "🔒";
       }
     },
-    // The level on the screen: what the screen shows, what the right thumb's zones are called in it, and its touch buttons.
+    // The level on the screen: what the screen shows, what the right thumb's zones are called in it, and what the tab and the corner offer.
     level(level: Shown): void {
       shown = level;
       screen.setAttribute("aria-label", screenWords[level]);
@@ -176,6 +185,10 @@ export function createView() {
         }),
       );
     },
+    // The card for the run just over.
+    over(card: ResultCard): void {
+      result = card;
+    },
     // The admin's test mode, on or off: its badge, and the start button's words.
     testing(on: boolean): void {
       testing = on;
@@ -183,16 +196,16 @@ export function createView() {
       startButton.textContent = on ? "Start test run" : "Start run";
       shareButton.disabled = on;
     },
+    // A run going or not: Start or pause, the card, the tab's handle and the corner's buttons, and (for `thumbs.css`) the thumb marks, which
+    // on a phone held on its side wait for a run so the first-screen card is clear of them.
     running(on: boolean): void {
       playing = on;
+      if (on) result = null;
+      main.dataset.running = String(on);
       startButton.hidden = on;
       pauseButton.disabled = !on;
       shareButton.disabled = on || testing;
-      menu.disabled = on;
-      for (const button of buttonsIn(touch, "button")) button.disabled = !on;
-      if (on) return;
-      bagItems.hidden = true;
-      bag.setAttribute("aria-expanded", "false");
+      offer();
     },
   };
 }

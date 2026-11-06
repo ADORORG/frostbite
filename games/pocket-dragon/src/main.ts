@@ -1,8 +1,13 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
 import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@frostbite/game-sdk/play";
+import {
+  connectToPlatform,
+  sendRun,
+  type PlatformPlay,
+} from "@frostbite/game-sdk/play";
 import { createRunLoop } from "@frostbite/game-sdk/run-loop";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, trackOf, tracks } from "./audio.ts";
 import {
@@ -16,13 +21,11 @@ import { createCardPanel, noteMarks } from "./page/card-panel.ts";
 import { element } from "./page/elements.ts";
 import { attachHands, playOfKey, type Action } from "./page/hands.ts";
 import { createIdleRuns, startPlay } from "./page/plays.ts";
+import { resultOf } from "./page/result.ts";
 import type { PlayRun, Shown } from "./page/runs.ts";
-import { sendRun } from "./page/send.ts";
 import { settle } from "./page/settle.ts";
-import { attachTapToStart } from "./page/tap-start.ts";
 import { attachTestMode, testNote, testOverNote } from "./page/test-panel.ts";
 import { attachThumbs } from "./page/thumbs.ts";
-import { attachTouchPanel } from "./page/touch-panel.ts";
 import { createView, pickedFrom } from "./page/view.ts";
 import {
   freshProgress,
@@ -45,8 +48,7 @@ const picker = element("chapters", "nav");
 const shareButton = element("share", "button");
 const nurseryButton = element("nursery", "button");
 const stage = element("stage", "div");
-const view = createView();
-const touch = attachTouchPanel(element("main", "main"));
+const view = createView({ hold });
 
 let play: PlatformPlay | null = null;
 let progress: Progress = freshProgress;
@@ -130,6 +132,7 @@ async function finish(finished: PlayRun): Promise<void> {
   lastVisit = finished === visit ? visit : null;
   if (finished.test) {
     note.textContent = finished.overNote ?? testOverNote;
+    view.over(resultOf({ best: 0, finished, newBest: false, next: chosen }));
     showChapters();
     show();
     return;
@@ -141,6 +144,8 @@ async function finish(finished: PlayRun): Promise<void> {
   lastRun = after.lastRun;
   shareButton.classList.add("fresh");
   if (finished.id !== "quest" && after.opened !== null) chosen = after.opened;
+  const best = progress.best[finished.id];
+  view.over(resultOf({ best, finished, newBest: after.newBest, next: chosen }));
   saveProgress();
   showChapters();
   view.fame(progress.fame);
@@ -184,7 +189,6 @@ async function startRealRun(): Promise<PlayRun> {
 
 const begin = (nursery = false): Promise<void> =>
   loop.launch(async () => {
-    touch.closeMenu();
     visit = nursery ? nurseryRun(localSeed()) : null;
     if (visit !== null) {
       runId = null;
@@ -253,10 +257,7 @@ attachHands(document.body, {
   start: () => void (canStart() && begin()),
 });
 attachThumbs(stage, hold);
-attachTapToStart(stage, {
-  canStart: () => !loop.running() && canStart() && !touch.menuOpen(),
-  start: () => void begin(),
-});
+attachTapToStart(stage, startButton);
 picker.addEventListener("click", (event) => {
   const id = pickedFrom(event);
   if (id !== undefined) choose(id);

@@ -82,101 +82,54 @@
           <span class="thumb-stick"></span>
           <span id="thumb-act" class="thumb-act">Jump</span>
           <span id="thumb-fire" class="thumb-fire">Fire</span>
-          <span id="thumb-again" class="thumb-again" hidden
-            >Tap to play again</span
-          >
         </div>
-        <div id="touch" class="touch" role="group" aria-label="Touch buttons">
+      </div>
+      <div id="tab" class="tab">
+        <button
+          id="menu"
+          type="button"
+          aria-expanded="false"
+          aria-controls="chapters"
+        >
+          Levels
+        </button>
+        <button
+          id="bag"
+          type="button"
+          aria-expanded="false"
+          aria-controls="bag-items"
+          hidden
+        >
+          Bag
+        </button>
+        <div
+          id="bag-items"
+          class="bag-items"
+          role="group"
+          aria-label="Backpack"
+          hidden
+        >
           <button
             type="button"
-            data-hold="evade"
-            data-for="woods"
-            data-outside
-            aria-label="Fly up"
+            data-hold="berry"
+            aria-label="Eat a berry: fire reaches farther"
           >
-            Fly ▲
+            Berry
           </button>
           <button
             type="button"
-            data-hold="quick"
-            data-for="woods"
-            data-outside
-            aria-label="Fly down"
+            data-hold="mushroom"
+            aria-label="Roll a mushroom's glitch blast"
           >
-            Fly ▼
+            Blast
           </button>
           <button
             type="button"
-            data-hold="vision"
-            data-for="woods"
-            data-outside
-            aria-label="Frost vision: slow the world and see three futures"
+            data-hold="pineapple"
+            aria-label="Eat a pineapple: grow big"
           >
-            Vision
+            Grow
           </button>
-          <button
-            type="button"
-            data-hold="help"
-            data-for="woods"
-            data-outside
-            aria-label="Send Sparky into a nook too small for Glitchy"
-          >
-            Sparky
-          </button>
-          <button
-            type="button"
-            data-hold="evade"
-            data-for="nursery"
-            aria-label="Change the paint's colour"
-          >
-            Ink
-          </button>
-          <button
-            type="button"
-            data-hold="charm"
-            data-for="nursery"
-            aria-label="Wipe the sky clean"
-          >
-            Clear
-          </button>
-          <button
-            id="bag"
-            type="button"
-            data-for="hills castle woods"
-            aria-expanded="false"
-            aria-controls="bag-items"
-          >
-            Bag
-          </button>
-          <div
-            id="bag-items"
-            class="bag-items"
-            role="group"
-            aria-label="Backpack"
-            hidden
-          >
-            <button
-              type="button"
-              data-hold="berry"
-              aria-label="Eat a berry: fire reaches farther"
-            >
-              Berry
-            </button>
-            <button
-              type="button"
-              data-hold="mushroom"
-              aria-label="Roll a mushroom's glitch blast"
-            >
-              Blast
-            </button>
-            <button
-              type="button"
-              data-hold="pineapple"
-              aria-label="Eat a pineapple: grow big"
-            >
-              Grow
-            </button>
-          </div>
         </div>
       </div>
       <div class="foot">
@@ -187,14 +140,6 @@
           <button id="pause" type="button" disabled>Pause</button>
           <button id="share" type="button" disabled>Share card</button>
         </div>
-        <button
-          id="menu"
-          type="button"
-          aria-expanded="false"
-          aria-controls="chapters"
-        >
-          Levels
-        </button>
       </div>
       <section aria-labelledby="earned-title">
         <h2 id="earned-title">Earned this run</h2>

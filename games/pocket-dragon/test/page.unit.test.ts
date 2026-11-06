@@ -95,14 +95,14 @@ describe("the player's hands", () => {
     expect(handed.hold).toHaveBeenLastCalledWith("hot0", true);
   });
 
-  it("hold a touch button while a finger is on it, and let everything go when the page is left", () => {
+  it("hold a food of the Bag while a finger is on it, and let everything go when the page is left", () => {
     const handed = hands();
-    const vision = document.querySelector('[data-hold="vision"]');
-    if (vision === null) throw new Error("no vision button");
-    touch(vision, "pointerdown");
-    expect(handed.hold).toHaveBeenLastCalledWith("vision", true);
-    touch(vision, "pointerup");
-    expect(handed.hold).toHaveBeenLastCalledWith("vision", false);
+    const berry = document.querySelector('[data-hold="berry"]');
+    if (berry === null) throw new Error("no berry button");
+    touch(berry, "pointerdown");
+    expect(handed.hold).toHaveBeenLastCalledWith("berry", true);
+    touch(berry, "pointerup");
+    expect(handed.hold).toHaveBeenLastCalledWith("berry", false);
     touch(document.body, "pointerdown");
     expect(handed.hold).toHaveBeenCalledTimes(2);
     window.dispatchEvent(new Event("blur"));
@@ -160,10 +160,13 @@ describe("a level's run as the page plays it", () => {
 });
 
 describe("the page's view", () => {
-  it("draws the run twice its size with its counts and the metaplasma banked, and the guide on an idle screen", () => {
+  it("draws the run twice its size with its counts and the metaplasma banked, and the guide over an idle screen", () => {
     const screen = surface();
-    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
-      screen.context,
+    const card = surface();
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(
+      function (this: HTMLCanvasElement) {
+        return this.id === "screen" ? screen.context : card.context;
+      },
     );
     const view = createView();
     view.draw(startRun("woods", 4), true, 70, 12_345);
@@ -175,7 +178,9 @@ describe("the page's view", () => {
     expect(element("banked", "strong").textContent).toBe("12,345");
     expect(element("stat-0-label", "span").textContent).toBe("Clues");
     expect(element("stat-1", "strong").textContent).toBe("0 of 3");
-    expect(screen.texts()).toContain("THE WHISPERING WOODS");
+    // The guide is drawn on a layer of its own at the display's pixels, not on the small screen.
+    expect(card.texts()).toContain("THE WHISPERING WOODS");
+    expect(screen.texts()).not.toContain("THE WHISPERING WOODS");
     const playing = {
       ...startRun("hills", 4),
       plasma: () => 7,
@@ -194,7 +199,7 @@ describe("the page's view", () => {
     expect(element("banked", "strong").textContent).toBe("9");
   });
 
-  it("opens the quest and the levels reached, names the thumbs' zones and offers each level's touch buttons, and lists what was earned", () => {
+  it("opens the quest and the levels reached, names the thumbs' zones, and lists what was earned", () => {
     const view = createView();
     view.chapters("castle", { ...freshProgress, unlocked: 2 }, false);
     const [quest, hills, castle, woods] = buttonsIn(document, "[data-chapter]");
@@ -210,24 +215,17 @@ describe("the page's view", () => {
     expect(woods?.querySelector("span")?.textContent).toBe("🔒");
     expect(quest?.title).toContain("All three levels");
     expect(woods?.title).toContain("Clear the level before");
-    const offered = () =>
-      buttonsIn(document, "#touch button[data-for]")
-        .filter((button) => !button.hidden)
-        .map((button) => button.textContent.trim());
     view.level("woods");
     expect(element("thumb-act", "span").textContent).toBe("Use");
     expect(element("thumb-fire", "span").textContent).toBe("Fire");
     expect(element("screen", "canvas").getAttribute("aria-label")).toContain(
       "maze",
     );
-    expect(offered()).toEqual(["Bag"]);
     view.level("nursery");
     expect(element("thumb-act", "span").textContent).toBe("Dance");
     expect(element("thumb-fire", "span").textContent).toBe("Paint");
-    expect(offered()).toEqual(["Ink", "Clear"]);
     view.level("castle");
     expect(element("thumb-act", "span").textContent).toBe("Talk");
-    expect(offered()).toEqual(["Bag"]);
     view.chapters("woods", freshProgress, true);
     expect(
       buttonsIn(document, "[data-chapter]").every((button) => button.disabled),
@@ -241,19 +239,15 @@ describe("the page's view", () => {
         (item) => item.textContent,
       ),
     ).toEqual(["First egg", "mystery"]);
-    const touchButtons = () => buttonsIn(document, "#touch button");
     view.running(false);
-    expect(touchButtons().every((button) => button.disabled)).toBe(true);
+    expect(element("bag", "button").disabled).toBe(true);
+    expect(element("pause", "button").disabled).toBe(true);
     view.running(true);
     expect(element("start", "button").hidden).toBe(true);
+    expect(element("pause", "button").disabled).toBe(false);
     expect(element("menu", "button").disabled).toBe(true);
-    expect(touchButtons().some((button) => button.disabled)).toBe(false);
-    element("bag-items", "div").hidden = false;
+    expect(element("bag", "button").disabled).toBe(false);
     view.running(false);
-    expect(element("bag-items", "div").hidden).toBe(true);
-    expect(element("bag", "button").getAttribute("aria-expanded")).toBe(
-      "false",
-    );
     expect(element("menu", "button").disabled).toBe(false);
   });
 

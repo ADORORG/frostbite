@@ -10,7 +10,6 @@ import { shiftTicks } from "../src/rules/quest/constants.ts";
 import { legKinds, legRun } from "../src/rules/quest/legs.ts";
 import { startQuest } from "../src/rules/quest/tick.ts";
 import type { QuestState } from "../src/rules/quest/types.ts";
-import { startWoods } from "../src/rules/woods/index.ts";
 import { arrivalTicks, drawQuest } from "../src/screen/quest-draw.ts";
 import { colour } from "../src/screen/palette.ts";
 import { surface } from "./support/canvas.ts";
@@ -78,29 +77,14 @@ describe("the quest on the screen", () => {
     };
     expect(white(drawn(settled))).toHaveLength(0);
   });
-
-  it("says how the quest ended", () => {
-    const won = drawn({
-      ...startQuest(3),
-      finishTick: 36_100,
-      leg: legRun(legKinds.woods, { ...startWoods(3), escaped: true }),
-    });
-    expect(won.texts()).toEqual(
-      expect.arrayContaining([
-        "QUEST COMPLETE!",
-        "THE DRAGONS ARE SAFE  TIME 10:01",
-      ]),
-    );
-    expect(drawn({ ...startQuest(3), lost: true }).texts()).toContain(
-      "THE QUEST IS OVER",
-    );
-  });
 });
 
 // A finished run as the page has it: only what settling it asks for.
 function finished(
   id: PlayId,
-  more: Partial<Pick<PlayRun, "cleared" | "fame" | "level" | "won">> = {},
+  more: Partial<
+    Pick<PlayRun, "cleared" | "fame" | "level" | "score" | "won">
+  > = {},
 ): PlayRun {
   return {
     cleared: () => [],
@@ -210,8 +194,16 @@ describe("a finished run, settled", () => {
     const lost = settle(freshProgress, finished("hills"));
     expect(lost).toMatchObject({
       news: "Egg Hills: 12,000 points.",
+      newBest: true,
       opened: null,
     });
     expect(lost.lastRun.outcome).toBe("lost");
+    // The best of the play is beaten only by a higher score: the same again is not a new best.
+    expect(settle(lost.progress, finished("hills")).newBest).toBe(false);
+    const higher = finished("hills", { score: () => 12_001 });
+    expect(settle(lost.progress, higher).newBest).toBe(true);
+    expect(
+      settle(freshProgress, finished("hills", { score: () => 0 })).newBest,
+    ).toBe(false);
   });
 });

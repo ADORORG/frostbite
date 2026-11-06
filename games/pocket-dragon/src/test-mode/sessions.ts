@@ -1,4 +1,7 @@
-import { createRunRecorder, type RunRecord } from "@frostbite/game-sdk/run-record";
+import {
+  createRunRecorder,
+  type RunRecord,
+} from "@frostbite/game-sdk/run-record";
 
 import type { ChapterPlay } from "../chapters.ts";
 import type { QuestSession } from "../quest-session.ts";

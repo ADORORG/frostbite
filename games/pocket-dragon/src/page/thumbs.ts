@@ -1,11 +1,12 @@
+import { attachZones } from "@frostbite/game-sdk/touch-zones";
+
 import type { Action } from "./hands.ts";
-import { attachZones } from "./zones.ts";
 
 // Where the thumbs go on a touch screen, the same in every level. The left half of the screen is a stick: pushed one of eight ways from its
 // middle, it holds that way (two of them on a slant). The right half acts (jump, talk, use, dance) and fires (or paints). The game's screen
 // keeps its 16:9 shape inside the box it is shown in: on a box taller than that (a phone held upright) the picture sits at the top and the
 // thumbs have the room under it, the act zone on the outside and fire on the inside; on a wider box (held on its side) the picture is in
-// the middle with room either side, acting above and firing below. The marks drawn for them (`touch.css`) follow the same sums.
+// the middle with room either side, acting above and firing below. The marks drawn for them (`thumbs.css`) follow the same sums.
 export type Stick =
   | "down"
   | "down-left"
@@ -29,15 +30,21 @@ export interface Point {
 export const upright = (width: number, height: number): boolean =>
   width < height * shape;
 
+// The tab (Levels or the Bag) is in the bottom left corner, under the left thumb, so the stick's middle is lifted clear of it: upright, the
+// room under the picture is taken to end this share of the box's height above its foot; on its side, the middle is this share of the way
+// down instead of half.
+export const footShare = 0.05;
+export const sideHeight = 0.4;
+
 // The middle of the stick: in the middle of the room under the picture, halfway across the left half (upright); in the middle of the room
-// to the left of the picture, or an eighth of the way in where that room is narrow (on its side).
+// to the left of the picture, or an eighth of the way in where that room is narrow, and a little above halfway down (on its side).
 export function stickMiddle(width: number, height: number): Point {
   if (upright(width, height)) {
     const picture = Math.min(height, width / shape);
-    return { x: width / 4, y: (picture + height) / 2 };
+    return { x: width / 4, y: (picture + height * (1 - footShare)) / 2 };
   }
   const room = (width - height * shape) / 2;
-  return { x: Math.max(room / 2, width / 8), y: height / 2 };
+  return { x: Math.max(room / 2, width / 8), y: height * sideHeight };
 }
 
 // The eight ways, by the eighth of a turn they point to (clockwise from right, as the page's y runs down).
@@ -106,15 +113,22 @@ export function createHeld(hold: (action: Action, on: boolean) => void) {
   };
 }
 
-// The thumbs on the screen's box: each zone a finger is in holds its actions.
+// The thumbs on the screen's box, through the SDK's zones: each zone a finger is in holds its actions, a finger that slides to the next zone
+// lets go of the first, and only a finger counts (a mouse has the keys). The SDK says where a finger is as a share of the box; the zones are
+// cut by the box's own shape, so its size is asked for each time.
 export function attachThumbs(
   stage: HTMLElement,
   hold: (action: Action, on: boolean) => void,
 ): () => void {
   const held = createHeld(hold);
-  return attachZones(stage, {
-    at: thumbAt,
+  return attachZones<Thumb>(stage, {
     enter: (thumb) => held.press(thumbHolds[thumb]),
+    fingersOnly: true,
     leave: (thumb) => held.release(thumbHolds[thumb]),
+    slide: true,
+    zoneAt: ({ x, y }) => {
+      const { height, width } = stage.getBoundingClientRect();
+      return thumbAt(x * width, y * height, width, height);
+    },
   });
 }

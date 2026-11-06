@@ -118,19 +118,6 @@ function drawShift(
   }
 }
 
-// How the quest ended, in a band low on the screen (the level's own words stay above it).
-function drawBanner(
-  context: CanvasRenderingContext2D,
-  title: string,
-  line: string,
-  fill: string,
-): void {
-  context.fillStyle = "rgb(12 6 32 / 0.78)";
-  context.fillRect(0, 100, width, 34);
-  write(context, title, width / 2, 103, 14, fill);
-  write(context, line, width / 2, 121, 8, colour.white);
-}
-
 export function drawQuest(
   context: CanvasRenderingContext2D,
   state: QuestState,
@@ -151,15 +138,5 @@ export function drawQuest(
     context.fillStyle = `rgb(255 255 255 / ${String(1 - since / arrivalTicks)})`;
     context.fillRect(0, 0, width, height);
   }
-  if (state.finishTick !== null)
-    drawBanner(
-      context,
-      "QUEST COMPLETE!",
-      test
-        ? "A TEST RUN: NOTHING WAS COUNTED"
-        : `THE DRAGONS ARE SAFE  TIME ${clockOf(state.finishTick)}`,
-      colour.gold,
-    );
-  else if (state.lost)
-    drawBanner(context, "THE QUEST IS OVER", "TRY AGAIN!", colour.blush);
+  // How the quest ended is told by the card over the screen once the run is over (`page/result.ts`).
 }

@@ -2,14 +2,14 @@
 
 An original, family-friendly adventure for the platform's arcade, starring Glitchy, a mysterious baby dragon, in three levels that change
 dimension as they go: a side view, a map from above, then the third dimension (a maze seen through Glitchy's eyes, and then the woods and
-DeFu's lair in true 3D). **The whole quest** plays them as one run
-against one clock: clear Egg Hills and its last portal shifts Glitchy into a new dimension, the Guild and the Castle; clear that and it
-turns into the third dimension, the Whispering Woods. The hearts Glitchy has left carry from level to level, and losing them all (or
-running out of a level's time) ends the quest. Win fast, with hearts to spare, for a place in the **Hall of Fame** (the ten best won quests,
-by score and then time, saved with the progress). A level cleared in the quest (or alone) opens it to practise on its own with 1, 2 or 3;
-only the whole quest reaches the Hall of Fame. It is client-only: no server, no network, nothing stored by the game itself (the platform
-keeps progress and milestones). Nobody is ever hurt: a grumpy creature is cheered up, a beaten ghost dragon turns to sparkles, a guard
-goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The villain is DeFu, who wants every dragon egg for her rocket.
+DeFu's lair in true 3D). **The whole quest** plays them as one run against one clock: clear Egg Hills and its last portal shifts Glitchy
+into a new dimension, the Guild and the Castle; clear that and it turns into the third dimension, the Whispering Woods. The hearts Glitchy
+has left carry from level to level, and losing them all (or running out of a level's time) ends the quest. Win fast, with hearts to spare,
+for a place in the **Hall of Fame** (the ten best won quests, by score and then time, saved with the progress). A level cleared in the
+quest (or alone) opens it to practise on its own with 1, 2 or 3; only the whole quest reaches the Hall of Fame. It is client-only: no
+server, no network, nothing stored by the game itself (the platform keeps progress and milestones). Nobody is ever hurt: a grumpy creature
+is cheered up, a beaten ghost dragon turns to sparkles, a guard goes home dizzy, a bump costs a heart, and a tired guild takes a nap. The
+villain is DeFu, who wants every dragon egg for her rocket.
 
 1. **Egg Hills** (a side-scrolling platformer). Run and jump across three stages: catch eggs and the golden egg on its high ledge, eat the
    fire berry, breathe fire to melt ice walls, and cheer up the gloomlings (land on them or puff fire at them). Each stage has its own
@@ -161,22 +161,24 @@ mode can win nothing: its runs never reach the platform, and the verifier (which
 Arrows or WASD to go, an action key (space or Z) and a fire key (F or X). In Egg Hills left and right run and up or the action key jumps
 (hold for a high jump, tap for a hop), down digs into a burrow, and with wings jump flaps in the air; in the woods up and down walk and
 left and right turn in the maze, and outside it the arrows walk, fire breathes at the tile ahead and the action key frees a caged dragon,
-opens a chest, fits a key or launches an egg (and skips a scene); in the castle the arrows
-walk, the action key talks, picks up and opens (a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows
-move through the menu and the action key chooses, or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a
-charm. In every level B eats a berry, R rolls a mushroom's glitch blast and G eats a pineapple, from the backpack; out of the maze in the
-woods E flies up, Q flies down, V turns on frost vision and H sends Sparky. Enter starts a run, P pauses, and between runs 0 chooses the
-whole quest, 1, 2 and 3 a level open to practise, and (once the quest is won) 4 visits the secret Sky Nursery. M and N turn the music and
-the effects off and on; the sound panel is at the bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or
-Space to press, Escape to close), so none of them start a run.
+opens a chest, fits a key or launches an egg (and skips a scene); in the castle the arrows walk, the action key talks, picks up and opens
+(a door, a chest, the cage), and fire leaves a guard dizzy. In a cheer battle the arrows move through the menu and the action key chooses,
+or the hotkeys act at once: 1 to 5 for the shows, Q a quick cheer, E evade and C a charm. In every level B eats a berry, R rolls a
+mushroom's glitch blast and G eats a pineapple, from the backpack; out of the maze in the woods E flies up, Q flies down, V turns on frost
+vision and H sends Sparky. Enter starts a run, P pauses, and between runs 0 chooses the whole quest, 1, 2 and 3 a level open to practise,
+and (once the quest is won) 4 visits the secret Sky Nursery. M and N turn the music and the effects off and on; the sound panel is at the
+bottom left. The card panel takes its own keys while it is open (Tab to move, Enter or Space to press, Escape to close), so none of them
+start a run.
 
-On a touch screen the thumbs play on the screen itself (`src/page/thumbs.ts`), each finger followed on its own. The left half is a
-stick: pushed any of eight ways from its marked middle, it holds that way (up jumps in Egg Hills). The right half acts (jump, talk, use or
-dance) and fires (or paints), as marked: side by side under the picture on a phone held upright, one above the other held on its side. A
-tap starts a run. **Bag** opens the backpack's three foods; out of the woods' maze **Fly ▲**, **Fly ▼**, **Vision** and **Sparky** are
-buttons over the screen, and in the Sky Nursery **Ink** and **Clear**. A cheer challenge is played with the stick and the act side. A thin
-line along the top holds the counts, the levels button (☰: the chapters and the player's card), pause and the sound switches; nothing
-scrolls. `touch.css` and `thumbs.css` lay out a touch screen, and the SDK's `phone.css` a narrow window with a mouse.
+On a touch screen the thumbs play on the screen itself (`src/page/thumbs.ts`, on the SDK's touch zones), each finger followed on its own:
+the left half is a stick, pushed any of eight ways from its marked middle (up jumps in Egg Hills), and the right half acts (jump, talk, use
+or dance) and fires (or paints), as marked. A cheer challenge is played with the stick and the act side. A tap on the screen starts a run.
+The SDK's `phone.css` makes the screen the whole frame, with the counts along the top and pause and the sound switches as icons in the top
+right corner. A tab stays in sight in the bottom left corner: **Levels** between runs (the quest and the levels on a sheet over the screen,
+with **Share card**), and **Bag** during a run with a backpack (its three foods slide out beside it). Out of the woods' maze **Fly up**,
+**Fly down**, **Vision** and **Sparky** are the SDK's touch buttons in the bottom right corner, and in the Sky Nursery **Ink** and
+**Clear**. Nothing scrolls. Before a run the screen shows the first-screen card of the quest or the level, and after one a card with how it
+ended, the score, the best and how to go again (`src/page/result.ts`), both drawn sharp by the SDK on a layer of their own.
 
 ## Layout
 
@@ -207,7 +209,7 @@ src/session.ts      one run of a level as a player plays it: ticks, control chan
 src/quest-session.ts the whole quest as a player plays it, its presses written into `keys` inputs sixty-four at a time
 src/screen/         drawing each level (a side view, a map from above, a raycast first-person view), at twice the size for sharp words;
                     the woods outside the maze flat (woods-base, the fallback) with what is written over them in 3D too (woods-base-hud,
-                    woods-scenes); quest-draw adds the quest's clock and hearts, the shift into the next dimension and how it ended;
+                    woods-scenes); quest-draw adds the quest's clock and hearts and the shift into the next dimension;
                     kit-sprites, pack-hud and each level's kit file draw the backpack, its foods, the glitch blasts and a big Glitchy;
                     frost-futures plays frost vision's three ways out with the rules, and frost-look draws them and the heights;
                     sparky-look draws Sparky flat, in the scenes and under the hearts
@@ -219,10 +221,9 @@ src/three/          the woods outside the maze in 3D with three.js: parts (shape
 src/card/           the player's card: words, content (what a card says, from the progress and the last run), trophy-list, invite,
                     layout (the three sizes), paint (blocks, sparkles, foil, type), art, frame and frame-text (the trading card),
                     trophies (the shelf), badges (the levels) and poster (the whole picture)
-src/page/           the page: keys (hands) and thumbs (zones, thumbs, tap-start, touch-panel, input; see `DECISIONS.md`), a level's
-                    run and the quest's (runs, quest-run), settle (what a finished run changes), send (a finished run to the platform,
-                    once), what is shown around the screen (view, with the Hall of Fame) and card-panel; styles in `card.css`,
-                    `touch.css` and `thumbs.css`
+src/page/           the page: keys (hands), thumbs (on the SDK's zones), the tab (Levels and the Bag), extras (a place's touch buttons),
+                    a level's run and the quest's (runs, quest-run), settle (what a finished run changes), result (the card after a
+                    run), view (around the screen, with the Hall of Fame) and card-panel; styles in `card.css`, `touch.css`, `thumbs.css`
 src/bonus/          the secret Sky Nursery: nursery (its own small seeded state machine), nursery-draw, nursery-run (a visit as
                     the page plays it, counting for nothing) and cards (its three cards to share)
 src/main.ts         joins the page to the platform (progress, milestones, runs) and runs it on the SDK's run loop
@@ -252,19 +253,19 @@ count what a run gathers, but the bank is not a milestone and is not checked.
 
 ## Milestones
 
-Forty, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs, fire,
-ice melted, gloomlings cheered, the hills cleared, a clear without a bump, guards cheered up and the rocket's eggs freed. The woods have
-ten, across their three parts: the maze's clues, chests, lanterns and moon chest, getting out of it (and within three minutes), the
-launcher built; every caged dragon freed in the woods; and DeFu's factory broken and her rocket defused in the lair. The guild has eleven,
-across day, night and winter: a first friend and the whole guild, every piece of gear, all eight of the night's eggs saved, the guild at
-level five, the castle stormed, without a nap, a perfect pick, within four minutes, a charm used, and the **Masterful Pocket Dragon
-Charm**, for storming the castle with every friend, every secret charm found, no nap, and every keeper won over with its favourite show
-first. Two more can be earned in any level and are named once: a first secret charm, and 300 metaplasma in one run. The whole quest
-earns every level's marks on the way (the same as each level played alone) and six of its own: winning it, winning without losing a
-heart, winning with exactly one heart left, winning in ten minutes or less, winning with every egg (Egg Hills' three golden eggs, all
-eight of the castle's night eggs saved and every egg of the woods' maze), and winning after visiting all six of Egg Hills' secret areas.
-Some are earned on the same tick as a level's clear, but each asks for something more than the clear. The words are in the manifest.
-The list is a draft for the owner to approve.
+Forty, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs, fire, ice
+melted, gloomlings cheered, the hills cleared, a clear without a bump, guards cheered up and the rocket's eggs freed. The woods have ten,
+across their three parts: the maze's clues, chests, lanterns and moon chest, getting out of it (and within three minutes), the launcher
+built; every caged dragon freed in the woods; and DeFu's factory broken and her rocket defused in the lair. The guild has eleven, across
+day, night and winter: a first friend and the whole guild, every piece of gear, all eight of the night's eggs saved, the guild at level
+five, the castle stormed, without a nap, a perfect pick, within four minutes, a charm used, and the **Masterful Pocket Dragon Charm**, for
+storming the castle with every friend, every secret charm found, no nap, and every keeper won over with its favourite show first. Two more
+can be earned in any level and are named once: a first secret charm, and 300 metaplasma in one run. The whole quest earns every level's
+marks on the way (the same as each level played alone) and six of its own: winning it, winning without losing a heart, winning with exactly
+one heart left, winning in ten minutes or less, winning with every egg (Egg Hills' three golden eggs, all eight of the castle's night eggs
+saved and every egg of the woods' maze), and winning after visiting all six of Egg Hills' secret areas. Some are earned on the same tick as
+a level's clear, but each asks for something more than the clear. The words are in the manifest. The list is a draft for the owner to
+approve.
 
 ## Fairness
 
@@ -284,16 +285,13 @@ the charms behind still takes the golden egg, after a nap; the castle bot plays 
 egg, then a puff of fire at any guard beside it or carrying an egg). A player who does nothing in DeFu's lair loses the rocket, and the
 level still ends. Nobody has played it as a person yet.
 
-## Tests
+## Tests and decisions
 
 `pnpm --filter @game/pocket-dragon test:unit` (the rules, the screen and the page's parts, the thumbs driven by pointer events among them),
 `test:integration` (the bundled page against a simulated platform: each level and the quest sent once under the platform's run and seed,
 test mode and the Sky Nursery sending nothing, a quest played by thumbs), `test:coverage`. Runs played to their end get their animation
-frames at once (`fastFrames`). The 3D view is tested without WebGL, as plain three.js objects; how it looks was checked in a browser.
-
-## Decisions
-
-The owners' decisions (three.js, test mode's key hash, the milestones) and the SDK stand-ins are in `DECISIONS.md`.
+frames at once (`fastFrames`). The 3D view is tested without WebGL, as plain three.js objects; how it looks was checked in a browser. The
+owners' decisions (three.js, test mode's key hash, the milestones, the touch tab and the phone guard's limit) are in `DECISIONS.md`.
 
 ## Ownership
 

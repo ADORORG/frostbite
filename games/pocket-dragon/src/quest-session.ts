@@ -1,4 +1,7 @@
-import { createRunRecorder, type RunRecord } from "@frostbite/game-sdk/run-record";
+import {
+  createRunRecorder,
+  type RunRecord,
+} from "@frostbite/game-sdk/run-record";
 
 import { gameId, verifierId, verifierVersion } from "./rules/constants.ts";
 import { maxTicks } from "./rules/quest/constants.ts";
