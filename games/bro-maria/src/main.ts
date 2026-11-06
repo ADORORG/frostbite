@@ -19,7 +19,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { stages, ticksPerSecond } from "./rules/constants.ts";
 import { coinsTaken } from "./rules/milestones.ts";
 import { scoreOf } from "./score.ts";

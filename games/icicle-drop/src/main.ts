@@ -19,7 +19,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { attachControls } from "./screen/controls.ts";
 import { showBoard } from "./screen/board-view.ts";
 import { guide } from "./guide.ts";

@@ -14,8 +14,10 @@
     "./audio/effects": "./src/audio/effects.ts",
     "./audio/settings": "./src/audio/settings.ts",
     "./audio/tracks": "./src/audio/tracks.ts",
+    "./best-progress": "./src/best-progress.ts",
     "./build": "./src/build.ts",
     "./cabinets": "./src/cabinets.ts",
+    "./card": "./src/card.ts",
     "./client": "./src/client.ts",
     "./controls": "./src/controls.ts",
     "./dev-host": "./src/dev-host/server.ts",
@@ -118,6 +120,10 @@
         "types": "./dist/audio/tracks.d.ts",
         "default": "./dist/audio/tracks.js"
       },
+      "./best-progress": {
+        "types": "./dist/best-progress.d.ts",
+        "default": "./dist/best-progress.js"
+      },
       "./build": {
         "types": "./dist/build.d.ts",
         "default": "./dist/build.js"
@@ -125,6 +131,10 @@
       "./cabinets": {
         "types": "./dist/cabinets.d.ts",
         "default": "./dist/cabinets.js"
+      },
+      "./card": {
+        "types": "./dist/card.d.ts",
+        "default": "./dist/card.js"
       },
       "./client": {
         "types": "./dist/client.d.ts",

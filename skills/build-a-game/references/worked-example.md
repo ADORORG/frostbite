@@ -16,7 +16,7 @@ These paths are in the platform's repository. Open the file when you need the re
 | Screen drawn from a state                          | `src/screen/`                                                                         |
 | Keys, and touch (the screen as the controller)     | `src/screen/controls.ts` (`thumbs.ts` in Bro Maria)                                   |
 | Music and effects as data                          | `src/audio.ts`, `src/feedback.ts`                                                     |
-| What is saved and how it is validated              | `src/progress.ts`                                                                     |
+| What is saved and how it is validated              | the SDK's `best-progress` (`<sdk>/best-progress`)                                     |
 | The page: joins everything to the platform         | `src/main.ts`, `index.html`, `styles.css`                                             |
 | The verifier the platform replays                  | `src/replay.ts`, `src/sample-run.ts`                                                  |
 | The manifest and its pinned digest                 | `configs/games/frost-runner.ts`, listed in `configs/games.ts`                         |

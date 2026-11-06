@@ -1,17 +1,18 @@
-import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { describe, expect, it } from "vitest";
 
+import { defaultSound } from "../src/audio/settings.ts";
 import {
+  finishRun,
   freshProgress,
   restore,
   withBest,
   withSound,
-} from "../src/progress.ts";
+} from "../src/best-progress.ts";
 
 const quiet = { effects: false, music: false, volume: 0.2 };
 
 describe("what the platform hands back", () => {
-  it("is the saved best when it is a whole number of points, and a fresh game otherwise", () => {
+  it("is the saved best when it is a whole number, and a fresh game otherwise", () => {
     expect(restore({ best: 120 })).toEqual({ best: 120, sound: defaultSound });
     expect(restore({ best: 0 })).toEqual({ best: 0, sound: defaultSound });
     for (const bad of [
@@ -34,9 +35,12 @@ describe("what the platform hands back", () => {
       defaultSound,
     );
   });
+});
+
+describe("keeping the best", () => {
+  const base = { best: 100, sound: quiet };
 
   it("keeps the larger of the best and a new score, and the sound settings with it", () => {
-    const base = { best: 100, sound: quiet };
     expect(withBest(base, 150)).toEqual({ best: 150, sound: quiet });
     expect(withBest(base, 90)).toBe(base);
     expect(withBest(base, 100)).toBe(base);
@@ -47,5 +51,19 @@ describe("what the platform hands back", () => {
       best: 7,
       sound: quiet,
     });
+  });
+
+  it("says a run's best is new only when it beat the best, never for a tie, a lower score or a first run that scored nothing", () => {
+    expect(finishRun(base, 150)).toEqual({
+      newBest: true,
+      progress: { best: 150, sound: quiet },
+    });
+    expect(finishRun(base, 100)).toEqual({ newBest: false, progress: base });
+    expect(finishRun(base, 40)).toEqual({ newBest: false, progress: base });
+    expect(finishRun(freshProgress, 0)).toEqual({
+      newBest: false,
+      progress: freshProgress,
+    });
+    expect(finishRun(freshProgress, 1).newBest).toBe(true);
   });
 });

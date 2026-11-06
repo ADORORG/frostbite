@@ -1,5 +1,6 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient } from "@frostbite/game-sdk/client";
+import { cardFor } from "@frostbite/game-sdk/card";
 import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 import { createPause } from "@frostbite/game-sdk/pause";
 import {
@@ -20,10 +21,10 @@ import { buildTimeline } from "./screen/timeline.ts";
 import {
   freshProgress,
   restore,
-  withBest,
+  finishRun,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { arrow, tapped, toggled, type Next } from "./picking.ts";
 import { type Direction } from "./rules/constants.ts";
 import { neighbour } from "./rules/board.ts";
@@ -32,7 +33,8 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
-import { cardOf } from "./screen/result.ts";
+import { guide } from "./guide.ts";
+import { resultOf } from "./screen/result.ts";
 import { firstView, type View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
@@ -100,7 +102,7 @@ function show(): void {
       : playing.after.score - playing.before.score - playing.after.lastGain;
   const state = shown();
   draw(context, state, view, playback.scene(), bonus);
-  guideLayer.show(cardOf(state, view));
+  guideLayer.show(cardFor(view.phase, guide, () => resultOf(state, view)));
 }
 
 // The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).
@@ -138,12 +140,12 @@ async function finish(finished: MatchSession): Promise<void> {
   sound.music(false);
   const state = finished.state();
   const record = finished.record();
-  const before = progress.best;
-  progress = withBest(progress, state.score);
+  const done = finishRun(progress, state.score);
+  progress = done.progress;
   view = {
     ...view,
     best: progress.best,
-    newBest: progress.best > before && state.score > 0,
+    newBest: done.newBest,
     phase: "over",
   };
   saveProgress();
