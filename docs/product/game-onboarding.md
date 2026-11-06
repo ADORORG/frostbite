@@ -120,8 +120,8 @@ Every game on the platform behaves the same way, and the SDK has the pieces so a
   paused run replays like any other.
 - **A layout that does not move**: nothing under the player's thumb may move during a run. A button that is not offered keeps its place
   (`visibility`, not `display: none`), buttons have a fixed minimum width so a changing label does not shift their neighbours, and the note, the
-  earned list and the score row have heights that never grow. `tests/e2e/tests/tower-stack-layout.spec.ts` compares the boxes through a run; copy it
-  for a new game.
+  earned list and the score row have heights that never grow. `tests/e2e/tests/game-contract.spec.ts` compares the boxes of the controls and the screen when a run starts and in its
+  first seconds, for every game under `games/`; nothing is copied for a new game.
 - **Tests without a speaker** (`@frostbite/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
   test can check that a game made a sound, stopped its music, or stayed quiet while paused.
 
@@ -291,6 +291,12 @@ must be one the frame can serve, the script must bundle, the game must tell the 
 must never refuse what it asks (an undeclared milestone, a call too large or too fast), nothing may be thrown
 uncaught, and the cover files the manifest names must exist. The same test fails if a folder under `/games` is not registered, or a registered embedded game has no
 folder. The runner starts the game in a simulated host with storage and network blocked.
+
+**The browser contract, run automatically.** `tests/e2e/tests/game-contract.spec.ts` opens every game under `games/` in the platform (the games
+that are not played on a screen of their own are listed in `tests/e2e/src/player-games.ts`) on every browser profile, the phone included, and
+checks what every game does the same way: the first Tab is the skip link, a run starts from a tap on a touch screen and from Enter on a keyboard,
+the first-screen card is drawn at the pixels of the display, and no control or screen moves when a run starts or in its first seconds. A new game
+gets it by existing. What it does not check, because it depends on how a game plays, stays in a spec of its own: how a run ends, and the card and note after it.
 
 Strict manifest fields; identifier shape and uniqueness; capabilities from the known list; milestone ids unique
 within the game (at most 64) and every text bounded (`gameManifestLimits`); the network is a configured chain;

@@ -7,6 +7,7 @@ import { chromium, devices, type Browser } from "@playwright/test";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { serveGame } from "../src/game-hosting.ts";
+import { gamesDirectory, notPlayedOnAScreen } from "../src/player-games.ts";
 import { controlProblems, measureControls } from "../src/game-controls.ts";
 import {
   layoutDifferences,
@@ -24,17 +25,11 @@ import {
 //  - On a desktop the place of every named part must be what `fixtures/games-desktop-layout.json` holds, give or take the room a font takes
 //    (`layoutTolerancePx`: exact pixels passed on the machine that recorded them and failed on CI), so a change made for phones cannot move
 //    anything there. A change meant for desktops is made on purpose: `UPDATE_GAME_LAYOUT=1 pnpm test:integration` writes the new places.
-const gamesDirectory = resolve(import.meta.dirname, "../../../games");
 const fixture = resolve(
   import.meta.dirname,
   "../fixtures/games-desktop-layout.json",
 );
 const update = process.env.UPDATE_GAME_LAYOUT === "1";
-// Not games played on a screen of their own: a developer tool, the original cabinets, which draw into a page of their own at run time, and the
-// fixture game, a plain starter page that exists so that tests have "a game" (it is not made to fit a phone, and a change to make it so would
-// change every test that uses it).
-const skipped = new Set(["sdk-explorer", "fixture-taps"]);
-
 // The frame the platform gives a game on an iPhone 13 held upright and on its side (measured in the platform's own page).
 const phones = [
   { height: 520, name: "portrait", width: 390 },
@@ -57,7 +52,7 @@ let names: string[] = [];
 beforeAll(async () => {
   outRoot = await mkdtemp(join(tmpdir(), "games-layout-"));
   names = (await buildGames({ gamesDirectory, outRoot })).filter(
-    (name) => !skipped.has(name),
+    (name) => !notPlayedOnAScreen.has(name),
   );
   browser = await chromium.launch();
 }, 120_000);

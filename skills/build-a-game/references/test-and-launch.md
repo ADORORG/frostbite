@@ -32,8 +32,10 @@ getContext()" when a test draws on a canvas; it is harmless.
   not earned by a run that falls short; an illegal input is refused with a reason.
 - **A guard is real:** break the code a test guards and watch the test fail for that reason, then restore it. A test that cannot fail
   is decoration.
-- **Page:** keys, pause (a paused run adds no input and no tick), sound state, and a layout that does not move (compare element boxes
-  through a run, as `tests/e2e/tests/tower-stack-layout.spec.ts` does).
+- **Page:** keys, pause (a paused run adds no input and no tick), sound state, and a layout that does not move. A new game
+  needs no spec of its own for that: `tests/e2e/tests/game-contract.spec.ts` runs over every folder under `games/` and checks that the
+  first Tab is the skip link, a run starts from a tap (touch) or Enter (keyboard), the first-screen card has the display's pixels, and
+  no control or screen moves when a run starts. Only what depends on how your game plays (a run ending, a note appearing) needs a spec.
 - **Honesty:** the page says "Connected" only when the platform answered. It never claims how a milestone is checked: that is the
   manifest's verification field, and the platform decides what players get.
 
@@ -53,8 +55,8 @@ getContext()" when a test draws on a canvas; it is harmless.
   the frame can serve, the script must bundle, the game must tell the platform it is ready, nothing may be refused or thrown, and the
   cover files must exist. It fails if a folder under `games/` is not registered.
 - `pnpm test:e2e` for the browser journeys when the change touches how games play. It builds the platform and starts a disposable
-  Postgres with Docker, so it is slow and needs Docker; a layout spec for a new game is copied from
-  `tests/e2e/tests/tower-stack-layout.spec.ts`. Say in your report if you could not run it.
+  Postgres with Docker, so it is slow and needs Docker; it includes the contract spec above, which your game joins by having a folder.
+  Say in your report if you could not run it.
 
 ## Open the pull request
 
