@@ -44,9 +44,9 @@ expectation can still pass here and fail there: guards compare with a tolerance 
 
 ### What a green local run does not cover
 
-`pnpm ci:local` does not run `contracts` (needs Rust), `image` (a Docker build, pull requests only) or `publish` (a push to `main`/`dev` after everything else
-passed): those run only on GitHub. It also cannot reproduce the runner's fonts or operating system. A green local run is therefore not the whole of Verify;
-read the jobs it names when it finishes.
+`pnpm ci:local` does not run `contracts` and `contracts-harness` (they need Rust), `image` (a Docker build, pull requests only) or `publish` (a push to
+`main`/`dev`, once `static`, `typecheck`, `coverage-merge`, `contracts`, `contracts-harness` and `e2e` passed): those run only on GitHub. It also cannot
+reproduce the runner's fonts or operating system. A green local run is therefore not the whole of Verify; read the jobs it names when it finishes.
 
 ### Before a push
 
