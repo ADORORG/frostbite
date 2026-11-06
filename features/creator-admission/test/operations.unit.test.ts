@@ -1,5 +1,5 @@
-import { creatorApplicationResponseSchema } from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { creatorApplicationResponseSchema } from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createCreatorApplicationOperations } from "../src/application/operations.ts";

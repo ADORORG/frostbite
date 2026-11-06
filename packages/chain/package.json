@@ -1,5 +1,5 @@
 {
-  "name": "@ador/chain",
+  "name": "@frostbite/chain",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -24,8 +24,8 @@
     "test:regtest": "vitest run --config vitest.regtest.config.ts"
   },
   "dependencies": {
-    "@ador/cache": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/cache": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@alkanes/ts-sdk": "https://pkg.alkanes.build/dist/@alkanes/ts-sdk?v=0.1.6-669e7c0",
     "@bitcoinerlab/secp256k1": "1.2.0",
     "bitcoinjs-lib": "7.0.2"

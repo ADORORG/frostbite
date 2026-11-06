@@ -1,4 +1,4 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/headers", () => ({
@@ -9,7 +9,7 @@ import { GET, POST } from "../src/app/api/v1/[...segments]/route.ts";
 
 beforeAll(() => {
   process.env.APP_ENV = "test";
-  process.env.NEXT_PUBLIC_APP_NAME = "Frostbit test";
+  process.env.NEXT_PUBLIC_APP_NAME = "Frostbite test";
   process.env.PUBLIC_BASE_URL = "https://launch.example";
   // What building the sign-in services reads; the email routes build theirs on the first request.
   process.env.AUTH_SESSION_ABSOLUTE_TIMEOUT_MS = "604800000";

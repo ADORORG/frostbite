@@ -2,7 +2,7 @@ import {
   collectionDraftSchema,
   collectionLimits,
   type CollectionDraft,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 
 // What the person has typed, as text: nothing is converted until they save, so a half-typed number is
 // never rewritten under them.

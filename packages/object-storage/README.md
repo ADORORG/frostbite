@@ -1,4 +1,4 @@
-# `@ador/object-storage`
+# `@frostbite/object-storage`
 
 Provider-neutral server-side object-storage contracts.
 

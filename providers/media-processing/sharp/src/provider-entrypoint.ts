@@ -1,6 +1,6 @@
-import type { MediaProcessingProviderServices } from "@ador/media/processing";
-import type { ProviderEntrypoint } from "@ador/plugin-kit/providers";
-import { resolveDerivativePolicy } from "@ador/shared/uploads";
+import type { MediaProcessingProviderServices } from "@frostbite/media/processing";
+import type { ProviderEntrypoint } from "@frostbite/plugin-kit/providers";
+import { resolveDerivativePolicy } from "@frostbite/shared/uploads";
 
 import { createSharpImageProcessor } from "./create-processor.ts";
 import { sharpMediaProcessingProviderId } from "./identity.ts";

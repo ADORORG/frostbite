@@ -2,7 +2,7 @@ import {
   httpErrorEnvelopeSchema,
   idempotencyHeaderName,
   type IdempotencyKey,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 
 import { ApiError } from "./api-error.ts";
 

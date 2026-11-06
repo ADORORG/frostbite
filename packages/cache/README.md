@@ -1,4 +1,4 @@
-# `@ador/cache`
+# `@frostbite/cache`
 
 The platform's one place for keeping a reading for a while: a server-side read cache for what many visitors ask of the same
 upstream, and a browser-side expiring store for what a page may keep between loads. Nothing else in the repository implements
@@ -14,7 +14,7 @@ its own time-to-live, single-flight or stale-while-error logic.
   - Callers that arrive while a reading is on its way share it; a failed reading is never kept; a reading still pending after
     `freshMs` is not waited on; a reading that finishes late never replaces a newer one.
 - `assertReadPolicy(policy)`: whole, non-negative milliseconds, `maxStaleMs` not below `freshMs`.
-- `@ador/cache/expiring-store`: `createExpiringStore({ storage, schema, prefix, maxAgeMs, now })` with `read`, `write`, `remove`.
+- `@frostbite/cache/expiring-store`: `createExpiringStore({ storage, schema, prefix, maxAgeMs, now })` with `read`, `write`, `remove`.
   Browser-safe. Storage is advisory: missing, full, blocked or edited storage is a miss, and a stored value is checked against its
   schema and its age before it is used.
 
@@ -26,7 +26,7 @@ its own time-to-live, single-flight or stale-while-error logic.
 
 ## Verification
 
-`pnpm --filter @ador/cache typecheck test:unit test:integration test:coverage`. Platform engineering owns it.
+`pnpm --filter @frostbite/cache typecheck test:unit test:integration test:coverage`. Platform engineering owns it.
 
 ## Ownership
 

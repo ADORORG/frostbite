@@ -1,4 +1,4 @@
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { describe, expect, it, vi } from "vitest";
 
 import { type E2ESessionContext, useE2ESession } from "../src/session.ts";

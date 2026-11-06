@@ -15,7 +15,7 @@ verifies a real bucket.
 
 ## Decisions
 
-- **Local R2 stand-in:** the already pinned MinIO image, packaged as `@ador/test-kit/s3-runtime` (per-run
+- **Local R2 stand-in:** the already pinned MinIO image, packaged as `@frostbite/test-kit/s3-runtime` (per-run
   credentials, buckets, CORS for the web origin, guaranteed cleanup). The R2 conformance suite now uses it.
 - **Plain `http` only on loopback outside hosted environments:** one rule in `@repo/config/transport`,
   applied to `R2_ENDPOINT` and the Inngest base URL; path-style addressing for plain-http endpoints.
@@ -38,11 +38,11 @@ verifies a real bucket.
 - `src/ui/hooks/` adapts that logic to React; `src/ui/components/` holds small presentational components;
   `uploads-workspace.tsx` is the only client boundary and composition root; `uploads-surface.tsx` is a
   server-rendered shell. The page is registered through the manifest (`/studio/uploads`, navigation entry),
-  with the path defined once in `@ador/shared/uploads`.
+  with the path defined once in `@frostbite/shared/uploads`.
 - Retry reuses the attempt's idempotency key, so intent creation (which re-signs) and completion are safe
   to repeat, and a finished transfer is never repeated.
-- Test and ops tooling: `@ador/test-kit` (`s3-runtime`, `service-process`, `png`), `withUploadServices` in
-  the e2e package, a real-R2 smoke script (`pnpm --filter @ador/provider-object-storage-r2 smoke`) and the
+- Test and ops tooling: `@frostbite/test-kit` (`s3-runtime`, `service-process`, `png`), `withUploadServices` in
+  the e2e package, a real-R2 smoke script (`pnpm --filter @frostbite/provider-object-storage-r2 smoke`) and the
   R2 checklist in that package's README.
 
 ## Findings and defects fixed

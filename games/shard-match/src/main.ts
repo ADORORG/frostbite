@@ -1,12 +1,18 @@
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient } from "@ador/game-sdk/client";
-import { createPause } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { startNote } from "@ador/game-sdk/run-notes";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient } from "@frostbite/game-sdk/client";
+import { cardFor } from "@frostbite/game-sdk/card";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
+import { createPause } from "@frostbite/game-sdk/pause";
+import {
+  connectToPlatform,
+  sendRun,
+  type PlatformPlay,
+} from "@frostbite/game-sdk/play";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { tempoFor, toastFor } from "./feedback.ts";
-import { followPause, loadTitles, refusalNote, submitRun } from "./submit.ts";
+import { followPause, loadTitles, refusalNote } from "./submit.ts";
 import { boxes, listEarned, setText } from "./dom.ts";
 import { hintFor, watchIdle } from "./hint.ts";
 import { createPlayback } from "./playback.ts";
@@ -15,10 +21,10 @@ import { buildTimeline } from "./screen/timeline.ts";
 import {
   freshProgress,
   restore,
-  withBest,
+  finishRun,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { arrow, tapped, toggled, type Next } from "./picking.ts";
 import { type Direction } from "./rules/constants.ts";
 import { neighbour } from "./rules/board.ts";
@@ -27,7 +33,9 @@ import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { fitCanvas, phoneMedia, watchShape } from "./screen/shape.ts";
-import type { View } from "./screen/view.ts";
+import { guide } from "./guide.ts";
+import { resultOf } from "./screen/result.ts";
+import { firstView, type View } from "./screen/view.ts";
 import { createMatchSession, type MatchSession } from "./session.ts";
 
 // The page of the game: it draws, it plays, and it asks the platform to remember. It saves nothing itself and asks nothing of the network.
@@ -42,6 +50,8 @@ const {
   screen,
 } = page;
 const { start: startButton, status, total: totalOut } = page;
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -54,16 +64,7 @@ let earnedCount = 0;
 let lastInput = Date.now();
 // The idle screen's board.
 let backdrop = startRun(1);
-let view: View = {
-  best: 0,
-  cursor: 0,
-  grab: -1,
-  hint: [],
-  newBest: false,
-  phase: "ready",
-  shape: "wide",
-  toast: null,
-};
+let view: View = firstView;
 
 const localSeed = (): number => Math.floor(Math.random() * 0x1_0000_0000);
 const pause = createPause();
@@ -99,7 +100,9 @@ function show(): void {
     playing === null
       ? 0
       : playing.after.score - playing.before.score - playing.after.lastGain;
-  draw(context, shown(), view, playback.scene(), bonus);
+  const state = shown();
+  draw(context, state, view, playback.scene(), bonus);
+  guideLayer.show(cardFor(view.phase, guide, () => resultOf(state, view)));
 }
 
 // The playback of the swap just made; when it is over a run that ended is closed (so the last chain is seen to its end).
@@ -137,18 +140,18 @@ async function finish(finished: MatchSession): Promise<void> {
   sound.music(false);
   const state = finished.state();
   const record = finished.record();
-  const before = progress.best;
-  progress = withBest(progress, state.score);
+  const done = finishRun(progress, state.score);
+  progress = done.progress;
   view = {
     ...view,
     best: progress.best,
-    newBest: progress.best > before && state.score > 0,
+    newBest: done.newBest,
     phase: "over",
   };
   saveProgress();
   show();
   startButton.textContent = "Play again";
-  await submitRun(play, runId, record, (text) => setText(note, text));
+  await sendRun(play, runId, record);
 }
 
 function swap(cell: number, direction: number): void {
@@ -218,13 +221,7 @@ async function begin(): Promise<void> {
   const started = await play?.runs.start().catch(() => null);
   const ready = started?.status === "started" ? started : null;
   runId = ready?.runId ?? null;
-  setText(
-    note,
-    startNote(
-      started ?? null,
-      "Swap neighbouring shards to line up three or more.",
-    ),
-  );
+  setText(note, "Swap neighbours to line up three.");
   session = createMatchSession({
     onEarned: (id) => {
       sound.sfx("milestone");
@@ -260,9 +257,7 @@ const startFromKey = (): void => {
   if (!startButton.disabled && !going()) void begin();
 };
 
-function togglePause(): void {
-  if (going()) pause.toggle();
-}
+const togglePause = (): void => void (going() && pause.toggle());
 
 async function connect(): Promise<void> {
   try {
@@ -292,6 +287,7 @@ attachControls(
   () => view.shape,
 );
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 backdrop = startRun(localSeed());

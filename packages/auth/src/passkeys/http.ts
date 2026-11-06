@@ -1,4 +1,4 @@
-import { uuidV7TextSchema } from "@ador/shared/identifiers";
+import { uuidV7TextSchema } from "@frostbite/shared/identifiers";
 import { z } from "zod";
 
 import {

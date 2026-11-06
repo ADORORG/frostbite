@@ -7,7 +7,7 @@ ledger row depend on a deployment and are not done.
 
 - **Readiness.** `GET /api/ready` (web) and `GET /ready` (worker): the database and object storage each answer a
   small request within a time limit; 200 when both do, 503 otherwise; the body names each check and its outcome
-  and nothing else (reasons go to the log). `/health` stays liveness only. `@ador/http/readiness`,
+  and nothing else (reasons go to the log). `/health` stays liveness only. `@frostbite/http/readiness`,
   `databaseReadinessProbe`, `storageReadinessProbe` (asks about a key nobody writes).
 - **Security headers** (`apps/web/src/proxy.ts`): a Content Security Policy with a per-response nonce for scripts
   (`strict-dynamic`), storage origin only for images and uploads, no frames in or out, no plugins; plus nosniff,

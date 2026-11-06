@@ -1,9 +1,9 @@
-import { refuse, tickNamed, withFields } from "@ador/game-sdk/run-inputs";
+import { refuse, tickNamed, withFields } from "@frostbite/game-sdk/run-inputs";
 import type {
   GameVerifier,
   RunInput,
   Stepped,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 
 import { verifierVersion } from "../constants.ts";
 import { noSettings } from "../held.ts";

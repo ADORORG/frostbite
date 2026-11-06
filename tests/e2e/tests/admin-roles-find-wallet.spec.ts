@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 
 import { expect, test, type Page } from "@playwright/test";
-import { testWallets } from "@ador/auth/test-fixtures";
+import { testWallets } from "@frostbite/auth/test-fixtures";
 import {
   authSessions,
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database";
+} from "@frostbite/database";
 import { eq } from "drizzle-orm";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

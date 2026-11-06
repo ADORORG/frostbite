@@ -1,6 +1,6 @@
 "use client";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
 import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 

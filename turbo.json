@@ -42,6 +42,7 @@
     "R2_PUBLIC_BUCKET",
     "R2_REGION",
     "R2_SECRET_ACCESS_KEY",
+    "SHARD_MATCH_LONG",
     "UPDATE_GAME_LAYOUT"
   ],
   "ui": "tui",

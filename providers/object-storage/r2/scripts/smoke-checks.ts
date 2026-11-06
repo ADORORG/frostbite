@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 
-import { parseObjectKey, type ObjectStoragePort } from "@ador/object-storage";
+import {
+  parseObjectKey,
+  type ObjectStoragePort,
+} from "@frostbite/object-storage";
 
 export interface SmokeResult {
   readonly detail: string;
@@ -8,7 +11,7 @@ export interface SmokeResult {
   readonly ok: boolean;
 }
 
-const bytes = Buffer.from("ador-r2-smoke");
+const bytes = Buffer.from("frostbite-r2-smoke");
 const contentType = "text/plain";
 const lifetimeSeconds = 60;
 

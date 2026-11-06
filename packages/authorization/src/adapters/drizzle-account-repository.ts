@@ -2,9 +2,9 @@ import {
   accountAuditEvents,
   organizationMemberships,
   organizations,
-} from "@ador/database/schema/accounts";
-import type { DatabaseClient } from "@ador/database/connection";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/accounts";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 
 import type {

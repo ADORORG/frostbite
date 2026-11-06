@@ -9,13 +9,14 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
-    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+    "test:coverage": "vitest run --config vitest.config.ts --coverage --exclude test/fairness.integration.test.ts",
+    "test:simulation": "vitest run --config vitest.config.ts test/fairness.integration.test.ts"
   },
   "dependencies": {
-    "@ador/game-sdk": "workspace:*"
+    "@frostbite/game-sdk": "workspace:*"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

@@ -1,5 +1,5 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { gameMilestoneUnlocks } from "@ador/database/schema/game-saves";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { gameMilestoneUnlocks } from "@frostbite/database/schema/game-saves";
 import { and, eq } from "drizzle-orm";
 
 // Whether the milestone is on the player's account as earned, at any level (reported by the game or replay-verified). What

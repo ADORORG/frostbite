@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CollectionDetail } from "@ador/shared/collections";
+import type { CollectionDetail } from "@frostbite/shared/collections";
 
 import {
   draftFormKeys,

@@ -13,8 +13,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/chain": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/chain": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/configs": "workspace:*"
   },

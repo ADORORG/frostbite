@@ -1,5 +1,5 @@
-import { createFeatureRegistry } from "@ador/plugin-kit";
-import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
+import { createFeatureRegistry } from "@frostbite/plugin-kit";
+import { chainFeesRoute, chainIndexingRoute } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createChainStatusFeature } from "../src/registration.ts";

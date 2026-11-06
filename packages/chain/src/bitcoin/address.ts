@@ -1,6 +1,6 @@
 import { address, networks, opcodes, script } from "bitcoinjs-lib";
 
-import type { BitcoinNetwork } from "@ador/shared/chain";
+import type { BitcoinNetwork } from "@frostbite/shared/chain";
 
 export type { BitcoinNetwork };
 

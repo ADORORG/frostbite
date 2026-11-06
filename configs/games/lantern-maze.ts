@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -111,12 +111,13 @@ export const lanternMazeGame = defineGame({
   schemaVersion: 1,
   summary:
     "Find the key and the door in a dark cellar, lit only by a lantern whose oil every step burns.",
+  tags: ["puzzle", "strategy"],
   title: "Lantern Maze",
   verification: {
     replay: {
       id: "lantern-maze",
       sha256:
-        "c1f66ba2f34f532dcffc22f3bf93aaf1ba4679d21b57d4bdf77be16fbae56564",
+        "47e85a8b3a1a108fde0dc22a1bf0c482296c33e0145eb8ed938032d60f37bb89",
       version: 1,
     },
   },

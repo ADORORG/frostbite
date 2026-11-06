@@ -2,8 +2,8 @@ import {
   authSecurityEvents,
   authSessions,
   contactIdentities,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { sha256 } from "../src/domain/crypto.ts";
@@ -102,10 +102,9 @@ describe("removing an address", () => {
   it("lists an account's addresses, oldest first, and only its own", async () => {
     const account = await twoAddresses();
     await signedInAccount({ address: "other@example.com" });
-    expect(await links.list(account.userId, "email")).toEqual([
-      "keep@example.com",
-      "drop@example.com",
-    ]);
+    expect(
+      (await links.list(account.userId, "email")).map(({ value }) => value),
+    ).toEqual(["keep@example.com", "drop@example.com"]);
     expect(await links.list(account.userId, "phone")).toEqual([]);
   });
 

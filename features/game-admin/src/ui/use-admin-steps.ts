@@ -1,12 +1,12 @@
-import type { FeeSpeed } from "@ador/shared/chain";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import type {
   GameAdminAction,
   GameAdminStep,
   GameAdminTransaction,
   ListGameAdminStepsResponse,
   ListGameAdminTemplatesResponse,
-} from "@ador/shared/games";
-import { walletRefusedCopy } from "@ador/wallet/client";
+} from "@frostbite/shared/games";
+import { walletRefusedCopy } from "@frostbite/wallet/client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { GameAdminApi } from "../client/api.ts";

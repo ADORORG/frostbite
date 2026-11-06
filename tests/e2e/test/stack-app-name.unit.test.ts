@@ -4,14 +4,18 @@ import { appNameFrom } from "../src/stack-app-name.ts";
 
 describe("the name the stack calls the platform", () => {
   it("is the settings file's, so the stack shows the product as it will be", () => {
-    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbit", {})).toBe("Frostbit");
-    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=  Frostbit  ", {})).toBe(
-      "Frostbit",
+    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbite", {})).toBe("Frostbite");
+    expect(appNameFrom("NEXT_PUBLIC_APP_NAME=  Frostbite  ", {})).toBe(
+      "Frostbite",
+    );
+    // A quoted value keeps its spaces when the file is read, so this is the case that needs the name's own trim.
+    expect(appNameFrom('NEXT_PUBLIC_APP_NAME="  Frostbite  "', {})).toBe(
+      "Frostbite",
     );
   });
   it("is the shell's when both are set", () => {
     expect(
-      appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbit", {
+      appNameFrom("NEXT_PUBLIC_APP_NAME=Frostbite", {
         NEXT_PUBLIC_APP_NAME: "Mine",
       }),
     ).toBe("Mine");

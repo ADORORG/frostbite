@@ -3,26 +3,26 @@ import {
   type DatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import type { AssetPipelineActivities } from "@ador/jobs/activities";
-import type { MediaProcessingProviderServices } from "@ador/media/processing";
-import type { ObjectStorageProviderServices } from "@ador/object-storage";
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import type { AssetPipelineActivities } from "@frostbite/jobs/activities";
+import type { MediaProcessingProviderServices } from "@frostbite/media/processing";
+import type { ObjectStorageProviderServices } from "@frostbite/object-storage";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import {
   resolveDerivativePolicy,
   resolveUploadPolicy,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import {
   createAssetPipelineActivities,
   createAssetProcessingService,
   createAssetValidationService,
   createDrizzleAssetProcessingRepository,
   createDrizzleAssetValidationRepository,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
 import { systemClock } from "./clock.ts";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
 
 export interface AssetPipelineOptions {
   readonly clock?: () => Date;

@@ -1,4 +1,4 @@
-import { block, sprite, wrap } from "@ador/game-sdk/pixels";
+import { block, sprite, wrap } from "@frostbite/game-sdk/pixels";
 
 // The screen's size and where the tower stands on it. The field is the rules' width in units, one to a pixel, in the middle of the screen.
 export const screenWidth = 160;

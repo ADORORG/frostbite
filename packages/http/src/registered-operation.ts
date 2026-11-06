@@ -1,5 +1,5 @@
-import type { RouteContribution } from "@ador/shared/features";
-import type { PageAccessRequirement } from "@ador/shared/features";
+import type { RouteContribution } from "@frostbite/shared/features";
+import type { PageAccessRequirement } from "@frostbite/shared/features";
 
 import { assertCachePolicy, type HttpCachePolicy } from "./cache.ts";
 import {

@@ -1,14 +1,15 @@
-import { createGuideLayer } from "@ador/game-sdk/guide-layer";
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { createRunLoop } from "@ador/game-sdk/run-loop";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@frostbite/game-sdk/play";
+import { createRunLoop } from "@frostbite/game-sdk/run-loop";
+import { byInput } from "@frostbite/game-sdk/touch";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { worldSounds } from "./feedback.ts";
@@ -19,7 +20,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachControls } from "./screen/controls.ts";
 import { ticksPerSecond } from "./rules/constants.ts";
@@ -154,17 +155,7 @@ async function finish(finished: RunSession): Promise<void> {
   saveProgress();
   show();
   startButton.textContent = "Run again";
-  if (runId === null || play === null) {
-    note.textContent = submitNote(null);
-    return;
-  }
-  const sent = runId;
-  note.textContent = submitNote({ kind: "pending" });
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  note.textContent = submitNote(settled);
+  await sendRun(play, runId, record);
 }
 
 const begin = (): Promise<void> =>
@@ -172,9 +163,9 @@ const begin = (): Promise<void> =>
     const started = await play?.runs.start().catch(() => null);
     const ready = started?.status === "started" ? started : null;
     runId = ready?.runId ?? null;
-    note.textContent = startNote(
-      started ?? null,
-      "Tap the top of the screen (or press space) to jump, the bottom (or the down key) to slide.",
+    note.textContent = byInput(
+      "Space jumps, down slides.",
+      "Tap the top to jump, the bottom to slide.",
     );
     session = createRunSession({
       onEarned: (id) => {
@@ -223,6 +214,7 @@ attachControls(screen, {
 jumpButton.addEventListener("click", () => act("jump"));
 slideButton.addEventListener("click", () => act("slide"));
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 void connect();

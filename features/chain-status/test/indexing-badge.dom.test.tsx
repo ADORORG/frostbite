@@ -1,6 +1,6 @@
-import { ApiError } from "@ador/client-http";
-import type { ChainIndexing } from "@ador/shared/chain";
-import { mount, settle, textOf } from "@ador/test-kit/dom";
+import { ApiError } from "@frostbite/client-http";
+import type { ChainIndexing } from "@frostbite/shared/chain";
+import { mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChainStatusApi } from "../src/client/api.ts";

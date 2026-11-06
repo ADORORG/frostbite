@@ -1,6 +1,6 @@
 import type { WalletAuthServices } from "../../src/application/wallet-services.ts";
-import type { HttpOperationContext } from "@ador/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { HttpOperationContext } from "@frostbite/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { vi } from "vitest";
 
 export const origin = "https://launch.example";

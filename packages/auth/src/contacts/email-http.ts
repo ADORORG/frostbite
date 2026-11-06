@@ -54,12 +54,20 @@ export const emailCodeSignedInResponseSchema = z.strictObject({
 });
 
 export const emailEmptyInputSchema = z.strictObject({});
+// The account's addresses, the oldest first, each with when it was added, and how many the account may hold.
 export const emailAddressesResponseSchema = z.strictObject({
-  addresses: z.array(z.string().min(1)),
+  addresses: z.array(
+    z.strictObject({
+      addedAt: z.iso.datetime(),
+      address: z.string().min(1),
+    }),
+  ),
+  maximum: z.number().int().min(1),
 });
 export const emailLinkedResponseSchema = z.strictObject({
   changed: z.literal(true),
 });
 
+export type EmailAddressesView = z.infer<typeof emailAddressesResponseSchema>;
 export type EmailCodeRequest = z.infer<typeof emailCodeRequestSchema>;
 export type EmailCodeVerify = z.infer<typeof emailCodeVerifySchema>;

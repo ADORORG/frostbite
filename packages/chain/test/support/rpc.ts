@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 
 import type { JsonRpc } from "../../src/bitcoin-alkanes/node/transport.ts";
 

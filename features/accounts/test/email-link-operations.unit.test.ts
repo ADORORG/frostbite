@@ -1,11 +1,12 @@
-import { accountOutcomes } from "@ador/shared/account-outcomes";
-import type { ContactLinkService } from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
+import type { ContactLinkService } from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createEmailLinkOperations } from "../src/application/email-link-operations.ts";
 
 const correlationId = createUuidV7();
+const added = new Date("2026-10-20T08:30:00.000Z");
 const actorSession = {
   absoluteExpiresAt: new Date("2026-10-26T00:00:00.000Z"),
   authenticatedAt: new Date("2026-10-25T12:00:00.000Z"),
@@ -25,7 +26,10 @@ function operations(overrides: Partial<ContactLinkService> = {}) {
     confirm: vi.fn(
       async () => ({ ok: true, sessionToken: "token-1" }) as const,
     ),
-    list: vi.fn(async () => ["a@b.co"]),
+    addresses: vi.fn(async () => ({
+      addresses: [{ addedAt: added, value: "a@b.co" }],
+      maximum: 5,
+    })),
     request: vi.fn(async () => ({ ok: true }) as const),
     unlink: vi.fn(async () => ({ ok: true, sessionToken: "token-2" }) as const),
     ...overrides,
@@ -51,7 +55,7 @@ describe("every email-linking step", () => {
     ];
     for (const answered of answers)
       expect(answered).toMatchObject({ error: "unauthorized", ok: false });
-    expect(service.list).not.toHaveBeenCalled();
+    expect(service.addresses).not.toHaveBeenCalled();
     expect(service.request).not.toHaveBeenCalled();
     expect(service.confirm).not.toHaveBeenCalled();
     expect(service.unlink).not.toHaveBeenCalled();
@@ -59,13 +63,19 @@ describe("every email-linking step", () => {
 });
 
 describe("listing the account's addresses", () => {
-  it("lists those of the session's own account", async () => {
+  it("lists those of the session's own account, each with when it was added (as text), and how many it may hold", async () => {
     const { addresses, service } = operations();
     expect(await addresses.execute({}, signedIn)).toEqual({
       ok: true,
-      value: { addresses: ["a@b.co"] },
+      value: {
+        addresses: [{ addedAt: "2026-10-20T08:30:00.000Z", address: "a@b.co" }],
+        maximum: 5,
+      },
     });
-    expect(service.list).toHaveBeenCalledWith(actorSession.userId, "email");
+    expect(service.addresses).toHaveBeenCalledWith(
+      actorSession.userId,
+      "email",
+    );
   });
 });
 
@@ -91,6 +101,7 @@ describe("asking for a link code", () => {
     [{ ok: false, reason: "invalid-destination" } as const, "invalid_request"],
     [{ ok: false, reason: "unsupported-channel" } as const, "not_found"],
     [{ ok: false, reason: "delivery-failed" } as const, "conflict"],
+    [{ ok: false, reason: "limit-reached" } as const, "conflict"],
     [
       { ok: false, reason: "cooldown", retryAfterMs: 5000 } as const,
       "conflict",
@@ -100,6 +111,16 @@ describe("asking for a link code", () => {
     const answered = await request.execute({ email: "a@b.co" }, signedIn);
     expect(answered).toMatchObject({ error, ok: false });
     expect(request.applicationErrors).toContain(error);
+  });
+
+  it("names the limit by its own outcome, so the page can say it in the catalogue's words", async () => {
+    const { request } = operations({
+      request: async () => ({ ok: false, reason: "limit-reached" }),
+    });
+    expect(await request.execute({ email: "a@b.co" }, signedIn)).toMatchObject({
+      message: accountOutcomes["email-limit-reached"].message,
+      reason: "email-limit-reached",
+    });
   });
 });
 
@@ -138,6 +159,7 @@ describe("entering a link code", () => {
 
   it.each([
     ["taken", "conflict", "email-taken"],
+    ["limit-reached", "conflict", "email-limit-reached"],
     [
       "recent-authentication-required",
       "forbidden",

@@ -1,27 +1,33 @@
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { cardFor } from "@frostbite/game-sdk/card";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@frostbite/game-sdk/play";
+import { byInput } from "@frostbite/game-sdk/touch";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { stepSounds, tempoFor } from "./feedback.ts";
 import {
   freshProgress,
   restore,
-  withBest,
+  finishRun,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { directions, type Direction } from "./rules/constants.ts";
 import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
+import { lanternPoint } from "./screen/layout.ts";
+import { guide } from "./guide.ts";
+import { resultOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createMazeSession, type MazeSession } from "./session.ts";
 
@@ -53,6 +59,8 @@ const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
 const pad = element("pad", "div");
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -88,7 +96,10 @@ const going = (): boolean => {
 };
 
 function show(): void {
-  if (context !== null) draw(context, session?.state() ?? backdrop, view);
+  if (context === null) return;
+  const state = session?.state() ?? backdrop;
+  draw(context, state, view);
+  guideLayer.show(cardFor(view.phase, guide, () => resultOf(state, view)));
 }
 
 function addEarned(id: string): void {
@@ -126,28 +137,18 @@ async function finish(finished: MazeSession): Promise<void> {
   sound.music(false);
   const state = finished.state();
   const record = finished.record();
-  const before = progress.best;
-  progress = withBest(progress, state.score);
+  const done = finishRun(progress, state.score);
+  progress = done.progress;
   view = {
     ...view,
     best: progress.best,
-    newBest: progress.best > before && state.score > 0,
+    newBest: done.newBest,
     phase: "over",
   };
   saveProgress();
   show();
   startButton.textContent = "Light another";
-  if (runId === null || play === null) {
-    setText(note, submitNote(null));
-    return;
-  }
-  const sent = runId;
-  setText(note, submitNote({ kind: "pending" }));
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  setText(note, submitNote(settled));
+  await sendRun(play, runId, record);
 }
 
 function choose(direction: Direction): void {
@@ -170,9 +171,9 @@ async function begin(): Promise<void> {
   runId = ready?.runId ?? null;
   setText(
     note,
-    startNote(
-      started ?? null,
-      "Find the key, then the door. Every step burns oil; flasks add some.",
+    byInput(
+      "Find the key, then the door.",
+      "Tap or hold to walk. Find the key, then the door.",
     ),
   );
   session = createMazeSession({
@@ -241,16 +242,30 @@ async function connect(): Promise<void> {
 screen.width = screenWidth * canvasScale;
 screen.height = screenHeight * canvasScale;
 setText(totalOut, String(milestoneIds.length));
-attachControls(screen, {
-  move: choose,
-  pause: togglePause,
-  start: startFromKey,
-});
+attachControls(
+  screen,
+  {
+    move: choose,
+    pause: togglePause,
+    start: startFromKey,
+  },
+  () => {
+    const state = session?.state();
+    return state === undefined || state.ended
+      ? null
+      : lanternPoint(
+          state.layout.maze.width,
+          state.layout.maze.height,
+          state.position,
+        );
+  },
+);
 for (const direction of directions)
   pad
     .querySelector(`[data-direction="${direction}"]`)
     ?.addEventListener("click", () => choose(direction));
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 backdrop = startRun(localSeed());

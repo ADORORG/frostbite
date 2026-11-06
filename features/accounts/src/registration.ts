@@ -1,6 +1,10 @@
-import { defineFeature } from "@ador/plugin-kit";
-import { emailCodeRoutes, passkeyRoutes, walletAuthRoutes } from "@ador/auth";
-import { manageRolesCapability } from "@ador/shared/accounts";
+import { defineFeature } from "@frostbite/plugin-kit";
+import {
+  emailCodeRoutes,
+  passkeyRoutes,
+  walletAuthRoutes,
+} from "@frostbite/auth";
+import { manageRolesCapability } from "@frostbite/shared/accounts";
 
 import { walletBalanceRoute } from "./balance/contract.ts";
 import type { BalanceSource } from "./balance/source.ts";
@@ -40,12 +44,14 @@ export function createAccountsFeature(
   setup: SetupRules,
   // How email sign-in works here, or null when the deployment has no mail (the routes then answer that email is not available).
   email: EmailSignInRules | null,
+  // The most email addresses one account may hold, whether or not mail is set up.
+  maximumEmailAddresses: number,
 ) {
   const wallet = validateWalletAuthConfig(input);
   // One passkey service for the whole feature, made when a request first needs it.
   const passkeys = createPasskeyServiceResolver(methods);
   // One channel and one sender for signing in by email and for adding an address to an account.
-  const emails = createEmailResolvers(email, methods);
+  const emails = createEmailResolvers(email, methods, maximumEmailAddresses);
   return defineFeature({
     manifest: {
       capabilities: [
@@ -105,7 +111,7 @@ export function createAccountsFeature(
       version: "1.0.0",
     },
     load: async () =>
-      import("@ador/feature-accounts/entrypoint").then(
+      import("@frostbite/feature-accounts/entrypoint").then(
         ({ createAccountsEntrypoint }) =>
           createAccountsEntrypoint({
             balanceSource,

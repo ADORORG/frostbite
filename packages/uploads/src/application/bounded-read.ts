@@ -1,6 +1,6 @@
 import type { Readable } from "node:stream";
 
-import { ObjectStorageError } from "@ador/object-storage/errors";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
 
 // Buffers at most `limit` bytes, so memory is bounded by the declared size. Returns null as soon
 // as the object proves larger; the stream is always destroyed.

@@ -1,4 +1,4 @@
-import { siteDescription, siteTagline } from "@ador/shared/platform";
+import { siteDescription, siteTagline } from "@frostbite/shared/platform";
 import { describe, expect, it } from "vitest";
 
 import { createPlatformShellEntrypoint } from "../src/entrypoint.js";

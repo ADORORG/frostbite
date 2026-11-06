@@ -3,7 +3,7 @@ import {
   targetBlocksOf,
   type FeeSpeed,
   type FeeSpeedPolicy,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import release from "../contracts/templates/release.json" with { type: "json" };
 

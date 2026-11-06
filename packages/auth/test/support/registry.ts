@@ -1,4 +1,4 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
 
 import { createMethodRegistry } from "../../src/methods/registry.ts";
 import { passkeyMethod } from "../../src/passkeys/method.ts";

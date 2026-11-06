@@ -6,7 +6,7 @@ import { config, proxy } from "../src/proxy";
 beforeEach(() => {
   vi.stubEnv("APP_ENV", "production");
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbite");
   vi.stubEnv("R2_ENDPOINT", "https://acct.r2.cloudflarestorage.com");
   vi.stubEnv("SECURITY_CSP_MODE", "");
   vi.stubEnv("TRUSTED_PROXY_HOPS", "");

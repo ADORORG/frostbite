@@ -4,10 +4,10 @@ import type {
   CreatorApplicationState,
   CreatorReviewPosition,
   CreatorReviewSort,
-} from "@ador/shared/creator-admission";
-import type { PlatformRole } from "@ador/shared/accounts";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { CorrelationId, IdempotencyKey } from "@ador/shared/http";
+} from "@frostbite/shared/creator-admission";
+import type { PlatformRole } from "@frostbite/shared/accounts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { CorrelationId, IdempotencyKey } from "@frostbite/shared/http";
 
 export interface CreatorApplicationFeedback {
   readonly createdAt: Date;

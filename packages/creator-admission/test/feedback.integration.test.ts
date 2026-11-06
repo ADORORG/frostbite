@@ -1,5 +1,5 @@
-import { creatorAdmissionEvents } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { creatorAdmissionEvents } from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import {

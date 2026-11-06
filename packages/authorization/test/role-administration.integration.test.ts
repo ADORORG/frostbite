@@ -1,5 +1,5 @@
-import { runMigrations } from "@ador/database";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+import { runMigrations } from "@frostbite/database";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createDrizzleRoleAdministration } from "../src/adapters/drizzle-role-administration.ts";

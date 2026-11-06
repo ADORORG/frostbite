@@ -11,6 +11,11 @@ viewport projects (mobile, tablet, desktop, wide). Real-service flows (uploads, 
 run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experience-quality matrices
 (axe, keyboard, reduced motion, layout) run on every viewport.
 
+**What a project skips is printed.** `src/skip-reporter.ts` lists, after a run, every test a project skipped and the reason given to
+`test.skip(condition, "reason")`, so a spec that does not run on a phone shows in the log instead of hiding behind a green total. A test that
+should run on the `mobile` project must not be in `desktopOnlySpecs`; `test/playwright-config.integration.test.ts` fails if a layout, touch or phone spec is.
+Pass `--reporter=list` to see each test's result.
+
 **Pictures are compared only on request.** Without `E2E_VISUAL=1` every `toHaveScreenshot` is skipped
 (`ignoreSnapshots`), and the rest of each test still runs. Verify (`ci.yml`) never compares pictures; the
 "Visual baselines" workflow (`visual.yml`, by hand or weekly) does, and gates nothing.
@@ -46,8 +51,8 @@ PostgreSQL, S3, worker, Inngest, and web server as the browser tests, with the s
 until Ctrl+C. It builds the web app first (every start; Next reuses its cache, `--no-build` skips it), then
 prints the address, the pages worth visiting, and which rewards chain it is on.
 
-- **The data is kept.** The stack's PostgreSQL and S3 store (SeaweedFS) are containers named `ador-stack-postgres` and
-  `ador-stack-s3` with their data in Docker volumes (`ador-stack-postgres-data`, `ador-stack-s3-data`). Ctrl+C
+- **The data is kept.** The stack's PostgreSQL and S3 store (SeaweedFS) are containers named `frostbite-stack-postgres` and
+  `frostbite-stack-s3` with their data in Docker volumes (`frostbite-stack-postgres-data`, `frostbite-stack-s3-data`). Ctrl+C
   stops them and keeps them; the next `pnpm stack` starts them again, applies any new migrations, and seeds the people and
   sample content only if they are not there. The passwords they were made with are in `.stack-data/secrets.json` (ignored by
   git, owner-readable). `pnpm stack --fresh` deletes the containers, volumes and passwords first, after you type `delete`

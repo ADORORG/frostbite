@@ -1,4 +1,4 @@
-import { ScenesProvider } from "@ador/scenes/react";
+import { ScenesProvider } from "@frostbite/scenes/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 

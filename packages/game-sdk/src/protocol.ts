@@ -5,6 +5,7 @@ import {
   claimStates,
   claimUnavailableReasons,
   errorCodeSchema,
+  forwardedKeySchema,
   gameChannel,
   jsonValueSchema,
   milestoneStatusSchema,
@@ -174,7 +175,7 @@ export const methods = {
         .strict(),
     ]),
   },
-  // Hands the platform the record of a run it issued (`@ador/game-sdk/run-record`). The platform replays it under the
+  // Hands the platform the record of a run it issued (`@frostbite/game-sdk/run-record`). The platform replays it under the
   // game's published rules: `verified` (and which milestones that earned), `rejected` (with why; the run is spent), or
   // `refused` (nothing was replayed). One record per run.
   "run.submit": {
@@ -243,6 +244,9 @@ export const events = {
     .object({ id: z.string().min(1).max(64), state: z.enum(claimStates) })
     .strict(),
   "fullscreen.changed": z.object({ active: z.boolean() }).strict(),
+  // A key pressed while the keyboard is the page's (nothing is focused), so a player can start a game without a click first and the
+  // page's skip link stays the first stop for Tab. The client plays it back as a key event on the game's window.
+  "key.forwarded": forwardedKeySchema,
   "player.changed": playerIdentitySchema,
   "lifecycle.changed": z
     .object({ state: z.enum(["active", "paused"]) })

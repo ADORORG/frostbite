@@ -1,7 +1,7 @@
 import { act } from "react";
 import { describe, expect, it } from "vitest";
 
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { LibraryWorkspace } from "../src/ui/library-workspace.tsx";
 import {
   button,

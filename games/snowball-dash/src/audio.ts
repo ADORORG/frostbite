@@ -1,5 +1,9 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Snowball Dash's sound, as data: a driving groove in D minor (a pulsing bass under a falling-snow tune; the page speeds it up as the
 // slope does), and an effect for each thing that happens, with a shard that rings higher the longer the run of close calls. Nothing here is

@@ -1,4 +1,5 @@
-import { ApiError } from "@ador/client-http";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -70,7 +71,10 @@ describe("opening the saved link", () => {
     const store = storeHolding("tok");
     expect(
       await redeemSavedToken({ redeem: failsWith("not_found"), store }),
-    ).toEqual({ kind: "invalid" });
+    ).toEqual({
+      kind: "invalid",
+      message: outcomeMessage("setup-link-invalid"),
+    });
     expect(store.held).toBeNull();
   });
 

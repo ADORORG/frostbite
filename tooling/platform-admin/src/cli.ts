@@ -6,8 +6,8 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import { createAuthMethods } from "@ador/feature-accounts/methods";
+} from "@frostbite/database/connection";
+import { createAuthMethods } from "@frostbite/feature-accounts/methods";
 import { parseEnvironment } from "@repo/config/env";
 import { parseMailEnvironment } from "@repo/config/mail";
 

@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { castleMotes } from "../rules/castle/motes.ts";
 import { charmSpots } from "../rules/castle/places.ts";

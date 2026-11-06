@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -6,12 +6,11 @@ const [betaTarget] = targetChains;
 if (betaTarget === undefined) throw new Error("No target chain is configured.");
 
 // POCKET DRAGON: GLITCHY'S QUEST: an original, family-friendly adventure in three levels that change dimension as they go, played as one
-// timed run (the whole quest) or a level at a time for practice: Egg Hills, a side-scrolling platformer with DeFu's fights; the Guild
-// and the Castle, a small role-playing quest on a map from above (day, night and winter); and the Whispering Woods, a maze seen through
-// Glitchy's eyes and then DeFu's woods and lair in 3D, where her egg rocket is defused or launched. Hearts carry from level to level on one
-// clock, and the page keeps a Hall of Fame of won quests; a phone plays it with thumbs on the screen. Nobody is ever hurt. Every milestone
-// is decided by the rules alone (`games/pocket-dragon/src/rules/*/milestones.ts`) and replay-checked: one verifier, a cabinet per level
-// and one for the quest; a replay shows the run followed the rules, not that a person played it. The digest pins the built file: a change
+// timed run (the whole quest) or a level at a time: Egg Hills, a side-scrolling platformer with DeFu's fights; the Guild and the Castle, a
+// small role-playing quest on a map from above (day, night and winter); and the Whispering Woods, a maze seen through Glitchy's eyes, then
+// DeFu's woods and lair in 3D, where her egg rocket is defused or launched. Hearts carry over on one clock; won quests go in a Hall of
+// Fame; a phone plays it with thumbs on the screen. Nobody is ever hurt. Every milestone is decided by the rules alone (`src/rules/*/
+// milestones.ts`) and replay-checked by one verifier with a cabinet per level and the quest; the digest pins the built file, so a change
 // to the rules is a change here. The title, summary and milestone list are a draft for the owner.
 const once = (
   id: string,
@@ -287,6 +286,7 @@ export const pocketDragonGame = defineGame({
   schemaVersion: 1,
   summary:
     "A baby dragon's quest across three dimensions: a boss-battle platformer, a guild of dragons who storm a castle, and a 3D race to defuse DeFu's egg rocket.",
+  tags: ["platformer", "action", "strategy"],
   title: "Pocket Dragon: Glitchy's Quest",
   verification: {
     replay: {

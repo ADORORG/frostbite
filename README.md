@@ -1,6 +1,6 @@
-# frostbit
+# Frostbite
 
-The frostbit is a modular Bitcoin Alkanes launchpad and game arcade. This repository is the shared
+Frostbite is a modular Bitcoin Alkanes launchpad and game arcade. This repository is the shared
 Turborepo foundation for the web application, feature plugins, reusable UI, runtime-neutral
 contracts, configuration, and provider-neutral PostgreSQL infrastructure.
 
@@ -18,6 +18,7 @@ gated until their product decisions and end-to-end verification are complete.
 - `packages/ui` — reusable arcade components and design tokens.
 - `tests/e2e` — Playwright browser coverage.
 - `tooling/repository-policy` — executable workspace, boundary, file-size, and coverage gates.
+- `tooling/brand-rename` — `pnpm rename:brand`: renames the platform's npm scope and the names built on it, and checks that nothing was missed.
 - `packages/jobs` — provider-neutral outbox relay policy and workflow publication port.
 - `apps/worker` — standalone service: signed workflow endpoint and outbox relay.
 
@@ -55,7 +56,7 @@ pnpm repository:check
 ```
 
 The web container applies pending database migrations when it starts, before it serves (the image's default command), under a database
-lock so containers starting together migrate once. The worker never migrates. Locally, run `pnpm --filter @ador/database migration:apply`.
+lock so containers starting together migrate once. The worker never migrates. Locally, run `pnpm --filter @frostbite/database migration:apply`.
 
 `pnpm stack` starts the whole product locally (database, storage, worker, web) with seeded users, keeping its data between runs, for
 manual testing in a browser; see [`tests/e2e/README.md`](tests/e2e/README.md).

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { failed } from "../src/client/outcome.ts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -18,6 +18,7 @@ const flow = vi.hoisted(() => ({
   findPeople: vi.fn(),
   grantRole: vi.fn(),
   listPeople: vi.fn(),
+  searchPeople: vi.fn(),
   suspendRole: vi.fn(),
 }));
 vi.mock("../src/roles/roles-flow.ts", () => flow);
@@ -204,10 +205,10 @@ describe("changing a role", () => {
 
 describe("finding a person", () => {
   it("shows the account the typed address names, with the actions for it", async () => {
-    flow.findPeople.mockResolvedValue([grace]);
+    flow.searchPeople.mockResolvedValue({ kind: "found", people: [grace] });
     await mount([ada]);
     await search("grace@example.com");
-    expect(flow.findPeople).toHaveBeenCalledWith(
+    expect(flow.searchPeople).toHaveBeenCalledWith(
       expect.any(Function),
       "grace@example.com",
     );
@@ -218,11 +219,14 @@ describe("finding a person", () => {
   });
 
   it("says how many matched, and that only an exact match is found when none did", async () => {
-    flow.findPeople.mockResolvedValue([grace, ada]);
+    flow.searchPeople.mockResolvedValue({
+      kind: "found",
+      people: [grace, ada],
+    });
     await mount([]);
     await search("x");
     expect(lamp()).toContain("2 accounts match");
-    flow.findPeople.mockResolvedValue([]);
+    flow.searchPeople.mockResolvedValue({ kind: "found", people: [] });
     await search("nobody@example.com");
     expect(lamp()).toContain("Nobody has that address");
     expect(
@@ -230,19 +234,22 @@ describe("finding a person", () => {
     ).toBeNull();
   });
 
-  it("says the search could not be completed", async () => {
-    flow.findPeople.mockRejectedValue(new Error("down"));
+  it("says why the search failed in the catalogue's words, by the outcome and not by any text", async () => {
+    flow.searchPeople.mockResolvedValue(failed("signed-out"));
     await mount([]);
     await search("x");
-    expect(lamp()).toContain("could not be completed");
+    expect(lamp()).toBe(outcomeMessage("signed-out"));
+    expect(container.querySelector(".status-lamp--unavailable")).not.toBeNull();
   });
 
   it("reads the results again after a change made from them", async () => {
+    flow.searchPeople.mockResolvedValue({ kind: "found", people: [grace] });
     flow.findPeople.mockResolvedValue([grace]);
     flow.grantRole.mockResolvedValue({ effective: true, kind: "granted" });
     await mount([ada]);
     await search("grace@example.com");
     await press("Grant staff for grace@example.com");
-    expect(flow.findPeople).toHaveBeenCalledTimes(2);
+    expect(flow.searchPeople).toHaveBeenCalledOnce();
+    expect(flow.findPeople).toHaveBeenCalledOnce();
   });
 });

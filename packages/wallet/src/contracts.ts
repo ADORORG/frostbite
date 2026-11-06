@@ -1,4 +1,4 @@
-import type { WalletNetwork } from "@ador/shared/chain";
+import type { WalletNetwork } from "@frostbite/shared/chain";
 
 export type { WalletNetwork };
 

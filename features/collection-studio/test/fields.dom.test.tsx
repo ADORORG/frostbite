@@ -1,4 +1,4 @@
-import { chainOptionSchema } from "@ador/shared/chain";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import {
   chooseOption,
   click,
@@ -7,7 +7,7 @@ import {
   mount,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -20,7 +20,7 @@ import {
 } from "../src/ui/components/step-fields.tsx";
 import { fakeCollections } from "./support/fake-api.ts";
 import { imageAsset } from "./support/detail.ts";
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { signet } from "./support/stubs.ts";
 
 const chain = chainOptionSchema.parse({

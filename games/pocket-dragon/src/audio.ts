@@ -1,5 +1,5 @@
-import { commonEffects, tone, type Effect } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import { commonEffects, tone, type Effect } from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 import { moreEffects } from "./audio-more.ts";
 import type { ChapterId } from "./rules/constants.ts";

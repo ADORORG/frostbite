@@ -1,5 +1,5 @@
-import { refuse } from "@ador/game-sdk/run-inputs";
-import type { Stepped } from "@ador/game-sdk/run-record";
+import { refuse } from "@frostbite/game-sdk/run-inputs";
+import type { Stepped } from "@frostbite/game-sdk/run-record";
 
 import { castleChapter } from "../castle/index.ts";
 import { castleEarned } from "../castle/milestones.ts";

@@ -1,4 +1,4 @@
-import type { FeeRate, JsonValue } from "@ador/shared/chain";
+import type { FeeRate, JsonValue } from "@frostbite/shared/chain";
 
 import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
 import { isRecord, listOf, recordOf, textOf, wholeNumberOf } from "./json.ts";
@@ -57,6 +57,9 @@ function utxoOf(value: JsonValue): NodeUtxo {
   };
 }
 
+// What is said when the node has no estimate for the confirmation target asked about: for one target and for a list of them alike.
+const noFeeEstimateWords = "The node has no fee estimate for the target.";
+
 // One look at the node's fee estimates, answered for each target with the nearest estimate at or above it. A target the node has no
 // estimate for stops the whole answer: a rate is never guessed.
 async function feeRatesFor(
@@ -78,9 +81,7 @@ async function feeRatesFor(
     const choice = known.find(([blocks]) => blocks >= target);
     const rate = choice?.[1];
     if (typeof rate !== "number") {
-      throw new NodeUnavailableError(
-        "The node has no fee estimate for the target.",
-      );
+      throw new NodeUnavailableError(noFeeEstimateWords);
     }
     return { satPerVb: rate, targetBlocks: target };
   });
@@ -125,9 +126,7 @@ export function createEsploraClient(rpc: JsonRpc): EsploraClient {
     feeRate: async (target) => {
       const [only] = await feeRatesFor(rpc, [target]);
       if (only === undefined) {
-        throw new NodeUnavailableError(
-          "The node has no fee estimate for the target.",
-        );
+        throw new NodeUnavailableError(noFeeEstimateWords);
       }
       return only.satPerVb;
     },

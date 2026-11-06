@@ -1,7 +1,7 @@
 "use client";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
-import { platformRoles, type PlatformRole } from "@ador/shared/accounts";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
+import { platformRoles, type PlatformRole } from "@frostbite/shared/accounts";
 import {
   ArcadeActionButton,
   SectionBlock,
@@ -15,6 +15,7 @@ import {
   findPeople,
   grantRole,
   listPeople,
+  searchPeople,
   suspendRole,
   type Person,
 } from "./roles-flow.ts";
@@ -57,8 +58,11 @@ export function RolesPanel({
   async function search(event: FormEvent) {
     event.preventDefault();
     setWorking(true);
-    try {
-      const matches = await findPeople(request, query);
+    const outcome = await searchPeople(request, query);
+    if (outcome.kind === "failed") {
+      setMessage({ text: outcome.message, tone: "unavailable" });
+    } else {
+      const matches = outcome.people;
       setFound(matches);
       setMessage({
         text:
@@ -66,11 +70,6 @@ export function RolesPanel({
             ? "Nobody has that address. Check how it is written; only an exact match is found."
             : `${matches.length === 1 ? "One account matches" : `${matches.length} accounts match`}.`,
         tone: matches.length === 0 ? "unavailable" : "ready",
-      });
-    } catch {
-      setMessage({
-        text: "The search could not be completed. Try again.",
-        tone: "unavailable",
       });
     }
     setWorking(false);

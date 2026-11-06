@@ -1,11 +1,11 @@
-import { collectionReviewPolicyVersion } from "@ador/shared/collections";
-import type { JsonValue } from "@ador/shared/chain";
+import { collectionReviewPolicyVersion } from "@frostbite/shared/collections";
+import type { JsonValue } from "@frostbite/shared/chain";
 import {
   correlationIdSchema,
   idempotencyKeySchema,
   requestFingerprint,
-} from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type { SubmissionMutation } from "./submission-repository.ts";
 

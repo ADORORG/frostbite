@@ -1,4 +1,4 @@
-import { createRequester, type FetchLike } from "@ador/client-http";
+import { createRequester, type FetchLike } from "@frostbite/client-http";
 import {
   reviewActivityResponseSchema,
   reviewDetailResponseSchema,
@@ -11,8 +11,8 @@ import {
   type ReviewQueueResponse,
   type ReviewSubmissionResponse,
   type SubmissionState,
-} from "@ador/shared/collections";
-import { queryList, type IdempotencyKey } from "@ador/shared/http";
+} from "@frostbite/shared/collections";
+import { queryList, type IdempotencyKey } from "@frostbite/shared/http";
 
 export interface CallOptions {
   readonly signal?: AbortSignal;

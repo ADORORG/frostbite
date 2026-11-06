@@ -1,4 +1,4 @@
-import { idempotencyKeySchema } from "@ador/shared/http";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createBrowserServices } from "../../src/client/services.ts";

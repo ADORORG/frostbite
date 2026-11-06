@@ -1,5 +1,5 @@
-import type { ContactCodeService } from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { ContactCodeService } from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createEmailSignInOperations } from "../src/application/email-sign-in-operations.ts";

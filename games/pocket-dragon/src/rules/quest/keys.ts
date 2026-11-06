@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 
 // A quest is long (half an hour of play can hold thousands of presses), so its presses are written compactly: one input, `keys`, holds
 // up to `mostKeys` changes as a string. Each change is the ticks since the change before it (or since the quest began), in decimal, then

@@ -1,4 +1,4 @@
-import { createGameClient } from "@ador/game-sdk/client";
+import { createGameClient } from "@frostbite/game-sdk/client";
 
 const client = createGameClient({ timeoutMs: 100 });
 void client

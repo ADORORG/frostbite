@@ -2,8 +2,8 @@ import {
   collectionItems,
   collections,
   type DatabaseClient,
-} from "@ador/database";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { seedCreatorUser, seedUploadedAsset } from "./creator-database.ts";
 

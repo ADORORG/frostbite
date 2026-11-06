@@ -1,8 +1,9 @@
-import type { FetchLike } from "@ador/client-http";
-import { ApiError } from "@ador/client-http";
+import type { FetchLike } from "@frostbite/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it } from "vitest";
 
 import { createChainStatusApi, indexingTimeoutMs } from "../src/client/api.ts";
+import { ok } from "./support/fee-fixtures.ts";
 
 const reply = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -42,6 +43,33 @@ describe("asking the platform how the chain is doing", () => {
     });
     const caller = new AbortController();
     await api.indexing(caller.signal);
+    expect(signal?.aborted).toBe(false);
+    caller.abort();
+    expect(signal?.aborted).toBe(true);
+  });
+
+  it("asks for the fee market the same way: one same-origin GET, an answer checked against the contract", async () => {
+    const seen: { method: string; url: string }[] = [];
+    const answer = await createChainStatusApi(async (url, init) => {
+      seen.push({ method: init.method, url });
+      return reply(ok);
+    }).fees(new AbortController().signal);
+    expect(answer).toEqual(ok);
+    expect(seen).toEqual([{ method: "GET", url: "/api/v1/chain/fees" }]);
+    await expect(
+      createChainStatusApi(async () => reply({ state: "ok" })).fees(
+        new AbortController().signal,
+      ),
+    ).rejects.toBeInstanceOf(ApiError);
+  });
+
+  it("stops waiting for fees on the caller's abort", async () => {
+    let signal: AbortSignal | undefined;
+    const caller = new AbortController();
+    await createChainStatusApi(async (_url, init) => {
+      signal = init.signal;
+      return reply(ok);
+    }).fees(caller.signal);
     expect(signal?.aborted).toBe(false);
     caller.abort();
     expect(signal?.aborted).toBe(true);

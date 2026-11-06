@@ -1,7 +1,10 @@
-import type { AssetRejectionReason, UploadPurpose } from "@ador/shared/uploads";
-import type { IdempotencyKey } from "@ador/shared/http";
+import type {
+  AssetRejectionReason,
+  UploadPurpose,
+} from "@frostbite/shared/uploads";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 
-import type { ApiErrorCode } from "@ador/client-http";
+import type { ApiErrorCode } from "@frostbite/client-http";
 import type { FileRejection } from "./file-checks.ts";
 import type { TransferFailure } from "./transfer.ts";
 
@@ -26,7 +29,12 @@ export interface UploadAttempt {
 export type FinishedOutcome = "processed" | "rejected" | "unprocessable";
 
 export type FailureCause =
-  | { readonly kind: "api"; readonly code: ApiErrorCode }
+  // `reason` is the reason the server named, when it named one: what the page chooses its words by before it falls back on the status class.
+  | {
+      readonly kind: "api";
+      readonly code: ApiErrorCode;
+      readonly reason?: string | null;
+    }
   | { readonly kind: "transfer"; readonly failure: TransferFailure }
   // A defect in this page, not a failure of the network or the server.
   | { readonly kind: "unexpected" };

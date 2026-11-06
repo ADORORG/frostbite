@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { httpMethodSchema } from "@ador/shared/http";
-import { capabilitySchema } from "@ador/shared/accounts";
+import { httpMethodSchema } from "@frostbite/shared/http";
+import { capabilitySchema } from "@frostbite/shared/accounts";
 
 const featureIdPattern = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const semanticVersionPattern = /^\d+\.\d+\.\d+$/;

@@ -1,4 +1,4 @@
-import type { ProviderRegistry } from "@ador/plugin-kit/providers";
+import type { ProviderRegistry } from "@frostbite/plugin-kit/providers";
 import { describe, expectTypeOf, it } from "vitest";
 
 import type { ObjectStoragePort } from "../src/contracts.ts";

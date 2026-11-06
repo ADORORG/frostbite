@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { levelAt, speedAt } from "../../src/rules/course.ts";
 import { snowballRules } from "../../src/rules/index.ts";

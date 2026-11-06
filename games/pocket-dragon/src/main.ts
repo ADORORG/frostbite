@@ -1,8 +1,8 @@
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { createRunLoop } from "@ador/game-sdk/run-loop";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
+import { connectToPlatform, type PlatformPlay } from "@frostbite/game-sdk/play";
+import { createRunLoop } from "@frostbite/game-sdk/run-loop";
 
 import { effects, trackOf, tracks } from "./audio.ts";
 import {

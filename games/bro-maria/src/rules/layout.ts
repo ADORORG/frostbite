@@ -1,4 +1,4 @@
-import { stepSeed, startState } from "@ador/game-sdk/seeded";
+import { stepSeed, startState } from "@frostbite/game-sdk/seeded";
 
 import {
   groundRow,

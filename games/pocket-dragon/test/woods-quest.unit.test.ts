@@ -1,4 +1,4 @@
-import { replayRecord } from "@ador/game-sdk/replay";
+import { replayRecord } from "@frostbite/game-sdk/replay";
 import { describe, expect, it } from "vitest";
 
 import { gameId, verifierId, verifierVersion } from "../src/rules/constants.ts";

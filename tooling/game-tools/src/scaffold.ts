@@ -1,14 +1,17 @@
 import {
   cp,
   mkdir,
+  mkdtemp,
   readdir,
   readFile,
+  rm,
   stat,
   writeFile,
 } from "node:fs/promises";
 import { join } from "node:path";
 
-import { gameIdSchema, gameManifestLimits } from "@ador/shared/games";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
+import { gameIdSchema, gameManifestLimits } from "@frostbite/shared/games";
 
 // Where the pieces of a game live, so the same code works on the repository and on a copy of it in a test.
 export interface ScaffoldPaths {
@@ -29,6 +32,8 @@ const templateTitle = "Starter Game";
 const templateExport = "starterGame";
 const importAnchor = "// game:new adds imports above this line.";
 const gameAnchor = "// game:new adds games above this line.";
+// What the template manifest holds in place of the digest of the verifier the new game builds.
+const digestPlaceholder = "0".repeat(64);
 // Never copied: what a build, a test run or an install leaves in a game's folder.
 const notCopied = new Set(["node_modules", "coverage", ".turbo", "dist"]);
 
@@ -62,6 +67,61 @@ async function textFiles(directory: string): Promise<string[]> {
       found.push(path);
   }
   return found;
+}
+
+// The manifest pins the digest of the replay verifier the game builds, and a test fails until it does, so a new game starts with the pin
+// already right rather than with a failing test. A game with no verifier has nothing to pin. The verifier is built from a copy of the
+// game's source inside this package, where the SDK resolves before the new game has been installed; the digest is of what is built, so
+// it is the same wherever the source is built from.
+async function pinVerifier(
+  folder: string,
+  manifestFile: string,
+): Promise<void> {
+  const manifest = await readFile(manifestFile, "utf8");
+  if (!manifest.includes(digestPlaceholder)) return;
+  const scratch = await mkdtemp(join(import.meta.dirname, "..", ".pin-"));
+  try {
+    await cp(join(folder, "src"), join(scratch, "src"), { recursive: true });
+    const built = await bundleVerifier(scratch);
+    if (built === null)
+      throw new ScaffoldError(
+        `${folder} has no src/replay.ts, but its manifest pins a verifier.`,
+      );
+    await writeFile(
+      manifestFile,
+      manifest.replace(digestPlaceholder, built.sha256),
+    );
+  } finally {
+    await rm(scratch, { force: true, recursive: true });
+  }
+}
+
+// The new game's README: what it is, where its pieces are, how to test it, and who owns it (the repository's policy asks for all four).
+function readmeFor(title: string, id: string): string {
+  return [
+    `# ${title}`,
+    "",
+    "Started from the template (`tooling/game-tools/template`), which is a small finished game. Replace the rules, the drawing, the words",
+    `and the milestones in \`configs/games/${id}.ts\`; see \`docs/product/game-onboarding.md\`.`,
+    "",
+    "## Layout",
+    "",
+    "- `src/rules/`: the rules, a pure seeded state machine (the same seed and inputs always give the same run), and the milestones.",
+    "- `src/session.ts`: one run as the player plays it, and the run record its taps make.",
+    "- `src/screen/`: drawing, controls and the card after a run. `src/guide.ts` is the first-screen card.",
+    "- `src/audio.ts`, `src/feedback.ts`: sound as data, and what the player hears for what happened.",
+    "- `src/replay.ts`, `src/sample-run.ts`: the verifier the platform replays; the manifest pins its digest (a test prints the digest to pin when the rules change).",
+    "- `src/main.ts`: joins the above to the page and the platform.",
+    "",
+    "## Test commands",
+    "",
+    `\`pnpm --filter @game/${id} test:unit\`, \`test:integration\`, \`test:coverage\`.`,
+    "",
+    "## Ownership",
+    "",
+    "The game's author owns it; the platform games team reviews every game before it is merged.",
+    "",
+  ].join("\n");
 }
 
 // Makes a new game from the template and registers it, so the author starts from a game that already
@@ -118,10 +178,7 @@ export async function scaffoldGame(options: {
   });
   for (const file of await textFiles(folder))
     await writeFile(file, rename(await readFile(file, "utf8")));
-  await writeFile(
-    join(folder, "README.md"),
-    `# ${title}\n\nStarted from the template (\`tooling/game-tools/template\`). Replace the rules in \`src/game.ts\`, the page\nin \`index.html\` and \`src/main.ts\`, and the milestones in \`configs/games/${id.data}.ts\`, then see\n\`docs/product/game-onboarding.md\`.\n\nTest commands: \`pnpm --filter @game/${id.data} test:unit\`, \`test:integration\`, \`test:coverage\`.\n`,
-  );
+  await writeFile(join(folder, "README.md"), readmeFor(title, id.data));
   await mkdir(paths.manifestDirectory, { recursive: true });
   // The template's own comment is about the template, so it is replaced, not renamed.
   const manifestBody = templateManifest.slice(
@@ -131,9 +188,18 @@ export async function scaffoldGame(options: {
     manifestFile,
     rename(
       templateManifest.slice(0, templateManifest.indexOf("// ")) +
-        `// ${title}, started from the template. Replace the description, summary and milestones; a milestone's id\n// must be one the game's code asks the platform to unlock.\n${manifestBody}`,
+        `// ${title}, started from the template. Replace the description, summary, tags and milestones; a milestone's id\n// must be one the game's code asks the platform to unlock.\n${manifestBody}`,
     ),
   );
+  // A game that cannot be pinned is not left half made: the rest of this function is the registry line, and a folder with no registry
+  // line would be refused as "already exists" the next time.
+  try {
+    await pinVerifier(folder, manifestFile);
+  } catch (error) {
+    await rm(folder, { force: true, recursive: true });
+    await rm(manifestFile, { force: true });
+    throw error;
+  }
   await writeFile(
     paths.registryFile,
     registry

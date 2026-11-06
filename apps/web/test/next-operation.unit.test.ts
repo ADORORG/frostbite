@@ -1,10 +1,10 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
 import {
   passkeyEmptyInputSchema,
   passkeyMutationResponseSchema,
-} from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
-import { platformSessionCookieName } from "@ador/shared/auth";
+} from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { describe, expect, it, vi } from "vitest";
 
 const setCookie = vi.hoisted(() => vi.fn());

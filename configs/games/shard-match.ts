@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -118,12 +118,13 @@ export const shardMatchGame = defineGame({
   schemaVersion: 1,
   summary:
     "Swap neighbouring shards to line up three or more, and chain the falls for more.",
+  tags: ["puzzle"],
   title: "Shard Match",
   verification: {
     replay: {
       id: "shard-match",
       sha256:
-        "5eda6f42a9810025efbe11ec69bdf8d6edc0415bed7982f171bd61ab7c53a0f2",
+        "4a72fd410fe0e55d95ac3d522605fc44a545085934a30da546e1bb0cf118ed5c",
       version: 2,
     },
   },

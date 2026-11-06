@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 
 // The things a game must not be able to do from inside the platform's frame, each as an action to try: reach the network, read the
 // page's storage, read its cookies. The explorer tries all three and says what happened to each, so a builder (and the platform's own

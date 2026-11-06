@@ -1,15 +1,15 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   collectionReviewEvents,
   collectionSubmissions,
-} from "@ador/database/schema/collection-submissions";
-import { collectionItems } from "@ador/database/schema/collections";
+} from "@frostbite/database/schema/collection-submissions";
+import { collectionItems } from "@frostbite/database/schema/collections";
 import {
   collectionAssetPurposes,
   liveSubmissionStates,
   missingSubmissionRequirements,
-} from "@ador/shared/collections";
-import { requestFingerprint } from "@ador/shared/http";
+} from "@frostbite/shared/collections";
+import { requestFingerprint } from "@frostbite/shared/http";
 import { and, asc, desc, eq } from "drizzle-orm";
 
 import type { SubmissionAuthoring } from "../application/submission-repository.ts";

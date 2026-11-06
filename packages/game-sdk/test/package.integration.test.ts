@@ -68,8 +68,8 @@ describe("the published package", () => {
 
   it("gives the command that opens the local test page, built where the package says", async () => {
     expect(manifest.bin).toEqual({
-      "ador-game-dev": "./dist/dev-host/bin.js",
-      "ador-game-skill": "./dist/skill/bin.js",
+      "frostbite-game-dev": "./dist/dev-host/bin.js",
+      "frostbite-game-skill": "./dist/skill/bin.js",
     });
     const built = new Set(await readdir(out, { recursive: true }));
     expect(built.has("dev-host/bin.js")).toBe(true);

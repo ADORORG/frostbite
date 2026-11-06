@@ -1,13 +1,13 @@
 "use client";
 
-import { ExplorerBoundary } from "@ador/feature-chain-status/transaction";
-import { walletInfoSchema } from "@ador/game-sdk/protocol";
+import { ExplorerBoundary } from "@frostbite/feature-chain-status/transaction";
+import { walletInfoSchema } from "@frostbite/game-sdk/protocol";
 import {
   useStepWallet,
   useWalletChooser,
   useWalletConnection,
-} from "@ador/wallet/client";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/wallet/client";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { useMemo, type ComponentProps } from "react";
 
 import type { ClaimFeeSettings } from "../wallet-config.ts";

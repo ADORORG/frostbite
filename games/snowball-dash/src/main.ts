@@ -1,13 +1,15 @@
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
-import { createRunLoop } from "@ador/game-sdk/run-loop";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { cardFor } from "@frostbite/game-sdk/card";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@frostbite/game-sdk/play";
+import { createRunLoop } from "@frostbite/game-sdk/run-loop";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, track } from "./audio.ts";
 import { tempoAt, worldSounds } from "./feedback.ts";
@@ -15,16 +17,18 @@ import { multiplierOf } from "./screen/hud.ts";
 import {
   freshProgress,
   restore,
-  withBest,
+  finishRun,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { ticksPerSecond } from "./rules/constants.ts";
 import { levelAt } from "./rules/course.ts";
 import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
+import { guide } from "./guide.ts";
+import { resultOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
@@ -56,6 +60,8 @@ const totalOut = element("total", "span");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -89,7 +95,10 @@ const sound = setUpSound({
 });
 
 function show(): void {
-  if (context !== null) draw(context, session?.state() ?? backdrop, view);
+  if (context === null) return;
+  const state = session?.state() ?? backdrop;
+  draw(context, state, view);
+  guideLayer.show(cardFor(view.phase, guide, () => resultOf(state, view)));
 }
 
 function addEarned(id: string): void {
@@ -154,29 +163,19 @@ async function finish(finished: RunSession): Promise<void> {
   sound.music(false);
   const state = finished.state();
   const record = finished.record();
-  const before = progress.best;
-  progress = withBest(progress, state.score);
+  const done = finishRun(progress, state.score);
+  progress = done.progress;
   view = {
     ...view,
     best: progress.best,
-    newBest: progress.best > before && state.score > 0,
+    newBest: done.newBest,
     phase: "over",
   };
   overAt = performance.now();
   saveProgress();
   show();
   startButton.textContent = "Roll again";
-  if (runId === null || play === null) {
-    setText(note, submitNote(null));
-    return;
-  }
-  const sent = runId;
-  setText(note, submitNote({ kind: "pending" }));
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  setText(note, submitNote(settled));
+  await sendRun(play, runId, record);
 }
 
 const begin = (): Promise<void> =>
@@ -184,13 +183,7 @@ const begin = (): Promise<void> =>
     const started = await play?.runs.start().catch(() => null);
     const ready = started?.status === "started" ? started : null;
     runId = ready?.runId ?? null;
-    setText(
-      note,
-      startNote(
-        started ?? null,
-        "Press to hop, hold to go higher. Close calls build your multiplier.",
-      ),
-    );
+    setText(note, "Press to hop, hold to go higher.");
     session = createRunSession({
       onEarned: (id) => {
         sound.sfx("milestone");
@@ -266,6 +259,7 @@ screen.height = screenHeight * canvasScale;
 setText(totalOut, String(milestoneIds.length));
 attachControls(screen, { pause: togglePause, press });
 pauseButton.addEventListener("click", togglePause);
+attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 backdrop = startRun(localSeed());

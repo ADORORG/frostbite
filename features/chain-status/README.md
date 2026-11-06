@@ -1,4 +1,4 @@
-# `@ador/feature-chain-status`
+# `@frostbite/feature-chain-status`
 
 How far the rewards chain's indexer has read, and what it costs to be confirmed on it, as two public routes, a lamp and a panel any page can show, and the one fee speed picker any step can use.
 
@@ -6,25 +6,25 @@ How far the rewards chain's indexer has read, and what it costs to be confirmed 
 
 A platform record is only as current as the chain's indexer: a transaction in a block is "confirmed" for the platform only once the
 indexer has run it (ADR-018). This feature tells anyone whether the indexer is keeping up, and the same reading decides when a
-step or claim is called delayed (`@ador/chain/indexing`, `isDelayed` in `@ador/shared/chain`).
+step or claim is called delayed (`@frostbite/chain/indexing`, `isDelayed` in `@frostbite/shared/chain`).
 
 ## Public API
 
 - `createChainStatusFeature(config)` (package root): the registration for `configs/features.ts`. Declares the routes
   `GET /api/v1/chain/indexing` and `GET /api/v1/chain/fees` (public, no input) and no page.
-- `@ador/feature-chain-status/badge`: `<IndexingBadge refreshMs />`, a client component. It draws nothing until the platform answers,
+- `@frostbite/feature-chain-status/badge`: `<IndexingBadge refreshMs />`, a client component. It draws nothing until the platform answers,
   asks again every `refreshMs` (not while the tab is hidden), draws nothing where the platform follows no chain, and says
   "Chain status unknown" when the platform cannot be reached. The app places it in the header through `ShellStatusProvider` in the layout.
 - The badge also opens a panel one click beside the lamp: the latest block and, for each fee speed (slow, medium, fast, lightning),
   the chain's rate, the approximate wait and, only where the page knows the size of a transaction already built, what it would pay. No cost is told for a size that is only assumed. Where the chain or the
   platform cannot be asked it says "Fees unknown" and draws no rate.
-- `@ador/feature-chain-status/fee-picker`: `<FeeSpeedPicker market value onChange vbytes? maxFeeSats?>` and `useFeeQuotes({ refreshMs })`,
+- `@frostbite/feature-chain-status/fee-picker`: `<FeeSpeedPicker market value onChange vbytes? maxFeeSats?>` and `useFeeQuotes({ refreshMs })`,
   the one control any step that pays a fee uses (staff steps and a player's claim today; minting next). It shows the four speeds with their
   wait and rate, an optional cost for a transaction of `vbytes`, refuses a speed above `maxFeeSats` with the reason, never offers a speed the server marked `withinLimit: false` (the chain quotes more for it than any step, even a small one, may pay: the platform's `maxFeeSats`, told in the `/fees` answer, against the smallest step, `smallestStepVbytes`, which is never shown as a cost; the header panel marks those rows too), and says plainly
   when the market is unknown. The choice is the speed, never the rate: the speed travels on the intent (`feeSpeed`) and the adapter
   quotes the rate for its block target when it builds the transaction. Other features import only this subpath.
 - `<CostOverview asset baseUnits detail?>` (same entry): the cost of a built transaction, told wherever a person is about to act on the chain. A fee in satoshis (`btc`) is shown as sats, then the rate it was priced at, the speed with its wait and about how large the transaction is (fee ÷ rate); any other asset is its amount and name. `detail` is the `feeDetail` the builder put on the summary.
-- `@ador/feature-chain-status/transaction`: `<ExplorerBoundary txUrl>` (a page says once where its block explorer is, `{id}` where a transaction's id goes), `<TransactionLink id>` (the id as a link to the explorer in a new tab, or as plain text where there is no explorer or the address cannot name a transaction) and `<TransactionList transactions>` (the labelled list staff steps and player claims both show), with `plainTransactionLabel`. Staff steps and the player's claim dialog use the same ones, so a transaction is followed the same way in both.
+- `@frostbite/feature-chain-status/transaction`: `<ExplorerBoundary txUrl>` (a page says once where its block explorer is, `{id}` where a transaction's id goes), `<TransactionLink id>` (the id as a link to the explorer in a new tab, or as plain text where there is no explorer or the address cannot name a transaction) and `<TransactionList transactions>` (the labelled list staff steps and player claims both show), with `plainTransactionLabel`. Staff steps and the player's claim dialog use the same ones, so a transaction is followed the same way in both.
 - The lamp itself is the shared `StatusLamp` (`@repo/ui/arcade`) in its compact form, so another status (a queue, a provider) reuses it.
 
 ## Independent readings
@@ -34,10 +34,10 @@ A failing indexer leaves the fees and the block number shown; `/chain/indexing` 
 never waits for the indexer. The sync bar spans the last `syncWindowBlocks` blocks (`rewardsPolicy`), so 40 blocks behind reads 60%, not 100%;
 over the whole chain's height any lag under a few thousand blocks rounds to a full bar.
 
-## Keeping readings (`@ador/cache`)
+## Keeping readings (`@frostbite/cache`)
 
-- **Server:** the fee rates, the tip and the indexer's progress are read through `createStatusReadings` (`@ador/chain/status-readings`), built on
-  `@ador/cache`: one reading is shared by every visitor for `rewardsPolicy.statusReadings.freshMs`; when the node is slow or failing the last
+- **Server:** the fee rates, the tip and the indexer's progress are read through `createStatusReadings` (`@frostbite/chain/status-readings`), built on
+  `@frostbite/cache`: one reading is shared by every visitor for `rewardsPolicy.statusReadings.freshMs`; when the node is slow or failing the last
   good reading is still served, with its own `observedAt`, for up to `maxStaleMs`, and then not at all. A refresh that fails is logged by key.
   The services' own view (`cacheIndexing`, used to judge delay) never serves anything older than its time to live.
 - **Page:** a failed ask never blanks a good answer (`holdReading`): the pill keeps the last one, says "Last read HH:MM UTC; the platform could
@@ -66,12 +66,12 @@ variables, tables or provider code.
 
 ## Verification
 
-`pnpm --filter @ador/feature-chain-status typecheck test:unit test:integration test:coverage`. Platform engineering owns it.
+`pnpm --filter @frostbite/feature-chain-status typecheck test:unit test:integration test:coverage`. Platform engineering owns it.
 
 ## The header and the fee controls
 
-- `NetworkPill` (via `@ador/feature-chain-status/badge`) is the chain in the header: a light, the network's name and its latest block; opened, how far the platform has read the chain and the four fee speeds as tiles. Nothing is drawn where no chain is followed, and an unknown is shown as unknown.
-- `FeeSpeedChip` (`@ador/feature-chain-status/fee-picker`) is the speed chosen as one small control that opens the tiles (`FeeSpeedPicker`). A speed marked `withinLimit: false` by the server is never offered. Staff pages and the player's claim use it.
+- `NetworkPill` (via `@frostbite/feature-chain-status/badge`) is the chain in the header: a light, the network's name and its latest block; opened, how far the platform has read the chain and the four fee speeds as tiles. Nothing is drawn where no chain is followed, and an unknown is shown as unknown.
+- `FeeSpeedChip` (`@frostbite/feature-chain-status/fee-picker`) is the speed chosen as one small control that opens the tiles (`FeeSpeedPicker`). A speed marked `withinLimit: false` by the server is never offered. Staff pages and the player's claim use it.
 
 ## Ownership
 

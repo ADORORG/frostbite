@@ -1,5 +1,5 @@
-import type { VerificationLevel } from "@ador/game-sdk/protocol";
-import type { GameMilestone } from "@ador/shared/games";
+import type { VerificationLevel } from "@frostbite/game-sdk/protocol";
+import type { GameMilestone } from "@frostbite/shared/games";
 
 // Where a milestone stands for a player. Only these two can be true today: the game reports a milestone, and
 // nothing can be claimed on chain yet. When minting exists the claim states (pending, claimed, complete) are

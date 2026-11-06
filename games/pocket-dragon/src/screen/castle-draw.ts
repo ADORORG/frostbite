@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { stepOf } from "../rules/castle/guild.ts";
 import { mapHeight, mapWidth } from "../rules/castle/map.ts";

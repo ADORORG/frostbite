@@ -1,6 +1,6 @@
-import { accountOutcomes } from "@ador/shared/account-outcomes";
-import type { PasskeySignInService } from "@ador/auth";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
+import type { PasskeySignInService } from "@frostbite/auth";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createPasskeySignInOperations } from "../src/application/passkey-sign-in-operations.ts";

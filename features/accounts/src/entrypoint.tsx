@@ -1,7 +1,7 @@
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import { createBalanceOperation } from "./application/balance-operation.ts";
 import type { BalanceSource } from "./balance/source.ts";
@@ -11,6 +11,7 @@ import {
   type RoleServices,
 } from "./roles/operations.ts";
 import { RolesPage } from "./roles/roles-page.tsx";
+import { emailAddressesView } from "./application/email-addresses-view.ts";
 import { createEmailLinkOperations } from "./application/email-link-operations.ts";
 import { createEmailSignInOperations } from "./application/email-sign-in-operations.ts";
 import { createPasskeySignInOperations } from "./application/passkey-sign-in-operations.ts";
@@ -18,22 +19,22 @@ import { createPasskeyOperations } from "./application/passkey-operations.ts";
 import { createWalletMethodsOperations } from "./application/wallet-methods-operations.ts";
 import { createWalletSignInOperations } from "./application/wallet-sign-in-operations.ts";
 import type { WalletAuthServices } from "./application/wallet-services.ts";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
-import { emailMethodKind } from "@ador/auth";
-import { manageRolesCapability } from "@ador/shared/accounts";
+import { emailMethodKind } from "@frostbite/auth";
+import { manageRolesCapability } from "@frostbite/shared/accounts";
 import type {
   ContactCodeService,
   ContactLinkService,
   createPasskeyLinkingService,
   PasskeySignInService,
-} from "@ador/auth";
+} from "@frostbite/auth";
 import { AccountSurface } from "./ui/account-surface.tsx";
 import { AdminHome } from "./ui/admin-home.tsx";
 import { SetupPage } from "./ui/setup-page.tsx";
 import { SignInPage } from "./ui/sign-in-page.tsx";
 import { createRedeemSetupLinkOperation } from "./setup/operation.ts";
-import type { SetupLinkService } from "@ador/authorization";
+import type { SetupLinkService } from "@frostbite/authorization";
 
 type PasskeyService = ReturnType<typeof createPasskeyLinkingService>;
 
@@ -49,9 +50,7 @@ async function account(
   // The email addresses are shown only where mail is set up; a failure to read them hides the panel rather than showing a list
   // that was not read.
   const emailAddresses = emailOffered
-    ? await getEmailLinks()
-        .list(actorUserId, emailMethodKind)
-        .catch(() => null)
+    ? await emailAddressesView(getEmailLinks(), actorUserId).catch(() => null)
     : null;
   try {
     return (

@@ -1,6 +1,7 @@
-import { defaultSound } from "@ador/game-sdk/audio/settings";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@frostbite/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -25,7 +26,7 @@ describe("Icicle Drop, bundled and run against a simulated platform", () => {
     expect(window.document.getElementById("best")?.textContent).toBe("4321");
   });
 
-  it("starts a run on a seed of its own, says the run is its own report, and moves the tiles", async () => {
+  it("starts a run, says how to play and nothing about the platform, and moves the tiles", async () => {
     const { window } = await play({ best: 0 });
     await settle();
     window.document
@@ -33,7 +34,10 @@ describe("Icicle Drop, bundled and run against a simulated platform", () => {
       ?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
     expect(window.document.getElementById("note")?.textContent).toContain(
-      "local seed",
+      "Arrows slide",
+    );
+    expect(window.document.getElementById("note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
     );
     const tiles = () =>
       [...window.document.querySelectorAll("#board .tile")].map(
@@ -51,8 +55,13 @@ describe("Icicle Drop, bundled and run against a simulated platform", () => {
     expect(tiles().filter((text) => text !== "").length).toBeGreaterThan(2);
   });
 
-  it("moves the tiles from the keyboard, and a run ends with a note about what the platform could not check", async () => {
-    const { stored, window } = await play({ best: 0 });
+  it("moves the tiles from the keyboard, and a run ends with the note unchanged", async () => {
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     await settle();
     window.document
       .getElementById("start")
@@ -62,17 +71,20 @@ describe("Icicle Drop, bundled and run against a simulated platform", () => {
     for (let at = 0; at < 3_000; at += 1) {
       const code = ["ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp"][at % 4];
       window.dispatchEvent(new window.KeyboardEvent("keydown", { code }));
-      if (
-        window.document
-          .getElementById("note")
-          ?.textContent?.includes("your own claim")
-      )
+      // The pause button is on while a run is going and off once it has ended.
+      if (window.document.getElementById("pause")?.hasAttribute("disabled"))
         break;
     }
     await settle(100);
-    expect(window.document.getElementById("note")?.textContent).toContain(
-      "your own claim",
+    expect(window.document.getElementById("note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
     );
+    expect(
+      window.document.getElementById("start")?.hasAttribute("hidden"),
+    ).toBe(false);
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

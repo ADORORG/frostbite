@@ -14,13 +14,13 @@ services, with accessibility, keyboard, responsive, and visual coverage.
 
 ## What was built
 
-- `@ador/client-http` (new): the browser requester (`createRequester`, `ApiError`, retry classification),
+- `@frostbite/client-http` (new): the browser requester (`createRequester`, `ApiError`, retry classification),
   extracted from the uploads feature, which now uses it. A real-socket integration suite proves the wire
   behaviour.
 - `@repo/ui`: `ArcadeTextField` (label, hint, error, multiline) and step-list and choice-group styles.
-- `@ador/test-kit/dom`: shared jsdom helpers (moved from the uploads tests).
-- `@ador/shared/collections`: page paths, the wizard link helper, and the navigation label.
-- `@ador/feature-collection-studio`: two authenticated pages (list at `/studio/collections`, wizard at
+- `@frostbite/test-kit/dom`: shared jsdom helpers (moved from the uploads tests).
+- `@frostbite/shared/collections`: page paths, the wizard link helper, and the navigation label.
+- `@frostbite/feature-collection-studio`: two authenticated pages (list at `/studio/collections`, wizard at
   `/studio/collections/:collectionId`), a "My collections" navigation entry, and the client layer
   (typed API client, form parsing, progress rules, error copy), hooks, and components.
 - Playwright: wizard journey (create, resume, items, stale-draft conflict), and the experience-quality
@@ -50,8 +50,8 @@ services, with accessibility, keyboard, responsive, and visual coverage.
 
 `env:check`, `format:check`, `typecheck`, `lint` (including the repository policy), `test:unit`,
 `test:integration`, `test:coverage` (merged thresholds pass), `db:check`, and the full `test:e2e` (144
-tests) exit 0. Coverage: `@ador/feature-collection-studio` 99.7 % lines and 97.9 % branches,
-`@ador/client-http` and `@repo/ui` 100 %; the one unreached branch is the "no next step" arm on a saving
+tests) exit 0. Coverage: `@frostbite/feature-collection-studio` 99.7 % lines and 97.9 % branches,
+`@frostbite/client-http` and `@repo/ui` 100 %; the one unreached branch is the "no next step" arm on a saving
 step, impossible by construction.
 
 ## Findings and limits

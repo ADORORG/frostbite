@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import { platformStatusSchema } from "@ador/shared/platform";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import { platformStatusSchema } from "@frostbite/shared/platform";
 
 import { resolveApiOperation } from "@repo/configs/api";
 import { featureRegistry } from "@repo/configs/features";

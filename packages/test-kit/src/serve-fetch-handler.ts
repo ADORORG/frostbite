@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import {
   createNodeRequestListener,
   type FetchHandler,
-} from "@ador/http/node-adapter";
+} from "@frostbite/http/node-adapter";
 
 export interface ServedRequest {
   readonly method: string;

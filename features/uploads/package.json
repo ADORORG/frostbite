@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-uploads",
+  "name": "@frostbite/feature-uploads",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -23,21 +23,21 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/client-http": "workspace:*",
-    "@ador/database": "workspace:*",
-    "@ador/http": "workspace:*",
-    "@ador/jobs": "workspace:*",
-    "@ador/media": "workspace:*",
-    "@ador/object-storage": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*",
-    "@ador/uploads": "workspace:*",
+    "@frostbite/client-http": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/jobs": "workspace:*",
+    "@frostbite/media": "workspace:*",
+    "@frostbite/object-storage": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*",
+    "@frostbite/uploads": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

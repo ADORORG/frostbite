@@ -1,5 +1,5 @@
 {
-  "name": "@ador/game-runs",
+  "name": "@frostbite/game-runs",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,15 +16,15 @@
     "test:coverage": "node --experimental-strip-types ../database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
-    "@ador/database": "workspace:*",
-    "@ador/game-sdk": "workspace:*",
-    "@ador/game-verification": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/game-sdk": "workspace:*",
+    "@frostbite/game-verification": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4",
     "zod": "4.5.4"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

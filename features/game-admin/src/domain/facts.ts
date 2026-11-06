@@ -1,4 +1,4 @@
-import type { GameAdminStep } from "@ador/shared/games";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import type { KeyValue } from "@repo/ui/arcade";
 
 import { shortHash } from "./copy.ts";

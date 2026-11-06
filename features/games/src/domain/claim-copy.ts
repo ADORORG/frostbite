@@ -1,8 +1,12 @@
+import {
+  chainUnreachableWords,
+  submitRefusalWords,
+} from "@frostbite/shared/chain-step-words";
 import type {
   GameClaim,
   GameClaimState,
   GameClaimUnavailableReason,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What a person is told about a claim, in one place. It never says "minted" or "claimed" before the chain's indexed state agrees:
 // `claimed` is only "confirmed" and says it is not complete yet.
@@ -88,7 +92,7 @@ export const claimUnavailableCopy: Readonly<
   "not-earned": "Earn this milestone first.",
   "not-supported": "Claiming is not available for this game yet.",
   "signed-out": "Sign in to claim.",
-  unavailable: "The network could not be reached. Try again.",
+  unavailable: chainUnreachableWords,
   "wrong-network": "Your wallet is on another network than this game's.",
 };
 
@@ -98,6 +102,9 @@ export const claimSignerCopy = {
   "wallet-cannot-sign":
     "The wallet you connected cannot sign claims here. Connect another from the wallet button in the header.",
 } as const;
+
+// Why the platform turned down what the wallet signed, for a claim.
+export const claimSubmitRefusalCopy = submitRefusalWords("claim");
 
 export const unreachableCopy =
   "The platform could not be reached. Nothing was changed.";

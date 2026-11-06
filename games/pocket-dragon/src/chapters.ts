@@ -1,4 +1,4 @@
-import type { GameVerifier } from "@ador/game-sdk/run-record";
+import type { GameVerifier } from "@frostbite/game-sdk/run-record";
 
 import { castleChapter, castleRules } from "./rules/castle/index.ts";
 import { startCastle, tickCastle } from "./rules/castle/tick.ts";

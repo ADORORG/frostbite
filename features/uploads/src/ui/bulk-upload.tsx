@@ -4,7 +4,7 @@ import {
   defaultUploadPolicy,
   uploadContentTypes,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import {
   ArcadeActionButton,
   ArcadeFileDrop,
@@ -18,7 +18,10 @@ import {
   type UploadsClientServices,
 } from "../client/browser-services.ts";
 import { purposeLabels } from "../client/purpose-labels.ts";
-import { describeByteLimit } from "../client/rejection-copy.ts";
+import {
+  describeByteLimit,
+  formatsToChoose,
+} from "../client/rejection-copy.ts";
 import { BulkUploadList } from "./components/bulk-upload-list.tsx";
 import { useBulkUpload } from "./hooks/use-bulk-upload.ts";
 
@@ -59,7 +62,7 @@ export function BulkUpload({
     <div className="arcade-form">
       <ArcadeFileDrop
         accept={accept}
-        hint={`PNG, JPEG, or WebP, up to ${limit} each, up to ${services.policy.bulkFileLimit} files in one go. Each file keeps its name.`}
+        hint={`${formatsToChoose}, up to ${limit} each, up to ${services.policy.bulkFileLimit} files in one go. Each file keeps its name.`}
         label={`Upload many: ${purposeLabels[purpose].toLowerCase()}`}
         onFiles={(files) => setSkipped(bulk.add(files).skipped)}
       />

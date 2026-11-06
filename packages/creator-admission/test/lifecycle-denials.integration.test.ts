@@ -1,5 +1,8 @@
-import { creatorApplications, platformRoleAssignments } from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import {
+  creatorApplications,
+  platformRoleAssignments,
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { createCreatorAdmissionService } from "../src/application/service.ts";

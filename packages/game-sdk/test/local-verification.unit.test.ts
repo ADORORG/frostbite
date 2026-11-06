@@ -37,7 +37,7 @@ describe("the browser's copy of a milestone the account verified", () => {
   it("treats a stored level it does not know as a corrupt value, not a milestone", async () => {
     const store = storage();
     store.setItem(
-      "ador:game:g:milestones",
+      "frostbite:game:g:milestones",
       JSON.stringify({ "first-win": { ...record("trusted"), id: undefined } }),
     );
     const backend = createLocalBackend({ gameId: "g", storage: store });

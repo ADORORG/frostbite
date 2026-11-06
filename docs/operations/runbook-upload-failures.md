@@ -44,7 +44,7 @@ the image page) or the file name (kept with the upload).
 
 ```sql
 select id, state, purpose, file_name, created_at, expires_at
-from ador.upload_intents
+from frostbite.upload_intents
 where user_id = '<user-id>' and state = 'reserved' and expires_at > now();
 ```
 
@@ -60,7 +60,7 @@ most two at a time.
 2. CORS: the private bucket must allow `PUT` with `content-type` from the site's exact origin
    (`docs/operations/preview-environment-checklist.md`, R2 section). A changed hostname breaks it at once.
 3. Credentials: `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` valid, and the token allows object write on the
-   private bucket. `pnpm --filter @ador/provider-object-storage-r2 smoke` checks storage behavior.
+   private bucket. `pnpm --filter @frostbite/provider-object-storage-r2 smoke` checks storage behavior.
 4. A completed intent whose object is missing (`missing-object`): the browser did not finish the PUT. The user
    retries; completion is idempotent.
 
@@ -70,11 +70,11 @@ Find the asset and its event:
 
 ```sql
 select a.id, a.processing_state, a.created_at, a.validation_completed_at, a.processing_completed_at
-from ador.assets a where a.user_id = '<user-id>' and a.processing_state in ('pending-validation','validated')
+from frostbite.assets a where a.user_id = '<user-id>' and a.processing_state in ('pending-validation','validated')
 order by a.created_at desc limit 10;
 
 select id, status, attempts, available_at, delivered_at, failure_reason, lease_expires_at
-from ador.outbox_events
+from frostbite.outbox_events
 where event_name = 'uploads.assetprocessing.requested.v1' and status <> 'delivered'
 order by occurred_at desc limit 20;
 ```
@@ -99,7 +99,7 @@ order by occurred_at desc limit 20;
 `rejection_reason` says why:
 
 ```sql
-select id, processing_state, rejection_reason, created_at from ador.assets where id = '<asset-id>';
+select id, processing_state, rejection_reason, created_at from frostbite.assets where id = '<asset-id>';
 ```
 
 `unsupported-format`, `media-type-mismatch`, `malformed`, `animation-unsupported`, `size-exceeded`,
@@ -117,7 +117,7 @@ The asset is `processed` but the library could not sign a rendition: either stor
 
 ```sql
 select kind, content_type, width_pixels, height_pixels, created_at
-from ador.asset_derivatives where asset_id = '<asset-id>';
+from frostbite.asset_derivatives where asset_id = '<asset-id>';
 ```
 
 No rows for a processed asset is a defect: report with the asset id. Rows present: check storage credentials
@@ -136,7 +136,7 @@ reserved, and records it. Outstanding removals:
 
 ```sql
 select id, state, cleanup_eligible_at, object_removed_at
-from ador.upload_intents where state = 'abandoned' and object_removed_at is null order by cleanup_eligible_at;
+from frostbite.upload_intents where state = 'abandoned' and object_removed_at is null order by cleanup_eligible_at;
 ```
 
 Rows that stay for more than a few cleanup passes (the loop runs about every five minutes) mean storage
@@ -155,7 +155,7 @@ busiest moments; the files that were refused can be retried together. To see how
 stored as a hash, so you can only check a known address or user id, not list people):
 
 ```sql
-select bucket, hits, window_start from ador.rate_limit_windows
+select bucket, hits, window_start from frostbite.rate_limit_windows
 where bucket = 'createUploadIntent' order by window_start desc, hits desc limit 10;
 ```
 

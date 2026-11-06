@@ -1,4 +1,4 @@
-import type { ChainPorts, TransactionPart } from "@ador/chain/ports";
+import type { ChainPorts, TransactionPart } from "@frostbite/chain/ports";
 import type {
   ChainFamilyId,
   ChainRef,
@@ -9,9 +9,12 @@ import type {
   TrackedState,
   TransactionSummary,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
-import type { ContractStore, Recording } from "@ador/database/game-contracts";
+import type {
+  ContractStore,
+  Recording,
+} from "@frostbite/database/game-contracts";
 
 // What staff do through this package. On a game that has a contract: define a milestone, pause or resume claims. Before it has one:
 // publish a template (once for every game) and create the game's contract from it.
@@ -234,9 +237,16 @@ export type StartStepResult =
       readonly ok: false;
     }
   | {
-      readonly code: "bad-drawing" | "could-not-build";
+      readonly code: "bad-drawing";
       readonly ok: false;
       readonly reason: string;
+    }
+  // What the builder said when it said anything: the page says that the step could not be built, so there is no detail to add when the
+  // builder failed without one.
+  | {
+      readonly code: "could-not-build";
+      readonly ok: false;
+      readonly reason?: string;
     };
 
 export type SubmitStepResult =

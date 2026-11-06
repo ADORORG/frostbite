@@ -7,11 +7,11 @@ changes (the contract already refuses any second definition).
 
 ## What it is
 
-- `@ador/game-admin`: service (`start`, `submitSigned`, `refresh`, `list`), repository over `ador.game_admin_steps`, README. Works through
+- `@frostbite/game-admin`: service (`start`, `submitSigned`, `refresh`, `list`), repository over `frostbite.game_admin_steps`, README. Works through
   the neutral ports; tested on the simulated chain against PostgreSQL.
-- `@ador/feature-game-admin`: four routes, two pages, client, panel (pause/resume, milestones with drawings, review, log).
+- `@frostbite/feature-game-admin`: four routes, two pages, client, panel (pause/resume, milestones with drawings, review, log).
 - Shared, not copied: the transaction lifecycle (`canMove`, `afterObservation`, `afterBroadcast`, `moveTo`, `signedOf`, `stageOf`), the
-  summary codec and the stored-row mapping moved to `@ador/shared/chain`; the table's columns and checks to
+  summary codec and the stored-row mapping moved to `@frostbite/shared/chain`; the table's columns and checks to
   `packages/database/src/schema/tracked-transaction.ts` (`game_milestone_claims` now uses them; `drizzle-kit generate` reports no change).
   `configs/game-rewards.ts` is the one place the chain and contracts are configured for claims and administration.
 - `game:administer` capability, granted to the `staff` role.

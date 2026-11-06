@@ -1,5 +1,5 @@
-import type { FetchLike } from "@ador/client-http";
-import type { LocalSnapshot } from "@ador/game-sdk/local-backend";
+import type { FetchLike } from "@frostbite/client-http";
+import type { LocalSnapshot } from "@frostbite/game-sdk/local-backend";
 import { describe, expect, it, vi } from "vitest";
 
 import { createAccountPort } from "../src/client/account-sync.ts";

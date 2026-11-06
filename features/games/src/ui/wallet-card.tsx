@@ -1,5 +1,5 @@
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { ArcadeInfoCard, shortenMiddle } from "@repo/ui/arcade";
 
 // What this game can see of the player's wallet, said as it is: the address and the network, when one is

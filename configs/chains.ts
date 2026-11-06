@@ -1,4 +1,4 @@
-import type { BetaNetwork, ChainOption } from "@ador/shared/chain";
+import type { BetaNetwork, ChainOption } from "@frostbite/shared/chain";
 import { parseBetaNetworkEnvironment } from "@repo/config/beta-network";
 
 import { betaChains, type BetaChain } from "./beta-chains.ts";

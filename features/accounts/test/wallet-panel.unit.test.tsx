@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 // The harness comes first: it puts the stand-in wallet connection in place before anything that reads one is loaded.
@@ -22,7 +22,8 @@ import {
 } from "./support/widget-harness.tsx";
 import { AccountSurface } from "../src/ui/account-surface.tsx";
 import { WalletPanel } from "../src/ui/wallet-panel.tsx";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
+import { emailView } from "./support/email-view.ts";
 
 const panel = (otherWays = 0) =>
   show(<WalletPanel expectedNetwork="signet" otherWays={otherWays} />);
@@ -180,7 +181,7 @@ describe("the wallets card on the account page", () => {
       show(
         <AccountSurface
           actorUserId={createUuidV7()}
-          emailAddresses={emails}
+          emailAddresses={emails === null ? null : emailView(emails)}
           expectedNetwork="signet"
           passkeyCredentialIds={passkeys}
         />,

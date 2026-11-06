@@ -1,4 +1,4 @@
-import { packCode, sha256Hex } from "@ador/chain/bitcoin-alkanes";
+import { packCode, sha256Hex } from "@frostbite/chain/bitcoin-alkanes";
 import { describe, expect, it } from "vitest";
 
 import { checkConfiguration } from "../src/checks/configuration.ts";

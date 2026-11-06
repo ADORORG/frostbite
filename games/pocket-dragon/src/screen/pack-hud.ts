@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { blazeTicks, itemList, type Item, type Powers } from "../rules/kit.ts";
 import { kitIcons, kitKey } from "./kit-sprites.ts";

@@ -9,8 +9,8 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
@@ -117,7 +117,7 @@ export async function seedMoreFor(userId: string, createdAt: string) {
     userId,
   });
   await database.execute(
-    sql`update ador.assets set created_at = ${createdAt}::timestamptz where id = ${assetId}`,
+    sql`update frostbite.assets set created_at = ${createdAt}::timestamptz where id = ${assetId}`,
   );
   return uuidV7Schema.parse(assetId);
 }

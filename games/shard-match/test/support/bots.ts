@@ -1,4 +1,4 @@
-import { stepInt } from "@ador/game-sdk/seeded";
+import { stepInt } from "@frostbite/game-sdk/seeded";
 
 import { legalMoves } from "../../src/rules/moves.ts";
 import { startRun, type MatchState } from "../../src/rules/state.ts";

@@ -1,4 +1,4 @@
-import type { TransactionIntent } from "@ador/shared/chain";
+import type { TransactionIntent } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { parseAlkaneId } from "../src/bitcoin-alkanes/node/alkane-id.ts";

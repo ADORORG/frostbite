@@ -1,177 +1,86 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-import { bundleGameScript } from "@ador/game-sdk/build";
-import type { JsonValue } from "@ador/game-sdk/protocol";
-import {
-  runGameInSimulatedHost,
-  type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
+import { recordingRuns } from "@frostbite/test-kit/simulated-game-host";
 import { afterEach, describe, expect, it } from "vitest";
 
-const root = join(import.meta.dirname, "..");
-const milestone = (id: string, title: string) => ({
-  claimPolicy: "once" as const,
-  criteria: title,
-  description: title,
-  id,
-  title,
-});
-const manifest = {
-  id: "starter-game",
-  milestones: [
-    milestone("first-five", "First five"),
-    milestone("ten-taps", "Ten taps"),
-  ],
-};
-const settle = (ms = 60) => new Promise((resolve) => setTimeout(resolve, ms));
+import { byId, closeGame, play, settle } from "./support/page.ts";
 
-let running: SimulatedGame | undefined;
-afterEach(() => running?.close());
-
-async function play(saved?: { score: number }) {
-  const stored: {
-    progress: JsonValue | null;
-    unlocked: Record<string, string>;
-  } = {
-    progress: saved ?? null,
-    unlocked: {},
-  };
-  const html = await readFile(join(root, "index.html"), "utf8");
-  const script = await bundleGameScript(join(root, "src/main.ts"));
-  running = runGameInSimulatedHost({
-    backend: {
-      counters: async () => ({}),
-      identity: async () => ({ id: "sample-player-0001", kind: "local" }),
-      loadProgress: async () => stored.progress,
-      reportProgress: async () => ({
-        current: 0,
-        newlyUnlocked: false,
-        unlockedAt: null,
-      }),
-      milestones: async () =>
-        Object.fromEntries(
-          Object.entries(stored.unlocked).map(([id, unlockedAt]) => [
-            id,
-            { count: 1, unlockedAt, verification: "self-reported" as const },
-          ]),
-        ),
-      player: () => ({ signedIn: false, walletConnected: false }),
-      saveProgress: async (value) => void (stored.progress = value),
-      unlock: async (id, now) => {
-        const already = stored.unlocked[id];
-        stored.unlocked[id] ??= now.toISOString();
-        return {
-          alreadyUnlocked: already !== undefined,
-          count: 1,
-          counted: false,
-          unlockedAt: stored.unlocked[id] ?? "",
-        };
-      },
-    },
-    game: manifest,
-    html,
-    policy: {
-      ...defaultGameHostPolicy,
-      saveCallsPerMinute: 600,
-      unlockCallsPerMinute: 600,
-    },
-    script,
-  });
-  return { stored, window: running.window };
-}
+afterEach(closeGame);
 
 describe("Starter Game, bundled and run against a simulated platform", () => {
-  it("connects, and lets the player tap only once it has", async () => {
+  it("connects, and lets the player start only once it has", async () => {
     const { window } = await play();
     await settle();
-    expect(window.document.getElementById("status")?.textContent).toBe(
-      "Connected. Tap to score.",
+    expect(byId(window, "status")?.textContent).toBe("Connected.");
+    expect(byId(window, "start")?.hasAttribute("disabled")).toBe(false);
+    expect(byId(window, "catch")?.hasAttribute("disabled")).toBe(true);
+  });
+
+  it("carries on from the best the platform hands back", async () => {
+    const { window } = await play({ best: 41 });
+    await settle();
+    expect(byId(window, "best")?.textContent).toBe("41");
+  });
+
+  it("starts a run, says how to play and nothing about the platform, and sends the run once it ends", async () => {
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
     );
-    expect(
-      window.document.getElementById("tap")?.hasAttribute("disabled"),
-    ).toBe(false);
-  });
-
-  it("carries on from the progress the platform hands back", async () => {
-    const { window } = await play({ score: 7 });
     await settle();
-    expect(window.document.getElementById("score")?.textContent).toBe("7");
-  });
-
-  it("unlocks a milestone through the platform, and lists it", async () => {
-    const { stored, window } = await play({ score: 4 });
-    await settle();
-    window.document
-      .getElementById("tap")
-      ?.dispatchEvent(new window.MouseEvent("click"));
-    await settle();
-    expect(Object.keys(stored.unlocked)).toEqual(["first-five"]);
-    expect(
-      [...window.document.querySelectorAll("#unlocked li")].map(
-        (li) => li.textContent,
-      ),
-    ).toEqual(["First five"]);
-  });
-
-  it("saves the score a moment after tapping, in one call", async () => {
-    const { stored, window } = await play({ score: 1 });
-    await settle();
-    const button = window.document.getElementById("tap");
-    for (let i = 0; i < 3; i += 1)
-      button?.dispatchEvent(new window.MouseEvent("click"));
-    await settle(1_150);
-    expect(stored.progress).toEqual({ score: 4 });
-    expect(
-      running?.events.filter(({ type }) => type === "progress-saved"),
-    ).toHaveLength(1);
-  });
-
-  it("reports that it is cut off when it probes for the network, storage and cookies", async () => {
-    const { window } = await play();
-    await settle();
-    window.document
-      .getElementById("probe")
-      ?.dispatchEvent(new window.MouseEvent("click"));
-    await settle();
-    expect(window.document.getElementById("probe-result")?.textContent).toBe(
-      "fetch: blocked\nlocalStorage: blocked\ncookie: allowed",
+    byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
+    await settle(100);
+    expect(byId(window, "note")?.textContent).toContain("Space catches");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
     );
+    expect(byId(window, "catch")?.hasAttribute("disabled")).toBe(false);
+    // Catching on whatever tick the click lands on, a tap soon misses and ends the run.
+    for (
+      let at = 0;
+      at < 400 && byId(window, "start")?.hasAttribute("hidden");
+      at += 1
+    ) {
+      byId(window, "catch")?.dispatchEvent(new window.MouseEvent("click"));
+      await settle(35);
+    }
+    const start = byId(window, "start");
+    expect(start?.textContent).toBe("Go again");
+    expect(start?.hasAttribute("hidden")).toBe(false);
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
+    expect(stored.progress).toEqual({
+      best: expect.any(Number),
+      sound: defaultSound,
+    });
+  }, 40_000);
+
+  it("sends nothing for a run that was never started", async () => {
+    const recorded = recordingRuns();
+    const { window } = await play({ best: 0 }, {}, { runs: recorded.runs });
+    await settle();
+    byId(window, "catch")?.dispatchEvent(new window.MouseEvent("click"));
+    await settle(100);
+    expect(recorded.submitted).toHaveLength(0);
   });
 
-  it("says so when the platform does not answer", async () => {
-    const html = await readFile(join(root, "index.html"), "utf8");
-    const script = await bundleGameScript(join(root, "src/main.ts"));
-    running = runGameInSimulatedHost({
-      backend: {
-        counters: async () => ({}),
-        identity: async () => ({ id: "sample-player-0001", kind: "local" }),
-        reportProgress: async () => ({
-          current: 0,
-          newlyUnlocked: false,
-          unlockedAt: null,
-        }),
-        loadProgress: async () => {
-          throw new Error("down");
-        },
-        milestones: async () => ({}),
-        player: () => ({ signedIn: false, walletConnected: false }),
-        saveProgress: async () => undefined,
-        unlock: async () => ({
-          alreadyUnlocked: false,
-          count: 1,
-          counted: false,
-          unlockedAt: "",
-        }),
+  it("says so when the platform does not answer, and can still be played", async () => {
+    const { window } = await play(undefined, {
+      loadProgress: async () => {
+        throw new Error("down");
       },
-      game: manifest,
-      html,
-      script,
     });
     await settle();
-    expect(running.window.document.getElementById("status")?.textContent).toBe(
+    expect(window.document.getElementById("status")?.textContent).toBe(
       "The platform said: unavailable",
     );
+    expect(
+      window.document.getElementById("start")?.hasAttribute("disabled"),
+    ).toBe(false);
   });
 });

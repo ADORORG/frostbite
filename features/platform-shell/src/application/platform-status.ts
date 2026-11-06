@@ -1,11 +1,11 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   platformStatusInputSchema,
   platformStatusRoute,
   platformStatusSchema,
   type PlatformStatus,
   type PlatformStatusInput,
-} from "@ador/shared/platform";
+} from "@frostbite/shared/platform";
 
 export function createPlatformStatusOperation(
   registeredFeatures: number,

@@ -1,4 +1,4 @@
-import type { Resource } from "@ador/client-react";
+import type { Resource } from "@frostbite/client-react";
 
 // How a page follows what the platform tells it of the chain: how often it asks, and how old a reading may get before the page stops showing
 // it. `forgetAfterMs` is the platform's own limit on serving an old reading (`rewardsPolicy.statusReadings.maxStaleMs`), told to the page

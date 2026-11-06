@@ -1,23 +1,23 @@
-import { drawGuide, type Guide } from "./guide.ts";
+import { drawCard, type Card } from "./guide.ts";
 
-// The first-screen card, drawn over a game's canvas at the pixels of the display and not the pixels of the game. A game's own canvas is small
-// (160x90 or 256x144) and is scaled up to the page, which blurs any writing on it; this is a second canvas laid exactly over the first, as big as it
-// is shown times the display's pixel ratio, so the card is sharp whatever the size of the page. It takes no touches, takes no place in the
-// page's layout, and is hidden when there is no card to show.
+// The card over a game's screen (the first-screen card, or the one after a run), drawn at the pixels of the display and not the pixels of the
+// game. A game's own canvas is small (160x90 or 256x144) and is scaled up to the page, which blurs any writing on it; this is a second canvas
+// laid exactly over the first, as big as it is shown times the display's pixel ratio, so the card is sharp whatever the size of the page. It
+// takes no touches, takes no place in the page's layout, and is hidden when there is no card to show.
 export interface GuideLayer {
-  // Shows the card, or hides it (null). Showing the same card again does nothing unless the screen has changed size.
-  readonly show: (guide: Guide | null) => void;
+  // Shows the card, or hides it (null). Showing the same card again does nothing unless the screen has changed size or the card has changed.
+  readonly show: (card: Card | null) => void;
 }
 
 export interface GuideLayerOptions {
-  readonly draw?: typeof drawGuide;
+  readonly draw?: typeof drawCard;
   readonly ratio?: () => number;
 }
 
 export function createGuideLayer(
   screen: HTMLCanvasElement,
   {
-    draw = drawGuide,
+    draw = drawCard,
     ratio = () => window.devicePixelRatio,
   }: GuideLayerOptions = {},
 ): GuideLayer {
@@ -38,7 +38,7 @@ export function createGuideLayer(
     zIndex: "2",
   });
   screen.after(layer);
-  let current: Guide | null = null;
+  let current: Card | null = null;
   let painted = "";
 
   const paint = (): void => {
@@ -49,7 +49,7 @@ export function createGuideLayer(
     }
     const box = screen.getBoundingClientRect();
     const scale = Math.max(1, ratio());
-    const key = `${String(box.left)} ${String(box.top)} ${String(box.width)} ${String(box.height)} ${String(scale)}`;
+    const key = `${String(box.left)} ${String(box.top)} ${String(box.width)} ${String(box.height)} ${String(scale)} ${JSON.stringify(current)}`;
     const context = layer.getContext("2d");
     if (
       context === null ||
@@ -74,9 +74,8 @@ export function createGuideLayer(
     new ResizeObserver(paint).observe(screen);
   screen.ownerDocument.defaultView?.addEventListener("resize", paint);
   return {
-    show(guide) {
-      if (guide === current && guide !== null) return paint();
-      current = guide;
+    show(card) {
+      current = card;
       paint();
     },
   };

@@ -12,7 +12,7 @@ import {
   vi,
 } from "vitest";
 
-import { TransactionLink } from "@ador/feature-chain-status/transaction";
+import { TransactionLink } from "@frostbite/feature-chain-status/transaction";
 import { WalletGamePlayer } from "../src/ui/wallet-game-player.tsx";
 import { game } from "./support/player-harness.tsx";
 
@@ -28,7 +28,7 @@ vi.mock("../src/ui/game-player.tsx", () => ({
     return <TransactionLink id="ab12" />;
   },
 }));
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useStepWallet: (allowed: readonly string[]) => {
     seen.allowed = allowed;
     return {

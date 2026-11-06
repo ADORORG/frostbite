@@ -1,5 +1,5 @@
 import { Psbt, type Transaction } from "bitcoinjs-lib";
-import type { SignedTransaction } from "@ador/shared/chain";
+import type { SignedTransaction } from "@frostbite/shared/chain";
 
 import type { TransactionPart } from "../ports.ts";
 

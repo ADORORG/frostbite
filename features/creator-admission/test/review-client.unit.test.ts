@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
+import { ApiError } from "@frostbite/client-http";
+import { creatorApplicationRoutes } from "@frostbite/shared/creator-admission";
 import { describe, expect, it, vi } from "vitest";
 
 import { describeFailure } from "../src/client/error-copy.ts";

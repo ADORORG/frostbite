@@ -1,4 +1,4 @@
-import { ApiError, type Requester } from "@ador/client-http";
+import { ApiError, type Requester } from "@frostbite/client-http";
 import { describe, expect, it } from "vitest";
 
 import { failed } from "../src/client/outcome.ts";
@@ -26,12 +26,32 @@ const failing = (code: ApiError["code"], reason?: string, message?: string) =>
   answering(apiFailure(code, reason ?? null, message));
 
 describe("the account's addresses in the browser", () => {
-  it("reads them from the server", async () => {
-    const { request, sent } = answering({ addresses: ["a@b.co", "c@d.co"] });
-    expect(await listEmailAddresses(request)).toEqual(["a@b.co", "c@d.co"]);
+  it("reads them from the server: each with when it was added, and how many the account may hold", async () => {
+    const view = {
+      addresses: [
+        { addedAt: "2026-10-01T09:30:00.000Z", address: "a@b.co" },
+        { addedAt: "2026-10-02T09:30:00.000Z", address: "c@d.co" },
+      ],
+      maximum: 5,
+    };
+    const { request, sent } = answering(view);
+    expect(await listEmailAddresses(request)).toEqual(view);
     expect(sent).toEqual([
       { body: undefined, method: "GET", path: "/api/v1/email/addresses" },
     ]);
+  });
+
+  it("refuses an address whose time is not a time, rather than drawing a date nobody gave", async () => {
+    const { request } = answering({
+      addresses: [{ addedAt: "yesterday", address: "a@b.co" }],
+      maximum: 5,
+    });
+    await expect(listEmailAddresses(request)).rejects.toThrow();
+  });
+
+  it("refuses an answer in the old shape, with no dates, rather than showing a list it cannot vouch for", async () => {
+    const { request } = answering({ addresses: ["a@b.co"], maximum: 5 });
+    await expect(listEmailAddresses(request)).rejects.toThrow();
   });
 });
 

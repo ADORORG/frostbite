@@ -3,7 +3,7 @@ import type { Sound } from "./engine.ts";
 
 // The sound controls a player sees in every game: music and effects each on or off, a volume, and a line that says honestly when
 // nothing can be heard yet. M turns the music off and on, N the effects. A press anywhere on the page unlocks sound, since a browser
-// keeps a page silent until then, and wakes it again after an interruption. Style it with `@import "@ador/game-sdk/audio/panel.css"`.
+// keeps a page silent until then, and wakes it again after an interruption. Style it with `@import "@frostbite/game-sdk/audio/panel.css"`.
 export const panelCopy = {
   group: "Sound",
   music: "Music",

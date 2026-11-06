@@ -1,7 +1,7 @@
 import {
   collectionImportResponseSchema,
   importCollectionItemsInputSchema,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { describe, expect, it, vi } from "vitest";
 
 import { createImportItemsOperation } from "../src/application/import-operation.ts";

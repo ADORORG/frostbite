@@ -1,5 +1,5 @@
-import { createRequester, type FetchLike } from "@ador/client-http";
-import type { IdempotencyKey } from "@ador/shared/http";
+import { createRequester, type FetchLike } from "@frostbite/client-http";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 import {
   completedUploadResponseSchema,
   libraryOlderRoute,
@@ -12,9 +12,9 @@ import {
   type CreateUploadIntentInput,
   type LibraryResponse,
   type UploadIntentResponse,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
-export type { FetchLike } from "@ador/client-http";
+export type { FetchLike } from "@frostbite/client-http";
 
 export interface UploadsApi {
   completeIntent(

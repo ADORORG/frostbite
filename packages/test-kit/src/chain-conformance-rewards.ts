@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 
-import type { ChainAdapter } from "@ador/chain/adapter";
-import type { Address, ContractRef } from "@ador/shared/chain";
+import type { ChainAdapter } from "@frostbite/chain/adapter";
+import type { Address, ContractRef } from "@frostbite/shared/chain";
 
 // What an adapter that declares the rewards reader must show: a holder who has never claimed has claimed nothing, the answer is
 // a whole count, asking again changes nothing, and a collectible that does not exist has no preview. The fixture names a contract, a holder with no claims and a milestone.

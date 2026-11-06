@@ -11,24 +11,24 @@ import {
   gameMilestoneUnlocks,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
-import { writeRecording } from "@ador/database/game-contracts";
+} from "@frostbite/database";
+import { writeRecording } from "@frostbite/database/game-contracts";
 import {
   createListGameClaimsOperation,
   createRefreshGameClaimOperation,
   createStartGameClaimOperation,
   createSubmitGameClaimOperation,
-} from "@ador/feature-games/claims-operations";
-import { createGameClaimsResolver } from "@ador/feature-games/claims-runtime";
-import { chainRefSchema } from "@ador/shared/chain";
-import { defineGame, type GameClaim } from "@ador/shared/games";
-import { correlationIdSchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
+} from "@frostbite/feature-games/claims-operations";
+import { createGameClaimsResolver } from "@frostbite/feature-games/claims-runtime";
+import { chainRefSchema } from "@frostbite/shared/chain";
+import { defineGame, type GameClaim } from "@frostbite/shared/games";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
 import {
   nativeAsset,
   simulatedFamily,
-} from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/test-kit/simulated-chain-transaction";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 // The claim path as the page drives it, against real PostgreSQL and the simulated chain, with a game the platform has never
@@ -58,6 +58,7 @@ const game = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Claim game",
   version: "1",
 });

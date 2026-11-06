@@ -1,5 +1,6 @@
-import { click, mount, textOf } from "@ador/test-kit/dom";
-import type { FeeSpeed } from "@ador/shared/chain";
+import { feeSpeedQuestion } from "../src/domain/fee-copy.ts";
+import { click, mount, textOf } from "@frostbite/test-kit/dom";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { FeeSpeedChip } from "../src/ui/fee-speed-chip.tsx";
@@ -36,6 +37,9 @@ describe("the fee speed chip", () => {
     expect(trigger(container)?.textContent).toBe("FeeFast");
     await click(trigger(container));
     expect(textOf(container)).toContain("could not be asked what a fee costs");
+    expect(
+      container.querySelector(`[aria-label="${feeSpeedQuestion}"]`),
+    ).not.toBeNull();
   });
 
   it("chooses a speed from the opened picker and closes it", async () => {
@@ -53,5 +57,21 @@ describe("the fee speed chip", () => {
     );
     expect(chosen).toEqual(["medium"]);
     expect(container.querySelector(".popover__panel")).toBeNull();
+  });
+
+  it("hands the platform's limit and the transaction's size to the picker, which prices each speed with them", async () => {
+    const container = await mount(
+      <FeeSpeedChip
+        market={answered(ok)}
+        maxFeeSats={100}
+        onChange={() => undefined}
+        value="fast"
+        vbytes={200}
+      />,
+    );
+    await click(trigger(container));
+    expect(textOf(container)).toContain(
+      "More than the 100 sats this step may pay",
+    );
   });
 });

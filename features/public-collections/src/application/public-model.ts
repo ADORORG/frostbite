@@ -1,10 +1,10 @@
 import type {
   ApprovedCollectionSummary,
   ApprovedVersion,
-} from "@ador/collections";
-import { pickRendition } from "@ador/feature-uploads/presentation";
-import type { ChainOption } from "@ador/shared/chain";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/collections";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
+import type { ChainOption } from "@frostbite/shared/chain";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 // What the public may see of an approved collection, and nothing else. Each field is copied across
 // explicitly: the creator's identity, the review history, private notes, the content hash, and the

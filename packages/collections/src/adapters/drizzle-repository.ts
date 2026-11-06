@@ -1,12 +1,12 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   collectionItems,
   collections,
-} from "@ador/database/schema/collections";
-import { collectionSubmissions } from "@ador/database/schema/collection-submissions";
+} from "@frostbite/database/schema/collections";
+import { collectionSubmissions } from "@frostbite/database/schema/collection-submissions";
 import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 
-import type { SubmissionState } from "@ador/shared/collections";
+import type { SubmissionState } from "@frostbite/shared/collections";
 import type {
   CollectionAggregate,
   CollectionRepository,

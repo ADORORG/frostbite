@@ -1,14 +1,14 @@
 import {
   createCreatorAdmissionService,
   createDrizzleCreatorAdmissionRepository,
-} from "@ador/creator-admission";
+} from "@frostbite/creator-admission";
 import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import { creatorReviewQueueLimits } from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import { creatorReviewQueueLimits } from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { authorizationPolicy } from "@repo/config/authorization";
 
 let service: ReturnType<typeof createCreatorAdmissionService> | undefined;

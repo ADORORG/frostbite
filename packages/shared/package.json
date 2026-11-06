@@ -1,5 +1,5 @@
 {
-  "name": "@ador/shared",
+  "name": "@frostbite/shared",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,6 +10,7 @@
     "./auth": "./src/auth/wallet-auth-action.ts",
     "./auth/sign-in-path": "./src/auth/sign-in-path.ts",
     "./chain": "./src/chain/index.ts",
+    "./chain-step-words": "./src/chain/step-words.ts",
     "./creator-admission": "./src/creator-admission/index.ts",
     "./decisions": "./src/decisions/gates.ts",
     "./features": "./src/features/manifest.ts",

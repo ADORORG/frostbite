@@ -4,7 +4,7 @@
 # target or the start command:
 #   web      applies the pending migrations, then node apps/web/.next/standalone/apps/web/server.js   (target `web`, the default)
 #   worker   pnpm --filter worker start                                                                (target `worker`)
-#   release  pnpm --filter @ador/database migration:apply   (by hand, or a platform that wants a separate step)
+#   release  pnpm --filter @frostbite/database migration:apply   (by hand, or a platform that wants a separate step)
 # See docs/operations/deployment.md. Secrets are never in the image: they come from the platform's environment at run time.
 
 ARG NODE_VERSION=24.11.1
@@ -59,4 +59,4 @@ CMD ["pnpm", "--filter", "worker", "start"]
 # The web container migrates before it serves: a migration that fails stops the container, so the previous version keeps serving. The
 # migration takes a database lock, so several web containers starting together migrate once. The worker never migrates.
 FROM runtime AS web
-CMD ["sh", "-c", "pnpm --filter @ador/database migration:apply && exec node apps/web/.next/standalone/apps/web/server.js"]
+CMD ["sh", "-c", "pnpm --filter @frostbite/database migration:apply && exec node apps/web/.next/standalone/apps/web/server.js"]

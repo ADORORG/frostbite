@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import type { Spot } from "../rules/grid.ts";
 import { visionCost } from "../rules/woods/constants.ts";

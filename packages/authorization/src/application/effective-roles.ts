@@ -1,4 +1,4 @@
-import type { MethodKind, PlatformRole } from "@ador/shared/accounts";
+import type { MethodKind, PlatformRole } from "@frostbite/shared/accounts";
 
 // Which of an account's platform roles work. A role the policy ties to a kind of sign-in method (`requiredMethods`) takes effect only
 // while the account holds every kind named; granting it without the method records it but does not let it act. One rule, used to

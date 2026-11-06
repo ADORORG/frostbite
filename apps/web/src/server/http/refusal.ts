@@ -4,7 +4,7 @@ import {
   correlationHeaderName,
   httpErrorEnvelopeSchema,
   type HttpErrorCode,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 
 interface RefusalOptions {
   // When the cause is logged under the same id the caller is given.

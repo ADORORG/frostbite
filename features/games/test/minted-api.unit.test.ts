@@ -1,4 +1,4 @@
-import type { FetchLike } from "@ador/client-http";
+import type { FetchLike } from "@frostbite/client-http";
 import { describe, expect, it, vi } from "vitest";
 
 import { createMintedApi } from "../src/client/minted-api.ts";

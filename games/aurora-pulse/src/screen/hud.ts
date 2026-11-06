@@ -1,21 +1,14 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { maxEnergy, lanes } from "../rules/constants.ts";
 import { multiplierOf } from "../feedback.ts";
 import { stageAt, type PulseState } from "../rules/state.ts";
-import {
-  hitY,
-  laneWidth,
-  laneX,
-  screenHeight,
-  screenWidth,
-  topY,
-} from "./layout.ts";
+import { hitY, laneWidth, laneX, screenWidth, topY } from "./layout.ts";
 import { colour, laneColours } from "./palette.ts";
 import type { View } from "./view.ts";
 
 // What is written over the screen: the stage, the score, the combo and its multiplier, the energy, the verdict on the last tap, the keys, a line
-// of news, and the cards before and after a run. All of it is on the canvas, so showing more of it never moves the page.
+// of news. All of it is on the canvas, so showing more of it never moves the page.
 const font = '"Courier New", ui-monospace, monospace';
 export const keyNames = ["D", "F", "J", "K"] as const;
 // How long a verdict stays on the screen, in ticks.
@@ -114,57 +107,4 @@ export function hud(
       6,
       "center",
     );
-}
-
-function card(
-  context: CanvasRenderingContext2D,
-  lines: readonly (readonly [string, string, number])[],
-): void {
-  context.globalAlpha = 0.84;
-  block(context, colour.back, 0, 0, screenWidth, screenHeight);
-  context.globalAlpha = 1;
-  lines.forEach(([text, fill, size], index) => {
-    write(
-      context,
-      text,
-      screenWidth / 2,
-      22 + index * 12,
-      fill,
-      size,
-      "center",
-    );
-  });
-}
-
-export function cards(
-  context: CanvasRenderingContext2D,
-  state: PulseState,
-  view: View,
-): void {
-  if (view.phase === "ready")
-    card(context, [
-      ["AURORA PULSE", colour.perfect, 10],
-      ["TAP EACH NOTE AS IT MEETS THE LINE", colour.text, 5],
-      ["KEYS D F J K, ARROWS, OR TAP A QUARTER", colour.great, 5],
-      ["ENTER TO START", colour.textDim, 5],
-    ]);
-  if (view.phase === "over")
-    card(context, [
-      [
-        state.cause === "finished" ? "TRACK COMPLETE" : "THE LIGHT WENT OUT",
-        colour.danger,
-        8,
-      ],
-      [
-        `STAGE ${String(stageAt(state.tick))}   SCORE ${String(state.score)}`,
-        colour.text,
-        6,
-      ],
-      [
-        view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-        colour.perfect,
-        6,
-      ],
-      ["ENTER TO PLAY AGAIN", colour.great, 5],
-    ]);
 }

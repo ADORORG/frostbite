@@ -1,4 +1,4 @@
-import type { SetupLinkService } from "@ador/authorization";
+import type { SetupLinkService } from "@frostbite/authorization";
 
 // What the operator is told. The link is the only place the token ever appears: it is printed once, to this terminal, and is not
 // stored anywhere readable (the database keeps only its hash).

@@ -89,7 +89,7 @@ reason.
   executable workspaces; native Rust formatting, Clippy, and type checks passed.
 - Unit and integration suites passed, including a real PostgreSQL container, the Next.js production
   fixture, nine native contract tests, and four WASM contract tests.
-- `@ador/chain` and `@ador/wallet` measured 100% statements, branches, functions, and lines. Merged
+- `@frostbite/chain` and `@frostbite/wallet` measured 100% statements, branches, functions, and lines. Merged
   line and branch coverage exceeded 90%; Rust measured 98.99% lines, 100% functions, and 94.55%
   regions.
 - Migration verification, the production build, and 36 Playwright cases passed.

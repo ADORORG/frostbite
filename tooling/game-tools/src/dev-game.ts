@@ -1,4 +1,4 @@
-import { startDevHost } from "@ador/game-sdk/dev-host";
+import { startDevHost } from "@frostbite/game-sdk/dev-host";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 

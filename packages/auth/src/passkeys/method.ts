@@ -1,5 +1,5 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { passkeyCredentials } from "@ador/database/schema/auth";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { passkeyCredentials } from "@frostbite/database/schema/auth";
 import { eq } from "drizzle-orm";
 
 import type { MethodAdapter } from "../methods/contracts.ts";

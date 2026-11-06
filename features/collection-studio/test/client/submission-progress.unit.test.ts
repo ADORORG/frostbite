@@ -2,7 +2,7 @@ import {
   submissionStates,
   type CollectionSubmission,
   type SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import { submissionStateCopy } from "../../src/client/submission-copy.ts";

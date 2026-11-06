@@ -1,5 +1,5 @@
-import { commonEffects, tone } from "@ador/game-sdk/audio/effects";
-import type { Track } from "@ador/game-sdk/audio/tracks";
+import { commonEffects, tone } from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
 // Aurora Pulse's sound, as data: a steady pulse (a step is half a beat, and the tempo is the chart's, 32 ticks to a beat) of a low bass, a bright
 // arpeggio and a high shimmer in A minor, and an effect for each thing that happens: each lane taps in a note of its own (a pentatonic run, so any

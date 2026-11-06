@@ -2,9 +2,9 @@ import {
   platformRoleSchema,
   type AuthorizationPolicy,
   type PlatformRole,
-} from "@ador/shared/accounts";
-import type { CorrelationId } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/accounts";
+import type { CorrelationId } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 // Who may grant and suspend platform roles, and the rules that keep that safe. An administrator does it, from the role screen; every
 // change is recorded with who made it, in the transaction that made it. Asking for what is already so changes nothing and writes

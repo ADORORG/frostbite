@@ -1,4 +1,4 @@
-import { defaultUploadPolicy } from "@ador/shared/uploads";
+import { defaultUploadPolicy } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { validateImage } from "../src/validate.ts";

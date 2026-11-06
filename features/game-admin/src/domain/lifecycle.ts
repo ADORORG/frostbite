@@ -1,5 +1,5 @@
 import type { ProgressStep } from "@repo/ui/arcade";
-import type { GameAdminStep } from "@ador/shared/games";
+import type { GameAdminStep } from "@frostbite/shared/games";
 
 import { stepCopy } from "./copy.ts";
 

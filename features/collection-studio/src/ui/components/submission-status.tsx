@@ -1,4 +1,4 @@
-import type { CollectionSubmission } from "@ador/shared/collections";
+import type { CollectionSubmission } from "@frostbite/shared/collections";
 import { StatusLamp } from "@repo/ui/arcade";
 
 import { submissionStateCopy } from "../../client/submission-copy.ts";

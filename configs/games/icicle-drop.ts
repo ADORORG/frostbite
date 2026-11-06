@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -180,12 +180,13 @@ export const icicleDropGame = defineGame({
   schemaVersion: 1,
   summary:
     "A sliding ice-tile puzzle: join two of a kind and chase the big tile.",
+  tags: ["puzzle"],
   title: "Icicle Drop",
   verification: {
     replay: {
       id: "icicle-drop",
       sha256:
-        "8ba48e8d8c46ab6c0b3e2148c5af2e78fe78b8bb50f7900c4252dfd9cc5fde20",
+        "17133b2afdb15a2a60c78f66785887c5d28444f332d61540ca279ce6add81934",
       version: 1,
     },
   },

@@ -1,4 +1,4 @@
-import type { PageMetadata } from "@ador/plugin-kit/page-metadata";
+import type { PageMetadata } from "@frostbite/plugin-kit/page-metadata";
 
 import type { ProductCatalog } from "./domain/catalog.ts";
 

@@ -1,6 +1,6 @@
-import { assets } from "@ador/database";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import { defaultUploadPolicy } from "@ador/shared/uploads";
+import { assets } from "@frostbite/database";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import { defaultUploadPolicy } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { createAssetValidationService } from "../src/application/validation-service.ts";

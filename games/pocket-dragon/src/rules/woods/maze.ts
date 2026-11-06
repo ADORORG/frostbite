@@ -1,4 +1,4 @@
-import { startState, stepSeed } from "@ador/game-sdk/seeded";
+import { startState, stepSeed } from "@frostbite/game-sdk/seeded";
 
 import { itemList } from "../kit.ts";
 import {

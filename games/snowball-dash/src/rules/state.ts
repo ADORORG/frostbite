@@ -1,4 +1,4 @@
-import { startState } from "@ador/game-sdk/seeded";
+import { startState } from "@frostbite/game-sdk/seeded";
 
 import { coyoteTicks, firstObstacleAt } from "./constants.ts";
 import { layAhead } from "./spawn.ts";

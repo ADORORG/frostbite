@@ -1,4 +1,4 @@
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
+import { validateBitcoinAddress } from "@frostbite/chain/bitcoin";
 import { Signer } from "bip322-js";
 import { describe, expect, it } from "vitest";
 

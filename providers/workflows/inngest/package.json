@@ -1,5 +1,5 @@
 {
-  "name": "@ador/provider-workflows-inngest",
+  "name": "@frostbite/provider-workflows-inngest",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -18,16 +18,16 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/events": "workspace:*",
-    "@ador/jobs": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/events": "workspace:*",
+    "@frostbite/jobs": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/config": "workspace:*",
     "inngest": "4.21.1",
     "zod": "4.5.4"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

@@ -1,7 +1,10 @@
 "use client";
 
-import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import {
+  useWalletChooser,
+  useWalletConnection,
+} from "@frostbite/wallet/client";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import {
   ArcadeActionButton,
   Avatar,
@@ -11,7 +14,7 @@ import {
 } from "@repo/ui/arcade";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { networkName, shortAddress } from "../widget/format.ts";
 
 // The wallets that sign in to this account, with what to do about each: link the one connected in this browser, connect another to

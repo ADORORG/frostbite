@@ -6,23 +6,23 @@ import {
   createPostgresContainerArguments,
   postgresUrl,
   waitForPostgres,
-} from "@ador/database/test-postgres";
+} from "@frostbite/database/test-postgres";
 import {
   ensureRunning,
   findContainer,
   stopKeeping,
   wipe,
   type Docker,
-} from "@ador/test-kit/durable-container";
+} from "@frostbite/test-kit/durable-container";
 
 // The parts of the local stack that outlive a run: the database and the object storage. Named so a second start finds them again; the
 // secrets they were first made with are kept beside the repository (ignored by git), because a volume remembers its first password.
 export const durableStack = {
   postgres: {
-    container: "ador-stack-postgres",
-    volume: "ador-stack-postgres-data",
+    container: "frostbite-stack-postgres",
+    volume: "frostbite-stack-postgres-data",
   },
-  s3: { container: "ador-stack-s3", volume: "ador-stack-s3-data" },
+  s3: { container: "frostbite-stack-s3", volume: "frostbite-stack-s3-data" },
 } as const;
 
 export interface StackSecrets {

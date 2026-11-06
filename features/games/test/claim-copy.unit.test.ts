@@ -1,12 +1,18 @@
 import {
+  chainUnreachableWords,
+  signatureMismatchWords,
+} from "@frostbite/shared/chain-step-words";
+import {
+  gameClaimRefusalReasons,
   gameClaimStates,
   gameClaimUnavailableReasons,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import {
   claimCopy,
   claimStateCopy,
+  claimSubmitRefusalCopy,
   claimUnavailableCopy,
   isSettledClaim,
   showsDelayed,
@@ -83,5 +89,26 @@ describe("when a claim is over", () => {
       "expired",
       "failed",
     ]);
+  });
+});
+
+describe("why the platform turned down what the wallet signed", () => {
+  it("has words, about a claim, for every reason a signed claim is turned down", () => {
+    expect(Object.keys(claimSubmitRefusalCopy).sort()).toEqual(
+      [...gameClaimRefusalReasons].sort(),
+    );
+    for (const reason of gameClaimRefusalReasons)
+      expect(claimSubmitRefusalCopy[reason].length).toBeGreaterThan(20);
+    expect(claimSubmitRefusalCopy.expired).toContain("claim");
+  });
+
+  it("says the network is gone, and the signature is not what was shown, in the platform's one wording", () => {
+    expect(claimSubmitRefusalCopy["chain-unavailable"]).toBe(
+      chainUnreachableWords,
+    );
+    expect(claimSubmitRefusalCopy["invalid-signature"]).toBe(
+      signatureMismatchWords,
+    );
+    expect(claimUnavailableCopy.unavailable).toBe(chainUnreachableWords);
   });
 });

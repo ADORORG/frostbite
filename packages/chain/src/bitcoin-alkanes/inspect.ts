@@ -1,5 +1,5 @@
 import { crypto } from "bitcoinjs-lib";
-import type { ContractInspection, ContractRef } from "@ador/shared/chain";
+import type { ContractInspection, ContractRef } from "@frostbite/shared/chain";
 
 import { toHex } from "./node/hex.ts";
 import { parseAlkaneId } from "./node/alkane-id.ts";

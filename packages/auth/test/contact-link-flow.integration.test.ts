@@ -1,5 +1,5 @@
-import { authSessions } from "@ador/database";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+import { authSessions } from "@frostbite/database";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { sha256 } from "../src/domain/crypto.ts";
@@ -13,6 +13,16 @@ import {
 } from "./support/contact-world.ts";
 
 useContactWorld();
+
+// The addresses an account holds, as text, oldest first.
+async function addressesOf(
+  links: Awaited<ReturnType<typeof world>>["links"],
+  userId: string,
+) {
+  return (await links.addresses(userId, "email")).addresses.map(
+    ({ value }) => value,
+  );
+}
 
 describe("linking a second address to a signed-in account", () => {
   async function activeSession(userId: string) {
@@ -48,7 +58,7 @@ describe("linking a second address to a signed-in account", () => {
       session,
     });
     expect(linked.ok && linked.sessionToken !== null).toBe(true);
-    expect(await links.list(account.userId, "email")).toEqual([
+    expect(await addressesOf(links, account.userId)).toEqual([
       "first@example.com",
       "second@example.com",
     ]);
@@ -112,7 +122,7 @@ describe("linking a second address to a signed-in account", () => {
         session,
       }),
     ).toEqual({ ok: false, reason: "taken" });
-    expect(await links.list(account.userId, "email")).toEqual([
+    expect(await addressesOf(links, account.userId)).toEqual([
       "first@example.com",
     ]);
   });

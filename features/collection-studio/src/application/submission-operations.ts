@@ -1,5 +1,8 @@
-import type { createSubmissionService, SubmitResult } from "@ador/collections";
-import type { HttpOperation } from "@ador/http";
+import type {
+  createSubmissionService,
+  SubmitResult,
+} from "@frostbite/collections";
+import type { HttpOperation } from "@frostbite/http";
 import {
   collectionSubmissionListSchema,
   collectionSubmissionResponseSchema,
@@ -11,8 +14,8 @@ import {
   type CollectionSubmissionResponse,
   type ListCollectionSubmissionsInput,
   type SubmitCollectionInput,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import {
   commonFailures,

@@ -4,7 +4,7 @@ const chain = vi.hoisted(() => ({
   walletRequests: vi.fn(),
   withWalletSignatures: vi.fn(),
 }));
-vi.mock("@ador/chain/wallet-signing", () => chain);
+vi.mock("@frostbite/chain/wallet-signing", () => chain);
 
 import {
   signWithWallet,

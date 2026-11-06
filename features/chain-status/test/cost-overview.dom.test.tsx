@@ -1,4 +1,4 @@
-import { mount } from "@ador/test-kit/dom";
+import { mount } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { costBreakdown } from "../src/domain/fee-copy.ts";

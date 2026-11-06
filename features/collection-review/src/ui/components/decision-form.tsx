@@ -3,7 +3,7 @@ import {
   reviewFieldLimits,
   type ReviewAction,
   type SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
 import { useId, useState } from "react";
 

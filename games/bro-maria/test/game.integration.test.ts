@@ -1,6 +1,7 @@
-import { defaultSound } from "@ador/game-sdk/audio/settings";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { recordingRuns } from "@frostbite/test-kit/simulated-game-host";
 import { closeGame, play, settle } from "./support/page.ts";
 
 afterEach(closeGame);
@@ -21,12 +22,15 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
       expect(button.hasAttribute("disabled")).toBe(true);
   });
 
-  it("starts a run on a seed of its own, says the run is its own report, and turns on the controls", async () => {
+  it("starts a run, says how to play and nothing about the platform, and turns on the controls", async () => {
     const { window } = await play({ best: 0 });
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
-    expect(byId(window, "note")?.textContent).toContain("local seed");
+    expect(byId(window, "note")?.textContent).toContain("space jumps");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
     expect(byId(window, "start")?.hasAttribute("hidden")).toBe(true);
     expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(false);
     for (const button of window.document.querySelectorAll("#pad button"))
@@ -36,8 +40,13 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
     expect(byId(window, "stages")?.textContent).toBe("6");
   });
 
-  it("runs until the last life is lost, then says what the platform could not check and keeps the best", async () => {
-    const { stored, window } = await play({ best: 0 });
+  it("runs until the last life is lost, then keeps the best, and says nothing about the platform", async () => {
+    const recorded = recordingRuns();
+    const { stored, window } = await play(
+      { best: 0 },
+      {},
+      { runs: recorded.runs },
+    );
     window.Math.random = () => earlyPit;
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
@@ -54,7 +63,12 @@ describe("Bro Maria, bundled and run against a simulated platform", () => {
     expect(byId(window, "start")?.hasAttribute("hidden")).toBe(false);
     expect(byId(window, "start")?.textContent).toBe("Run again");
     expect(byId(window, "lives")?.textContent).toBe("0");
-    expect(byId(window, "note")?.textContent).toContain("your own claim");
+    expect(byId(window, "note")?.textContent).not.toMatch(
+      /platform|claim|seed/i,
+    );
+    expect(recorded.submitted).toHaveLength(1);
+    expect(recorded.submitted[0]?.runId).toBe("run-1");
+    expect(recorded.submitted[0]?.record).toMatchObject({ seed: 424_242 });
     expect(stored.progress).toEqual({
       best: expect.any(Number),
       sound: defaultSound,

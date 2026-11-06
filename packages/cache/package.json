@@ -1,5 +1,5 @@
 {
-  "name": "@ador/cache",
+  "name": "@frostbite/cache",
   "version": "0.0.0",
   "private": true,
   "type": "module",

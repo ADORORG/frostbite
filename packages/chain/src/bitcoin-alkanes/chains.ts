@@ -1,4 +1,4 @@
-import type { AssetRef, ChainRef } from "@ador/shared/chain";
+import type { AssetRef, ChainRef } from "@frostbite/shared/chain";
 
 import type { BitcoinNetwork } from "../bitcoin/address.ts";
 import type { AlkanesNode } from "./node/node.ts";

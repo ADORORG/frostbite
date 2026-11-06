@@ -1,4 +1,4 @@
-import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+import { attachKeys, standardKeys } from "@frostbite/game-sdk/controls";
 
 // What the player's hands can do: one key or touch for each of the two actions, Enter to start and P to pause (the same in every game).
 export interface Controls {

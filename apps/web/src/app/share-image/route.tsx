@@ -1,4 +1,4 @@
-import { siteTagline } from "@ador/shared/platform";
+import { siteTagline } from "@frostbite/shared/platform";
 
 import { defaultImageCacheControl } from "../../server/metadata/cache";
 import { shareCardResponse } from "../../server/metadata/share-card";

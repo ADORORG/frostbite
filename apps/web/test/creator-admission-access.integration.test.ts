@@ -1,5 +1,6 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { forbiddenMessage } from "@frostbite/http/outcome";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const resolvePageAccess = vi.hoisted(() => vi.fn());
@@ -13,7 +14,7 @@ import { PUT } from "../src/app/api/v1/[...segments]/route.ts";
 
 beforeAll(() => {
   process.env.APP_ENV = "test";
-  process.env.NEXT_PUBLIC_APP_NAME = "Frostbit test";
+  process.env.NEXT_PUBLIC_APP_NAME = "Frostbite test";
   process.env.PUBLIC_BASE_URL = "https://launch.example";
 });
 
@@ -48,7 +49,12 @@ describe("creator admission API access decisions", () => {
 
   it("maps insufficient capability and dependency failure without executing", async () => {
     resolvePageAccess.mockResolvedValueOnce({ kind: "forbidden" });
-    await expectError(await PUT(request(), context), 403, "forbidden");
+    const forbidden = await PUT(request(), context);
+    expect(
+      httpErrorEnvelopeSchema.parse(await forbidden.clone().json()).error
+        .message,
+    ).toBe(forbiddenMessage);
+    await expectError(forbidden, 403, "forbidden");
 
     resolvePageAccess.mockResolvedValueOnce({ kind: "unavailable" });
     await expectError(await PUT(request(), context), 503, "internal_error");

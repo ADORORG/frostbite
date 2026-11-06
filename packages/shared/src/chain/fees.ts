@@ -7,7 +7,7 @@ export const feeSpeeds = ["slow", "medium", "fast", "lightning"] as const;
 export type FeeSpeed = (typeof feeSpeeds)[number];
 export const feeSpeedSchema = z.enum(feeSpeeds);
 
-// The public explorers fee levels can be taken from (`REWARDS_FEE_API_FORMAT`). Each is one adapter in `@ador/chain` (`fee-sources`), keyed
+// The public explorers fee levels can be taken from (`REWARDS_FEE_API_FORMAT`). Each is one adapter in `@frostbite/chain` (`fee-sources`), keyed
 // by this list, so a name without an adapter cannot be configured and an adapter without a name cannot exist. An adapter carries its own
 // address for each network.
 // - `mempool`: mempool.space's recommendation by name;

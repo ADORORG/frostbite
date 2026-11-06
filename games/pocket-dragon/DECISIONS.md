@@ -84,13 +84,13 @@ The game has small stand-ins for them, each in one place and named after the SDK
 
 | Stand-in in the game                            | The SDK's                              | What it does                                          |
 | ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
-| `src/page/zones.ts` `attachZones`               | `@ador/game-sdk/touch-zones`           | zones on the screen, followed for each finger         |
-| `src/page/tap-start.ts` `attachTapToStart`      | `@ador/game-sdk/touch-start`           | a tap starts a run                                    |
-| `src/page/input.ts` `byInput`                   | `@ador/game-sdk/touch`                 | the words for a keyboard or a finger                  |
-| `touchLines` and `touchStart` in `src/guide.ts` | `touchLines` in `@ador/game-sdk/guide` | the first screen's lines for thumbs, and TAP TO START |
-| `src/page/send.ts` `sendRun`                    | `sendRun` in `@ador/game-sdk/play`     | sends a finished run once and drops a failure quietly |
+| `src/page/zones.ts` `attachZones`               | `@frostbite/game-sdk/touch-zones`           | zones on the screen, followed for each finger         |
+| `src/page/tap-start.ts` `attachTapToStart`      | `@frostbite/game-sdk/touch-start`           | a tap starts a run                                    |
+| `src/page/input.ts` `byInput`                   | `@frostbite/game-sdk/touch`                 | the words for a keyboard or a finger                  |
+| `touchLines` and `touchStart` in `src/guide.ts` | `touchLines` in `@frostbite/game-sdk/guide` | the first screen's lines for thumbs, and TAP TO START |
+| `src/page/send.ts` `sendRun`                    | `sendRun` in `@frostbite/game-sdk/play`     | sends a finished run once and drops a failure quietly |
 
-The game no longer imports `@ador/game-sdk/run-notes`, which the newer `dev` removes. Once that `dev` is pushed:
+The game no longer imports `@frostbite/game-sdk/run-notes`, which the newer `dev` removes. Once that `dev` is pushed:
 
 1. Switch these imports to the SDK's.
 2. Delete the stand-ins.

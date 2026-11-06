@@ -10,7 +10,11 @@ import {
 
 export { freePort };
 
-const defaultImage = "inngest/inngest:latest";
+// The Inngest server the tests run against, pinned to a release and its digest: `latest` moved to v1.50.0 on 2026-11-06 and Verify began to fail
+// ("validates then processes a published event" ended after validate) with no change of ours. Move the pin on purpose, with the suite run
+// against the new release first.
+const defaultImage =
+  "inngest/inngest:v1.49.0@sha256:ad551e89e493e34db74d155be37dc5549930fcb6eb8382e502c17da9762821c7";
 const defaultReadyTimeoutMs = 30_000;
 
 export interface InngestRuntime {
@@ -37,7 +41,7 @@ export async function startInngestRuntime(input: {
   readonly image?: string;
   readonly readyTimeoutMs?: number;
 }): Promise<InngestRuntime> {
-  const containerName = `ador-inngest-${randomUUID()}`;
+  const containerName = `frostbite-inngest-${randomUUID()}`;
   const { eventKey, signingKey } = input;
   const guard = guardContainer(containerName, input.terminate);
   const stop = guard.stop;

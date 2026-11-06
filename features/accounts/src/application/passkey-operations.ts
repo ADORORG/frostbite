@@ -7,9 +7,10 @@ import {
   passkeyRoutes,
   passkeyUnlinkInputSchema,
   type createPasskeyLinkingService,
-} from "@ador/auth";
-import type { HttpOperation, HttpOperationResult } from "@ador/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/auth";
+import type { HttpOperation, HttpOperationResult } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { outcomeFailure } from "./outcomes.ts";
 
@@ -22,13 +23,7 @@ const errors = ["conflict", "forbidden", "unauthorized"] as const;
 function sessionOrFailure(
   session: Parameters<Service["begin"]>[0]["session"] | null,
 ) {
-  return (
-    session ?? {
-      error: "unauthorized" as const,
-      message: "Authentication is required.",
-      ok: false as const,
-    }
-  );
+  return session ?? unauthenticated;
 }
 
 function mutationFailure(code: string): FailureResult {

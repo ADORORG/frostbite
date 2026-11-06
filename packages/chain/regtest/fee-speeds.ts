@@ -1,4 +1,4 @@
-import type { FeeSpeedPolicy } from "@ador/shared/chain";
+import type { FeeSpeedPolicy } from "@frostbite/shared/chain";
 
 // The speeds a person may choose between; the regtest drive only needs them to exist.
 export const feeSpeeds: FeeSpeedPolicy = {

@@ -177,13 +177,13 @@ describe("the wallet a game can see", () => {
     );
     expect(events).toEqual([
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { wallet: connected },
         event: "wallet.changed",
         version: 1,
       },
       {
-        channel: "ador-game",
+        channel: "frostbite-game",
         data: { wallet: null },
         event: "wallet.changed",
         version: 1,

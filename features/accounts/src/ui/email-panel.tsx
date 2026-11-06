@@ -1,6 +1,8 @@
 "use client";
 
-import { createRequester, sameOriginFetch } from "@ador/client-http";
+import type { EmailAddressesView } from "@frostbite/auth";
+import { createRequester, sameOriginFetch } from "@frostbite/client-http";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import {
   ArcadeActionButton,
   ConsoleCard,
@@ -10,6 +12,7 @@ import {
 } from "@repo/ui/arcade";
 import { useState, type FormEvent } from "react";
 
+import { addedOnText } from "./email-added.ts";
 import {
   confirmLinkCode,
   listEmailAddresses,
@@ -20,13 +23,14 @@ import {
 type Tone = "attention" | "ready" | "unavailable";
 
 // The email addresses that sign in to this account: add one by proving the mailbox with a code, remove one while another way in
-// remains. A change signs the other sessions out, and the page says so only after the server did it.
+// remains, each with the day it was added, up to the number the account may hold. A change signs the other sessions out, and the page
+// says so only after the server did it.
 export function EmailPanel({
-  initialAddresses,
+  initial,
 }: {
-  readonly initialAddresses: readonly string[];
+  readonly initial: EmailAddressesView;
 }) {
-  const [addresses, setAddresses] = useState(initialAddresses);
+  const [{ addresses, maximum }, setView] = useState(initial);
   const [step, setStep] = useState<"address" | "code">("address");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -40,7 +44,7 @@ export function EmailPanel({
   // Reads the list again after a change. False when it could not be read: the change was made, but the list shown may be out of date.
   async function refresh(): Promise<boolean> {
     try {
-      setAddresses(await listEmailAddresses(request));
+      setView(await listEmailAddresses(request));
       return true;
     } catch {
       return false;
@@ -96,11 +100,14 @@ export function EmailPanel({
     setWorking(false);
   }
 
+  // At the limit there is nothing to add: the form gives way to the reason, in the catalogue's words (the server says the same if asked).
+  const full = addresses.length >= maximum;
+
   return (
     <ConsoleCard
       count={addresses.length}
       glyph="✉"
-      lead="Addresses that can sign in to this account with a one-time code."
+      lead={`Addresses that can sign in to this account with a one-time code. Up to ${String(maximum)} can be linked.`}
       title="Email addresses"
     >
       <StatusLamp label={message.text} tone={message.tone} />
@@ -108,7 +115,7 @@ export function EmailPanel({
         <p>No email address is linked to this account.</p>
       ) : (
         <ul aria-label="Linked email addresses" className="console-list">
-          {addresses.map((address) => (
+          {addresses.map(({ addedAt, address }) => (
             <ConsoleRow
               action={
                 <ArcadeActionButton
@@ -121,6 +128,7 @@ export function EmailPanel({
                   Remove
                 </ArcadeActionButton>
               }
+              detail={addedOnText(addedAt)}
               key={address}
               leading={<span aria-hidden="true">✉</span>}
               name={address}
@@ -128,7 +136,9 @@ export function EmailPanel({
           ))}
         </ul>
       )}
-      {step === "address" ? (
+      {full && step === "address" ? (
+        <p>{accountOutcomes["email-limit-reached"].message}</p>
+      ) : step === "address" ? (
         <form className="arcade-form" onSubmit={(event) => void ask(event)}>
           <ArcadeTextField
             autoComplete="email"

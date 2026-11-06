@@ -1,7 +1,10 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint, FeatureLoadContext } from "@ador/plugin-kit";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type {
+  FeatureEntrypoint,
+  FeatureLoadContext,
+} from "@frostbite/plugin-kit";
 
-import { siteDescription, siteTagline } from "@ador/shared/platform";
+import { siteDescription, siteTagline } from "@frostbite/shared/platform";
 import { createPlatformStatusOperation } from "./application/platform-status.ts";
 import { drawSections } from "./application/draw-sections.ts";
 import { PlatformHome } from "./ui/home.tsx";

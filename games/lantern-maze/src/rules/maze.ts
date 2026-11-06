@@ -1,4 +1,4 @@
-import { stepInt, startState } from "@ador/game-sdk/seeded";
+import { stepInt, startState } from "@frostbite/game-sdk/seeded";
 
 import { deltas } from "./constants.ts";
 

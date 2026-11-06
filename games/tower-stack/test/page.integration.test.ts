@@ -1,4 +1,4 @@
-import { installFakeAudio } from "@ador/game-sdk/audio/fake";
+import { installFakeAudio } from "@frostbite/game-sdk/audio/fake";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { byId, closeGame, play, settle } from "./support/page.ts";

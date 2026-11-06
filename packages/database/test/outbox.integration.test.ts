@@ -1,5 +1,8 @@
-import type { DomainEventEnvelope } from "@ador/events";
-import { relayOutboxBatch, TerminalWorkflowDeliveryError } from "@ador/jobs";
+import type { DomainEventEnvelope } from "@frostbite/events";
+import {
+  relayOutboxBatch,
+  TerminalWorkflowDeliveryError,
+} from "@frostbite/jobs";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

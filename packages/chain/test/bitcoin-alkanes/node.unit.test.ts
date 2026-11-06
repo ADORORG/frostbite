@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { JsonValue } from "@ador/shared/chain";
+import type { JsonValue } from "@frostbite/shared/chain";
 
 import { NodeRejectedError } from "../../src/bitcoin-alkanes/node/errors.ts";
 import { createRpcNode } from "../../src/bitcoin-alkanes/node/node.ts";

@@ -1,4 +1,4 @@
-import { collectionLimits } from "@ador/shared/collections";
+import { collectionLimits } from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeFileDrop,

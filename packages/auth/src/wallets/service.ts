@@ -1,5 +1,5 @@
-import type { CorrelationId } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { CorrelationId } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type { ActiveSession } from "../application/session-repository.ts";
 import {

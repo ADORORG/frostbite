@@ -1,7 +1,7 @@
 import type { GameClient } from "./client.ts";
 import { jsonValueSchema } from "./protocol.ts";
 import { canonicalJson, type RunRecord } from "./run-record.ts";
-import type { CabinetRuns } from "./run-notes.ts";
+import type { CabinetRuns } from "./cabinet-runs.ts";
 
 // What a page of a game needs from the platform to report what a player earns and to have a run checked, in one place. A page opened
 // outside the platform has no host to answer; then nothing is reported, and a run is played on a seed of the page's own and its
@@ -43,4 +43,16 @@ export async function connectToPlatform(
         ),
     },
   };
+}
+
+// Hands a finished run's record to the platform to be replayed, and says nothing to the player about it: how a run is checked is not
+// part of playing. A run with no platform run (a page opened outside the platform, or a player the platform could not give one) is
+// not sent, and one the platform cannot be reached for is dropped; its milestones are then the game's own report.
+export async function sendRun(
+  play: PlatformPlay | null,
+  runId: string | null,
+  record: RunRecord,
+): Promise<void> {
+  if (play === null || runId === null) return;
+  await play.runs.submit(runId, record).catch(() => undefined);
 }

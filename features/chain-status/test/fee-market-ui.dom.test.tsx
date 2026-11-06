@@ -1,5 +1,6 @@
-import type { FeeSpeed } from "@ador/shared/chain";
-import { click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { feeSpeedQuestion } from "../src/domain/fee-copy.ts";
+import type { FeeSpeed } from "@frostbite/shared/chain";
+import { click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import type { ChainStatusApi } from "../src/client/api.ts";
@@ -57,7 +58,7 @@ describe("the fee speed picker", () => {
     expect(textOf(container)).toContain("9.00 sat/vB");
     expect(textOf(container)).toContain("block 157,401");
     expect(container.querySelector("legend")?.textContent).toBe(
-      "How fast should it confirm?",
+      feeSpeedQuestion,
     );
   });
 

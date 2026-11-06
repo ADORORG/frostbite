@@ -5,7 +5,7 @@ import {
   moveTo,
   signedOf,
   type SignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { completing } from "./completion.ts";
 import { refOf } from "./plan.ts";

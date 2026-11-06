@@ -1,4 +1,4 @@
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import type { ComponentType } from "react";
 
 // How a person signs in with one kind of method, on the sign-in page. The server decides which kinds the deployment offers (the

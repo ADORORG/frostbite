@@ -3,14 +3,14 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
-import type { RunsService } from "@ador/game-sdk/host";
+} from "@frostbite/client-http";
+import type { RunsService } from "@frostbite/game-sdk/host";
 import {
   startGameRunResponseSchema,
   startGameRunRoute,
   submitGameRunResponseSchema,
   submitGameRunRoute,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // How long a request for a run, and a submission, may take. A submission waits for a replay on the server, so it is given
 // longer; both are well inside the ten seconds a game waits on the platform.

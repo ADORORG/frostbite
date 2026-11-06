@@ -1,5 +1,5 @@
-import { ScenesProvider } from "@ador/scenes/react";
-import { homeSectionOrder } from "@ador/shared/platform";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { homeSectionOrder } from "@frostbite/shared/platform";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -33,20 +33,20 @@ describe("public product entrypoint", () => {
       await page?.render({
         actorUserId: null,
         navigation: [],
-        params: { slug: "frostbite" },
+        params: { slug: "glacier-guild" },
       }),
     );
     const invalid = renderToStaticMarkup(
       await page?.render({
         actorUserId: null,
         navigation: [],
-        params: { slug: "Frostbite" },
+        params: { slug: "Glacier-Guild" },
       }),
     );
     expect(valid).toContain("No published creator matches");
-    expect(valid).toContain("frostbite");
+    expect(valid).toContain("glacier-guild");
     expect(invalid).toContain("Invalid route");
-    expect(invalid).not.toContain("Frostbite");
+    expect(invalid).not.toContain("Glacier-Guild");
   });
 
   it("gives the landing page a part for launches, a small tile saying plainly that none are open, and none for creators", async () => {

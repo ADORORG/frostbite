@@ -1,5 +1,5 @@
-import { platformRoleSchema } from "@ador/shared/accounts";
-import { uuidV7TextSchema } from "@ador/shared/identifiers";
+import { platformRoleSchema } from "@frostbite/shared/accounts";
+import { uuidV7TextSchema } from "@frostbite/shared/identifiers";
 import { z } from "zod";
 
 // The role screen's routes (ADR-021 points 7 and 8): who holds platform roles, finding a person, giving a role and taking it away. Every one is

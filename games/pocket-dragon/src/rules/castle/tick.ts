@@ -1,4 +1,4 @@
-import { startState, stepInt } from "@ador/game-sdk/seeded";
+import { startState, stepInt } from "@frostbite/game-sdk/seeded";
 
 import { startHearts } from "../constants.ts";
 import { isItem, noKit, startPowers, wearOff, type Kit } from "../kit.ts";

@@ -1,6 +1,6 @@
 # `@repo/ui`
 
-Shared Frostbit design-system package. It owns semantic visual tokens, accessible primitives,
+Shared Frostbite design-system package. It owns semantic visual tokens, accessible primitives,
 arcade components, and platform patterns derived from the immutable standalone arcade reference.
 
 ## Public API
@@ -19,7 +19,7 @@ entry per work area (`studio`, `admin`) in the bar, `account` links in one menu 
 as itself), `footer` links in the footer, and, inside a work area with more than one link, that area's
 sidebar (tabs on a narrow screen) and a breadcrumb. A work area's bar entry opens the first link the
 person may see. The grouping is `buildNavigationModel` in `src/patterns/navigation-model.ts`; its areas
-must match the manifest's (`@ador/shared/features`), which a type error at each page enforces. Guided
+must match the manifest's (`@frostbite/shared/features`), which a type error at each page enforces. Guided
 forms use the `wizard-steps` styles (a connected row that scrolls sideways on narrow screens).
 
 Lists use `ArcadeFilterTabs` (buttons with counts and `aria-pressed`), `ArcadeEmptyState` (title, one

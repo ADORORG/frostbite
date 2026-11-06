@@ -1,6 +1,6 @@
-import type { WalletNetwork } from "@ador/shared/chain";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { CorrelationId } from "@ador/shared/http";
+import type { WalletNetwork } from "@frostbite/shared/chain";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { CorrelationId } from "@frostbite/shared/http";
 
 import type { SessionMaterial } from "../application/repository.ts";
 

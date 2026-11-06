@@ -1,4 +1,5 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
+import { fixtureGame } from "./support/fixture-game.ts";
 
 // What a crawler or a link preview sees: the server-rendered HTML, with no script run. Pictures are fetched like a platform's
 // crawler would, and the private pages are checked for the instruction to stay out of search.
@@ -43,8 +44,8 @@ test("the games page and a game's page carry their own tags and a picture that e
   expect(list.tags.get("twitter:card")).toBe("summary_large_image");
   expect(list.tags.get("robots")).toBeUndefined();
 
-  const game = await page(request, "/games/frostbite");
-  expect(game.tags.get("og:title")).toBe("FROST·BITE");
+  const game = await page(request, fixtureGame.href);
+  expect(game.tags.get("og:title")).toBe(fixtureGame.title);
   expect(game.tags.get("og:type")).toBe("website");
   expect(game.tags.get("og:site_name")).toBeTruthy();
   expect(game.tags.get("og:description")).toBeTruthy();
@@ -53,7 +54,9 @@ test("the games page and a game's page carry their own tags and a picture that e
   expect(game.tags.get("og:image:height")).toBe("630");
   expect(game.tags.get("og:image:alt")).toBeTruthy();
   const image = game.tags.get("og:image");
-  expect(image).toMatch(/^https?:\/\/.+\/games\/frostbite\/share-image$/u);
+  expect(image).toMatch(
+    new RegExp(`^https?://.+${fixtureGame.href}/share-image$`, "u"),
+  );
   expect(game.tags.get("twitter:image")).toBe(image);
   expect(game.canonical).toBe(game.tags.get("og:url"));
   await expectPicture(request, image ?? "");
@@ -108,7 +111,7 @@ test("robots.txt closes the private areas and the sitemap lists public pages onl
     (match) => new URL(match[1] ?? "").pathname,
   );
   expect(paths).toContain("/");
-  expect(paths).toContain("/games/frostbite");
+  expect(paths).toContain(fixtureGame.href);
   for (const path of paths)
     expect(path, path).not.toMatch(
       /^\/(studio|admin|account|sign-in|setup|api)(\/|$)/u,

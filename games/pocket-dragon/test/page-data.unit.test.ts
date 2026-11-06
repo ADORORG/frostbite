@@ -1,4 +1,4 @@
-import { defaultSound } from "@ador/game-sdk/audio/settings";
+import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { describe, expect, it } from "vitest";
 
 import { effects, tracks } from "../src/audio.ts";

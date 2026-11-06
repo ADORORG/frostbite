@@ -1,4 +1,4 @@
-import type { ChainConfig, ChainRef, ChainRole } from "@ador/shared/chain";
+import type { ChainConfig, ChainRef, ChainRole } from "@frostbite/shared/chain";
 
 import { simulatedFamily } from "./transaction.ts";
 

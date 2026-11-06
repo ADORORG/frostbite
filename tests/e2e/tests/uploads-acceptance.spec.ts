@@ -1,6 +1,9 @@
-import { createJpeg, createWebp } from "@ador/test-kit/images";
-import { createDecodablePng, createUndecodablePng } from "@ador/test-kit/png";
-import { uploadsNewPath, uploadsStudioPath } from "@ador/shared/uploads";
+import { createJpeg, createWebp } from "@frostbite/test-kit/images";
+import {
+  createDecodablePng,
+  createUndecodablePng,
+} from "@frostbite/test-kit/png";
+import { uploadsNewPath, uploadsStudioPath } from "@frostbite/shared/uploads";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

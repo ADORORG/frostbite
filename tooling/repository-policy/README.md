@@ -9,10 +9,16 @@ Run `pnpm repository:check` for static policies, `pnpm decision:check` for the d
 and `pnpm repository:coverage` after workspace coverage reports exist. Root and CI commands invoke
 these gates automatically.
 
-The import-boundary policy also keeps chain-family code and vendor SDKs (`@ador/chain/bitcoin`,
+The import-boundary policy also keeps chain-family code and vendor SDKs (`@frostbite/chain/bitcoin`,
 `/bitcoin-alkanes`, `/alkanes`, `bitcoinjs-lib`, `@alkanes/*`, `@omnisat/*`) inside `packages/chain/`,
 `providers/chain/`, `packages/wallet/`, and conformance tests; `packages/auth/` is a recorded exception
 until sign-in moves to the neutral address codec (ADR-017). Everything else uses the neutral ports.
+
+## Every policy is wired
+
+`src/check.ts` only prints; the list of static policies `pnpm repository:check` runs is `collectViolations` in `src/collect-violations.ts`. Its test
+builds a clean fixture repository and breaks one policy at a time, so a policy that is dropped from the list (and so no longer enforced) fails a test.
+A new policy goes in that list and gets a breakage in `test/collect-violations.unit.test.ts`.
 
 ## Sentences are written once
 
@@ -35,6 +41,18 @@ and sharded jobs once per shard. Default jobs: `static`, `typecheck`, `tests`, `
 `--job <id>` (repeatable; `contracts` needs Rust). A step's output is in `.ci-local/logs`. `sudo` steps (system packages) are skipped and
 `--with-deps` is dropped: install those yourself. It cannot reproduce the runner's fonts or a different operating system, so a pixel-exact
 expectation can still pass here and fail there: guards compare with a tolerance for that reason.
+
+### What a green local run does not cover
+
+`pnpm ci:local` does not run `contracts` and `contracts-harness` (they need Rust), `image` (a Docker build, pull requests only) or `publish` (a push to
+`main`/`dev`, once `static`, `typecheck`, `coverage-merge`, `contracts`, `contracts-harness` and `e2e` passed): those run only on GitHub. It also cannot
+reproduce the runner's fonts or operating system. A green local run is therefore not the whole of Verify; read the jobs it names when it finishes.
+
+### Before a push
+
+`pnpm hooks:install` (once per clone) points git at `.githooks/`. Its `pre-push` runs `pnpm ci:local --job static --job typecheck`, the fast jobs, and prints
+that `tests`, `game-simulations`, `coverage-merge` and `e2e` were not run: run them with `pnpm ci:local` before a push that changes behaviour, a game's
+layout or its touch controls. `git push --no-verify` skips the hook for one push.
 
 ## Skills stay true
 

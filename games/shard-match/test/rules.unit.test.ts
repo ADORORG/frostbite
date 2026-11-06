@@ -1,4 +1,4 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import { describe, expect, it } from "vitest";
 
 import { runsOf } from "../src/rules/board.ts";

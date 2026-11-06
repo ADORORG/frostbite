@@ -2,11 +2,13 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { buildGames } from "@ador/game-sdk/build";
+import { buildGames } from "@frostbite/game-sdk/build";
 import { chromium, devices, type Browser } from "@playwright/test";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { serveGame } from "../src/game-hosting.ts";
+import { gamesDirectory, notPlayedOnAScreen } from "../src/player-games.ts";
+import { controlProblems, measureControls } from "../src/game-controls.ts";
 import {
   layoutDifferences,
   parseSavedLayouts,
@@ -23,20 +25,20 @@ import {
 //  - On a desktop the place of every named part must be what `fixtures/games-desktop-layout.json` holds, give or take the room a font takes
 //    (`layoutTolerancePx`: exact pixels passed on the machine that recorded them and failed on CI), so a change made for phones cannot move
 //    anything there. A change meant for desktops is made on purpose: `UPDATE_GAME_LAYOUT=1 pnpm test:integration` writes the new places.
-const gamesDirectory = resolve(import.meta.dirname, "../../../games");
 const fixture = resolve(
   import.meta.dirname,
   "../fixtures/games-desktop-layout.json",
 );
 const update = process.env.UPDATE_GAME_LAYOUT === "1";
-// Not games played on a screen of their own: a developer tool, and the original cabinets, which draw into a page of their own at run time.
-const skipped = new Set(["sdk-explorer"]);
-const notPhoneChecked = new Set(["frostbite"]);
-
 // The frame the platform gives a game on an iPhone 13 held upright and on its side (measured in the platform's own page).
 const phones = [
   { height: 520, name: "portrait", width: 390 },
   { height: 198, name: "landscape", width: 750 },
+] as const;
+// The same phone with the platform's bar out of the way (the whole window, which is what playing full screen gives), as it is held.
+const phonesFull = [
+  { height: 760, name: "portrait full screen", width: 390 },
+  { height: 360, name: "landscape full screen", width: 750 },
 ] as const;
 const desktops = [
   { height: 800, name: "1280x800", width: 1280 },
@@ -50,7 +52,7 @@ let names: string[] = [];
 beforeAll(async () => {
   outRoot = await mkdtemp(join(tmpdir(), "games-layout-"));
   names = (await buildGames({ gamesDirectory, outRoot })).filter(
-    (name) => !skipped.has(name),
+    (name) => !notPlayedOnAScreen.has(name),
   );
   browser = await chromium.launch();
 }, 120_000);
@@ -84,7 +86,7 @@ describe("on a phone", () => {
   for (const size of phones) {
     it(`${size.name}: no game scrolls, and the screen takes the frame`, async () => {
       const problems: string[] = [];
-      for (const name of names.filter((n) => !notPhoneChecked.has(n))) {
+      for (const name of names) {
         const layout = await layoutOf(name, size, true);
         if (layout.scrollHeight > layout.clientHeight)
           problems.push(
@@ -100,6 +102,35 @@ describe("on a phone", () => {
           problems.push(
             `${name}'s screen is ${String(canvas?.w)}x${String(canvas?.h)} in ${String(size.width)}x${String(size.height)}`,
           );
+      }
+      expect(problems).toEqual([]);
+    }, 180_000);
+  }
+});
+
+describe("on a touch screen the page is played with the screen, and what is left to press is a few small icons", () => {
+  for (const size of [...phones, ...phonesFull]) {
+    it(`${size.name}: no more than three icons, each a thumb wide, none on another or on the readouts`, async () => {
+      const problems: string[] = [];
+      for (const name of names) {
+        const hosted = await serveGame(join(outRoot, name));
+        const context = await browser.newContext({
+          ...devices["iPhone 13"],
+          viewport: size,
+        });
+        try {
+          const page = await context.newPage();
+          await page.goto(hosted.url, { waitUntil: "load" });
+          await page.waitForTimeout(800);
+          for (const problem of controlProblems(
+            await measureControls(page),
+            size,
+          ))
+            problems.push(`${name}: ${problem}`);
+        } finally {
+          await context.close();
+          await hosted.close();
+        }
       }
       expect(problems).toEqual([]);
     }, 180_000);

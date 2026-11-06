@@ -1,4 +1,4 @@
-import type { Readiness, ReadinessProbe } from "@ador/shared/readiness";
+import type { Readiness, ReadinessProbe } from "@frostbite/shared/readiness";
 
 export const defaultReadinessTimeoutMs = 2_000;
 

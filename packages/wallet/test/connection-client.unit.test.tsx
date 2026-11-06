@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WalletConnectionClient } from "../src/client/connection-client.ts";
+import { noConnectedAccountMessage } from "../src/client/connection-errors.ts";
 
 const connect = vi.fn(async () => undefined);
 const disconnect = vi.fn();
@@ -107,16 +108,16 @@ describe("normalized wallet connection client", () => {
     renderToStaticMarkup(<Probe />);
     if (captured === null) throw new Error("Expected captured wallet client");
     await expect(captured.signMessage("message")).rejects.toThrow(
-      "connected wallet",
+      noConnectedAccountMessage,
     );
     Reflect.set(state, "connected", true);
     await expect(captured.signMessage("message")).rejects.toThrow(
-      "connected wallet",
+      noConnectedAccountMessage,
     );
     Reflect.set(state, "provider", "xverse");
     Reflect.set(state, "address", "");
     await expect(captured.signMessage("message")).rejects.toThrow(
-      "connected wallet",
+      noConnectedAccountMessage,
     );
     Reflect.set(state, "address", "tb1qcandidate");
     await expect(captured.signMessage("message")).resolves.toBe("signature");
@@ -131,13 +132,13 @@ describe("normalized wallet connection client", () => {
     renderToStaticMarkup(<Probe />);
     if (captured === null) throw new Error("Expected captured wallet client");
     await expect(captured.signPsbt("psbt", [0])).rejects.toThrow(
-      "connected wallet",
+      noConnectedAccountMessage,
     );
     Reflect.set(state, "connected", true);
     Reflect.set(state, "provider", "xverse");
     Reflect.set(state, "address", "");
     await expect(captured.signPsbt("psbt", [0])).rejects.toThrow(
-      "connected wallet",
+      noConnectedAccountMessage,
     );
     Reflect.set(state, "address", "tb1qcandidate");
     state.signPsbt.mockResolvedValueOnce({

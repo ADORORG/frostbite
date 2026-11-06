@@ -1,19 +1,13 @@
-import type { HttpErrorCode } from "../http/index.ts";
+import { defineOutcomes, type OutcomeEntry } from "../http/outcomes.ts";
 
-// Everything that can go wrong when a person signs in, links a way in, or administers roles, and what is said about it. This is the one
+// Everything that can go wrong when a person signs in, links a way in, administers roles, or opens the first-administrator link, and what is said about it. This is the one
 // catalogue: the server builds each failure from it (the reason travels in the error envelope), and the page chooses its words from the
 // reason, never from the message. A sentence is written here once; a test fails if two reasons say the same thing or a reason has no
 // words, and `tooling/repository-policy` fails if a sentence like these is written anywhere else.
 //
 // `http` is the status class the server answers with, or null for what only ever happens in the browser (no connection, a prompt closed).
-// `serverWords` marks the few where the server knows more than the catalogue (how long to wait), so the page shows the server's sentence
+// `serverWords` marks the few where the server knows more than the catalogue (how long to wait, which sign-in methods are missing), so the page shows the server's sentence
 // when it sent one and this one otherwise.
-interface Outcome {
-  readonly http: HttpErrorCode | null;
-  readonly message: string;
-  readonly serverWords?: true;
-}
-
 export const accountOutcomes = {
   // The ways any request can fail.
   network: {
@@ -63,6 +57,11 @@ export const accountOutcomes = {
     http: "conflict",
     message:
       "This email address is already linked to a different account. Sign in to that account and remove it there first, or use another address.",
+  },
+  "email-limit-reached": {
+    http: "conflict",
+    message:
+      "This account already has as many email addresses as it can hold. Remove one before adding another.",
   },
   "email-missing": {
     http: "not_found",
@@ -143,25 +142,26 @@ export const accountOutcomes = {
     message:
       "This is the last working administrator. Make another administrator first.",
   },
-} as const satisfies Record<string, Outcome>;
+  // The single-use link that makes the first administrator.
+  "setup-link-invalid": {
+    http: "not_found",
+    message:
+      "This setup link is not valid, or it has expired. Ask for a new one.",
+  },
+  "setup-method-needed": {
+    http: "conflict",
+    message:
+      "This account needs another way to sign in first. Add it, then open the link again.",
+    serverWords: true,
+  },
+} as const satisfies Record<string, OutcomeEntry>;
 
 export type AccountOutcome = keyof typeof accountOutcomes;
 
-const known: ReadonlySet<string> = new Set(Object.keys(accountOutcomes));
+const outcomes = defineOutcomes(accountOutcomes);
+
 // A reason a server sent, if it is one of these: the page never trusts a string it was not built with.
-export function isAccountOutcome(
-  reason: string | null,
-): reason is AccountOutcome {
-  return reason !== null && known.has(reason);
-}
+export const isAccountOutcome = outcomes.isOutcome;
 
 // The words for an outcome, preferring the server's own where the catalogue says it knows more.
-export function outcomeMessage(
-  outcome: AccountOutcome,
-  serverMessage: string | null = null,
-): string {
-  const entry: Outcome = accountOutcomes[outcome];
-  return entry.serverWords === true && serverMessage !== null
-    ? serverMessage
-    : entry.message;
-}
+export const outcomeMessage = outcomes.messageOf;

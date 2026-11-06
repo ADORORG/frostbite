@@ -1,6 +1,8 @@
+import { replayForwardedKey } from "./forwarded-keys.ts";
 import {
   eventMessageSchema,
   events,
+  forwardedKeySchema,
   gameChannel,
   methods,
   protocolVersion,
@@ -158,6 +160,13 @@ export function createGameClient(
     const name = event as EventName;
     const parsed = events[name].safeParse(message.data.data);
     if (!parsed.success) return;
+    // `parsed` was checked against this event's own schema above, which for a key is `forwardedKeySchema`; parsing it again only gives
+    // the compiler the key type, and cannot fail.
+    if (name === "key.forwarded")
+      replayForwardedKey(
+        globalThis.window,
+        forwardedKeySchema.parse(parsed.data),
+      );
     // Handlers are stored by event name and registered through `on`, which ties each to that name's data type;
     // `parsed` has just been checked against the same name, so the data is what every handler there expects.
     for (const handler of handlers.get(name) ?? [])

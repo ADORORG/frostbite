@@ -1,5 +1,5 @@
-import type { RunsService } from "@ador/game-sdk/host";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import type { RunsService } from "@frostbite/game-sdk/host";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { nurseryOverNote } from "../src/bonus/nursery-run.ts";

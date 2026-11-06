@@ -19,7 +19,7 @@ afterEach(async () => {
   directories = [];
 });
 async function scratch() {
-  const path = await mkdtemp(join(tmpdir(), "ador-mail-"));
+  const path = await mkdtemp(join(tmpdir(), "frostbite-mail-"));
   directories.push(path);
   return path;
 }

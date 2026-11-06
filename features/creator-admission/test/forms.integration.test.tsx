@@ -1,5 +1,5 @@
-import { creatorApplicationRoutes } from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { creatorApplicationRoutes } from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

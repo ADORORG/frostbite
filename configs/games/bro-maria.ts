@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -270,12 +270,13 @@ export const broMariaGame = defineGame({
   scene: "hopper",
   schemaVersion: 1,
   summary: "Run, jump and stomp across an icy level to the far lantern.",
+  tags: ["platformer", "action"],
   title: "Bro Maria",
   verification: {
     replay: {
       id: "bro-maria",
       sha256:
-        "978eaf47a654fa9454476a6c48d5b04b5fc8fc276345a2e7a511fe0893276810",
+        "b201ef464c81f96beea4605f3b391ecc1bf22e22475c9a3bc9c6135275db878d",
       version: 2,
     },
   },

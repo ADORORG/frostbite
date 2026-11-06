@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleVerifier } from "@ador/game-sdk/build";
-import { defineGame } from "@ador/shared/games";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
+import { defineGame } from "@frostbite/shared/games";
 
 // A game made up for tests that need a game the platform has never heard of, onboarded the way any game is: its rules built
 // into verifier.js by the SDK, the digest pinned in its manifest, the file placed where the game is served. Nothing in the
@@ -10,7 +10,7 @@ import { defineGame } from "@ador/shared/games";
 export const adderMilestone = "reached";
 
 const rulesSource = `
-import type { GameVerifier } from "@ador/game-sdk/run-record";
+import type { GameVerifier } from "@frostbite/game-sdk/run-record";
 const rules: GameVerifier<number> = {
   earned: (total) => (total >= 3 ? ["${adderMilestone}"] : []),
   id: "adder",
@@ -75,6 +75,7 @@ export const adderManifest = (id: string, sha256: string) =>
     network: "bip122:00000008819873e925422c1ff0f99f7c",
     schemaVersion: 1,
     summary: "An adder.",
+    tags: ["arcade"],
     title: "Adder",
     verification: { replay: { id: "adder", sha256, version: 1 } },
     version: "1",

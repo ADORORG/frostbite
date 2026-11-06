@@ -1,14 +1,14 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   creatorApplications,
   creatorApplicationSnapshots,
-} from "@ador/database/schema/creator-admission";
-import { authUsers } from "@ador/database/schema/auth";
+} from "@frostbite/database/schema/creator-admission";
+import { authUsers } from "@frostbite/database/schema/auth";
 import {
   creatorApplicationSubmissionSchema,
   resolveCreatorAdmissionTransition,
-} from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { desc, eq } from "drizzle-orm";
 
 import type { CreatorAdmissionRepository } from "../application/repository.ts";

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // The wallet library needs the app's provider, which the layout supplies; these tests load the page module on its own.
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   useWalletChooser: () => ({ request: () => undefined }),
   useWalletConnection: () => ({
     address: "",
@@ -21,7 +21,7 @@ import { games } from "@repo/configs/games";
 beforeEach(() => {
   vi.stubEnv("APP_ENV", "test");
   vi.stubEnv("PUBLIC_BASE_URL", "https://play.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbite");
 });
 afterEach(() => vi.unstubAllEnvs());
 

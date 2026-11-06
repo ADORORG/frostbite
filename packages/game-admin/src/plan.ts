@@ -1,11 +1,11 @@
-import { InvalidAddressError } from "@ador/chain/ports";
+import { InvalidAddressError } from "@frostbite/chain/ports";
 import type {
   Address,
   ChainRef,
   ContractRef,
   TrackedState,
   TransactionIntent,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type {
   AdminChainPorts,

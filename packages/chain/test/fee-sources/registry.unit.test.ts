@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { feeApiFormats, betaNetworks } from "@ador/shared/chain";
+import { feeApiFormats, betaNetworks } from "@frostbite/shared/chain";
 
 import {
   createFeeSource,

@@ -1,5 +1,9 @@
-import type { AlkanesNode } from "@ador/chain/bitcoin-alkanes";
-import { indexingHealth, lagOf, type DelayPolicy } from "@ador/shared/chain";
+import type { AlkanesNode } from "@frostbite/chain/bitcoin-alkanes";
+import {
+  indexingHealth,
+  lagOf,
+  type DelayPolicy,
+} from "@frostbite/shared/chain";
 
 import { messageOf, type CheckResult } from "../result.ts";
 

@@ -1,9 +1,12 @@
-import { ApiError } from "@ador/client-http";
-import type { ClaimsService } from "@ador/game-sdk/host";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { FeeSpeed } from "@ador/shared/chain";
-import type { GameClaim, GameClaimUnavailableReason } from "@ador/shared/games";
-import { claimUnavailableReasons } from "@ador/game-sdk/protocol";
+import { ApiError } from "@frostbite/client-http";
+import type { ClaimsService } from "@frostbite/game-sdk/host";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { FeeSpeed } from "@frostbite/shared/chain";
+import type {
+  GameClaim,
+  GameClaimUnavailableReason,
+} from "@frostbite/shared/games";
+import { claimUnavailableReasons } from "@frostbite/game-sdk/protocol";
 
 import { createClaimsApi, type ClaimsApi } from "./claims-api.ts";
 

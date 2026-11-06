@@ -1,13 +1,13 @@
 import type {
   CollectionSummary,
   SubmissionState,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   creatorApplicationPath,
   creatorApplicationStates,
   creatorStandingCopy,
   neverAppliedCopy,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { describe, expect, it } from "vitest";
 
 import {

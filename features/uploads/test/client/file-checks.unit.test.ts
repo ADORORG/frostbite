@@ -1,10 +1,16 @@
-import { assetRejectionReasons, uploadPurposes } from "@ador/shared/uploads";
+import {
+  assetRejectionReasons,
+  uploadOutcomes,
+  uploadPurposes,
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { checkFile } from "../../src/client/file-checks.ts";
 import {
   assetRejectionCopy,
   describeFileRejection,
+  describeUploadHint,
+  formatsToChoose,
 } from "../../src/client/rejection-copy.ts";
 
 describe("local file checks", () => {
@@ -99,5 +105,35 @@ describe("rejection copy", () => {
     expect(
       describeFileRejection({ kind: "too-large", maxBytes: 25_000_000 }),
     ).toContain("25 MB");
+  });
+
+  it("says the accepted formats the same wherever they are named, from the one list of what is accepted", () => {
+    expect(formatsToChoose).toBe("PNG, JPEG, or WebP");
+    // These two sentences are what the browser tests read on the page.
+    expect(assetRejectionCopy["unsupported-format"]).toBe(
+      "This image format is not supported. Use PNG, JPEG, or WebP.",
+    );
+    expect(
+      describeFileRejection({ contentType: "x", kind: "unsupported-type" }),
+    ).toBe("Only PNG, JPEG, and WebP images can be uploaded.");
+    expect(assetRejectionCopy.malformed).toContain(formatsToChoose);
+    expect(assetRejectionCopy["media-type-mismatch"]).toContain(
+      formatsToChoose,
+    );
+  });
+
+  it("tells a file picker's hint the same way for every picker, with the size limit and that animated images are out", () => {
+    expect(describeUploadHint("25 MB")).toBe(
+      "PNG, JPEG, or WebP, up to 25 MB. Animated images are not supported.",
+    );
+    expect(assetRejectionCopy["animation-unsupported"]).toBe(
+      "Animated images are not supported. Upload a still image.",
+    );
+  });
+
+  it("says a file over the limit in the words of the platform's refusal to start an upload", () => {
+    expect(assetRejectionCopy["size-exceeded"]).toBe(
+      uploadOutcomes["file-over-limit"].message,
+    );
   });
 });

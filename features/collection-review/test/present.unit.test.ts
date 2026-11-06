@@ -1,5 +1,5 @@
-import type { ReviewActivityRecord } from "@ador/collections";
-import { decodeActivityCursor } from "@ador/shared/collections";
+import type { ReviewActivityRecord } from "@frostbite/collections";
+import { decodeActivityCursor } from "@frostbite/shared/collections";
 import { describe, expect, it } from "vitest";
 
 import { presentActivity } from "../src/application/present.ts";

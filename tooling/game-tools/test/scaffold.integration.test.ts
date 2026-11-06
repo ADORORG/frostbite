@@ -1,7 +1,5 @@
 import {
-  cp,
   mkdir,
-  mkdtemp,
   readdir,
   readFile,
   rm,
@@ -12,10 +10,15 @@ import { execFile } from "node:child_process";
 import { join } from "node:path";
 import { promisify, stripVTControlCharacters } from "node:util";
 
-import { gameManifestSchema } from "@ador/shared/games";
-import { checkGameConformance } from "@ador/test-kit/game-conformance";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
+import { gameManifestSchema } from "@frostbite/shared/games";
+import { checkGameConformance } from "@frostbite/test-kit/game-conformance";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import {
+  makeScaffoldWorkspace,
+  type ScaffoldWorkspace,
+} from "./support/scaffold-workspace.ts";
 import {
   exportNameOf,
   ScaffoldError,
@@ -25,36 +28,19 @@ import {
 
 const run = promisify(execFile);
 const vitest = join(import.meta.dirname, "../node_modules/.bin/vitest");
-const repository = join(import.meta.dirname, "../../..");
-const skipped = new Set(["node_modules", "coverage", ".turbo"]);
 let workspace = "";
-const paths = () => ({
-  gamesDirectory: join(workspace, "games"),
-  manifestDirectory: join(workspace, "configs/games"),
-  registryFile: join(workspace, "configs/games.ts"),
-  templateDirectory: join(workspace, "template/game"),
-  templateManifestFile: join(workspace, "template/manifest.ts"),
-});
+let made: ScaffoldWorkspace | undefined;
+const paths = () => {
+  if (made === undefined) throw new Error("No workspace yet");
+  return made.paths;
+};
 
-// A copy of the parts of the repository a new game touches, inside this package so the game's imports resolve.
 beforeEach(async () => {
-  workspace = await mkdtemp(join(import.meta.dirname, "..", ".tmp-"));
-  await cp(
-    join(repository, "tooling/game-tools/template"),
-    join(workspace, "template"),
-    {
-      filter: (source) => !skipped.has(source.split("/").pop() ?? ""),
-      recursive: true,
-    },
-  );
+  made = await makeScaffoldWorkspace();
+  workspace = made.root;
+  // A build leaves a coverage folder in the template; copying must leave it behind.
   await mkdir(join(workspace, "template/game/coverage"));
   await writeFile(join(workspace, "template/game/coverage/x.json"), "{}");
-  await mkdir(join(workspace, "configs/games"), { recursive: true });
-  for (const file of ["games.ts", "chains.ts", "beta-chains.ts"])
-    await cp(
-      join(repository, "configs", file),
-      join(workspace, "configs", file),
-    );
 });
 afterEach(() => rm(workspace, { force: true, recursive: true }));
 
@@ -113,6 +99,20 @@ describe("making a new game from the template", () => {
     const text = await read("configs/games/river-run.ts");
     expect(text).not.toContain("starter");
     expect(text).toContain("started from the template");
+  });
+
+  it("pins the digest of the verifier the new game builds, so the platform's verifier check passes with no edit", async () => {
+    await scaffoldGame({ id: "river-run", paths: paths(), title: "River Run" });
+    const built = await bundleVerifier(join(workspace, "games/river-run"));
+    const module = (await import(
+      join(workspace, "configs/games/river-run.ts")
+    )) as { riverRunGame: { verification?: { replay: unknown } } };
+    expect(built).not.toBeNull();
+    expect(module.riverRunGame.verification?.replay).toEqual({
+      id: "river-run",
+      sha256: built?.sha256,
+      version: 1,
+    });
   });
 
   it("registers the game once, above the markers, and keeps the markers for the next one", async () => {

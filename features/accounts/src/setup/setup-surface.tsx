@@ -4,8 +4,8 @@ import {
   createRequester,
   sameOriginFetch,
   type Requester,
-} from "@ador/client-http";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/client-http";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { SignInSurface } from "../sign-in/sign-in-surface.tsx";
@@ -83,11 +83,7 @@ export function SetupSurface({
         </p>
       );
     case "invalid":
-      return (
-        <p role="alert">
-          This setup link is not valid, or it has expired. Ask for a new one.
-        </p>
-      );
+      return <p role="alert">{state.message}</p>;
     case "done":
       return (
         <p role="status">

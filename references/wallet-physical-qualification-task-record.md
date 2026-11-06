@@ -41,7 +41,7 @@ enable only the capabilities supported by complete physical evidence.
 - Register a detachable `wallet-connection` feature requiring the generic `wallet:connect`
   capability.
 - Expose `/connect` with qualification candidates selected in `configs/wallet.ts`.
-- Keep all LaserEyes hooks, provider detection, and lifecycle calls inside `@ador/wallet/client`.
+- Keep all LaserEyes hooks, provider detection, and lifecycle calls inside `@frostbite/wallet/client`.
 - State explicitly that connection is neither authentication nor provider qualification.
 - Load the LaserEyes declaration augmentation as a type-only dependency so Next.js does not execute
   the declaration file at runtime.
@@ -80,8 +80,8 @@ connection to an undetected wallet. Browser tests assert no vertical overflow at
 screen sizes. Shared UI modal tests cover arbitrary content,
 unique accessible labels, hydration protection, opening, and closing (10 UI tests; 100% coverage).
 
-- `pnpm --filter @ador/feature-wallet-connection test:coverage`: 16 tests passed; 100% coverage.
-- `pnpm --filter @ador/wallet test:coverage`: 55 tests passed; 100% coverage.
+- `pnpm --filter @frostbite/feature-wallet-connection test:coverage`: 16 tests passed; 100% coverage.
+- `pnpm --filter @frostbite/wallet test:coverage`: 55 tests passed; 100% coverage.
 - Wallet and feature typecheck/lint passed; E2E typecheck/lint passed.
 - `pnpm --filter web build`: passed with network access for the configured fonts.
 - Modal Playwright checks passed at mobile, tablet, desktop, and wide viewports, including axe,

@@ -1,4 +1,4 @@
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createPasskeyLinkingService } from "../src/passkeys/service.ts";

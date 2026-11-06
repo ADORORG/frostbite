@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { Bungee, Chakra_Petch, Press_Start_2P } from "next/font/google";
-import { IndexingBadge } from "@ador/feature-chain-status/badge";
-import { AnimationToggle, ScenesProvider } from "@ador/scenes/react";
+import { IndexingBadge } from "@frostbite/feature-chain-status/badge";
+import { AnimationToggle, ScenesProvider } from "@frostbite/scenes/react";
 import { ShellStatusProvider } from "@repo/ui/arcade";
 import "@repo/ui/styles.css";
-import "@ador/scenes/styles.css";
+import "@frostbite/scenes/styles.css";
 import "./globals.css";
 import { chainStatusConfig } from "@repo/configs/chain-status";
 import { walletAuthConfig } from "@repo/configs/wallet";

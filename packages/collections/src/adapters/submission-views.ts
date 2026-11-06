@@ -1,13 +1,13 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   collectionReviewEvents,
   type CollectionReviewEventRow,
   type CollectionSubmissionRow,
-} from "@ador/database/schema/collection-submissions";
-import type { CreatorApplicationState } from "@ador/shared/creator-admission";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { authUsers } from "@ador/database/schema/auth";
-import { creatorApplications } from "@ador/database/schema/creator-admission";
+} from "@frostbite/database/schema/collection-submissions";
+import type { CreatorApplicationState } from "@frostbite/shared/creator-admission";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { authUsers } from "@frostbite/database/schema/auth";
+import { creatorApplications } from "@frostbite/database/schema/creator-admission";
 import { asc, eq, inArray } from "drizzle-orm";
 
 import type {

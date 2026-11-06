@@ -1,11 +1,11 @@
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import {
   fieldsOf,
   refuse,
   tickNamed,
   withFields,
-} from "@ador/game-sdk/run-inputs";
-import type { RunInput, Stepped } from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-inputs";
+import type { RunInput, Stepped } from "@frostbite/game-sdk/run-record";
 
 // The inputs every chapter takes, and how they are checked, in one place. A run record holds only when a control was pressed or let
 // go of (`{ tick, on }`, `on` 1 or 0) and when the run was closed (`end` `{ tick }`); the rules play the ticks between. Each chapter

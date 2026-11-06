@@ -1,4 +1,5 @@
-import { ScenesProvider } from "@ador/scenes/react";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { games } from "@repo/configs/games";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -23,8 +24,10 @@ describe("home navigation", () => {
     expect(markup).toContain('id="launches"');
     expect(markup).toContain('href="/games"');
     expect(markup).toContain('id="games"');
-    // The rail shows the registered games by their own titles.
-    expect(markup).toContain("FROST·BITE");
+    // The rail shows the registered games by their own titles (the first one, whichever game that is).
+    const [first] = games;
+    expect(first).toBeDefined();
+    expect(markup).toContain(first?.title);
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/creators"');
     // Signing in is the wallet widget's job (the layout supplies it), not a page or a link of its own.

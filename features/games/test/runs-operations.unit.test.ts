@@ -1,11 +1,11 @@
-import type { GameRunsService } from "@ador/game-runs";
+import type { GameRunsService } from "@frostbite/game-runs";
 import {
   startGameRunRoute,
   submitGameRunRoute,
   submitGameRunInputSchema,
-} from "@ador/shared/games";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/games";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import {

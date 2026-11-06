@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema } from "@frostbite/shared/chain";
 
 import { signSimulated } from "../src/simulated-chain/transaction.ts";
 import { fixedNow, funding, one, simulatedPorts } from "./support/chains.ts";

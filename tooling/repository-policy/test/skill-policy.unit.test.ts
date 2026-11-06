@@ -156,6 +156,22 @@ describe("the skill policy", () => {
     ]);
   });
 
+  it("does not take the path of a game named like the platform for the platform's name", async () => {
+    await put("games/acme/index.html", "<html></html>");
+    await put(
+      "skills/demo/references/one.md",
+      "Copy the shape of `games/acme/index.html`.\n",
+    );
+    expect(await findSkillViolations(root)).toEqual([]);
+    await put(
+      "skills/demo/references/one.md",
+      "Copy `games/acme/index.html`, the acme way.\n",
+    );
+    expect(await findSkillViolations(root)).toEqual([
+      'skills/demo/references/one.md names the platform ("acme"); say <sdk> and look the name up.',
+    ]);
+  });
+
   it("does not look for a platform name when the SDK has no scope", async () => {
     await put("packages/game-sdk/package.json", '{"name":"game-sdk"}');
     await put("skills/demo/references/one.md", "game-sdk is fine here\n");

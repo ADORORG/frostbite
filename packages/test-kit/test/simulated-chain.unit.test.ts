@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { createChainRegistry } from "@ador/chain/registry";
-import { InvalidAddressError } from "@ador/chain/ports";
-import { chainRefSchema, contractRefSchema } from "@ador/shared/chain";
+import { createChainRegistry } from "@frostbite/chain/registry";
+import { InvalidAddressError } from "@frostbite/chain/ports";
+import { chainRefSchema, contractRefSchema } from "@frostbite/shared/chain";
 
 import { simulatedAddress } from "../src/simulated-chain/address.ts";
 import { simulatedChainConfig } from "../src/simulated-chain/config.ts";

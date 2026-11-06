@@ -1,4 +1,4 @@
-import { walletNetworks } from "@ador/shared/chain";
+import { walletNetworks } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { networkName, shortAddress } from "../src/widget/format.ts";

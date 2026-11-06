@@ -5,7 +5,7 @@ import {
   mount,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { emptyDecisionForm } from "../src/client/decisions.ts";

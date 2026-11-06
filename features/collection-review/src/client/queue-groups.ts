@@ -1,4 +1,4 @@
-import type { SubmissionState } from "@ador/shared/collections";
+import type { SubmissionState } from "@frostbite/shared/collections";
 
 export interface QueueGroup {
   readonly id: "approved" | "finished" | "needs-review";

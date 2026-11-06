@@ -128,6 +128,19 @@ html[data-theatre="true"] {
 .arcade-section--stage > .arcade-stage[data-theatre="true"] {
   height: 100dvh;
 }
+/* The way out on a touch screen in theatre: a chip over the game's top left corner, clear of the notch, big enough for a thumb. The game's own
+   controls keep to the other corners. */
+.arcade-stage__exit {
+  position: absolute;
+  z-index: 10;
+  inset-block-start: max(0.5rem, env(safe-area-inset-top));
+  inset-inline-start: max(0.5rem, env(safe-area-inset-left));
+  opacity: 0.8;
+}
+.arcade-stage__exit .arcade-button {
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+}
 @media (max-width: 64rem) {
   .arcade-stage__save,
   .arcade-stage__hint {

@@ -1,4 +1,4 @@
-import { syncGameStateResponseSchema } from "@ador/shared/games";
+import { syncGameStateResponseSchema } from "@frostbite/shared/games";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";
@@ -54,7 +54,7 @@ test("a signed-out player is given an id that stays the same in that browser", a
   // Kept by the platform page under a key for this game, never by the game.
   expect(
     await page.evaluate(() =>
-      window.localStorage.getItem("ador:game:sdk-explorer:player-id"),
+      window.localStorage.getItem("frostbite:game:sdk-explorer:player-id"),
     ),
   ).toBe(JSON.stringify(first.id));
 });

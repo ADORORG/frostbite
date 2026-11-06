@@ -1,4 +1,4 @@
-import { createRequester, type FetchLike } from "@ador/client-http";
+import { createRequester, type FetchLike } from "@frostbite/client-http";
 import {
   creatorApplicationRoutes,
   creatorReviewQueueResponseSchema,
@@ -7,7 +7,7 @@ import {
   type CreatorReviewQueueResponse,
   type CreatorReviewReadResponse,
   type CreatorReviewSort,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 export interface CallOptions {
   readonly signal?: AbortSignal;

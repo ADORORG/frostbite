@@ -1,5 +1,5 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { gameMilestoneUnlocks } from "@ador/database/schema/game-saves";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { gameMilestoneUnlocks } from "@frostbite/database/schema/game-saves";
 
 // Records milestones the platform itself established by replaying a run, in the transaction that settles that run, so a
 // verdict and its milestones stand or fall together. A milestone already held as self-reported is upgraded and keeps

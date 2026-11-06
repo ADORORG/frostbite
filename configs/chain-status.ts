@@ -1,4 +1,4 @@
-import type { ChainStatusConfig } from "@ador/feature-chain-status";
+import type { ChainStatusConfig } from "@frostbite/feature-chain-status";
 
 import { followedRewardsChain } from "./game-rewards.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";

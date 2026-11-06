@@ -1,6 +1,6 @@
 import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
-import { chainRefSchema, type FundingPolicy } from "@ador/shared/chain";
+import { chainRefSchema, type FundingPolicy } from "@frostbite/shared/chain";
 
 import { BuildRefusedError } from "../../src/bitcoin-alkanes/build-refused.ts";
 import { createTransactionBuilder } from "../../src/bitcoin-alkanes/builder.ts";
@@ -10,6 +10,7 @@ import {
 } from "../../src/bitcoin-alkanes/chains.ts";
 import { psbtFormat } from "../../src/bitcoin-alkanes/format.ts";
 import { milestoneKey } from "../../src/bitcoin-alkanes/milestone-key.ts";
+import { invalidContractOrSenderWords } from "../../src/bitcoin-alkanes/refusal-words.ts";
 import { claimScript } from "../../src/bitcoin-alkanes/tx/claim-call.ts";
 import { fakeNode } from "../support/nodes.ts";
 import {
@@ -130,10 +131,16 @@ describe("building a milestone claim", () => {
     ) => builder.build({ ...claimIntent, ...overrides }, funding(10_000n));
     await expect(
       claim({ sender: { chain, value: "nope" } }),
-    ).rejects.toMatchObject({ code: "invalid-request" });
+    ).rejects.toMatchObject({
+      code: "invalid-request",
+      message: invalidContractOrSenderWords,
+    });
     await expect(
       claim({ contract: { ...game, id: "rewards-1" } }),
-    ).rejects.toMatchObject({ code: "invalid-request" });
+    ).rejects.toMatchObject({
+      code: "invalid-request",
+      message: invalidContractOrSenderWords,
+    });
     const elsewhere = chainRefSchema.parse(
       "bip122:00000000000000000000000000000009",
     );

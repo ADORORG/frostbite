@@ -1,6 +1,6 @@
-import type { ChainOption } from "@ador/shared/chain";
-import { submitCollectionInputSchema } from "@ador/shared/collections";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { submitCollectionInputSchema } from "@frostbite/shared/collections";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import { mutationContext, type RequestContext } from "./submission-context.ts";
 import type {

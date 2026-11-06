@@ -4,20 +4,23 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   createDrizzleContractStore,
   type ContractStore,
-} from "@ador/database/game-contracts";
-import { authUsers } from "@ador/database/schema/auth";
+} from "@frostbite/database/game-contracts";
+import { authUsers } from "@frostbite/database/schema/auth";
 import {
   createDrizzleGameAdminRepository,
   createGameAdminService,
   type AdministeredGame,
-} from "@ador/game-admin";
-import { sanitizeDrawing } from "@ador/milestone-art";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import { chainFamilyIdSchema, contractRefSchema } from "@ador/shared/chain";
+} from "@frostbite/game-admin";
+import { sanitizeDrawing } from "@frostbite/milestone-art";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import {
+  chainFamilyIdSchema,
+  contractRefSchema,
+} from "@frostbite/shared/chain";
 import { inArray } from "drizzle-orm";
 
 import type { GameAdminConfig } from "./config.ts";

@@ -1,6 +1,6 @@
-import { chainRefSchema } from "@ador/shared/chain";
+import { chainRefSchema } from "@frostbite/shared/chain";
 
-import { createBitcoinAlkanesAdapter } from "@ador/chain/bitcoin-alkanes";
+import { createBitcoinAlkanesAdapter } from "@frostbite/chain/bitcoin-alkanes";
 
 import { defineChainAdapterConformance } from "../src/chain-conformance.ts";
 import { simulated } from "./support/chains.ts";

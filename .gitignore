@@ -50,6 +50,7 @@ yarn-error.log*
 # Rendered scene videos (pnpm scenes:render); generated, never hand-edited
 /apps/web/public/scenes/
 /tooling/game-tools/.tmp-*
+/tooling/game-tools/.pin-*
 
 # Local regtest state and built indexer (tooling/regtest)
 tooling/regtest/.regtest/

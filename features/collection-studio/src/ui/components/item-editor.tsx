@@ -1,9 +1,9 @@
 import {
   collectionLimits,
   type CollectionItem,
-} from "@ador/shared/collections";
-import type { IdempotencyKey } from "@ador/shared/http";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/shared/collections";
+import type { IdempotencyKey } from "@frostbite/shared/http";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import { ArcadeActionButton, ArcadeTextField } from "@repo/ui/arcade";
 import { useRef, useState } from "react";
 

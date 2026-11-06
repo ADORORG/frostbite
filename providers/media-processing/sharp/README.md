@@ -1,4 +1,4 @@
-# `@ador/provider-media-processing-sharp`
+# `@frostbite/provider-media-processing-sharp`
 
 `sharp` adapter for the platform-owned `ImageProcessor` port (ADR-013). It decodes untrusted images in
 an isolated process and returns normalized WebP thumbnails and previews.
@@ -37,7 +37,7 @@ schedule })` is the injectable orchestration used by tests and any alternative l
 
 ## Configuration
 
-None of its own: limits come from the typed derivative policy in `@ador/shared/uploads`. The worker is
+None of its own: limits come from the typed derivative policy in `@frostbite/shared/uploads`. The worker is
 a TypeScript file run with Node type stripping; a bundled deployment must ship it alongside.
 
 ## Tests

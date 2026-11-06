@@ -1,9 +1,9 @@
-import { createProviderRegistry } from "@ador/plugin-kit/providers";
+import { createProviderRegistry } from "@frostbite/plugin-kit/providers";
 import {
   uploadDetailPath,
   uploadsNewPath,
   uploadsStudioPath,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -49,7 +49,7 @@ describe("uploads entrypoint", () => {
     expect(markup).toContain("<h1>Uploads</h1>");
     // The frame's own words: the area, and the platform's name in the footer.
     expect(markup).toContain('<p class="arcade-eyebrow">Studio</p>');
-    expect(markup).toContain("<span>Frostbit</span>");
+    expect(markup).toContain("<span>Frostbite</span>");
     expect(markup).not.toContain("PRIVATE DRAFTS");
     expect(markup).toContain('href="/studio"');
     expect(markup).toContain("Upload an image");

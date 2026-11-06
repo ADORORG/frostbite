@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { heroWidth, pixel, tile } from "../rules/hills/constants.ts";
 import type { HillsState } from "../rules/hills/types.ts";

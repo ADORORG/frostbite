@@ -27,11 +27,11 @@ earned, claim pending, claimed and complete stay.
 - The game page on the platform shows it in an `<iframe sandbox="allow-scripts">` with a new-tab-free design.
   The platform page, not the game, owns everything persistent.
 - Consequences for a game: no `fetch`, no storage of its own, no CDN scripts or fonts (everything is bundled),
-  no in-browser compilation (precompiled). The legacy FROST·BITE needs a build step that does this (GP-09).
+  no in-browser compilation (precompiled). A game written for a plain web page needs a build step that does this.
 
 ## 2. The interface (what a game may call)
 
-A small versioned protocol over `postMessage`, wrapped by a `@ador/game-sdk` package so a game just calls
+A small versioned protocol over `postMessage`, wrapped by a `@frostbite/game-sdk` package so a game just calls
 functions. Every message carries protocol version, request id and a payload validated on both sides; the host
 accepts messages only from the game's own frame.
 
@@ -58,7 +58,7 @@ The host never forwards cookies, wallet objects, keys, signatures or raw transac
 (owner, 2026-10-13):** the wallet's public **address** and network name are given to a game that declared the
 `wallet` capability, because the game has no network access and an address is public. Every other call that
 needs a capability is refused with `permission_denied` unless the game declared it. The page also sends events
-(`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`, and `claim.changed` for a game that declared `milestone:claim`); see `game-sdk-roadmap.md`. A game that breaks the protocol is stopped and the player told.
+(`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`, `key.forwarded`, and `claim.changed` for a game that declared `milestone:claim`); see `game-sdk-roadmap.md`. `key.forwarded` carries a key the player pressed before clicking into the game (letters, digits, arrows, Space, Enter; never Tab or Escape); the SDK plays it back as an ordinary key event on the game's window, so a game that listens for keys needs no code for it. A game that breaks the protocol is stopped and the player told.
 
 ## 3. Where progress and milestones live
 
@@ -92,12 +92,12 @@ records, never from token ownership.
 
 ## 6. Build order
 
-1. `@ador/game-sdk` and the host: frame with the headers above, the protocol, a conformance test with a
+1. `@frostbite/game-sdk` and the host: frame with the headers above, the protocol, a conformance test with a
    simulated game (this is GP-02/GP-03, now simpler); the game page plays a game through it.
 2. Local save and load; the progress limits.
 3. Account records and sync on sign-in, with the merge rules.
 4. Milestone list and unlock; declared milestones in manifests (already declarable).
-5. Migrate FROST·BITE to a precompiled, self-contained bundle on the SDK (GP-09).
+5. Migrate the first game to a precompiled, self-contained bundle on the SDK (GP-09; done, and that game has since been removed).
 6. Minting: the `game-rewards` contract with the verification level, the `mint-milestone` intent through the
    quote, sign, broadcast, observe pipeline (needs the mint pipeline, W6/W7, and the gated decisions).
 
@@ -120,11 +120,11 @@ Answered in a second round:
   by the game's own measure; otherwise the newer save wins quietly.
 - **Frame permissions:** full-screen, audio and keyboard or gamepad input, and nothing else (no camera,
   microphone, location or file access).
-- **Build first:** the SDK, the isolated frame and a simulated test game, before touching FROST·BITE.
+- **Build first:** the SDK, the isolated frame and a simulated test game, before touching a real game.
 
 Settled by the G6 spike and the claim path (2026-10-15): the shape of a deterministic run record, the verifier contract,
 the replay pipeline and the claim path (`run.start`, `run.submit`, server-issued single-use runs, a verified level on the
-account) are in `docs/product/run-record.md`; FROST·BITE's ice-field and SAT SNAKE cabinets use them (a real-time cabinet
+account) are in `docs/product/run-record.md`; the replay-verified games use them (a real-time cabinet
 ported to fixed steps, task #63, done for one cabinet). Replay verification is optional and a game may skip it. Decided
 2026-10-16 (ADR-018 Amendment 2): no platform dealer for hidden information and no sandboxed runner for outside games' rules;
 a builder secures a game client side, and self-reported milestones may mint within limits.
@@ -133,7 +133,7 @@ a builder secures a game client side, and self-reported milestones may mint with
 
 Built and tested (steps 1 to 4 of section 6): the SDK and protocol, the isolated frame and its headers, the
 simulated and real-browser tests, local saving, account saving and sync, milestone list and unlock, the 64 KB
-limit and call rates. Not built: the registration generator, milestone states beyond "reached", FROST·BITE on the
+limit and call rates. Not built: the registration generator, milestone states beyond "reached", the first game on the
 SDK, the run-record spike, and minting (steps 5 and 6).
 
 Differences the owner should confirm or change (the merge rule is one function, `mergeGameState`):

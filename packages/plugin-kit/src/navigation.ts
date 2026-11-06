@@ -3,7 +3,7 @@ import {
   type NavigationArea,
   type NavigationContribution,
   type PageAccessRequirement,
-} from "@ador/shared/features";
+} from "@frostbite/shared/features";
 
 export type NavigationAudience = Exclude<
   PageAccessRequirement["kind"],

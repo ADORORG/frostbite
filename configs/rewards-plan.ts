@@ -1,5 +1,5 @@
-import type { RewardsPlan } from "@ador/game-admin";
-import { chainRefSchema } from "@ador/shared/chain";
+import type { RewardsPlan } from "@frostbite/game-admin";
+import { chainRefSchema } from "@frostbite/shared/chain";
 
 import { betaChain } from "./chains.ts";
 import { rewardsPolicy } from "./rewards-policy.ts";

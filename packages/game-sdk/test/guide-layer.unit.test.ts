@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createGuideLayer } from "../src/guide-layer.ts";
-import type { Guide } from "../src/guide.ts";
+import type { Card, Guide, ResultCard } from "../src/guide.ts";
 
 const guide: Guide = {
   lines: ["JUMP"],
@@ -24,7 +24,7 @@ function setUp(ratio = 3) {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
     context as unknown as CanvasRenderingContext2D,
   );
-  const drawn: { guide: Guide; height: number; width: number }[] = [];
+  const drawn: { guide: Card; height: number; width: number }[] = [];
   const layer = createGuideLayer(screen, {
     draw: (_context, width, height, shown) =>
       void drawn.push({ guide: shown, height, width }),
@@ -36,6 +36,10 @@ function setUp(ratio = 3) {
 }
 
 afterEach(() => vi.restoreAllMocks());
+
+const result: ResultCard = {
+  rows: [{ colour: "#fff", text: "RUN OVER", weight: 1.5 }],
+};
 
 describe("the card over the screen", () => {
   it("is laid right after the screen, takes no touches, and is hidden until there is a card", () => {
@@ -78,6 +82,17 @@ describe("the card over the screen", () => {
     layer.show(guide);
     expect(card.style.display).toBe("block");
     expect(drawn).toHaveLength(2);
+  });
+
+  it("draws the next card when one replaces another with no card between, and not when the same card is shown again", () => {
+    const { drawn, layer } = setUp();
+    layer.show(result);
+    layer.show({ rows: [{ colour: "#fff", text: "RUN OVER", weight: 1.5 }] });
+    expect(drawn).toHaveLength(1);
+    layer.show({ rows: [{ colour: "#fff", text: "SCORE 9", weight: 1 }] });
+    expect(
+      drawn.map(({ guide }) => ("rows" in guide ? guide.rows[0]?.text : "")),
+    ).toEqual(["RUN OVER", "SCORE 9"]);
   });
 
   it("is drawn again when the screen changes size", () => {

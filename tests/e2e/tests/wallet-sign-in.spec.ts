@@ -5,11 +5,11 @@ import {
   type BrowserContext,
   type Page,
 } from "@playwright/test";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
-import { authMethodsResponseSchema } from "@ador/auth";
-import { testWallets, signAs } from "@ador/auth/test-fixtures";
+import { authMethodsResponseSchema } from "@frostbite/auth";
+import { testWallets, signAs } from "@frostbite/auth/test-fixtures";
 import {
   connectWallet,
   installFakeWallet,
@@ -80,7 +80,7 @@ test("a player signs in with a wallet, stays signed in across a reload, and sign
   );
   expect(cookie).toMatchObject({ httpOnly: true, path: "/", sameSite: "Lax" });
   expect(await page.evaluate(() => document.cookie)).not.toContain(
-    "ador-session",
+    "frostbite-session",
   );
   // After a reload the session holds and the widget reconnects to the same wallet without being asked.
   await page.reload();

@@ -32,7 +32,7 @@ try {
   });
   console.log(`Created:\n${created.map((path) => `  ${path}`).join("\n")}`);
   console.log(
-    `\nNext:\n  1. pnpm install\n  2. pnpm --filter @game/${id} test:unit   (and test:integration)\n  3. Edit src/game.ts, index.html, src/main.ts and configs/games/${id}.ts\n  4. pnpm --filter web dev, then open /games/${id}\n  5. Open a pull request (see docs/product/game-onboarding.md)`,
+    `\nNext:\n  1. pnpm install\n  2. pnpm --filter @game/${id} test:unit   (and test:integration)\n  3. Replace the rules in src/rules/, then the screen, words and milestones (src/guide.ts, src/screen/, configs/games/${id}.ts)\n  4. pnpm --filter web dev, then open /games/${id}\n  5. Open a pull request (see docs/product/game-onboarding.md)`,
   );
 } catch (error) {
   if (!(error instanceof ScaffoldError)) throw error;

@@ -4,14 +4,14 @@ import type {
   ImageProcessor,
   ProcessImageInput,
   ProcessImageResult,
-} from "@ador/media/processing";
+} from "@frostbite/media/processing";
 import type {
   ObjectKey,
   ObjectStoragePort,
   StoredObjectMetadata,
-} from "@ador/object-storage/contracts";
-import { ObjectStorageError } from "@ador/object-storage/errors";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/object-storage/contracts";
+import { ObjectStorageError } from "@frostbite/object-storage/errors";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type {
   AssetProcessingLookup,

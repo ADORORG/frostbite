@@ -5,7 +5,7 @@ How a deployment is pointed at the chain its games' rewards contracts live on, a
 hashes, the release gate) are `configs/rewards-policy.ts`; the assembly is `configs/rewards-chain.ts`.
 
 Where each template and each game's contract is on the chain is **not configuration**. Staff publish and create them from the
-Game rewards page, and the platform records them when each step completes (`ador.published_templates`, `ador.game_contracts`).
+Game rewards page, and the platform records them when each step completes (`frostbite.published_templates`, `frostbite.game_contracts`).
 
 ## Turn it on
 
@@ -109,6 +109,6 @@ and in the log; nothing new is built or sent, and the pages say it is not availa
 
 When the public signet indexer is stalled, `tooling/regtest` runs a real chain on this machine (Bitcoin Core in Docker and the Alkanes indexer):
 `tooling/regtest/scripts/build-indexer.sh` once, then `pnpm --filter @repo/regtest regtest up`, and point `REWARDS_CHAIN_RPC_URL` at
-`http://127.0.0.1:18081`. `pnpm --filter @ador/chain test:regtest` runs the whole lifecycle against it. See the package README. The
+`http://127.0.0.1:18081`. `pnpm --filter @frostbite/chain test:regtest` runs the whole lifecycle against it. See the package README. The
 platform treats the chain as `regtest` only in the adapter so far; wiring a regtest chain into the app's configuration and the
 games' manifests is not done.

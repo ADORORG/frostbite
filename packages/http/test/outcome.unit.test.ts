@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   failure,
+  forbiddenMessage,
   idempotencyKeyConflict,
+  invalidCursor,
   unauthenticated,
 } from "../src/outcome.ts";
 
@@ -41,5 +43,17 @@ describe("the shared idempotency conflict", () => {
       message: "The idempotency key conflicts with another request.",
       ok: false,
     });
+  });
+
+  it("has one shared answer for a page cursor the list did not produce, as a bad request", () => {
+    expect(invalidCursor).toEqual({
+      error: "invalid_request",
+      message: "The page cursor is not valid.",
+      ok: false,
+    });
+  });
+
+  it("has one sentence for a caller who lacks the capability", () => {
+    expect(forbiddenMessage).toBe("The actor lacks the required capability.");
   });
 });

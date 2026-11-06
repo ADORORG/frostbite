@@ -5,7 +5,7 @@ import { stepOnce } from "../src/rules/move.ts";
 import { startRun } from "../src/rules/state.ts";
 import { draw } from "../src/screen/draw.ts";
 import { hud, meterFull, meterWidth } from "../src/screen/hud.ts";
-import { cell, originOf, screenWidth } from "../src/screen/layout.ts";
+import { cell, originOf, screenWidth, zoomOf } from "../src/screen/layout.ts";
 import { colour, floorByDistance } from "../src/screen/palette.ts";
 import type { View } from "../src/screen/view.ts";
 import { ofColour, surface } from "./support/canvas.ts";
@@ -23,10 +23,12 @@ describe("the drawn cellar", () => {
     const state = startRun(9);
     const { context, drawn } = surface();
     draw(context, state, view("running"));
-    const origin = originOf(state.layout.maze.width, state.layout.maze.height);
+    const { maze } = state.layout;
+    const origin = originOf(maze.width, maze.height);
+    const zoom = zoomOf(maze.width, maze.height);
     const lit = drawn.filter(
       ({ fill, width }) =>
-        floorByDistance.includes(fill as never) && width === cell,
+        floorByDistance.includes(fill as never) && width === cell * zoom,
     );
     expect(lit.length).toBe(state.seen.filter(Boolean).length);
     expect(lit.some(({ x, y }) => x === origin.x && y === origin.y)).toBe(true);
@@ -42,14 +44,15 @@ describe("the drawn cellar", () => {
     const state = startRun(9);
     const { maze } = state.layout;
     const origin = originOf(maze.width, maze.height);
+    const zoom = zoomOf(maze.width, maze.height);
     const { context, drawn } = surface();
     draw(context, state, view("running"));
     expect(ofColour(drawn, colour.footprint)).toEqual([
       expect.objectContaining({
-        height: maze.height * cell + 2,
-        width: maze.width * cell + 2,
-        x: origin.x - 1,
-        y: origin.y - 1,
+        height: (maze.height * cell + 2) * zoom,
+        width: (maze.width * cell + 2) * zoom,
+        x: origin.x - zoom,
+        y: origin.y - zoom,
       }),
     ]);
   });
@@ -59,20 +62,24 @@ describe("the drawn cellar", () => {
     const total = state.layout.maze.open.length;
     state = { ...state, seen: Array.from({ length: total }, () => true) };
     const { context, drawn } = surface();
+    const { maze } = state.layout;
+    const zoom = zoomOf(maze.width, maze.height);
     draw(context, state, view("running"));
     expect(ofColour(drawn, colour.floorSeen).length).toBeGreaterThan(total / 2);
     const keys = (list: typeof drawn) =>
       ofColour(list, colour.key).filter(
-        ({ width, height }) => width === 3 && height === 3,
+        ({ width, height }) => width === 3 * zoom && height === 3 * zoom,
       );
     expect(keys(drawn)).toHaveLength(1);
     expect(
       ofColour(drawn, colour.flask).filter(
-        ({ width, height }) => width === 4 && height === 4,
+        ({ width, height }) => width === 4 * zoom && height === 4 * zoom,
       ),
     ).toHaveLength(state.flasks.length);
     expect(
-      ofColour(drawn, colour.door).filter(({ width }) => width === cell - 2),
+      ofColour(drawn, colour.door).filter(
+        ({ width }) => width === (cell - 2) * zoom,
+      ),
     ).toHaveLength(1);
     const open = surface();
     draw(open.context, { ...state, hasKey: true }, view("running"));
@@ -155,34 +162,19 @@ describe("the writing", () => {
     expect(shown("over", 5)).toBe(false);
   });
 
-  it("covers the cellar with a card before a run and after one, saying how it ended", () => {
-    const text = (s: ReturnType<typeof surface>) =>
-      s.written.map(({ text: t }) => t);
-    const ready = surface();
-    draw(ready.context, startRun(9), view("ready"));
-    expect(text(ready)).toContain("LANTERN MAZE");
-    const running = surface();
-    draw(running.context, startRun(9), view("running"));
-    expect(text(running)).not.toContain("LANTERN MAZE");
-    for (const [cause, said] of [
-      ["dark", "THE LANTERN WENT OUT"],
-      ["escaped", "YOU ESCAPED THE CELLAR"],
-      ["spent", "YOUR LEGS GAVE OUT"],
-      [null, "RUN OVER"],
-    ] as const) {
-      const over = surface();
+  it("leaves both cards, before a run and after it, to the SDK: the canvas carries none", () => {
+    const text = (phase: "over" | "ready") => {
+      const s = surface();
       draw(
-        over.context,
-        { ...startRun(9), cause, floorsCleared: 3, score: 450 },
-        view("over", { best: 900 }),
+        s.context,
+        { ...startRun(9), cause: "dark", floorsCleared: 3, score: 450 },
+        view(phase, { best: 900, newBest: true }),
       );
-      expect(text(over)).toEqual(
-        expect.arrayContaining([said, "FLOORS 3   SCORE 450", "BEST 900"]),
-      );
-    }
-    const best = surface();
-    draw(best.context, startRun(9), view("over", { newBest: true }));
-    expect(text(best)).toContain("NEW BEST!");
+      return s.written.map(({ text: t }) => t);
+    };
+    expect(text("ready")).not.toContain("LANTERN MAZE");
+    expect(text("over")).not.toContain("THE LANTERN WENT OUT");
+    expect(text("over")).not.toContain("NEW BEST!");
   });
 });
 

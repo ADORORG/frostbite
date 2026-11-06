@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-chain-status",
+  "name": "@frostbite/feature-chain-status",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -21,17 +21,17 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/client-http": "workspace:*",
-    "@ador/client-react": "workspace:*",
-    "@ador/http": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/cache": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/client-http": "workspace:*",
+    "@frostbite/client-react": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/cache": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8"
   },
   "devDependencies": {
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",

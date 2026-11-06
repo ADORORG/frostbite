@@ -27,10 +27,10 @@ Plan: `docs/product/plan-sdk-g-sign-in.md` (approved 2026-10-13 with the default
 
 - Database: security-action values `wallet-linked` and `wallet-unlinked`, table `released_wallets` (its own schema file),
   migrations `wallet_release_hold` and `drop_wallet_qualification`.
-- `@ador/auth`: `methods/rule.ts`, wallet methods service and Drizzle repository (advisory lock, locked recent session,
+- `@frostbite/auth`: `methods/rule.ts`, wallet methods service and Drizzle repository (advisory lock, locked recent session,
   hold, events), session `revokeById`, `verify` guards, routes and schemas for the nine wallet endpoints, shared
   session-lock helper.
-- `@ador/http` and the web adapter: effect `clear-platform-session` (cookie cleared with max-age 0).
+- `@frostbite/http` and the web adapter: effect `clear-platform-session` (cookie cleared with max-age 0).
 - `features/accounts`: nine operations, wallet policy config with validation, client store (`createWalletSession`) with
   one action at a time and signatures dropped when the wallet changes, hook, picker, panel, sign-in page.
 - Removed: `features/wallet-connection`, `packages/auth/src/qualification`, `packages/shared/src/auth/qualification.ts`,

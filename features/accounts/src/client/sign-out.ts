@@ -2,9 +2,9 @@ import {
   walletAuthRoutes,
   walletChangedResponseSchema,
   walletEmptyRequestSchema,
-} from "@ador/auth";
-import type { Requester } from "@ador/client-http";
-import type { AccountOutcome } from "@ador/shared/account-outcomes";
+} from "@frostbite/auth";
+import type { Requester } from "@frostbite/client-http";
+import type { AccountOutcome } from "@frostbite/shared/account-outcomes";
 
 import { outcomeOf } from "./outcome.ts";
 

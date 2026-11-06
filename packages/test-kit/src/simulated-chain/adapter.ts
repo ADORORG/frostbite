@@ -1,18 +1,18 @@
-import { portCapabilities, type ChainAdapter } from "@ador/chain/adapter";
+import { portCapabilities, type ChainAdapter } from "@frostbite/chain/adapter";
 import type {
   Broadcaster,
   ChainObserver,
   ChainReader,
   ContractGateway,
   RewardsReader,
-} from "@ador/chain/ports";
+} from "@frostbite/chain/ports";
 import type {
   Amount,
   ChainRef,
   ChainTransaction,
   Observation,
   TransactionRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { simulatedAddressCodec } from "./address.ts";
 import {

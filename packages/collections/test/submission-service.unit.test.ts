@@ -1,4 +1,4 @@
-import { chainOptionSchema } from "@ador/shared/chain";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import { createSubmissionService } from "../src/application/submission-service.ts";

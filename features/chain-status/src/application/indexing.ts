@@ -1,4 +1,4 @@
-import type { HttpOperation } from "@ador/http";
+import type { HttpOperation } from "@frostbite/http";
 import {
   chainIndexingInputSchema,
   chainIndexingRoute,
@@ -6,7 +6,7 @@ import {
   indexingHealth,
   lagOf,
   type ChainIndexing,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { ChainStatusConfig } from "../config.ts";
 

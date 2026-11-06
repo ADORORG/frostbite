@@ -6,7 +6,7 @@ verification levels beyond `self-reported` are not built.
 
 ## What was built
 
-- **`@ador/game-sdk`**: protocol v1 (`ador-game` channel; ready, progress load/save, milestones list/unlock,
+- **`@frostbite/game-sdk`**: protocol v1 (`frostbite-game` channel; ready, progress load/save, milestones list/unlock,
   player info) as schemas with one `methods` table; `createGameClient` (game side); `createGameHost` and
   `attachGameHost` (page side, accepts a message only from the frame's own window); `createLocalBackend`
   (browser storage, validated on read); policy limits (64 KB progress, 60 saves/min, 60 unlocks/min); frame

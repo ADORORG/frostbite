@@ -1,10 +1,11 @@
-import type { DecideResult, createReviewService } from "@ador/collections";
-import type { HttpOperation } from "@ador/http";
+import type { DecideResult, createReviewService } from "@frostbite/collections";
+import type { HttpOperation } from "@frostbite/http";
 import {
   failure,
   idempotencyKeyConflict,
   unauthenticated,
-} from "@ador/http/outcome";
+  invalidCursor,
+} from "@frostbite/http/outcome";
 import {
   collectionReviewCapability,
   decodeActivityCursor,
@@ -24,15 +25,15 @@ import {
   type ReviewQueueInput,
   type ReviewQueueResponse,
   type ReviewSubmissionResponse,
-} from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import {
   presentActivity,
   presentQueueItem,
   presentReviewSubmission,
 } from "./present.ts";
-import type { createAssetLibraryService } from "@ador/uploads";
+import type { createAssetLibraryService } from "@frostbite/uploads";
 
 export type ReviewService = ReturnType<typeof createReviewService>;
 export type AssetPreviews = Pick<
@@ -40,6 +41,12 @@ export type AssetPreviews = Pick<
   "getMany"
 >;
 type Resolve = () => Promise<ReviewService>;
+
+// One answer for a submission that is not there, wherever it is asked for.
+const submissionNotFound = failure(
+  "not_found",
+  "The submission was not found.",
+);
 
 const access = {
   capability: collectionReviewCapability,
@@ -60,7 +67,7 @@ function refusal(result: Refusal) {
         `This submission is ${result.state} and cannot take that action.`,
       );
     case "not-found":
-      return failure("not_found", "The submission was not found.");
+      return submissionNotFound;
     case "owner-not-eligible":
       return failure(
         "conflict",
@@ -132,8 +139,7 @@ export function createReadOperation(
       const record = await (
         await getService()
       ).readForReview(uuidV7Schema.parse(input.submissionId));
-      if (record === null)
-        return failure("not_found", "The submission was not found.");
+      if (record === null) return submissionNotFound;
       // Only the images frozen into this submission are signed, as its creator's own assets.
       const ids = record.snapshot.assets.map(({ id }) =>
         uuidV7Schema.parse(id),
@@ -171,8 +177,7 @@ export function createActivityOperation(getService: Resolve) {
       const position =
         input.cursor === null ? null : decodeActivityCursor(input.cursor);
       // A cursor the log did not produce is refused, not treated as the start of the log.
-      if (input.cursor !== null && position === null)
-        return failure("invalid_request", "The page cursor is not valid.");
+      if (input.cursor !== null && position === null) return invalidCursor;
       const page = await (
         await getService()
       ).activity(

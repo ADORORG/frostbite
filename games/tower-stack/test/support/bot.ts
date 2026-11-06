@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { blockX, rangeOf } from "../../src/rules/block.ts";
 import { towerRules } from "../../src/rules/index.ts";

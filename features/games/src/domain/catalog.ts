@@ -1,6 +1,6 @@
-import { scenes } from "@ador/scenes/library";
-import { requiredCapability } from "@ador/game-sdk/protocol";
-import type { ChainOption } from "@ador/shared/chain";
+import { scenes } from "@frostbite/scenes/library";
+import { requiredCapability } from "@frostbite/game-sdk/protocol";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   embeddedGameAssetPath,
   embeddedGamePath,
@@ -8,9 +8,10 @@ import {
   gameManifestHash,
   gamePlayAddress,
   type GameCapability,
+  type GameTag,
   type GameManifest,
   type GameMilestone,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // What a person is told about each thing a game may ask the host for. Only the ones the host protocol answers
 // (see `requiredCapability`) are granted, and only to a game the platform plays itself; the rest are
@@ -72,6 +73,8 @@ export interface PublicGame {
   // The scene the game asked for on its card (by id), or null when it left the choice to the platform.
   readonly scene: string | null;
   readonly summary: string;
+  // What the game is like, from the platform's list (the games page filters by it).
+  readonly tags: readonly GameTag[];
   readonly title: string;
   readonly version: string;
 }
@@ -127,6 +130,7 @@ export function createGameCatalog(
     playUrl: gamePlayAddress(game.launch),
     scene: game.scene ?? null,
     summary: game.summary,
+    tags: game.tags,
     title: game.title,
     version: game.version,
   }));

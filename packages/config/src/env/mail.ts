@@ -1,4 +1,4 @@
-import { mailSettingsSchema, type MailSettings } from "@ador/mail";
+import { mailSettingsSchema, type MailSettings } from "@frostbite/mail";
 import { z } from "zod";
 
 import { parseEnvironment } from "./runtime.ts";

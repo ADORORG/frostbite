@@ -1,5 +1,8 @@
-import { chainRefSchema } from "@ador/shared/chain";
-import { rewardsInitialisation, type GameManifest } from "@ador/shared/games";
+import { chainRefSchema } from "@frostbite/shared/chain";
+import {
+  rewardsInitialisation,
+  type GameManifest,
+} from "@frostbite/shared/games";
 
 // What the pages and the service know of a game that declares rewards: where it is, and its milestones with their claim limits
 // (from the manifest alone). Whether it has a contract is on record, not here. A game that declares none is unknown here.

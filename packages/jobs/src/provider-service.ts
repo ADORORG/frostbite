@@ -1,4 +1,4 @@
-import type { ProviderServices } from "@ador/plugin-kit/providers";
+import type { ProviderServices } from "@frostbite/plugin-kit/providers";
 
 import type { WorkflowEventPublisher } from "./outbox-relay.ts";
 import type { AssetPipelineActivities } from "./pipeline-activities.ts";
@@ -14,7 +14,7 @@ export interface WorkflowEndpointFactory {
   }): SignedWorkflowEndpoint;
 }
 
-declare module "@ador/plugin-kit/providers" {
+declare module "@frostbite/plugin-kit/providers" {
   interface ProviderServices {
     readonly "workflow-orchestration:event-publisher": WorkflowEventPublisher;
     readonly "workflow-orchestration:signed-endpoint": WorkflowEndpointFactory;

@@ -2,7 +2,7 @@ import type {
   ChainRef,
   TransactionSummary,
   UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { validateBitcoinAddress } from "../../bitcoin/address.ts";
 import { BuildRefusedError } from "../build-refused.ts";

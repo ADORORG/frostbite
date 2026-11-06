@@ -16,6 +16,7 @@ export const laneX = (lane: number): number => fieldX + lane * laneWidth;
 export const noteY = (ahead: number, lookahead: number): number =>
   hitY - Math.round((ahead * (hitY - topY)) / lookahead);
 
-// The lane under a point of the screen: the page is cut in four, side by side, so a thumb has room (a lane is a quarter of the width).
+// The lane under a point of the screen: the lanes are where they are drawn, and the margins on either side belong to the lane next to them, so
+// a thumb that lands a little outside the field still plays the lane it is nearest.
 export const laneAt = (x: number): number =>
-  Math.max(0, Math.min(lanes - 1, Math.floor((x * lanes) / screenWidth)));
+  Math.max(0, Math.min(lanes - 1, Math.floor((x - fieldX) / laneWidth)));

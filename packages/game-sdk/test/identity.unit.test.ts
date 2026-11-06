@@ -59,8 +59,8 @@ describe("this browser's id for the player", () => {
       kind: "local",
     });
     expect([...store.map.keys()].sort()).toEqual([
-      "ador:game:other-game:player-id",
-      "ador:game:tap-tower:player-id",
+      "frostbite:game:other-game:player-id",
+      "frostbite:game:tap-tower:player-id",
     ]);
   });
 
@@ -69,7 +69,9 @@ describe("this browser's id for the player", () => {
     ["a value of the wrong kind", JSON.stringify({ id: 1 })],
     ["text that is not JSON", "not json"],
   ])("is replaced when the stored value is %s", async (_what, stored) => {
-    const store = memoryStorage(new Map([["ador:game:g:player-id", stored]]));
+    const store = memoryStorage(
+      new Map([["frostbite:game:g:player-id", stored]]),
+    );
     const backend = createLocalBackend({
       gameId: "g",
       newId: () => "fresh-id-0001",
@@ -79,7 +81,7 @@ describe("this browser's id for the player", () => {
       id: "fresh-id-0001",
       kind: "local",
     });
-    expect(store.map.get("ador:game:g:player-id")).toBe(
+    expect(store.map.get("frostbite:game:g:player-id")).toBe(
       JSON.stringify("fresh-id-0001"),
     );
   });

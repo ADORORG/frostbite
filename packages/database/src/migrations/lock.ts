@@ -2,7 +2,7 @@ import { Client, type ClientConfig } from "pg";
 
 // The name the lock is taken on, turned into the 64-bit key PostgreSQL wants. One name, so every process that migrates this database
 // (the web container at start, an operator's command) waits for the others instead of racing them.
-export const migrationLockName = "ador.database.migrations";
+export const migrationLockName = "frostbite.database.migrations";
 
 // How long a process waits for another that is migrating. A migration holds the lock for as long as it runs, so this is longer than any
 // migration should take; a holder that hangs is not waited on for ever.

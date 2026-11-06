@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { maxAdminPayloadChars } from "@ador/shared/games";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
 
 import release from "../../../contracts/templates/release.json" with { type: "json" };
 import { rewardsPolicy } from "@repo/configs/rewards-policy";

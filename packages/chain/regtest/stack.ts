@@ -13,7 +13,7 @@ import {
   type TransactionIntent,
   type SignedTransaction,
   type UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import {
   createConfiguredRegistry,

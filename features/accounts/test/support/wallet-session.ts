@@ -1,5 +1,5 @@
-import { ApiError, type Requester } from "@ador/client-http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { ApiError, type Requester } from "@frostbite/client-http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { vi } from "vitest";
 
 import type { WalletConnection } from "../../src/client/wallet-session.ts";

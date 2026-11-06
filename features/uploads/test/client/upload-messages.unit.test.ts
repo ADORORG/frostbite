@@ -1,7 +1,10 @@
-import { assetRejectionReasons } from "@ador/shared/uploads";
+import {
+  assetRejectionReasons,
+  uploadOutcomes,
+} from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
-import type { ApiErrorCode } from "@ador/client-http";
+import type { ApiErrorCode } from "@frostbite/client-http";
 import {
   availableUploadActions,
   describeUploadState,
@@ -70,6 +73,25 @@ describe("upload messages", () => {
     expect(
       describeUploadState(failed({ code: "network", kind: "api" }))?.tone,
     ).toBe("unavailable");
+  });
+
+  it("chooses words by the reason the server named, so two conflicts are not described as one", () => {
+    const words = (reason: string | null) =>
+      describeUploadState(failed({ code: "conflict", kind: "api", reason }))
+        ?.text ?? "";
+    expect(words("upload-limit-reached")).toBe(
+      uploadOutcomes["upload-limit-reached"].message,
+    );
+    expect(words("file-not-arrived")).toBe(
+      uploadOutcomes["file-not-arrived"].message,
+    );
+    expect(words("file-not-arrived")).not.toBe(words("upload-limit-reached"));
+    // A conflict with no reason, or one this page does not know, is the status class's generic words: not the limit.
+    expect(words(null)).toBe(words("some-other-reason"));
+    expect(words(null)).not.toContain("limit");
+    expect(
+      describeUploadState(failed({ code: "conflict", kind: "api" }))?.text,
+    ).toBe(words(null));
   });
 
   it("describes a defect in the page as such, not as a network or server problem", () => {

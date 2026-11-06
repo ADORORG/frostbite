@@ -2,7 +2,7 @@ import type {
   BroadcastOutcome,
   ChainRef,
   SignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { Broadcaster } from "../ports.ts";
 import { servedChain, type ServedChain } from "./chains.ts";

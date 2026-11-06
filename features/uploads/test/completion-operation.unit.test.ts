@@ -1,5 +1,7 @@
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import type { CompleteIntentResult } from "@ador/uploads";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { uploadOutcomes } from "@frostbite/shared/uploads";
+import type { CompleteIntentResult } from "@frostbite/uploads";
 import { describe, expect, it, vi } from "vitest";
 
 import { createCompleteUploadIntentOperation } from "../src/application/completion-operation.ts";
@@ -26,7 +28,7 @@ describe("complete upload intent operation", () => {
     const operation = createCompleteUploadIntentOperation(getService);
     await expect(
       operation.execute({ intentId }, { ...context, actorUserId: null }),
-    ).resolves.toMatchObject({ error: "unauthorized", ok: false });
+    ).resolves.toEqual(unauthenticated);
     expect(getService).not.toHaveBeenCalled();
   });
 
@@ -49,15 +51,21 @@ describe("complete upload intent operation", () => {
   );
 
   it.each([
-    ["unavailable", "not_found"],
-    ["missing-object", "conflict"],
-    ["invalid-object", "invalid_request"],
-  ] as const)("maps %s to %s", async (kind, error) => {
-    const operation = createCompleteUploadIntentOperation(async () =>
-      service({ kind }),
-    );
-    await expect(
-      operation.execute({ intentId }, context),
-    ).resolves.toMatchObject({ error, ok: false });
-  });
+    ["unavailable", "upload-not-found"],
+    ["missing-object", "file-not-arrived"],
+    ["invalid-object", "file-not-the-one-sent"],
+  ] as const)(
+    "maps %s to the catalogue's %s: its status class, its words and its reason",
+    async (kind, outcome) => {
+      const operation = createCompleteUploadIntentOperation(async () =>
+        service({ kind }),
+      );
+      await expect(operation.execute({ intentId }, context)).resolves.toEqual({
+        error: uploadOutcomes[outcome].http,
+        message: uploadOutcomes[outcome].message,
+        ok: false,
+        reason: outcome,
+      });
+    },
+  );
 });

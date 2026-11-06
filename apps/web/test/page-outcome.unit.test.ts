@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ActiveSession } from "@ador/auth";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { ActiveSession } from "@frostbite/auth";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type { PageAccessDecision } from "../src/server/auth/page-access";
 import { pageOutcome } from "../src/server/auth/page-outcome";

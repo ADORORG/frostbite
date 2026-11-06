@@ -4,20 +4,20 @@ import {
   createDatabaseClient,
   createDatabasePool,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   createDrizzleGameRunRepository,
   createGameRunsService,
   resolveGameRunPolicy,
   type GameRunGame,
-} from "@ador/game-runs";
-import { recordVerifiedMilestones } from "@ador/game-saves";
-import { createGameVerifiers } from "@ador/game-verification/node";
-import { resolveVerificationPolicy } from "@ador/game-verification/policy";
-import type { VerifierRegistry } from "@ador/game-verification/registry";
-import { verifyRun } from "@ador/game-verification/verify";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import { gameRunSeedMax, type GameManifest } from "@ador/shared/games";
+} from "@frostbite/game-runs";
+import { recordVerifiedMilestones } from "@frostbite/game-saves";
+import { createGameVerifiers } from "@frostbite/game-verification/node";
+import { resolveVerificationPolicy } from "@frostbite/game-verification/policy";
+import type { VerifierRegistry } from "@frostbite/game-verification/registry";
+import { verifyRun } from "@frostbite/game-verification/verify";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import { gameRunSeedMax, type GameManifest } from "@frostbite/shared/games";
 
 import type { GameRunsConfig } from "./runs-config.ts";
 

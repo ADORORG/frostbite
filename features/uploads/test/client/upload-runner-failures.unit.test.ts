@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { TransferError } from "../../src/client/transfer.ts";
 import { attempt, setup } from "../support/runner-harness.ts";
 
@@ -9,25 +9,25 @@ describe("upload runner failures", () => {
     [
       "a network failure",
       new ApiError("network", null, "x"),
-      { code: "network", kind: "api" },
+      { code: "network", kind: "api", reason: null },
       true,
     ],
     [
       "a server fault",
       new ApiError("internal_error", 500, "x"),
-      { code: "internal_error", kind: "api" },
+      { code: "internal_error", kind: "api", reason: null },
       true,
     ],
     [
       "a conflict",
       new ApiError("conflict", 409, "x"),
-      { code: "conflict", kind: "api" },
+      { code: "conflict", kind: "api", reason: null },
       false,
     ],
     [
       "no session",
       new ApiError("unauthorized", 401, "x"),
-      { code: "unauthorized", kind: "api" },
+      { code: "unauthorized", kind: "api", reason: null },
       false,
     ],
   ] as const)(
@@ -43,6 +43,23 @@ describe("upload runner failures", () => {
       ]);
     },
   );
+
+  it("passes on the reason the server named, so the page can choose its words by it", async () => {
+    const { events, go } = setup({
+      api: {
+        completeIntent: vi
+          .fn()
+          .mockRejectedValue(
+            new ApiError("conflict", 409, "x", null, "file-not-arrived"),
+          ),
+      },
+    });
+    await go();
+    expect(events.at(-1)).toMatchObject({
+      cause: { code: "conflict", kind: "api", reason: "file-not-arrived" },
+      type: "failed",
+    });
+  });
 
   it.each(["network", "rejected"] as const)(
     "reports a %s transfer failure as retryable",

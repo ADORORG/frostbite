@@ -1,7 +1,7 @@
 import type {
   AssetRejectionReason,
   UploadContentType,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 // Names the structural parser generation; stored with each outcome so a later decoder-backed
 // validator (W3-05) can be told apart from results produced here.

@@ -1,10 +1,10 @@
-import { defineFeature } from "@ador/plugin-kit";
+import { defineFeature } from "@frostbite/plugin-kit";
 import {
   creatorApplicationPath,
   creatorApplicationRoutes,
   creatorReviewDetailPath,
   creatorReviewPath,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 
 export const creatorAdmissionFeature = defineFeature({
   manifest: {
@@ -52,7 +52,7 @@ export const creatorAdmissionFeature = defineFeature({
     version: "1.0.0",
   },
   load: async () =>
-    import("@ador/feature-creator-admission/entrypoint").then(
+    import("@frostbite/feature-creator-admission/entrypoint").then(
       ({ createCreatorAdmissionEntrypoint }) =>
         createCreatorAdmissionEntrypoint(),
     ),

@@ -1,4 +1,4 @@
-import type { GameAdminStep } from "@ador/shared/games";
+import type { GameAdminStep } from "@frostbite/shared/games";
 import { ArcadeBadge, SectionBlock } from "@repo/ui/arcade";
 
 import {

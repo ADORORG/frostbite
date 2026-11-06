@@ -1,4 +1,4 @@
-import type { GameClaim, GameMilestone } from "@ador/shared/games";
+import type { GameClaim, GameMilestone } from "@frostbite/shared/games";
 import { ArcadeActionButton, ArcadeStatusCard } from "@repo/ui/arcade";
 
 import { gameMilestonePolicyLabels } from "../domain/catalog.ts";

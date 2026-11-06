@@ -1,31 +1,31 @@
 import { randomUUID } from "node:crypto";
 
-import { createDrizzleSubmissionRepository } from "@ador/collections";
-import { runMigrations } from "@ador/database";
+import { createDrizzleSubmissionRepository } from "@frostbite/collections";
+import { runMigrations } from "@frostbite/database";
 import {
   createDatabaseFromEnvironment,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import { requestFingerprint } from "@ador/shared/http";
+} from "@frostbite/database/connection";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import { requestFingerprint } from "@frostbite/shared/http";
 import {
   createUuidV7,
   uuidV7Schema,
   type UuidV7,
-} from "@ador/shared/identifiers";
+} from "@frostbite/shared/identifiers";
 import {
   seedReadyCollection,
   seededChain,
-} from "@ador/test-kit/collection-database";
+} from "@frostbite/test-kit/collection-database";
 import {
   seedDerivative,
   seedPlatformUser,
-} from "@ador/test-kit/creator-database";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
+} from "@frostbite/test-kit/creator-database";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
 import {
   storageRegistry,
   unusedStorage,
-} from "@ador/test-kit/storage-registry";
+} from "@frostbite/test-kit/storage-registry";
 import { authorizationPolicy } from "@repo/config/authorization";
 
 import { createCollectionReviewEntrypoint } from "../../src/entrypoint.tsx";

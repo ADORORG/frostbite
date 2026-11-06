@@ -1,7 +1,7 @@
-import { chainRefSchema, type ContractRef } from "@ador/shared/chain";
-import { defineGame } from "@ador/shared/games";
-import type { StepView } from "@ador/game-admin";
-import { transactionSummarySchema } from "@ador/shared/chain";
+import { chainRefSchema, type ContractRef } from "@frostbite/shared/chain";
+import { defineGame } from "@frostbite/shared/games";
+import type { StepView } from "@frostbite/game-admin";
+import { transactionSummarySchema } from "@frostbite/shared/chain";
 
 import type { GameAdminConfig } from "../../src/config.ts";
 import { adminGames } from "../../src/game-info.ts";
@@ -42,6 +42,7 @@ export const game = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Arcade",
   version: "1",
 });
@@ -56,6 +57,7 @@ export const plainGame = defineGame({
   network: chain,
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Plain",
   version: "1",
 });

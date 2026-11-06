@@ -23,20 +23,26 @@ const prompt = () =>
 function phone(matches: boolean) {
   window.matchMedia = vi.fn((query: string) => ({
     addEventListener: () => undefined,
-    // Every part of the question must be asked: held sideways, short, and touched.
+    // The question about a phone held sideways must be asked whole: held sideways, short, and touched. The question about a touch screen
+    // alone is only about the touch.
     matches:
       matches &&
-      ["orientation: landscape", "max-height", "pointer: coarse"].every(
-        (part) => query.includes(part),
-      ),
+      (query.includes("orientation")
+        ? ["orientation: landscape", "max-height", "pointer: coarse"].every(
+            (part) => query.includes(part),
+          )
+        : query.includes("pointer: coarse")),
     removeEventListener: () => undefined,
   })) as unknown as typeof window.matchMedia;
   Object.defineProperty(document, "fullscreenEnabled", {
     configurable: true,
     value: true,
   });
+  // jsdom has no full screen; a frame says it can, as a browser's would.
+  HTMLIFrameElement.prototype.requestFullscreen = async () => undefined;
 }
 afterEach(() => {
+  Reflect.deleteProperty(HTMLIFrameElement.prototype, "requestFullscreen");
   Reflect.deleteProperty(window, "matchMedia");
   Reflect.deleteProperty(document, "fullscreenEnabled");
   vi.useRealTimers();
@@ -75,7 +81,7 @@ describe("the notice when a milestone is reported", () => {
 
   it("does not announce a milestone the player already had", async () => {
     window.localStorage.setItem(
-      "ador:game:embedded-game:milestones",
+      "frostbite:game:embedded-game:milestones",
       JSON.stringify({
         "first-level": {
           unlockedAt: "2026-10-01T00:00:00.000Z",
@@ -141,14 +147,14 @@ describe("the offer of full screen to a phone held sideways", () => {
     frame.requestFullscreen = call;
     await act(async () =>
       [...(prompt()?.querySelectorAll("button") ?? [])]
-        .find((b) => b.textContent === "Full screen")
+        .find((b) => b.textContent === "Play full screen")
         ?.click(),
     );
     expect(call).toHaveBeenCalledTimes(1);
     expect(prompt()).toBeNull();
   });
 
-  it("still offers theatre, but not full screen, where the browser does not allow full screen", async () => {
+  it("still makes the one offer where the browser does not allow full screen, since the page can give the game the window itself", async () => {
     phone(true);
     Object.defineProperty(document, "fullscreenEnabled", {
       configurable: true,
@@ -158,16 +164,16 @@ describe("the offer of full screen to a phone held sideways", () => {
     const labels = [...(prompt()?.querySelectorAll("button") ?? [])].map(
       (b) => b.textContent,
     );
-    expect(labels).toEqual(["Theatre", "Not now"]);
+    expect(labels).toEqual(["Play full screen", "Not now"]);
   });
 
-  it("goes away when the player enters theatre from the bar instead, since the game already has the window", async () => {
+  it("goes away when the player gives the game the window from the bar instead", async () => {
     phone(true);
     await mount();
     expect(prompt()).not.toBeNull();
     await act(async () =>
       [...h.container.querySelectorAll(".arcade-stage__bar button")]
-        .find((b) => b.getAttribute("aria-label") === "Theatre")
+        .find((b) => b.textContent === "Play full screen")
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     );
     expect(
@@ -176,12 +182,12 @@ describe("the offer of full screen to a phone held sideways", () => {
     expect(prompt()).toBeNull();
   });
 
-  it("gives the game the whole window, and goes away, when the player accepts theatre", async () => {
+  it("gives the game the whole window, and goes away, when the player accepts", async () => {
     phone(true);
     await mount();
     await act(async () =>
       [...(prompt()?.querySelectorAll("button") ?? [])]
-        .find((b) => b.textContent === "Theatre")
+        .find((b) => b.textContent === "Play full screen")
         ?.click(),
     );
     expect(

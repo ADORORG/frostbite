@@ -1,4 +1,4 @@
-import type { PlatformPlay } from "@ador/game-sdk/play";
+import type { PlatformPlay } from "@frostbite/game-sdk/play";
 import { describe, expect, it, vi } from "vitest";
 
 import { sendRun } from "../src/page/send.ts";

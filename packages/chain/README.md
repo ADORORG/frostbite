@@ -1,4 +1,4 @@
-# `@ador/chain`
+# `@frostbite/chain`
 
 The chain boundary: neutral ports, the adapter registry, and the chain-family adapters behind them
 ([ADR-017](../../../docs/decisions/ADR-017-multichain-chain-family-adapters.md)). Nothing above this
@@ -8,18 +8,18 @@ package knows which chain family it is talking to.
 
 Neutral surface, safe for features, workers, and apps:
 
-- `@ador/chain/ports` — the small ports (`AddressCodec`, `ChainReader`, `ContractGateway`,
+- `@frostbite/chain/ports` — the small ports (`AddressCodec`, `ChainReader`, `ContractGateway`,
   `TransactionBuilder`, `Broadcaster`, `ChainObserver`) and `InvalidAddressError`. Data types and
-  schemas live in `@ador/shared/chain`.
-- `@ador/chain/adapter` — `ChainAdapter`, `portCapabilities`, and `portNames`.
-- `@ador/chain/registry` — `createChainRegistry`, which checks the configured chains against the
+  schemas live in `@frostbite/shared/chain`.
+- `@frostbite/chain/adapter` — `ChainAdapter`, `portCapabilities`, and `portNames`.
+- `@frostbite/chain/registry` — `createChainRegistry`, which checks the configured chains against the
   registered adapters once at boot and then resolves a chain's config, adapter, ports, and
   capabilities.
 
 Family-specific, allowed only where the repository boundary policy permits (this package, the wallet
 bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/` exception):
 
-- `@ador/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter, and what a caller needs to
+- `@frostbite/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter, and what a caller needs to
   wire it to a node (`createRpcNode`, `createJsonRpc`, `AlkanesNode`, `TransactionOptions`). It always provides the address codec.
   Given a node per chain (`BitcoinAlkanesNodes`) it also provides the **rewards reader**: `claimed` (how many times a holder claimed
   a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Given transaction options as well
@@ -37,7 +37,7 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   explorers, each carrying its own address for each network, chosen by `REWARDS_FEE_API_FORMAT`), `fallback.ts` (the operator's rate,
   `fixed.ts`, taken only where the explorer cannot be read) and `index.ts` (`createFeeSource`, `probeFeeSource`), because the hosted nodes'
   own estimates are not usable on the test networks and are never fallen back to. To add an explorer: a parser if its answer is new, its
-  name in `feeApiFormats` (`@ador/shared/chain`), and an entry in `adapters.ts` with its address for each network;
+  name in `feeApiFormats` (`@frostbite/shared/chain`), and an entry in `adapters.ts` with its address for each network;
   `admin/free-address.ts` chooses a new template's address at random from widening ranges (`templateSequence`: `first`, `window`,
   `attempts`), not by counting up, so low crowded numbers and a predictable sequence are both avoided; `tx/` builds a claim (the
   protostone and runestone encoding ported from the indexer, fee and coin selection, the PSBT); `builder.ts`, `verify.ts`,
@@ -45,9 +45,9 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
   opcodes, and `milestone-key.ts` and `holder.ts` the rules shared with the contracts, all tested against the vector files in
   `contracts/templates/abi/`. Reads use the node directly, not `@alkanes/ts-sdk`, whose read results are loosely typed (`any`),
   return raw hex for simulations and need its WASM runtime; the SDK stays for the wallet and signing paths.
-- `@ador/chain/bitcoin` — `validateBitcoinAddress` (P2WPKH and P2TR, mainnet or signet, `bitcoinjs-lib`
+- `@frostbite/chain/bitcoin` — `validateBitcoinAddress` (P2WPKH and P2TR, mainnet or signet, `bitcoinjs-lib`
   7.0.2).
-- `@ador/chain/alkanes` — `loadAlkanesSdk`, the isolated entrypoint for the immutable
+- `@frostbite/chain/alkanes` — `loadAlkanesSdk`, the isolated entrypoint for the immutable
   `@alkanes/ts-sdk@0.1.6-669e7c0` artifact.
 
 ## Invariants
@@ -82,9 +82,9 @@ application's chain list is loaded into `createChainRegistry` by the first featu
 decoders against a real node; without it the test is skipped and no suite needs the network.
 
 Run `typecheck`, `test:unit`, `test:integration`, or `test:coverage`. The conformance suite and the
-simulated second family live in `@ador/test-kit` (`chain-conformance`, `simulated-chain`).
+simulated second family live in `@frostbite/test-kit` (`chain-conformance`, `simulated-chain`).
 
-## Configured chains (`@ador/chain/configured`)
+## Configured chains (`@frostbite/chain/configured`)
 
 The one entry the platform's configuration uses to reach a chain. A `ConfiguredChain` is the chain's record plus its family's
 adapter settings (`AdapterSettings`, a union with one member today: `bitcoin-alkanes`). `createConfiguredRegistry` builds the

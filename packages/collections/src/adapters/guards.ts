@@ -1,14 +1,14 @@
-import { creatorApplications } from "@ador/database/schema/creator-admission";
-import { assets, uploadIntents } from "@ador/database/schema/uploads";
-import { collections } from "@ador/database/schema/collections";
+import { creatorApplications } from "@frostbite/database/schema/creator-admission";
+import { assets, uploadIntents } from "@frostbite/database/schema/uploads";
+import { collections } from "@frostbite/database/schema/collections";
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   collectionAssetPurposes,
   type CollectionDraft,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { and, eq, inArray, sql } from "drizzle-orm";
 
 type AssetPurpose =

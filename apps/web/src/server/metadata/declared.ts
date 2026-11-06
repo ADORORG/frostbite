@@ -1,5 +1,8 @@
-import { privatePage, type PageMetadata } from "@ador/plugin-kit/page-metadata";
-import type { ResolvedFeaturePage } from "@ador/plugin-kit";
+import {
+  privatePage,
+  type PageMetadata,
+} from "@frostbite/plugin-kit/page-metadata";
+import type { ResolvedFeaturePage } from "@frostbite/plugin-kit";
 
 // What a resolved page declares about itself. Only a public page can be shared: one behind sign-in is private whatever it declares,
 // because a preview or a search result would show it to someone who is not allowed to see it. A page with nothing declared, and an

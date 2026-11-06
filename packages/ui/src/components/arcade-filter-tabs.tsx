@@ -1,3 +1,5 @@
+import { FilterChip } from "./filter-chip.tsx";
+
 export interface FilterOption<Value extends string> {
   readonly count: number;
   readonly label: string;
@@ -20,16 +22,13 @@ export function ArcadeFilterTabs<Value extends string>({
   return (
     <div aria-label={label} className="arcade-filter-tabs" role="group">
       {options.map((option) => (
-        <button
-          aria-pressed={option.value === value}
-          className="arcade-filter-tabs__option"
+        <FilterChip
+          count={option.count}
           key={option.value}
-          onClick={() => onChange(option.value)}
-          type="button"
-        >
-          {option.label}
-          <span className="arcade-filter-tabs__count">{option.count}</span>
-        </button>
+          label={option.label}
+          onPress={() => onChange(option.value)}
+          pressed={option.value === value}
+        />
       ))}
     </div>
   );

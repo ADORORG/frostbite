@@ -1,4 +1,5 @@
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createPasskeyOperations } from "../src/application/passkey-operations.ts";
@@ -124,7 +125,7 @@ describe("passkey HTTP operations", () => {
       finish.execute({ challengeId: createUuidV7(), credential }, anonymous),
       unlink.execute({ credentialId: "credential" }, anonymous),
     ]);
-    for (const result of results)
-      expect(result).toMatchObject({ error: "unauthorized", ok: false });
+    // Every one gives the platform's one answer for a request with no session, so no route words it differently.
+    for (const result of results) expect(result).toEqual(unauthenticated);
   });
 });

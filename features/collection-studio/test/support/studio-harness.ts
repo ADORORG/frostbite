@@ -3,21 +3,21 @@ import { randomUUID } from "node:crypto";
 import {
   createDatabaseFromEnvironment,
   parseDatabaseEnvironment,
-} from "@ador/database/connection";
-import { runMigrations } from "@ador/database";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { chainOptionSchema } from "@ador/shared/chain";
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import { runMigrations } from "@frostbite/database";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { chainOptionSchema } from "@frostbite/shared/chain";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 import {
   seedCreatorUser,
   seedDerivative,
   seedUploadedAsset,
-} from "@ador/test-kit/creator-database";
+} from "@frostbite/test-kit/creator-database";
 import {
   storageRegistry,
   unusedStorage,
-} from "@ador/test-kit/storage-registry";
+} from "@frostbite/test-kit/storage-registry";
 
 import { createCollectionStudioEntrypoint } from "../../src/entrypoint.tsx";
 import { signet } from "./stubs.ts";

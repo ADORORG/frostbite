@@ -1,5 +1,5 @@
-import { authSessions, contactCodes } from "@ador/database";
-import type { MailSender } from "@ador/mail";
+import { authSessions, contactCodes } from "@frostbite/database";
+import type { MailSender } from "@frostbite/mail";
 import { describe, expect, it } from "vitest";
 
 import { emailMethod } from "../src/contacts/method.ts";

@@ -1,4 +1,4 @@
-import { parseObjectKey } from "@ador/object-storage/contracts";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import { storageRegistry, unusedStorage } from "../src/storage-registry.ts";

@@ -1,4 +1,4 @@
-import { sha256Hex, type FetchLike } from "@ador/chain/bitcoin-alkanes";
+import { sha256Hex, type FetchLike } from "@frostbite/chain/bitcoin-alkanes";
 import { describe, expect, it } from "vitest";
 
 import { exitCodeOf, formatReport, messageOf } from "../src/result.ts";

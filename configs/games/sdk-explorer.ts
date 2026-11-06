@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -39,6 +39,7 @@ export const sdkExplorerGame = defineGame({
   rewards: { templateId: "game-rewards", templateVersion: "1.0.0" },
   schemaVersion: 1,
   summary: "Calls every part of the game SDK and shows the answers.",
+  tags: ["developer"],
   title: "SDK Explorer",
   version: "0.1.0",
 });

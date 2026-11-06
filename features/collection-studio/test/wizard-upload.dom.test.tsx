@@ -1,17 +1,17 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import {
   buttonMatching,
   click,
   mount,
   settle,
   textOf,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 // The real uploader is covered in the uploads feature. Here each uploader is a button that "finishes an
 // upload" of a known image, so the wizard's handling of the result is tested on its own.
 let uploadedId = "";
-vi.mock("@ador/feature-uploads/inline", () => ({
+vi.mock("@frostbite/feature-uploads/inline", () => ({
   InlineUpload: ({
     onUploaded,
     purpose,

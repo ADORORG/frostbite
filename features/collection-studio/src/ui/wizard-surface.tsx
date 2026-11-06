@@ -1,5 +1,5 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
-import type { ChainOption } from "@ador/shared/chain";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
+import type { ChainOption } from "@frostbite/shared/chain";
 
 import { CollectionWizard } from "./collection-wizard.tsx";
 import { StudioFrame } from "./studio-frame.tsx";

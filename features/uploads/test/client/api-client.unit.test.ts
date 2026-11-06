@@ -8,7 +8,7 @@ import {
   ApiError,
   isRetryableApiError,
   type ApiErrorCode,
-} from "@ador/client-http";
+} from "@frostbite/client-http";
 import { assetId, intentId } from "../support/library-fixtures.ts";
 
 const json = (body: object, status = 200) =>

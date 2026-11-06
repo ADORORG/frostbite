@@ -28,22 +28,22 @@ local runtime and all workspace gates passing.
   cannot host the decoder's child process (a copied lone asset with no `sharp` beside it and no
   `"type": "module"`), and every workaround coupled the web deployable to a native decoder.
 - The limits I chose and the user has not set are recorded as typed, overridable policy defaults in
-  `@ador/jobs/policy`: 4 retries, 2 concurrent media steps, relay batch 10, 60 s lease, 8 attempts,
+  `@frostbite/jobs/policy`: 4 retries, 2 concurrent media steps, relay batch 10, 60 s lease, 8 attempts,
   1 s to 300 s backoff, 2 s idle and 5 s error polling. They are not environment values.
 
 ## Delivered design
 
-- **Provider-neutral contracts and logic (`@ador/jobs`)**: activity contract; `runAssetPipeline`,
+- **Provider-neutral contracts and logic (`@frostbite/jobs`)**: activity contract; `runAssetPipeline`,
   parameterized over a durable `step`; typed workflow capabilities; the relay loop; policy. 100% coverage.
-- **Mapper (`@ador/uploads`)** from the two services to the activity contract; a latent bug fixed along
+- **Mapper (`@frostbite/uploads`)** from the two services to the activity contract; a latent bug fixed along
   the way (validation replay on an already processed asset threw "incoherent").
 - **Provider (`providers/workflows/inngest`)**: client, event publisher (event id as idempotency key,
   terminal versus retryable classification from real SDK errors), function wiring, signed endpoint
   factory via `inngest/edge`, registration and entrypoint. The SDK is imported only here.
-- **Composition**: `createAssetPipelineResolver` in `@ador/feature-uploads/pipeline`.
+- **Composition**: `createAssetPipelineResolver` in `@frostbite/feature-uploads/pipeline`.
 - **Host (`apps/worker`)**: relay loop, signed endpoint, liveness, structured secret-free logs, clean
   shutdown; template, `env:check`, and Turbo env declarations for the five new `INNGEST_*` keys.
-- **Shared infrastructure**: `@ador/http/node-adapter` (one Node-to-fetch bridge) and `@ador/test-kit`
+- **Shared infrastructure**: `@frostbite/http/node-adapter` (one Node-to-fetch bridge) and `@frostbite/test-kit`
   (disposable real Inngest server, REST reader, fetch server) used by the provider and worker tests.
 
 ## Findings from running the real runtime

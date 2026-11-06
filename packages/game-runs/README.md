@@ -1,4 +1,4 @@
-# `@ador/game-runs`
+# `@frostbite/game-runs`
 
 Server-issued runs for replay-verified milestones. A signed-in player asks for a run, the platform gives it a
 seed, and the game submits the record of that run once. The platform replays it and stores the verdict. It
@@ -39,7 +39,7 @@ None of its own. The policy, clock, ids, seeds and the `verify` function are sup
 
 ## Tests
 
-`pnpm --filter @ador/game-runs test:unit` (the service against an in-memory repository),
+`pnpm --filter @frostbite/game-runs test:unit` (the service against an in-memory repository),
 `test:integration` (the adapter and the table's checks on real PostgreSQL, including concurrent starts and
 submissions), `test:coverage` (100% of statements, branches, functions and lines).
 

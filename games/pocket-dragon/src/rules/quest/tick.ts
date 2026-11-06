@@ -1,5 +1,5 @@
-import { refuse } from "@ador/game-sdk/run-inputs";
-import type { Stepped } from "@ador/game-sdk/run-record";
+import { refuse } from "@frostbite/game-sdk/run-inputs";
+import type { Stepped } from "@frostbite/game-sdk/run-record";
 
 import { chapterIds, startHearts } from "../constants.ts";
 import { playOn } from "../held.ts";

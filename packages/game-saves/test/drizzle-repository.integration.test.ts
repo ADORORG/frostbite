@@ -1,5 +1,9 @@
-import { authUsers, gameMilestoneUnlocks, gameSaves } from "@ador/database";
-import type { GameState } from "@ador/shared/games";
+import {
+  authUsers,
+  gameMilestoneUnlocks,
+  gameSaves,
+} from "@frostbite/database";
+import type { GameState } from "@frostbite/shared/games";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

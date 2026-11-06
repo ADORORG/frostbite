@@ -1,9 +1,9 @@
 import {
   manageRolesCapability,
   type AuthorizationPolicy,
-} from "@ador/shared/accounts";
-import { collectionReviewCapability } from "@ador/shared/collections";
-import { gameAdminCapability } from "@ador/shared/games";
+} from "@frostbite/shared/accounts";
+import { collectionReviewCapability } from "@frostbite/shared/collections";
+import { gameAdminCapability } from "@frostbite/shared/games";
 
 // What each of the two working roles may do, written once so the administrator's powers are exactly these and cannot drift from them.
 const reviewerCapabilities = [

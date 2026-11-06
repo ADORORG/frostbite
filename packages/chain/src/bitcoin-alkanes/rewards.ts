@@ -3,7 +3,7 @@ import type {
   ChainRef,
   CollectiblePreview,
   ContractRef,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import type { RewardsReader } from "../ports.ts";
 import { servedChain, type ServedChain } from "./chains.ts";

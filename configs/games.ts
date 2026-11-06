@@ -6,11 +6,11 @@ import {
   applyGameLaunchSettings,
   defineGames,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import { targetChains } from "./chains.ts";
 import { broMariaGame } from "./games/bro-maria.ts";
-import { frostbite } from "./games/frostbite.ts";
+import { fixtureTapsGame } from "./games/fixture-taps.ts";
 import { sdkExplorerGame } from "./games/sdk-explorer.ts";
 import { frostRunnerGame } from "./games/frost-runner.ts";
 import { icicleDropGame } from "./games/icicle-drop.ts";
@@ -24,17 +24,18 @@ import { pocketDragonGame } from "./games/pocket-dragon.ts";
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
 function developmentGames(): GameManifest[] {
-  return developmentGamesEnabled(process.env) ? [sdkExplorerGame] : [];
+  return developmentGamesEnabled(process.env)
+    ? [sdkExplorerGame, fixtureTapsGame]
+    : [];
 }
 
 // The games the platform lists: one line per game. A game is added here and nowhere else; the catalog and the
-// detail pages read this list. Where each is played (host, base path, return address, network) comes from the
-// deployment's `GAME_LAUNCHES` setting, so the same build serves a subdomain, a path or no play address.
+// detail pages read this list. Where a game that is played at an address of its own is played (host, base path, return
+// address) comes from the deployment's `GAME_LAUNCHES` setting. No game is played that way today: every game below is played
+// by the platform itself, so the setting is applied to none and a setting that names any game stops the platform from starting.
+// A game played at its own address goes in the list given to `applyGameLaunchSettings`.
 export const games = defineGames([
-  ...applyGameLaunchSettings(
-    [frostbite],
-    parseGameLaunchEnvironment(process.env),
-  ),
+  ...applyGameLaunchSettings([], parseGameLaunchEnvironment(process.env)),
   ...developmentGames(),
   frostRunnerGame,
   icicleDropGame,

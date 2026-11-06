@@ -1,4 +1,4 @@
-import type { SessionState } from "@ador/feature-accounts/widget";
+import type { SessionState } from "@frostbite/feature-accounts/widget";
 
 import type { PageAccessDependencies } from "./page-access.ts";
 import { resolvePageAccess } from "./page-access.ts";

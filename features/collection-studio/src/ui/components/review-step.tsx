@@ -1,9 +1,9 @@
-import { pickRendition } from "@ador/feature-uploads/presentation";
-import type { ChainOption } from "@ador/shared/chain";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
+import type { ChainOption } from "@frostbite/shared/chain";
 import type {
   CollectionDetail,
   CollectionSubmission,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeButton,

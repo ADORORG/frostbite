@@ -1,4 +1,4 @@
-import { signInHref } from "@ador/shared/auth/sign-in-path";
+import { signInHref } from "@frostbite/shared/auth/sign-in-path";
 
 import type { PageAccessDecision } from "./page-access";
 

@@ -52,9 +52,9 @@ export function replayRecord<State>(
 
 // The names a verifier artifact leaves in its global scope for the platform's runner to find. The artifact is one script
 // that, once run, defines these and nothing else the runner relies on.
-export const replayGlobal = "__adorReplay";
-export const sampleGlobal = "__adorSample";
-export const metaGlobal = "__adorMeta";
+export const replayGlobal = "__frostbiteReplay";
+export const sampleGlobal = "__frostbiteSample";
+export const metaGlobal = "__frostbiteMeta";
 
 // The whole surface the platform uses: a record as text in, an outcome as text out, so the same artifact can run in the
 // server's process or in an isolated runtime that only passes strings across. The record has been checked against the

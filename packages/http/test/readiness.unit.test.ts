@@ -1,5 +1,5 @@
-import type { ReadinessProbe } from "@ador/shared/readiness";
-import { readinessSchema } from "@ador/shared/readiness";
+import type { ReadinessProbe } from "@frostbite/shared/readiness";
+import { readinessSchema } from "@frostbite/shared/readiness";
 import { describe, expect, it, vi } from "vitest";
 
 import { runReadiness } from "../src/readiness.ts";

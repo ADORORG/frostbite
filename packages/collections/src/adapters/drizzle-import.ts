@@ -1,11 +1,11 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
-import { collectionItems } from "@ador/database/schema/collections";
-import { assets, uploadIntents } from "@ador/database/schema/uploads";
-import { collectionAssetPurposes } from "@ador/shared/collections";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import { collectionItems } from "@frostbite/database/schema/collections";
+import { assets, uploadIntents } from "@frostbite/database/schema/uploads";
+import { collectionAssetPurposes } from "@frostbite/shared/collections";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { and, count, desc, eq, inArray, max, sql } from "drizzle-orm";
 
 import type {

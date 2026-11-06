@@ -1,7 +1,7 @@
 import {
   useAction as useSharedAction,
   type Action as Shared,
-} from "@ador/client-react";
+} from "@frostbite/client-react";
 
 import { describeFailure, type Failure } from "../../client/error-copy.ts";
 

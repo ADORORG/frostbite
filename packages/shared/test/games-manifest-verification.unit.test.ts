@@ -24,6 +24,7 @@ const manifest = (over: object = {}) => ({
   network: "bip122:00000008819873e925422c1ff0f99f7c",
   schemaVersion: 1,
   summary: "A game.",
+  tags: ["arcade"],
   title: "Sample",
   version: "1",
   ...over,
@@ -31,7 +32,7 @@ const manifest = (over: object = {}) => ({
 const verified = {
   capabilities: ["run:submit"],
   milestones: [{ ...milestone, verification: "replay-verified" }],
-  verification: { replay: { id: "ice-field", sha256: sha, version: 1 } },
+  verification: { replay: { id: "tap-count", sha256: sha, version: 1 } },
 };
 const accepts = (value: object) => gameManifestSchema.safeParse(value).success;
 const message = (value: object) => {
@@ -92,19 +93,19 @@ describe("a game's replay verifier", () => {
   it("is the rules' id, their version and the digest of the artifact, and nothing else", () => {
     expect(
       gameReplayVerifierSchema.safeParse({
-        id: "ice-field",
+        id: "tap-count",
         sha256: sha,
         version: 1,
       }).success,
     ).toBe(true);
     for (const bad of [
       { id: "Ice Field", sha256: sha, version: 1 },
-      { id: "ice-field", sha256: "A".repeat(64), version: 1 },
-      { id: "ice-field", sha256: "a".repeat(63), version: 1 },
-      { id: "ice-field", sha256: sha, version: 0 },
-      { id: "ice-field", sha256: sha, version: 1.5 },
-      { id: "ice-field", sha256: sha, version: 0x1_0000 },
-      { id: "ice-field", sha256: sha, version: 1, extra: true },
+      { id: "tap-count", sha256: "A".repeat(64), version: 1 },
+      { id: "tap-count", sha256: "a".repeat(63), version: 1 },
+      { id: "tap-count", sha256: sha, version: 0 },
+      { id: "tap-count", sha256: sha, version: 1.5 },
+      { id: "tap-count", sha256: sha, version: 0x1_0000 },
+      { id: "tap-count", sha256: sha, version: 1, extra: true },
     ])
       expect(gameReplayVerifierSchema.safeParse(bad).success).toBe(false);
   });
@@ -113,7 +114,7 @@ describe("a game's replay verifier", () => {
     expect(accepts(manifest(verified))).toBe(true);
     expect(
       gameManifestSchema.parse(manifest(verified)).verification?.replay.id,
-    ).toBe("ice-field");
+    ).toBe("tap-count");
   });
 
   it("needs the run:submit capability, which is how a run is sent to be checked", () => {
@@ -155,7 +156,7 @@ describe("a game's replay verifier", () => {
       manifest({
         ...verified,
         verification: {
-          replay: { id: "ice-field", sha256: "b".repeat(64), version: 1 },
+          replay: { id: "tap-count", sha256: "b".repeat(64), version: 1 },
         },
       }),
     );

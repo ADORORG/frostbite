@@ -1,5 +1,8 @@
-import type { AccountStatus, OrganizationRole } from "@ador/shared/accounts";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type {
+  AccountStatus,
+  OrganizationRole,
+} from "@frostbite/shared/accounts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 export interface AccountMutationContext {
   readonly actorUserId: UuidV7;

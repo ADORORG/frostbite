@@ -1,6 +1,6 @@
 "use client";
 
-import { mintedPictureHref } from "@ador/shared/games";
+import { mintedPictureHref } from "@frostbite/shared/games";
 
 import { mintedCopy } from "../domain/minted-copy.ts";
 import { Medallion } from "./medallion.tsx";

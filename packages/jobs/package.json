@@ -1,5 +1,5 @@
 {
-  "name": "@ador/jobs",
+  "name": "@frostbite/jobs",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,8 +20,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/events": "workspace:*",
-    "@ador/plugin-kit": "workspace:*",
+    "@frostbite/events": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {

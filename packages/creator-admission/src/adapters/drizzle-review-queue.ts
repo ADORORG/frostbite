@@ -1,12 +1,12 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   creatorAdmissionEvents,
   creatorApplications,
   creatorApplicationSnapshots,
-} from "@ador/database/schema/creator-admission";
-import { authUsers } from "@ador/database/schema/auth";
-import type { CreatorReviewSort } from "@ador/shared/creator-admission";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/creator-admission";
+import { authUsers } from "@frostbite/database/schema/auth";
+import type { CreatorReviewSort } from "@frostbite/shared/creator-admission";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import {
   and,
   asc,

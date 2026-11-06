@@ -3,8 +3,8 @@ import {
   neverAppliedCopy,
   standingBadgeLabel,
   type CreatorApplicationResponse,
-} from "@ador/shared/creator-admission";
-import { collectionStudioPath } from "@ador/shared/collections";
+} from "@frostbite/shared/creator-admission";
+import { collectionStudioPath } from "@frostbite/shared/collections";
 import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
 
 type Application = CreatorApplicationResponse["application"];

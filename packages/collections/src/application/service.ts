@@ -1,4 +1,4 @@
-import type { ChainOption } from "@ador/shared/chain";
+import type { ChainOption } from "@frostbite/shared/chain";
 import {
   collectionDraftSchema,
   collectionItemSchema,
@@ -7,9 +7,12 @@ import {
   type CollectionDraft,
   type CollectionImportRow,
   type CollectionItem,
-} from "@ador/shared/collections";
-import { idempotencyKeySchema, requestFingerprint } from "@ador/shared/http";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/collections";
+import {
+  idempotencyKeySchema,
+  requestFingerprint,
+} from "@frostbite/shared/http";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type {
   AddItemResult,

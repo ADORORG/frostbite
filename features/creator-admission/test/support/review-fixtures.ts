@@ -2,8 +2,8 @@ import type {
   CreatorReviewDetail,
   CreatorReviewQueueItem,
   CreatorReviewQueueResponse,
-} from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 
 export const emptyCounts: CreatorReviewQueueResponse["counts"] = {
   active: 0,

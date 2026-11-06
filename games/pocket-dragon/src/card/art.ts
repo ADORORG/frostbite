@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import type { ChapterId } from "../rules/constants.ts";
 import { colour, friendColours, hillSkies } from "../screen/palette.ts";

@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { blastStepTicks, type Item, type TileBlast } from "../rules/kit.ts";
 import { colour } from "./palette.ts";

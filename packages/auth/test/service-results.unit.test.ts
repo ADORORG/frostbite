@@ -1,5 +1,5 @@
-import { validateBitcoinAddress } from "@ador/chain/bitcoin";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { validateBitcoinAddress } from "@frostbite/chain/bitcoin";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import type {

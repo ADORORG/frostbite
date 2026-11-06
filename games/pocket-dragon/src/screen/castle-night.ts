@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { phaseTicks } from "../rules/castle/constants.ts";
 import { bubble, cage, throne } from "../rules/castle/places.ts";

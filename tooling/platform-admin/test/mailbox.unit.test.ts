@@ -5,8 +5,8 @@ import { formatMailbox, parseLimit } from "../src/mailbox.ts";
 const message = (n: number) => ({
   from: "login@stack.invalid",
   sentAt: `2026-10-25T12:0${n}:00.000Z`,
-  subject: `${n}23456 is your Ador sign-in code`,
-  text: `Your Ador sign-in code is ${n}23456.\n\nIt works once.`,
+  subject: `${n}23456 is your Frostbite sign-in code`,
+  text: `Your Frostbite sign-in code is ${n}23456.\n\nIt works once.`,
   to: `person${n}@example.com`,
 });
 
@@ -21,8 +21,8 @@ describe("printing the local mailbox", () => {
       out.indexOf("person1@example.com"),
     );
     expect(out).toContain("2026-10-25T12:02:00.000Z  to person2@example.com");
-    expect(out).toContain("  Subject: 223456 is your Ador sign-in code");
-    expect(out).toContain("  Your Ador sign-in code is 223456.");
+    expect(out).toContain("  Subject: 223456 is your Frostbite sign-in code");
+    expect(out).toContain("  Your Frostbite sign-in code is 223456.");
     expect(out).toContain("  It works once.");
     expect(out.endsWith("It works once.")).toBe(true);
   });

@@ -1,4 +1,4 @@
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 // Where a balance comes from: the chain indexer the platform has chosen, behind the smallest port the widget needs.
 // An adapter implements it (it may wrap the chain package's address codec and `ChainReader`, which a feature may not

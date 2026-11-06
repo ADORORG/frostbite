@@ -3,7 +3,7 @@ import {
   maxRunRecordBytes,
   canonicalJson,
   type RunRecord,
-} from "@ador/game-sdk/run-record";
+} from "@frostbite/game-sdk/run-record";
 import { describe, expect, it } from "vitest";
 
 import { maxChoices, maxTicks } from "../src/rules/constants.ts";

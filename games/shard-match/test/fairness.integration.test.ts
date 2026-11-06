@@ -1,5 +1,5 @@
-import { replayRecord } from "@ador/game-sdk/replay";
-import { describe, expect, it } from "vitest";
+import { replayRecord } from "@frostbite/game-sdk/replay";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { directions } from "../src/rules/constants.ts";
 import { matchRules } from "../src/rules/index.ts";
@@ -16,9 +16,26 @@ import {
 // at once (the greedy player), and one who looks a swap further (the planner). The random player must run out of swaps early, the greedy one
 // later, and the planner should not run out at all in the time measured; together they must earn every milestone.
 const seeds = [1, 2, 3, 4, 5, 6].map((seed) => seed * 7_919);
-const randoms = seeds.map((seed) => play(seed, randomPlayer));
-const greedy = seeds.slice(0, 4).map((seed) => play(seed, greedyPlayer));
-const planner = play(seeds[0] ?? 1, plannerPlayer, 1_200);
+
+// How many swaps the planner makes. Measured on seed 1: the last milestone to come (3,000 points in one swap) is earned between the 400th
+// and the 500th swap, and the 500th swap is in level 27. The gate plays 600 so that the milestones are not on its edge; the planner costs
+// about 0.12 s a swap (the others are a second or two each), so the whole 1,200-swap run, which reaches level 49, is kept for
+// `SHARD_MATCH_LONG=1` and is not part of the gate.
+const plannerSeed = seeds[0] ?? 1;
+const plannerSwaps = 600;
+const longPlannerSwaps = 1_200;
+const long = process.env["SHARD_MATCH_LONG"] === "1";
+
+let randoms: Result[] = [];
+let greedy: Result[] = [];
+let planner: Result;
+
+// Played once, before the first test, and not when the file is loaded, so a run that selects none of this file's tests (a name filter) does not pay for them.
+beforeAll(() => {
+  randoms = seeds.map((seed) => play(seed, randomPlayer));
+  greedy = seeds.slice(0, 4).map((seed) => play(seed, greedyPlayer));
+  planner = play(plannerSeed, plannerPlayer, plannerSwaps);
+}, 300_000);
 
 describe("the game, played whole", () => {
   it("runs out of swaps early for a player who makes any swap that makes a line", () => {
@@ -46,14 +63,24 @@ describe("the game, played whole", () => {
     expect(planner.state.ended).toBe(false);
     expect(planner.state.level).toBeGreaterThan(25);
     expect(planner.state.moves).toBeGreaterThan(0);
-  }, 300_000);
+  });
+
+  it.runIf(long)(
+    "still does not run out in twice the swaps",
+    () => {
+      const whole = play(plannerSeed, plannerPlayer, longPlannerSwaps);
+      expect(whole.state.ended).toBe(false);
+      expect(whole.state.level).toBeGreaterThan(40);
+    },
+    600_000,
+  );
 
   it("can earn every milestone, between the players", () => {
     const all = new Set<string>();
     for (const { state } of [...randoms, ...greedy, planner])
       for (const id of earnedBy(state)) all.add(id);
     expect(milestoneIds.filter((id) => !all.has(id))).toEqual([]);
-  }, 300_000);
+  });
 
   it("makes records the platform's replay accepts, whoever plays", () => {
     const record = (result: Result, seed: number) => ({
@@ -75,7 +102,7 @@ describe("the game, played whole", () => {
     for (const [result, seed] of [
       [randoms[0], seeds[0]],
       [greedy[1], seeds[1]],
-      [planner, seeds[0]],
+      [planner, plannerSeed],
     ] as const) {
       if (result === undefined || seed === undefined)
         throw new Error("no result");
@@ -87,5 +114,5 @@ describe("the game, played whole", () => {
       expect(made.inputs.length).toBeLessThanOrEqual(5_000);
     }
     expect(directions).toHaveLength(4);
-  }, 300_000);
+  });
 });

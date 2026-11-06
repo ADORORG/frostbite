@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { authUsers, gameRuns } from "@ador/database";
+import { authUsers, gameRuns } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

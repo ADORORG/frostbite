@@ -1,5 +1,9 @@
-import { createReadCache, type Aged, type ReadPolicy } from "@ador/cache";
-import type { ChainRef, FeeRate, IndexingStatus } from "@ador/shared/chain";
+import { createReadCache, type Aged, type ReadPolicy } from "@frostbite/cache";
+import type {
+  ChainRef,
+  FeeRate,
+  IndexingStatus,
+} from "@frostbite/shared/chain";
 
 import type { ChainObserver } from "./ports.ts";
 

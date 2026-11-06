@@ -1,6 +1,6 @@
 "use client";
 
-import { useStepWallet } from "@ador/wallet/client";
+import { useStepWallet } from "@frostbite/wallet/client";
 
 import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";

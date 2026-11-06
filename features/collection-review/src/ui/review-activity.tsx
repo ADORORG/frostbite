@@ -1,6 +1,6 @@
 "use client";
 
-import { collectionReviewQueuePath } from "@ador/shared/collections";
+import { collectionReviewQueuePath } from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeButton,

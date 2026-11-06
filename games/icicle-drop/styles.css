@@ -1,6 +1,6 @@
 @import "tiles.css";
-@import "@ador/game-sdk/audio/panel.css";
-@import "@ador/game-sdk/phone.css";
+@import "@frostbite/game-sdk/audio/panel.css";
+@import "@frostbite/game-sdk/phone.css";
 @import "./guide.css";
 
 :root {
@@ -67,6 +67,10 @@ main {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+/* "Start run" becomes "New run" when a run starts: the button keeps its width, so the controls beside it do not move. */
+.foot .actions #start {
+  min-inline-size: 8rem;
 }
 h1,
 h2,

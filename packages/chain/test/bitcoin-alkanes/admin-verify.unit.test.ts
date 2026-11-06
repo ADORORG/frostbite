@@ -1,7 +1,7 @@
 import { sha256Hex } from "../../src/bitcoin-alkanes/admin/data.ts";
 import { Psbt } from "bitcoinjs-lib";
 import { describe, expect, it } from "vitest";
-import type { UnsignedTransaction } from "@ador/shared/chain";
+import type { UnsignedTransaction } from "@frostbite/shared/chain";
 
 import {
   bundleFormat,

@@ -1,4 +1,4 @@
-import type { AlkanesNode } from "@ador/chain/bitcoin-alkanes";
+import type { AlkanesNode } from "@frostbite/chain/bitcoin-alkanes";
 
 import { messageOf, type CheckResult } from "../result.ts";
 import type { FoundTemplate } from "./templates.ts";

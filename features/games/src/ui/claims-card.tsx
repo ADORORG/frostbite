@@ -1,4 +1,4 @@
-import type { GameClaim } from "@ador/shared/games";
+import type { GameClaim } from "@frostbite/shared/games";
 import { ArcadeActionButton, ArcadeInfoCard } from "@repo/ui/arcade";
 
 import { claimCopy, showsDelayed } from "../domain/claim-copy.ts";

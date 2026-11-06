@@ -1,4 +1,4 @@
-import type { UploadCleanupResult } from "@ador/feature-uploads/cleanup";
+import type { UploadCleanupResult } from "@frostbite/feature-uploads/cleanup";
 
 export interface CleanupPassDependencies {
   // Called for every pass that found abandoned uploads, with what became of them.

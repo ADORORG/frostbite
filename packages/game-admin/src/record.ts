@@ -1,4 +1,4 @@
-import { walk } from "@ador/shared/chain";
+import { walk } from "@frostbite/shared/chain";
 
 import { isUnreadableCreation } from "./completion.ts";
 import { stepViewerFor } from "./steps.ts";

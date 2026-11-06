@@ -1,6 +1,6 @@
 "use client";
 
-import { mintedPictureHref } from "@ador/shared/games";
+import { mintedPictureHref } from "@frostbite/shared/games";
 
 import { useImageState } from "./use-image-state.ts";
 

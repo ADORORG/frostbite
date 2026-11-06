@@ -4,7 +4,7 @@ import { ArcadeDialog } from "@repo/ui/arcade";
 import {
   useWalletChooser,
   type WalletConnectionClient,
-} from "@ador/wallet/client";
+} from "@frostbite/wallet/client";
 import { useEffect, useRef } from "react";
 
 import type { WalletCandidate } from "../wallet-config.ts";

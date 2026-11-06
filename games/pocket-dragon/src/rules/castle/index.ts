@@ -1,4 +1,4 @@
-import type { GameVerifier } from "@ador/game-sdk/run-record";
+import type { GameVerifier } from "@frostbite/game-sdk/run-record";
 
 import { verifierVersion } from "../constants.ts";
 import { noSettings, playOn, stepChapter, type Chapter } from "../held.ts";

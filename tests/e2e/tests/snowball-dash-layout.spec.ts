@@ -1,3 +1,4 @@
+import { restartDelayMs } from "@frostbite/game-sdk/touch-start";
 import { expect, test, type FrameLocator } from "@playwright/test";
 
 // Snowball Dash is played against the clock, so nothing under the player's thumb may move while it runs: the screen, the controls, the note
@@ -16,12 +17,22 @@ const watched = [
 // in rows of their own, each watched above).
 const desktopOnly = [".foot"] as const;
 
-async function boxes(game: FrameLocator, desktop: boolean) {
+// On a touch screen (whatever the size of the window) the shared phone layout hides the Start button, the note and the list earned: what is
+// watched there is what has a box, since a hidden control (or one the layout gives no box of its own) is not a place anything can move from.
+async function shownControls(game: FrameLocator, desktop: boolean) {
+  const shown: string[] = [];
+  for (const selector of desktop ? [...watched, ...desktopOnly] : watched)
+    if ((await game.locator(selector).boundingBox()) !== null)
+      shown.push(selector);
+  return shown;
+}
+
+async function boxes(game: FrameLocator, shown: readonly string[]) {
   const found: Record<
     string,
     { height: number; width: number; x: number; y: number }
   > = {};
-  for (const selector of desktop ? [...watched, ...desktopOnly] : watched) {
+  for (const selector of shown) {
     const box = await game.locator(selector).boundingBox();
     if (box === null) throw new Error(`${selector} has no box`);
     found[selector] = box;
@@ -41,18 +52,27 @@ for (const size of [
     await page.goto("/games/snowball-dash");
     const game = page.frameLocator(frameSelector);
     await expect(game.locator("#status")).toHaveText("Connected.");
-    const before = await boxes(game, size.name === "desktop");
-    await game.locator("#start").click();
+    const shown = await shownControls(game, size.name === "desktop");
+    // The screen is always there; a layout that showed nothing would make this test watch nothing.
+    expect(shown).toContain("#screen");
+    const buttons = shown.includes("#start");
+    const before = await boxes(game, shown);
+    if (buttons) await game.locator("#start").click();
+    else {
+      // With no Start button in sight a tap on the screen starts the run, once the button has been on offer for a moment.
+      await page.waitForTimeout(restartDelayMs + 100);
+      await game.locator("#screen").tap();
+    }
     await expect(game.locator("#pause")).toBeEnabled();
-    expect(await boxes(game, size.name === "desktop")).toEqual(before);
+    expect(await boxes(game, shown)).toEqual(before);
     // One hop earns the first milestone, which is listed: the list gains an item and nothing around it moves.
     await page.keyboard.down("Space");
     await page.waitForTimeout(200);
     await page.keyboard.up("Space");
-    await expect(game.locator("#earned li").first()).toBeVisible();
-    expect(await boxes(game, size.name === "desktop")).toEqual(before);
+    await expect(game.locator("#earned li")).not.toHaveCount(0);
+    expect(await boxes(game, shown)).toEqual(before);
     // Hop no more: the snowball meets the first rock and the run ends with the card on the screen.
-    await expect(game.locator("#start")).toBeVisible({ timeout: 15_000 });
+    await expect(game.locator("#pause")).toBeDisabled({ timeout: 15_000 });
     await expect(game.locator("#note")).not.toHaveText("");
-    expect(await boxes(game, size.name === "desktop")).toEqual(before);
+    expect(await boxes(game, shown)).toEqual(before);
   });

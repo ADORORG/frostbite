@@ -3,7 +3,7 @@ import {
   creatorReviewHref,
   creatorStandingCopy,
   type CreatorReviewQueueItem,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { ArcadeBadge, ArcadeButton } from "@repo/ui/arcade";
 
 // The applications in the chosen group, one card each: who, how far along, which submission, and when it was

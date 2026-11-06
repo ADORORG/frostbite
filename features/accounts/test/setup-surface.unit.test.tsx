@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { ApiError, type Parser, type Requester } from "@ador/client-http";
+import { ApiError, type Parser, type Requester } from "@frostbite/client-http";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -145,8 +146,8 @@ describe("opening a setup link", () => {
   it("tells the person a link that does not work is not valid, and offers no way to retry it", async () => {
     window.history.replaceState(null, "", "/setup#tok");
     await show(server("not_found").request);
-    expect(container.querySelector('[role="alert"]')?.textContent).toContain(
-      "not valid, or it has expired",
+    expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+      outcomeMessage("setup-link-invalid"),
     );
     expect(container.querySelector("button")).toBeNull();
   });

@@ -16,12 +16,11 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 | `src/session.ts`                     | One run as the player plays it: applies steps through the rules and records each accepted one into a run record.                     |
 | `src/screen/`                        | Draws a state on a canvas (the lit cellar, the lantern, the writing and the cards). Draws and decides nothing.                       |
 | `src/audio.ts`, `src/feedback.ts`    | The music and effects as data, and which effect each change of state makes. The music speeds up as the oil runs low.                 |
-| `src/progress.ts`                    | What is saved (the best score and the sound settings) and how what the platform hands back is validated.                             |
 | `src/replay.ts`, `src/sample-run.ts` | What the platform replays: the rules and one legal run. Its digest is pinned in `configs/games/lantern-maze.ts`.                     |
 
 ## How it plays
 
-- **Keys:** the arrows or WASD step the lantern, or swipe the screen (a pad appears on a touch screen). Enter starts a run and never throws
+- **Keys:** the arrows or WASD step the lantern, or a finger on the screen: the lantern walks toward it, a step for a tap and a walk for a hold (`src/screen/controls.ts`; no buttons on a touch screen). Enter starts a run and never throws
   one away; P or Space pauses.
 - **A floor:** a maze carved from the run's seed and the floor number, 7 by 5 cells on the first floor and 15 by 9 from the tenth. From the
   fifth floor some walls are taken out, so there are loops. The lantern lights cells within 4 steps along the passages, then 3, 2 and 1.

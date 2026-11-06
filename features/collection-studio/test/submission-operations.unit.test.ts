@@ -1,4 +1,4 @@
-import type { SubmissionRecord, SubmitResult } from "@ador/collections";
+import type { SubmissionRecord, SubmitResult } from "@frostbite/collections";
 import { describe, expect, it, vi } from "vitest";
 
 import {

@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 
-import { portCapabilities, type ChainAdapter } from "@ador/chain/adapter";
+import { portCapabilities, type ChainAdapter } from "@frostbite/chain/adapter";
 
 import {
   checkRewardsReader,

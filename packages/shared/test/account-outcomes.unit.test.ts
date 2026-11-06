@@ -60,6 +60,13 @@ describe("the catalogue of account outcomes", () => {
     expect(isAccountOutcome(null)).toBe(false);
   });
 
+  it("lets the server speak only for the outcomes whose words depend on something it knows: how long to wait, which sign-in methods are missing", () => {
+    const speaking = names.filter(
+      (name) => "serverWords" in accountOutcomes[name],
+    );
+    expect(speaking.sort()).toEqual(["code-too-soon", "setup-method-needed"]);
+  });
+
   it("uses the server's words only where the catalogue says the server knows more", () => {
     expect(outcomeMessage("code-too-soon", "Ask again in 30 seconds.")).toBe(
       "Ask again in 30 seconds.",

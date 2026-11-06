@@ -1,7 +1,7 @@
 import {
   domainEventEnvelopeSchema,
   type DomainEventEnvelope,
-} from "@ador/events";
+} from "@frostbite/events";
 import { and, asc, eq, inArray, lte, or, sql } from "drizzle-orm";
 
 import type {

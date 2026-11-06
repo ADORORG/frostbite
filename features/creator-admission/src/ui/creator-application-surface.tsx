@@ -1,7 +1,7 @@
-import { studioHomePath } from "@ador/shared/collections";
-import type { CreatorApplicationResponse } from "@ador/shared/creator-admission";
+import { studioHomePath } from "@frostbite/shared/collections";
+import type { CreatorApplicationResponse } from "@frostbite/shared/creator-admission";
 import { ArcadeButton, PageFrame, StatusLamp } from "@repo/ui/arcade";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import { StudioApplication } from "./studio-application.tsx";
 

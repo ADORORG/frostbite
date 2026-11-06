@@ -1,7 +1,7 @@
 "use client";
 
-import type { ChainOption } from "@ador/shared/chain";
-import { creatorApplicationPath } from "@ador/shared/creator-admission";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { creatorApplicationPath } from "@frostbite/shared/creator-admission";
 import { StatusLamp } from "@repo/ui/arcade";
 import { useState } from "react";
 

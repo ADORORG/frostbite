@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { ApiError } from "@frostbite/client-http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { vi } from "vitest";
 
 import { fakeServices } from "./dom.tsx";

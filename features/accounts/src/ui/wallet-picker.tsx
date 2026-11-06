@@ -5,7 +5,7 @@ import {
   walletNetworkUnavailableReason,
   type WalletConnectionClient,
   type WalletConnectionFailure,
-} from "@ador/wallet/client";
+} from "@frostbite/wallet/client";
 import { useState } from "react";
 
 import type { WalletCandidate } from "../wallet-config.ts";

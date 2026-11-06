@@ -1,7 +1,7 @@
 import {
   walletRequests,
   withWalletSignatures,
-} from "@ador/chain/wallet-signing";
+} from "@frostbite/chain/wallet-signing";
 
 import type { WalletConnectionClient } from "../client/connection-client.ts";
 

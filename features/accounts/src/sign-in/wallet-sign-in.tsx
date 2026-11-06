@@ -1,10 +1,13 @@
 "use client";
 
-import { useWalletChooser, useWalletConnection } from "@ador/wallet/client";
+import {
+  useWalletChooser,
+  useWalletConnection,
+} from "@frostbite/wallet/client";
 import { useEffect, useRef } from "react";
 
 import { useWalletSession } from "../client/use-wallet-session.ts";
-import { outcomeMessage } from "@ador/shared/account-outcomes";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
 import { networkName, shortAddress } from "../widget/format.ts";
 import type { SignInViewProps } from "./views.ts";
 

@@ -1,4 +1,4 @@
-import { uploadsNewPath } from "@ador/shared/uploads";
+import { uploadsNewPath } from "@frostbite/shared/uploads";
 import {
   ArcadeActionButton,
   ArcadeButton,

@@ -1,4 +1,4 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 
 import type { SubmissionRepository } from "../application/submission-repository.ts";
 import { createDrizzleReview } from "./drizzle-review.ts";

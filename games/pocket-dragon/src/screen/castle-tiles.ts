@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { tileAt } from "../rules/castle/map.ts";
 import { boulders, brambles } from "../rules/castle/places.ts";

@@ -1,4 +1,4 @@
-import { libraryAssetFixture } from "@ador/test-kit/library-asset";
+import { libraryAssetFixture } from "@frostbite/test-kit/library-asset";
 import { describe, expect, it } from "vitest";
 
 import {

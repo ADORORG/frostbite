@@ -1,5 +1,5 @@
-import { authUsers, gameAdminSteps } from "@ador/database";
-import { maxAdminPayloadChars } from "@ador/shared/games";
+import { authUsers, gameAdminSteps } from "@frostbite/database";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

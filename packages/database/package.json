@@ -1,5 +1,5 @@
 {
-  "name": "@ador/database",
+  "name": "@frostbite/database",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -26,6 +26,7 @@
     "./schema/rate-limit": "./src/schema/rate-limit.ts",
     "./schema/uploads": "./src/schema/uploads.ts",
     "./schema/wallet-release": "./src/schema/wallet-release.ts",
+    "./test-expired-rows": "./test/support/expired-row-fixtures.ts",
     "./test-postgres": "./test/support/postgres-container.ts"
   },
   "scripts": {
@@ -41,9 +42,9 @@
     "test:coverage": "node --experimental-strip-types test/support/run-postgres.ts coverage"
   },
   "dependencies": {
-    "@ador/events": "workspace:*",
-    "@ador/jobs": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/events": "workspace:*",
+    "@frostbite/jobs": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4",
     "pg": "8.23.0",
     "zod": "4.5.4"

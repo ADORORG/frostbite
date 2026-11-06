@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import type { PageMetadata } from "@ador/plugin-kit/page-metadata";
+import type { PageMetadata } from "@frostbite/plugin-kit/page-metadata";
 
 import { defaultShareImage, type SiteIdentity } from "./site.ts";
-import { siteDescription, siteTagline } from "@ador/shared/platform";
+import { siteDescription, siteTagline } from "@frostbite/shared/platform";
 
 const imageSize = { height: 630, width: 1200 } as const;
 

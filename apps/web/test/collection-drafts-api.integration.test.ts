@@ -1,4 +1,4 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/headers", () => ({
@@ -14,7 +14,7 @@ import {
 
 beforeAll(() => {
   process.env.APP_ENV = "test";
-  process.env.NEXT_PUBLIC_APP_NAME = "Frostbit test";
+  process.env.NEXT_PUBLIC_APP_NAME = "Frostbite test";
   process.env.PUBLIC_BASE_URL = "https://launch.example";
 });
 

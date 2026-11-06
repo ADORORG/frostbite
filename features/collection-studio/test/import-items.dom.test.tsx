@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { button, click, mount, settle, textOf } from "@ador/test-kit/dom";
+import { ApiError } from "@frostbite/client-http";
+import { button, click, mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 

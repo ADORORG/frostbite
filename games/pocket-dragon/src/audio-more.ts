@@ -1,4 +1,4 @@
-import { tone, type Effect } from "@ador/game-sdk/audio/effects";
+import { tone, type Effect } from "@frostbite/game-sdk/audio/effects";
 
 // The effects of the quest's newer things, kept apart from the first ones (`audio.ts`) so each file stays short: a spring, a secret
 // area found, a door through to it, the wings and their flaps, the forcefield, the guild going up a level, and the backpack (a food

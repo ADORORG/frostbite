@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -149,12 +149,13 @@ export const towerStackGame = defineGame({
   schemaVersion: 1,
   summary:
     "Drop the sliding block on the tower and build it as high as you can.",
+  tags: ["reflex", "arcade"],
   title: "Tower Stacker",
   verification: {
     replay: {
       id: "tower-stack",
       sha256:
-        "39ec8fec4da743f74fd039f9fd5218d8b6c09770079edcd79a27fadcbad40ca9",
+        "e819de285c8d1d63bf4bbb0eea69641688fdcfb8aa38f35be8764ffbbde67ad7",
       version: 1,
     },
   },

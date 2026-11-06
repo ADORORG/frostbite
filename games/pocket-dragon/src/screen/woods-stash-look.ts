@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { cell } from "../rules/woods/constants.ts";
 import type { WoodsState } from "../rules/woods/types.ts";

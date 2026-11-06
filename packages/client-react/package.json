@@ -1,5 +1,5 @@
 {
-  "name": "@ador/client-react",
+  "name": "@frostbite/client-react",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -19,8 +19,8 @@
     "react": "19.2.8"
   },
   "devDependencies": {
-    "@ador/client-http": "workspace:*",
-    "@ador/test-kit": "workspace:*",
+    "@frostbite/client-http": "workspace:*",
+    "@frostbite/test-kit": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "26.4.0",

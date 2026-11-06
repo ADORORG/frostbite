@@ -1,4 +1,4 @@
-import { mintedPictureContentTypes } from "@ador/shared/games";
+import { mintedPictureContentTypes } from "@frostbite/shared/games";
 
 import type { GameClaimRepository } from "./repository.ts";
 import type { GameClaimsDependencies, MintedPictureResult } from "./types.ts";

@@ -1,11 +1,11 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import { describe, expect, it, vi } from "vitest";
 
 import {
   createWalletSession,
   disconnected,
 } from "../src/client/wallet-session.ts";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import {
   address,
   challenge,

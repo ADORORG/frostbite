@@ -1,5 +1,5 @@
-import type { WorkflowProviderServices } from "@ador/jobs/provider-service";
-import type { ProviderEntrypoint } from "@ador/plugin-kit/providers";
+import type { WorkflowProviderServices } from "@frostbite/jobs/provider-service";
+import type { ProviderEntrypoint } from "@frostbite/plugin-kit/providers";
 
 import { createInngestClient } from "./client.ts";
 import { parseInngestEnvironment } from "./config.ts";

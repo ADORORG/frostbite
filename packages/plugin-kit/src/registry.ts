@@ -5,9 +5,9 @@ import {
   type FeatureManifest,
   type NavigationContribution,
   type PageAccessRequirement,
-} from "@ador/shared/features";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { RegisteredHttpOperation } from "@ador/http/registered-operation";
+} from "@frostbite/shared/features";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { RegisteredHttpOperation } from "@frostbite/http/registered-operation";
 import type { ReactNode } from "react";
 import { collectHomeSections, type HomeSection } from "./home-sections.ts";
 import type { NavigationItem } from "./navigation.ts";
@@ -39,6 +39,10 @@ export interface PageRenderContext {
   readonly homeSections?: readonly HomeSection[];
   readonly navigation: readonly NavigationItem[];
   readonly params: Readonly<Record<string, string>>;
+  // The address's query string as the framework read it, for a page whose content depends on it (a search); left out by a caller with none.
+  readonly searchParams?: Readonly<
+    Record<string, string | readonly string[] | undefined>
+  >;
 }
 
 export interface ResolvedFeaturePage {

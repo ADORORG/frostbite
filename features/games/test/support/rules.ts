@@ -1,4 +1,4 @@
-import type { MilestoneRules } from "@ador/game-saves";
+import type { MilestoneRules } from "@frostbite/game-saves";
 
 // A game whose milestones are all earned once, with no target: the shape every game had before progress existed.
 export const rules = (ids: readonly string[]): MilestoneRules =>

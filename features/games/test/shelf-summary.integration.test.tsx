@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { mount, textOf } from "@ador/test-kit/dom";
+import { mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { mintedCopy } from "../src/domain/minted-copy.ts";

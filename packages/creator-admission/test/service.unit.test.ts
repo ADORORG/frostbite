@@ -1,6 +1,6 @@
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import type { CreatorApplicationDraft } from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import type { CreatorApplicationDraft } from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import type { CreatorAdmissionRepository } from "../src/application/repository.ts";

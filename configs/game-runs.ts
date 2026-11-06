@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import type { GameRunsConfig } from "@ador/feature-games";
+import type { GameRunsConfig } from "@frostbite/feature-games";
 
 // Where the games are built and served from, and so where each game's verifier file is read. The web app runs from its own
 // folder (`next dev`, `build` and `start` all do), so the games built into its `public/play` are found there; a deployment

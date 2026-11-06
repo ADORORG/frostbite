@@ -1,14 +1,14 @@
-import type { DatabaseClient } from "@ador/database/connection";
+import type { DatabaseClient } from "@frostbite/database/connection";
 import {
   gameMilestoneCounters,
   gameMilestoneUnlocks,
   gameSaves,
-} from "@ador/database/schema/game-saves";
+} from "@frostbite/database/schema/game-saves";
 import {
   gameMilestoneRecordSchema,
   gameProgressSchema,
   type GameState,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { and, eq, sql } from "drizzle-orm";
 
 import type { GameSyncRepository } from "./repository.ts";

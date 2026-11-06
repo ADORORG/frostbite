@@ -1,13 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import type { HostedGame } from "@ador/game-sdk/host";
-import { createMemoryGameBackend } from "@ador/test-kit/memory-game-backend";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import type { HostedGame } from "@frostbite/game-sdk/host";
+import { createMemoryGameBackend } from "@frostbite/test-kit/memory-game-backend";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+} from "@frostbite/test-kit/simulated-game-host";
 import { afterEach, describe, expect, it } from "vitest";
 
 const root = join(import.meta.dirname, "..");

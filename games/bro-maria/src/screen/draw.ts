@@ -1,5 +1,6 @@
 import { banner } from "./banner.ts";
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { touchHints } from "./touch-hints.ts";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import {
   groundRow,
@@ -210,4 +211,5 @@ export function draw(context: CanvasRenderingContext2D, state: State): void {
   hero(context, state, camera);
   snow(context, state.tick, screenWidth, screenHeight);
   banner(context, state, screenWidth);
+  touchHints(context, state, screenWidth, screenHeight);
 }

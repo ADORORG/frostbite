@@ -15,7 +15,6 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 | `src/session.ts`                     | One run as the player plays it: ticks the rules, records each press and release into a run record.                                                                                         |
 | `src/screen/`                        | Draws a state on a canvas (sky, hills, snow, obstacles, shards, the snowball, the writing). Draws and decides nothing.                                                                     |
 | `src/audio.ts`, `src/feedback.ts`    | The music and effects as data, and which effect each change of state makes. The music speeds up with the level.                                                                            |
-| `src/progress.ts`                    | What is saved (the best score and the sound settings) and how what the platform hands back is validated.                                                                                   |
 | `src/replay.ts`, `src/sample-run.ts` | What the platform replays: the rules and one legal run. Its digest is pinned in `configs/games/snowball-dash.ts`.                                                                          |
 
 ## How it plays

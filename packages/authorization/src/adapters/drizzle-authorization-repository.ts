@@ -2,17 +2,17 @@ import {
   organizationMemberships,
   organizations,
   platformRoleAssignments,
-} from "@ador/database/schema/accounts";
+} from "@frostbite/database/schema/accounts";
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   accountStatusSchema,
   organizationRoleSchema,
   platformRoleSchema,
   type MethodKind,
-} from "@ador/shared/accounts";
+} from "@frostbite/shared/accounts";
 import { and, eq } from "drizzle-orm";
 
 import type { AuthorizationRepository } from "../application/repository.ts";

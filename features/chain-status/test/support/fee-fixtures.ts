@@ -1,4 +1,4 @@
-import type { ChainFees, FeeQuoteView } from "@ador/shared/chain";
+import type { ChainFees, FeeQuoteView } from "@frostbite/shared/chain";
 
 import type { FeeMarket } from "../../src/ui/use-fee-quotes.ts";
 

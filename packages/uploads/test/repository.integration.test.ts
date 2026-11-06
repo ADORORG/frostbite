@@ -6,15 +6,15 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createDrizzleUploadIntentRepository } from "../src/adapters/drizzle-repository.ts";
 import type { UploadIntentView } from "../src/application/repository.ts";
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { providerIdSchema } from "@ador/shared/providers";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { providerIdSchema } from "@frostbite/shared/providers";
 
 const environment = parseDatabaseEnvironment(process.env);
 const pool = createDatabasePool(environment);

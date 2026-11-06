@@ -2,7 +2,7 @@
 
 Detachable creator onboarding and staff-review surfaces plus HTTP operations. Register `creatorAdmissionFeature` once in the platform feature registry; removing that line removes its pages and routes.
 
-The feature owns composition only. Domain rules live in `@ador/creator-admission`, contracts in `@ador/shared/creator-admission`, persistence in the Drizzle adapter, and visual grammar in `@repo/ui`.
+The feature owns composition only. Domain rules live in `@frostbite/creator-admission`, contracts in `@frostbite/shared/creator-admission`, persistence in the Drizzle adapter, and visual grammar in `@repo/ui`.
 
 It contributes authenticated creator-application navigation and capability-gated review navigation.
 It requires authenticated pages, API routes, PostgreSQL configuration, and the `creator:review`

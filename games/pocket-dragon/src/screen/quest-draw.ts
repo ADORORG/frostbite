@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { chapterTitles } from "../chapters.ts";
 import { chapterIds, type ChapterId } from "../rules/constants.ts";

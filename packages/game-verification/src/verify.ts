@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { canonicalJson, runRecordSchema } from "@ador/game-sdk/run-record";
+import { canonicalJson, runRecordSchema } from "@frostbite/game-sdk/run-record";
 
 import {
   defaultVerificationPolicy,

@@ -59,9 +59,9 @@ Run 2026-10-16, niced, on a busy machine.
 - `pnpm format:check`, `pnpm lint` (49 workspaces, repository policy included: it caught a 326-line test file, which was split), `pnpm typecheck` (49/49): pass.
 - `pnpm contracts:test`: `rewards-core` 32 unit and 3 ABI tests; harness 26 tests (admin 5, claims 6, collectible 5, milestones 6, simulate_claim 1,
   trace_vectors 1, transfer 1, typescript_claim 1), code hashes unchanged. `pnpm contracts:coverage` `rewards-core` 97.9% regions, 100% functions, 99.5% lines.
-- `pnpm test:coverage`: passes (49 workspaces, merged repository coverage above 90% lines and branches). `@ador/chain` has 159 unit tests; the live test (6, against the public
-  mainnet node) passes with `ALKANES_LIVE_NODE_URL` set. `@ador/test-kit` now runs the full conformance suite against the real adapter's claim path.
-  Two earlier full runs failed on `@ador/feature-uploads` DOM tests that exceed a 5 s timeout when the machine is loaded (a desktop file indexer was using a core,
+- `pnpm test:coverage`: passes (49 workspaces, merged repository coverage above 90% lines and branches). `@frostbite/chain` has 159 unit tests; the live test (6, against the public
+  mainnet node) passes with `ALKANES_LIVE_NODE_URL` set. `@frostbite/test-kit` now runs the full conformance suite against the real adapter's claim path.
+  Two earlier full runs failed on `@frostbite/feature-uploads` DOM tests that exceed a 5 s timeout when the machine is loaded (a desktop file indexer was using a core,
   load average 12); the package passes alone and the third full run passed. Not caused by this change; recorded as task #79.
 - `pnpm --filter web build`: exit 0. The full e2e run was not repeated: no page, route or browser code changed.
 - Mutation proof: see above.

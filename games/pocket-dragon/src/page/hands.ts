@@ -1,4 +1,4 @@
-import { attachKeys, standardKeys } from "@ador/game-sdk/controls";
+import { attachKeys, standardKeys } from "@frostbite/game-sdk/controls";
 
 import { chapterIds, type PlayId } from "../rules/constants.ts";
 

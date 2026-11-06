@@ -1,4 +1,4 @@
-import type { Aged } from "@ador/cache";
+import type { Aged } from "@frostbite/cache";
 
 import type { StatusPolling } from "./domain/freshness.ts";
 import type {
@@ -6,7 +6,7 @@ import type {
   FeeRate,
   FeeSpeedPolicy,
   IndexingStatus,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 // What the platform needs to tell anyone how far a chain's indexer has read: the chain it follows (none, where it follows no chain,
 // and then nothing is shown), what counts as far behind, and how often a page asks again.

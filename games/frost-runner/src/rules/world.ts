@@ -1,4 +1,4 @@
-import { startState, stepInt } from "@ador/game-sdk/seeded";
+import { startState, stepInt } from "@frostbite/game-sdk/seeded";
 
 import {
   baseSpeed,

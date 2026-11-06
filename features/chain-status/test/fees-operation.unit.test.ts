@@ -1,4 +1,4 @@
-import { chainFeesSchema, type FeeSpeedPolicy } from "@ador/shared/chain";
+import { chainFeesSchema, type FeeSpeedPolicy } from "@frostbite/shared/chain";
 import { describe, expect, it, vi } from "vitest";
 
 import { createFeesOperation } from "../src/application/fees.ts";

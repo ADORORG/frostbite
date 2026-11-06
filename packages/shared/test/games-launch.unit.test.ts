@@ -24,6 +24,7 @@ const game = (id = "sample-game"): GameManifest => ({
   network: signet,
   schemaVersion: 1,
   summary: "A sample game.",
+  tags: ["arcade"],
   title: "Sample game",
   version: "1.0.0",
 });
@@ -60,7 +61,7 @@ describe("a game's host", () => {
 });
 
 describe("a game's base path", () => {
-  it.each(["", "/frostbite", "/play/frostbite", "/a.b/c_d", "/v1-2"])(
+  it.each(["", "/example-game", "/play/example-game", "/a.b/c_d", "/v1-2"])(
     "accepts %j",
     (value) => {
       expect(gameBasePathSchema.safeParse(value).success).toBe(true);
@@ -69,9 +70,9 @@ describe("a game's base path", () => {
 
   it.each([
     "/",
-    "frostbite",
-    "/frostbite/",
-    "//frostbite",
+    "example-game",
+    "/example-game/",
+    "//example-game",
     "/../admin",
     "/./x",
     "/Frostbite",
@@ -92,16 +93,16 @@ describe("the address a player is sent to", () => {
 
   it("is the host itself when the game has the whole host (subdomain style)", () => {
     expect(
-      gamePlayAddress(launch({ url: "https://frostbite.example.com" })),
-    ).toBe("https://frostbite.example.com/");
+      gamePlayAddress(launch({ url: "https://example-game.example.com" })),
+    ).toBe("https://example-game.example.com/");
   });
 
   it("is the host plus the base path when the game lives under a path (domain-path style)", () => {
     expect(
       gamePlayAddress(
-        launch({ basePath: "/play/frostbite", url: "https://example.com" }),
+        launch({ basePath: "/play/example-game", url: "https://example.com" }),
       ),
-    ).toBe("https://example.com/play/frostbite");
+    ).toBe("https://example.com/play/example-game");
   });
 
   it("keeps a port", () => {

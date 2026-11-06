@@ -1,7 +1,7 @@
-import { mediaValidatorVersion, validateImage } from "@ador/media";
-import type { ObjectStoragePort } from "@ador/object-storage/contracts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import type { UploadPolicy } from "@ador/shared/uploads";
+import { mediaValidatorVersion, validateImage } from "@frostbite/media";
+import type { ObjectStoragePort } from "@frostbite/object-storage/contracts";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import type { UploadPolicy } from "@frostbite/shared/uploads";
 
 import { readUpTo } from "./bounded-read.ts";
 import type {

@@ -1,4 +1,4 @@
-import { InvalidAddressError } from "@ador/chain/ports";
+import { InvalidAddressError } from "@frostbite/chain/ports";
 import {
   afterBroadcast,
   afterObservation,
@@ -10,7 +10,7 @@ import {
   type FeeSpeed,
   type SignedTransaction,
   type UnsignedTransaction,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 
 import { buildFailure, contractRefusal } from "./start-failures.ts";
 import { createClaimViewer } from "./claim-steps.ts";

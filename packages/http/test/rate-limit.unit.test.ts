@@ -1,4 +1,4 @@
-import { rateLimitConfigSchema } from "@ador/shared/http";
+import { rateLimitConfigSchema } from "@frostbite/shared/http";
 import { describe, expect, it, vi } from "vitest";
 
 import {

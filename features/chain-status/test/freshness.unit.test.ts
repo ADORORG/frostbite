@@ -1,4 +1,4 @@
-import type { Resource } from "@ador/client-react";
+import type { Resource } from "@frostbite/client-react";
 import { describe, expect, it } from "vitest";
 
 import { freshnessOf, holdReading } from "../src/domain/freshness.ts";

@@ -1,4 +1,4 @@
-import { startState, stepInt } from "@ador/game-sdk/seeded";
+import { startState, stepInt } from "@frostbite/game-sdk/seeded";
 
 // The Sky Nursery, the secret bonus board a won quest opens: a night sky over a cloud nest where Glitchy flies freely, gathers the
 // eggs floating about, hatches them in the nest into baby dragons (each with a name, up to twelve, who fly along behind), dances with

@@ -4,8 +4,8 @@ import { Readable } from "node:stream";
 import type {
   ObjectStoragePort,
   StoredObject,
-} from "@ador/object-storage/contracts";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/object-storage/contracts";
+import { providerIdSchema } from "@frostbite/shared/providers";
 
 export const providerId = providerIdSchema.parse("test-object-storage");
 

@@ -1,4 +1,7 @@
-import { probeFeeSource, type FeeSourceSettings } from "@ador/chain/configured";
+import {
+  probeFeeSource,
+  type FeeSourceSettings,
+} from "@frostbite/chain/configured";
 import type { RewardsChainEnvironment } from "@repo/config/rewards-chain";
 
 // What the platform looks at when it starts: the chosen fee explorer, once. Without a fallback rate an explorer that cannot be read stops the

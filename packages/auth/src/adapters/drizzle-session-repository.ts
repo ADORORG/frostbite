@@ -1,6 +1,6 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { authSessions } from "@ador/database/schema/auth";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { authSessions } from "@frostbite/database/schema/auth";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 
 import type { SessionRepository } from "../application/session-repository.ts";

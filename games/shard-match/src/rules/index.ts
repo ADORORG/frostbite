@@ -1,5 +1,5 @@
-import { fieldsOf, refuse } from "@ador/game-sdk/run-inputs";
-import type { GameVerifier, RunInput } from "@ador/game-sdk/run-record";
+import { fieldsOf, refuse } from "@frostbite/game-sdk/run-inputs";
+import type { GameVerifier, RunInput } from "@frostbite/game-sdk/run-record";
 
 import { cells, verifierId, verifierVersion } from "./constants.ts";
 import { earnedBy } from "./milestones.ts";

@@ -1,7 +1,7 @@
 import {
   gameLaunchSettingsMapSchema,
   type GameLaunchSettings,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { z } from "zod";
 
 import { environmentNames } from "./definitions.ts";

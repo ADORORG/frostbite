@@ -1,6 +1,6 @@
-import type { ExpiringStore } from "@ador/cache/expiring-store";
-import type { Requester } from "@ador/client-http";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { ExpiringStore } from "@frostbite/cache/expiring-store";
+import type { Requester } from "@frostbite/client-http";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 import {
   walletBalanceResponseSchema,

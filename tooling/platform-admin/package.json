@@ -7,17 +7,17 @@
     "env:check": "node --experimental-strip-types ../../packages/config/src/env/check-files.ts",
     "lint": "eslint . --max-warnings 0",
     "mailbox": "tsx src/mailbox-cli.ts",
-    "setup-link": "tsx src/cli.ts",
+    "setup-link": "node --experimental-strip-types src/cli.ts",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts integration",
     "test:coverage": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts coverage"
   },
   "dependencies": {
-    "@ador/authorization": "workspace:*",
-    "@ador/database": "workspace:*",
-    "@ador/feature-accounts": "workspace:*",
-    "@ador/mail": "workspace:*",
+    "@frostbite/authorization": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/feature-accounts": "workspace:*",
+    "@frostbite/mail": "workspace:*",
     "@repo/config": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4"
   },

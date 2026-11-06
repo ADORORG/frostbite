@@ -4,12 +4,12 @@ Baseline: `a6862fe`-descended branch `feat/w8-01-games-catalog`.
 
 ## What was built
 
-- `@ador/shared/games`: the manifest (`schemaVersion` 1: id, title, summary, description, game version, network,
+- `@frostbite/shared/games`: the manifest (`schemaVersion` 1: id, title, summary, description, game version, network,
   external launch with a nullable play address, declared capabilities, declared milestones), `defineGame`,
   `defineGames` (identifiers unique; frozen), and `gameManifestHash` (a digest of every declaration).
   Milestones are data (id, title, description, criteria, `once` or `repeatable`). Declaring them claims nothing.
-- `@ador/feature-games` (new workspace): `/games` and `/games/[slug]`, one "Games" navigation item. It replaces
-  the empty games stub that lived in `@ador/feature-public-products`.
+- `@frostbite/feature-games` (new workspace): `/games` and `/games/[slug]`, one "Games" navigation item. It replaces
+  the empty games stub that lived in `@frostbite/feature-public-products`.
 - `configs/games.ts`: one line per game; FROST·BITE registered with no play address (W8-02 makes it
   configurable), no capabilities and no milestones, since the host protocol and claim path do not exist.
 - `docs/product/game-onboarding.md`: the template, the checks, and the path (GP-00 to GP-08) to milestones minted

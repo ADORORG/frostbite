@@ -1,4 +1,4 @@
-# @ador/game-sdk
+# @frostbite/game-sdk
 
 How a game and the platform talk, and the tools to build, serve and test a game.
 
@@ -10,12 +10,12 @@ the account and (later) minting; the game owns only its rules and its drawing.
 
 ## Public API
 
-- `./protocol`: the versioned message protocol (channel `ador-game`, version 1), as schemas. One `methods` table
+- `./protocol`: the versioned message protocol (channel `frostbite-game`, version 1), as schemas. One `methods` table
   is the source of truth for names, parameters and results.
 - `./client`: `createGameClient()` for a game: `ready`, `progress.load/save`, `milestones.list/unlock/progress/counts`,
   `player.info`, `player.identity` (an opaque per-game id; `player.changed` when it changes on sign-in), `wallet.get` (the connected wallet's public address and network; needs the `wallet` capability), `wallet.connect` (asks the platform to open its wallet chooser; the same capability),
   `milestones.claim` (asks the platform to start a claim of an earned milestone; needs `milestone:claim`; `claim.changed` tells how it goes), `run.start` and `run.submit` (replay-verified runs: a platform seed, then one record per run; the `run:submit` capability), `capabilities.get`, `ui.toast`, and `on(event, handler)` for what the platform tells the game
-  (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`). Failures surface as `GameHostError` with a stable
+  (`wallet.changed`, `lifecycle.changed`, `fullscreen.changed`; and `key.forwarded`, which the client plays back as a key event on `window`, so a game hears keys pressed before the player clicked into it). Failures surface as `GameHostError` with a stable
   code (including `permission_denied` for a capability the game did not declare).
 - `./host`: `createGameHost()` for the platform page (`services` lend it a wallet, a way to open the wallet chooser and a place to show a toast;
   `push` and `emit` send events). `./attach`: `attachGameHost()` connects it to a frame. A message is handled only when its
@@ -27,9 +27,6 @@ the account and (later) minting; the game owns only its rules and its drawing.
   reads and writes; the account is reconciled once before the game's first read, then sent the whole local
   state after each change (one request at a time). A missing account (`signed-out`) ends syncing; a failed
   sync is `pending` and retried with the next change. `status()` is what the page may truthfully say.
-- `./storage-shim`: `createPlatformStorage` gives a game written for `localStorage` a storage kept in memory,
-  with the keys it names saved through `progress.save` (one save after a burst, a refused save retried with the
-  next change). The page that owns the player's data stays the platform.
 - `./cabinets`: `combineCabinets` / `cabinet(rules)` build one verifier from the rules of several cabinets; a record names its
   cabinet in `config.cabinet`, and an unknown or missing name is an `invalid-config` outcome.
 - `./frame-headers`: the response headers (CSP `sandbox allow-scripts`, `connect-src 'none'`, …) the platform
@@ -48,8 +45,13 @@ the account and (later) minting; the game owns only its rules and its drawing.
 - `./audio/panel`: `mountSoundPanel(container, sound, { onChange })` draws the controls every game carries, in the place the game gives
   it (bottom left of the foot, never floating over the game): music and effects each on or off, a volume, M and N as shortcuts, and a
   line that says "Sound starts when you press a key" until a press has unlocked it, or that the browser cannot play sound. Every
-  press wakes a suspended context. Style it with `@import "@ador/game-sdk/audio/panel.css";`. A game that draws a small screen (160x90, 256x144) and scales it up lays its first-screen card over it with `createGuideLayer(screen).show(guide | null)` from `@ador/game-sdk/guide-layer`: a second canvas as big as the screen is shown times the display pixel ratio, so the writing is sharp, not blurred by the scaling. For a phone, `@import "@ador/game-sdk/phone.css";` lays the page of a game out (the bar of readouts, the screen, the buttons under it, the sound panel, the note, the milestones) in one thin row each when held upright, and screen-and-column when held on its side; it applies only inside those two queries (and a touch-only rule that stops a press selecting or flashing), so a desktop page is as the game styled it. A game page has the usual parts (`main`, `.bar`, `.foot`, `#note`, `.actions`, `#pad`, `#sound`, `#earned`). `onChange` is where the game saves
+  press wakes a suspended context. Style it with `@import "@frostbite/game-sdk/audio/panel.css";`. A game that draws a small screen (160x90, 256x144, 640x360: any canvas the page scales up) lays its first-screen card, and the card after a run (a `ResultCard`: rows of text, colour and weight, the weights from `resultWeight`), over it with `createGuideLayer(screen).show(guide | resultCard | null)` from `@frostbite/game-sdk/guide-layer`: a second canvas as big as the screen is shown times the display pixel ratio, so the writing is sharp, not blurred by the scaling. For a phone, `@import "@frostbite/game-sdk/phone.css";` lays the page of a game out. Held upright (or in a narrow window) it is the bar of readouts, the screen, the buttons under it, the sound panel, the note and the milestones in one thin row each; on its side, screen and column (`phone-frame.css`, which `phone.css` imports and which a window with a mouse is not given). On a **touch screen** (`pointer: coarse`) the game is played with the screen itself, so the buttons that were for a mouse go and what stays is drawn over the screen: the readouts as a thin line along the top (clear of the platform's way out, a chip at the top left, and held upright on a line of their own under the icons), the notes at the foot, and three round 44px icons in the top right (pause, music, effects), all inside the safe area. A game makes its screen answer to the hand: `attachZones(screen, { zoneAt, enter, leave, slide, fingersOnly })` from `@frostbite/game-sdk/touch-zones` cuts the screen into zones (`zoneAt` gets a part of the width and height, 0 to 1) and tells the game when a finger enters or leaves one, following each finger on its own (Bro Maria's thumb zones, Aurora Pulse's lanes and Lantern Maze's steering are built on it), and `attachTouchButtons(main, [{ label, press, release }])` from `@frostbite/game-sdk/touch-buttons` draws one to four action buttons (fire, a special move; `main` is the page's main element) in the bottom right corner over the screen, a thumb wide and inside the safe area, on a touch screen only: only the buttons take touches, a finger on one never reaches the screen's zones, each finger holds its own button until it lifts (sliding off keeps it held), a click from the keyboard is a press and a release, and losing focus lets go (more than four actions: cycle them with one button, or give them keys), and `attachTapToStart(screen, startButton)` from `@frostbite/game-sdk/touch-start` makes a tap on a waiting game start a run (only if Start run was on offer when the finger went down and for `restartDelayMs`, so the tap that ends a run does not start the next). A line that names Enter is said for a finger with `byInput(keys, touch)` from `@frostbite/game-sdk/touch`, and a first-screen `Guide` may carry `touchLines`, and `touchStart` (a game that begins something particular, "TAP TO PRACTISE LEVEL 2"), and says "TAP TO START" on a touch screen where it has none. A game page has the usual parts (`main`, `.bar`, `.foot`, `#note`, `.actions`, `#pad`, `#sound`, `#earned`). `onChange` is where the game saves
   the settings.
+- `./best-progress`: what a game keeps for its player when it notes a best: `Progress` (`best`, `sound`), `restore(unknown)` (anything the
+  platform hands back that is not a whole non-negative best is a fresh game), `withBest`, `withSound` and `finishRun(progress, score)`,
+  which keeps the best and says whether the run beat it. `./card`: `Phase`, `RunView` (the best, whether it is new, the phase and the
+  line of news a screen shows beside a run) and `cardFor(phase, guide, result)`, which says what is over the screen: the first-screen
+  card before a run, the card after a run once it is over, nothing while one goes. The words and rows stay in the game.
 - `./controls`: `attachKeys(window, keys, on)` gives every game the same keys. `standardKeys` is Enter (and the numpad Enter) for
   `start` and P for `pause`; a game adds its own (`{ ...standardKeys, Space: "pause", ArrowLeft: "left" }`) or takes Enter or P for
   something else. Held keys do not repeat, Ctrl/Alt/Meta shortcuts and typing in a field are left to the browser, and a handled key is
@@ -62,12 +64,12 @@ the account and (later) minting; the game owns only its rules and its drawing.
   `active()` is true while a run is going and not paused, which is when the player's choices count.
 - `./audio/fake`: a stand-in for the browser's audio for a game's own tests (`installFakeAudio(window)` returns a context that notes each
   tone asked of it), so a test can hear that a game made a sound without a speaker.
-- The conformance runner lives in `@ador/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
+- The conformance runner lives in `@frostbite/test-kit` (`./simulated-game-host`, `./game-conformance`), since it is a
   test tool: `checkGameConformance({ folder, game })` checks a game folder the way the platform will play it.
 
 ## The local test page
 
-`ador-game-dev <game-folder> [--game game.json] [--port 5173]` (and `pnpm game:dev <id>` inside this repository) opens a page
+`frostbite-game-dev <game-folder> [--game game.json] [--port 5173]` (and `pnpm game:dev <id>` inside this repository) opens a page
 that frames the game in the same sandbox, serves its files with the headers the platform gives them, and builds it again on
 every reload. Beside the game is a panel for the platform's side: sign the player in and out (the id changes from this browser's
 to the account's and the game gets `player.changed`), connect a fake wallet and move it between networks (`wallet.changed`),
@@ -76,12 +78,12 @@ send `lifecycle.changed` (tab hidden) and `fullscreen.changed`, take a claim thr
 page needs of the manifest: `{ "id", "capabilities", "milestones" }` (the same fields as the manifest's own). **Everything on the
 panel is made up**: it shows how a game answers each case, not what the platform will decide (runs are not replayed, nothing is
 minted, no failure or slow answer is injected). It needs `esbuild`, the same optional peer as the build.
-`import { startDevHost } from "@ador/game-sdk/dev-host"` starts the same page from code, for a test.
+`import { startDevHost } from "@frostbite/game-sdk/dev-host"` starts the same page from code, for a test.
 
 ## The build-a-game skill
 
 The package ships an AI skill (`skills/build-a-game/` in the repository; the package build copies it to `dist/skill/files`) that takes
-an agent from an idea to a game that passes the platform's checks. `ador-game-skill install [--dir <project>] [--no-agents]` copies it
+an agent from an idea to a game that passes the platform's checks. `frostbite-game-skill install [--dir <project>] [--no-agents]` copies it
 to `<project>/.claude/skills/build-a-game/` and writes a marked block into `AGENTS.md` that points an agent at it (what the project
 wrote around the block is untouched). `update` refreshes it when a newer SDK ships a newer skill; a copy someone edited is kept unless
 `--force` replaces it. `doctor` exits 0 only when the installed copy is the one this SDK ships and `AGENTS.md` points at it. Inside the
@@ -93,7 +95,7 @@ Without this package: `npx skills add <the repository's GitHub link to skills/bu
 
 ## Installing it outside this repository
 
-The package builds to plain JavaScript with declarations (`pnpm --filter @ador/game-sdk build:package`) and is packed
+The package builds to plain JavaScript with declarations (`pnpm --filter @frostbite/game-sdk build:package`) and is packed
 by `pnpm pack`, which runs that build first and swaps the source entries for the built ones (`publishConfig`).
 It depends only on `zod`; `esbuild` is an optional peer, needed only for `./build`. Installing the packed file in an
 empty project, type-checking against its declarations and running a conversation through it was done on

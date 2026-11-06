@@ -1,6 +1,6 @@
 "use client";
 
-import { TransactionLink } from "@ador/feature-chain-status/transaction";
+import { TransactionLink } from "@frostbite/feature-chain-status/transaction";
 import { ArcadeDialog, KeyValueList } from "@repo/ui/arcade";
 
 import { mintedCopy } from "../domain/minted-copy.ts";

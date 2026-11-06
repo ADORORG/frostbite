@@ -6,7 +6,7 @@ Baseline: `107f020` on `feat/studio-bulk-items`.
 
 - Upload intents keep the name the file had (`upload_intents.file_name`, bare name only, bounded, enforced by a
   schema check and by `uploadFileNameSchema`); the library shows it as `fileName` (null for older uploads).
-- `BulkUpload` (`@ador/feature-uploads/bulk`): choose or drop many files; each is checked on sight, sent under
+- `BulkUpload` (`@frostbite/feature-uploads/bulk`): choose or drop many files; each is checked on sight, sent under
   its own idempotency key, and reported on separately. At most the server's per-person unfinished-upload limit
   are being sent, and at most `bulkInFlightLimit` are under way, so the processing queue stays short.
   One shared watcher reads the library once per interval for the whole batch. Retry keeps the file's key and

@@ -1,4 +1,4 @@
-import { assetRejectionReasons } from "@ador/shared/uploads";
+import { assetRejectionReasons } from "@frostbite/shared/uploads";
 import { describe, expect, it } from "vitest";
 
 import { validateImage } from "../src/validate.ts";

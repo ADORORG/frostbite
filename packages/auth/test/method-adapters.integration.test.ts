@@ -8,7 +8,7 @@ import {
   passkeyCredentials,
   runMigrations,
   walletIdentities,
-} from "@ador/database";
+} from "@frostbite/database";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { methodRegistry } from "./support/registry.ts";

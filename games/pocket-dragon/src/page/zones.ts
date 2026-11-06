@@ -1,7 +1,7 @@
 // Thumbs on the screen. The surface is cut into zones; a finger that comes down in one, or slides into one, holds what that zone means
 // until it slides out or comes up. Each finger is followed on its own, so a left thumb can run while a right one jumps. A mouse is left
 // to the keys and buttons, and a press on a button laid over the surface is the button's. A stand-in for the SDK's `attachZones`
-// (`@ador/game-sdk/touch-zones`) in the owners' newer `dev`: switch to it once it is on `dev`.
+// (`@frostbite/game-sdk/touch-zones`) in the owners' newer `dev`: switch to it once it is on `dev`.
 export interface ZoneOptions<Zone extends string> {
   // The zone at a point of the surface (measured from its top left corner) when it is `width` by `height`, or null for none.
   readonly at: (

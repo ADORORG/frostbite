@@ -1,5 +1,5 @@
-import { walletNetworkSchema } from "@ador/shared/chain";
-import { uuidV7TextSchema } from "@ador/shared/identifiers";
+import { walletNetworkSchema } from "@frostbite/shared/chain";
+import { uuidV7TextSchema } from "@frostbite/shared/identifiers";
 import { z } from "zod";
 
 // The wallet sign-in and account-method routes, as contracts: their addresses, and the shapes of what crosses them.
@@ -56,7 +56,7 @@ export const walletAuthRoutes = {
 // The path the signed message names as the page asking for it (the origin comes from the platform's own address).
 export const walletAuthUriPath = "/auth/wallet";
 
-// The networks a wallet may sign in from: the platform-wide vocabulary, stated once in `@ador/shared/chain`.
+// The networks a wallet may sign in from: the platform-wide vocabulary, stated once in `@frostbite/shared/chain`.
 export { walletNetworkSchema };
 
 export const walletChallengeRequestSchema = z.strictObject({

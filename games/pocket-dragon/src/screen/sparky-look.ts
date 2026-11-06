@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import type { Spot } from "../rules/grid.ts";
 import { nookAhead, nooks, sparkyTicks } from "../rules/woods/sparky.ts";

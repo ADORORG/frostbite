@@ -1,4 +1,4 @@
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 import type { SessionMaterial } from "../application/repository.ts";
 import type { StoredPasskeyCredential } from "./sign-in-contracts.ts";

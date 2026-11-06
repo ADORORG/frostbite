@@ -1,8 +1,8 @@
-import { replayRecord, type ReplayOutcome } from "@ador/game-sdk/replay";
-import type { GameVerifier, RunRecord } from "@ador/game-sdk/run-record";
+import { replayRecord, type ReplayOutcome } from "@frostbite/game-sdk/replay";
+import type { GameVerifier, RunRecord } from "@frostbite/game-sdk/run-record";
 
-export type { GameVerifier, Stepped } from "@ador/game-sdk/run-record";
-export type { ReplayOutcome } from "@ador/game-sdk/replay";
+export type { GameVerifier, Stepped } from "@frostbite/game-sdk/run-record";
+export type { ReplayOutcome } from "@frostbite/game-sdk/replay";
 
 // A verifier with its state type folded away, so verifiers of different games sit in one registry.
 export interface Verifier {

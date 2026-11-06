@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 
-import { parseObjectKey } from "@ador/object-storage/contracts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { parseObjectKey } from "@frostbite/object-storage/contracts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import {
   defaultDerivativePolicy,
   defaultUploadPolicy,
   type resolveDerivativePolicy,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { AssetProcessingSubject } from "../../src/application/processing-repository.ts";
 import { createAssetProcessingService } from "../../src/application/processing-service.ts";

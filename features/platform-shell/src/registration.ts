@@ -1,5 +1,5 @@
-import { defineFeature } from "@ador/plugin-kit";
-import { platformStatusRoute } from "@ador/shared/platform";
+import { defineFeature } from "@frostbite/plugin-kit";
+import { platformStatusRoute } from "@frostbite/shared/platform";
 
 export const platformShellFeature = defineFeature({
   manifest: {
@@ -14,7 +14,7 @@ export const platformShellFeature = defineFeature({
     routes: [platformStatusRoute],
   },
   load: async (context) =>
-    import("@ador/feature-platform-shell/entrypoint").then(
+    import("@frostbite/feature-platform-shell/entrypoint").then(
       ({ createPlatformShellEntrypoint }) =>
         createPlatformShellEntrypoint(context),
     ),

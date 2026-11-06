@@ -1,6 +1,6 @@
-import type { DatabaseTransaction } from "@ador/database/connection";
-import { platformRoleAssignments } from "@ador/database/schema/accounts";
-import type { PlatformRole } from "@ador/shared/accounts";
+import type { DatabaseTransaction } from "@frostbite/database/connection";
+import { platformRoleAssignments } from "@frostbite/database/schema/accounts";
+import type { PlatformRole } from "@frostbite/shared/accounts";
 import { and, eq, inArray } from "drizzle-orm";
 
 // Whether the user holds an active assignment of one of the roles, read inside the caller's

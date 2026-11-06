@@ -1,4 +1,4 @@
-import { block, wrap } from "@ador/game-sdk/pixels";
+import { block, wrap } from "@frostbite/game-sdk/pixels";
 
 import {
   arenaX,

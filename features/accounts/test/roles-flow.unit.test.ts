@@ -1,5 +1,5 @@
-import { ApiError, type Requester } from "@ador/client-http";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { ApiError, type Requester } from "@frostbite/client-http";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it } from "vitest";
 
 import { failed } from "../src/client/outcome.ts";
@@ -8,6 +8,7 @@ import {
   findPeople,
   grantRole,
   listPeople,
+  searchPeople,
   suspendRole,
 } from "../src/roles/roles-flow.ts";
 
@@ -51,6 +52,32 @@ describe("reading in the browser", () => {
         path: "/api/v1/admin/roles/find",
       },
     ]);
+  });
+});
+
+describe("searching in the browser", () => {
+  it("reports the people found", async () => {
+    const { request } = answering({ people: [person] });
+    expect(await searchPeople(request, "ada@example.com")).toEqual({
+      kind: "found",
+      people: [person],
+    });
+  });
+
+  it("reports a failure as the outcome the server named", async () => {
+    expect(
+      await searchPeople(
+        failing("unauthorized", "signed-out").request,
+        "ada@example.com",
+      ),
+    ).toEqual(failed("signed-out"));
+  });
+
+  it("does not hide a failure that is not the server's", async () => {
+    const request: Requester = async () => {
+      throw new TypeError("a bug");
+    };
+    await expect(searchPeople(request, "x")).rejects.toThrow("a bug");
   });
 });
 

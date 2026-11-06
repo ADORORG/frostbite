@@ -1,4 +1,4 @@
-import { jsonValueSchema, type JsonValue } from "@ador/shared/chain";
+import { jsonValueSchema, type JsonValue } from "@frostbite/shared/chain";
 
 import { NodeRejectedError, NodeUnavailableError } from "./errors.ts";
 import { isRecord } from "./json.ts";

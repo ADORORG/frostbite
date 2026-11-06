@@ -8,7 +8,7 @@ import { createR2Client } from "../src/r2-client.ts";
 import { s3Environment } from "./support/s3-environment.ts";
 
 const { endpoint, ...credentials } = s3Environment;
-const bucket = "ador-conformance";
+const bucket = "frostbite-conformance";
 const key = "nested/asset.txt";
 const sdk = new S3Client({
   credentials,
@@ -24,7 +24,7 @@ const client = createR2Client(
     endpoint,
     environment: "test",
     privateBucket: bucket,
-    publicBucket: "ador-conformance-public",
+    publicBucket: "frostbite-conformance-public",
     region: "us-east-1",
   },
   sdk,

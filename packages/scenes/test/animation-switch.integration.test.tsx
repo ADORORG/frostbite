@@ -5,7 +5,7 @@ import {
   installReactTestEnvironment,
   mount,
   textOf,
-} from "@ador/test-kit/dom";
+} from "@frostbite/test-kit/dom";
 import { act } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -84,7 +84,7 @@ describe("the animation switch", () => {
   });
 
   it("runs one frame loop while the page is open, and none once it is gone", async () => {
-    const { unmountAll } = await import("@ador/test-kit/dom");
+    const { unmountAll } = await import("@frostbite/test-kit/dom");
     await mount(stage(null));
     expect(browser.looping()).toBe(true);
     await unmountAll();

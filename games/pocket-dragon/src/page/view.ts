@@ -1,4 +1,4 @@
-import { drawGuide } from "@ador/game-sdk/guide";
+import { drawGuide } from "@frostbite/game-sdk/guide";
 
 import { chapterTitles } from "../chapters.ts";
 import { guideFor } from "../guide.ts";

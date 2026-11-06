@@ -1,15 +1,15 @@
 import {
   createDrizzleSubmissionRepository,
   createReviewService,
-} from "@ador/collections";
-import type { UploadsContext } from "@ador/feature-uploads/context";
-import { memoizeUntilFailure } from "@ador/plugin-kit/lazy";
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/collections";
+import type { UploadsContext } from "@frostbite/feature-uploads/context";
+import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import {
   createAssetLibraryService,
   createDrizzleAssetLibraryRepository,
-} from "@ador/uploads";
+} from "@frostbite/uploads";
 
 // Events on one page of the activity log; an engineering bound, not a product quota.
 const activityLimit = 50;

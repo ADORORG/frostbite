@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { lookahead, maxEnergy } from "../src/rules/constants.ts";
-import { startRun, type PulseState } from "../src/rules/state.ts";
+import { type PulseState } from "../src/rules/state.ts";
 import { draw } from "../src/screen/draw.ts";
 import { comboX, energyFill, verdictTicks } from "../src/screen/hud.ts";
 import { hitY, laneWidth, laneX, noteY, topY } from "../src/screen/layout.ts";
@@ -189,26 +189,16 @@ describe("the writing", () => {
     ).not.toContain("Stage 4");
   });
 
-  it("covers the field with a card before a run and after one, saying how it ended", () => {
-    expect(texts(drawn(startRun(9), view("ready")))).toContain("AURORA PULSE");
-    expect(texts(drawn(startRun(9), view("running")))).not.toContain(
-      "AURORA PULSE",
-    );
-    for (const [cause, said] of [
-      ["faded", "THE LIGHT WENT OUT"],
-      ["finished", "TRACK COMPLETE"],
-      ["spent", "THE LIGHT WENT OUT"],
-    ] as const) {
-      const over = drawn(
-        withCounts({ cause, score: 450, tick: 96 + 1024 * 3 }),
-        view("over", { best: 900 }),
+  it("leaves both cards, before a run and after it, to the SDK: the canvas carries none", () => {
+    const text = (phase: "over" | "ready") =>
+      texts(
+        drawn(
+          withCounts({ cause: "faded", score: 450, tick: 96 + 1024 * 3 }),
+          view(phase, { best: 900, newBest: true }),
+        ),
       );
-      expect(texts(over)).toEqual(
-        expect.arrayContaining([said, "STAGE 4   SCORE 450", "BEST 900"]),
-      );
-    }
-    expect(
-      texts(drawn(startRun(9), view("over", { newBest: true }))),
-    ).toContain("NEW BEST!");
+    expect(text("ready")).not.toContain("AURORA PULSE");
+    expect(text("over")).not.toContain("THE LIGHT WENT OUT");
+    expect(text("over")).not.toContain("NEW BEST!");
   });
 });

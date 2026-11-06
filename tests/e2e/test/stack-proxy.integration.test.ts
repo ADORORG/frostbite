@@ -5,7 +5,7 @@ import { request as httpsRequest } from "node:https";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { stackActors, type StackActor } from "../src/manual-stack.ts";

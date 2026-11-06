@@ -1,4 +1,4 @@
-import { uploadPurposes, type UploadPurpose } from "@ador/shared/uploads";
+import { uploadPurposes, type UploadPurpose } from "@frostbite/shared/uploads";
 
 // Display names for every upload purpose, keyed by the exhaustive purpose union.
 export const purposeLabels: Readonly<Record<UploadPurpose, string>> = {

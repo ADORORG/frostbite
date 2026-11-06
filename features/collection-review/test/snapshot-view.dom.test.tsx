@@ -1,4 +1,4 @@
-import { mount, textOf } from "@ador/test-kit/dom";
+import { mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it } from "vitest";
 
 import { SnapshotView } from "../src/ui/components/snapshot-view.tsx";

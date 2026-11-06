@@ -1,8 +1,8 @@
 import {
   creatorAdmissionEvents,
   creatorApplicationSnapshots,
-} from "@ador/database";
-import type { CreatorReviewDecision } from "@ador/shared/creator-admission";
+} from "@frostbite/database";
+import type { CreatorReviewDecision } from "@frostbite/shared/creator-admission";
 import { describe, expect, it } from "vitest";
 
 import {

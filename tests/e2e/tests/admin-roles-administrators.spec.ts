@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { testWallets } from "@ador/auth/test-fixtures";
+import { testWallets } from "@frostbite/auth/test-fixtures";
 import {
   authSessions,
   createDatabaseClient,
@@ -7,8 +7,8 @@ import {
   parseDatabaseEnvironment,
   platformRoleAssignments,
   walletIdentities,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { and, eq } from "drizzle-orm";
 
 import { seededEmails } from "../src/creator-fixtures.ts";

@@ -1,5 +1,5 @@
-import type { MethodRegistry } from "@ador/auth";
-import type { MethodKind } from "@ador/shared/accounts";
+import type { MethodRegistry } from "@frostbite/auth";
+import type { MethodKind } from "@frostbite/shared/accounts";
 
 // The kinds of method an account holds, as authorization asks for them.
 export function createHeldMethodKinds<Context>(

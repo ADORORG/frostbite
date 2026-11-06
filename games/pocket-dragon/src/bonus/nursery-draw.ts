@@ -1,4 +1,4 @@
-import { block, sprite } from "@ador/game-sdk/pixels";
+import { block, sprite } from "@frostbite/game-sdk/pixels";
 
 import { byInput } from "../page/input.ts";
 import { egg } from "../screen/hills-things.ts";

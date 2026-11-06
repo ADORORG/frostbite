@@ -1,4 +1,4 @@
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 
 import { AdminFrame } from "./admin-frame.tsx";
 import { ReviewDetail } from "./review-detail.tsx";

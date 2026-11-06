@@ -1,4 +1,4 @@
-import type { Guide } from "@ador/game-sdk/guide";
+import type { Guide } from "@frostbite/game-sdk/guide";
 
 import { byInput } from "./page/input.ts";
 import type { PlayId } from "./rules/constants.ts";

@@ -1,4 +1,4 @@
-import type { CollectionImportRow } from "@ador/shared/collections";
+import type { CollectionImportRow } from "@frostbite/shared/collections";
 
 import { repository, seedAsset } from "./database.ts";
 import { mutation, newId } from "./fixtures.ts";

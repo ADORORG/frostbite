@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { createDrizzleContractStore } from "@ador/database/game-contracts";
+import { createDrizzleContractStore } from "@frostbite/database/game-contracts";
 import {
   gameAdminSteps,
   gameContracts,
@@ -10,20 +10,16 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
-import {
-  chainRefSchema,
-  type Address,
-  type TransactionIntent,
-} from "@ador/shared/chain";
-import { maxAdminPayloadChars } from "@ador/shared/games";
-import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
-import { simulatedAddress } from "@ador/test-kit/simulated-chain-address";
+} from "@frostbite/database";
+import { chainRefSchema, type Address } from "@frostbite/shared/chain";
+import { maxAdminPayloadChars } from "@frostbite/shared/games";
+import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
+import { simulatedAddress } from "@frostbite/test-kit/simulated-chain-address";
 import {
   nativeAsset,
   signSimulated,
   simulatedFamily,
-} from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/test-kit/simulated-chain-transaction";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleGameAdminRepository } from "../../src/drizzle-repository.ts";
@@ -34,6 +30,20 @@ import type {
   RewardsPlan,
   StartStepInput,
 } from "../../src/types.ts";
+
+import {
+  chainAvailable,
+  chainFailure,
+  builtIntents,
+  placement,
+  hideCreated,
+  inspected,
+  indexer,
+  lostSend,
+  broadcastGate,
+} from "./switches.ts";
+
+export * from "./switches.ts";
 
 export { signSimulated };
 export const environment = parseDatabaseEnvironment(process.env);
@@ -79,31 +89,6 @@ export const rewards: RewardsPlan = {
   publishable: [gameTemplate, collectibleTemplate],
 };
 export const contracts = createDrizzleContractStore(database);
-export const chainAvailable = { value: true };
-// Makes the chain fail to build, or build a transaction larger than the platform keeps.
-export const chainFailure = { build: false, oversize: false };
-// The intents the chain was asked to build, oldest first.
-export const builtIntents: TransactionIntent[] = [];
-// Makes the chain find no free address for a template.
-export const placement = { exhausted: false };
-// Makes the chain say nothing of what a step created.
-export const hideCreated = { value: false };
-// What the chain says of a contract staff enter by hand: whether code is there, its hash, or that the node cannot be asked.
-export const inspected: {
-  codeHash: string | null;
-  down: boolean;
-  exists: boolean;
-} = { codeHash: null, down: false, exists: false };
-// How far behind the tip the chain's indexer is, or that the node cannot be asked.
-export const indexer = { behind: 0, down: false };
-// Makes the next broadcast end as the real adapter does when its node cannot be reached: ambiguous, never received.
-export const lostSend = { always: false, next: false };
-// Held broadcasts, so two steps on one transaction can be made to overlap.
-export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
-  enabled: false,
-  held: [],
-};
-
 function ports(): AdminChainPorts {
   const { addressCodec, broadcaster, builder, contracts, observer } =
     network.adapter.ports;
@@ -128,6 +113,7 @@ function ports(): AdminChainPorts {
     builder: {
       build: async (...asked) => {
         builtIntents.push(asked[0]);
+        if (chainFailure.build === "opaque") throw "the node is down";
         if (chainFailure.build) throw new Error("the node is down");
         const built = await builder.build(...asked);
         return chainFailure.oversize

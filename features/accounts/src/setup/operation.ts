@@ -1,6 +1,8 @@
-import type { SetupLinkService } from "@ador/authorization";
-import type { HttpOperation } from "@ador/http";
-import { failure, unauthenticated } from "@ador/http/outcome";
+import type { SetupLinkService } from "@frostbite/authorization";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+
+import { outcomeFailure } from "../application/outcomes.ts";
 
 import {
   redeemSetupLinkRequestSchema,
@@ -11,10 +13,7 @@ import {
 } from "./contract.ts";
 
 // One answer for a link that is unknown, expired, replaced or spent, so a caller learns nothing about which it was.
-const invalidLink = failure(
-  "not_found",
-  "This setup link is not valid, or it has expired.",
-);
+const invalidLink = outcomeFailure("setup-link-invalid");
 
 // Opening a setup link while signed in. The account that becomes administrator is the session's own, never one the request names.
 export function createRedeemSetupLinkOperation(
@@ -35,8 +34,8 @@ export function createRedeemSetupLinkOperation(
         case "already-used-by-you":
           return { ok: true, value: { status: result.kind } };
         case "needs-method":
-          return failure(
-            "conflict",
+          return outcomeFailure(
+            "setup-method-needed",
             `Add a ${result.missing.join(" and ")} sign-in method to this account first, then open the link again.`,
           );
         case "invalid-link":

@@ -2,7 +2,7 @@ import {
   uploadPurposes,
   type LibraryAsset,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import type { FilterOption } from "@repo/ui/arcade";
 
 import { purposeLabels } from "./purpose-labels.ts";

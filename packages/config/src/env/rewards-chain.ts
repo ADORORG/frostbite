@@ -1,4 +1,4 @@
-import { feeApiFormatSchema, type FeeApiFormat } from "@ador/shared/chain";
+import { feeApiFormatSchema, type FeeApiFormat } from "@frostbite/shared/chain";
 import { z } from "zod";
 
 const blankAsUnset = (value: string | undefined) =>

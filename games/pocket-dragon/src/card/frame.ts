@@ -1,4 +1,4 @@
-import { block } from "@ador/game-sdk/pixels";
+import { block } from "@frostbite/game-sdk/pixels";
 
 import { colour } from "../screen/palette.ts";
 import { drawArt } from "./art.ts";

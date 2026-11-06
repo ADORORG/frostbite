@@ -1,5 +1,5 @@
-import type { Requester } from "@ador/client-http";
-import type { PlatformRole } from "@ador/shared/accounts";
+import type { Requester } from "@frostbite/client-http";
+import type { PlatformRole } from "@frostbite/shared/accounts";
 
 import { failedFrom, type Failed } from "../client/outcome.ts";
 import {
@@ -35,6 +35,21 @@ export async function findPeople(
       body: { query },
     })
   ).people;
+}
+
+// What looking a person up did: the accounts that match, or why not, from the catalogue of outcomes.
+export type SearchOutcome =
+  { readonly kind: "found"; readonly people: readonly Person[] } | Failed;
+
+export async function searchPeople(
+  request: Requester,
+  query: string,
+): Promise<SearchOutcome> {
+  try {
+    return { kind: "found", people: await findPeople(request, query) };
+  } catch (error) {
+    return failedFrom(error);
+  }
 }
 
 export async function grantRole(

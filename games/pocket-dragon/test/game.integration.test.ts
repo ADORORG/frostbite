@@ -1,9 +1,9 @@
 import { runInNewContext } from "node:vm";
 import { join } from "node:path";
 
-import { bundleVerifier } from "@ador/game-sdk/build";
-import { replayRecord } from "@ador/game-sdk/replay";
-import type { RunRecord } from "@ador/game-sdk/run-record";
+import { bundleVerifier } from "@frostbite/game-sdk/build";
+import { replayRecord } from "@frostbite/game-sdk/replay";
+import type { RunRecord } from "@frostbite/game-sdk/run-record";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { instructions } from "../src/guide.ts";
@@ -25,7 +25,7 @@ describe("the verifier the game publishes", () => {
     expect(built?.bytes ?? 0).toBeLessThan(200_000);
     const scope: Record<string, unknown> = {};
     runInNewContext(built?.code ?? "", scope);
-    const replay = scope.__adorReplay;
+    const replay = scope.__frostbiteReplay;
     if (typeof replay !== "function") throw new Error("no replay");
     const verdict = (record: RunRecord): unknown =>
       JSON.parse(String(replay(JSON.stringify(record))));

@@ -8,8 +8,8 @@ import {
   type AuthorizationPolicy,
   type Capability,
   type OrganizationRole,
-} from "@ador/shared/accounts";
-import { createUuidV7, type UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/accounts";
+import { createUuidV7, type UuidV7 } from "@frostbite/shared/identifiers";
 
 import type {
   AccountRepository,

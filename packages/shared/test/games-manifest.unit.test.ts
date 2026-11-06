@@ -40,15 +40,19 @@ const manifest = (overrides: Partial<GameManifest> = {}): GameManifest => ({
   network: chain,
   schemaVersion: 1,
   summary: "A sample game.",
+  tags: ["arcade"],
   title: "Sample game",
   version: "1.2.3",
   ...overrides,
 });
 
 describe("game identifiers", () => {
-  it.each(["frostbite", "sample-game", "game-2", "ab"])("accepts %s", (id) => {
-    expect(gameIdSchema.safeParse(id).success).toBe(true);
-  });
+  it.each(["example-game", "sample-game", "game-2", "ab"])(
+    "accepts %s",
+    (id) => {
+      expect(gameIdSchema.safeParse(id).success).toBe(true);
+    },
+  );
 
   it.each([
     "",
@@ -65,7 +69,7 @@ describe("game identifiers", () => {
   });
 
   it("builds the page address from the identifier", () => {
-    expect(gameHref("frostbite")).toBe("/games/frostbite");
+    expect(gameHref("example-game")).toBe("/games/example-game");
   });
 });
 
@@ -103,6 +107,14 @@ describe("a game manifest", () => {
     ["a capability that does not exist", { capabilities: ["root"] }],
     ["a capability twice", { capabilities: ["wallet", "wallet"] }],
     ["two milestones with one id", { milestones: [milestone, milestone] }],
+    ["no tags", { tags: [] }],
+    ["tags left out", { tags: undefined }],
+    ["a tag that is not on the platform's list", { tags: ["Arcade"] }],
+    ["a tag twice", { tags: ["arcade", "arcade"] }],
+    [
+      "more tags than a card can carry",
+      { tags: ["action", "arcade", "endless", "puzzle", "reflex"] },
+    ],
     ["a blank title", { title: "  " }],
     ["a blank summary", { summary: "" }],
     ["a chain that is not a chain reference", { network: "signet" }],

@@ -1,4 +1,4 @@
-import { sprite } from "@ador/game-sdk/pixels";
+import { sprite } from "@frostbite/game-sdk/pixels";
 
 import { kitSpots } from "../rules/castle/places.ts";
 import type { CastleState, Spot } from "../rules/castle/types.ts";

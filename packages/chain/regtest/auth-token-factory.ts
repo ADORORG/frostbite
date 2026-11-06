@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { Address } from "@ador/shared/chain";
+import type { Address } from "@frostbite/shared/chain";
 
 import { sha256Hex } from "../src/bitcoin-alkanes/admin/data.ts";
 import { templateKey } from "../src/bitcoin-alkanes/admin/templates.ts";

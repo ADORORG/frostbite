@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { outcomeMessage } from "@ador/shared/account-outcomes";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import { outcomeMessage } from "@frostbite/shared/account-outcomes";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import {
@@ -19,6 +19,7 @@ const flow = vi.hoisted(() => ({
   findPeople: vi.fn(),
   grantRole: vi.fn(),
   listPeople: vi.fn(),
+  searchPeople: vi.fn(),
   suspendRole: vi.fn(),
 }));
 vi.mock("../src/roles/roles-flow.ts", () => flow);

@@ -3,7 +3,7 @@ import { plays } from "./zones.ts";
 // A tap on the screen starts a run when none is going, as Enter and the Start button do. A tap is a finger that comes down and lifts again
 // soon and close by, both while a run may start; one that came down during a run, or within a moment of the last touch of one, does not
 // count, so a thumb still busy when a run ends does not start the next before the player has seen how it went. A stand-in for the SDK's
-// `attachTapToStart` (`@ador/game-sdk/touch-start`) in the owners' newer `dev`: switch to it once it is on `dev`.
+// `attachTapToStart` (`@frostbite/game-sdk/touch-start`) in the owners' newer `dev`: switch to it once it is on `dev`.
 export const settleMs = 600;
 export const tapMs = 800;
 export const tapPx = 32;

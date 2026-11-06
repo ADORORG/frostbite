@@ -6,8 +6,8 @@ import {
   settle,
   textOf,
   typeInto,
-} from "@ador/test-kit/dom";
-import { idempotencyKeySchema } from "@ador/shared/http";
+} from "@frostbite/test-kit/dom";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
 import { describe, expect, it, vi } from "vitest";
 
 import { ItemsStep } from "../src/ui/components/items-step.tsx";

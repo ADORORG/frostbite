@@ -1,6 +1,6 @@
 "use client";
 
-import { useResource, type Resource } from "@ador/client-react";
+import { useResource, type Resource } from "@frostbite/client-react";
 import { useEffect } from "react";
 
 // A value the platform is asked for when the page opens and then every `refreshMs` while the tab shows. A failed ask keeps the last

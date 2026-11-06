@@ -1,5 +1,5 @@
-import type { AuthorizationPolicy } from "@ador/shared/accounts";
-import { createUuidV7 } from "@ador/shared/identifiers";
+import type { AuthorizationPolicy } from "@frostbite/shared/accounts";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import type { AccountRepository } from "../src/application/account-repository.ts";

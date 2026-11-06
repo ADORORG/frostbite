@@ -3,8 +3,8 @@ import type {
   MethodKind,
   OrganizationRole,
   PlatformRole,
-} from "@ador/shared/accounts";
-import type { UuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/accounts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 export interface OrganizationAccessRecord {
   readonly membershipStatus: AccountStatus;

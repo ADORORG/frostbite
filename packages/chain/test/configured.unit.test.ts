@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { chainRefSchema, type ChainConfig } from "@ador/shared/chain";
+import { chainRefSchema, type ChainConfig } from "@frostbite/shared/chain";
 import { describe, expect, it } from "vitest";
 
 import {

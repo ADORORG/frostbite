@@ -1,8 +1,8 @@
 import {
   creatorStandingCopy,
   type CreatorApplicationState,
-} from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 

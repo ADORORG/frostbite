@@ -1,10 +1,10 @@
-# `@ador/game-admin`
+# `@frostbite/game-admin`
 
 The steps staff take on the platform's rewards contracts: publish a template, create a game's contract, define a milestone (with its
 drawing), and pause or resume claims. Build the transaction, keep what staff were shown and signed, send it, and follow it until the
 chain agrees, and record what it made. Decisions: ADR-018
 Amendment 3 (no platform key; staff sign each step by hand; any admin may pause and resume, logged) and its D19/D22 note.
-Works through the chain-neutral ports (`@ador/chain`), tested on the simulated chain; the `bitcoin-alkanes` adapter builds the
+Works through the chain-neutral ports (`@frostbite/chain`), tested on the simulated chain; the `bitcoin-alkanes` adapter builds the
 same steps (`packages/chain/src/bitcoin-alkanes/admin`).
 
 ## Public API
@@ -25,8 +25,8 @@ same steps (`packages/chain/src/bitcoin-alkanes/admin`).
   from are published; null for a game the service does not administer.
 - `templates()`: the templates published on the rewards chain, and where.
 
-`createDrizzleGameAdminRepository(database, { clock })` stores steps in `ador.game_admin_steps`. What completed steps made is read
-through the `ContractStore` of `@ador/database/game-contracts` (`ador.published_templates`, `ador.game_contracts`), which the
+`createDrizzleGameAdminRepository(database, { clock })` stores steps in `frostbite.game_admin_steps`. What completed steps made is read
+through the `ContractStore` of `@frostbite/database/game-contracts` (`frostbite.published_templates`, `frostbite.game_contracts`), which the
 repository writes to in the same transaction that completes the step.
 
 ## Invariants
@@ -45,7 +45,7 @@ repository writes to in the same transaction that completes the step.
 - A step is about one game, or (publishing a template) about none; the table's checks keep each operation's subject and contract
   coherent (`subject_coherent`, `contract_coherent`).
 - The lifecycle (`canMove`, `afterObservation`, `afterBroadcast`, `moveTo`) and the stored-row mapping are shared with
-  `@ador/game-claims` through `@ador/shared/chain`; the table's columns and checks through `@ador/database`
+  `@frostbite/game-claims` through `@frostbite/shared/chain`; the table's columns and checks through `@frostbite/database`
   (`tracked-transaction.ts`).
 
 ## Not here
@@ -55,7 +55,7 @@ The routes and page (`features/game-admin`); the signer; reading a creation's ad
 
 ## Tests
 
-`pnpm --filter @ador/game-admin test:integration` (the service end to end on the simulated chain against real PostgreSQL:
+`pnpm --filter @frostbite/game-admin test:integration` (the service end to end on the simulated chain against real PostgreSQL:
 lifecycle, in-progress reuse, refusals, rejection, revert, expiry, concurrency, the table's constraints), `test:coverage`.
 Mutation proof: `references/game-admin-task-record.md`.
 

@@ -1,4 +1,4 @@
-import { sprite } from "@ador/game-sdk/pixels";
+import { sprite } from "@frostbite/game-sdk/pixels";
 
 import { cages, chests, panels, valves } from "../rules/woods/base-map.ts";
 import { countdownLeft, laserPhase, waveAt } from "../rules/woods/lair.ts";

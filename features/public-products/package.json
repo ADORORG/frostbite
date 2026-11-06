@@ -1,5 +1,5 @@
 {
-  "name": "@ador/feature-public-products",
+  "name": "@frostbite/feature-public-products",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,8 +17,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/plugin-kit": "workspace:*",
-    "@ador/scenes": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/scenes": "workspace:*",
     "@repo/ui": "workspace:*",
     "react": "19.2.8"
   },

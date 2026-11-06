@@ -1,5 +1,5 @@
-import { ScenesProvider } from "@ador/scenes/react";
-import { WalletProvider } from "@ador/wallet/client";
+import { ScenesProvider } from "@frostbite/scenes/react";
+import { WalletProvider } from "@frostbite/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -19,6 +19,7 @@ async function render(
   games: Parameters<typeof createGamesEntrypoint>[0],
   path: "/games" | "/games/[slug]",
   slug?: string,
+  searchParams?: Readonly<Record<string, string | readonly string[]>>,
 ) {
   const page = createGamesEntrypoint(
     games,
@@ -36,6 +37,7 @@ async function render(
           actorUserId: null,
           navigation: [],
           params: slug === undefined ? {} : { slug },
+          searchParams,
         })}
       </WalletProvider>
     </ScenesProvider>,
@@ -58,6 +60,22 @@ describe("the games index", () => {
     expect(markup).toContain("Playable");
     expect(markup).toContain("Not playable yet");
     expect(markup).toContain("Bitcoin signet");
+  });
+
+  it("opens already narrowed when the address asks for it, so a shared link shows the same games on the first paint", async () => {
+    const games = [templateGame, bareGame, embeddedGame];
+    const narrowed = await render(games, "/games", undefined, {
+      q: "embedded",
+    });
+    expect(narrowed).toContain('value="embedded"');
+    expect(narrowed).toContain('href="/games/embedded-game"');
+    expect(narrowed).not.toContain('href="/games/template-game"');
+    expect(narrowed).not.toContain('href="/games/bare-game"');
+    const none = await render(games, "/games", undefined, { q: "zzzz" });
+    expect(none).toContain("No games match");
+    // An address with nothing the page knows about shows every game.
+    const plain = await render(games, "/games", undefined, { utm: "x" });
+    expect(plain).toContain('href="/games/bare-game"');
   });
 
   it("shows each game as a preview in a numbered wall, with a stand-in where there is no cover", async () => {

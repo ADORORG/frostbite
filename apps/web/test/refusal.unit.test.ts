@@ -1,4 +1,4 @@
-import { httpErrorEnvelopeSchema } from "@ador/shared/http";
+import { httpErrorEnvelopeSchema } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
 import { refusal } from "../src/server/http/refusal";

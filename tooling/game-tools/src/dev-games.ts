@@ -1,4 +1,4 @@
-import type { DevGame } from "@ador/game-sdk/dev-host";
+import type { DevGame } from "@frostbite/game-sdk/dev-host";
 
 // What the local test page needs of a registered game, taken from its manifest: who it is, what it asks for, and its milestones.
 // A manifest that is not in the list is refused with the ids that are, so a typo is seen at once.

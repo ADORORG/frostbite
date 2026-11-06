@@ -3,9 +3,12 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
-import type { AccountPort } from "@ador/game-sdk/synced-backend";
-import { gameSyncRoute, syncGameStateResponseSchema } from "@ador/shared/games";
+} from "@frostbite/client-http";
+import type { AccountPort } from "@frostbite/game-sdk/synced-backend";
+import {
+  gameSyncRoute,
+  syncGameStateResponseSchema,
+} from "@frostbite/shared/games";
 
 // How long a sync may take before it counts as failed. The game's first read waits for the first sync, and a
 // game gives up on the platform after ten seconds, so this leaves the game time to start from the browser's

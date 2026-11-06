@@ -3,7 +3,7 @@ import {
   createDrizzleRoleDirectory,
   createRoleAdministration,
   createRoleDirectory,
-} from "@ador/authorization";
+} from "@frostbite/authorization";
 import { parseAuthSessionEnvironment } from "@repo/config/env";
 
 import { createHeldMethodKinds } from "../held-method-kinds.ts";

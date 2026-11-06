@@ -3,10 +3,10 @@ import { Readable } from "node:stream";
 import type {
   ObjectStoragePort,
   PresignedUpload,
-} from "@ador/object-storage/contracts";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { providerIdSchema } from "@ador/shared/providers";
+} from "@frostbite/object-storage/contracts";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { providerIdSchema } from "@frostbite/shared/providers";
 import { vi } from "vitest";
 
 import type {

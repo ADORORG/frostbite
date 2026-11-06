@@ -1,4 +1,4 @@
-import { defineGame } from "@ador/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 
 import { targetChains } from "../chains.ts";
 
@@ -111,12 +111,13 @@ export const auroraPulseGame = defineGame({
   schemaVersion: 1,
   summary:
     "Tap four lanes of falling notes in time, and keep the light of the aurora burning.",
+  tags: ["rhythm", "arcade"],
   title: "Aurora Pulse",
   verification: {
     replay: {
       id: "aurora-pulse",
       sha256:
-        "64486f801025e6d92b3dcf6b8898f9f489360c6ea2894d5705d02a9fb3aef911",
+        "ffae75e641eacec2574d683a7448faa57ca1cd96f9ccad5a43d1382d7f0d82cf",
       version: 1,
     },
   },

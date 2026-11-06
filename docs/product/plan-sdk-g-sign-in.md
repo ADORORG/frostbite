@@ -51,7 +51,7 @@ widget (SDK-F, #55), which is the screen on top of it.
 
 ### 4.1 An identity-method port (the adapter pattern)
 
-A small port in `@ador/auth`, so the account does not care which method proved the person:
+A small port in `@frostbite/auth`, so the account does not care which method proved the person:
 
 ```
 IdentityMethod  { id: "wallet" | "passkey" | "email"; list(userId); link(...); unlink(...); canSignIn: boolean }
@@ -66,7 +66,7 @@ IdentityMethod  { id: "wallet" | "passkey" | "email"; list(userId); link(...); u
   rule is inside the passkey service; it moves to the port so wallet and passkey unlinking use the same function.
   (The rule counts methods across all adapters, so it cannot live inside one of them.)
 
-### 4.2 Server (new, in `@ador/auth` and the accounts feature)
+### 4.2 Server (new, in `@frostbite/auth` and the accounts feature)
 
 - Routes (authenticated or not as noted, all POST/GET JSON, same-origin, rate limited like the passkey routes):
   - `POST /api/v1/auth/wallet/challenge` (public): `{ address, network, walletAdapter, action: "sign-in" }`.
@@ -89,11 +89,11 @@ IdentityMethod  { id: "wallet" | "passkey" | "email"; list(userId); link(...); u
 
 ### 4.3 Client (the widget's logic, not its look)
 
-- A hook in a new client module of `@ador/wallet`/the accounts feature (not in the games feature):
+- A hook in a new client module of `@frostbite/wallet`/the accounts feature (not in the games feature):
   `useWalletSession()` returns `{ wallet, account, methods, signIn(), link(), unlink(id), signOut(), state }`, where
   `state` has explicit values (`disconnected`, `connected-signed-out`, `signing`, `signed-in`, `not-linked`,
   `failed(reason)`), so the widget never shows "signed in" before the server said so.
-- The wallet **connection** stays the existing library boundary (`@ador/wallet/client`); nothing in a feature calls an
+- The wallet **connection** stays the existing library boundary (`@frostbite/wallet/client`); nothing in a feature calls an
   extension directly. Signing goes through the normalized `signMessage` it already exposes.
 - The widget (SDK-F) consumes this hook. SDK-G ships the hook and a plain "connect, sign in, methods" panel that
   replaces the qualification page; SDK-F replaces that panel with the header widget.

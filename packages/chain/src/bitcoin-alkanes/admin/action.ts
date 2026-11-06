@@ -1,4 +1,4 @@
-import type { TransactionIntent } from "@ador/shared/chain";
+import type { TransactionIntent } from "@frostbite/shared/chain";
 
 import type { Call } from "../tx/call-script.ts";
 import { milestoneKey } from "../milestone-key.ts";

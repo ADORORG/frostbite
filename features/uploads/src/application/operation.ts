@@ -1,13 +1,18 @@
-import type { HttpOperation } from "@ador/http";
-import { idempotencyKeyConflict } from "@ador/http/outcome";
+import type { HttpOperation } from "@frostbite/http";
+import {
+  idempotencyKeyConflict,
+  unauthenticated,
+} from "@frostbite/http/outcome";
 import {
   createUploadIntentInputSchema,
   uploadIntentResponseSchema,
   uploadIntentRoutes,
   type CreateUploadIntentInput,
   type UploadIntentResponse,
-} from "@ador/shared/uploads";
-import type { createUploadIntentService } from "@ador/uploads";
+} from "@frostbite/shared/uploads";
+import type { createUploadIntentService } from "@frostbite/uploads";
+
+import { uploadFailure } from "./outcomes.ts";
 
 type Service = ReturnType<typeof createUploadIntentService>;
 
@@ -18,13 +23,7 @@ export function createUploadIntentOperation(
     access: { kind: "authenticated" },
     applicationErrors: ["conflict", "invalid_request", "unauthorized"],
     execute: async (input, context) => {
-      if (context.actorUserId === null) {
-        return {
-          error: "unauthorized",
-          message: "Authentication is required.",
-          ok: false,
-        } as const;
-      }
+      if (context.actorUserId === null) return unauthenticated;
       if (context.idempotencyKey === undefined)
         throw new Error("Idempotency boundary missing");
       const result = await (
@@ -35,17 +34,9 @@ export function createUploadIntentOperation(
       });
       if (result.kind === "conflict") return idempotencyKeyConflict;
       if (result.kind === "quota-exceeded")
-        return {
-          error: "conflict",
-          message: "The active upload limit has been reached.",
-          ok: false,
-        } as const;
+        return uploadFailure("upload-limit-reached");
       if (result.kind === "invalid-size")
-        return {
-          error: "invalid_request",
-          message: "The file exceeds the limit for this upload purpose.",
-          ok: false,
-        } as const;
+        return uploadFailure("file-over-limit");
       return {
         ok: true,
         value: {

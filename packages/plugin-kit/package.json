@@ -1,5 +1,5 @@
 {
-  "name": "@ador/plugin-kit",
+  "name": "@frostbite/plugin-kit",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -19,8 +19,8 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@ador/http": "workspace:*",
-    "@ador/shared": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/shared": "workspace:*",
     "react": "19.2.8"
   },
   "devDependencies": {

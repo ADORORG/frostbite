@@ -7,9 +7,14 @@ import {
   type HostedGame,
   type HostEvent,
   type HostServices,
-} from "@ador/game-sdk/host";
-import type { GameHostPolicy } from "@ador/game-sdk/policy";
-import type { EventMessage, Response } from "@ador/game-sdk/protocol";
+  type RunsService,
+} from "@frostbite/game-sdk/host";
+import type { GameHostPolicy } from "@frostbite/game-sdk/policy";
+import type {
+  EventMessage,
+  JsonValue,
+  Response,
+} from "@frostbite/game-sdk/protocol";
 
 export interface SimulatedGame {
   // Closes the page the game ran in.
@@ -102,5 +107,33 @@ export function runGameInSimulatedHost(options: {
     pushes,
     replies,
     window,
+  };
+}
+
+// A page that gives a game one run on the platform's seed, and keeps every record the game hands back, so a test can see that a
+// finished run was sent (and for which run). Lend it with `services: { runs }`, and give the game the `run:submit` capability.
+export function recordingRuns(seed = 424_242): {
+  readonly runs: RunsService;
+  readonly submitted: readonly {
+    readonly record: JsonValue;
+    readonly runId: string;
+  }[];
+} {
+  const submitted: { readonly record: JsonValue; readonly runId: string }[] =
+    [];
+  return {
+    runs: {
+      start: async () => ({
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        runId: "run-1",
+        seed,
+        status: "started",
+      }),
+      submit: async (runId, record) => {
+        submitted.push({ record, runId });
+        return { earned: [], status: "verified" };
+      },
+    },
+    submitted,
   };
 }

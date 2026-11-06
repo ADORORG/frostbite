@@ -9,12 +9,12 @@ import {
   parseDatabaseEnvironment,
   publishedTemplates,
   runMigrations,
-} from "@ador/database";
-import type { GameAdminStep } from "@ador/shared/games";
-import { correlationIdSchema } from "@ador/shared/http";
-import { uuidV7Schema } from "@ador/shared/identifiers";
-import { createSimulatedChain } from "@ador/test-kit/simulated-chain";
-import { nativeAsset } from "@ador/test-kit/simulated-chain-transaction";
+} from "@frostbite/database";
+import type { GameAdminStep } from "@frostbite/shared/games";
+import { correlationIdSchema } from "@frostbite/shared/http";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
+import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
+import { nativeAsset } from "@frostbite/test-kit/simulated-chain-transaction";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import {

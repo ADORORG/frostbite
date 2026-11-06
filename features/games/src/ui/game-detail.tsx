@@ -1,5 +1,5 @@
-import { gamesPath } from "@ador/shared/games";
-import type { NavigationItem } from "@ador/plugin-kit/navigation";
+import { gamesPath } from "@frostbite/shared/games";
+import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import {
   ArcadeBadge,
   ArcadeButton,

@@ -1,14 +1,14 @@
-import { registerHttpOperation } from "@ador/http/registered-operation";
-import type { FeatureEntrypoint } from "@ador/plugin-kit";
-import { privatePage } from "@ador/plugin-kit/page-metadata";
-import type { ChainOption } from "@ador/shared/chain";
-import { homeSectionOrder } from "@ador/shared/platform";
+import { registerHttpOperation } from "@frostbite/http/registered-operation";
+import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
+import { privatePage } from "@frostbite/plugin-kit/page-metadata";
+import type { ChainOption } from "@frostbite/shared/chain";
+import { homeSectionOrder } from "@frostbite/shared/platform";
 import {
   gamePagePath,
   gamesPath,
   myMilestonesPath,
   type GameManifest,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 import {
   createListGameClaimsOperation,
@@ -26,6 +26,7 @@ import {
 } from "./application/runs-operations.ts";
 import { createSyncGameStateOperation } from "./application/sync-operation.ts";
 import { createGameCatalog } from "./domain/catalog.ts";
+import { parseGameQuery, searchParamsOf } from "./domain/game-query.ts";
 import type { GameClaimsConfig } from "./claims-config.ts";
 import { createGameClaimsResolver } from "./claims-runtime.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
@@ -89,12 +90,16 @@ export function createGamesEntrypoint(
         metadata: () =>
           catalog.list().length === 0 ? privatePage : gamesIndexMetadata,
         path: gamesPath,
-        render: ({ navigation }) => {
+        render: ({ navigation, searchParams = {} }) => {
           const list = catalog.list();
           return list.length === 0 ? (
             <NoGames navigation={navigation} />
           ) : (
-            <GamesIndex games={list} navigation={navigation} />
+            <GamesIndex
+              games={list}
+              initial={parseGameQuery(searchParamsOf(searchParams))}
+              navigation={navigation}
+            />
           );
         },
       },

@@ -12,7 +12,7 @@ import { findContainer, wipe } from "../src/durable-container.ts";
 import { startDurableS3Runtime } from "../src/s3-durable.ts";
 
 const id = randomUUID().slice(0, 8);
-const container = `ador-test-s3-keep-${id}`;
+const container = `frostbite-test-s3-keep-${id}`;
 const volume = `${container}-data`;
 const secret = randomUUID();
 const clientFor = (endpoint: string, accessKeyId: string) =>

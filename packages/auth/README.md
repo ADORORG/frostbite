@@ -1,4 +1,4 @@
-# `@ador/auth`
+# `@frostbite/auth`
 
 Detachable, server-only Bitcoin wallet authentication, passkey linking, and session lifecycle logic.
 
@@ -34,7 +34,7 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
 - `createContactCodeService` (`src/contacts/`, with `createDrizzleContactCodeRepository`) signs a person in with a one-time code
   sent to a contact. It is the same for every channel: a `ContactChannel` says how a destination is written (`normalize`), how a
   code is delivered (`deliver`), and its policy (digits, lifetime, tries, resend cooldown, sends per window); `createEmailChannel`
-  is the email one (over the `MailSender` port of `@ador/mail`) and a text-message channel would be another. `request` normalizes
+  is the email one (over the `MailSender` port of `@frostbite/mail`) and a text-message channel would be another. `request` normalizes
   the destination, then issues under a per-destination lock (cooldown and window limits are decided where two requests together
   cannot both slip under them; a newer code replaces the older ones), sends it, and forgets the code if the send failed. `verify`
   counts a try before it compares (so tries cannot be dodged), checks the salted hash in constant time, then spends the code and
@@ -49,7 +49,12 @@ Detachable, server-only Bitcoin wallet authentication, passkey linking, and sess
   mailbox, the code is spent, and nothing moves and nothing says whose it is (ADR-021 point 5). Removing needs a recent sign-in and
   never takes the last way in (the registry's `removalOutcome`), under the account's lock. Both replace every session of the account
   and write `email-linked` / `email-unlinked` to `auth_security_events` with a hash of the address. Routes (all need a session):
-  `GET /api/v1/email/addresses`, `POST /api/v1/email/link/request`, `/link/verify`, `/unlink`.
+  `GET /api/v1/email/addresses` (the account's addresses oldest first, each with when it was added, and how many it may hold),
+  `POST /api/v1/email/link/request`, `/link/verify`, `/unlink`. An account holds at most `maximumAddresses` of one kind (the policy's
+  number, `emailAddressPolicy` in `@repo/config`): `request` refuses before anything is mailed (`limit-reached`, counting the account's own
+  addresses only, and letting through one it already holds), and `completeLink` counts again in its transaction under the account's lock,
+  in the order address, account, session that every other change takes, so sessions adding different addresses together cannot pass the
+  limit or wait on each other.
 
 Callers compose these exports explicitly. Removing wallet authentication requires removing its
 registration and route adapter; no feature discovery or global registration is used.
@@ -98,11 +103,11 @@ Docker is required for integration and coverage commands because they apply the 
 an isolated PostgreSQL 18 container.
 
 ```bash
-pnpm --filter @ador/auth typecheck
-pnpm --filter @ador/auth lint
-pnpm --filter @ador/auth test:unit
-pnpm --filter @ador/auth test:integration
-pnpm --filter @ador/auth test:coverage
+pnpm --filter @frostbite/auth typecheck
+pnpm --filter @frostbite/auth lint
+pnpm --filter @frostbite/auth test:unit
+pnpm --filter @frostbite/auth test:integration
+pnpm --filter @frostbite/auth test:coverage
 ```
 
 ## Ownership

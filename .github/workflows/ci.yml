@@ -63,8 +63,8 @@ jobs:
         run: pnpm typecheck
 
   # Unit and integration tests run once, under coverage (test:coverage runs both suites), instead of once plain and again for coverage.
-  # Shard Match is held out and run beside this job: its fairness test plays whole games with bots when the file loads, which alone takes
-  # longer than all the other workspaces together at the same concurrency.
+  # Shard Match is held out and run beside this job: its fairness test plays whole games with bots (about a minute plain, three times that under coverage), too long to
+  # share this job's concurrency. It runs in the game-simulations job, plain.
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -121,6 +121,12 @@ jobs:
 
       - name: Run Shard Match tests with coverage
         run: pnpm --filter @game/shard-match test:coverage
+
+      # The fairness simulation plays whole games with bots. It adds nothing to the coverage report (the rest of the workspace covers it well above
+      # the threshold alone) and instrumentation makes it about three times slower (219 s against 70 s plain, measured), too close to its time limit
+      # on a slow runner, so it runs plain, in its own step.
+      - name: Run the Shard Match fairness simulation
+        run: pnpm --filter @game/shard-match test:simulation
 
       - name: Retain coverage reports
         if: always()

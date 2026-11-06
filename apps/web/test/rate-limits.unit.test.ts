@@ -1,5 +1,5 @@
-import { chainFeesRoute, chainIndexingRoute } from "@ador/shared/chain";
-import { resolveRateLimit } from "@ador/shared/http";
+import { chainFeesRoute, chainIndexingRoute } from "@frostbite/shared/chain";
+import { resolveRateLimit } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
 import { rateLimits } from "@repo/configs/rate-limits";

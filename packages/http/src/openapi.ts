@@ -6,11 +6,12 @@ import {
   idempotencyKeySchema,
   type ApplicationHttpErrorCode,
   type HttpMethod,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 import { z } from "zod";
 
 import type { HttpOperation } from "./operation.js";
-import { platformSessionCookieName } from "@ador/shared/auth";
+import { forbiddenMessage } from "./outcome.ts";
+import { platformSessionCookieName } from "@frostbite/shared/auth";
 
 type JsonSchema = z.core.JSONSchema.JSONSchema;
 type OpenApiMethod = "delete" | "get" | "patch" | "post" | "put";
@@ -79,7 +80,7 @@ function methodKey(method: HttpMethod): OpenApiMethod {
 
 const errorDescriptions: Readonly<Record<ApplicationHttpErrorCode, string>> = {
   conflict: "The request conflicts with current state.",
-  forbidden: "The actor lacks the required capability.",
+  forbidden: forbiddenMessage,
   invalid_request: "The request is invalid.",
   not_found: "The requested resource does not exist.",
   unauthorized: "Authentication is required or invalid.",

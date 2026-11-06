@@ -10,8 +10,8 @@ import {
 describe("the path to come back to after signing in", () => {
   it("keeps a plain path on this site, with its query, and drops a fragment", () => {
     expect(safeReturnPath("/admin")).toBe("/admin");
-    expect(safeReturnPath("/admin/games/frostbite")).toBe(
-      "/admin/games/frostbite",
+    expect(safeReturnPath("/admin/games/example-game")).toBe(
+      "/admin/games/example-game",
     );
     expect(safeReturnPath("/games?tab=top&page=2")).toBe(
       "/games?tab=top&page=2",

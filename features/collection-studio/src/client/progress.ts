@@ -1,4 +1,4 @@
-import type { CollectionDetail } from "@ador/shared/collections";
+import type { CollectionDetail } from "@frostbite/shared/collections";
 
 export const wizardSteps = [
   "details",

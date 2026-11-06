@@ -1,9 +1,9 @@
-import { chainOptionSchema } from "@ador/shared/chain";
+import { chainOptionSchema } from "@frostbite/shared/chain";
 import type {
   CollectionSubmission,
   SubmissionState,
-} from "@ador/shared/collections";
-import { button, click, mount, textOf } from "@ador/test-kit/dom";
+} from "@frostbite/shared/collections";
+import { button, click, mount, textOf } from "@frostbite/test-kit/dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { ReviewStep } from "../src/ui/components/review-step.tsx";

@@ -9,8 +9,8 @@ import {
   createDatabasePool,
   parseDatabaseEnvironment,
   runMigrations,
-} from "@ador/database";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/database";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleContactCodeRepository } from "../../src/contacts/drizzle-repository.ts";

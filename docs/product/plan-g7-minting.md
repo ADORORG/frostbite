@@ -1,6 +1,6 @@
 # G7: minting a milestone (task #42; GP-05, GP-07)
 
-Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 to G7e-5 built (the contract templates; the adapter's reads; its milestone-claim path; the drawing sanitiser; the staff's administration steps, signed by hand with a one-time key for witness data). G7f adds the staff page (`/admin/games`, `@ador/feature-game-admin` over `@ador/game-admin`), run on the simulated chain; the wallet-side signing of a bundle is not built. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
+Status: **G7a to G7d built** (the manifest declaration; the intent, claim records and claim service on the simulated chain; the SDK method, the host handler and the HTTP routes; the player's review and states); G7e-1 to G7e-5 built (the contract templates; the adapter's reads; its milestone-claim path; the drawing sanitiser; the staff's administration steps, signed by hand with a one-time key for witness data). G7f adds the staff page (`/admin/games`, `@frostbite/feature-game-admin` over `@frostbite/game-admin`), run on the simulated chain; the wallet-side signing of a bundle is not built. Written 2026-10-16 after ADR-018 Amendments 1 and 2.
 Specification it builds on: ADR-018 (`docs/decisions/`), `docs/product/game-host-interface.md`, ADR-017 (neutral chain ports).
 
 ## 1. What G7 is now
@@ -52,7 +52,7 @@ The real chain work is **not buildable yet**, and the reason is the ledger, not 
 | Quote, build, sign, broadcast, observe on `bitcoin-alkanes` | Blocked on W7-00 (D22, confirmation policy); the adapter has only the address codec |
 | A wallet that can sign a transaction                        | Signing is qualification-only (wallet audit; roadmap SDK-6)                         |
 
-What does **not** depend on those, because the platform already has a simulated chain (`@ador/test-kit/simulated-chain`) and a
+What does **not** depend on those, because the platform already has a simulated chain (`@frostbite/test-kit/simulated-chain`) and a
 chain-neutral port set:
 
 - **G7a Manifest declaration** (GP-01): a game declares its rewards contract role and version, and the `milestone:claim`
@@ -76,15 +76,15 @@ the builder's drawing in a generated frame, or a generated sprite when the miles
 defines milestones and pauses. See `contracts/templates/README.md` for the layout, the ABI, the known limits and the chain-neutral
 mapping the adapter implements.
 
-**Built so far.** G7a: `rewards` and `milestone:claim` in the manifest (`@ador/shared/games`). G7b: the `mint-milestone`
-intent and summary in `@ador/shared/chain`; a `rewards` reader port (`RewardsReader.claimed`, capability `rewards:read`) in
-`@ador/chain`, which tells that a claim the platform watched confirm has also been indexed; the simulated chain executes claims
-(and can revert one); the `game_milestone_claims` table; and `@ador/game-claims` (start, submit signed, refresh, list). Notes: a
+**Built so far.** G7a: `rewards` and `milestone:claim` in the manifest (`@frostbite/shared/games`). G7b: the `mint-milestone`
+intent and summary in `@frostbite/shared/chain`; a `rewards` reader port (`RewardsReader.claimed`, capability `rewards:read`) in
+`@frostbite/chain`, which tells that a claim the platform watched confirm has also been indexed; the simulated chain executes claims
+(and can revert one); the `game_milestone_claims` table; and `@frostbite/game-claims` (start, submit signed, refresh, list). Notes: a
 claim is `complete` only once the reader shows the wallet's expected count; a failed claim stops at the state that saw the failure
 (no reconcile step for a claim that never happened); the platform's claim limit is per account while the chain's is per address.
 **G7c.** `milestones.claim` and the `claim.changed` event in the SDK protocol (capability `milestone:claim`, rate limited, the
 milestone must be declared); four POST routes (`/api/v1/games/claims/start|submit|refresh|list`; this API's GET has no query
-string) over `@ador/game-claims`; the page's claims port; `configs/game-claims.ts`. **Nothing is configured**: no contract is
+string) over `@frostbite/game-claims`; the page's claims port; `configs/game-claims.ts`. **Nothing is configured**: no contract is
 deployed and no chain adapter takes claims, so every claim is answered `not-supported`, and the page's port answers the same
 until G7d gives it somewhere to show the claim to the player. The start route takes the wallet address as text and the platform
 parses it for the game's chain (an address from another chain is `wrong-network`).
@@ -98,9 +98,9 @@ for claiming without telling a game that did not declare `wallet`. **Signing**: 
 none exists yet (signing is qualification-only), so the review says "your wallet cannot sign claims in this version yet" and
 offers no signature; the real signer is G7e. Everything is tested with a test signer against the routes.
 
-**G7f.** Staff administration: the `game_admin_steps` log (who built and who sent each step), the `@ador/game-admin` service, and the pages and routes that drive it (`features/game-admin`), under the `game:administer` capability the `staff` role holds. Decisions: any staff member may pause and resume, logged; a complete step needs the network's records to show it (1 confirmation on signet); a milestone is defined once. The decided "delayed" display is built in G7j (below). Staff paste a signed transaction until a wallet that signs steps is qualified.
+**G7f.** Staff administration: the `game_admin_steps` log (who built and who sent each step), the `@frostbite/game-admin` service, and the pages and routes that drive it (`features/game-admin`), under the `game:administer` capability the `staff` role holds. Decisions: any staff member may pause and resume, logged; a complete step needs the network's records to show it (1 confirmation on signet); a milestone is defined once. The decided "delayed" display is built in G7j (below). Staff paste a signed transaction until a wallet that signs steps is qualified.
 
-**G7g.** The platform is pointed at signet from four settings (`REWARDS_*`: node address, fee ceiling, timeout, templates folder; policy values in `configs/rewards-policy.ts`, assembled behind `@ador/chain/configured`). Where a template or a game's contract is on the chain is **not configuration**: staff publish each template at an address they choose and create each game's contract from the page, and the platform records the address when the step completes (`ador.published_templates`, `ador.game_contracts`), reading a created contract from the confirmed transaction's trace. Claims read the contract from that record. Not built: a wallet that signs, a run against a live signet indexer (the public one is stalled, S73), recording an unreadable creation by hand (built in G7g-3).
+**G7g.** The platform is pointed at signet from four settings (`REWARDS_*`: node address, fee ceiling, timeout, templates folder; policy values in `configs/rewards-policy.ts`, assembled behind `@frostbite/chain/configured`). Where a template or a game's contract is on the chain is **not configuration**: staff publish each template at an address they choose and create each game's contract from the page, and the platform records the address when the step completes (`frostbite.published_templates`, `frostbite.game_contracts`), reading a created contract from the confirmed transaction's trace. Claims read the contract from that record. Not built: a wallet that signs, a run against a live signet indexer (the public one is stalled, S73), recording an unreadable creation by hand (built in G7g-3).
 
 G7a to G7d are safe to build now and are real: when G7e lands they swap the simulated chain for the real one at the ports. They
 also let the owner see the whole experience before a contract exists. Each is its own branch and task.
@@ -129,11 +129,11 @@ also let the owner see the whole experience before a contract exists. Each is it
 - Nothing stops a player claiming without playing (section 2). If rewards ever carry value this must be revisited
   (ADR-018 Amendment 2 review trigger).
 - G7a to G7d on a simulated chain can pass while the real adapter disagrees on a detail (fees, confirmation); the conformance
-  suite for the chain ports (`@ador/test-kit/chain-conformance`) is the guard and must run against the real adapter in G7e.
+  suite for the chain ports (`@frostbite/test-kit/chain-conformance`) is the guard and must run against the real adapter in G7e.
 
 ## 8. Out of scope
 
 Transferable tokens and marketplaces (a separate ADR), a platform-wide cap, per-person rather than per-address limits,
 attestation of any kind, minting from a game that is not registered.
 
-**G7j.** The "delayed" display and the indexing lamp. A step or claim that has been sent and is waiting is **delayed** when the chain's indexer is more than 2 blocks behind the tip, or it was sent more than 60 minutes ago (`rewardsPolicy.delay`; ADR-018). Delayed is about the wait and never the outcome: the page says "Sent, delayed" or "Confirmed, delayed", says it has not failed, and nothing is retried, cancelled or marked failed. The rule is one function (`isDelayed`, `@ador/shared/chain`); `@ador/chain/indexing` judges a list of waits against one reading of the indexer per chain, and falls back to the time alone where the chain cannot be asked. The time is counted from `broadcast_at` (new on both tracked tables, set once when the network gives the transaction's id, never moved by later news; rows sent before it existed use their last change). Staff steps and the player's claim list and milestones show it; the SDK's claim states that games receive are unchanged. The header lamp (`features/chain-status`, route `GET /api/v1/chain/indexing`, `<IndexingBadge>` in the layout through `ShellStatusProvider`) says "Chain in sync", "n blocks behind", "Delayed, n blocks behind" or "Chain status unknown", and draws nothing where no rewards chain is configured. The node is asked at most once per `rewardsPolicy.indexingReadingMs` however many pages are open.
+**G7j.** The "delayed" display and the indexing lamp. A step or claim that has been sent and is waiting is **delayed** when the chain's indexer is more than 2 blocks behind the tip, or it was sent more than 60 minutes ago (`rewardsPolicy.delay`; ADR-018). Delayed is about the wait and never the outcome: the page says "Sent, delayed" or "Confirmed, delayed", says it has not failed, and nothing is retried, cancelled or marked failed. The rule is one function (`isDelayed`, `@frostbite/shared/chain`); `@frostbite/chain/indexing` judges a list of waits against one reading of the indexer per chain, and falls back to the time alone where the chain cannot be asked. The time is counted from `broadcast_at` (new on both tracked tables, set once when the network gives the transaction's id, never moved by later news; rows sent before it existed use their last change). Staff steps and the player's claim list and milestones show it; the SDK's claim states that games receive are unchanged. The header lamp (`features/chain-status`, route `GET /api/v1/chain/indexing`, `<IndexingBadge>` in the layout through `ShellStatusProvider`) says "Chain in sync", "n blocks behind", "Delayed, n blocks behind" or "Chain status unknown", and draws nothing where no rewards chain is configured. The node is asked at most once per `rewardsPolicy.indexingReadingMs` however many pages are open.

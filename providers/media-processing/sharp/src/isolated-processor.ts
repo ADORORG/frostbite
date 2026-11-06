@@ -2,8 +2,8 @@ import type {
   ImageProcessor,
   ProcessImageInput,
   ProcessImageResult,
-} from "@ador/media/processing";
-import type { DerivativePolicy } from "@ador/shared/uploads";
+} from "@frostbite/media/processing";
+import type { DerivativePolicy } from "@frostbite/shared/uploads";
 
 import { encodeFrame, maximumHeaderBytes } from "./protocol.ts";
 import { isWorkerFault } from "./exit-codes.ts";

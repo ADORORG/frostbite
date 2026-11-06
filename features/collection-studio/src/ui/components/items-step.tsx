@@ -1,7 +1,7 @@
-import { BulkUpload } from "@ador/feature-uploads/bulk";
-import type { CollectionDetail } from "@ador/shared/collections";
-import type { IdempotencyKey } from "@ador/shared/http";
-import type { LibraryAsset } from "@ador/shared/uploads";
+import { BulkUpload } from "@frostbite/feature-uploads/bulk";
+import type { CollectionDetail } from "@frostbite/shared/collections";
+import type { IdempotencyKey } from "@frostbite/shared/http";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import { ArcadeProgress } from "@repo/ui/arcade";
 import { useState } from "react";
 

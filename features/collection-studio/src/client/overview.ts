@@ -5,7 +5,7 @@ import {
   submissionStateLabels,
   type CollectionStanding,
   type CollectionSummary,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import type { FilterOption } from "@repo/ui/arcade";
 import type { ArcadeTone } from "@repo/ui/arcade";
 

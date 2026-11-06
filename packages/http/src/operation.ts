@@ -11,12 +11,12 @@ import {
   type HttpMethod,
   type IdempotencyKey,
   type IdempotencyPolicy,
-} from "@ador/shared/http";
+} from "@frostbite/shared/http";
 import type { z } from "zod";
 
 import type { HttpCachePolicy } from "./cache.ts";
-import type { PageAccessRequirement } from "@ador/shared/features";
-import type { UuidV7 } from "@ador/shared/identifiers";
+import type { PageAccessRequirement } from "@frostbite/shared/features";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
 
 export interface HttpOperationContext {
   readonly actorSession: HttpAuthenticatedSession | null;

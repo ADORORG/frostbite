@@ -1,4 +1,4 @@
-# `@ador/events`
+# `@frostbite/events`
 
 Provider-neutral, versioned domain-event envelopes used by transactional outbox delivery.
 
@@ -9,7 +9,7 @@ identity is stable across delivery retries and audited replay. This package owns
 
 ## Public API
 
-`@ador/events` exports the schemas and the type:
+`@frostbite/events` exports the schemas and the type:
 
 - `domainEventEnvelopeSchema` and `DomainEventEnvelope`: the envelope (`eventId`, `name`, `schemaVersion`, `occurredAt`, `correlationId`,
   `causationId`, `payload`), strict, with the name's `.vN` suffix required to match `schemaVersion`.
@@ -20,7 +20,7 @@ identity is stable across delivery retries and audited replay. This package owns
 
 ## Dependencies
 
-`@ador/shared` (the correlation id schema) and `zod`.
+`@frostbite/shared` (the correlation id schema) and `zod`.
 
 ## Configuration
 
@@ -34,7 +34,7 @@ None.
 
 ## Tests
 
-`pnpm --filter @ador/events test:unit`, `test:integration`, `test:coverage`.
+`pnpm --filter @frostbite/events test:unit`, `test:integration`, `test:coverage`.
 
 ## Ownership
 

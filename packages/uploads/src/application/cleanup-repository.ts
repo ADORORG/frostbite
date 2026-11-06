@@ -1,6 +1,6 @@
-import type { ObjectKey } from "@ador/object-storage/contracts";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { ProviderId } from "@ador/shared/providers";
+import type { ObjectKey } from "@frostbite/object-storage/contracts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { ProviderId } from "@frostbite/shared/providers";
 
 // An upload that was never completed and whose cleanup time has passed. Its private object, if the
 // browser ever wrote one, is what remains to be removed.

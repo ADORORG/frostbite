@@ -28,7 +28,7 @@ evidence can enable only passing wallet capabilities for the exact pinned LaserE
 
 ## Approach
 
-Keep qualification policy and evidence evaluation in `@ador/wallet`, while the selected candidates
+Keep qualification policy and evidence evaluation in `@frostbite/wallet`, while the selected candidates
 and accepted evidence remain explicit configuration. Application code consumes only the evaluated
 enabled capabilities. This preserves one-line detachment and avoids wallet-specific application
 adapters.
@@ -58,7 +58,7 @@ defect and changed nothing:
    ADR-005/ADR-006 boundaries.
 
 An additional M11 repository-rule audit found no policy violation. All changed production and test
-source files remain below 250 lines. `@ador/wallet` coverage is 100% for statements, branches,
+source files remain below 250 lines. `@frostbite/wallet` coverage is 100% for statements, branches,
 functions, and lines (144 statements, 100 branches, 35 functions, and 138 lines).
 
 Full verification passed: formatting, lint and repository policy, environment parity, TypeScript and

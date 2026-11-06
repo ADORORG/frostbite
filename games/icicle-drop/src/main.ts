@@ -1,13 +1,14 @@
-import { fillGuide } from "@ador/game-sdk/guide";
-import { setUpSound } from "@ador/game-sdk/audio/setup";
-import { createGameClient, GameHostError } from "@ador/game-sdk/client";
-import { createPause, pauseCopy } from "@ador/game-sdk/pause";
-import { connectToPlatform, type PlatformPlay } from "@ador/game-sdk/play";
+import { fillGuide } from "@frostbite/game-sdk/guide";
+import { setUpSound } from "@frostbite/game-sdk/audio/setup";
+import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
-  startNote,
-  submitNote,
-  type SubmitState,
-} from "@ador/game-sdk/run-notes";
+  connectToPlatform,
+  type PlatformPlay,
+  sendRun,
+} from "@frostbite/game-sdk/play";
+import { byInput } from "@frostbite/game-sdk/touch";
+import { attachTapToStart } from "@frostbite/game-sdk/touch-start";
 
 import { effects, joinSound, track } from "./audio.ts";
 import { moveSound } from "./feedback.ts";
@@ -18,7 +19,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { attachControls } from "./screen/controls.ts";
 import { showBoard } from "./screen/board-view.ts";
 import { guide } from "./guide.ts";
@@ -125,17 +126,7 @@ async function finish(finished: DropSession): Promise<void> {
   progress = withBest(progress, finished.state().score);
   saveProgress();
   show();
-  if (runId === null || play === null) {
-    note.textContent = submitNote(null);
-    return;
-  }
-  const sent = runId;
-  note.textContent = submitNote({ kind: "pending" });
-  const settled: SubmitState = await play.runs.submit(sent, record).then(
-    (result) => ({ kind: "settled", result }) as const,
-    () => ({ kind: "failed" }) as const,
-  );
-  note.textContent = submitNote(settled);
+  await sendRun(play, runId, record);
 }
 
 function choose(direction: Direction): void {
@@ -157,9 +148,9 @@ async function begin(): Promise<void> {
   const started = await play?.runs.start().catch(() => null);
   const ready = started?.status === "started" ? started : null;
   runId = ready?.runId ?? null;
-  note.textContent = startNote(
-    started ?? null,
-    "Slide the tiles with the arrow keys, WASD or a swipe. Equal tiles join.",
+  note.textContent = byInput(
+    "Arrows slide the tiles.",
+    "Swipe to slide the tiles.",
   );
   session = createDropSession({
     onEarned: (id) => {
@@ -214,6 +205,8 @@ for (const direction of directions)
     .querySelector(`[data-direction="${direction}"]`)
     ?.addEventListener("click", () => choose(direction));
 pauseButton.addEventListener("click", togglePause);
+// The first-screen card lies over the board, so a tap lands on the stage the two share.
+attachTapToStart(grid.parentElement ?? grid, startButton);
 startButton.addEventListener("click", () => void begin());
 setRunning(false);
 void connect();

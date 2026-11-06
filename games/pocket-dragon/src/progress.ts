@@ -2,7 +2,7 @@ import {
   defaultSound,
   parseSound,
   type SoundSettings,
-} from "@ador/game-sdk/audio/settings";
+} from "@frostbite/game-sdk/audio/settings";
 
 import { chapterIds, type ChapterId, type PlayId } from "./rules/constants.ts";
 

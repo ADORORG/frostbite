@@ -1,8 +1,8 @@
 import {
   laserEyesProviderIds,
   type LaserEyesProviderId,
-} from "@ador/wallet/conformance";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+} from "@frostbite/wallet/conformance";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 export interface WalletCandidate {
   readonly id: LaserEyesProviderId;

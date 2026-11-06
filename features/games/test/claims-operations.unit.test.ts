@@ -1,11 +1,11 @@
-import type { GameClaimsService } from "@ador/game-claims";
-import { signedTransactionSchema } from "@ador/shared/chain";
+import type { GameClaimsService } from "@frostbite/game-claims";
+import { signedTransactionSchema } from "@frostbite/shared/chain";
 import {
   listGameClaimsRoute,
   refreshGameClaimRoute,
   startGameClaimRoute,
   submitGameClaimRoute,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import {

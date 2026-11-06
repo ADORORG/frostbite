@@ -1,17 +1,18 @@
-import { ApiError } from "@ador/client-http";
-import type { WalletInfo } from "@ador/game-sdk/protocol";
-import type { FeeSpeed } from "@ador/shared/chain";
+import { ApiError } from "@frostbite/client-http";
+import type { WalletInfo } from "@frostbite/game-sdk/protocol";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 import type {
   GameClaim,
   GameClaimState,
   GameClaimUnavailableReason,
-} from "@ador/shared/games";
-import { walletRefusedCopy } from "@ador/wallet/client";
+} from "@frostbite/shared/games";
+import { walletRefusedCopy } from "@frostbite/wallet/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ClaimsApi } from "../client/claims-api.ts";
 import {
   claimSignerCopy,
+  claimSubmitRefusalCopy,
   claimUnavailableCopy,
   isSettledClaim,
   unreachableCopy,
@@ -26,15 +27,6 @@ export type ClaimSigner = (
 
 // How often an unsettled claim is looked at.
 export const defaultClaimPollMs = 4_000;
-
-const submitRefusal = {
-  "chain-unavailable": "The network could not be reached. Try signing again.",
-  expired: "It was not signed in time. Start the claim again.",
-  "invalid-signature":
-    "What was signed is not what was shown. Nothing was sent.",
-  "not-awaiting-signature": "This claim can no longer be signed.",
-  "not-found": "This claim could not be found.",
-} as const;
 
 // A player's claims for one game: loaded, started (from a button here or by the game asking), reviewed and signed, and followed
 // until they are over. The platform decides what each state means; this only shows it and tells the game when it changes.
@@ -166,7 +158,7 @@ export function useClaims(options: {
       if (signed === null) return setMessage("Nothing was signed.");
       const answer = await api.submit({ claimId: active.id, signed });
       if (answer.status === "submitted") upsert(answer.claim, true);
-      else setMessage(submitRefusal[answer.reason]);
+      else setMessage(claimSubmitRefusalCopy[answer.reason]);
     } catch {
       setMessage(unreachableCopy);
     } finally {

@@ -1,4 +1,4 @@
-import type { MailMessage } from "@ador/mail";
+import type { MailMessage } from "@frostbite/mail";
 
 // The colours of the arcade design (`packages/ui/src/tokens.css`), written out because a mail client cannot read the site's stylesheet.
 // Every colour is set explicitly on the element that uses it, so a client that darkens or lightens a message has nothing left to guess.

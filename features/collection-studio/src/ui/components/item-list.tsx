@@ -1,5 +1,5 @@
-import { pickRendition } from "@ador/feature-uploads/presentation";
-import type { CollectionDetail } from "@ador/shared/collections";
+import { pickRendition } from "@frostbite/feature-uploads/presentation";
+import type { CollectionDetail } from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeBadge,

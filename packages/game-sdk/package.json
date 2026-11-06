@@ -1,5 +1,5 @@
 {
-  "name": "@ador/game-sdk",
+  "name": "@frostbite/game-sdk",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,8 +14,10 @@
     "./audio/effects": "./src/audio/effects.ts",
     "./audio/settings": "./src/audio/settings.ts",
     "./audio/tracks": "./src/audio/tracks.ts",
+    "./best-progress": "./src/best-progress.ts",
     "./build": "./src/build.ts",
     "./cabinets": "./src/cabinets.ts",
+    "./card": "./src/card.ts",
     "./client": "./src/client.ts",
     "./controls": "./src/controls.ts",
     "./dev-host": "./src/dev-host/server.ts",
@@ -33,11 +35,14 @@
     "./replay": "./src/replay.ts",
     "./run-inputs": "./src/run-inputs.ts",
     "./run-loop": "./src/run-loop.ts",
-    "./run-notes": "./src/run-notes.ts",
+    "./cabinet-runs": "./src/cabinet-runs.ts",
     "./run-record": "./src/run-record.ts",
     "./seeded": "./src/seeded.ts",
-    "./storage-shim": "./src/storage-shim.ts",
-    "./synced-backend": "./src/synced-backend.ts"
+    "./synced-backend": "./src/synced-backend.ts",
+    "./touch": "./src/touch.ts",
+    "./touch-start": "./src/touch-start.ts",
+    "./touch-buttons": "./src/touch-buttons.ts",
+    "./touch-zones": "./src/touch-zones.ts"
   },
   "scripts": {
     "env:check": "node --experimental-strip-types ../config/src/env/check-files.ts",
@@ -46,7 +51,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
-    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('src/phone.css','dist/phone.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
+    "build:package": "rm -rf dist && tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/audio/panel.css','dist/audio/panel.css'); require('node:fs').cpSync('src/phone.css','dist/phone.css'); require('node:fs').cpSync('src/phone-frame.css','dist/phone-frame.css'); require('node:fs').cpSync('../../skills/build-a-game','dist/skill/files',{recursive:true})\"",
     "prepack": "pnpm run build:package"
   },
   "dependencies": {
@@ -69,8 +74,8 @@
   "license": "UNLICENSED",
   "sideEffects": false,
   "bin": {
-    "ador-game-dev": "./dist/dev-host/bin.js",
-    "ador-game-skill": "./dist/skill/bin.js"
+    "frostbite-game-dev": "./dist/dev-host/bin.js",
+    "frostbite-game-skill": "./dist/skill/bin.js"
   },
   "files": [
     "dist",
@@ -115,6 +120,10 @@
         "types": "./dist/audio/tracks.d.ts",
         "default": "./dist/audio/tracks.js"
       },
+      "./best-progress": {
+        "types": "./dist/best-progress.d.ts",
+        "default": "./dist/best-progress.js"
+      },
       "./build": {
         "types": "./dist/build.d.ts",
         "default": "./dist/build.js"
@@ -122,6 +131,10 @@
       "./cabinets": {
         "types": "./dist/cabinets.d.ts",
         "default": "./dist/cabinets.js"
+      },
+      "./card": {
+        "types": "./dist/card.d.ts",
+        "default": "./dist/card.js"
       },
       "./client": {
         "types": "./dist/client.d.ts",
@@ -191,9 +204,9 @@
         "types": "./dist/run-inputs.d.ts",
         "default": "./dist/run-inputs.js"
       },
-      "./run-notes": {
-        "types": "./dist/run-notes.d.ts",
-        "default": "./dist/run-notes.js"
+      "./cabinet-runs": {
+        "types": "./dist/cabinet-runs.d.ts",
+        "default": "./dist/cabinet-runs.js"
       },
       "./run-record": {
         "types": "./dist/run-record.d.ts",
@@ -203,13 +216,25 @@
         "types": "./dist/seeded.d.ts",
         "default": "./dist/seeded.js"
       },
-      "./storage-shim": {
-        "types": "./dist/storage-shim.d.ts",
-        "default": "./dist/storage-shim.js"
-      },
       "./synced-backend": {
         "types": "./dist/synced-backend.d.ts",
         "default": "./dist/synced-backend.js"
+      },
+      "./touch": {
+        "types": "./dist/touch.d.ts",
+        "default": "./dist/touch.js"
+      },
+      "./touch-buttons": {
+        "types": "./dist/touch-buttons.d.ts",
+        "default": "./dist/touch-buttons.js"
+      },
+      "./touch-zones": {
+        "types": "./dist/touch-zones.d.ts",
+        "default": "./dist/touch-zones.js"
+      },
+      "./touch-start": {
+        "types": "./dist/touch-start.d.ts",
+        "default": "./dist/touch-start.js"
       }
     }
   },

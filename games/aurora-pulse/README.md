@@ -1,7 +1,7 @@
 # Aurora Pulse
 
 A rhythm game for the platform. Notes fall down four lanes toward a line; the player taps each lane as its note meets the line (D F J K, the arrow
-keys, or a quarter of the screen). A tap is judged perfect (within 2 ticks, about a thirtieth of a second), great (5) or good (9) by how far off the
+keys, or a tap on the lane itself; the margins either side belong to the lane beside them). A tap is judged perfect (within 2 ticks, about a thirtieth of a second), great (5) or good (9) by how far off the
 note it was, or is a stray if no note of its lane is in reach; a note not tapped is a miss. Hits fill the light of the aurora and build a combo that
 multiplies the score; misses and strays drain the light, and the run ends when it is gone, or the track (about ten minutes, 36 stages' worth of
 chart) is played out. It is client-only: no server, no network, nothing stored by the game itself (the platform keeps progress and milestones).
@@ -16,7 +16,6 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 | `src/session.ts`                     | One run as the player plays it: ticks the rules, records each tap (with its tick) into a run record, and closes it with the tick it reached.            |
 | `src/screen/`                        | Draws a state on a canvas (the aurora, the lanes and notes, the writing and the cards). Draws and decides nothing.                                      |
 | `src/audio.ts`, `src/feedback.ts`    | The music and effects as data, and which effect each change of state makes. Each lane taps in a note of its own; a perfect tap adds a glint.            |
-| `src/progress.ts`                    | What is saved (the best score and the sound settings) and how what the platform hands back is validated.                                                |
 | `src/replay.ts`, `src/sample-run.ts` | What the platform replays: the rules and one legal run. Its digest is pinned in `configs/games/aurora-pulse.ts`.                                        |
 
 ## How it plays

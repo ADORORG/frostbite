@@ -1,11 +1,11 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
-import { platformRoleAssignments } from "@ador/database/schema/accounts";
-import { authUsers } from "@ador/database/schema/auth";
-import { platformRoleSchema } from "@ador/shared/accounts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/connection";
+import { platformRoleAssignments } from "@frostbite/database/schema/accounts";
+import { authUsers } from "@frostbite/database/schema/auth";
+import { platformRoleSchema } from "@frostbite/shared/accounts";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 import { asc, eq, inArray } from "drizzle-orm";
 
 import { effectiveRoles } from "../application/effective-roles.ts";

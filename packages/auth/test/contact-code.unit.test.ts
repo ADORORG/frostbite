@@ -1,4 +1,4 @@
-import type { MailSender } from "@ador/mail";
+import type { MailSender } from "@frostbite/mail";
 import { describe, expect, it, vi } from "vitest";
 
 import { codeMatches, generateCode, hashCode } from "../src/contacts/code.ts";
@@ -77,7 +77,7 @@ describe("the email channel", () => {
   it("sends the code to the address, saying who asks, how long it lasts and what to do if it was not asked for", async () => {
     const send = vi.fn<MailSender["send"]>(() => Promise.resolve());
     const channel = createEmailChannel({
-      appName: "Ador",
+      appName: "Frostbite",
       policy,
       sender: { send },
     });
@@ -85,10 +85,10 @@ describe("the email channel", () => {
     expect(send).toHaveBeenCalledOnce();
     const [message] = send.mock.calls[0] ?? [];
     expect(message).toMatchObject({
-      subject: "123456 is your Ador sign-in code",
+      subject: "123456 is your Frostbite sign-in code",
       to: "ada@example.com",
     });
-    expect(message?.text).toContain("Your Ador sign-in code is 123456.");
+    expect(message?.text).toContain("Your Frostbite sign-in code is 123456.");
     expect(message?.text).toContain("expires in 10 minutes");
     expect(message?.text).toContain("ignore this message");
     // The styled version goes with it, so a client that shows one has it.
@@ -97,7 +97,7 @@ describe("the email channel", () => {
 
   it("lets a failed send reach the caller", async () => {
     const channel = createEmailChannel({
-      appName: "Ador",
+      appName: "Frostbite",
       policy,
       sender: { send: () => Promise.reject(new Error("down")) },
     });
@@ -108,7 +108,7 @@ describe("the email channel", () => {
 
   it("names its kind and its account, and keeps the policy it was given", () => {
     const channel = createEmailChannel({
-      appName: "Ador",
+      appName: "Frostbite",
       policy,
       sender: { send: () => Promise.resolve() },
     });

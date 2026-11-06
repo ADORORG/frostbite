@@ -1,5 +1,5 @@
 import { shortenMiddle } from "@repo/ui/arcade";
-import type { WalletNetwork } from "@ador/wallet/contracts";
+import type { WalletNetwork } from "@frostbite/wallet/contracts";
 
 export const abbreviated = (address: string) =>
   address.length <= 18

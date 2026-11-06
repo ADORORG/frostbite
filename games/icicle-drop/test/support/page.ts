@@ -1,13 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { bundleGameScript } from "@ador/game-sdk/build";
-import { defaultGameHostPolicy } from "@ador/game-sdk/policy";
-import type { JsonValue } from "@ador/game-sdk/protocol";
+import { bundleGameScript } from "@frostbite/game-sdk/build";
+import type { HostServices } from "@frostbite/game-sdk/host";
+import { defaultGameHostPolicy } from "@frostbite/game-sdk/policy";
+import type { JsonValue } from "@frostbite/game-sdk/protocol";
 import {
   runGameInSimulatedHost,
   type SimulatedGame,
-} from "@ador/test-kit/simulated-game-host";
+} from "@frostbite/test-kit/simulated-game-host";
 
 import { milestoneIds } from "../../src/rules/milestones.ts";
 
@@ -21,6 +22,7 @@ const milestone = (id: string, title: string) => ({
   title,
 });
 const manifest = {
+  capabilities: ["run:submit"],
   id: "icicle-drop",
   milestones: milestoneIds.map((id) => milestone(id, id)),
 };
@@ -36,6 +38,7 @@ export const closeGame = (): void => running?.close();
 export async function play(
   saved?: { best: number; sound?: JsonValue },
   answers: Partial<Backend> = {},
+  services: HostServices = {},
 ) {
   const stored: {
     progress: JsonValue | null;
@@ -85,6 +88,7 @@ export async function play(
       unlockCallsPerMinute: 600,
     },
     script,
+    services,
   });
   return { stored, window: running.window };
 }

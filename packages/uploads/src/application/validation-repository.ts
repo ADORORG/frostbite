@@ -1,11 +1,11 @@
-import type { ObjectKey } from "@ador/object-storage/contracts";
-import type { UuidV7 } from "@ador/shared/identifiers";
-import type { ProviderId } from "@ador/shared/providers";
+import type { ObjectKey } from "@frostbite/object-storage/contracts";
+import type { UuidV7 } from "@frostbite/shared/identifiers";
+import type { ProviderId } from "@frostbite/shared/providers";
 import type {
   AssetRejectionReason,
   UploadContentType,
   UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 export interface AssetValidationSubject {
   readonly assetId: UuidV7;

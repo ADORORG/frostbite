@@ -42,7 +42,7 @@ activity with no user-facing surface; the asset's owner is unchanged and no new 
 1. **Limits (D07 gap):** 8192 px maximum width and height and 40 megapixels decoded, as typed upload
    policy (`maxImageDimension`, `maxImagePixels`), overridable by configuration. The existing
    per-purpose byte caps (5/15/25/25 MB) are accepted as the original-byte limits.
-2. **Decoder:** a structural parser with no third-party dependency now (`@ador/media`); a vetted
+2. **Decoder:** a structural parser with no third-party dependency now (`@frostbite/media`); a vetted
    decoder and its ADR arrive with W3-05, where thumbnails require decoding. No dependency was added.
 
 ## Delivered design
@@ -50,7 +50,7 @@ activity with no user-facing surface; the asset's owner is unchanged and no new 
 - `packages/media`: pure `validateImage`; PNG/JPEG/WebP structural parsers; stable reason codes.
 - `assets` gains validation outcome columns, `validated`/`rejected` states, and the
   `assets_validation_coherent` CHECK. Migration `20261006063740_square_nightcrawler`.
-- `@ador/uploads`: `AssetValidationRepository` port, Drizzle adapter (conditional first-writer-wins
+- `@frostbite/uploads`: `AssetValidationRepository` port, Drizzle adapter (conditional first-writer-wins
   record), and `createAssetValidationService` (bounded read, provider binding, idempotent replay).
 - Shared contract: states, `assetRejectionReasons`, and the new policy fields.
 
@@ -84,11 +84,11 @@ afterwards, and `format:check`, `lint`, and `git diff --check` were rerun after 
 sequentially with no concurrent edits: `env:check`,
 `format:check`, `typecheck`, `lint`, `test:unit`, `test:integration` (real PostgreSQL), `test:coverage`,
 `db:check`, and `test:e2e` (114 passed, 6 existing WebAuthn skips) all passed; `git diff --check` clean.
-Coverage: `@ador/media` 100% statements/branches/functions/lines; `@ador/uploads` 99.30% statements
-and 97.02% branches; `@ador/shared` 100% statements and 97.64% branches; merged thresholds passed.
+Coverage: `@frostbite/media` 100% statements/branches/functions/lines; `@frostbite/uploads` 99.30% statements
+and 97.02% branches; `@frostbite/shared` 100% statements and 97.64% branches; merged thresholds passed.
 Largest handwritten source/test file: 231 lines. No third-party dependency was added: the lockfile
-gains only importer entries for `@ador/media` (workspace links and dev tooling at versions already
-pinned elsewhere) and the `@ador/uploads` link, with no new package or version in the graph.
+gains only importer entries for `@frostbite/media` (workspace links and dev tooling at versions already
+pinned elsewhere) and the `@frostbite/uploads` link, with no new package or version in the graph.
 
 Mutation proof (each deliberate defect applied alone, the relevant suite run, the source restored
 byte-for-byte): about 110 mutations across the three parsers, signature detection, limit checks, hash,

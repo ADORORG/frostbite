@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { walletAuthActions } from "@ador/shared/auth";
+import { walletAuthActions } from "@frostbite/shared/auth";
 import {
   bigint,
   bytea,

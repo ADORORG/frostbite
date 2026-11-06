@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { accountOutcomes } from "@ador/shared/account-outcomes";
+import { ApiError } from "@frostbite/client-http";
+import { accountOutcomes } from "@frostbite/shared/account-outcomes";
 import { describe, expect, it } from "vitest";
 
 import { failed, failedFrom, outcomeOf } from "../src/client/outcome.ts";

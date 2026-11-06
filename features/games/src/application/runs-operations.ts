@@ -1,6 +1,6 @@
-import type { GameRunsService } from "@ador/game-runs";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
+import type { GameRunsService } from "@frostbite/game-runs";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
 import {
   startGameRunInputSchema,
   startGameRunResponseSchema,
@@ -12,7 +12,7 @@ import {
   type StartGameRunResponse,
   type SubmitGameRunInput,
   type SubmitGameRunResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // Starts a run for the signed-in player. The owner is the session, never a field of the request. A game the platform has no
 // verifier for, or a player with too many open runs, is an answer ("unavailable", with why), not an error.

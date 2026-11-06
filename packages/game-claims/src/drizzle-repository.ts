@@ -1,11 +1,11 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { gameMilestoneClaims } from "@ador/database/schema/game-claims";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { gameMilestoneClaims } from "@frostbite/database/schema/game-claims";
 import {
   addressSchema,
   readTracked,
   sentAtAfter,
   trackedValues,
-} from "@ador/shared/chain";
+} from "@frostbite/shared/chain";
 import { and, desc, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 
 import {

@@ -1,9 +1,10 @@
+import { invalidCursor } from "@frostbite/http/outcome";
 import {
   creatorReviewQueueResponseSchema,
   creatorReviewReadResponseSchema,
   encodeCreatorReviewCursor,
-} from "@ador/shared/creator-admission";
-import { createUuidV7 } from "@ador/shared/identifiers";
+} from "@frostbite/shared/creator-admission";
+import { createUuidV7 } from "@frostbite/shared/identifiers";
 import { describe, expect, it, vi } from "vitest";
 
 import { createCreatorReviewOperations } from "../src/application/review-operations.ts";
@@ -161,7 +162,7 @@ describe("creator review queue operation", () => {
         { cursor: "not-a-cursor", group: "all", sort: "oldest" },
         context,
       ),
-    ).resolves.toMatchObject({ error: "invalid_request", ok: false });
+    ).resolves.toEqual(invalidCursor);
     expect(service.reviewQueue).not.toHaveBeenCalled();
   });
 });

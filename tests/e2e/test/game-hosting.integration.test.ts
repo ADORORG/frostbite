@@ -60,21 +60,21 @@ describe("hosting a game", () => {
   });
 
   it("answers only under the base path when the game lives under one (domain-path style)", async () => {
-    const hosted = await host(`${fixtures}hosted-game`, "/frostbite");
-    expect(hosted.url.endsWith("/frostbite/")).toBe(true);
+    const hosted = await host(`${fixtures}hosted-game`, "/hosted");
+    expect(hosted.url.endsWith("/hosted/")).toBe(true);
     expect((await get(hosted.url)).status).toBe(200);
     expect((await get(`${hosted.url}main.js`)).status).toBe(200);
     const origin = new URL(hosted.url).origin;
     // The same files are not there at the root, nor under a path that merely starts the same.
     expect((await get(`${origin}/main.js`)).status).toBe(404);
     expect((await get(`${origin}/`)).status).toBe(404);
-    expect((await get(`${origin}/frostbite-other/main.js`)).status).toBe(404);
-    expect((await get(`${origin}/frostbite`)).status).toBe(200);
+    expect((await get(`${origin}/hosted-other/main.js`)).status).toBe(404);
+    expect((await get(`${origin}/hosted`)).status).toBe(200);
   });
 
   it("serves identical bytes in both styles, so one build serves both", async () => {
     const whole = await host(`${fixtures}hosted-game`);
-    const under = await host(`${fixtures}hosted-game`, "/play/frostbite");
+    const under = await host(`${fixtures}hosted-game`, "/play/hosted");
     for (const file of [
       "",
       "styles.css",

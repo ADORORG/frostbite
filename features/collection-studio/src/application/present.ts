@@ -2,13 +2,13 @@ import type {
   CollectionAggregate,
   CollectionItemRecord,
   CollectionSummaryRecord,
-} from "@ador/collections";
+} from "@frostbite/collections";
 import type {
   CollectionDetail,
   CollectionSummary,
-} from "@ador/shared/collections";
-import { uuidV7Schema, type UuidV7 } from "@ador/shared/identifiers";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/shared/collections";
+import { uuidV7Schema, type UuidV7 } from "@frostbite/shared/identifiers";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 
 export function presentItem(item: CollectionItemRecord) {
   return {

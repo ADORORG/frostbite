@@ -6,7 +6,7 @@ Baseline: `12e1dd0` (branch `feat/creator-review-queue`, stacked on `feat/applic
 
 ## What was built
 
-- **Contract** (`@ador/shared/creator-admission/review-queue.ts`): groups (all, needs review, approved or paused,
+- **Contract** (`@frostbite/shared/creator-admission/review-queue.ts`): groups (all, needs review, approved or paused,
   finished) with their states, three sorts (oldest, newest, name), UTF-8 safe opaque keyset cursor, queue and read
   schemas, label maps, two routes (`review-queue`, `review-read`) and the detail page path.
 - **Repository + service**: `listForReview` (latest submission per application, text keyset `(key, id)`

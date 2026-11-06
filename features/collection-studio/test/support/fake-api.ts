@@ -1,12 +1,12 @@
-import { ApiError } from "@ador/client-http";
+import { ApiError } from "@frostbite/client-http";
 import type {
   CollectionDetail,
   CollectionSubmission,
   CollectionSummary,
-} from "@ador/shared/collections";
-import type { CreatorApplicationState } from "@ador/shared/creator-admission";
-import { idempotencyKeySchema } from "@ador/shared/http";
-import type { LibraryAsset } from "@ador/shared/uploads";
+} from "@frostbite/shared/collections";
+import type { CreatorApplicationState } from "@frostbite/shared/creator-admission";
+import { idempotencyKeySchema } from "@frostbite/shared/http";
+import type { LibraryAsset } from "@frostbite/shared/uploads";
 import { vi } from "vitest";
 
 import type { CollectionsApi } from "../../src/client/collections-api.ts";

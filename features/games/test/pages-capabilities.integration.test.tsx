@@ -1,4 +1,4 @@
-import { WalletProvider } from "@ador/wallet/client";
+import { WalletProvider } from "@frostbite/wallet/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -13,7 +13,7 @@ import {
   startGameRunRoute,
   submitGameClaimRoute,
   submitGameRunRoute,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 import { createGamesEntrypoint } from "../src/entrypoint.tsx";
 import { createGamesFeature } from "../src/registration.ts";
 import {

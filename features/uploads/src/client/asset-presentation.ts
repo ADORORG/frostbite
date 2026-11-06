@@ -2,7 +2,7 @@ import type {
   DerivativeAccess,
   LibraryAsset,
   LibraryDerivative,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 import type { ArcadeTone } from "@repo/ui/arcade";
 

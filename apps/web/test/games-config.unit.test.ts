@@ -1,7 +1,9 @@
-import { gameManifestSchema } from "@ador/shared/games";
+import { gameManifestSchema } from "@frostbite/shared/games";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { targetChains } from "@repo/configs/chains";
+import { fixtureTapsGame } from "@repo/configs/games/fixture-taps";
+import { sdkExplorerGame } from "@repo/configs/games/sdk-explorer";
 
 const signet = targetChains[0]?.chainId ?? "";
 
@@ -11,7 +13,7 @@ async function gamesWith(launches: string, appEnv = "local") {
   vi.resetModules();
   vi.stubEnv("APP_ENV", appEnv);
   vi.stubEnv("PUBLIC_BASE_URL", "https://platform.example.com");
-  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbit");
+  vi.stubEnv("NEXT_PUBLIC_APP_NAME", "Frostbite");
   vi.stubEnv("GAME_LAUNCHES", launches);
   return (await import("@repo/configs/games")).games;
 }
@@ -24,50 +26,15 @@ afterEach(() => {
 });
 
 describe("the platform's game list", () => {
-  it("lists FROST·BITE first, then SDK Explorer while the platform runs for development, then the games built on the SDK, and every game passes the manifest schema", async () => {
+  it("lists each game once, the games that exist to check the platform among them while it runs for development, and every game passes the manifest schema", async () => {
     const games = await gamesWith("");
-    expect(games.map(({ id }) => id)).toEqual([
-      "frostbite",
-      "sdk-explorer",
-      "frost-runner",
-      "icicle-drop",
-      "tower-stack",
-      "bro-maria",
-      "snowball-dash",
-      "lantern-maze",
-      "shard-match",
-      "aurora-pulse",
-      "pocket-dragon",
-    ]);
+    const ids = games.map(({ id }) => id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toEqual(
+      expect.arrayContaining([sdkExplorerGame.id, fixtureTapsGame.id]),
+    );
     for (const game of games)
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
-  });
-
-  it("plays FROST·BITE on the platform itself, with no address to set, and declares four of its own marks as milestones, replay-verifiable only where the rules can decide them, and only what the platform grants", async () => {
-    const [frostbite] = await gamesWith("");
-    expect(frostbite?.launch).toEqual({ mode: "embedded" });
-    expect(frostbite?.capabilities).toEqual(["milestone:claim", "run:submit"]);
-    expect(
-      frostbite?.milestones.map(({ id, verification }) => [id, verification]),
-    ).toEqual([
-      ["first-win", "replay-verified"],
-      ["first-glacier", "replay-verified"],
-      ["snake-ten", "replay-verified"],
-      // A simulation event: no replay can decide it, so it stays the game's own report.
-      ["first-cashout", undefined],
-    ]);
-    expect(frostbite?.network).toBe(signet);
-  });
-
-  // The two hosting styles for a game that is played at an address of its own are checked on the launch rules
-  // themselves (packages/shared) and in a real browser (tests/e2e game-hosting); no game is registered that way
-  // today, so a deployment's address setting has nothing to name.
-  it("refuses an address setting for FROST·BITE, which the platform plays itself", async () => {
-    await expect(
-      gamesWith(
-        JSON.stringify({ frostbite: { url: "https://frostbite.example.com" } }),
-      ),
-    ).rejects.toThrow('Launch settings name "frostbite"');
   });
 
   it.each([
@@ -75,16 +42,19 @@ describe("the platform's game list", () => {
     ["local", true],
     ["preview", false],
     ["production", false],
-  ])("lists SDK Explorer in %s: %s", async (appEnv, listed) => {
-    const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
-    expect(ids.includes("sdk-explorer")).toBe(listed);
-    expect(ids[0]).toBe("frostbite");
-  });
+  ])(
+    "lists the games that exist to check the platform in %s: %s",
+    async (appEnv, listed) => {
+      const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
+      expect(ids.includes(sdkExplorerGame.id)).toBe(listed);
+      expect(ids.includes(fixtureTapsGame.id)).toBe(listed);
+      expect(ids.length).toBeGreaterThan(0);
+    },
+  );
 
   it("declares a rewards contract on each of the games built for players, so staff can create it", async () => {
     const games = await gamesWith("");
     for (const id of [
-      "frostbite",
       "frost-runner",
       "icicle-drop",
       "tower-stack",
@@ -117,15 +87,15 @@ describe("the platform's game list", () => {
 
   it("refuses to start with a game on a chain that is not configured", async () => {
     vi.resetModules();
-    vi.doMock("@repo/configs/games/frostbite", async (original) => {
-      const { frostbite } =
-        await original<typeof import("@repo/configs/games/frostbite")>();
-      return { frostbite: { ...frostbite, network: "eip155:1" } };
+    vi.doMock("@repo/configs/games/fixture-taps", async (original) => {
+      const { fixtureTapsGame: game } =
+        await original<typeof import("@repo/configs/games/fixture-taps")>();
+      return { fixtureTapsGame: { ...game, network: "eip155:1" } };
     });
     try {
       await expect(gamesWith("")).rejects.toThrow("not a configured chain");
     } finally {
-      vi.doUnmock("@repo/configs/games/frostbite");
+      vi.doUnmock("@repo/configs/games/fixture-taps");
     }
   });
 

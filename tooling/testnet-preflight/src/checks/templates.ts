@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import { packCode, sha256Hex } from "@ador/chain/bitcoin-alkanes";
+import { packCode, sha256Hex } from "@frostbite/chain/bitcoin-alkanes";
 
 import { messageOf, type CheckResult } from "../result.ts";
 

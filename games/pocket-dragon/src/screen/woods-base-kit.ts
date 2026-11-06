@@ -1,4 +1,4 @@
-import { sprite } from "@ador/game-sdk/pixels";
+import { sprite } from "@frostbite/game-sdk/pixels";
 
 import type { Spot } from "../rules/grid.ts";
 import { baseKit } from "../rules/woods/base-map.ts";

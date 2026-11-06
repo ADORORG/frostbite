@@ -1,6 +1,6 @@
-import type { ChainOption } from "@ador/shared/chain";
-import type { CollectionListResponse } from "@ador/shared/collections";
-import { collectionNewPath } from "@ador/shared/collections";
+import type { ChainOption } from "@frostbite/shared/chain";
+import type { CollectionListResponse } from "@frostbite/shared/collections";
+import { collectionNewPath } from "@frostbite/shared/collections";
 import {
   ArcadeActionButton,
   ArcadeButton,

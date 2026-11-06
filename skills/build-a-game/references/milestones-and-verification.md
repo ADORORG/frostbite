@@ -3,7 +3,7 @@
 ## The manifest
 
 One `defineGame({...})` record, validated when the platform starts. Fields: `schemaVersion: 1`, `id` (lower-case words joined by
-hyphens; the page address and every record's key), `title`, `summary` (one sentence for the list), `description`, `version`, `network`
+hyphens; the page address and every record's key), `title`, `summary` (one sentence for the list), `tags` (one to four kinds from the platform's list as `gameTags` lists them in the platform's shared games module: action, arcade, developer, endless, platformer, puzzle, reflex, rhythm, strategy; the games page searches and filters by them), `description`, `version`, `network`
 (a chain the platform is configured for), `launch: { mode: "embedded" }`, `capabilities`, `cover`, optional `scene` (a name from the
 platform's scene library, which refuses to start with a name it does not have), `milestones`, and for a rewarding game `rewards` and
 `verification`. Strict fields: an unknown one is refused.

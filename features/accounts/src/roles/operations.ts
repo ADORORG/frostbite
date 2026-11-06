@@ -2,11 +2,11 @@ import type {
   DirectoryEntry,
   RoleAdministration,
   RoleDirectory,
-} from "@ador/authorization";
-import type { HttpOperation } from "@ador/http";
-import { unauthenticated } from "@ador/http/outcome";
-import { manageRolesCapability } from "@ador/shared/accounts";
-import { uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/authorization";
+import type { HttpOperation } from "@frostbite/http";
+import { unauthenticated } from "@frostbite/http/outcome";
+import { manageRolesCapability } from "@frostbite/shared/accounts";
+import { uuidV7Schema } from "@frostbite/shared/identifiers";
 
 import { outcomeFailure } from "../application/outcomes.ts";
 

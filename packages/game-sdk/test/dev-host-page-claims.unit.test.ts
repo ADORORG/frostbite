@@ -76,22 +76,22 @@ describe("the toast, the reset and stopping", () => {
     await ask("ready", { sdkVersion: 1 });
     await ask("progress.save", { state: { level: 3 } });
     window.localStorage.setItem("another-site", "kept");
-    window.localStorage.setItem("ador:game:other-game:progress", "kept");
+    window.localStorage.setItem("frostbite:game:other-game:progress", "kept");
     expect(
       Object.keys(window.localStorage).some((key) =>
-        key.startsWith("ador:game:tiny-game:"),
+        key.startsWith("frostbite:game:tiny-game:"),
       ),
     ).toBe(true);
     await click("dev-reset");
     expect(
       Object.keys(window.localStorage).filter((key) =>
-        key.startsWith("ador:game:tiny-game:"),
+        key.startsWith("frostbite:game:tiny-game:"),
       ),
     ).toEqual([]);
     expect(window.localStorage.getItem("another-site")).toBe("kept");
-    expect(window.localStorage.getItem("ador:game:other-game:progress")).toBe(
-      "kept",
-    );
+    expect(
+      window.localStorage.getItem("frostbite:game:other-game:progress"),
+    ).toBe("kept");
     expect(state.recordedSrc).toHaveLength(2);
   });
 

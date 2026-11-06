@@ -51,3 +51,31 @@ describe("the stage", () => {
     expect(markup).toContain("<iframe");
   });
 });
+
+describe("the stage's way out", () => {
+  const stage = (theatre: boolean, exit?: boolean) =>
+    renderToStaticMarkup(
+      <ArcadeStage
+        bar={<span>bar</span>}
+        {...(exit === true ? { exit: <span>out</span> } : {})}
+        theatre={theatre}
+      >
+        <iframe title="game" />
+      </ArcadeStage>,
+    );
+
+  it("takes the bar's place while the stage covers the window, and only then", () => {
+    const covering = stage(true, true);
+    expect(covering).toContain("arcade-stage__exit");
+    expect(covering).not.toContain("arcade-stage__bar");
+    const ordinary = stage(false, true);
+    expect(ordinary).toContain("arcade-stage__bar");
+    expect(ordinary).not.toContain("arcade-stage__exit");
+  });
+
+  it("is not there when none was given, so the bar stays in theatre", () => {
+    const markup = stage(true);
+    expect(markup).toContain("arcade-stage__bar");
+    expect(markup).not.toContain("arcade-stage__exit");
+  });
+});

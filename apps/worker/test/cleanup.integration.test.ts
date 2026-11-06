@@ -2,8 +2,8 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
   uploadIntents,
-} from "@ador/database";
-import { defaultUploadPolicy } from "@ador/shared/uploads";
+} from "@frostbite/database";
+import { defaultUploadPolicy } from "@frostbite/shared/uploads";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 

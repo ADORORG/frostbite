@@ -1,7 +1,7 @@
 import {
   collectionLimits,
   type CollectionItem,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import { sql } from "drizzle-orm";
 import {
   check,

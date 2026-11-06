@@ -8,8 +8,8 @@ another game.
 
 ## Controls
 
-Arrows or A and D run, space or up or W jump (hold for a high jump, tap for a hop), Enter starts a run, P pauses. On a touch screen there are
-three buttons. M and N turn the music and the effects off and on; the sound panel is at the bottom left.
+Arrows or A and D run, space or up or W jump (hold for a high jump, tap for a hop), Enter starts a run, P pauses. On a touch screen there are no buttons: the screen is cut in three and a finger holds what is under it (`src/screen/thumbs.ts` on the SDK's `touch-zones`): the left quarter runs back, the next quarter runs forward, the right half jumps, and
+a tap on the waiting screen starts a run. A pause icon and the two sound icons sit in the top right corner. M and N turn the music and the effects off and on; the sound panel is at the bottom left.
 
 ## Layout
 

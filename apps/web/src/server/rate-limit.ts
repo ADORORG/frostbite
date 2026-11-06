@@ -1,6 +1,9 @@
-import { createPostgresRateLimiter } from "@ador/database/rate-limit";
-import { createRateLimitGate, type RateLimitGate } from "@ador/http/rate-limit";
-import type { RateLimitDecision } from "@ador/shared/http";
+import { createPostgresRateLimiter } from "@frostbite/database/rate-limit";
+import {
+  createRateLimitGate,
+  type RateLimitGate,
+} from "@frostbite/http/rate-limit";
+import type { RateLimitDecision } from "@frostbite/shared/http";
 import { parseSecurityEnvironment } from "@repo/config/env";
 
 import { rateLimits } from "@repo/configs/rate-limits";

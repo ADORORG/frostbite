@@ -3,8 +3,8 @@ import {
   creatorApplications,
   platformRoleAssignments,
   type CreatorApplication,
-} from "@ador/database";
-import { expectToWait, holdTransaction } from "@ador/test-kit/race";
+} from "@frostbite/database";
+import { expectToWait, holdTransaction } from "@frostbite/test-kit/race";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

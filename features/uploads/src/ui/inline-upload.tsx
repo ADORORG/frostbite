@@ -4,7 +4,7 @@ import {
   defaultUploadPolicy,
   uploadContentTypes,
   type UploadPurpose,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 import { ArcadeFileDrop } from "@repo/ui/arcade";
 import { useCallback, useRef, useState } from "react";
 
@@ -13,7 +13,10 @@ import {
   type UploadsClientServices,
 } from "../client/browser-services.ts";
 import { purposeLabels } from "../client/purpose-labels.ts";
-import { describeByteLimit } from "../client/rejection-copy.ts";
+import {
+  describeByteLimit,
+  describeUploadHint,
+} from "../client/rejection-copy.ts";
 import type { UploadEvent } from "../client/upload-state.ts";
 import { UploadFeedback } from "./components/upload-feedback.tsx";
 import { useUploadSession } from "./hooks/use-upload-session.ts";
@@ -57,7 +60,7 @@ export function InlineUpload({
       <ArcadeFileDrop
         accept={accept}
         disabled={session.busy}
-        hint={`PNG, JPEG, or WebP, up to ${limit}. Animated images are not supported.`}
+        hint={describeUploadHint(limit)}
         label={`Upload ${purposeLabels[purpose].toLowerCase()}`}
         onFile={(file) => session.select(file, purpose)}
       />

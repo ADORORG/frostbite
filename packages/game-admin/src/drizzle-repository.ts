@@ -1,10 +1,14 @@
-import type { DatabaseClient } from "@ador/database/connection";
-import { gameAdminSteps } from "@ador/database/schema/game-admin";
-import { readTracked, sentAtAfter, trackedValues } from "@ador/shared/chain";
+import type { DatabaseClient } from "@frostbite/database/connection";
+import { gameAdminSteps } from "@frostbite/database/schema/game-admin";
+import {
+  readTracked,
+  sentAtAfter,
+  trackedValues,
+} from "@frostbite/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
-import { writeRecording } from "@ador/database/game-contracts";
+import { writeRecording } from "@frostbite/database/game-contracts";
 import type { AdminAction, GameAdminRepository, StoredStep } from "./types.ts";
 
 type Row = typeof gameAdminSteps.$inferSelect;

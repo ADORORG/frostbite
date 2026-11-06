@@ -1,4 +1,4 @@
-import { collectionListResponseSchema } from "@ador/shared/collections";
+import { collectionListResponseSchema } from "@frostbite/shared/collections";
 import { expect, test } from "@playwright/test";
 
 import { creatorE2EFixtures } from "../src/creator-fixtures.ts";

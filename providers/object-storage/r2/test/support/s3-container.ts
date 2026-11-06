@@ -1,4 +1,4 @@
-import { startS3Runtime } from "@ador/test-kit/s3-runtime";
+import { startS3Runtime } from "@frostbite/test-kit/s3-runtime";
 
 // Browser origin the disposable service allows, so CORS-dependent checks have something to verify.
 export const testWebOrigin = "https://app.example.test";

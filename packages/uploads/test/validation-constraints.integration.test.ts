@@ -1,4 +1,4 @@
-import { assets } from "@ador/database";
+import { assets } from "@frostbite/database";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 

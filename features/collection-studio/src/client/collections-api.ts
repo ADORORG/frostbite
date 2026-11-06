@@ -1,4 +1,8 @@
-import { ApiError, createRequester, type FetchLike } from "@ador/client-http";
+import {
+  ApiError,
+  createRequester,
+  type FetchLike,
+} from "@frostbite/client-http";
 import {
   collectionDetailSchema,
   collectionImportResponseSchema,
@@ -24,18 +28,18 @@ import {
   type SaveCollectionDraftInput,
   type SubmitCollectionInput,
   type UpdateCollectionItemInput,
-} from "@ador/shared/collections";
+} from "@frostbite/shared/collections";
 import {
   creatorApplicationResponseSchema,
   creatorApplicationRoutes,
   type CreatorApplicationState,
-} from "@ador/shared/creator-admission";
-import type { IdempotencyKey } from "@ador/shared/http";
+} from "@frostbite/shared/creator-admission";
+import type { IdempotencyKey } from "@frostbite/shared/http";
 import {
   libraryResponseSchema,
   libraryRoute,
   type LibraryResponse,
-} from "@ador/shared/uploads";
+} from "@frostbite/shared/uploads";
 
 // The state of the caller's creator application; `state` is null if they never applied. An object, so a
 // person who never applied is an answer that has arrived, not an absence of one.
@@ -160,4 +164,4 @@ export function createCollectionsApi(fetchImpl: FetchLike): CollectionsApi {
   };
 }
 
-export type { FetchLike } from "@ador/client-http";
+export type { FetchLike } from "@frostbite/client-http";

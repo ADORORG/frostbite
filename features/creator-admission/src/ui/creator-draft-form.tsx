@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   creatorApplicationRoutes,
   type CreatorApplicationResponse,
-} from "@ador/shared/creator-admission";
+} from "@frostbite/shared/creator-admission";
 import { ArcadePanel, StatusLamp } from "@repo/ui/arcade";
 
 import {

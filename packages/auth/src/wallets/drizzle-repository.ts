@@ -1,15 +1,15 @@
 import type {
   DatabaseClient,
   DatabaseTransaction,
-} from "@ador/database/connection";
+} from "@frostbite/database/connection";
 import {
   authSecurityEvents,
   authSessions,
   walletIdentities,
-} from "@ador/database/schema/auth";
-import { releasedWallets } from "@ador/database/schema/wallet-release";
-import { walletNetworkSchema } from "@ador/shared/chain";
-import { createUuidV7, uuidV7Schema } from "@ador/shared/identifiers";
+} from "@frostbite/database/schema/auth";
+import { releasedWallets } from "@frostbite/database/schema/wallet-release";
+import { walletNetworkSchema } from "@frostbite/shared/chain";
+import { createUuidV7, uuidV7Schema } from "@frostbite/shared/identifiers";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { lockActiveSession } from "../adapters/lock-active-session.ts";

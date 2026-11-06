@@ -1,14 +1,14 @@
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import type { WalletConnectionClient } from "@ador/wallet/client";
+import type { WalletConnectionClient } from "@frostbite/wallet/client";
 import { beforeAll, beforeEach, expect, it, vi } from "vitest";
 
 import { WalletChooserDialog } from "../src/widget/chooser-dialog.tsx";
 import { walletConfig } from "./support/wallet-config.ts";
 
 const state = vi.hoisted(() => ({ chooser: { dismiss: vi.fn(), open: true } }));
-vi.mock("@ador/wallet/client", () => ({
+vi.mock("@frostbite/wallet/client", () => ({
   classifyWalletConnectionError: () => ({ kind: "failed", message: "x" }),
   useWalletChooser: () => state.chooser,
   walletNetworkUnavailableReason: () => null,

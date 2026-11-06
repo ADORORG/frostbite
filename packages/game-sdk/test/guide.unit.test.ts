@@ -1,65 +1,18 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import {
   drawGuide,
   fillGuide,
   fittedSize,
   glyphWidth,
+  linesFor,
+  startLineFor,
+  touchStartLine,
   widestShare,
   type Guide,
 } from "../src/guide.ts";
-
-// A context that remembers each piece of text (with the size and colour it was written in) and each fill.
-function recorder() {
-  const texts: {
-    fill: string;
-    size: number;
-    text: string;
-    x: number;
-    y: number;
-  }[] = [];
-  const fills: {
-    alpha: number;
-    fill: string;
-    height: number;
-    width: number;
-  }[] = [];
-  const state = { alpha: 1, fill: "", font: "" };
-  const context = {
-    fillRect: (_x: number, _y: number, width: number, height: number) =>
-      void fills.push({ alpha: state.alpha, fill: state.fill, height, width }),
-    fillText: (text: string, x: number, y: number) =>
-      void texts.push({
-        fill: state.fill,
-        size: Number(/(\d+(?:\.\d+)?)px/u.exec(state.font)?.[1]),
-        text,
-        x,
-        y,
-      }),
-    get fillStyle() {
-      return state.fill;
-    },
-    set fillStyle(value: string) {
-      state.fill = value;
-    },
-    get font() {
-      return state.font;
-    },
-    set font(value: string) {
-      state.font = value;
-    },
-    get globalAlpha() {
-      return state.alpha;
-    },
-    set globalAlpha(value: number) {
-      state.alpha = value;
-    },
-    textAlign: "",
-    textBaseline: "",
-  } as unknown as CanvasRenderingContext2D;
-  return { context, fills, texts };
-}
+import { recorder } from "./support/canvas-recorder.ts";
 
 const guide: Guide = {
   lines: ["SPACE OR UP: JUMP", "ARROWS: RUN"],
@@ -163,5 +116,105 @@ describe("the guide as page elements", () => {
     expect(box.lastElementChild?.className).toBe("guide-start");
     fillGuide(box, { ...guide, lines: [] });
     expect(box.children).toHaveLength(2);
+  });
+});
+
+describe("the line that says how to begin", () => {
+  const touch = (matches: boolean) => {
+    window.matchMedia = ((query: string) => ({
+      matches: matches && query === "(pointer: coarse)",
+    })) as unknown as typeof window.matchMedia;
+  };
+  afterEach(() => Reflect.deleteProperty(window, "matchMedia"));
+
+  it("is the game's own on a screen with a keyboard", () => {
+    touch(false);
+    expect(startLineFor("ENTER TO START")).toBe("ENTER TO START");
+  });
+
+  it("tells a touch screen to tap, since it has no Enter", () => {
+    touch(true);
+    expect(startLineFor("ENTER TO START")).toBe(touchStartLine);
+  });
+
+  it("is the game's own words for a touch screen, where it gave some, and its keyboard line is untouched", () => {
+    const card = { ...guide, touchStart: "TAP TO PRACTISE LEVEL 2" };
+    touch(true);
+    expect(startLineFor("ENTER TO START", "TAP TO PRACTISE LEVEL 2")).toBe(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+    const r = recorder();
+    drawGuide(r.context, 320, 180, card);
+    const written = r.texts.map(({ text }) => text);
+    expect(written).toContain("TAP TO PRACTISE LEVEL 2");
+    expect(written).not.toContain(touchStartLine);
+    const box = document.createElement("div");
+    fillGuide(box, card);
+    expect(box.querySelector(".guide-start")?.textContent).toBe(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+    touch(false);
+    const keys = recorder();
+    drawGuide(keys.context, 320, 180, card);
+    expect(keys.texts.map(({ text }) => text)).toContain(guide.start);
+    expect(keys.texts.map(({ text }) => text)).not.toContain(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+  });
+
+  it("is \"TAP TO START\" where the game's touch line is blank, on the canvas card, the page's card and by itself", () => {
+    touch(true);
+    for (const blank of ["", "   "]) {
+      const card = { ...guide, touchStart: blank };
+      expect(startLineFor("ENTER TO START", blank)).toBe(touchStartLine);
+      const r = recorder();
+      drawGuide(r.context, 320, 180, card);
+      expect(r.texts.map(({ text }) => text)).toContain(touchStartLine);
+      const box = document.createElement("div");
+      fillGuide(box, card);
+      expect(box.querySelector(".guide-start")?.textContent).toBe(
+        touchStartLine,
+      );
+    }
+    touch(false);
+    expect(startLineFor("ENTER TO START", "")).toBe("ENTER TO START");
+  });
+
+  it("is the one the canvas card writes", () => {
+    touch(true);
+    const r = recorder();
+    drawGuide(r.context, 320, 180, guide);
+    expect(r.texts.map(({ text }) => text)).toContain(touchStartLine);
+    expect(r.texts.map(({ text }) => text)).not.toContain(guide.start);
+  });
+
+  it("is the one a page's card shows", () => {
+    touch(true);
+    const box = document.createElement("div");
+    fillGuide(box, guide);
+    expect(box.querySelector(".guide-start")?.textContent).toBe(touchStartLine);
+  });
+
+  it("has its own lines for a touch screen, where the game gave some", () => {
+    touch(true);
+    const card = { ...guide, touchLines: ["DRAG TO RUN"] };
+    const r = recorder();
+    drawGuide(r.context, 320, 180, card);
+    const written = r.texts.map(({ text }) => text);
+    expect(written).toContain("DRAG TO RUN");
+    expect(written).not.toContain(guide.lines[0]);
+    // The card is laid out for the lines it shows, not for the ones it does not.
+    const plain = recorder();
+    drawGuide(plain.context, 320, 180, { ...guide, lines: ["DRAG TO RUN"] });
+    expect(r.texts.map(({ y }) => y)).toEqual(plain.texts.map(({ y }) => y));
+    const box = document.createElement("div");
+    fillGuide(box, card);
+    expect(
+      [...box.querySelectorAll("p")].map(({ textContent }) => textContent),
+    ).toEqual(["DRAG TO RUN", touchStartLine]);
+    touch(false);
+    expect(linesFor(card)).toEqual(card.lines);
+    touch(true);
+    expect(linesFor(guide)).toEqual(guide.lines);
   });
 });

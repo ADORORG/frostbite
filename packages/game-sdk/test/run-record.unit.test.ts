@@ -12,11 +12,11 @@ import {
 const record = (over: Partial<RunRecord> = {}): RunRecord => ({
   claims: ["first-win"],
   config: { mines: 5 },
-  gameId: "frostbite",
+  gameId: "example-game",
   inputs: [{ data: 3, type: "pick" }, { type: "settle" }],
   schemaVersion: 1,
   seed: 12345,
-  verifier: "ice-field",
+  verifier: "tap-count",
   verifierVersion: 1,
   ...over,
 });
@@ -101,9 +101,9 @@ describe("the record schema", () => {
 describe("the recorder", () => {
   const start = {
     config: { mines: 5 },
-    gameId: "frostbite",
+    gameId: "example-game",
     seed: 7,
-    verifier: "ice-field",
+    verifier: "tap-count",
     verifierVersion: 1,
   };
 
@@ -114,11 +114,11 @@ describe("the recorder", () => {
     expect(recorder.finish(["first-win"])).toEqual({
       claims: ["first-win"],
       config: { mines: 5 },
-      gameId: "frostbite",
+      gameId: "example-game",
       inputs: [{ data: 3, type: "pick" }, { type: "settle" }],
       schemaVersion: 1,
       seed: 7,
-      verifier: "ice-field",
+      verifier: "tap-count",
       verifierVersion: 1,
     });
   });

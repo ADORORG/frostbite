@@ -32,21 +32,66 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
    they differ in meaning, not only in name.
    If nobody can be asked, choose sensible defaults, write the title, summary and milestone list down as a **draft for the owner to
    approve**, and say so in the manifest comment and in your report. The owner approves a game's words and milestones; you do not.
-3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. This gives a minimal
-   starter (a tap counter with `src/game.ts`), not the finished pattern: delete its `src/game.ts` and test, and build the layers in
-   `references/game-pattern.md`, copying the shape of the closest finished game (`references/worked-example.md`). Never start from an
-   empty folder. Outside the repository, copy that structure by hand.
+3. **Scaffold.** In the platform's repository run `pnpm game:new <id> --title "<Title>"` then `pnpm install`. This gives a small
+   finished game in the pattern of `references/game-pattern.md`: seeded rules (`src/rules/`), a session that records the run
+   (`src/session.ts`), the screen, the two cards (`src/guide.ts`, `src/screen/result.ts`), sound, keys, pause, a replay verifier
+   (`src/replay.ts`) and the tests that prove them, already registered and passing. Replace the rules first, then the drawing, the
+   words and the milestones; keep the layers and the wiring in `src/main.ts`. Never start from an empty folder. Outside the
+   repository, copy that structure by hand (`references/worked-example.md`).
 4. **Write the rules first, apart from the screen.** Pure and seeded: the same seed and inputs always give the same run. No clock,
    no `Math.random`, no I/O. See `references/game-pattern.md` and `references/milestones-and-verification.md`.
 5. **Add the screen, sound, keys, pause and a steady layout** with the SDK's pieces, never your own copies. See
-   `references/game-pattern.md` and `references/sdk-cheatsheet.md`.
-6. **Write the manifest** and the milestones. A new game is registered in three places: its manifest `configs/games/<id>.ts`, the
-   list in `configs/games.ts` (both done by `game:new`), and the ordered list of ids in `apps/web/test/games-config.unit.test.ts`
-   (which `game:new` does not touch: add the id yourself). See `references/milestones-and-verification.md`.
+   `references/game-pattern.md` and `references/sdk-cheatsheet.md`. Build for a phone from the first screen, not at the end: see
+   "Phones and notes" below.
+6. **Write the manifest** and the milestones. A new game is registered in two places, both written by `game:new`: its manifest
+   `configs/games/<id>.ts` and the list in `configs/games.ts`. No test needs its id added; the conformance test fails if a folder
+   under `games/` is not registered. See `references/milestones-and-verification.md`.
 7. **Test, run, check.** See `references/test-and-launch.md`. Do not call the game finished until every command listed there has
    run and you have reported what each printed.
 8. **Hand over.** Summarise what was built, what was run and its output, what was not verified (how it looks and sounds, touch on a
    real phone), and the pull request to open. Never push or deploy for the person unless they ask.
+
+## When the starter does not fit
+
+The starter is a one-screen, real-time game drawn on a canvas, whose run is a seeded list of taps the platform can replay. Many games
+fit it; some do not. Scaffold anyway and change only what differs. Keep what every game has: the page skeleton, sound, keys, pause, the
+steady layout, the two cards and the phone rules below. Say in your report what you changed and why.
+
+- **Drawn in page elements, not on a canvas** (a board of tiles): there is no `canvas#screen` to lay the cards over, so a game that
+  does this takes the first-screen card from the page instead (Icicle Drop is the example). The browser contract skips only its check
+  of the card's pixels for such a game.
+- **Turn-based, or no clock**: the starter counts ticks. A game without them still records the player's choices in order and replays
+  them; the rules take a move, not a tick, and the loop and its pause have nothing to advance.
+- **Several screens or levels chosen by the player** (menus, chapters): keep them behind a button, not in the page flow, so the page never scrolls on touch.
+- **More than four extra touch buttons**: one button that cycles the actions, or keys; never a pad under the screen.
+- **Rules the platform cannot replay** (anything that depends on what the rules cannot see): drop `src/replay.ts`, `src/sample-run.ts`,
+  the manifest's `verification` and the milestones' replay-verified mark. The platform's verifier test says what else must agree.
+  Its milestones are then self-reported, and nothing that carries money or a privilege may depend on one.
+
+Never change `tests/e2e/tests/game-contract.spec.ts` to let a game pass. If a game cannot meet one of its checks (its page parts are
+`canvas#screen`, `#start`, `#pause` and its buttons), say which and why in your report, and let the person decide.
+
+## Phones and notes
+
+Players open games on phones. A game that cannot be played there is not finished, whatever its tests say. These are the rules; the
+pieces to use and the files to copy are in `references/game-pattern.md` ("Touch", "Page skeleton").
+
+- **The screen is the controller.** On a touch screen the whole frame is the game: the readouts are one thin line along the top, pause and
+  the two sound icons sit in the top right corner, and the note shows at the foot (only while it has words). Fingers play the game
+  directly. Do not put a pad of buttons under the screen: enough rows of buttons leave the screen no room to be seen. A game that needs a few
+  extra buttons (fire, a special move) uses `attachTouchButtons` (`<sdk>/touch-buttons`): one to four, in the bottom right corner over the
+  screen. A game with more actions cycles them with one of the four or gives them keys.
+- **The page never scrolls on touch.** Import `<sdk>/phone.css` and give the page the parts it lays out. Chapter menus, score lists and
+  cards belong behind a button, not in the page flow.
+- **One note, about how to play.** One short line, worded for a finger as well as for a keyboard. Never say how a run was checked or
+  whether it was sent: no seeds, no "claimed", no "not sent". How the game plays is all the player wants. If a game must
+  say how its milestones are checked, that is a field in the manifest, not words on the screen.
+- **Send the run and say nothing.** At the end of a run call `sendRun(play, runId, record)` (`<sdk>/play`).
+- **Prove it.** The game's integration test must show that a finished run is submitted once and that a test-only or practice run is
+  not (`references/test-and-launch.md`).
+- **Say what you could not check.** Resizing a desktop window does not switch on touch input, but the browser's device mode (a phone
+  profile in DevTools) does, so use it to see the touch layout (`(pointer: coarse)`) and the whole-screen controls. How it feels under a
+  thumb, and on the phone's own browser, only a real phone shows: say plainly that you did not try one unless you did.
 
 ## Rules that are never negotiable
 

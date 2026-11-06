@@ -1,5 +1,5 @@
 import type { StatusTone } from "@repo/ui/arcade";
-import type { ChainIndexing } from "@ador/shared/chain";
+import type { ChainIndexing } from "@frostbite/shared/chain";
 
 // What the lamp says, in the platform's words. "Delayed" is about waiting and never about failing: nothing sent is lost or cancelled.
 export interface IndexingLampView {

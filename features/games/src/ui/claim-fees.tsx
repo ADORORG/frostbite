@@ -3,9 +3,9 @@
 import {
   FeeSpeedChip,
   useFeeQuotes,
-} from "@ador/feature-chain-status/fee-picker";
-import type { ChainStatusApi } from "@ador/feature-chain-status/api";
-import type { FeeSpeed } from "@ador/shared/chain";
+} from "@frostbite/feature-chain-status/fee-picker";
+import type { ChainStatusApi } from "@frostbite/feature-chain-status/api";
+import type { FeeSpeed } from "@frostbite/shared/chain";
 
 import type { ClaimFeeSettings } from "../wallet-config.ts";
 

@@ -1,4 +1,4 @@
-# `@ador/mail`
+# `@frostbite/mail`
 
 The mail port and its senders. Anything that sends a message depends on `MailSender`; a sender is chosen by settings, not by code.
 
@@ -36,7 +36,7 @@ DKIM), or messages are filtered as spam.
 
 ## Tests
 
-`pnpm --filter @ador/mail test:unit`, `test:integration` (real files, and a real SMTP server on a local port), `test:coverage`.
+`pnpm --filter @frostbite/mail test:unit`, `test:integration` (real files, and a real SMTP server on a local port), `test:coverage`.
 
 ## Ownership
 

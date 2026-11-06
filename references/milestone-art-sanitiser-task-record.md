@@ -4,7 +4,7 @@ Branch `feat/g7e-4-svg-sanitiser`, stacked on `feat/g7e-2-alkanes-reads` (baseli
 
 ## What it is
 
-`@ador/milestone-art` cleans a builder's milestone drawing before it is put on chain by the platform. The drawing is read as a strict
+`@frostbite/milestone-art` cleans a builder's milestone drawing before it is put on chain by the platform. The drawing is read as a strict
 subset of SVG (elements with quoted attributes; no text, comments, CDATA, doctype, instructions or entities; printable ASCII), every
 element, attribute and value is checked against an allow-list, references must resolve, and the result is written fresh in one
 canonical form. A drawing is refused with a code and a reason, never repaired.

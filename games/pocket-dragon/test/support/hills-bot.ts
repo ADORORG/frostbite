@@ -1,4 +1,4 @@
-import type { RunInput } from "@ador/game-sdk/run-record";
+import type { RunInput } from "@frostbite/game-sdk/run-record";
 
 import { heroWidth, maxTicks, tile } from "../../src/rules/hills/constants.ts";
 import { hillsRules } from "../../src/rules/hills/index.ts";

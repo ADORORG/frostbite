@@ -1,5 +1,5 @@
-import { ApiError } from "@ador/client-http";
-import { creatorReviewHref } from "@ador/shared/creator-admission";
+import { ApiError } from "@frostbite/client-http";
+import { creatorReviewHref } from "@frostbite/shared/creator-admission";
 import { afterEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { CreatorReviewApi } from "../src/client/review-api.ts";

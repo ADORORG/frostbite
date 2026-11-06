@@ -1,5 +1,5 @@
-import type { MintedMilestone } from "@ador/shared/games";
-import { defineGame } from "@ador/shared/games";
+import type { MintedMilestone } from "@frostbite/shared/games";
+import { defineGame } from "@frostbite/shared/games";
 import { describe, expect, it } from "vitest";
 
 import { createGameCatalog } from "../src/domain/catalog.ts";

@@ -1,26 +1,27 @@
 import { randomBytes } from "node:crypto";
 
-import { createInngestProviderEntrypoint } from "@ador/provider-workflows-inngest/provider-entrypoint";
-import { inngestWorkflowProvider } from "@ador/provider-workflows-inngest/registration";
+import { createInngestProviderEntrypoint } from "@frostbite/provider-workflows-inngest/provider-entrypoint";
+import { inngestWorkflowProvider } from "@frostbite/provider-workflows-inngest/registration";
 import {
   createProviderRegistry,
   defineProvider,
-} from "@ador/plugin-kit/providers";
-import type { UploadCleanupResult } from "@ador/uploads";
+} from "@frostbite/plugin-kit/providers";
+import type { UploadCleanupResult } from "@frostbite/uploads";
 import {
   freePort,
   startInngestRuntime,
   waitFor,
   type InngestRuntime,
-} from "@ador/test-kit/inngest-runtime";
-import { runtimeApi } from "@ador/test-kit/inngest-runtime-api";
+} from "@frostbite/test-kit/inngest-runtime";
+import { runtimeApi } from "@frostbite/test-kit/inngest-runtime-api";
 import {
   serveFetchHandler,
   type ServedEndpoint,
-} from "@ador/test-kit/serve-fetch-handler";
+} from "@frostbite/test-kit/serve-fetch-handler";
 
 import { createWorkerRuntime, type WorkerRuntime } from "../../src/runtime.ts";
 import { countingProcessor, memoryStorage } from "./fakes.ts";
+import { rowSweepLimits } from "./row-sweep-limits.ts";
 
 // Everything a chain test needs, wired the way production wires it except for the two ports faked
 // at their boundary: object storage and the media decoder.
@@ -79,6 +80,7 @@ export async function createScenario() {
   const worker: WorkerRuntime = createWorkerRuntime({
     environment: process.env,
     providers,
+    rowSweepLimits,
   });
   const served: ServedEndpoint = await serveFetchHandler(worker.handle);
   let inngest: InngestRuntime | undefined;

@@ -1,22 +1,25 @@
-import { attachGameHost } from "@ador/game-sdk/attach";
+import { attachGameHost } from "@frostbite/game-sdk/attach";
 import {
   createGameHost,
   type GameHost,
   type HostedGame,
   type ClaimsService,
   type RunsService,
-} from "@ador/game-sdk/host";
-import type { VerificationLevel, WalletInfo } from "@ador/game-sdk/protocol";
-import type { GameClaimState } from "@ador/shared/games";
+} from "@frostbite/game-sdk/host";
+import type {
+  VerificationLevel,
+  WalletInfo,
+} from "@frostbite/game-sdk/protocol";
+import type { GameClaimState } from "@frostbite/shared/games";
 import {
   createLocalBackend,
   type KeyValueStorage,
-} from "@ador/game-sdk/local-backend";
+} from "@frostbite/game-sdk/local-backend";
 import {
   createSyncedBackend,
   type AccountPort,
   type SyncStatus,
-} from "@ador/game-sdk/synced-backend";
+} from "@frostbite/game-sdk/synced-backend";
 import {
   useCallback,
   useEffect,
@@ -30,6 +33,7 @@ import { createAccountPort } from "../client/account-sync.ts";
 import { createClaimsService } from "../client/claims-port.ts";
 import { createRunsService } from "../client/runs-port.ts";
 import { useHostEvents } from "./use-host-events.ts";
+import { useKeyForwarding } from "./use-key-forwarding.ts";
 
 // How long a "milestone reached" notice stays up.
 export const toastMs = 6_000;
@@ -57,7 +61,7 @@ function browserStorage(): {
 } {
   try {
     const { localStorage } = window;
-    localStorage.getItem("ador:probe");
+    localStorage.getItem("frostbite:probe");
     return { kept: true, storage: localStorage };
   } catch {
     const memory = new Map<string, string>();
@@ -236,6 +240,7 @@ export function useGameSession(
   }, [canConnect, capabilities, frame, id, milestones, src, title]);
 
   useHostEvents(host, frame, wallet);
+  useKeyForwarding(host, connected);
 
   // Tells the game how a claim is going; dropped for a game that did not declare `milestone:claim`.
   const emitClaim = useCallback(

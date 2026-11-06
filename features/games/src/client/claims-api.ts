@@ -2,7 +2,7 @@ import {
   createRequester,
   sameOriginFetch,
   type FetchLike,
-} from "@ador/client-http";
+} from "@frostbite/client-http";
 import {
   listGameClaimsResponseSchema,
   listGameClaimsRoute,
@@ -18,7 +18,7 @@ import {
   type StartGameClaimResponse,
   type SubmitGameClaimInput,
   type SubmitGameClaimResponse,
-} from "@ador/shared/games";
+} from "@frostbite/shared/games";
 
 // How long a request about a claim may take: starting one builds a transaction and asks the chain its cost, so it is given
 // longer than a look.
