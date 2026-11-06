@@ -119,6 +119,25 @@ describe("refusing before writing anything", () => {
     expect(await read("configs/games.ts")).toBe(registryText);
   });
 
+  it("leaves nothing behind when the manifest pins a verifier the game does not have", async () => {
+    await writeFile(
+      paths.templateManifestFile,
+      `${manifestText}// sha256: "${"0".repeat(64)}"\n`,
+    );
+    expect(await failure("pinless")).toMatchObject({
+      message: expect.stringContaining("has no src/replay.ts"),
+    });
+    expect(await exists(join(paths.gamesDirectory, "pinless"))).toBe(false);
+    expect(await exists(join(paths.manifestDirectory, "pinless.ts"))).toBe(
+      false,
+    );
+    expect(await read("configs/games.ts")).toBe(registryText);
+    // And the author can try again, since nothing is in the way.
+    expect(await failure("pinless")).toMatchObject({
+      message: expect.stringContaining("has no src/replay.ts"),
+    });
+  });
+
   it.each([
     ["the import anchor", "// game:new adds imports above this line."],
     ["the game anchor", "// game:new adds games above this line."],

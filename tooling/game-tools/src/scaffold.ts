@@ -191,7 +191,15 @@ export async function scaffoldGame(options: {
         `// ${title}, started from the template. Replace the description, summary, tags and milestones; a milestone's id\n// must be one the game's code asks the platform to unlock.\n${manifestBody}`,
     ),
   );
-  await pinVerifier(folder, manifestFile);
+  // A game that cannot be pinned is not left half made: the rest of this function is the registry line, and a folder with no registry
+  // line would be refused as "already exists" the next time.
+  try {
+    await pinVerifier(folder, manifestFile);
+  } catch (error) {
+    await rm(folder, { force: true, recursive: true });
+    await rm(manifestFile, { force: true });
+    throw error;
+  }
   await writeFile(
     paths.registryFile,
     registry
