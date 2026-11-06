@@ -20,7 +20,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { cameraTarget, easeCamera } from "./screen/camera.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";

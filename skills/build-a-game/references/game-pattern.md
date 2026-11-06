@@ -12,8 +12,9 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 3. **Screen** (`src/screen/`): draws a state. Pure functions of state; no game logic.
 4. **Audio and feedback** (`src/audio.ts`, `src/feedback.ts`): sound as data, and a pure function from "state before, state after" to
    the effect names to play.
-5. **Progress** (`src/progress.ts`): the shape of what is saved (`best`, `sound`), with `restore(unknown)` that validates anything
-   the platform hands back and falls back to a fresh game.
+5. **Progress** (`<sdk>/best-progress`, not a file of the game): the shape of what is saved (`best`, `sound`), with `restore(unknown)`
+   that validates anything the platform hands back and falls back to a fresh game, `withBest`, `withSound`, and `finishRun(progress, score)`,
+   which keeps the best and says whether this run beat it (`newBest`). A game that saves more than that keeps its own module.
 6. **Page** (`src/main.ts`): joins the above to the DOM and the platform. It saves nothing itself.
 7. **Verifier** (`src/replay.ts`): a default export of the rules and a named export `sample()` returning one legal run.
 
@@ -52,7 +53,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 - **Sharp cards**: never write the first-screen card (title, how to play, how to begin) or the card after a run (score, best) on the game's own canvas: the page scales
   that canvas up and blurs the writing, on a phone worst of all. Give the game a `guide.ts` (a `Guide`: `title`, `lines`, `start`, and
   `touchLines` where a phone is told something else, `touchStart` where the start line names what a tap begins), lay it over the screen with `createGuideLayer(screen)` from
-  `<sdk>/guide-layer`, and `show(cardOf(state, view))` after every change. `cardOf` is a function in `src/screen/result.ts`, not a branch in `main.ts`: it returns the first-screen guide while the game waits to begin, the result card once a run is over, and `null` while a run goes, so the choice is unit-tested (jsdom has no canvas, so `show()` itself cannot be). The card after a run is a `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) built by the game's `resultOf(state, view)`, which returns null unless the run is over. Copy `games/lantern-maze/src/screen/result.ts`.
+  `<sdk>/guide-layer`, and `show(cardFor(view.phase, guide, () => resultOf(state, view)))` after every change. `cardFor` (`<sdk>/card`, with the `Phase` and `RunView` types a game's view is made of) returns the first-screen guide while the game waits to begin, the result card once a run is over, and `null` while a run goes, so the choice is made once, in the SDK, and tested there (jsdom has no canvas, so `show()` itself cannot be). The card after a run is a `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) built by the game's `resultOf(state, view)`, which returns null unless the run is over. Copy `games/lantern-maze/src/screen/result.ts`.
 - **Plays without the platform**: a failed `ready()` only changes the status line, a failed `run.start()` says nothing, and the game
   still starts on a seed of its own (its milestones are then self-reported).
 

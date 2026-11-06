@@ -20,7 +20,7 @@ import {
   withBest,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachControls } from "./screen/controls.ts";
 import { ticksPerSecond } from "./rules/constants.ts";

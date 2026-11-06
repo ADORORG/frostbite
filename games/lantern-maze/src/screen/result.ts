@@ -1,13 +1,11 @@
 import {
   bestLine,
-  type Card,
   resultWeight,
   type ResultCard,
 } from "@frostbite/game-sdk/guide";
 import { byInput } from "@frostbite/game-sdk/touch";
 
 import type { MazeState } from "../rules/state.ts";
-import { guide } from "../guide.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -46,7 +44,3 @@ export const resultOf = (state: MazeState, view: View): ResultCard | null =>
         ],
       }
     : null;
-
-// What is over the screen: the first-screen card while the game waits to begin, the card after a run once it is over, and nothing while a run goes.
-export const cardOf = (state: MazeState, view: View): Card | null =>
-  view.phase === "ready" ? guide : resultOf(state, view);

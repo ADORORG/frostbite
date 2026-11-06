@@ -1,16 +1,9 @@
 import { frequency, stepsAt } from "@frostbite/game-sdk/audio/tracks";
-import { defaultSound } from "@frostbite/game-sdk/audio/settings";
 import { replayRecord } from "@frostbite/game-sdk/replay";
 import { describe, expect, it } from "vitest";
 
 import { effects, track } from "../src/audio.ts";
 import { worldSounds } from "../src/feedback.ts";
-import {
-  freshProgress,
-  restore,
-  withBest,
-  withSound,
-} from "../src/progress.ts";
 import { jumpSpeed, maxTicks, tile } from "../src/rules/constants.ts";
 import { broRules } from "../src/rules/index.ts";
 import { sample } from "../src/replay.ts";
@@ -19,43 +12,6 @@ import { scoreOf } from "../src/score.ts";
 import { onFlat, withHero } from "./support/states.ts";
 
 const base = onFlat();
-const quiet = { effects: false, music: false, volume: 0.2 };
-
-describe("what the platform hands back", () => {
-  it("is the saved best when it is a whole number of points, and a fresh game otherwise", () => {
-    expect(restore({ best: 120 })).toEqual({ best: 120, sound: defaultSound });
-    for (const bad of [
-      null,
-      undefined,
-      5,
-      "x",
-      {},
-      { best: -1 },
-      { best: 1.5 },
-      { best: "9" },
-    ])
-      expect(restore(bad)).toBe(freshProgress);
-  });
-
-  it("brings back the sound the player chose, and the defaults when it is missing or wrong", () => {
-    expect(restore({ best: 3, sound: quiet }).sound).toEqual(quiet);
-    expect(restore({ best: 3 }).sound).toEqual(defaultSound);
-    expect(restore({ best: 3, sound: { volume: 9 } }).sound).toEqual(
-      defaultSound,
-    );
-  });
-
-  it("keeps the larger best, and changes the sound without touching it", () => {
-    const kept = { best: 100, sound: quiet };
-    expect(withBest(kept, 150)).toEqual({ best: 150, sound: quiet });
-    expect(withBest(kept, 90)).toBe(kept);
-    expect(withBest(kept, 100)).toBe(kept);
-    expect(withSound({ best: 7, sound: defaultSound }, quiet)).toEqual({
-      best: 7,
-      sound: quiet,
-    });
-  });
-});
 
 describe("the score", () => {
   it("is a hundred for a coin, two hundred for a stomp, fifty for a crate, and a bonus for the time left on a finish", () => {

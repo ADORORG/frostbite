@@ -1,5 +1,6 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { cardFor } from "@frostbite/game-sdk/card";
 import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
@@ -15,16 +16,17 @@ import { pulseSounds } from "./feedback.ts";
 import {
   freshProgress,
   restore,
-  withBest,
+  finishRun,
   withSound,
   type Progress,
-} from "./progress.ts";
+} from "@frostbite/game-sdk/best-progress";
 import { ticksPerSecond } from "./rules/constants.ts";
 import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
-import { cardOf } from "./screen/result.ts";
+import { guide } from "./guide.ts";
+import { resultOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createPulseSession, type PulseSession } from "./session.ts";
 
@@ -88,7 +90,7 @@ function show(): void {
   if (context === null) return;
   const state = session?.state() ?? backdrop;
   draw(context, state, view);
-  guideLayer.show(cardOf(state, view));
+  guideLayer.show(cardFor(view.phase, guide, () => resultOf(state, view)));
 }
 
 function addEarned(id: string): void {
@@ -140,12 +142,12 @@ async function finish(finished: PulseSession): Promise<void> {
   sound.music(false);
   const state = finished.state();
   const record = finished.record();
-  const before = progress.best;
-  progress = withBest(progress, state.score);
+  const done = finishRun(progress, state.score);
+  progress = done.progress;
   view = {
     ...view,
     best: progress.best,
-    newBest: progress.best > before && state.score > 0,
+    newBest: done.newBest,
     phase: "over",
   };
   saveProgress();

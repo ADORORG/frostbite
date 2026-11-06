@@ -16,7 +16,6 @@ Nothing: a game is a page. `src/main.ts` joins the pieces to the page and the pl
 | `src/session.ts`                     | One run as the player plays it: ticks the rules, records each tap (with its tick) into a run record, and closes it with the tick it reached.            |
 | `src/screen/`                        | Draws a state on a canvas (the aurora, the lanes and notes, the writing and the cards). Draws and decides nothing.                                      |
 | `src/audio.ts`, `src/feedback.ts`    | The music and effects as data, and which effect each change of state makes. Each lane taps in a note of its own; a perfect tap adds a glint.            |
-| `src/progress.ts`                    | What is saved (the best score and the sound settings) and how what the platform hands back is validated.                                                |
 | `src/replay.ts`, `src/sample-run.ts` | What the platform replays: the rules and one legal run. Its digest is pinned in `configs/games/aurora-pulse.ts`.                                        |
 
 ## How it plays

@@ -1,6 +1,5 @@
 import {
   bestLine,
-  type Card,
   resultWeight,
   type ResultCard,
   type ResultRow,
@@ -8,7 +7,6 @@ import {
 import { byInput } from "@frostbite/game-sdk/touch";
 
 import type { MatchState } from "../rules/state.ts";
-import { guide } from "../guide.ts";
 import { colour } from "./palette.ts";
 import type { View } from "./view.ts";
 
@@ -60,7 +58,3 @@ export const resultOf = (state: MatchState, view: View): ResultCard | null => {
         ],
       };
 };
-
-// What is over the screen: the first-screen card while the game waits to begin, the card after a run once it is over, and nothing while a run goes.
-export const cardOf = (state: MatchState, view: View): Card | null =>
-  view.phase === "ready" ? guide : resultOf(state, view);
