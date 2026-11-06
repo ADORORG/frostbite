@@ -199,9 +199,6 @@ importers:
       '@frostbite/test-kit':
         specifier: workspace:*
         version: link:../../packages/test-kit
-      '@game/frostbite':
-        specifier: workspace:*
-        version: link:../../games/frostbite
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1286,70 +1283,6 @@ importers:
       eslint:
         specifier: 10.9.1
         version: 10.9.1(jiti@2.7.0)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: 4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
-
-  games/frostbite:
-    dependencies:
-      '@frostbite/game-sdk':
-        specifier: workspace:*
-        version: link:../../packages/game-sdk
-      react:
-        specifier: 19.2.8
-        version: 19.2.8
-      react-dom:
-        specifier: 19.2.8
-        version: 19.2.8(react@19.2.8)
-    devDependencies:
-      '@fontsource/jetbrains-mono':
-        specifier: 5.3.0
-        version: 5.3.0
-      '@fontsource/press-start-2p':
-        specifier: 5.3.0
-        version: 5.3.0
-      '@fontsource/vt323':
-        specifier: 5.3.0
-        version: 5.3.0
-      '@frostbite/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
-      '@frostbite/test-kit':
-        specifier: workspace:*
-        version: link:../../packages/test-kit
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      '@repo/vitest-config':
-        specifier: workspace:*
-        version: link:../../packages/vitest-config
-      '@types/jsdom':
-        specifier: 30.0.0
-        version: 30.0.0
-      '@types/node':
-        specifier: 26.4.0
-        version: 26.4.0
-      '@types/react':
-        specifier: ^19
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: ^19
-        version: 19.2.5(@types/react@19.2.18)
-      '@vitest/coverage-v8':
-        specifier: 4.1.11
-        version: 4.1.11(vitest@4.1.11)
-      eslint:
-        specifier: 10.9.1
-        version: 10.9.1(jiti@2.7.0)
-      jsdom:
-        specifier: 30.0.1
-        version: 30.0.1(@noble/hashes@2.4.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -4101,15 +4034,6 @@ packages:
 
   '@fastify/proxy-addr@5.1.0':
     resolution: {integrity: sha512-INS+6gh91cLUjB+PVHfu1UqcB76Sqtpyp7bnL+FYojhjygvOPA9ctiD/JDKsyD9Xgu4hUhCSJBPig/w7duNajw==}
-
-  '@fontsource/jetbrains-mono@5.3.0':
-    resolution: {integrity: sha512-fqDfB5I9f1p1TV486aUgB9t8zP84P0O1FtQR5Ol9vjwPy+S+EIGlVYm1cvj2W5shcZMTg2nZFdVMoH5wFu8a1A==}
-
-  '@fontsource/press-start-2p@5.3.0':
-    resolution: {integrity: sha512-gxWFxdeDglPhEYSwEeooomcaFK8kSQYLQwVxfnOJeYRj2sPEHXjpVtFgEaYfqzOjuAJGrIcJOipu2KY5YkbyuQ==}
-
-  '@fontsource/vt323@5.3.0':
-    resolution: {integrity: sha512-3w33Rg/0+R1587HQfz4t7Q7e0GGeCqr3wmzIwqdGInUnrGEwMA5eX39GP4Z9wpTQnwfhVOhYuxuRwRUeIcicbw==}
 
   '@grpc/grpc-js@1.14.5':
     resolution: {integrity: sha512-7VZM+SVdEcUUqSQeNI3zM8Qs/BhQKZndPo2h5VkYkAM8Iz0wJIa8mKV5ekQGqG8UUsnkQ0NMxIxwkIHYvj0qOw==}
@@ -9154,12 +9078,6 @@ snapshots:
     dependencies:
       '@fastify/forwarded': 3.0.2
       ipaddr.js: 2.5.0
-
-  '@fontsource/jetbrains-mono@5.3.0': {}
-
-  '@fontsource/press-start-2p@5.3.0': {}
-
-  '@fontsource/vt323@5.3.0': {}
 
   '@grpc/grpc-js@1.14.5':
     dependencies:

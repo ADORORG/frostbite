@@ -191,13 +191,6 @@ export const creatorE2EFixtures = {
   },
   // Counted against a rate limit on purpose, so no other spec may sign in as this person: a request of theirs in
   // the same minute would push the count over (found when two specs shared one user).
-  // A player whose FROST·BITE run is replay-checked by the platform and saved to the account (G6c), alone, because
-  // the milestone it earns is part of what the spec asserts.
-  runPlayer: {
-    sessionId: "01994b10-0000-7000-8000-000000000073",
-    sessionToken: "e2e-run-player-session-token",
-    userId: "01994b10-0000-7000-8000-000000000072",
-  },
   rateLimitProbe: {
     sessionId: "01994b10-0000-7000-8000-000000000071",
     sessionToken: "e2e-rate-limit-probe-session-token",

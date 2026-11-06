@@ -174,7 +174,7 @@ describe("an overlay", () => {
       return browser.surfaceOf(canvases(container)[0] ?? null)?.drawn[0]
         ?.height;
     };
-    expect(await heights("frostbite")).toBe(await heights("frostbite"));
+    expect(await heights("example-game")).toBe(await heights("example-game"));
   });
 
   it("gives different ids different scenes, spread over the list", async () => {

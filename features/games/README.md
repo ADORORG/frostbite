@@ -38,7 +38,7 @@ never a broken one. It is drawn through an image tag, which cannot run what a dr
 `/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it
 answers on every keystroke with no request: `domain/search-games.ts` is a pure function from the games and a query to the matching games,
 best first. Every word typed must be found, as the start of a word, in a game's title, tags, summary, description or milestone titles (case
-and accents ignored; "frostbite" finds FROST·BITE); a title or tag hit ranks above a summary hit, and a title that is the whole query first of
+and accents ignored; "frostbreaker" finds FROST·BREAKER); a title or tag hit ranks above a summary hit, and a title that is the whole query first of
 all. Titles and tags forgive a slipped letter in a word of four letters or more (`domain/typo.ts`); text a game wrote does not. Kinds are
 the closed list `gameTags` (`@frostbite/shared/games`, `tags` in the manifest, one to four per game): chosen kinds match any of them, "Playable
 now" narrows to games a player can open. A narrowed wall drops the featured first card and the place numbers.

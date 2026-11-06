@@ -55,8 +55,8 @@ describe("picking a scene at random", () => {
 
 describe("picking a scene from an id", () => {
   it("gives the same answer every time, inside the range", () => {
-    expect(pickStable("frostbite", 8)).toBe(pickStable("frostbite", 8));
-    for (const id of ["a", "b", "frostbite", ""])
+    expect(pickStable("example-game", 8)).toBe(pickStable("example-game", 8));
+    for (const id of ["a", "b", "example-game", ""])
       expect(pickStable(id, 8)).toBeLessThan(8);
   });
 

@@ -37,7 +37,7 @@ const wordsOf = (text: string): string[] =>
     .split(/[^\p{L}\p{N}]+/u)
     .filter((word) => word !== "");
 
-// "FROST·BITE" is two words to read and one to type: both are found.
+// A title such as "FROST·BREAKER" is two words to read and one to type: both are found.
 const wordsAndWhole = (text: string): string[] => [
   ...wordsOf(text),
   wordsOf(text).join(""),

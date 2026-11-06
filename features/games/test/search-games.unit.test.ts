@@ -33,25 +33,28 @@ describe("searching the games", () => {
   });
 
   it("finds a title typed as one word or as two", () => {
-    expect(find("frostbite")).toContain("frostbite");
-    expect(find("frost bite")).toEqual(["frostbite"]);
-    expect(find("bite")).toEqual(["frostbite"]);
+    expect(find("frostbreaker")).toContain("frost-breaker");
+    expect(find("frost breaker")).toEqual(["frost-breaker"]);
+    expect(find("breaker")).toEqual(["frost-breaker"]);
   });
 
   it("looks in the tags, the summary, the description and the milestones", () => {
     expect(find("reflex")).toEqual(["frost-runner"]);
-    expect(find("minefield")).toEqual(["frostbite"]);
+    expect(find("minefield")).toEqual(["frost-breaker"]);
     expect(find("frozen")).toEqual(["shard-match"]);
     expect(find("chain")).toEqual(["shard-match"]);
   });
 
   it("ranks a title above a tag above a summary above a description, whatever order the games were registered in", () => {
     // Each answer lists a game registered later ahead of one registered earlier, so only the places decide it.
-    expect(find("strategy").slice(-2)).toEqual(["grand-strategy", "frostbite"]);
+    expect(find("strategy").slice(-2)).toEqual([
+      "grand-strategy",
+      "frost-breaker",
+    ]);
     expect(find("arcade")).toEqual([
       "snowball-dash",
       "icicle-drop",
-      "frostbite",
+      "frost-breaker",
     ]);
     expect(find("dash")).toEqual(["snowball-dash", "frost-runner"]);
     // "friends" is in the description of an earlier game and the summary of a later one.
@@ -60,7 +63,7 @@ describe("searching the games", () => {
 
   it("keeps the order registered for games that score alike", () => {
     expect(find("endless")).toEqual(["frost-runner", "snowball-dash"]);
-    expect(find("frost")).toEqual(["frost-runner", "frostbite"]);
+    expect(find("frost")).toEqual(["frost-runner", "frost-breaker"]);
   });
 
   it("puts a title that starts with the query above one that only holds it", () => {
@@ -68,7 +71,7 @@ describe("searching the games", () => {
       "strategy-rush-hour",
       "strategy-rush",
       "grand-strategy",
-      "frostbite",
+      "frost-breaker",
     ]);
   });
 
@@ -95,7 +98,7 @@ describe("searching the games", () => {
     expect(find("sand")).toEqual([]);
     expect(find("xyzzy")).toEqual([]);
     expect(find("zzz")).toEqual([]);
-    expect(find("flost")).toEqual(["frost-runner", "frostbite"]);
+    expect(find("flost")).toEqual(["frost-runner", "frost-breaker"]);
     expect(find("snorkel")).toEqual([]);
   });
 
@@ -122,7 +125,10 @@ describe("searching the games", () => {
   });
 
   it("copes with a very long query", () => {
-    expect(find("frost ".repeat(5_000))).toEqual(["frost-runner", "frostbite"]);
+    expect(find("frost ".repeat(5_000))).toEqual([
+      "frost-runner",
+      "frost-breaker",
+    ]);
   });
 
   it("keeps the games with any chosen tag", () => {
@@ -131,7 +137,7 @@ describe("searching the games", () => {
       "icicle-drop",
     ]);
     expect(find("", { tags: ["puzzle", "strategy"] })).toEqual([
-      "frostbite",
+      "frost-breaker",
       "shard-match",
       "icicle-drop",
       "grand-strategy",

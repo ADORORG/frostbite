@@ -8,7 +8,6 @@ import { expectConnectedToPlatform } from "./support/platform-connection.ts";
 const games = [
   "aurora-pulse",
   "bro-maria",
-  "frostbite",
   "frost-runner",
   "icicle-drop",
   "lantern-maze",

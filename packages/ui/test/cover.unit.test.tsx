@@ -38,7 +38,7 @@ describe("what stands in for a missing picture", () => {
 
   it("is the first letters of the first two words, capitals, whatever the separators", () => {
     expect(standInInitials("Frost Bite")).toBe("FB");
-    expect(standInInitials("FROST·BITE")).toBe("FB");
+    expect(standInInitials("ICE·BREAKER")).toBe("IB");
     expect(standInInitials("tap")).toBe("T");
     expect(standInInitials("  the   quick brown fox ")).toBe("TQ");
     expect(standInInitials("")).toBe("");

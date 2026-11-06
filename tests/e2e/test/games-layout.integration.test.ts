@@ -34,7 +34,6 @@ const update = process.env.UPDATE_GAME_LAYOUT === "1";
 // fixture game, a plain starter page that exists so that tests have "a game" (it is not made to fit a phone, and a change to make it so would
 // change every test that uses it).
 const skipped = new Set(["sdk-explorer", "fixture-taps"]);
-const notPhoneChecked = new Set(["frostbite"]);
 
 // The frame the platform gives a game on an iPhone 13 held upright and on its side (measured in the platform's own page).
 const phones = [
@@ -92,7 +91,7 @@ describe("on a phone", () => {
   for (const size of phones) {
     it(`${size.name}: no game scrolls, and the screen takes the frame`, async () => {
       const problems: string[] = [];
-      for (const name of names.filter((n) => !notPhoneChecked.has(n))) {
+      for (const name of names) {
         const layout = await layoutOf(name, size, true);
         if (layout.scrollHeight > layout.clientHeight)
           problems.push(
@@ -118,7 +117,7 @@ describe("on a touch screen the page is played with the screen, and what is left
   for (const size of [...phones, ...phonesFull]) {
     it(`${size.name}: no more than three icons, each a thumb wide, none on another or on the readouts`, async () => {
       const problems: string[] = [];
-      for (const name of names.filter((n) => !notPhoneChecked.has(n))) {
+      for (const name of names) {
         const hosted = await serveGame(join(outRoot, name));
         const context = await browser.newContext({
           ...devices["iPhone 13"],

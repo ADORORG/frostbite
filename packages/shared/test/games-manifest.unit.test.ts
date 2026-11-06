@@ -47,9 +47,12 @@ const manifest = (overrides: Partial<GameManifest> = {}): GameManifest => ({
 });
 
 describe("game identifiers", () => {
-  it.each(["frostbite", "sample-game", "game-2", "ab"])("accepts %s", (id) => {
-    expect(gameIdSchema.safeParse(id).success).toBe(true);
-  });
+  it.each(["example-game", "sample-game", "game-2", "ab"])(
+    "accepts %s",
+    (id) => {
+      expect(gameIdSchema.safeParse(id).success).toBe(true);
+    },
+  );
 
   it.each([
     "",
@@ -66,7 +69,7 @@ describe("game identifiers", () => {
   });
 
   it("builds the page address from the identifier", () => {
-    expect(gameHref("frostbite")).toBe("/games/frostbite");
+    expect(gameHref("example-game")).toBe("/games/example-game");
   });
 });
 

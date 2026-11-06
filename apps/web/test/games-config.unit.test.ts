@@ -37,22 +37,6 @@ describe("the platform's game list", () => {
       expect(gameManifestSchema.safeParse(game).success).toBe(true);
   });
 
-  it("plays FROST·BITE on the platform itself, with no address to set, and declares four of its own marks as milestones, replay-verifiable only where the rules can decide them, and only what the platform grants", async () => {
-    const [frostbite] = await gamesWith("");
-    expect(frostbite?.launch).toEqual({ mode: "embedded" });
-    expect(frostbite?.capabilities).toEqual(["milestone:claim", "run:submit"]);
-    expect(
-      frostbite?.milestones.map(({ id, verification }) => [id, verification]),
-    ).toEqual([
-      ["first-win", "replay-verified"],
-      ["first-glacier", "replay-verified"],
-      ["snake-ten", "replay-verified"],
-      // A simulation event: no replay can decide it, so it stays the game's own report.
-      ["first-cashout", undefined],
-    ]);
-    expect(frostbite?.network).toBe(signet);
-  });
-
   it.each([
     ["test", true],
     ["local", true],
@@ -71,7 +55,6 @@ describe("the platform's game list", () => {
   it("declares a rewards contract on each of the games built for players, so staff can create it", async () => {
     const games = await gamesWith("");
     for (const id of [
-      "frostbite",
       "frost-runner",
       "icicle-drop",
       "tower-stack",

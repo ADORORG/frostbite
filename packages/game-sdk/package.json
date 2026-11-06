@@ -36,7 +36,6 @@
     "./cabinet-runs": "./src/cabinet-runs.ts",
     "./run-record": "./src/run-record.ts",
     "./seeded": "./src/seeded.ts",
-    "./storage-shim": "./src/storage-shim.ts",
     "./synced-backend": "./src/synced-backend.ts",
     "./touch": "./src/touch.ts",
     "./touch-start": "./src/touch-start.ts",
@@ -206,10 +205,6 @@
       "./seeded": {
         "types": "./dist/seeded.d.ts",
         "default": "./dist/seeded.js"
-      },
-      "./storage-shim": {
-        "types": "./dist/storage-shim.d.ts",
-        "default": "./dist/storage-shim.js"
       },
       "./synced-backend": {
         "types": "./dist/synced-backend.d.ts",

@@ -1,8 +1,0 @@
-{
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "types": ["node"],
-    "jsx": "react"
-  },
-  "include": ["src", "test", "vitest.config.ts"]
-}

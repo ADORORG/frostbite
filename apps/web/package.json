@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@frostbite/test-kit": "workspace:*",
-    "@game/frostbite": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/vitest-config": "workspace:*",
     "@types/node": "^20",
