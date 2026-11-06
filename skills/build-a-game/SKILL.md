@@ -56,7 +56,9 @@ pieces to use and the files to copy are in `references/game-pattern.md` ("Touch"
 
 - **The screen is the controller.** On a touch screen the whole frame is the game: the readouts are one thin line along the top, pause and
   the two sound icons sit in the top right corner, and the note shows at the foot (only while it has words). Fingers play the game
-  directly. Do not put a pad of buttons under the screen: enough rows of buttons leave the screen no room to be seen.
+  directly. Do not put a pad of buttons under the screen: enough rows of buttons leave the screen no room to be seen. A game that needs a few
+  extra buttons (fire, a special move) uses `attachTouchButtons` (`<sdk>/touch-buttons`): one to four, in the bottom right corner over the
+  screen. A game with more actions cycles them with one of the four or gives them keys.
 - **The page never scrolls on touch.** Import `<sdk>/phone.css` and give the page the parts it lays out. Chapter menus, score lists and
   cards belong behind a button, not in the page flow.
 - **One note, about how to play.** One short line, worded for a finger as well as for a keyboard. Never say how a run was checked or
