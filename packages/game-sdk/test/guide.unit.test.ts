@@ -137,6 +137,31 @@ describe("the line that says how to begin", () => {
     expect(startLineFor("ENTER TO START")).toBe(touchStartLine);
   });
 
+  it("is the game's own words for a touch screen, where it gave some, and its keyboard line is untouched", () => {
+    const card = { ...guide, touchStart: "TAP TO PRACTISE LEVEL 2" };
+    touch(true);
+    expect(startLineFor("ENTER TO START", "TAP TO PRACTISE LEVEL 2")).toBe(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+    const r = recorder();
+    drawGuide(r.context, 320, 180, card);
+    const written = r.texts.map(({ text }) => text);
+    expect(written).toContain("TAP TO PRACTISE LEVEL 2");
+    expect(written).not.toContain(touchStartLine);
+    const box = document.createElement("div");
+    fillGuide(box, card);
+    expect(box.querySelector(".guide-start")?.textContent).toBe(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+    touch(false);
+    const keys = recorder();
+    drawGuide(keys.context, 320, 180, card);
+    expect(keys.texts.map(({ text }) => text)).toContain(guide.start);
+    expect(keys.texts.map(({ text }) => text)).not.toContain(
+      "TAP TO PRACTISE LEVEL 2",
+    );
+  });
+
   it("is the one the canvas card writes", () => {
     touch(true);
     const r = recorder();

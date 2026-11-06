@@ -51,7 +51,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
   panel's place, the `visibility` rule for hidden buttons and the touch rules. Do not write a layout from nothing.
 - **Sharp cards**: never write the first-screen card (title, how to play, how to begin) or the card after a run (score, best) on the game's own canvas: the page scales
   that canvas up and blurs the writing, on a phone worst of all. Give the game a `guide.ts` (a `Guide`: `title`, `lines`, `start`, and
-  `touchLines` where a phone is told something else), lay it over the screen with `createGuideLayer(screen)` from
+  `touchLines` where a phone is told something else, `touchStart` where the start line names what a tap begins), lay it over the screen with `createGuideLayer(screen)` from
   `<sdk>/guide-layer`, and `show(guide)` while the game is waiting to begin and `show(null)` once a run starts. The card after a run is a
   `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) the same layer shows: `show(resultOf(state, view))`, where
   the game's `resultOf` returns null unless the run is over.

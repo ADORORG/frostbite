@@ -12,6 +12,9 @@ export interface Guide {
   readonly title: string;
   // What a touch screen is told instead of `lines`, for a game whose hands are different there (the keys name keys no phone has).
   readonly touchLines?: readonly string[];
+  // The line that says how to begin on a touch screen, for a game that begins something particular ("TAP TO PRACTISE LEVEL 2"). Without it a touch
+  // screen is told "TAP TO START".
+  readonly touchStart?: string;
 }
 
 // The card a game shows after a run: a heading, then what the run came to, then how to go again. The same card layer shows it, so it is as
@@ -87,8 +90,10 @@ function write(
 
 // How a touch screen is told to begin, in place of what a keyboard is told ("ENTER TO START"): there is no key to press.
 export const touchStartLine = "TAP TO START";
-export const startLineFor = (keyboardLine: string): string =>
-  byInput(keyboardLine, touchStartLine);
+export const startLineFor = (
+  keyboardLine: string,
+  touchLine: string = touchStartLine,
+): string => byInput(keyboardLine, touchLine);
 
 export const linesFor = (guide: Guide): readonly string[] =>
   isTouchScreen() && guide.touchLines !== undefined
@@ -142,7 +147,7 @@ export function drawGuide(
     draw(line, index + 1.3, colours.line, resultWeight.line),
   );
   draw(
-    startLineFor(guide.start),
+    startLineFor(guide.start, guide.touchStart),
     lines.length + 1.9,
     colours.start,
     resultWeight.line,
@@ -194,6 +199,6 @@ export function fillGuide(into: HTMLElement, guide: Guide): void {
   });
   const start = into.ownerDocument.createElement("p");
   start.className = "guide-start";
-  start.textContent = startLineFor(guide.start);
+  start.textContent = startLineFor(guide.start, guide.touchStart);
   into.replaceChildren(title, ...lines, start);
 }
