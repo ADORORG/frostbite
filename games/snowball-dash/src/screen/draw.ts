@@ -2,7 +2,7 @@ import { block } from "@frostbite/game-sdk/pixels";
 
 import type { RunState } from "../rules/types.ts";
 import { snowball } from "./ball.ts";
-import { cards, hud } from "./hud.ts";
+import { hud } from "./hud.ts";
 import { canvasScale, screenHeight, screenWidth } from "./layout.ts";
 import { colour } from "./palette.ts";
 import { obstacles, pits } from "./obstacles.ts";
@@ -37,5 +37,4 @@ export function draw(
     context.globalAlpha = 1;
   }
   hud(context, state, view);
-  cards(context, state, view);
 }

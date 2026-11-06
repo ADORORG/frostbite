@@ -3,11 +3,10 @@ import { block } from "@frostbite/game-sdk/pixels";
 import { lastFloor } from "../rules/constants.ts";
 import type { MazeState } from "../rules/state.ts";
 import { colour } from "./palette.ts";
-import { barHeight, screenHeight, screenWidth } from "./layout.ts";
+import { barHeight, screenWidth } from "./layout.ts";
 import type { View } from "./view.ts";
-import { byInput } from "@frostbite/game-sdk/touch";
 
-// What is written over the screen: the floor, the oil, the key, the score, a line of news, and the cards before and after a run. All of it is
+// What is written over the screen: the floor, the oil, the key, the score, and a line of news. All of it is
 // on the canvas, so showing more of it never moves the page.
 const font = '"Courier New", ui-monospace, monospace';
 
@@ -90,81 +89,4 @@ export function hud(
       6,
       "center",
     );
-}
-
-function card(
-  context: CanvasRenderingContext2D,
-  lines: readonly (readonly [string, string, number])[],
-): void {
-  context.globalAlpha = 0.82;
-  block(
-    context,
-    colour.black,
-    0,
-    barHeight,
-    screenWidth,
-    screenHeight - barHeight,
-  );
-  context.globalAlpha = 1;
-  lines.forEach(([text, fill, size], index) => {
-    write(
-      context,
-      text,
-      screenWidth / 2,
-      26 + index * 12,
-      fill,
-      size,
-      "center",
-    );
-  });
-}
-
-const reasons = {
-  dark: "THE LANTERN WENT OUT",
-  escaped: "YOU ESCAPED THE CELLAR",
-  spent: "YOUR LEGS GAVE OUT",
-} as const;
-
-export function cards(
-  context: CanvasRenderingContext2D,
-  state: MazeState,
-  view: View,
-): void {
-  if (view.phase === "ready")
-    card(context, [
-      ["LANTERN MAZE", colour.flameHot, 10],
-      ["FIND THE KEY, REACH THE DOOR", colour.text, 6],
-      ["EVERY STEP BURNS OIL", colour.flask, 6],
-      [
-        byInput(
-          "ARROWS / WASD - ENTER TO LIGHT",
-          "TAP OR HOLD WHERE TO WALK - TAP TO LIGHT",
-        ),
-        colour.cyan,
-        5,
-      ],
-    ]);
-  if (view.phase === "over")
-    card(context, [
-      [
-        state.cause === null ? "RUN OVER" : reasons[state.cause],
-        colour.danger,
-        8,
-      ],
-      [
-        `FLOORS ${String(state.floorsCleared)}   SCORE ${String(state.score)}`,
-        colour.text,
-        7,
-      ],
-      [
-        view.newBest ? "NEW BEST!" : `BEST ${String(view.best)}`,
-        colour.flameHot,
-        6,
-      ],
-      [
-        byInput("ENTER FOR ANOTHER CELLAR", "TAP FOR ANOTHER CELLAR"),
-        colour.cyan,
-        5,
-      ],
-    ]);
 }

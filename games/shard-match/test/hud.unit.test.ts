@@ -156,30 +156,14 @@ describe("the writing", () => {
     expect(ofColour(gone.drawn, "#123456")).toHaveLength(0);
   });
 
-  it("covers the board with a card before a run and after one, saying how it ended", () => {
-    expect(texts(draw0(startRun(9), view("ready")))).toContain("SHARD MATCH");
-    expect(texts(draw0(startRun(9), view("running")))).not.toContain(
-      "SHARD MATCH",
-    );
-    const over = draw0(
-      { ...startRun(9), cause: "out", levelsCleared: 4, score: 450 },
-      view("over", { best: 900 }),
-    );
-    expect(texts(over)).toEqual(
-      expect.arrayContaining([
-        "OUT OF SWAPS",
-        "LEVELS 4   SCORE 450",
-        "BEST 900",
-      ]),
-    );
-    expect(
-      texts(
-        draw0(
-          { ...startRun(9), cause: "spent" },
-          view("over", { newBest: true }),
-        ),
-      ),
-    ).toEqual(expect.arrayContaining(["WHAT A RUN!", "NEW BEST!"]));
+  it("leaves both cards, before a run and after it, to the SDK: the canvas carries none", () => {
+    const state = { ...startRun(9), cause: "out" as const, levelsCleared: 4 };
+    for (const phase of ["over", "ready"] as const)
+      expect(
+        texts(draw0(state, view(phase, { best: 900, newBest: true }))),
+      ).not.toEqual(expect.arrayContaining(["OUT OF SWAPS"]));
+    expect(texts(draw0(state, view("ready")))).not.toContain("SHARD MATCH");
+    expect(texts(draw0(state, view("over")))).not.toContain("NEW BEST!");
   });
 });
 

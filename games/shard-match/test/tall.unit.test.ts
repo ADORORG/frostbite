@@ -117,32 +117,4 @@ describe("the tall screen", () => {
     expect(lit(news)).toContain("NO LINE");
     expect(lit(news)).not.toContain("FROST 5 LEFT");
   });
-
-  it("has cards of shorter lines that say Start, not Enter", () => {
-    const ready = surface();
-    draw(ready.context, startRun(9), view("ready"));
-    const lines = lit(ready);
-    expect(lines).toContain("PRESS START");
-    expect(lines.join(" ")).not.toContain("ENTER");
-    // Every line fits the narrow screen at the size it is written in.
-    expect(Math.max(...lines.map((text) => text.length))).toBeLessThanOrEqual(
-      23,
-    );
-    const over = surface();
-    draw(
-      over.context,
-      {
-        ...startRun(9),
-        cause: "out",
-        ended: true,
-        levelsCleared: 4,
-        score: 1234,
-      },
-      view("over"),
-    );
-    expect(lit(over)).toEqual(
-      expect.arrayContaining(["OUT OF SWAPS", "LEVELS 4", "SCORE 1234"]),
-    );
-    expect(lit(over).join(" ")).toContain("PRESS START TO PLAY AGAIN");
-  });
 });

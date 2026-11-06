@@ -14,6 +14,30 @@ export interface Guide {
   readonly touchLines?: readonly string[];
 }
 
+// The card a game shows after a run: a heading, then what the run came to, then how to go again. The same card layer shows it, so it is as
+// sharp as the first-screen card. A row is its text, its colour (from the game's own palette) and its weight, the share of the usual size it is
+// written at (the heading is heavier than the rest).
+export interface ResultRow {
+  readonly colour: string;
+  readonly text: string;
+  readonly weight: number;
+}
+export interface ResultCard {
+  readonly rows: readonly ResultRow[];
+}
+
+// The weights of the rows of a card (the first-screen card's title and lines too), so every card has the same shape: the heading largest, then what the run came to, then
+// the best, and the line that says how to go again smallest.
+export const resultWeight = {
+  detail: 1.2,
+  heading: 1.5,
+  line: 1,
+  prompt: 0.85,
+} as const;
+
+// What the card layer can show: the first-screen card or the card after a run.
+export type Card = Guide | ResultCard;
+
 const font = '"Courier New", ui-monospace, monospace';
 const back = "#0c0620";
 const colours = {
@@ -21,6 +45,13 @@ const colours = {
   start: "#ffd23f",
   title: "#38e8ff",
 } as const;
+
+// How much the screen under a card is dimmed, the share of its height the card's rows use, the share of a row's height its writing is, and
+// the share of the height left clear above the first row. Both cards use the same, so they sit on the screen alike.
+const dimmed = 0.84;
+const usedHeight = 0.86;
+const rowShare = 0.62;
+const topMargin = 0.07;
 
 // How wide a character of the monospace type is, as a share of its size, and the share of the screen's width a line may take up.
 export const glyphWidth = 0.62;
@@ -64,6 +95,20 @@ export const linesFor = (guide: Guide): readonly string[] =>
     ? guide.touchLines
     : guide.lines;
 
+function dim(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+): void {
+  context.globalAlpha = dimmed;
+  block(context, back, 0, 0, width, height);
+  context.globalAlpha = 1;
+}
+
+// What a card says of the best: the best so far, or that this run made a new one.
+export const bestLine = (best: number, isNew: boolean): string =>
+  isNew ? "NEW BEST!" : `BEST ${String(best)}`;
+
 // Draws the card over a screen `width` by `height` (in the units the screen is drawn in): the screen dimmed, the title, the lines, the start.
 export function drawGuide(
   context: CanvasRenderingContext2D,
@@ -71,13 +116,11 @@ export function drawGuide(
   height: number,
   guide: Guide,
 ): void {
-  context.globalAlpha = 0.84;
-  block(context, back, 0, 0, width, height);
-  context.globalAlpha = 1;
+  dim(context, width, height);
   const lines = linesFor(guide);
   const rows = lines.length + 2;
-  const step = (height * 0.86) / (rows + 1);
-  const wanted = step * 0.62;
+  const step = (height * usedHeight) / (rows + 1);
+  const wanted = step * rowShare;
   const draw = (
     text: string,
     row: number,
@@ -85,11 +128,58 @@ export function drawGuide(
     scale: number,
   ): void => {
     const size = fittedSize(text, wanted * scale, width);
-    write(context, text, width / 2, height * 0.07 + step * row, fill, size);
+    write(
+      context,
+      text,
+      width / 2,
+      height * topMargin + step * row,
+      fill,
+      size,
+    );
   };
-  draw(guide.title, 0, colours.title, 1.5);
-  lines.forEach((line, index) => draw(line, index + 1.3, colours.line, 1));
-  draw(startLineFor(guide.start), lines.length + 1.9, colours.start, 1);
+  draw(guide.title, 0, colours.title, resultWeight.heading);
+  lines.forEach((line, index) =>
+    draw(line, index + 1.3, colours.line, resultWeight.line),
+  );
+  draw(
+    startLineFor(guide.start),
+    lines.length + 1.9,
+    colours.start,
+    resultWeight.line,
+  );
+}
+
+// Draws the card after a run over a screen `width` by `height`: the screen dimmed, then the rows from the top, each fitted to the screen.
+export function drawResult(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  card: ResultCard,
+): void {
+  dim(context, width, height);
+  const step = (height * usedHeight) / (card.rows.length + 1);
+  card.rows.forEach(({ colour, text, weight }, index) => {
+    const size = fittedSize(text, step * rowShare * weight, width);
+    write(
+      context,
+      text,
+      width / 2,
+      height * topMargin + step * index,
+      colour,
+      size,
+    );
+  });
+}
+
+// Draws whichever card there is.
+export function drawCard(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  card: Card,
+): void {
+  if ("rows" in card) drawResult(context, width, height, card);
+  else drawGuide(context, width, height, card);
 }
 
 // The same card for a game whose screen is made of page elements and not a canvas: fills `into` (a box laid over the screen) with the title, the

@@ -1,5 +1,6 @@
 import { setUpSound } from "@frostbite/game-sdk/audio/setup";
 import { createGameClient, GameHostError } from "@frostbite/game-sdk/client";
+import { createGuideLayer } from "@frostbite/game-sdk/guide-layer";
 import { createPause, pauseCopy } from "@frostbite/game-sdk/pause";
 import {
   connectToPlatform,
@@ -23,6 +24,7 @@ import { milestoneIds } from "./rules/milestones.ts";
 import { startRun } from "./rules/state.ts";
 import { attachControls } from "./screen/controls.ts";
 import { canvasScale, draw, screenHeight, screenWidth } from "./screen/draw.ts";
+import { cardOf } from "./screen/result.ts";
 import type { View } from "./screen/view.ts";
 import { createPulseSession, type PulseSession } from "./session.ts";
 
@@ -52,6 +54,8 @@ const totalOut = element("total", "span");
 const earnedList = element("earned", "ul");
 const startButton = element("start", "button");
 const pauseButton = element("pause", "button");
+// The cards before and after a run are drawn over the screen at the pixels of the display, so they stay sharp when the small screen is scaled up.
+const guideLayer = createGuideLayer(screen);
 const context = screen.getContext("2d");
 
 let play: PlatformPlay | null = null;
@@ -81,7 +85,10 @@ const sound = setUpSound({
 });
 
 function show(): void {
-  if (context !== null) draw(context, session?.state() ?? backdrop, view);
+  if (context === null) return;
+  const state = session?.state() ?? backdrop;
+  draw(context, state, view);
+  guideLayer.show(cardOf(state, view));
 }
 
 function addEarned(id: string): void {

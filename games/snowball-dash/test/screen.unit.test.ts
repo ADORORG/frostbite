@@ -166,28 +166,20 @@ describe("what is written over the screen", () => {
     ).not.toContain("5,000 points");
   });
 
-  it("has a card before the first run that says how to play", () => {
+  it("leaves the card before the first run to the SDK, which draws it at the display's pixels", () => {
     const text = said(painted(bare(), { ...running, phase: "ready" }));
-    expect(text).toContain("SNOWBALL DASH");
-    expect(text).toContain("ENTER, SPACE OR TAP TO ROLL");
+    expect(text).not.toContain("SNOWBALL DASH");
   });
 
-  it("has a card after a run with the score, the best, and how it ended", () => {
-    const over = (cause: "fell" | "hit", view: Partial<View>) =>
-      said(
-        painted(bare({ alive: false, cause, score: 777 }), {
-          ...running,
-          phase: "over",
-          ...view,
-        }),
-      );
-    const hit = over("hit", {});
-    expect(hit).toContain("RUN OVER");
-    expect(hit).toContain("SCORE 777");
-    expect(hit).toContain("BEST 100");
-    expect(over("fell", {})).toContain("INTO THE CREVASSE");
-    expect(over("hit", { newBest: true })).toContain("NEW BEST!");
-    expect(over("hit", {})).not.toContain("NEW BEST!");
+  it("leaves the card after a run to the SDK too: the canvas carries none", () => {
+    const text = said(
+      painted(bare({ alive: false, cause: "hit", score: 777 }), {
+        ...running,
+        phase: "over",
+      }),
+    );
+    expect(text).not.toContain("RUN OVER");
+    expect(text).not.toContain("NEW BEST!");
   });
 
   it("has no card while a run goes", () => {
