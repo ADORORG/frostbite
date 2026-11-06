@@ -52,9 +52,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
 - **Sharp cards**: never write the first-screen card (title, how to play, how to begin) or the card after a run (score, best) on the game's own canvas: the page scales
   that canvas up and blurs the writing, on a phone worst of all. Give the game a `guide.ts` (a `Guide`: `title`, `lines`, `start`, and
   `touchLines` where a phone is told something else, `touchStart` where the start line names what a tap begins), lay it over the screen with `createGuideLayer(screen)` from
-  `<sdk>/guide-layer`, and `show(guide)` while the game is waiting to begin and `show(null)` once a run starts. The card after a run is a
-  `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) the same layer shows: `show(resultOf(state, view))`, where
-  the game's `resultOf` returns null unless the run is over.
+  `<sdk>/guide-layer`, and `show(cardOf(state, view))` after every change. `cardOf` is a function in `src/screen/result.ts`, not a branch in `main.ts`: it returns the first-screen guide while the game waits to begin, the result card once a run is over, and `null` while a run goes, so the choice is unit-tested (jsdom has no canvas, so `show()` itself cannot be). The card after a run is a `ResultCard` (rows of `text`, `colour` from the game's palette, and `weight` from the SDK's `resultWeight`) built by the game's `resultOf(state, view)`, which returns null unless the run is over. Copy `games/lantern-maze/src/screen/result.ts`.
 - **Plays without the platform**: a failed `ready()` only changes the status line, a failed `run.start()` says nothing, and the game
   still starts on a seed of its own (its milestones are then self-reported).
 
