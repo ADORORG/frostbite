@@ -125,8 +125,7 @@ Every game on the platform behaves the same way, and the SDK has the pieces so a
 - **Tests without a speaker** (`@frostbite/game-sdk/audio/fake`): `installFakeAudio(window)` stands in for the browser's audio and notes every tone, so a
   test can check that a game made a sound, stopped its music, or stayed quiet while paused.
 
-Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker, Bro Maria and Snowball Dash use all of it. FROST·BITE's two replayable cabinets use the sound and the
-Enter key (SAT SNAKE also pauses); the rest of FROST·BITE keeps its own audio.
+Games on the SDK: Frost Runner, Icicle Drop, Tower Stacker, Bro Maria and Snowball Dash use all of it.
 
 ## Talking to the platform
 
@@ -219,20 +218,6 @@ max }`. The page shows the count ("Reached x3") and announces each counting. Cou
   page tells the player which of the two is true.
 - A game does nothing for either: it only calls `progress.save` and `milestones.unlock`.
 
-## Bringing a game written for a plain web page
-
-FROST·BITE came in this way (`games/frostbite`), and is the worked example:
-
-- Its old code stays as it was, in a folder marked **legacy** (`src/legacy/README.md` says what was changed and the
-  plan to refactor it; the repository policy skips that folder by name, and it may only shrink). New code is
-  written to the usual rules.
-- `src/main.ts` gives the old code what it expects from the platform before it starts: React (bundled), a
-  `localStorage` (`@frostbite/game-sdk/storage-shim`: kept in memory, with the keys the game names saved through
-  `progress.save`), and a way to report its own progress marks as milestones.
-- Anything the frame forbids is removed or replaced, not worked around: network calls and live-chain code were
-  removed, CDN scripts and fonts were bundled, a page of tools that kept data in the browser was left out.
-- Where the old code claimed something it did not do (a wallet connection), it now says it is a simulation.
-
 ## What the browser enforces
 
 The frame is `sandbox="allow-scripts"`, and the files are served with `Content-Security-Policy: sandbox
@@ -275,8 +260,7 @@ A game can offer a stronger level, `replay-verified`, for milestones its rules c
 A game with several replayable cabinets still publishes one verifier: `combineCabinets` (`@frostbite/game-sdk/cabinets`) takes
 each cabinet's rules (`cabinet(rules)`), and a record names its cabinet in `config.cabinet`. A real-time game ports to the same
 shape by making its rules count ticks instead of reading a clock, recording the player's choices with the tick each was made on,
-and letting the screen's timer drive the same step function (FROST·BITE's SAT SNAKE is the worked example,
-`docs/product/run-record.md`).
+and letting the screen's timer drive the same step function (`docs/product/run-record.md`).
 
 The platform replays the record on its server and holds the milestone on the account as `replay-verified`; the page shows
 it as "Replay-checked", and says what that shows (the run followed the game's rules) and what it does not (that a person
@@ -315,7 +299,7 @@ and coverage gates (above 90%).
 
 ## External games (none registered today)
 
-FROST·BITE moved onto the SDK and is played here, so no game uses this mode now. A game that cannot be bundled this way (it needs its own server) could still be listed with
+Every game is bundled on the SDK and played here, so no game uses this mode now. A game that cannot be bundled this way (it needs its own server) could still be listed with
 `launch: { mode: "external", ... }` and played at an address a deployment sets through `GAME_LAUNCHES`. It is
 shown as an external link, gets no saving, no milestones and no frame, and its host must not be the platform's
 own origin. The hosting rules are:

@@ -110,10 +110,9 @@ Procedure and rationale: `providers/object-storage/r2/README.md`.
 
 ## Games
 
-- [ ] FROST·BITE is played by the platform itself (`/games/frostbite`), so it needs no setting. `GAME_LAUNCHES` is
-      optional and applies only to a game played at an address of its own (none is registered today): naming
-      FROST·BITE or any game the platform plays itself stops the web service at start, so remove any old
-      `frostbite` entry from the environment. See `docs/product/game-onboarding.md`.
+- [ ] Every registered game is played by the platform itself, so none needs a setting. `GAME_LAUNCHES` is optional and
+      applies only to a game played at an address of its own (none is registered today): naming any game stops the web
+      service at start, so remove any old entry from the environment. See `docs/product/game-onboarding.md`.
 - [ ] The games are built by the web build (`pnpm --filter web build`) into `apps/web/public/play`; check the deploy
       log line `Built games: ...` lists every game.
 

@@ -14,12 +14,6 @@ const ignoredDirectories = new Set([
 ]);
 // Generated output that is built from reviewed source elsewhere and never edited: the games the web app serves.
 const generatedDirectories = new Set(["apps/web/public/play"]);
-// Code copied unchanged from before the platform, identified by a README in the folder with what was changed and
-// a plan to refactor it. It is not held to the 300-line limit, and may only shrink. Not generated, so not hidden:
-// every entry here is a debt with an owner.
-export const legacyDirectories: ReadonlySet<string> = new Set([
-  "games/frostbite/src/legacy",
-]);
 const sourceExtensions = new Set([".css", ".js", ".mjs", ".rs", ".ts", ".tsx"]);
 
 export async function listSourceFiles(
@@ -32,11 +26,7 @@ export async function listSourceFiles(
       if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
       const path = resolve(directory, entry.name);
       if (entry.isDirectory()) {
-        if (
-          !generatedDirectories.has(relative(root, path)) &&
-          !legacyDirectories.has(relative(root, path))
-        )
-          await visit(path);
+        if (!generatedDirectories.has(relative(root, path))) await visit(path);
       } else if (entry.isFile() && sourceExtensions.has(extname(entry.name)))
         files.push(path);
     }

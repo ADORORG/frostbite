@@ -35,8 +35,8 @@ export const shelf: readonly PublicGame[] = createGameCatalog(
       { description: "Dash past the spikes, even with friends. Gleaming ice." },
     ),
     game(
-      "frostbite",
-      "FROST·BITE",
+      "frost-breaker",
+      "FROST·BREAKER",
       "A predictive minefield arcade on Bitcoin.",
       ["strategy"],
     ),

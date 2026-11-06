@@ -148,7 +148,7 @@ Status: **Built** (tested), **Decision** (needs the owner), **Not built** (reaso
   runs appear on boards. **This conflicts with the earlier decision** (global boards labelled self-reported) and
   makes boards depend on G6, which also makes every board game deterministic. To be resolved in the next survey:
   self-reported boards first and a verified tier later, or no boards until G6.
-- **First verified game (G6):** **FROST·BITE**, which needs its board generation made deterministic (seeded).
+- **First verified game (G6):** FROST·BITE (since removed), which needed its board generation made deterministic (seeded).
 - **Build order:** **milestone progress (SDK-3), then the wallet widget (SDK-F), then leaderboards (SDK-2).**
 
 ### Eighth survey (2026-10-13)

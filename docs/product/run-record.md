@@ -108,7 +108,9 @@ Scope in this version: milestones earned once. Repeatable milestones and ones wi
 **hidden information** (the layout of mines) stays peekable: see the limit below. The platform cannot detect that, so the page
 describes exactly what was checked, and leaderboards (task #54) will require a game to declare it has none.
 
-## FROST·BITE: what is verified, and what cannot be yet
+## FROST·BITE (removed 2026-11-06): what was verified, and what could not be
+
+The game this section describes is no longer in the repository (task PD-2); the section is kept as the record of how the pattern was proved, and the paths below no longer exist.
 
 FROST·BITE's rules for the pick-based **ice field** and the **icicle economy** are a deterministic core
 (`games/frostbite/src/verifier`): a 5x5 field with seeded mines, picks that score safe tiles and end on a mine, settling a

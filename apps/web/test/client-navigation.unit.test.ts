@@ -36,8 +36,8 @@ function click(
 describe("which link clicks the app navigates by itself", () => {
   it("takes an ordinary click on a link to another page, keeping its query and heading", () => {
     expect(click({ href: "/collections" })).toBe("/collections");
-    expect(click({ href: "/games/frostbite?x=1#dock" })).toBe(
-      "/games/frostbite?x=1#dock",
+    expect(click({ href: "/games/example-game?x=1#dock" })).toBe(
+      "/games/example-game?x=1#dock",
     );
     expect(click({ href: "http://app.test/creators" })).toBe("/creators");
     expect(click({ href: "/launches", target: "_self" })).toBe("/launches");
@@ -91,7 +91,7 @@ describe("which link clicks the app navigates by itself", () => {
 
   it("leaves paths that are not pages to the browser", () => {
     expect(click({ href: "/api/v1/auth/methods" })).toBeNull();
-    expect(click({ href: "/play/frostbite/index.html" })).toBeNull();
+    expect(click({ href: "/play/example-game/index.html" })).toBeNull();
     // A page whose name merely starts like one is still a page.
     expect(click({ href: "/playground" })).toBe("/playground");
     expect(click({ href: "/apiary" })).toBe("/apiary");

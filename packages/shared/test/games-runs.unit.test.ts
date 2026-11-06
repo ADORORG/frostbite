@@ -13,12 +13,12 @@ const runId = "0198a000-0000-7000-8000-000000000001";
 describe("the run contracts", () => {
   it("takes a game id and nothing else to start a run", () => {
     expect(
-      startGameRunInputSchema.safeParse({ gameId: "frostbite" }).success,
+      startGameRunInputSchema.safeParse({ gameId: "example-game" }).success,
     ).toBe(true);
     for (const bad of [
       {},
       { gameId: "Bad Id" },
-      { extra: 1, gameId: "frostbite" },
+      { extra: 1, gameId: "example-game" },
     ])
       expect(startGameRunInputSchema.safeParse(bad).success).toBe(false);
   });
@@ -53,7 +53,7 @@ describe("the run contracts", () => {
 
   it("takes any JSON as the record, a run id that is a uuid, and no extra fields", () => {
     const ok = {
-      gameId: "frostbite",
+      gameId: "example-game",
       record: { any: ["json", 1, null] },
       runId,
     };
@@ -64,7 +64,7 @@ describe("the run contracts", () => {
     for (const bad of [
       { ...ok, runId: "run-1" },
       { ...ok, extra: true },
-      { gameId: "frostbite", runId },
+      { gameId: "example-game", runId },
     ])
       expect(submitGameRunInputSchema.safeParse(bad).success).toBe(false);
   });
