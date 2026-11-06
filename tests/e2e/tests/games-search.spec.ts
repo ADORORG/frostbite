@@ -160,8 +160,9 @@ test("on a narrow screen each group of kinds is one row that scrolls sideways", 
 test("the controls never push the page wider than the screen, and a result opens its game", async ({
   page,
 }) => {
+  // Two kinds chosen at once (a game matches either), so the row of chosen filters is as wide as it gets.
   await page.goto(
-    `/games?q=${fixtureGame.id.slice(0, 3)}&tag=${fixtureGame.tag}&tag=developer&playable=1`,
+    `/games?q=${fixtureGame.id.slice(0, 3)}&tag=${fixtureGame.tag}&tag=arcade&playable=1`,
   );
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
