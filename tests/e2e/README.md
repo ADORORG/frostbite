@@ -11,6 +11,11 @@ viewport projects (mobile, tablet, desktop, wide). Real-service flows (uploads, 
 run on desktop only (`desktopOnlySpecs` in `playwright.config.ts`); the experience-quality matrices
 (axe, keyboard, reduced motion, layout) run on every viewport.
 
+**What a project skips is printed.** `src/skip-reporter.ts` lists, after a run, every test a project skipped and the reason given to
+`test.skip(condition, "reason")`, so a spec that does not run on a phone shows in the log instead of hiding behind a green total. A test that
+should run on the `mobile` project must not be in `desktopOnlySpecs`; `test/playwright-config.integration.test.ts` fails if a layout, touch or phone spec is.
+Pass `--reporter=list` to see each test's result.
+
 **Pictures are compared only on request.** Without `E2E_VISUAL=1` every `toHaveScreenshot` is skipped
 (`ignoreSnapshots`), and the rest of each test still runs. Verify (`ci.yml`) never compares pictures; the
 "Visual baselines" workflow (`visual.yml`, by hand or weekly) does, and gates nothing.

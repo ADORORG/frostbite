@@ -26,7 +26,8 @@ export default defineConfig({
   ignoreSnapshots: !comparePictures,
   // A hung run fails in minutes instead of waiting for the job's own limit.
   globalTimeout: process.env.CI ? 25 * 60_000 : undefined,
-  reporter: [["html", { open: "never" }]],
+  // The second reporter lists what each project skipped and why, so a spec that does not run on a phone is visible in the log.
+  reporter: [["html", { open: "never" }], ["./src/skip-reporter.ts"]],
   expect: {
     // Applied only while a screenshot is taken (see the file for why).
     toHaveScreenshot: { stylePath: "./screenshot.css" },

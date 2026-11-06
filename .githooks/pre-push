@@ -1,0 +1,8 @@
+#!/bin/sh
+# Before a push: the fast CI jobs (static checks and types), on this machine, the way the runner runs them.
+# Install once with `pnpm hooks:install`. Skip once with `git push --no-verify`.
+set -e
+pnpm ci:local --job static --job typecheck
+echo
+echo "pre-push ran: static, typecheck."
+echo "NOT run here: tests, game-simulations, coverage-merge, e2e (pnpm ci:local runs them), and contracts, image, publish (GitHub only)."

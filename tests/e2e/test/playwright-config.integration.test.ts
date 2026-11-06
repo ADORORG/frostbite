@@ -1,3 +1,6 @@
+import { readdirSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import config from "../playwright.config.ts";
@@ -10,6 +13,24 @@ describe("Playwright production-server integration", () => {
       env: { HOSTNAME: "127.0.0.1", PORT: "4173" },
       url: "http://localhost:4173",
     });
+  });
+
+  it("runs every layout and touch spec on the mobile project (none is in the desktop-only list)", () => {
+    const pattern = (config.projects ?? []).find(
+      ({ name }) => name === "mobile",
+    )?.testIgnore;
+    if (!(pattern instanceof RegExp))
+      throw new Error("expected a RegExp ignore pattern");
+    const specs = readdirSync(resolve(import.meta.dirname, "../tests")).filter(
+      (name) =>
+        /(?:layout|touch|phone)/u.test(name) && name.endsWith(".spec.ts"),
+    );
+    expect(specs.length).toBeGreaterThan(0);
+    expect(specs.filter((name) => pattern.test(`tests/${name}`))).toEqual([]);
+  });
+
+  it("prints what each project skipped", () => {
+    expect(JSON.stringify(config.reporter)).toContain("skip-reporter");
   });
 
   it("runs the real-service upload flows on the desktop project only", () => {
