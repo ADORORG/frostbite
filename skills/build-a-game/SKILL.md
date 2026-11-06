@@ -51,6 +51,26 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
 8. **Hand over.** Summarise what was built, what was run and its output, what was not verified (how it looks and sounds, touch on a
    real phone), and the pull request to open. Never push or deploy for the person unless they ask.
 
+## When the starter does not fit
+
+The starter is a one-screen, real-time game drawn on a canvas, whose run is a seeded list of taps the platform can replay. Many games
+fit it; some do not. Scaffold anyway and change only what differs. Keep what every game has: the page skeleton, sound, keys, pause, the
+steady layout, the two cards and the phone rules below. Say in your report what you changed and why.
+
+- **Drawn in page elements, not on a canvas** (a board of tiles): there is no `canvas#screen` to lay the cards over, so a game that
+  does this takes the first-screen card from the page instead (Icicle Drop is the example). The browser contract skips only its check
+  of the card's pixels for such a game.
+- **Turn-based, or no clock**: the starter counts ticks. A game without them still records the player's choices in order and replays
+  them; the rules take a move, not a tick, and the loop and its pause have nothing to advance.
+- **Several screens or levels chosen by the player** (menus, chapters): keep them behind a button, not in the page flow, so the page never scrolls on touch.
+- **More than four extra touch buttons**: one button that cycles the actions, or keys; never a pad under the screen.
+- **Rules the platform cannot replay** (anything that depends on what the rules cannot see): drop `src/replay.ts`, `src/sample-run.ts`,
+  the manifest's `verification` and the milestones' replay-verified mark. The platform's verifier test says what else must agree.
+  Its milestones are then self-reported, and nothing that carries money or a privilege may depend on one.
+
+Never change `tests/e2e/tests/game-contract.spec.ts` to let a game pass. If a game cannot meet one of its checks (its page parts are
+`canvas#screen`, `#start`, `#pause` and its buttons), say which and why in your report, and let the person decide.
+
 ## Phones and notes
 
 Players open games on phones. A game that cannot be played there is not finished, whatever its tests say. These are the rules; the
