@@ -18,7 +18,6 @@ gated until their product decisions and end-to-end verification are complete.
 - `packages/ui` — reusable arcade components and design tokens.
 - `tests/e2e` — Playwright browser coverage.
 - `tooling/repository-policy` — executable workspace, boundary, file-size, and coverage gates.
-- `tooling/brand-rename` — `pnpm rename:brand`: renames the platform's npm scope and the names built on it, and checks that nothing was missed.
 - `packages/jobs` — provider-neutral outbox relay policy and workflow publication port.
 - `apps/worker` — standalone service: signed workflow endpoint and outbox relay.
 

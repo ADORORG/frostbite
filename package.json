@@ -61,7 +61,6 @@
     "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",
     "game:dev": "pnpm --filter @repo/game-tools dev",
     "game:new": "pnpm --filter @repo/game-tools new",
-    "rename:brand": "pnpm --filter @repo/brand-rename rename",
     "testnet:preflight": "pnpm --filter @repo/testnet-preflight preflight",
     "stack:https": "pnpm --filter @repo/e2e stack:https"
   },
