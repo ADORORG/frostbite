@@ -80,6 +80,18 @@ Check the node's indexer is keeping up: `metashrew_height` against `esplora_bloc
 after the indexer ran it (ADR-018), so a lagging indexer holds every step at "sent". On 2026-10-16 the public signet endpoint's
 indexer was about 1,000 blocks behind and not moving (finding S73).
 
+## The platform fee on mints
+
+Staff set what the platform charges on each milestone mint on `/admin/games` ("Platform fee"): the fee in satoshis and the treasury
+address it is paid to, saved together. The player pays it on top of the network fee, sees it and the total before signing, and it goes
+to the treasury as an extra output of the claim's transaction. 0 turns it off. The platform refuses an address that is not on the
+game's network, a fee under the dust limit of that address, and one above the policy maximum (`rewardsPolicy.maxPlatformFeeSats`).
+A change applies to claims started after it. A game's page shows its mints and the fees accrued; the list shows the same for every
+game. Fees are counted when a claim is complete, never before.
+
+If every claim stops with "not supported" after a change, look at the treasury address: a fee that is set and unusable stops the
+claim rather than letting it through without the fee. Set a valid address (or a fee of 0).
+
 ## Reading the lamp and "delayed"
 
 Every page has a small lamp in its header (nothing shows where no rewards chain is configured). **Chain in sync**: the indexer has read every

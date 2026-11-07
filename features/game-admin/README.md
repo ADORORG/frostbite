@@ -6,22 +6,26 @@ pause and resume; every step logged). Service and table: `@frostbite/game-admin`
 
 ## Public API
 
-`createGameAdminFeature(games, config)` returns the feature registration: six API routes and two admin pages. Register it once in
+`createGameAdminFeature(games, config)` returns the feature registration: ten API routes and two admin pages. Register it once in
 the feature registry (`configs/features.ts`); removing that line removes every route, page and navigation entry.
 
-| Operation                 | Route                                 | Notes                                                                   |
-| ------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
-| `startGameAdminStep`      | `POST /api/v1/game-admin/start`       | Builds the step; an answer (with why) when it cannot be taken           |
-| `submitGameAdminStep`     | `POST /api/v1/game-admin/submit`      | Takes what was signed; checked against what was built                   |
-| `refreshGameAdminStep`    | `POST /api/v1/game-admin/refresh`     | Looks at the chain once; the page asks until the step is over           |
-| `recordGameAdminContract` | `POST /api/v1/game-admin/record`      | Staff enter a contract's address the platform could not read; checked   |
-| `listGameAdminSteps`      | `GET /api/v1/game-admin/list?gameId=` | A game's log, its contract (once made), whether the templates are ready |
-| `listGameAdminTemplates`  | `GET /api/v1/game-admin/templates`    | The templates that may be published, which are and where, and their log |
+| Operation                 | Route                                  | Notes                                                                   |
+| ------------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
+| `startGameAdminStep`      | `POST /api/v1/game-admin/start`        | Builds the step; an answer (with why) when it cannot be taken           |
+| `submitGameAdminStep`     | `POST /api/v1/game-admin/submit`       | Takes what was signed; checked against what was built                   |
+| `refreshGameAdminStep`    | `POST /api/v1/game-admin/refresh`      | Looks at the chain once; the page asks until the step is over           |
+| `recordGameAdminContract` | `POST /api/v1/game-admin/record`       | Staff enter a contract's address the platform could not read; checked   |
+| `listGameAdminSteps`      | `GET /api/v1/game-admin/list?gameId=`  | A game's log, its contract (once made), whether the templates are ready |
+| `listGameAdminTemplates`  | `GET /api/v1/game-admin/templates`     | The templates that may be published, which are and where, and their log |
+| `listGameMints`           | `GET /api/v1/game-admin/mints`         | A game's totals and a page of its completed mints (`gameId`, `after`)   |
+| `listGameMintTotals`      | `GET /api/v1/game-admin/mint-totals`   | The totals of every game that declares rewards                          |
+| `getPlatformFee`          | `GET /api/v1/game-admin/platform-fee`  | The platform fee on each chain: in force, who set it, the history       |
+| `setPlatformFee`          | `POST /api/v1/game-admin/platform-fee` | Sets the fee and its treasury address together, as the signed-in staff  |
 
-| Page         | Path                    | Notes                                                                                        |
-| ------------ | ----------------------- | -------------------------------------------------------------------------------------------- |
-| Game rewards | `/admin/games`          | The templates (publish each at an address you choose), and the games that declare rewards    |
-| One game     | `/admin/games/[gameId]` | Create the contract once; then wallet, pause and resume, milestones, the review, and the log |
+| Page         | Path                    | Notes                                                                                                                    |
+| ------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Game rewards | `/admin/games`          | The templates, **the platform fee** (fee and treasury address side by side), and the games, each with its mints and fees |
+| One game     | `/admin/games/[gameId]` | Create the contract once; then wallet, pause and resume, milestones, the review, the log, **mints and fees**             |
 
 Everything requires `game:administer` (`gameAdminCapability`), which the authorization policy grants to the `staff` role.
 
@@ -56,6 +60,15 @@ which a game and its collectibles are made from, the most a contract may be crea
   milestones appear once the record has the contract. The page loads the record again when a step ends.
 - **The address a template goes to is the one staff type**, checked against the record (not already published, not used by anything
   else); the address of a game's contract is whatever the chain reports.
+
+## The platform fee and mints
+
+The fee a player pays the platform on top of the network fee each time a milestone is minted is set here, per chain, and nowhere
+else (`PlatformFeePanel` on `/admin/games`): the fee in satoshis and the treasury address are one form and are saved together. The
+platform refuses an address the chain does not accept, a fee above `rewardsPolicy.maxPlatformFeeSats`, and a fee above zero but
+below the dust limit of the address; 0 means no fee. A setting applies to the next claim a player starts; a claim already built
+keeps the fee it showed. Every setting is kept with who made it and when. `MintsSection` (a game's page) and `MintFigures` (each
+game's tile) read what the report in `@frostbite/game-claims` keeps: see that package for why it is cheap however many mints there are.
 
 ## Tests
 

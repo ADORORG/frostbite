@@ -8,6 +8,7 @@ import {
 } from "./admin-step.ts";
 import { gameIdSchema } from "./manifest.ts";
 
+export * from "./admin-mints.ts";
 export * from "./admin-record.ts";
 export * from "./admin-step.ts";
 

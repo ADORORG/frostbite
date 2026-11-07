@@ -13,6 +13,9 @@ import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { AdminFrame } from "./admin-frame.tsx";
 import { FeeSettingsBoundary, type FeeSettings } from "./fee-settings.tsx";
+import { MintFigures, MintFiguresBoundary } from "./mint-figures.tsx";
+import { MintsSection } from "./mints-section.tsx";
+import { PlatformFeePanel } from "./platform-fee-panel.tsx";
 import { WalletGamePanel, WalletTemplatesPanel } from "./wallet-panels.tsx";
 
 type Navigation = readonly NavigationItem[];
@@ -47,35 +50,39 @@ export function GamesSurface({
           />
         </FeeSettingsBoundary>
       </ExplorerBoundary>
+      <PlatformFeePanel {...(api === undefined ? {} : { api })} />
       <SectionBlock title="Games">
         {games.length === 0 ? (
           <ArcadeEmptyState title="Nothing to administer">
             No game declares rewards yet.
           </ArcadeEmptyState>
         ) : (
-          <ul aria-label="Games with rewards" className="tile-grid">
-            {games.map((game) => (
-              <li key={game.id}>
-                <Tile
-                  badge={
-                    <span title={game.chain}>
-                      <ArcadeBadge tone="cyan">
-                        {shortenMiddle(game.chain, { head: 10, tail: 4 })}
-                      </ArcadeBadge>
-                    </span>
-                  }
-                  footer={
-                    <a
-                      href={gameAdminHref(game.id)}
-                    >{`Administer ${game.title}`}</a>
-                  }
-                  title={game.title}
-                >
-                  <p>{`${game.milestones.length} milestone${game.milestones.length === 1 ? "" : "s"}`}</p>
-                </Tile>
-              </li>
-            ))}
-          </ul>
+          <MintFiguresBoundary {...(api === undefined ? {} : { api })}>
+            <ul aria-label="Games with rewards" className="tile-grid">
+              {games.map((game) => (
+                <li key={game.id}>
+                  <Tile
+                    badge={
+                      <span title={game.chain}>
+                        <ArcadeBadge tone="cyan">
+                          {shortenMiddle(game.chain, { head: 10, tail: 4 })}
+                        </ArcadeBadge>
+                      </span>
+                    }
+                    footer={
+                      <a
+                        href={gameAdminHref(game.id)}
+                      >{`Administer ${game.title}`}</a>
+                    }
+                    title={game.title}
+                  >
+                    <p>{`${game.milestones.length} milestone${game.milestones.length === 1 ? "" : "s"}`}</p>
+                    <MintFigures gameId={game.id} />
+                  </Tile>
+                </li>
+              ))}
+            </ul>
+          </MintFiguresBoundary>
         )}
       </SectionBlock>
     </AdminFrame>
@@ -123,6 +130,7 @@ export function GameSurface({
           />
         </FeeSettingsBoundary>
       </ExplorerBoundary>
+      <MintsSection {...(api === undefined ? {} : { api })} gameId={game.id} />
     </AdminFrame>
   );
 }

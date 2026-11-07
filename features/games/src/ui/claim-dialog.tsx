@@ -1,4 +1,7 @@
-import { NetworkFee } from "@frostbite/feature-chain-status/fee-picker";
+import {
+  FeeLine,
+  NetworkFee,
+} from "@frostbite/feature-chain-status/fee-picker";
 import {
   TransactionList,
   plainTransactionLabel,
@@ -12,7 +15,7 @@ import {
   shortenMiddle,
 } from "@repo/ui/arcade";
 
-import { claimCopy } from "../domain/claim-copy.ts";
+import { claimCopy, platformFeeNote } from "../domain/claim-copy.ts";
 
 // The claim a player signs from, in a dialog over the whole page so nothing (the dock, the game) can hide it: where the claim stands,
 // what it costs, and one button to sign. The rest of what the platform built is behind "Details". It shows exactly what the platform
@@ -37,6 +40,7 @@ export function ClaimDialog({
   readonly working: boolean;
 }) {
   const copy = claim === null ? null : claimCopy(claim);
+  const platformFee = claim?.summary.platformFee;
   return (
     <ArcadeDialog
       footer={
@@ -59,7 +63,7 @@ export function ClaimDialog({
           data-testid="claim-review"
         >
           <ActionProgress
-            detail={`${copy.detail}${claim.failureReason === null ? "" : ` (${claim.failureReason})`}`}
+            detail={`${copy.detail}${claim.failureReason === null ? "" : ` (${claim.failureReason})`}${platformFee !== undefined && claim.state === "awaiting-signature" ? ` ${platformFeeNote}` : ""}`}
             title={copy.label}
             working={claim.state === "pending" || claim.state === "claimed"}
           />
@@ -68,6 +72,23 @@ export function ClaimDialog({
             baseUnits={claim.summary.fee.baseUnits}
             detail={claim.summary.feeDetail}
           />
+          {platformFee === undefined ? null : (
+            <>
+              <FeeLine
+                asset={claim.summary.fee.asset}
+                baseUnits={platformFee.baseUnits}
+                label="Platform fee"
+              />
+              <FeeLine
+                asset={claim.summary.fee.asset}
+                baseUnits={(
+                  BigInt(claim.summary.fee.baseUnits) +
+                  BigInt(platformFee.baseUnits)
+                ).toString()}
+                label="Total fees"
+              />
+            </>
+          )}
           {claim.transactionId === null ? null : (
             <TransactionList
               transactions={[
@@ -98,6 +119,19 @@ export function ClaimDialog({
                     </span>
                   ),
                 },
+                ...(platformFee === undefined
+                  ? []
+                  : [
+                      {
+                        label: "Platform fee goes to",
+                        mono: true,
+                        value: (
+                          <span title={platformFee.recipient}>
+                            {shortenMiddle(platformFee.recipient)}
+                          </span>
+                        ),
+                      },
+                    ]),
                 { label: "Valid until", value: claim.summary.expiresAt },
               ]}
               label="What this claim does"

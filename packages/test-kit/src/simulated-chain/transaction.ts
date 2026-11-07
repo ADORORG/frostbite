@@ -35,6 +35,8 @@ const bodySchema = z
     nonce: z.number(),
     operation: z.string(),
     paused: z.boolean().optional(),
+    platformFeeAmount: z.string().optional(),
+    platformFeeTo: z.string().optional(),
     recipient: z.string().optional(),
     sender: z.string(),
     templateAt: z.string().optional(),
@@ -87,6 +89,8 @@ function detailsOfSummary(summary: UnsignedTransaction["summary"]) {
     maxDrawingBytes: summary.maxDrawingBytes,
     milestoneId: summary.milestone?.id,
     paused: summary.paused,
+    platformFeeAmount: summary.platformFee?.amount.baseUnits.toString(),
+    platformFeeTo: summary.platformFee?.recipient.value,
     recipient: summary.recipient?.value,
     templateAt: summary.template?.at?.id,
     templateId: summary.template?.id,
@@ -134,10 +138,22 @@ function describe(intent: TransactionIntent): Described {
       return {
         contract: intent.contract.id,
         milestoneId: intent.milestoneId,
+        platformFeeAmount: intent.platformFee?.baseUnits.toString(),
+        platformFeeTo: intent.platformFee?.recipient.value,
         // A claim is received by the one who makes it.
         recipient: intent.sender.value,
         summary: {
           milestone: { contract: intent.contract, id: intent.milestoneId },
+          platformFee:
+            intent.platformFee === undefined
+              ? undefined
+              : {
+                  amount: {
+                    asset: nativeAsset(intent.chain),
+                    baseUnits: intent.platformFee.baseUnits,
+                  },
+                  recipient: intent.platformFee.recipient,
+                },
           recipient: intent.sender,
         },
       };

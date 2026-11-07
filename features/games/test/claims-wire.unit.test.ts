@@ -91,6 +91,26 @@ describe("a claim as the page is told of it", () => {
     expect(toWireClaim(view()).summary).not.toHaveProperty("feeDetail");
   });
 
+  it("tells the platform's fee, and who it goes to, when the claim carries one, and nothing of it when it does not", () => {
+    const recipient = { chain: summary.chain, value: "sim:one:7ea5a1ab" };
+    const told = toWireClaim(
+      view({
+        summary: {
+          ...summary,
+          platformFee: {
+            amount: { asset: summary.fee.asset, baseUnits: 1_500n },
+            recipient,
+          },
+        },
+      }),
+    );
+    expect(gameClaimSchema.parse(told).summary.platformFee).toEqual({
+      baseUnits: "1500",
+      recipient: recipient.value,
+    });
+    expect(toWireClaim(view()).summary).not.toHaveProperty("platformFee");
+  });
+
   it("refuses a summary that does not name its milestone, which is not a claim", () => {
     const bare = transactionSummarySchema.parse({
       chain,

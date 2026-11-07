@@ -24,6 +24,7 @@
     "@frostbite/database": "workspace:*",
     "@frostbite/feature-chain-status": "workspace:*",
     "@frostbite/game-admin": "workspace:*",
+    "@frostbite/game-claims": "workspace:*",
     "@frostbite/wallet": "workspace:*",
     "@frostbite/http": "workspace:*",
     "@frostbite/milestone-art": "workspace:*",

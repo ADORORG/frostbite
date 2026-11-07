@@ -16,6 +16,7 @@ export const gameAdminConfig = {
     defaultSpeed: rewardsPolicy.defaultFeeSpeed,
     polling: rewardsPolicy.statusPolling,
   },
+  platformFee: { maximumSats: rewardsPolicy.maxPlatformFeeSats },
   drawingLimits: {
     maxAttributeLength: 4096,
     maxDepth: 8,

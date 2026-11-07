@@ -1,5 +1,5 @@
 import type { FetchLike } from "@frostbite/client-http";
-import { gameAdminRoutes } from "@frostbite/shared/games";
+import { gameAdminMintRoutes, gameAdminRoutes } from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
 import { createGameAdminApi } from "../src/client/api.ts";
@@ -105,5 +105,58 @@ describe("the administration routes as the page reaches them", () => {
     await expect(
       createGameAdminApi(fetchImpl).list("arcade"),
     ).rejects.toThrow();
+  });
+});
+
+describe("the mint and fee routes as the page reaches them", () => {
+  const cursor =
+    "2026-10-16T12:00:00.000Z~0198a000-0000-7000-8000-0000000000c1";
+  const page = {
+    mints: [],
+    next: null,
+    totals: { completed: 0, feesAccruedUnits: "0", inProgress: 0 },
+  };
+
+  it("asks for a game's mints, and for the page after a cursor, as a query", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async () => json(page));
+    const api = createGameAdminApi(fetchImpl);
+    await api.mints("arcade");
+    await api.mints("arcade", cursor);
+    expect(fetchImpl.mock.calls.map(([path]) => path)).toEqual([
+      `${gameAdminMintRoutes.mints.path}?gameId=arcade`,
+      `${gameAdminMintRoutes.mints.path}?${new URLSearchParams({ after: cursor, gameId: "arcade" }).toString()}`,
+    ]);
+  });
+
+  it("asks for every game's totals and for the platform fee, validating what comes back", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async (path) =>
+      json(
+        String(path).includes("mint-totals") ? { games: [] } : { chains: [] },
+      ),
+    );
+    const api = createGameAdminApi(fetchImpl);
+    expect(await api.mintTotals()).toEqual({ games: [] });
+    expect(await api.platformFee()).toEqual({ chains: [] });
+    await expect(
+      createGameAdminApi(async () => json({ chains: "no" })).platformFee(),
+    ).rejects.toBeDefined();
+  });
+
+  it("sets the fee and its address in one request body", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({ reason: "unknown-chain", status: "refused" }),
+    );
+    const input = {
+      chain: "simnet:one" as never,
+      feeUnits: "1500",
+      treasury: "sim:one:7ea5a1ab",
+    };
+    expect(await createGameAdminApi(fetchImpl).setPlatformFee(input)).toEqual({
+      reason: "unknown-chain",
+      status: "refused",
+    });
+    expect(asked(fetchImpl)).toEqual([
+      [gameAdminMintRoutes.setPlatformFee.path, input],
+    ]);
   });
 });

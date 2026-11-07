@@ -66,6 +66,14 @@ export const gameClaimSummarySchema = z
     // The rate and speed the fee was priced at, when the adapter priced it by rate.
     feeDetail: feeDetailSchema.optional(),
     milestoneId: gameIdSchema,
+    // What the platform charges on top of the network fee and where it goes, when it charges one: shown before signing, with the total.
+    platformFee: z
+      .object({
+        baseUnits: z.string().regex(/^\d{1,40}$/u),
+        recipient: z.string().min(1).max(256),
+      })
+      .strict()
+      .optional(),
     recipient: z.string().min(1).max(256),
   })
   .strict();

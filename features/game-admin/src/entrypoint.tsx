@@ -8,6 +8,12 @@ import {
 } from "@frostbite/shared/games";
 
 import {
+  createGetPlatformFeeOperation,
+  createListGameMintsOperation,
+  createListGameMintTotalsOperation,
+  createSetPlatformFeeOperation,
+} from "./application/mints.ts";
+import {
   createListStepsOperation,
   createListTemplatesOperation,
   createRecordContractOperation,
@@ -43,6 +49,10 @@ export function createGameAdminEntrypoint(
       registerHttpOperation(createStartStepOperation(resolve)),
       registerHttpOperation(createSubmitStepOperation(resolve)),
       registerHttpOperation(createListTemplatesOperation(resolve)),
+      registerHttpOperation(createListGameMintsOperation(resolve)),
+      registerHttpOperation(createListGameMintTotalsOperation(resolve)),
+      registerHttpOperation(createGetPlatformFeeOperation(resolve)),
+      registerHttpOperation(createSetPlatformFeeOperation(resolve)),
     ],
     pages: [
       {

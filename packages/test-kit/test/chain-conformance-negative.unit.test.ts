@@ -83,6 +83,7 @@ describe("the conformance suite refuses a broken adapter", () => {
     const codec = need(adapter.ports.addressCodec);
     const lenient = broken(adapter, {
       addressCodec: {
+        minimumOutput: codec.minimumOutput,
         parse: (chain, text) => codec.parse(chain, text.trim().toLowerCase()),
       },
     });
@@ -94,11 +95,23 @@ describe("the conformance suite refuses a broken adapter", () => {
   it("refuses a codec that accepts another chain's address", () => {
     const { adapter, fixtures } = simulated();
     const accepting = broken(adapter, {
-      addressCodec: { parse: (chain, text) => ({ chain, value: text }) },
+      addressCodec: {
+        minimumOutput: () => 1n,
+        parse: (chain, text) => ({ chain, value: text }),
+      },
     });
     expect(() => checkAddressCodec(accepting, fixtures)).toThrow(
       /must be refused with InvalidAddressError/u,
     );
+  });
+
+  it("refuses a codec that says an output may carry nothing", () => {
+    const { adapter, fixtures } = simulated();
+    const codec = need(adapter.ports.addressCodec);
+    const free = broken(adapter, {
+      addressCodec: { minimumOutput: () => 0n, parse: codec.parse },
+    });
+    expect(() => checkAddressCodec(free, fixtures)).toThrow(/smallest output/u);
   });
 
   it("refuses an adapter that claims a chain it cannot serve", () => {

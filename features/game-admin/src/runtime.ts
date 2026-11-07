@@ -15,6 +15,10 @@ import {
   createGameAdminService,
   type AdministeredGame,
 } from "@frostbite/game-admin";
+import {
+  createMintReport,
+  createPlatformFeeService,
+} from "@frostbite/game-claims";
 import { sanitizeDrawing } from "@frostbite/milestone-art";
 import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
 import {
@@ -102,7 +106,22 @@ export function createGameAdminResolver(
         .where(inArray(authUsers.id, [...ids]));
       return new Map(rows.map(({ id, name }) => [id, name]));
     };
-    return { names, rewards: config.rewards, service };
+    // What staff see of mints and the platform's fee on them. The fee is validated against the chain's own address rules.
+    const fees = createPlatformFeeService({
+      clock,
+      database,
+      maximumFeeSats: config.platformFee.maximumSats,
+      newId: randomUUID,
+      ports: (chain) => config.chain(chain)?.ports ?? null,
+    });
+    return {
+      fees,
+      games,
+      mints: createMintReport(database),
+      names,
+      rewards: config.rewards,
+      service,
+    };
   });
 }
 

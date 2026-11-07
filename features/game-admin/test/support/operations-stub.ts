@@ -10,7 +10,7 @@ import {
   createSubmitStepOperation,
 } from "../../src/application/operations.ts";
 import type { GameAdminRuntime } from "../../src/runtime.ts";
-import { chain, config, staffId, view } from "./fixtures.ts";
+import { chain, config, info, staffId, view } from "./fixtures.ts";
 
 export const context = {
   actorSession: null,
@@ -18,6 +18,9 @@ export const context = {
   correlationId: "c0ffee00-0000-4000-8000-000000000000" as never,
 };
 export const anonymous = { ...context, actorUserId: null };
+
+// What the step operations never ask: a mint report or a fee setting is for the operations that read them (see `mints-stub.ts`).
+const unused = () => Promise.reject(new Error("not used here"));
 
 export function stub(overrides: Partial<GameAdminService> = {}) {
   const service: GameAdminService = {
@@ -46,6 +49,9 @@ export function stub(overrides: Partial<GameAdminService> = {}) {
     ...overrides,
   };
   const resolve = async (): Promise<GameAdminRuntime> => ({
+    fees: { change: unused, setting: unused, view: unused },
+    games: info(),
+    mints: { recent: unused, totalsFor: unused },
     names: async () => new Map([[staffId, "Ada"]]),
     rewards: config().rewards,
     service,

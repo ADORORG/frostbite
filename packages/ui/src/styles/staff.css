@@ -134,3 +134,56 @@
     justify-self: start;
   }
 }
+
+/* The platform fee form: the fee and the address it is paid to side by side, one above the other on a narrow screen. */
+.fee-fields {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+  gap: var(--arcade-space-3);
+  align-items: start;
+}
+@media (max-width: 40rem) {
+  .fee-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A game's mint totals and its list of mints. */
+.mint-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3) var(--arcade-space-6);
+  margin: 0;
+}
+.mint-totals div {
+  display: grid;
+  gap: var(--arcade-space-1);
+}
+.mint-totals dt {
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-xs);
+}
+.mint-totals dd {
+  margin: 0;
+  font-size: var(--arcade-text-lg);
+}
+.mint-list {
+  display: grid;
+  gap: var(--arcade-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mint-list li {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr) 8rem 7rem;
+  gap: var(--arcade-space-2);
+  padding: var(--arcade-space-2) 0;
+  border-bottom: 0.0625rem solid var(--arcade-border-strong);
+  font-size: var(--arcade-text-xs);
+}
+@media (max-width: 40rem) {
+  .mint-list li {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

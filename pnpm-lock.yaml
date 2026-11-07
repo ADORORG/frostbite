@@ -733,6 +733,9 @@ importers:
       '@frostbite/game-admin':
         specifier: workspace:*
         version: link:../../packages/game-admin
+      '@frostbite/game-claims':
+        specifier: workspace:*
+        version: link:../../packages/game-claims
       '@frostbite/http':
         specifier: workspace:*
         version: link:../../packages/http

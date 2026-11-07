@@ -47,6 +47,7 @@ export const echoCodec: AddressCodec = {
     if (text.length === 0) throw new InvalidAddressError("empty");
     return { chain, value: text };
   },
+  minimumOutput: () => 1n,
 };
 
 export const silentBroadcaster: Broadcaster = {

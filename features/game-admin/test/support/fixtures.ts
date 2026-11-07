@@ -85,6 +85,7 @@ export const config = (): GameAdminConfig => ({
     maxDrawingBytes: 8192n,
     publishable: [gameTemplate, collectibleTemplate],
   },
+  platformFee: { maximumSats: 100_000n },
   signingWallets: ["xverse"],
 });
 
