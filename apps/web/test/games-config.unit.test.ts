@@ -52,6 +52,14 @@ describe("the platform's game list", () => {
     },
   );
 
+  it.each(["local", "production"])(
+    "lists Pocket Dragon first in %s, because the first game is the one shown larger",
+    async (appEnv) => {
+      const ids = (await gamesWith("", appEnv)).map(({ id }) => id);
+      expect(ids[0]).toBe("pocket-dragon");
+    },
+  );
+
   it("declares a rewards contract on each of the games built for players, so staff can create it", async () => {
     const games = await gamesWith("");
     for (const id of [

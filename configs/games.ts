@@ -36,6 +36,8 @@ function developmentGames(): GameManifest[] {
 // A game played at its own address goes in the list given to `applyGameLaunchSettings`.
 export const games = defineGames([
   ...applyGameLaunchSettings([], parseGameLaunchEnvironment(process.env)),
+  // The first game is shown larger than the rest on the games page and the landing page.
+  pocketDragonGame,
   ...developmentGames(),
   frostRunnerGame,
   icicleDropGame,
@@ -45,7 +47,6 @@ export const games = defineGames([
   lanternMazeGame,
   shardMatchGame,
   auroraPulseGame,
-  pocketDragonGame,
   // game:new adds games above this line.
 ]);
 
