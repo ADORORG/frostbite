@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pocket Dragon: Glitchy's Quest</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="main">
+      <div class="bar">
+        <header>
+          <h1 id="title">Pocket Dragon: Glitchy's Quest</h1>
+          <p id="status">Connecting to the platform…</p>
+          <p id="bank">Metaplasma banked: <strong id="banked">0</strong></p>
+          <div id="test-badge" class="test-badge" hidden>
+            <span>Test mode</span>
+            <button id="test-leave" type="button">Leave</button>
+          </div>
+        </header>
+        <p class="score">
+          <span class="points">Score <strong id="score">0</strong></span>
+          <span
+            ><span id="stat-0-label">Eggs</span>
+            <strong id="stat-0">0</strong></span
+          >
+          <span
+            ><span id="stat-1-label">Hearts</span>
+            <strong id="stat-1">3</strong></span
+          >
+          <span
+            ><span id="stat-2-label">Stage</span>
+            <strong id="stat-2">1 of 3</strong></span
+          >
+          <span class="plasma">Plasma <strong id="plasma">0</strong></span>
+          <span class="best">Best <strong id="best">0</strong></span>
+        </p>
+      </div>
+      <nav id="chapters" class="chapters" aria-label="The quest and its levels">
+        <button type="button" data-chapter="quest" aria-pressed="true">
+          <span aria-hidden="true">0</span> The whole quest
+        </button>
+        <button type="button" data-chapter="hills" aria-pressed="false">
+          <span aria-hidden="true">1</span> Egg Hills
+        </button>
+        <button
+          type="button"
+          data-chapter="castle"
+          aria-pressed="false"
+          disabled
+        >
+          <span aria-hidden="true">2</span> The Guild and the Castle
+        </button>
+        <button
+          type="button"
+          data-chapter="woods"
+          aria-pressed="false"
+          disabled
+        >
+          <span aria-hidden="true">3</span> The Whispering Woods
+        </button>
+        <button id="nursery" type="button" class="secret" hidden>
+          <span aria-hidden="true">4</span> Secret: the Sky Nursery
+        </button>
+      </nav>
+      <div id="stage" class="stage">
+        <canvas
+          id="world"
+          width="512"
+          height="288"
+          aria-hidden="true"
+          hidden
+        ></canvas>
+        <canvas
+          id="screen"
+          width="512"
+          height="288"
+          role="img"
+          aria-label="The game screen"
+        ></canvas>
+        <div class="thumbs" aria-hidden="true">
+          <span class="thumb-stick"></span>
+          <span id="thumb-act" class="thumb-act">Jump</span>
+          <span id="thumb-fire" class="thumb-fire">Fire</span>
+        </div>
+      </div>
+      <div id="tab" class="tab">
+        <button
+          id="menu"
+          type="button"
+          aria-expanded="false"
+          aria-controls="chapters"
+        >
+          Levels
+        </button>
+        <button
+          id="bag"
+          type="button"
+          aria-expanded="false"
+          aria-controls="bag-items"
+          hidden
+        >
+          Bag
+        </button>
+        <div
+          id="bag-items"
+          class="bag-items"
+          role="group"
+          aria-label="Backpack"
+          hidden
+        >
+          <button
+            type="button"
+            data-hold="berry"
+            aria-label="Eat a berry: fire reaches farther"
+          >
+            Berry
+          </button>
+          <button
+            type="button"
+            data-hold="mushroom"
+            aria-label="Roll a mushroom's glitch blast"
+          >
+            Blast
+          </button>
+          <button
+            type="button"
+            data-hold="pineapple"
+            aria-label="Eat a pineapple: grow big"
+          >
+            Grow
+          </button>
+        </div>
+      </div>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+          <button id="share" type="button" disabled>Share card</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+      <section aria-labelledby="fame-title" class="fame">
+        <h2 id="fame-title">Hall of Fame</h2>
+        <p id="fame-note" class="fame-note">
+          Win the whole quest to get in. Fastest and highest first.
+        </p>
+        <ol id="fame"></ol>
+      </section>
+    </main>
+    <div
+      id="card-panel"
+      class="card-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="card-title"
+      hidden
+    >
+      <div class="card-sheet">
+        <div class="card-head">
+          <h2 id="card-title">Your Pocket Dragon card</h2>
+          <button id="card-close" type="button">Close</button>
+        </div>
+        <div
+          id="card-kinds"
+          class="card-shapes"
+          role="group"
+          aria-label="Which card"
+          hidden
+        >
+          <button type="button" data-kind="family" aria-pressed="true">
+            Dragon family
+          </button>
+          <button type="button" data-kind="art" aria-pressed="false">
+            Sky art
+          </button>
+          <button type="button" data-kind="dance" aria-pressed="false">
+            Dance party
+          </button>
+        </div>
+        <div class="card-shapes" role="group" aria-label="Card size">
+          <button type="button" data-shape="square" aria-pressed="true">
+            1:1 post
+          </button>
+          <button type="button" data-shape="story" aria-pressed="false">
+            9:16 story
+          </button>
+          <button type="button" data-shape="wide" aria-pressed="false">
+            16:9 wide
+          </button>
+        </div>
+        <div id="card-holo" class="card-holo">
+          <img id="card-image" alt="" hidden />
+        </div>
+        <p id="card-hint" class="card-hint" aria-live="polite"></p>
+        <div id="card-link-row" class="card-link" hidden>
+          <label for="card-link">Invite link</label>
+          <input id="card-link" type="text" readonly />
+        </div>
+        <div class="card-actions">
+          <button id="card-download" type="button">Download</button>
+          <button id="card-send" type="button">Share</button>
+          <button id="card-copy" type="button">Copy invite link</button>
+        </div>
+      </div>
+    </div>
+    <div
+      id="test-panel"
+      class="card-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="test-title"
+      hidden
+    >
+      <div class="card-sheet test-sheet">
+        <h2 id="test-title">Test mode</h2>
+        <p>
+          For the game's admin only. In test mode hearts are never lost and the
+          rocket never leaves, and nothing is timed, scored, saved or sent.
+        </p>
+        <label for="test-key">Admin key</label>
+        <input
+          id="test-key"
+          type="password"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+        />
+        <p id="test-message" class="test-message" aria-live="polite"></p>
+        <div class="test-actions">
+          <button id="test-unlock" type="button">Unlock</button>
+          <button id="test-cancel" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

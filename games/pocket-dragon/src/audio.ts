@@ -1,0 +1,266 @@
+import {
+  commonEffects,
+  tone,
+  type Effect,
+} from "@frostbite/game-sdk/audio/effects";
+import type { Track } from "@frostbite/game-sdk/audio/tracks";
+
+import { moreEffects } from "./audio-more.ts";
+import type { ChapterId } from "./rules/constants.ts";
+
+// The game's sound, as data: a tune for each chapter (a bouncy one for the hills, a hushed one for the woods, a march for the castle)
+// and an effect for each thing that happens. Nothing here is a file: the SDK plays it with the browser's audio.
+const r = null;
+
+export const tracks: Readonly<Record<ChapterId, Track>> = {
+  castle: {
+    name: "pocket-dragon-castle",
+    tempo: 118,
+    voices: [
+      {
+        gain: 0.2,
+        hold: 1.2,
+        notes: [50, r, 57, r, 55, r, 57, r, 50, r, 57, r, 59, r, 57, r],
+        wave: "triangle",
+      },
+      {
+        gain: 0.09,
+        hold: 0.9,
+        notes: [
+          74,
+          r,
+          78,
+          81,
+          r,
+          78,
+          76,
+          r,
+          74,
+          r,
+          76,
+          78,
+          79,
+          r,
+          81,
+          r,
+          83,
+          r,
+          81,
+          78,
+          r,
+          76,
+          74,
+          r,
+          76,
+          r,
+          78,
+          r,
+          74,
+          r,
+          r,
+          r,
+        ],
+        wave: "square",
+      },
+    ],
+  },
+  hills: {
+    name: "pocket-dragon-hills",
+    tempo: 144,
+    voices: [
+      {
+        gain: 0.22,
+        hold: 1.3,
+        notes: [48, r, 55, r, 57, r, 55, r, 53, r, 60, r, 55, r, 59, r],
+        wave: "triangle",
+      },
+      {
+        gain: 0.1,
+        hold: 0.8,
+        notes: [
+          72,
+          76,
+          79,
+          r,
+          76,
+          r,
+          72,
+          r,
+          74,
+          77,
+          81,
+          r,
+          79,
+          r,
+          77,
+          76,
+          72,
+          76,
+          79,
+          84,
+          r,
+          83,
+          81,
+          79,
+          77,
+          r,
+          74,
+          r,
+          72,
+          r,
+          r,
+          r,
+        ],
+        wave: "square",
+      },
+      {
+        gain: 0.05,
+        hold: 6,
+        notes: [64, r, r, r, r, r, r, r, 65, r, r, r, r, r, r, r],
+        wave: "sine",
+      },
+    ],
+  },
+  woods: {
+    name: "pocket-dragon-woods",
+    tempo: 92,
+    voices: [
+      {
+        gain: 0.18,
+        hold: 3,
+        notes: [45, r, r, r, 52, r, r, r, 41, r, r, r, 48, r, r, r],
+        wave: "sine",
+      },
+      {
+        gain: 0.07,
+        hold: 1.5,
+        notes: [
+          r,
+          81,
+          r,
+          r,
+          76,
+          r,
+          79,
+          r,
+          r,
+          r,
+          72,
+          r,
+          74,
+          r,
+          r,
+          r,
+          r,
+          77,
+          r,
+          r,
+          76,
+          r,
+          72,
+          r,
+          r,
+          69,
+          r,
+          r,
+          r,
+          r,
+          r,
+          r,
+        ],
+        wave: "triangle",
+      },
+    ],
+  },
+};
+
+export const effects = {
+  ...moreEffects,
+  berry: [
+    tone("square", 400, 900, 0.18, 0.3),
+    tone("sine", 900, 1200, 0.12, 0.25, 0.15),
+  ],
+  cheer: [
+    tone("sine", 660, 880, 0.08, 0.3),
+    tone("sine", 880, 1175, 0.1, 0.3, 0.07),
+    tone("sine", 1175, 1568, 0.14, 0.25, 0.14),
+  ],
+  chest: [
+    tone("square", 988, 988, 0.06, 0.25),
+    tone("square", 1319, 1319, 0.16, 0.25, 0.06),
+  ],
+  clue: [
+    tone("sine", 880, 880, 0.2, 0.3),
+    tone("sine", 1319, 1319, 0.35, 0.25, 0.15),
+  ],
+  egg: [tone("square", 1100, 1500, 0.06, 0.22)],
+  finish: commonEffects.win,
+  fire: [
+    tone("noise", 0, 0, 0.18, 0.18),
+    tone("sawtooth", 500, 180, 0.18, 0.15),
+  ],
+  gate: [
+    tone("sine", 523, 523, 0.3, 0.3),
+    tone("sine", 659, 659, 0.3, 0.3, 0.1),
+    tone("sine", 784, 784, 0.5, 0.3, 0.2),
+  ],
+  golden: [
+    tone("square", 784, 784, 0.07, 0.3),
+    tone("square", 1047, 1047, 0.07, 0.3, 0.07),
+    tone("square", 1568, 1568, 0.2, 0.3, 0.14),
+  ],
+  hit: [tone("sawtooth", 380, 160, 0.22, 0.3), tone("noise", 0, 0, 0.08, 0.15)],
+  join: commonEffects.good,
+  jump: [tone("square", 280, 660, 0.14, 0.24)],
+  lantern: [tone("sine", 660, 990, 0.25, 0.25)],
+  melt: [
+    tone("noise", 0, 0, 0.25, 0.2),
+    tone("sine", 1200, 1800, 0.2, 0.2, 0.1),
+  ],
+  milestone: commonEffects.win,
+  nap: [tone("sine", 660, 330, 0.5, 0.25)],
+  open: [
+    tone("noise", 0, 0, 0.12, 0.2),
+    tone("square", 220, 440, 0.15, 0.2, 0.05),
+  ],
+  reply: [tone("sawtooth", 160, 110, 0.3, 0.2)],
+  show: [
+    tone("square", 880, 1760, 0.1, 0.22),
+    tone("square", 1320, 2000, 0.12, 0.2, 0.1),
+  ],
+  stage: commonEffects.good,
+  start: commonEffects.start,
+  stomp: [
+    tone("square", 300, 150, 0.06, 0.3),
+    tone("square", 450, 900, 0.1, 0.25, 0.05),
+  ],
+  talk: commonEffects.click,
+  burst: [
+    tone("noise", 0, 0, 0.4, 0.3),
+    tone("square", 300, 1200, 0.4, 0.25, 0.05),
+  ],
+  charm: [
+    tone("sine", 988, 1319, 0.1, 0.3),
+    tone("sine", 1319, 1760, 0.12, 0.3, 0.08),
+    tone("sine", 1760, 2349, 0.2, 0.25, 0.16),
+  ],
+  evade: [tone("sine", 1200, 600, 0.15, 0.25)],
+  freed: [tone("sine", 523, 1047, 0.3, 0.3)],
+  ghost: [tone("sine", 700, 300, 0.2, 0.3)],
+  guard: [tone("square", 600, 200, 0.2, 0.25)],
+  laser: [tone("sawtooth", 1400, 300, 0.3, 0.25)],
+  launch: [tone("square", 200, 600, 0.15, 0.25)],
+  plasma: [tone("sine", 1400, 1800, 0.05, 0.12)],
+  quick: [tone("square", 1000, 1400, 0.06, 0.25)],
+  target: [tone("square", 784, 1568, 0.15, 0.3)],
+  warning: [
+    tone("square", 880, 880, 0.08, 0.2),
+    tone("square", 880, 880, 0.08, 0.2, 0.15),
+  ],
+} as const satisfies Record<string, Effect>;
+
+export type EffectName = keyof typeof effects;
+
+// The tune for what is on the screen: a level's own, and the castle's for the Sky Nursery.
+export const trackOf = (shown: ChapterId | "nursery"): Track =>
+  tracks[shown === "nursery" ? "castle" : shown];

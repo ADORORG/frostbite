@@ -1,0 +1,30 @@
+{
+  "name": "@game/pocket-dragon",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "env:check": "node --experimental-strip-types ../../packages/config/src/env/check-files.ts",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts --project unit",
+    "test:integration": "vitest run --config vitest.config.ts --project integration",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
+  },
+  "dependencies": {
+    "@frostbite/game-sdk": "workspace:*",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@frostbite/test-kit": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@types/node": "26.4.0",
+    "@types/three": "0.187.0",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

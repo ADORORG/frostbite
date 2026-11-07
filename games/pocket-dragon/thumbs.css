@@ -1,0 +1,107 @@
+/* The marks for the thumbs, laid over the screen on a touch screen. Held upright they are under the picture and always shown; on its side
+   they are beside it, where a narrow room puts them over its edges, so they wait until a run goes and leave the first-screen card clear.
+   They go where the zones are (`src/page/thumbs.ts`): the picture keeps its 16:9 shape inside the stage; on a stage taller than that it
+   sits at the top and the thumbs have the room under it, the stick on the left and the act and fire marks on the right; on a wider stage
+   the picture is in the middle, with the stick in the room to its left and the marks in the room to its right, acting above and firing
+   below. The stick is lifted clear of the tab in the bottom left corner (`footShare` and `sideHeight` in `thumbs.ts`), and where the
+   buttons of a place take the bottom right corner (`src/page/extras.ts`) the act and fire marks keep clear of them. */
+.thumbs {
+  display: none;
+}
+@media (pointer: coarse) {
+  :root body main .stage .thumbs {
+    position: relative;
+    display: block;
+    grid-area: 1 / 1;
+    pointer-events: none;
+    --picture: min(100cqh, 100cqw * 9 / 16);
+    --thumbs-y: calc((var(--picture) + 95cqh) / 2);
+  }
+  :root body main .thumbs > * {
+    position: absolute;
+    translate: -50% -50%;
+    box-sizing: border-box;
+  }
+  :root body main .thumbs .thumb-stick {
+    top: var(--thumbs-y);
+    left: 25cqw;
+    inline-size: clamp(4rem, 34cqw, 8rem);
+    aspect-ratio: 1;
+    border: 0.1875rem dashed rgb(91 234 198 / 0.5);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(91 234 198 / 0.4) 0 16%,
+      transparent 17%
+    );
+  }
+  :root body main .thumbs .thumb-act,
+  :root body main .thumbs .thumb-fire {
+    top: var(--thumbs-y);
+    display: grid;
+    place-items: center;
+    inline-size: clamp(3.5rem, 20cqw, 5.5rem);
+    aspect-ratio: 1;
+    border: 0.1875rem solid;
+    border-radius: 50%;
+    background: rgb(29 17 64 / 0.55);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  :root body main .thumbs .thumb-act {
+    left: 87.5cqw;
+    border-color: rgb(255 216 77 / 0.65);
+    color: var(--gold);
+  }
+  :root body main .thumbs .thumb-fire {
+    left: 62.5cqw;
+    border-color: rgb(255 95 210 / 0.65);
+    color: var(--pink);
+  }
+  /* Upright, with the buttons of a place in the corner: the act and fire marks go up, just under the picture, and are smaller. */
+  :root body main:has(> .touch-buttons) .thumbs .thumb-act,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-fire {
+    top: calc(var(--picture) + 2.25rem);
+    inline-size: 3.5rem;
+  }
+}
+
+@container stage (min-aspect-ratio: 16 / 9) {
+  :root body main:not([data-running="true"]) .stage .thumbs {
+    display: none;
+  }
+  :root body main .stage .thumbs {
+    --room: max(0px, (100cqw - 100cqh * 16 / 9) / 2);
+    --side: max(var(--room) / 2, 12.5cqw);
+  }
+  :root body main .thumbs .thumb-stick {
+    top: 40cqh;
+    left: var(--side);
+    inline-size: clamp(3.5rem, 60cqh, 6rem);
+  }
+  :root body main .thumbs .thumb-act,
+  :root body main .thumbs .thumb-fire,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-act,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-fire {
+    left: calc(100cqw - var(--side));
+    inline-size: clamp(2.75rem, 34cqh, 4.5rem);
+    font-size: 0.625rem;
+    letter-spacing: 0;
+  }
+  /* Acting is in the top half and firing in the bottom half; the act mark sits low in its half, clear of the icons above it. */
+  :root body main .thumbs .thumb-act,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-act {
+    top: 40cqh;
+  }
+  :root body main .thumbs .thumb-fire,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-fire {
+    top: 80cqh;
+  }
+  /* On its side, with the buttons of a place in the corner: the act and fire marks move in, to their left. */
+  :root body main:has(> .touch-buttons) .thumbs .thumb-act,
+  :root body main:has(> .touch-buttons) .thumbs .thumb-fire {
+    left: calc(100cqw - 10.75rem);
+  }
+}

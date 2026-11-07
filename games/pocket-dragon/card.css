@@ -1,0 +1,144 @@
+/* The card panel: it opens over the game between runs, so nothing under the player's hands moves, and shows the card with a foil
+   shimmer running over the trading card itself (where it sits in the picture comes from the page, as --card-left and the like). */
+.card-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  background: rgb(12 6 32 / 0.88);
+}
+.card-panel[hidden],
+.card-panel [hidden] {
+  display: none !important;
+}
+.card-sheet {
+  display: grid;
+  gap: 0.625rem;
+  inline-size: min(56rem, 100%);
+  max-block-size: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 0.875rem 1rem 1rem;
+  border: 0.1875rem solid var(--lavender);
+  border-radius: 1rem;
+  background: var(--ink);
+  box-shadow:
+    0 0 2.5rem rgb(185 140 255 / 0.35),
+    0 0 0.5rem rgb(255 95 210 / 0.25);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.card-head h2 {
+  color: var(--gold);
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.card-shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.card-shapes button {
+  min-inline-size: 0;
+}
+.card-shapes button[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: #2b1a66;
+  box-shadow: 0 0.25rem 0 #c98a14;
+}
+.card-holo {
+  position: relative;
+  justify-self: center;
+  max-inline-size: 100%;
+  line-height: 0;
+}
+.card-holo img {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: 56dvh;
+  inline-size: auto;
+  block-size: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1.5rem rgb(91 234 198 / 0.25);
+}
+.card-holo::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: var(--card-left, 0);
+  inset-block-start: var(--card-top, 0);
+  inline-size: var(--card-width, 0);
+  block-size: var(--card-height, 0);
+  border-radius: 2%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(255 95 210 / 0.32) 40%,
+    rgb(56 243 255 / 0.32) 50%,
+    rgb(255 216 77 / 0.32) 60%,
+    transparent 70%
+  );
+  background-size: 300% 300%;
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  animation: card-foil 3.2s ease-in-out infinite alternate;
+}
+@keyframes card-foil {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 100%;
+  }
+}
+.card-hint {
+  min-block-size: 2.5rem;
+  color: var(--lavender);
+  font-size: 0.875rem;
+}
+.card-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-link input {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+  padding: 0.5rem 0.75rem;
+  border: 0.125rem solid var(--edge);
+  border-radius: 0.5rem;
+  background: var(--night);
+  color: var(--mint);
+  font:
+    0.9375rem ui-monospace,
+    monospace;
+}
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+/* Just after a run, the share button glows to say a new card is ready. */
+#share.fresh:not(:disabled) {
+  border-color: var(--gold);
+  animation: card-ready 1.4s ease-in-out infinite alternate;
+}
+@keyframes card-ready {
+  to {
+    box-shadow:
+      0 0.25rem 0 #c98a14,
+      0 0 1.25rem rgb(255 216 77 / 0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-holo::after {
+    animation: none;
+  }
+}
