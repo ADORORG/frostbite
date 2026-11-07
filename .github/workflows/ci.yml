@@ -238,9 +238,6 @@ jobs:
       - name: Set up Node and dependencies
         uses: ./.github/actions/setup-node
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
-
       - name: Build production artifacts
         run: pnpm exec turbo run build
 
