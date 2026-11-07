@@ -1,7 +1,8 @@
-import {
-  forwardableKeyCode,
-  type ForwardedKey,
-} from "@frostbite/game-sdk/protocol";
+import { forwardableKeyCode, type ForwardedKey } from "./protocol-values.ts";
+
+// The host side of `key.forwarded`: which keys a page that frames a game passes on before the player has clicked into it, and the listeners
+// that do it. The platform's game page and the local test page both use this, so a key behaves the same while a game is built as when it
+// is played. The game's side is `replayForwardedKey` (forwarded-keys.ts).
 
 interface KeyFacts {
   readonly altKey: boolean;
@@ -39,5 +40,25 @@ export function forwardedKeyOf(
     code: event.code,
     phase: event.type === "keydown" ? "down" : "up",
     repeat: event.repeat,
+  };
+}
+
+// Passes on the keys the player presses while nothing on the page has the keyboard, to `send` (the page tells the game with
+// `key.forwarded`), and keeps the page from scrolling once it has handed a scrolling key to the game. Returns what stops it.
+export function forwardPageKeys(
+  document: Document,
+  send: (key: ForwardedKey) => void,
+): () => void {
+  const forward = (event: KeyboardEvent) => {
+    const key = forwardedKeyOf(event, document.activeElement);
+    if (key === null) return;
+    send(key);
+    if (scrollingKey.test(key.code)) event.preventDefault();
+  };
+  document.addEventListener("keydown", forward);
+  document.addEventListener("keyup", forward);
+  return () => {
+    document.removeEventListener("keydown", forward);
+    document.removeEventListener("keyup", forward);
   };
 }

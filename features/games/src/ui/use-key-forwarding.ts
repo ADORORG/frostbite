@@ -1,7 +1,6 @@
 import type { GameHost } from "@frostbite/game-sdk/host";
+import { forwardPageKeys } from "@frostbite/game-sdk/host-keys";
 import { useEffect, type RefObject } from "react";
-
-import { forwardedKeyOf, scrollingKey } from "./key-forwarding.ts";
 
 // Gives a connected game the keys the player presses before clicking into it, without moving focus into its frame (which would take the
 // first Tab from the page's skip link). The page tells the game with `key.forwarded`, and the game's client plays it back as the key
@@ -12,17 +11,8 @@ export function useKeyForwarding(
 ): void {
   useEffect(() => {
     if (!connected) return undefined;
-    const forward = (event: KeyboardEvent) => {
-      const key = forwardedKeyOf(event, document.activeElement);
-      if (key === null) return;
-      host.current?.emit("key.forwarded", key);
-      if (scrollingKey.test(key.code)) event.preventDefault();
-    };
-    document.addEventListener("keydown", forward);
-    document.addEventListener("keyup", forward);
-    return () => {
-      document.removeEventListener("keydown", forward);
-      document.removeEventListener("keyup", forward);
-    };
+    return forwardPageKeys(document, (key) =>
+      host.current?.emit("key.forwarded", key),
+    );
   }, [connected, host]);
 }

@@ -1,5 +1,6 @@
 import { attachGameHost } from "../attach.ts";
 import { createGameHost } from "../host.ts";
+import { forwardPageKeys } from "../host-keys.ts";
 import type { GameHostBackend, HostedGame } from "../host-types.ts";
 import { createLocalBackend } from "../local-backend.ts";
 import {
@@ -138,6 +139,10 @@ export function mountDevPage(options: DevPageOptions) {
     host,
     listenOn: options.window,
   });
+  // As on the platform's page, a key pressed before the player clicks into the game still reaches it.
+  const stopKeys = forwardPageKeys(document, (key) =>
+    emit("key.forwarded", key),
+  );
 
   const button = (id: string, label: string, run: () => void) => {
     const made = element(document, "button", label);
@@ -270,6 +275,7 @@ export function mountDevPage(options: DevPageOptions) {
   return {
     dispose: () => {
       detach();
+      stopKeys();
       options.window.removeEventListener("message", onRequest);
     },
     frame,
