@@ -131,7 +131,8 @@ describe("Egg Hills' milestones", () => {
       expect(hillsEarned(played.state)).toEqual(hillsMilestones);
       expect(played.inputs.length).toBeLessThan(500);
     }
-  }, 180_000);
+    // About 30 s plain, but 3 minutes or more with coverage on a busy machine (the bot looks ahead on every tick), so it has room.
+  }, 420_000);
 
   it("are what the sample run claims, and what replaying it through the published rules gives", () => {
     const sample = sampleRun();
