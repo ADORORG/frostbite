@@ -80,7 +80,7 @@ The platform core is not edited to add a game.
   for another player. Milestones are labelled self-reported.
 - The keyboard is the game's, without moving focus. A game hears keys only inside its own frame, but focusing the frame on load would
   take the first Tab from the page's skip link. So `use-key-forwarding.ts` tells a connected game (`key.forwarded`) about the keys
-  pressed while nothing on the page has focus (`key-forwarding.ts` decides: letters, digits, arrows, Space, Enter; never Tab or
+  pressed while nothing on the page has focus (`forwardPageKeys` in the SDK's `host-keys.ts` decides, shared with the local test page: letters, digits, arrows, Space, Enter; never Tab or
   Escape, a shortcut, or a key a control or the frame already has), and stops the page scrolling for Space and the arrows it handed over.
   `tests/e2e/tests/game-keyboard.spec.ts` checks every game in a real browser, with no click first.
 

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { forwardedKeyOf } from "../src/ui/key-forwarding.ts";
+import { forwardedKeyOf, forwardPageKeys } from "../src/host-keys.ts";
 
 // The page forwards a key to the game only when the keyboard is the page's and not a control's: nothing is focused, so the key would
 // do nothing at all, and the player has not clicked into the game's frame, where the key would already reach the game.
@@ -100,5 +100,39 @@ describe("the keys the page forwards to the game", () => {
     expect(forwardedKeyOf(press("ArrowDown"), document.body)?.code).toBe(
       "ArrowDown",
     );
+  });
+});
+
+describe("the listeners that pass the keys on", () => {
+  const dispatch = (type: string, code: string) => {
+    const event = new KeyboardEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      code,
+    });
+    document.dispatchEvent(event);
+    return event;
+  };
+
+  it("sends a forwardable key down and up, and stops the page scrolling for a scrolling key only", () => {
+    const send = vi.fn();
+    const stop = forwardPageKeys(document, send);
+    expect(dispatch("keydown", "Space").defaultPrevented).toBe(true);
+    expect(dispatch("keyup", "KeyW").defaultPrevented).toBe(false);
+    expect(send.mock.calls).toEqual([
+      [{ code: "Space", phase: "down", repeat: false }],
+      [{ code: "KeyW", phase: "up", repeat: false }],
+    ]);
+    stop();
+  });
+
+  it("sends nothing for a key it does not forward, and nothing once stopped", () => {
+    const send = vi.fn();
+    const stop = forwardPageKeys(document, send);
+    expect(dispatch("keydown", "Tab").defaultPrevented).toBe(false);
+    expect(send).not.toHaveBeenCalled();
+    stop();
+    dispatch("keydown", "Enter");
+    expect(send).not.toHaveBeenCalled();
   });
 });

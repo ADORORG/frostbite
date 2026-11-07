@@ -74,7 +74,8 @@ that frames the game in the same sandbox, serves its files with the headers the 
 every reload. Beside the game is a panel for the platform's side: sign the player in and out (the id changes from this browser's
 to the account's and the game gets `player.changed`), connect a fake wallet and move it between networks (`wallet.changed`),
 send `lifecycle.changed` (tab hidden) and `fullscreen.changed`, take a claim through its states one press at a time
-(`claim.changed`), clear what the game saved, and read a log of every call, answer, refusal and event. `game.json` holds what the
+(`claim.changed`), clear what the game saved, and read a log of every call, answer, refusal and event. As on the platform's page, a key pressed before
+clicking into the game reaches it (`key.forwarded`, see `host-keys.ts`, shared with the platform), so a keyboard game works with no click first. `game.json` holds what the
 page needs of the manifest: `{ "id", "capabilities", "milestones" }` (the same fields as the manifest's own). **Everything on the
 panel is made up**: it shows how a game answers each case, not what the platform will decide (runs are not replayed, nothing is
 minted, no failure or slow answer is injected). It needs `esbuild`, the same optional peer as the build.
