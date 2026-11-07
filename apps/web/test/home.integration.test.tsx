@@ -27,7 +27,8 @@ describe("home navigation", () => {
     // The rail shows the registered games by their own titles (the first one, whichever game that is).
     const [first] = games;
     expect(first).toBeDefined();
-    expect(markup).toContain(first?.title);
+    // As the page writes it: a title with an apostrophe or an ampersand is escaped in markup.
+    expect(markup).toContain(renderToStaticMarkup(<>{first?.title}</>));
     expect(markup).toContain('href="/collections"');
     expect(markup).toContain('href="/creators"');
     // Signing in is the wallet widget's job (the layout supplies it), not a page or a link of its own.
