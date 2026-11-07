@@ -138,7 +138,7 @@ turned back into the link: the database keeps only its hash.
 
 1. **Open a shell in the running web container**: in Coolify, the application's Terminal; on the server, `docker exec -it <web container> sh`.
    The container already holds the deployment's settings (database, `PUBLIC_BASE_URL`), so nothing is copied anywhere. Any platform that
-   gives a shell in the container works the same way (Railway was not tried).
+   gives a shell in the container works the same way; for Railway see "On Railway" below.
 2. **Run `pnpm platform:setup-link`** from `/app`. It prints `<PUBLIC_BASE_URL>/setup#<token>` and when it stops working.
 3. **Open that link in a browser within the hour** and sign in with the wallet that will administer the platform (it must hold a wallet). The
    link is spent and that account is the administrator. From then on administrators are managed on `/admin/roles`.
@@ -150,6 +150,23 @@ Without a shell in the container, run it from a checkout of the repository (`pnp
 where the file holds the deployment's settings. The command validates the same settings as the web app, so the file needs all of that
 app's keys (start from `.env.production.example`), and `DATABASE_URL` must be reachable from that machine (a database on the platform's
 private network is not, which is why the container is the usual way). `DATABASE_SSL_MODE` must match what the server offers.
+
+### On Railway
+
+Written from the Railway CLI docs (docs.railway.com/cli/ssh and /cli/run, read 2026-11-07); not run on Railway yet. Install the Railway CLI,
+log in, and link the project (`railway link`) from any machine; the steps below are run there.
+
+- **Usual way, a shell in the web container.** `railway ssh --service <web service> --environment <environment>` opens a shell in the running
+  web container (the CLI asks you to register an SSH key with Railway the first time, and needs a system `ssh` client). Then run
+  `pnpm platform:setup-link` from `/app`, exactly as in steps 2 and 3 above. The container already holds the deployment's settings.
+  Railway's docs say a service without a public domain is reached by its service instance ID instead (`-d <ID>`).
+- **From your own machine, when `railway ssh` is not an option.** `railway run` only injects the service's variables into a command on your
+  machine, and `DATABASE_URL` on Railway names the database on its private network (`*.railway.internal`), which your machine cannot reach.
+  So use the checkout way described above and point `DATABASE_URL` at the database's public address: turn on the Postgres service's
+  TCP Proxy (Settings, Networking), copy its `DATABASE_PUBLIC_URL` into a settings file next to the web service's other values, and run
+  `pnpm platform:setup-link --env <file>`. `PUBLIC_BASE_URL` must be the exact https origin the web service uses, because it is the origin
+  printed in the link. Turn the TCP Proxy off again afterwards: it exposes the database to the internet.
+- Do not paste the link into chat or a ticket, whichever way it was made.
 
 ## Checklist before the first real deployment
 
