@@ -127,10 +127,14 @@ export function GameSurface({
             {...(api === undefined ? {} : { api })}
             game={game}
             signingWallets={signingWallets}
-          />
+          >
+            <MintsSection
+              {...(api === undefined ? {} : { api })}
+              gameId={game.id}
+            />
+          </WalletGamePanel>
         </FeeSettingsBoundary>
       </ExplorerBoundary>
-      <MintsSection {...(api === undefined ? {} : { api })} gameId={game.id} />
     </AdminFrame>
   );
 }

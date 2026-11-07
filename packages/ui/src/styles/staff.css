@@ -87,7 +87,15 @@
   grid-row: 1 / span 2;
 }
 
-/* The game's milestones: a row each. */
+/* A list that can grow long (the milestones, the activity log) sits in a box that scrolls on its own, so it does not lengthen the page. */
+.staff-scroll {
+  max-height: 26rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 0.0625rem solid var(--arcade-border);
+  border-radius: var(--arcade-radius-small);
+  padding: 0 var(--arcade-space-3);
+}
 .milestones {
   display: grid;
   margin: 0;

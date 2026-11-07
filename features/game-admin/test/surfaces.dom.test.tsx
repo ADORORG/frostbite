@@ -3,7 +3,7 @@ import { WalletProvider } from "@frostbite/wallet/client";
 import { describe, expect, it, vi } from "vitest";
 
 import { GameSurface, GamesSurface } from "../src/ui/surfaces.tsx";
-import { fakeApi } from "./support/fake-api.ts";
+import { fakeApi, listing, step } from "./support/fake-api.ts";
 import { info } from "./support/fixtures.ts";
 
 const navigation = [] as const;
@@ -177,5 +177,42 @@ describe("the staff pages, with mints and the platform fee", () => {
     await settle(() => expect(textOf(page)).toContain("4,500 sats"));
     expect(textOf(page)).toContain("Mints and fees");
     expect(api.mints).toHaveBeenCalledWith("arcade");
+  });
+
+  it("puts a game's mints and activity above its milestones, which come last", async () => {
+    const [arcade] = info();
+    const api = fakeApi({
+      list: vi.fn(async () =>
+        listing([step({ state: "complete", toSign: null })]),
+      ),
+    });
+    const page = await mount(
+      inApp(
+        <GameSurface
+          api={api}
+          explorerTxUrl="https://explorer.test/tx/{id}"
+          fees={fees}
+          game={arcade}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
+    );
+    await settle(() => expect(textOf(page)).toContain("Milestones"));
+    const order = [...page.querySelectorAll("h2")].map(
+      (heading) => heading.textContent,
+    );
+    const at = (title: string) => order.indexOf(title);
+    expect(at("Claims")).toBeGreaterThanOrEqual(0);
+    expect(at("Claims")).toBeLessThan(at("Mints and fees"));
+    expect(at("Mints and fees")).toBeLessThan(at("Activity"));
+    expect(at("Activity")).toBeLessThan(at("Milestones"));
+    // Milestones scroll in a box of their own, which the keyboard can reach.
+    const box = page.querySelector('[aria-label="Milestones of this game"]');
+    expect(box?.getAttribute("tabindex")).toBe("0");
+    expect(box?.className).toContain("staff-scroll");
+    const log = page.querySelector('[aria-label="Activity of this game"]');
+    expect(log?.getAttribute("tabindex")).toBe("0");
+    expect(log?.className).toContain("staff-scroll");
   });
 });
