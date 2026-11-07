@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { chainRefSchema } from "../chain/chain-ref.ts";
+import { chainRefTextSchema } from "../chain/chain-ref.ts";
 import { gameIdSchema } from "./manifest.ts";
 
 // What staff see of a game's mints and of the platform's fee on them. Amounts are whole units of the chain's smallest denomination, as
@@ -85,7 +85,7 @@ export const getPlatformFeeResponseSchema = z
       .array(
         z
           .object({
-            chain: chainRefSchema,
+            chain: chainRefTextSchema,
             current: feeSettingSchema.nullable(),
             history: z.array(feeSettingSchema).max(20),
             // The most the fee may be set to, by policy.
@@ -100,7 +100,7 @@ export const getPlatformFeeResponseSchema = z
 // The fee and the address it is paid to are set together: one cannot change without the other being stated.
 export const setPlatformFeeInputSchema = z
   .object({
-    chain: chainRefSchema,
+    chain: chainRefTextSchema,
     feeUnits: unitsSchema,
     treasury: z.string().trim().min(1).max(256),
   })
