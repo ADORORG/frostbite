@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   check,
   index,
   integer,
@@ -19,6 +20,10 @@ import {
 // A player's claim of a milestone from a game's rewards contract, as the platform tracks it: who, which game and milestone,
 // the transaction built for it (what the wallet was shown and signed), and where it is in the chain's lifecycle. At most one
 // claim per player, game and milestone is in progress at a time, which is what makes asking again return the same claim.
+// `platform_fee_sats` is the platform's fee the claim's transaction pays (0: none), fixed when the transaction was built, so a later change
+// of the fee never rewrites what an earlier claim carried. The per-game report reads from three places, none of which grows with the mints
+// it counts: `game_mint_totals` (below) holds completed mints and fees per game, `game_state` finds a game's claims that are still on their
+// way, and `game_recent` lists a game's latest completed mints in order, and the next page after a given one, without sorting.
 // `collectible_id` is the item the claim minted, once known. `expected_claims` is the count the chain's indexed state must show for the wallet before the claim is complete.
 export const gameMilestoneClaims = platformSchema.table(
   "game_milestone_claims",
@@ -31,6 +36,9 @@ export const gameMilestoneClaims = platformSchema.table(
     milestoneId: text("milestone_id").notNull(),
     walletAddress: text("wallet_address").notNull(),
     expectedClaims: integer("expected_claims").notNull(),
+    platformFeeSats: bigint("platform_fee_sats", { mode: "bigint" })
+      .notNull()
+      .default(0n),
     // The collectible the claim's transaction created, in the chain's own notation, learned when the network shows the transaction
     // included; none before that. It is only an address to ask the chain about: what is served for it is checked against the game's
     // contract before anyone is shown it.
@@ -39,6 +47,14 @@ export const gameMilestoneClaims = platformSchema.table(
   },
   (table) => [
     index("game_milestone_claims_player_idx").on(table.userId, table.gameId),
+    index("game_milestone_claims_game_state_idx").on(table.gameId, table.state),
+    index("game_milestone_claims_game_recent_idx")
+      .on(table.gameId, table.updatedAt.desc(), table.id.desc())
+      .where(sql`${table.state} = 'complete'`),
+    check(
+      "game_milestone_claims_platform_fee_not_negative",
+      sql`${table.platformFeeSats} >= 0`,
+    ),
     uniqueIndex("game_milestone_claims_one_in_progress_idx")
       .on(table.userId, table.gameId, table.milestoneId)
       .where(sql`${table.state} not in (${settledStatesSql})`),
@@ -47,5 +63,24 @@ export const gameMilestoneClaims = platformSchema.table(
       sql`${table.expectedClaims} >= 1`,
     ),
     ...trackedTransactionChecks("game_milestone_claims", table),
+  ],
+);
+
+// How many mints each game has completed and the platform fees they carried, kept by triggers on `game_milestone_claims` (see the
+// migration that made them): a claim becoming complete adds one and its fee, and one leaving `complete` takes them away. Deleting a
+// claim (its player's account was deleted) takes nothing away: the mint happened and the fee was paid on the chain. A game that has had
+// no mint has no row.
+export const gameMintTotals = platformSchema.table(
+  "game_mint_totals",
+  {
+    completed: bigint("completed", { mode: "number" }).notNull(),
+    feesSats: bigint("fees_sats", { mode: "bigint" }).notNull(),
+    gameId: text("game_id").primaryKey(),
+  },
+  (table) => [
+    check(
+      "game_mint_totals_not_negative",
+      sql`${table.completed} >= 0 and ${table.feesSats} >= 0`,
+    ),
   ],
 );

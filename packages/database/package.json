@@ -19,6 +19,7 @@
     "./schema/game-admin": "./src/schema/game-admin.ts",
     "./schema/game-claims": "./src/schema/game-claims.ts",
     "./schema/game-contracts": "./src/schema/game-contracts.ts",
+    "./schema/platform-fee": "./src/schema/platform-fee.ts",
     "./schema/game-runs": "./src/schema/game-runs.ts",
     "./schema/game-saves": "./src/schema/game-saves.ts",
     "./schema/passkey-sign-in": "./src/schema/passkey-sign-in.ts",

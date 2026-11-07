@@ -55,6 +55,10 @@ describe("game administration registration", () => {
       "POST startGameAdminStep",
       "POST submitGameAdminStep",
       "GET listGameAdminTemplates",
+      "GET listGameMints",
+      "GET listGameMintTotals",
+      "GET getPlatformFee",
+      "POST setPlatformFee",
     ]);
   });
 

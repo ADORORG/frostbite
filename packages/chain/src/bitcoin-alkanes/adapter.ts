@@ -9,6 +9,7 @@ import {
   validateBitcoinAddress,
   type BitcoinNetwork,
 } from "../bitcoin/address.ts";
+import { dustLimitSats } from "../bitcoin/dust.ts";
 import {
   InvalidAddressError,
   type AddressCodec,
@@ -101,6 +102,19 @@ export function createBitcoinAlkanesAdapter(
         );
       }
       return { chain, value: result.value.address };
+    },
+    minimumOutput: (address) => {
+      const network = networks.get(address.chain);
+      const result =
+        network === undefined
+          ? null
+          : validateBitcoinAddress(address.value, network);
+      if (result === null || !result.ok) {
+        throw new InvalidAddressError(
+          `Not an address on ${address.chain}, so its smallest output is unknown.`,
+        );
+      }
+      return dustLimitSats(result.value.type);
     },
   };
 

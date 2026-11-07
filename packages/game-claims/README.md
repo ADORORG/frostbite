@@ -27,6 +27,27 @@ to a real chain yet**: it works through the chain-neutral ports (`@frostbite/cha
 
 `createDrizzleGameClaimRepository(database, { clock })` stores claims in `frostbite.game_milestone_claims`.
 
+### The platform fee, and what staff see of mints
+
+- `GameClaimsDependencies.platformFee(chain)` is read for each claim that starts. A fee above zero becomes an extra output of the
+  claim's transaction (`platformFee` on the `mint-milestone` intent: whole units and the treasury address, which the chain's address
+  codec parses for the chain), is shown in the summary the player signs, and is **kept with the claim** (`platform_fee_sats`), so
+  a later change of the fee never rewrites what an earlier claim carried. A fee that is set and cannot be read (an address the chain
+  does not accept) stops the claim (`unavailable`, and `report` is told) instead of giving it away.
+- `createPlatformFeeReader(database)` reads the fee in force (the claim's side); `createPlatformFeeService({ database, ports,
+maximumFeeSats, ... })` adds what staff do: `view`, and `change(staffUserId, chain, { feeSats, treasury })`, which sets the fee and
+  the treasury address **together**, refusing an address the chain does not accept, a fee above the policy maximum, and a fee above
+  zero but under the least an output to that address may carry (`AddressCodec.minimumOutput`: a smaller one would stop every claim).
+  Settings are rows only ever added (`frostbite.platform_fee_settings`), so the table is also the history: who set what, and when.
+- `createMintReport(database)` answers `totalsFor(gameIds)` (completed mints, fees accrued, claims still on their way) and
+  `recent(gameId, pageSize, after?)` (a game's completed mints, newest first, with the cursor for the next page). **Nothing it runs
+  grows with the number of mints**: completed mints and fees are a row per game in `frostbite.game_mint_totals`, kept by triggers on
+  the claims table (a claim becoming complete adds one and its fee; leaving `complete` takes them away; deleting a claim, which
+  happens when its player's account is deleted, takes nothing away, because the fee was paid on the chain); claims still on their way
+  are found by `game_milestone_claims_game_state_idx`; and a page of the list is read from the partial index
+  `game_milestone_claims_game_recent_idx`, with no sort. The integration tests ask the database for each query's plan (`mintQueries`)
+  and fail if it stops using these.
+
 ## States
 
 The neutral transaction states (ADR-017): `awaiting_signature`, `signed`, `broadcast_accepted` or `broadcast_unknown` (the network
@@ -57,7 +78,8 @@ adapter's build, broadcast and observe (G7e). The confirmation depth is the adap
 ## Tests
 
 `pnpm --filter @frostbite/game-claims test:unit` (transitions, summary codec), `test:integration` (the service end to end on the
-simulated chain against real PostgreSQL: the whole lifecycle, every refusal, rejection, an unreachable network, a broadcast of
+simulated chain against real PostgreSQL: the platform fee and its settings, the report, the totals triggers and their backfill, the
+whole lifecycle, every refusal, rejection, an unreachable network, a broadcast of
 unknown outcome, a revert, indexer lag, expiry, concurrency, ownership, and the table's own constraints), `test:coverage`.
 
 ## Ownership

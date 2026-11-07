@@ -12,6 +12,7 @@ import {
 import {
   createDrizzleGameClaimRepository,
   createGameClaimsService,
+  createPlatformFeeReader,
   type ClaimableGame,
 } from "@frostbite/game-claims";
 import { hasEarnedMilestone } from "@frostbite/game-saves";
@@ -68,6 +69,7 @@ export function createGameClaimsResolver(
     const database = createDatabaseClient(
       createDatabasePool(parseDatabaseEnvironment(environment)),
     );
+    const fee = createPlatformFeeReader(database);
     return createGameClaimsService({
       clock,
       delay: config.delay,
@@ -81,6 +83,7 @@ export function createGameClaimsResolver(
       },
       game: claimableGameLookup(games, createDrizzleContractStore(database)),
       newId: randomUUID,
+      platformFee: fee.setting,
       report: ({ error, step }) =>
         console.error(
           `game claims: ${step} failed: ${error instanceof Error ? `${error.name}: ${error.message}` : "not an error"}`,

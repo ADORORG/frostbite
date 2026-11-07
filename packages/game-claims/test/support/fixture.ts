@@ -7,12 +7,7 @@ import {
   parseDatabaseEnvironment,
   runMigrations,
 } from "@frostbite/database";
-import {
-  chainRefSchema,
-  type Address,
-  type CollectiblePreview,
-  type TransactionIntent,
-} from "@frostbite/shared/chain";
+import { chainRefSchema, type Address } from "@frostbite/shared/chain";
 import { simulatedAddress } from "@frostbite/test-kit/simulated-chain-address";
 import { createSimulatedChain } from "@frostbite/test-kit/simulated-chain";
 import {
@@ -23,8 +18,21 @@ import {
 import { afterAll, beforeAll, beforeEach } from "vitest";
 
 import { createDrizzleGameClaimRepository } from "../../src/drizzle-repository.ts";
+import {
+  broadcastGate,
+  builtIntents,
+  chainFailure,
+  collectible,
+  indexer,
+  indexerLag,
+  reported,
+} from "./controls.ts";
 import { createGameClaimsService } from "../../src/service.ts";
-import type { ClaimChainPorts, ClaimableGame } from "../../src/types.ts";
+import type {
+  ClaimChainPorts,
+  ClaimableGame,
+  PlatformFeeSetting,
+} from "../../src/types.ts";
 
 export { signSimulated };
 export const environment = parseDatabaseEnvironment(process.env);
@@ -63,44 +71,13 @@ export const earn = (userId: string, milestoneId: string, game = gameId) =>
   earnedKeys.add(`${userId}|${game}|${milestoneId}`);
 
 export const game: { current: ClaimableGame | null } = { current: null };
+// The platform's fee as set for the chain: none until a test sets one.
+export const platformFeeSetting: { current: PlatformFeeSetting | null } = {
+  current: null,
+};
 export const chainAvailable = { value: true };
 
-// While `on`, the indexer is behind: it shows one claim fewer than the network has confirmed.
-export const indexerLag = { on: false };
-// How far behind the chain's tip its indexer reads, or that the node cannot be asked.
-export const indexer = { behind: 0, down: false };
-// What the chain does wrong on purpose.
-// Held broadcasts, released by a test one at a time, so two steps on one claim can be made to overlap.
-export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
-  enabled: false,
-  held: [],
-};
-// The intents the chain was asked to build, oldest first.
-export const builtIntents: TransactionIntent[] = [];
-export const chainFailure: {
-  broadcast: boolean;
-  // What building throws: any error (the node is down by default), or none.
-  build: Error | boolean;
-  observe: boolean;
-  // Why the contract would refuse the claim, in its words, or none.
-  simulate: string | false;
-} = {
-  broadcast: false,
-  build: false,
-  observe: false,
-  simulate: false,
-};
-// What the service was told stopped a claim from starting, oldest first.
-// What the chain says of the item a claim minted: the item the transaction created once it is included (the simulated chain mints
-// none), and what it serves for it. Reset before each test.
-export const collectible: {
-  created: string | null;
-  preview: (() => Promise<CollectiblePreview | null>) | null;
-} = { created: null, preview: null };
-export const item = "sim-item-1";
-export const drawing = new TextEncoder().encode("<svg></svg>");
-
-export const reported: { error: unknown; step: string }[] = [];
+export * from "./controls.ts";
 
 function ports(): ClaimChainPorts {
   const { addressCodec, broadcaster, builder, contracts, observer, rewards } =
@@ -197,6 +174,7 @@ export const service = createGameClaimsService({
   funding: () => funding,
   game: (id) => Promise.resolve(id === gameId ? game.current : null),
   newId: randomUUID,
+  platformFee: () => Promise.resolve(platformFeeSetting.current),
   ports: (requested) =>
     chainAvailable.value && requested === chain ? ports() : null,
   report: (failure) => reported.push(failure),
@@ -251,6 +229,7 @@ export function registerDatabase(): void {
     current = makeNetwork();
     earnedKeys.clear();
     game.current = claimableGame();
+    platformFeeSetting.current = null;
     chainAvailable.value = true;
     indexerLag.on = false;
     Object.assign(indexer, { behind: 0, down: false });
@@ -290,6 +269,7 @@ export async function newClaim(userId: string, milestoneId = "first-win") {
     gameId,
     id: randomUUID(),
     milestoneId,
+    platformFeeSats: 0n,
     unsigned,
     userId,
     wallet,

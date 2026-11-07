@@ -54,7 +54,8 @@ export function sameTransaction(a: Psbt, b: Psbt): boolean {
 }
 
 // What the person was shown must be what the transaction does: the collectible goes to the stated recipient (output 0), the second
-// output makes exactly the stated claim, and the fee is the stated fee.
+// output makes exactly the stated claim, the platform's fee (when one was shown) is paid to its address in the third, nothing else is
+// paid to anyone but the claimant, and the network fee is the stated fee.
 function matchesSummary(
   unsigned: UnsignedTransaction,
   psbt: Psbt,
@@ -75,7 +76,24 @@ function matchesSummary(
     servedChain(chains, unsigned.chain).network,
   );
   if (game === null || !address.ok) return false;
-  const [claimant, call] = psbt.txOutputs;
+  const [claimant, call, ...rest] = psbt.txOutputs;
+  const claimantScript = fromHex(address.value.scriptHex);
+  const shown = summary.platformFee;
+  const feeAddress =
+    shown === undefined
+      ? null
+      : validateBitcoinAddress(
+          shown.recipient.value,
+          servedChain(chains, unsigned.chain).network,
+        );
+  if (feeAddress !== null && !feeAddress.ok) return false;
+  const fee =
+    shown === undefined || feeAddress === null || !feeAddress.ok
+      ? null
+      : {
+          sats: shown.amount.baseUnits,
+          script: fromHex(feeAddress.value.scriptHex),
+        };
   const paid = psbt.data.inputs.reduce(
     (sum, input) => sum + (input.witnessUtxo?.value ?? 0n),
     0n,
@@ -84,9 +102,31 @@ function matchesSummary(
   return (
     claimant !== undefined &&
     call !== undefined &&
-    sameBytes(claimant.script, fromHex(address.value.scriptHex)) &&
+    sameBytes(claimant.script, claimantScript) &&
+    afterClaimOutputsMatch(rest, claimantScript, fee) &&
     sameBytes(call.script, claimScript(game, milestoneKey(milestone.id))) &&
     paid - spent === summary.fee.baseUnits
+  );
+}
+
+// The outputs after the claim: the platform's fee exactly as shown (when one was), then at most the claimant's own change, and nothing else.
+function afterClaimOutputsMatch(
+  rest: Psbt["txOutputs"],
+  claimantScript: Uint8Array,
+  fee: { readonly sats: bigint; readonly script: Uint8Array } | null,
+): boolean {
+  const [first, ...others] = rest;
+  const remaining = fee === null ? rest : others;
+  if (
+    fee !== null &&
+    (first === undefined ||
+      first.value !== fee.sats ||
+      !sameBytes(first.script, fee.script))
+  )
+    return false;
+  return (
+    remaining.length <= 1 &&
+    remaining.every((output) => sameBytes(output.script, claimantScript))
   );
 }
 

@@ -1,6 +1,6 @@
 import { mount, settle, textOf } from "@frostbite/test-kit/dom";
 import { WalletProvider } from "@frostbite/wallet/client";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { GameSurface, GamesSurface } from "../src/ui/surfaces.tsx";
 import { fakeApi } from "./support/fake-api.ts";
@@ -93,5 +93,89 @@ describe("the staff pages", () => {
     );
     expect(textOf(missing)).toContain("Game not found");
     expect(missing.querySelector("a[href='/admin/games']")).not.toBeNull();
+  });
+});
+
+describe("the staff pages, with mints and the platform fee", () => {
+  const platform = {
+    chains: [
+      {
+        chain: "simnet:one",
+        current: {
+          changedAt: "2026-10-16T12:00:00.000Z",
+          changedBy: "Ada",
+          feeUnits: "1500",
+          treasury: "sim:one:7ea5a1ab",
+        },
+        history: [],
+        maximumFeeUnits: "100000",
+      },
+    ],
+  };
+
+  it("show the platform fee above the games, and each game's mints and fees on its tile", async () => {
+    const api = fakeApi({
+      mintTotals: async () => ({
+        games: [
+          {
+            completed: 12,
+            feesAccruedUnits: "18000",
+            gameId: "arcade",
+            inProgress: 0,
+          },
+        ],
+      }),
+      platformFee: async () => platform as never,
+    });
+    const container = await mount(
+      inApp(
+        <GamesSurface
+          api={api}
+          explorerTxUrl="https://explorer.test/tx/{id}"
+          fees={fees}
+          games={info()}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
+    );
+    await settle(() =>
+      expect(textOf(container)).toContain("12 minted · 18,000 sats in fees"),
+    );
+    expect(textOf(container)).toContain("Each claim carries 1,500 sats");
+    const order = [...container.querySelectorAll("h2")].map(
+      (heading) => heading.textContent,
+    );
+    expect(order.indexOf("Platform fee")).toBeLessThan(order.indexOf("Games"));
+    // The fee and the address it is paid to are one form, side by side.
+    expect(
+      container.querySelector("form .fee-fields input[inputmode='numeric']"),
+    ).not.toBeNull();
+  });
+
+  it("show a game's mints and fees on its own page", async () => {
+    const [arcade] = info();
+    const api = fakeApi({
+      mints: vi.fn(async () => ({
+        mints: [],
+        next: null,
+        totals: { completed: 3, feesAccruedUnits: "4500", inProgress: 1 },
+      })),
+    });
+    const page = await mount(
+      inApp(
+        <GameSurface
+          api={api}
+          explorerTxUrl="https://explorer.test/tx/{id}"
+          fees={fees}
+          game={arcade}
+          navigation={navigation}
+          signingWallets={signingWallets}
+        />,
+      ),
+    );
+    await settle(() => expect(textOf(page)).toContain("4,500 sats"));
+    expect(textOf(page)).toContain("Mints and fees");
+    expect(api.mints).toHaveBeenCalledWith("arcade");
   });
 });

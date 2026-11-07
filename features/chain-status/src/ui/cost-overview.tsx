@@ -30,11 +30,18 @@ export function CostOverview({
 }
 
 // The fee set apart from the rest of a review, because it is what is being agreed to: what a person reads last before signing.
-export function NetworkFee(props: Parameters<typeof CostOverview>[0]) {
+export function FeeLine({
+  label,
+  ...props
+}: Parameters<typeof CostOverview>[0] & { readonly label: string }) {
   return (
     <div className="network-fee">
-      <span className="network-fee__label">Network fee</span>
+      <span className="network-fee__label">{label}</span>
       <CostOverview {...props} />
     </div>
   );
+}
+
+export function NetworkFee(props: Parameters<typeof CostOverview>[0]) {
+  return <FeeLine label="Network fee" {...props} />;
 }

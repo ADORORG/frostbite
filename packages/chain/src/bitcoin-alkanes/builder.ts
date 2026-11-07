@@ -27,6 +27,7 @@ import {
 import { selectCoins, shortfallNote, type CoinRequest } from "./tx/coins.ts";
 import { claimScript } from "./tx/claim-call.ts";
 import { buildClaimPsbt } from "./tx/psbt.ts";
+import { platformFeeOutput } from "./tx/platform-fee.ts";
 import { transactionParts } from "./signed-transactions.ts";
 import { verifySignedClaim } from "./verify.ts";
 
@@ -64,14 +65,19 @@ export function createTransactionBuilder(
         );
       }
       const call = claimScript(game, milestoneKey(intent.milestoneId));
+      const platformFee = platformFeeOutput(intent, network);
       const feeRate = await node.feeRate(
         feeTargetFor(options, intent.feeSpeed),
       );
       const request: CoinRequest = {
         changeDustSats: options.changeDustSats,
         feeRate,
-        fixedOutputs: [sender.value.type],
-        fixedSats: options.claimOutputSats,
+        // The claimant's output, and the platform's fee output when there is one: both are paid whatever the network fee is.
+        fixedOutputs:
+          platformFee === null
+            ? [sender.value.type]
+            : [sender.value.type, platformFee.type],
+        fixedSats: options.claimOutputSats + (platformFee?.sats ?? 0n),
         kind: sender.value.type,
         opReturnScriptLength: call.length,
         utxos: await node.utxos(sender.value.address),
@@ -94,6 +100,14 @@ export function createTransactionBuilder(
         claimOutputSats: options.claimOutputSats,
         claimScript: call,
         inputs: selection.chosen,
+        ...(platformFee === null
+          ? {}
+          : {
+              platformFee: {
+                script: fromHex(platformFee.scriptHex),
+                sats: platformFee.sats,
+              },
+            }),
         senderScript: fromHex(sender.value.scriptHex),
       });
       return {
@@ -110,6 +124,17 @@ export function createTransactionBuilder(
           feeDetail: feeDetailFor(options, intent.feeSpeed, feeRate),
           milestone: { contract: intent.contract, id: intent.milestoneId },
           operation: "mint-milestone",
+          ...(intent.platformFee === undefined
+            ? {}
+            : {
+                platformFee: {
+                  amount: {
+                    asset: nativeAsset(intent.chain),
+                    baseUnits: intent.platformFee.baseUnits,
+                  },
+                  recipient: intent.platformFee.recipient,
+                },
+              }),
           recipient: intent.sender,
         },
       };

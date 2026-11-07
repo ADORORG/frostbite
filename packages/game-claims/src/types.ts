@@ -35,6 +35,13 @@ export type ClaimChainPorts = Pick<
   | "rewards"
 >;
 
+// The platform's fee on a claim, as it is set for a chain: whole units of the chain's smallest denomination and the address it is paid to.
+// Absent (null) when none is charged. The address is as it was saved; the service parses it for the chain.
+export interface PlatformFeeSetting {
+  readonly feeSats: bigint;
+  readonly treasury: string;
+}
+
 export interface GameClaimsDependencies {
   readonly clock: () => Date;
   // When a claim's wait is called delayed.
@@ -45,6 +52,8 @@ export interface GameClaimsDependencies {
   game(gameId: string): Promise<ClaimableGame | null>;
   newId(): string;
   ports(chain: ChainRef): ClaimChainPorts | null;
+  // The fee in force on the chain right now, read for each claim that starts.
+  platformFee(chain: ChainRef): Promise<PlatformFeeSetting | null>;
   readonly repository: GameClaimRepository;
   // Told of anything unexpected that stopped a claim from starting (what it was, never the player's address), so an operator can see why
   // a player was only told "try again". Optional: nothing is lost when it is absent, the player is told the same.

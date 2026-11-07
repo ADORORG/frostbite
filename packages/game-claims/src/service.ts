@@ -12,6 +12,7 @@ import {
   type UnsignedTransaction,
 } from "@frostbite/shared/chain";
 
+import { claimFee } from "./claim-fee.ts";
 import { buildFailure, contractRefusal } from "./start-failures.ts";
 import { createClaimViewer } from "./claim-steps.ts";
 import { createPictureReader } from "./minted-picture.ts";
@@ -27,8 +28,17 @@ import type {
 } from "./types.ts";
 
 export function createGameClaimsService(dependencies: GameClaimsDependencies) {
-  const { clock, earned, funding, game, newId, ports, report, repository } =
-    dependencies;
+  const {
+    clock,
+    earned,
+    funding,
+    game,
+    newId,
+    platformFee,
+    ports,
+    report,
+    repository,
+  } = dependencies;
   const viewer = createClaimViewer(dependencies);
   const readPicture = createPictureReader({ ports, repository });
 
@@ -77,12 +87,20 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
       if (!(await earned(userId, gameId, milestoneId)))
         return { code: "not-earned", ok: false };
 
+      let fee: Awaited<ReturnType<typeof claimFee>>;
+      try {
+        fee = await claimFee(platformFee, current.chain, chain);
+      } catch (error) {
+        report?.({ error, step: "start" });
+        return { code: "unavailable", ok: false };
+      }
       const intent = {
         chain: current.chain,
         contract: current.contract,
         ...(feeSpeed === undefined ? {} : { feeSpeed }),
         milestoneId,
         operation: "mint-milestone",
+        ...(fee === null ? {} : { platformFee: fee.output }),
         sender,
       } as const;
       let unsigned: UnsignedTransaction;
@@ -105,6 +123,7 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
           gameId,
           id: newId(),
           milestoneId,
+          platformFeeSats: fee?.sats ?? 0n,
           unsigned,
           userId,
           wallet: sender,

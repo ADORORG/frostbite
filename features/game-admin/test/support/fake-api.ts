@@ -99,6 +99,17 @@ export const listing = (steps: GameAdminStep[]) => ({
 export function fakeApi(overrides: Partial<GameAdminApi> = {}) {
   const api: GameAdminApi = {
     list: vi.fn(async () => listing([])),
+    mints: vi.fn(async () => ({
+      mints: [],
+      next: null,
+      totals: { completed: 0, feesAccruedUnits: "0", inProgress: 0 },
+    })),
+    mintTotals: vi.fn(async () => ({ games: [] })),
+    platformFee: vi.fn(async () => ({ chains: [] })),
+    setPlatformFee: vi.fn(async () => ({
+      reason: "unknown-chain" as const,
+      status: "refused" as const,
+    })),
     record: vi.fn(async () => ({
       status: "recorded" as const,
       step: step({ createdContracts: ["2:7"], state: "complete" }),

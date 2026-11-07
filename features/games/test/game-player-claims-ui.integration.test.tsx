@@ -105,6 +105,50 @@ describe("claiming from the milestone list", () => {
     ).toEqual(["Priced at 25 sat/vB", "Slow, about 4 h", "About 200 vB"]);
   });
 
+  it("shows the platform's fee beside the network fee, with the total, and where the fee goes, when the claim carries one", async () => {
+    const base = claimAt("awaiting-signature");
+    const api = fakeApi({
+      start: vi.fn(async () => ({
+        claim: {
+          ...base,
+          summary: {
+            ...base.summary,
+            fee: { asset: "btc", baseUnits: "5050" },
+            platformFee: {
+              baseUnits: "1500",
+              recipient:
+                "bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0",
+            },
+          },
+        },
+        resumed: false,
+        status: "started" as const,
+      })),
+    });
+    await earned({ api, wallet });
+    await click("Claim ");
+    await flush();
+    const fees = [...(review()?.querySelectorAll(".network-fee") ?? [])].map(
+      (line) => line.textContent,
+    );
+    expect(fees).toEqual([
+      expect.stringContaining("Network fee5,050 sats"),
+      expect.stringContaining("Platform fee1,500 sats"),
+      expect.stringContaining("Total fees6,550 sats"),
+    ]);
+    expect(text()).toContain("The platform adds its own fee");
+    expect(text()).toContain("Platform fee goes to");
+  });
+
+  it("shows no platform fee, and does not mention one, when the claim carries none", async () => {
+    await earned({ api: fakeApi(), wallet });
+    await click("Claim ");
+    await flush();
+    expect(text()).not.toContain("Platform fee");
+    expect(text()).not.toContain("The platform adds its own fee");
+    expect(review()?.querySelectorAll(".network-fee")).toHaveLength(1);
+  });
+
   it("signs what was shown, sends it, and follows the claim to complete, saying confirmed is not complete and telling the game each step", async () => {
     const answers = [claimAt("claimed"), claimAt("complete")];
     let sent = false;

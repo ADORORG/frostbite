@@ -66,6 +66,9 @@ export interface AddressCodec {
   // Returns the canonical address, or throws InvalidAddressError for non-canonical, malformed, or
   // cross-chain input. It never "fixes up" what it was given.
   parse(chain: ChainRef, text: string): Address;
+  // The least an output to this address may carry for the network to relay it (the chain's dust limit), in the chain's smallest unit.
+  // The address must be one `parse` gave.
+  minimumOutput(address: Address): bigint;
 }
 
 export interface ChainReader {

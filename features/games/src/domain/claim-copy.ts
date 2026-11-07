@@ -41,6 +41,11 @@ export const claimStateCopy: Readonly<
   },
 };
 
+// Said beside a claim that is waiting for the player's wallet when the platform charges a fee on it, so the player knows to read it
+// before signing: the fee and the total are shown with the network fee.
+export const platformFeeNote =
+  "The platform adds its own fee, shown below with the total.";
+
 // What a claim in a waiting state says when it has waited longer than expected (over an hour since it was sent, or the network's
 // records are far behind). It says so and says nothing has failed, because it has not.
 const delayedCopy: Readonly<

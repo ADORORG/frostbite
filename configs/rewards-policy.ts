@@ -43,6 +43,9 @@ export const rewardsPolicy = {
   changeDustSats: 294n,
   // What a claim's collectible output carries: above the dust limit of a P2TR output so the collectible has somewhere to land.
   claimOutputSats: 546n,
+  // The most the platform's fee on one milestone claim may be set to, in satoshis: a guard against a slip of the keyboard when staff
+  // set it (0.001 BTC). Raising it is a change of policy, made here.
+  maxPlatformFeeSats: 100_000n,
   // When a wait is called delayed rather than ordinary (ADR-018): the indexer is more than this many blocks behind the chain's tip, or a
   // sent step or claim has gone this long without finishing. Delayed is shown, never as failed, and nothing is retried or cancelled.
   delay: { maxLagBlocks: 2, maxUnsettledMs: 60 * 60 * 1000 },

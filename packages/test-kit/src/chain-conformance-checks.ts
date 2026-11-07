@@ -80,6 +80,10 @@ export function checkAddressCodec(
     parsed,
     "parsing a canonical address is stable",
   );
+  assert.ok(
+    codec.minimumOutput(parsed) > 0n,
+    "an address has a smallest output the network relays, above nothing",
+  );
   const refused = [...fixtures.address.invalid, ...fixtures.crossChain];
   for (const text of refused) {
     assert.throws(

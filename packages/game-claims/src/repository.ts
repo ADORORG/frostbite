@@ -34,6 +34,9 @@ export interface StoredClaim {
   readonly gameId: string;
   readonly id: string;
   readonly milestoneId: string;
+  // What the platform charges on top of the network fee, in the chain's smallest unit (0: nothing), as it was when the transaction was
+  // built: what the wallet was shown is what is kept, whatever the fee is later set to.
+  readonly platformFeeSats: bigint;
   readonly signedPayload: string | null;
   readonly state: ClaimState;
   readonly transactionId: string | null;
@@ -53,6 +56,7 @@ export type NewClaim = Pick<
   | "gameId"
   | "id"
   | "milestoneId"
+  | "platformFeeSats"
   | "unsigned"
   | "userId"
   | "wallet"

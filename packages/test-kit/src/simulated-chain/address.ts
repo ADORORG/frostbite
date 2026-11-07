@@ -26,6 +26,8 @@ export function simulatedAddress(chain: ChainRef, body: string): Address {
   return { chain, value: `sim:${reference}:${body}${check(reference, body)}` };
 }
 
+export const simulatedMinimumOutput = 10n;
+
 export const simulatedAddressCodec: AddressCodec = {
   parse: (chain, text) => {
     if (chainNamespace(chain) !== simulatedNamespace) {
@@ -42,4 +44,6 @@ export const simulatedAddressCodec: AddressCodec = {
     }
     return { chain, value: text };
   },
+  // The simulated network has a small limit of its own, so a test can fall under it.
+  minimumOutput: () => simulatedMinimumOutput,
 };

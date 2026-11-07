@@ -4,18 +4,28 @@ import {
   type FetchLike,
 } from "@frostbite/client-http";
 import {
+  gameAdminMintRoutes,
   gameAdminRoutes,
+  getPlatformFeeResponseSchema,
   listGameAdminStepsResponseSchema,
   listGameAdminTemplatesResponseSchema,
+  listGameMintsResponseSchema,
+  listGameMintTotalsResponseSchema,
   recordGameAdminContractResponseSchema,
   refreshGameAdminStepResponseSchema,
+  setPlatformFeeResponseSchema,
   startGameAdminStepResponseSchema,
   submitGameAdminStepResponseSchema,
+  type GetPlatformFeeResponse,
   type ListGameAdminStepsResponse,
   type ListGameAdminTemplatesResponse,
+  type ListGameMintsResponse,
+  type ListGameMintTotalsResponse,
   type RecordGameAdminContractInput,
   type RecordGameAdminContractResponse,
   type RefreshGameAdminStepResponse,
+  type SetPlatformFeeInput,
+  type SetPlatformFeeResponse,
   type StartGameAdminStepInput,
   type StartGameAdminStepResponse,
   type SubmitGameAdminStepInput,
@@ -31,6 +41,13 @@ export const stepRequestTimeoutMs = 5_000;
 // (including no session) is thrown as the requester throws it, for the caller to say.
 export interface GameAdminApi {
   list(gameId: string): Promise<ListGameAdminStepsResponse>;
+  // A game's totals and a page of its completed mints, newest first; `after` is the previous page's `next`.
+  mints(gameId: string, after?: string): Promise<ListGameMintsResponse>;
+  // The totals of every game that declares rewards.
+  mintTotals(): Promise<ListGameMintTotalsResponse>;
+  // The platform's fee on claims, for each chain, and a way to set it (the fee and its treasury address together).
+  platformFee(): Promise<GetPlatformFeeResponse>;
+  setPlatformFee(input: SetPlatformFeeInput): Promise<SetPlatformFeeResponse>;
   // Enters where a game's contract is, when the platform could not read it from the confirmed transaction.
   record(
     input: RecordGameAdminContractInput,
@@ -52,6 +69,32 @@ export function createGameAdminApi(
         query: { gameId },
         signal: AbortSignal.timeout(stepRequestTimeoutMs),
       }),
+    mints: (gameId, after) =>
+      request(gameAdminMintRoutes.mints, listGameMintsResponseSchema, {
+        query: after === undefined ? { gameId } : { after, gameId },
+        signal: AbortSignal.timeout(stepRequestTimeoutMs),
+      }),
+    mintTotals: () =>
+      request(
+        gameAdminMintRoutes.mintTotals,
+        listGameMintTotalsResponseSchema,
+        {
+          signal: AbortSignal.timeout(stepRequestTimeoutMs),
+        },
+      ),
+    platformFee: () =>
+      request(gameAdminMintRoutes.platformFee, getPlatformFeeResponseSchema, {
+        signal: AbortSignal.timeout(stepRequestTimeoutMs),
+      }),
+    setPlatformFee: (input) =>
+      request(
+        gameAdminMintRoutes.setPlatformFee,
+        setPlatformFeeResponseSchema,
+        {
+          body: input,
+          signal: AbortSignal.timeout(stepRequestTimeoutMs),
+        },
+      ),
     record: (input) =>
       request(gameAdminRoutes.record, recordGameAdminContractResponseSchema, {
         body: input,

@@ -59,6 +59,14 @@ export function toWireClaim(view: ClaimView): GameClaim {
         ? {}
         : { feeDetail: view.summary.feeDetail }),
       milestoneId: view.milestoneId,
+      ...(view.summary.platformFee === undefined
+        ? {}
+        : {
+            platformFee: {
+              baseUnits: view.summary.platformFee.amount.baseUnits.toString(),
+              recipient: view.summary.platformFee.recipient.value,
+            },
+          }),
       recipient: view.wallet.value,
     },
     toSign:

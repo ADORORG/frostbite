@@ -23,6 +23,18 @@ const semanticVersionPattern = /^\d+\.\d+\.\d+$/u;
 // A sanity ceiling on a drawing carried in an intent; the real limit is the one set when the game's contract was made.
 const maxDrawingCharacters = 262_144;
 
+// The platform's fee on a milestone claim: an extra output the player pays on top of the network fee, to the platform's treasury
+// address. Carried in the intent so the adapter builds it, and in the summary so the player is shown it before signing.
+export const platformFeeSchema = z
+  .object({ amount: amountSchema, recipient: addressSchema })
+  .strict();
+export type PlatformFee = z.infer<typeof platformFeeSchema>;
+// What a claim asks for: how much, in the chain's smallest unit, and to whom. The adapter names the asset (the chain's own) when it builds,
+// and shows the result in the summary as a `platformFee`.
+export const platformFeeRequestSchema = z
+  .object({ baseUnits: z.bigint().positive(), recipient: addressSchema })
+  .strict();
+
 // Chain-neutral fields every intent shares. Anything family-specific (UTXO funding, gas settings)
 // goes in `extension`, which the owning adapter validates with its own schema.
 const intentBase = {
@@ -65,6 +77,8 @@ export const transactionIntentSchema = z
         contract: contractRefSchema,
         milestoneId: milestoneIdSchema,
         operation: z.literal("mint-milestone"),
+        // None: the claim carries no platform fee (a fee of zero is none).
+        platformFee: platformFeeRequestSchema.optional(),
       })
       .strict(),
     // Staff publish a template's code on the chain, once, so games can be made from it. (`deploy` makes a game from a published
@@ -119,6 +133,9 @@ export const transactionIntentSchema = z
       ...("collectibleAt" in intent && intent.collectibleAt
         ? [intent.collectibleAt.chain]
         : []),
+      ...(intent.operation === "mint-milestone" && intent.platformFee
+        ? [intent.platformFee.recipient.chain]
+        : []),
       ...(intent.operation === "transfer"
         ? [intent.recipient.chain, intent.amount.asset.chain]
         : []),
@@ -165,6 +182,8 @@ export const transactionSummarySchema = z
     collectibleAt: contractRefSchema.optional(),
     maxDrawingBytes: z.number().int().positive().optional(),
     paused: z.boolean().optional(),
+    // What the platform charges on top of the network fee for a `mint-milestone`, and where it goes; none when there is no fee.
+    platformFee: platformFeeSchema.optional(),
     // The template a `publish-template` or `deploy` transaction puts on the chain, with the hash of its code.
     template: z
       .object({
@@ -190,6 +209,12 @@ export const transactionSummarySchema = z
       ...(summary.contract ? [summary.contract.chain] : []),
       ...(summary.template?.at ? [summary.template.at.chain] : []),
       ...(summary.collectibleAt ? [summary.collectibleAt.chain] : []),
+      ...(summary.platformFee
+        ? [
+            summary.platformFee.recipient.chain,
+            summary.platformFee.amount.asset.chain,
+          ]
+        : []),
     ];
     if (embedded.some((chain) => chain !== summary.chain)) {
       context.addIssue({
