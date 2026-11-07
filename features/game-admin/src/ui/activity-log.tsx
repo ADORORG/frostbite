@@ -32,36 +32,43 @@ export function ActivityLog({
       {newestFirst.length === 0 ? (
         <p>{empty}</p>
       ) : (
-        <ul aria-label="Steps taken" className="activity">
-          {newestFirst.map((step) => (
-            <li
-              data-delayed={showsDelayed(step) ? "true" : undefined}
-              data-step-state={step.state}
-              key={step.id}
-            >
-              <div className="activity__what">
-                <strong>{operationLabel(step)}</strong>
-                <ArcadeBadge tone={stateTone[step.state]}>
-                  {stepCopy(step).label}
-                </ArcadeBadge>
-              </div>
-              <small className="activity__meta">
-                {`${shortTime(step.createdAt)} · built by ${who(step.createdBy)}${
-                  step.submittedBy === null
-                    ? ""
-                    : ` · sent by ${who(step.submittedBy)}`
-                }`}
-              </small>
-              <button
-                className="activity__open"
-                onClick={() => onOpen(step.id)}
-                type="button"
+        <div
+          aria-label="Activity of this game"
+          className="staff-scroll"
+          role="region"
+          tabIndex={0}
+        >
+          <ul aria-label="Steps taken" className="activity">
+            {newestFirst.map((step) => (
+              <li
+                data-delayed={showsDelayed(step) ? "true" : undefined}
+                data-step-state={step.state}
+                key={step.id}
               >
-                Details
-              </button>
-            </li>
-          ))}
-        </ul>
+                <div className="activity__what">
+                  <strong>{operationLabel(step)}</strong>
+                  <ArcadeBadge tone={stateTone[step.state]}>
+                    {stepCopy(step).label}
+                  </ArcadeBadge>
+                </div>
+                <small className="activity__meta">
+                  {`${shortTime(step.createdAt)} · built by ${who(step.createdBy)}${
+                    step.submittedBy === null
+                      ? ""
+                      : ` · sent by ${who(step.submittedBy)}`
+                  }`}
+                </small>
+                <button
+                  className="activity__open"
+                  onClick={() => onOpen(step.id)}
+                  type="button"
+                >
+                  Details
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </SectionBlock>
   );

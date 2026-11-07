@@ -1,6 +1,7 @@
 "use client";
 
 import { useStepWallet } from "@frostbite/wallet/client";
+import type { ReactNode } from "react";
 
 import type { GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
@@ -28,10 +29,12 @@ export function WalletTemplatesPanel({
 
 export function WalletGamePanel({
   api,
+  children,
   game,
   signingWallets,
 }: {
   readonly api?: GameAdminApi;
+  readonly children?: ReactNode;
   readonly game: AdminGameInfo;
   readonly signingWallets: readonly string[];
 }) {
@@ -42,6 +45,8 @@ export function WalletGamePanel({
       connectedAddress={wallet.address}
       game={game}
       {...(wallet.sign === undefined ? {} : { sign: wallet.sign })}
-    />
+    >
+      {children}
+    </GameAdminPanel>
   );
 }

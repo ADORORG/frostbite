@@ -1,7 +1,7 @@
 "use client";
 
 import { ArcadeInfoCard } from "@repo/ui/arcade";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
@@ -16,7 +16,8 @@ import { useAdminSteps, type StepSigner } from "./use-admin-steps.ts";
 import { useSigner } from "./use-signer.ts";
 
 // One game's rewards contract, for staff: create it once the templates are published, then pause and resume claims, define
-// milestones, review and sign each step, and the log of what has been done. The wallet address is whichever staff will sign with;
+// milestones, review and sign each step, and the log of what has been done. What the page shows about the game's mints (`children`) sits
+// above the log and the milestones: the milestones can be many, so they come last, in a box of their own. The wallet address is whichever staff will sign with;
 // the auth-token output is for networks whose steps must present the game's token.
 export function GameAdminPanel({
   api: injected,
@@ -24,8 +25,10 @@ export function GameAdminPanel({
   sign,
   pollMs,
   connectedAddress,
+  children,
 }: {
   readonly api?: GameAdminApi;
+  readonly children?: ReactNode;
   readonly game: AdminGameInfo;
   readonly pollMs?: number;
   readonly sign?: StepSigner;
@@ -45,9 +48,14 @@ export function GameAdminPanel({
   const { overview, starting } = admin;
   if (overview === null || overview.kind !== "game")
     return (
-      <ArcadeInfoCard title="Rewards contract">
-        <p role="status">{admin.message ?? "Loading this game's contract…"}</p>
-      </ArcadeInfoCard>
+      <>
+        <ArcadeInfoCard title="Rewards contract">
+          <p role="status">
+            {admin.message ?? "Loading this game's contract…"}
+          </p>
+        </ArcadeInfoCard>
+        {children}
+      </>
     );
   // A step cannot be started while no one is named to sign it, or while another is being prepared.
   const busy = !signer.ready || starting !== null;
@@ -79,40 +87,41 @@ export function GameAdminPanel({
         templatesReady={overview.templatesReady}
       />
       {hasContract ? (
-        <>
-          <ClaimsSection
-            busy={busy}
-            onChange={(paused) =>
-              void ask({ operation: "set-claims-paused", paused })
-            }
-            preparing={
-              isStarting(starting, pause)
-                ? "pause"
-                : isStarting(starting, resume)
-                  ? "resume"
-                  : null
-            }
-            steps={admin.steps}
-          />
-          <MilestoneList
-            busy={busy}
-            milestones={game.milestones}
-            onDefine={(milestoneId, drawing) =>
-              void ask({ drawing, milestoneId, operation: "define-milestone" })
-            }
-            preparing={
-              game.milestones.find((milestone) =>
-                isStarting(starting, {
-                  milestoneId: milestone.id,
-                  operation: "define-milestone",
-                }),
-              )?.id ?? null
-            }
-            steps={admin.steps}
-          />
-        </>
+        <ClaimsSection
+          busy={busy}
+          onChange={(paused) =>
+            void ask({ operation: "set-claims-paused", paused })
+          }
+          preparing={
+            isStarting(starting, pause)
+              ? "pause"
+              : isStarting(starting, resume)
+                ? "resume"
+                : null
+          }
+          steps={admin.steps}
+        />
       ) : null}
+      {children}
       <ActivityLog onOpen={admin.reopen} steps={admin.steps} />
+      {hasContract ? (
+        <MilestoneList
+          busy={busy}
+          milestones={game.milestones}
+          onDefine={(milestoneId, drawing) =>
+            void ask({ drawing, milestoneId, operation: "define-milestone" })
+          }
+          preparing={
+            game.milestones.find((milestone) =>
+              isStarting(starting, {
+                milestoneId: milestone.id,
+                operation: "define-milestone",
+              }),
+            )?.id ?? null
+          }
+          steps={admin.steps}
+        />
+      ) : null}
       <StepSheet admin={admin} />
     </>
   );
