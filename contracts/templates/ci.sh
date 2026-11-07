@@ -6,7 +6,9 @@
 # Alkanes runtime, runs natively, and is the crate whose coverage is measured; the contracts are
 # thin and each operation is exercised by the harness instead.
 set -euo pipefail
-cd "$(dirname "$0")"
+# Remember where this script is before moving: `test` runs the other steps through it, and a relative $0 would no longer resolve.
+self="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+cd "$(dirname "$self")"
 wasm=(--target wasm32-unknown-unknown)
 
 # The harness tests embed the built contracts (include_bytes!), so they do not even compile until build.sh has made them.
@@ -50,8 +52,8 @@ case "${1:-}" in
     cargo test --no-fail-fast "${selected[@]}"
     ;;
   test)
-    "$0" core
-    "$0" harness 0 1
+    "$self" core
+    "$self" harness 0 1
     ;;
   coverage)
     cargo llvm-cov -p rewards-core --fail-under-lines 90 --fail-under-functions 90 --fail-under-regions 90
