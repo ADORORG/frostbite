@@ -1,7 +1,7 @@
 "use client";
 
 import type { GetPlatformFeeResponse } from "@frostbite/shared/games";
-import { ArcadeInfoCard, SectionBlock } from "@repo/ui/arcade";
+import { ArcadeInfoCard, SectionBlock, shortenMiddle } from "@repo/ui/arcade";
 import { useEffect, useMemo, useState } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
@@ -78,7 +78,9 @@ export function PlatformFeePanel({
     >
       {fees.chains.map((chain) => (
         <div data-testid={`platform-fee-${chain.chain}`} key={chain.chain}>
-          <h3>{chain.chain}</h3>
+          <h3 title={chain.chain}>
+            {shortenMiddle(chain.chain, { head: 10, tail: 4 })}
+          </h3>
           <Current chain={chain} />
           <PlatformFeeForm
             chain={chain}
