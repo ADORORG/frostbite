@@ -264,8 +264,9 @@ can be earned in any level and are named once: a first secret charm, and 300 met
 marks on the way (the same as each level played alone) and six of its own: winning it, winning without losing a heart, winning with exactly
 one heart left, winning in ten minutes or less, winning with every egg (Egg Hills' three golden eggs, all eight of the castle's night eggs
 saved and every egg of the woods' maze), and winning after visiting all six of Egg Hills' secret areas. Some are earned on the same tick as
-a level's clear, but each asks for something more than the clear. The words are in the manifest. The list is a draft for the owner to
-approve.
+a level's clear, but each asks for something more than the clear. The words are in the manifest, and the drawing each becomes on chain
+is in `milestone-drawings.md` (with `milestone-drawings.svg`, all 40 framed, for review). The list and the drawings are a draft for the
+owner to approve.
 
 ## Fairness
 
