@@ -1,5 +1,8 @@
 import type { DatabaseClient } from "@frostbite/database/connection";
-import { gameMilestoneClaims } from "@frostbite/database/schema/game-claims";
+import {
+  gameMilestoneClaims,
+  gameMilestoneMintTotals,
+} from "@frostbite/database/schema/game-claims";
 import {
   addressSchema,
   readTracked,
@@ -154,18 +157,12 @@ export function createDrizzleGameClaimRepository(
         (
           await database
             .select({
-              count: sql<number>`count(*)::int`,
-              milestoneId: gameMilestoneClaims.milestoneId,
+              completed: gameMilestoneMintTotals.completed,
+              milestoneId: gameMilestoneMintTotals.milestoneId,
             })
-            .from(gameMilestoneClaims)
-            .where(
-              and(
-                eq(gameMilestoneClaims.gameId, gameId),
-                eq(gameMilestoneClaims.state, "complete"),
-              ),
-            )
-            .groupBy(gameMilestoneClaims.milestoneId)
-        ).map(({ count, milestoneId }) => [milestoneId, count]),
+            .from(gameMilestoneMintTotals)
+            .where(eq(gameMilestoneMintTotals.gameId, gameId))
+        ).map(({ completed, milestoneId }) => [milestoneId, completed]),
       ),
 
     listComplete: async (userId) =>

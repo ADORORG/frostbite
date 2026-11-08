@@ -65,9 +65,9 @@ the picture as the player the completed claim belongs to and answers "not found"
 platform does not list. Owner decisions (2026-10-27, confirmed 2026-11-08): every mint appears, the wallet in short form (shortened on the
 server, so the whole address never leaves it), no opt-in; each mint says whether the platform replayed the run (`replay-verified`) or the
 game only reported it (`self-reported`); the words are "minted to", never "owned by" (nothing locks a mint to its wallet, and the wallet
-paid may not be the player); only claims the network's records show complete. Counting is a read of the game's complete claims
-(`completeCounts`), cached for a minute; at a size where that is slow, per-milestone counters kept by triggers (as `game_mint_totals` is
-per game) are the follow-up.
+paid may not be the player); only claims the network's records show complete. Counting (`completeCounts`) reads one row per
+milestone from `game_milestone_mint_totals`, kept by triggers on the claims table, so it costs the same however many mints there are; the
+answer is still cached for a minute, which only spares the database a repeated read.
 
 ## Searching the games page
 
