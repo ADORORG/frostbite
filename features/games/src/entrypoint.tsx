@@ -1,6 +1,7 @@
 import { registerHttpOperation } from "@frostbite/http/registered-operation";
 import type { FeatureEntrypoint } from "@frostbite/plugin-kit";
 import { privatePage } from "@frostbite/plugin-kit/page-metadata";
+import type { ShareConfig } from "@frostbite/share";
 import type { ChainOption } from "@frostbite/shared/chain";
 import { homeSectionOrder } from "@frostbite/shared/platform";
 import {
@@ -60,6 +61,7 @@ export function createGamesEntrypoint(
   wallet: GameWalletConfig,
   runs: GameRunsConfig,
   claims: GameClaimsConfig,
+  share?: ShareConfig,
 ): FeatureEntrypoint {
   const catalog = createGameCatalog(games, chains);
   const runsService = createGameRunsResolver(games, runs);
@@ -131,6 +133,7 @@ export function createGamesEntrypoint(
             explorerTxUrl={wallet.explorerTxUrl}
             games={catalog.list()}
             navigation={navigation}
+            {...(share === undefined ? {} : { share })}
           />
         ),
       },

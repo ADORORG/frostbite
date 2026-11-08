@@ -5,10 +5,13 @@ import { gameHref, myMilestonesPath } from "@frostbite/shared/games";
 import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import { ExplorerBoundary } from "@frostbite/feature-chain-status/transaction";
 import { ArcadeButton, ArcadeEmptyState, StatusLamp } from "@repo/ui/arcade";
+import type { ShareConfig } from "@frostbite/share";
+import type { CreateShareInput } from "@frostbite/shared/games";
 import { useState } from "react";
 
 import type { PublicGame } from "../domain/catalog.ts";
 import { mintedCopy } from "../domain/minted-copy.ts";
+import { shareCopy } from "../domain/share-copy.ts";
 import { mintedPlaceholderCount } from "../domain/minted-view.ts";
 import {
   shelfStats,
@@ -17,12 +20,16 @@ import {
   type ShelfPiece,
 } from "../domain/shelf-view.ts";
 import type { MintedApi } from "../client/minted-api.ts";
+import type { SharesApi } from "../client/shares-api.ts";
 import { GamesFrame } from "./games-frame.tsx";
 import { GameShelf } from "./game-shelf.tsx";
 import { ShelfSummary } from "./shelf-summary.tsx";
 import { TrophyDialog } from "./trophy-dialog.tsx";
+import { ShareControl } from "./share-control.tsx";
 import { useMinted } from "./use-minted.ts";
 
+// Sharing the shelf names nothing but the shelf: the link's page shows the title and a way to play.
+const shelfRequest: CreateShareInput = { kind: "milestones" };
 const waiting = Array.from({ length: mintedPlaceholderCount }, (_, at) => at);
 
 // The signed-in player's milestones as a trophy case: a shelf for each game with a place for every milestone, the minted ones as
@@ -32,12 +39,17 @@ export function MyMilestones({
   explorerTxUrl,
   games,
   navigation,
+  share,
+  sharesApi,
 }: {
   readonly api?: MintedApi;
   // Where a transaction is shown on a block explorer (`{id}` where its id goes).
   readonly explorerTxUrl: string;
   readonly games: readonly PublicGame[];
   readonly navigation: readonly NavigationItem[];
+  // Where a link can be shared; without it nothing here can be.
+  readonly share?: ShareConfig;
+  readonly sharesApi?: SharesApi;
 }) {
   const state = useMinted(api);
   const [open, setOpen] = useState<{
@@ -52,6 +64,14 @@ export function MyMilestones({
           {state.kind === "ready" ? <span>{state.minted.length}</span> : null}
         </h2>
         <p>{mintedCopy.intro}</p>
+        {state.kind === "ready" && state.minted.length > 0 ? (
+          <ShareControl
+            api={sharesApi}
+            config={share}
+            request={shelfRequest}
+            text={shareCopy.post.collection}
+          />
+        ) : null}
       </header>
       {state.kind === "loading" ? (
         <>
@@ -82,7 +102,12 @@ export function MyMilestones({
               shelf={shelf}
             />
           ))}
-          <TrophyDialog onClose={() => setOpen(null)} open={open} />
+          <TrophyDialog
+            onClose={() => setOpen(null)}
+            open={open}
+            share={share}
+            sharesApi={sharesApi}
+          />
         </ExplorerBoundary>
       )}
     </GamesFrame>

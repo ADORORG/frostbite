@@ -1,20 +1,59 @@
 "use client";
 
 import { TransactionLink } from "@frostbite/feature-chain-status/transaction";
+import type { ShareConfig } from "@frostbite/share";
 import { ArcadeDialog, KeyValueList } from "@repo/ui/arcade";
+import { useMemo } from "react";
 
+import type { SharesApi } from "../client/shares-api.ts";
 import { mintedCopy } from "../domain/minted-copy.ts";
+import { shareCopy } from "../domain/share-copy.ts";
 import type { Shelf, ShelfPiece } from "../domain/shelf-view.ts";
 import { MintedArt } from "./minted-art.tsx";
+import { ShareControl } from "./share-control.tsx";
+
+// Sharing the milestone on show. A part of its own, so the request is made once for the piece and not again on every redraw of the dialog.
+function PieceShare({
+  api,
+  config,
+  piece,
+  shelf,
+}: {
+  readonly api?: SharesApi | undefined;
+  readonly config?: ShareConfig | undefined;
+  readonly piece: ShelfPiece;
+  readonly shelf: Shelf;
+}) {
+  const request = useMemo(
+    () => ({
+      gameId: shelf.gameId,
+      kind: "milestone" as const,
+      milestoneId: piece.milestoneId,
+    }),
+    [piece.milestoneId, shelf.gameId],
+  );
+  return (
+    <ShareControl
+      api={api}
+      config={config}
+      request={request}
+      text={shareCopy.post.milestone(piece.title, shelf.gameTitle)}
+    />
+  );
+}
 
 // A minted milestone up close: the picture large, what the milestone is, the day, and the transaction on the network's explorer.
 // Closed while `open` is null.
 export function TrophyDialog({
   onClose,
   open,
+  share,
+  sharesApi,
 }: {
   readonly onClose: () => void;
   readonly open: { readonly piece: ShelfPiece; readonly shelf: Shelf } | null;
+  readonly share?: ShareConfig | undefined;
+  readonly sharesApi?: SharesApi | undefined;
 }) {
   const piece = open?.piece;
   return (
@@ -48,6 +87,12 @@ export function TrophyDialog({
               },
             ]}
             label={mintedCopy.title}
+          />
+          <PieceShare
+            api={sharesApi}
+            config={share}
+            piece={piece}
+            shelf={open.shelf}
           />
         </div>
       )}

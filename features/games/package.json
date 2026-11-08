@@ -37,6 +37,7 @@
     "@frostbite/http": "workspace:*",
     "@frostbite/plugin-kit": "workspace:*",
     "@frostbite/scenes": "workspace:*",
+    "@frostbite/share": "workspace:*",
     "@frostbite/shared": "workspace:*",
     "@frostbite/wallet": "workspace:*",
     "@repo/ui": "workspace:*",

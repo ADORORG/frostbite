@@ -11,6 +11,14 @@ export const shareCopy = {
     `Earned in ${game}. Can you earn it too?`,
   notFoundBody: "This link is not shared any more, or never was.",
   notFoundTitle: "Nothing to see here",
+  // The words a post carries beside the link. What the post says is only what the platform checked: a real score, a real milestone.
+  post: {
+    collection: "My shelf of milestones. Can you collect more?",
+    milestone: (title: string, game: string) =>
+      `I earned ${title} in ${game}. Can you?`,
+    score: (score: string, game: string) =>
+      `Can you beat my ${score} in ${game}?`,
+  },
   play: (game: string) => `Play ${game}`,
   scoreKicker: "Score",
   scoreSubtitle: "Can you beat it?",

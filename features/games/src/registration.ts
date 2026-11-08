@@ -1,4 +1,5 @@
 import { defineFeature } from "@frostbite/plugin-kit";
+import type { ShareConfig } from "@frostbite/share";
 import type { ChainOption } from "@frostbite/shared/chain";
 import {
   gamePagePath,
@@ -37,6 +38,7 @@ export function createGamesFeature(
   wallet: GameWalletConfig,
   runs: GameRunsConfig,
   claims: GameClaimsConfig,
+  share?: ShareConfig,
 ) {
   return defineFeature({
     manifest: {
@@ -84,7 +86,7 @@ export function createGamesFeature(
     load: async () =>
       import("@frostbite/feature-games/entrypoint").then(
         ({ createGamesEntrypoint }) =>
-          createGamesEntrypoint(games, chains, wallet, runs, claims),
+          createGamesEntrypoint(games, chains, wallet, runs, claims, share),
       ),
   });
 }

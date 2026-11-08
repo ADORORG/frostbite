@@ -22,6 +22,7 @@ import { emailCodePolicy } from "./email-code.ts";
 import { targetChains } from "./chains.ts";
 import { gameAdminConfig } from "./game-admin.ts";
 import { gameClaimsConfig } from "./game-claims.ts";
+import { shareConfig } from "./share.ts";
 import { gameRunsConfig } from "./game-runs.ts";
 import { games } from "./games.ts";
 import { mailSettings } from "./mail.ts";
@@ -56,6 +57,7 @@ export const featureRegistry = createFeatureRegistry([
     gameWalletConfig,
     gameRunsConfig,
     gameClaimsConfig,
+    shareConfig,
   ),
   createGameAdminFeature(games, gameAdminConfig),
   createUploadsFeature(providerRegistry),
