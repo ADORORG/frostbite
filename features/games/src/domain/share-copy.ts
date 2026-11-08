@@ -53,6 +53,7 @@ export const shareCopy = {
     shelfTitle: (pieces: number, games: number) =>
       `${pieces.toLocaleString("en-US")} ${pieces === 1 ? "milestone" : "milestones"} from ${games.toLocaleString("en-US")} ${games === 1 ? "game" : "games"}`,
     inGame: "in",
+    newBest: (game: string) => `New best in ${game}`,
   },
   verification: {
     "replay-verified": "Verified by replay",

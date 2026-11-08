@@ -29,8 +29,8 @@ export function ShareButton({
   readonly kicker: string;
   readonly makeLink: () => Promise<string | null>;
   readonly text: string;
-  // `icon` is a round button with the mark alone, to sit over a picture.
-  readonly variant?: "button" | "icon";
+  // `icon` is a round button with the mark alone, to sit over a picture; `chip` is a small one with the words, for a thin bar.
+  readonly variant?: "button" | "chip" | "icon";
 }) {
   const [open, setOpen] = useState(false);
   return (

@@ -47,6 +47,28 @@ picture a link preview shows. Both are made from the same `sharedView` (`domain/
 ended, never was, names a game that is no longer listed or a milestone it no longer declares, shows "not shared" and gives previews no
 metadata. A preview picture is cached for up to an hour at the edge, so an ended link's picture can be seen for that long.
 
+### Sharing a new best and a held milestone (SHARE-1d)
+
+In a game, the platform reads the best score from the progress the game saves (`{ best }`, the SDK's `Progress`), so no game has to say it:
+the best the game loaded is the bar, and a save that beats it is a new best (`domain/best-score.ts`, watched in `use-game-session.ts`).
+A signed-in player whose progress is on their account (`sync === "account"`) then gets a small **Share** chip in the game's top bar, outside
+the picture and never over the play area, that shares that score; the page it opens calls it self-reported, because no replay verifier
+returns a score. A milestone the player holds has the same chip on its card in the game's milestone list. A player with no account sees
+neither, because a link is made from the account's own records.
+
+## The Minted gallery (M2)
+
+A game that mints milestones has a **Minted** section in its dock: how many players minted each milestone, then every mint, newest first, a
+page at a time (`ui/minted-gallery.tsx`). It is public. It is read from `GET /api/v1/games/gallery?gameId=` (a page of 24; `cursor` for the
+next; the per-milestone counts only with the first page) and each picture from `GET /api/v1/games/gallery/picture?claimId=`, which reads
+the picture as the player the completed claim belongs to and answers "not found" for a claim that is not complete or is of a game the
+platform does not list. Owner decisions (2026-10-27, confirmed 2026-11-08): every mint appears, the wallet in short form (shortened on the
+server, so the whole address never leaves it), no opt-in; each mint says whether the platform replayed the run (`replay-verified`) or the
+game only reported it (`self-reported`); the words are "minted to", never "owned by" (nothing locks a mint to its wallet, and the wallet
+paid may not be the player); only claims the network's records show complete. Counting is a read of the game's complete claims
+(`completeCounts`), cached for a minute; at a size where that is slow, per-milestone counters kept by triggers (as `game_mint_totals` is
+per game) are the follow-up.
+
 ## Searching the games page
 
 `/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it

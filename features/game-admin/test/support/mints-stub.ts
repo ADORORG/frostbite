@@ -35,6 +35,7 @@ export function mintsStub(
               milestoneId: "first-win",
               platformFeeSats: 1_500n,
               transactionId: "ab".repeat(16),
+              userId: "0198a000-0000-7000-8000-0000000000u1",
               walletAddress: "sim:one:a1b2c3fe",
             },
           ],

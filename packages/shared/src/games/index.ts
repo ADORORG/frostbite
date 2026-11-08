@@ -1,5 +1,6 @@
 export * from "./admin.ts";
 export * from "./claims.ts";
+export * from "./gallery.ts";
 export * from "./launch-settings.ts";
 export * from "./manifest.ts";
 export * from "./minted.ts";

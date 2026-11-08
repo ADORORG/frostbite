@@ -175,3 +175,10 @@
   border-radius: var(--arcade-radius-medium);
   overflow: hidden;
 }
+
+/* The Share chip on a milestone card the player holds. */
+.milestone-share {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-start: var(--arcade-space-2);
+}

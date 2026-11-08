@@ -1,4 +1,5 @@
 import type { GameClaim, GameMilestone } from "@frostbite/shared/games";
+import type { ReactNode } from "react";
 import { ArcadeActionButton, ArcadeStatusCard } from "@repo/ui/arcade";
 
 import { gameMilestonePolicyLabels } from "../domain/catalog.ts";
@@ -29,10 +30,13 @@ export interface MilestoneClaiming {
 export function MilestoneCard({
   claiming,
   milestone,
+  share,
   view,
 }: {
   readonly claiming?: MilestoneClaiming | undefined;
   readonly milestone: GameMilestone;
+  // A small control to share the milestone, for one the player holds; none otherwise.
+  readonly share?: ReactNode;
   // Absent while the player's records are not known (the game cannot be played here).
   readonly view?: MilestoneView | undefined;
 }) {
@@ -99,6 +103,9 @@ export function MilestoneCard({
             </>
           ) : null}
         </p>
+        {share === undefined || share === null ? null : (
+          <div className="milestone-share">{share}</div>
+        )}
         {notes.length === 0 ? null : (
           <details>
             <summary>How this is known</summary>

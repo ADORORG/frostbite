@@ -1,4 +1,5 @@
 import type { GameMilestone } from "@frostbite/shared/games";
+import type { ReactNode } from "react";
 
 import {
   presentMilestone,
@@ -17,6 +18,7 @@ export function MilestoneList({
   claim,
   milestones,
   progress,
+  shareOf,
   unlocked,
 }: {
   // Present for a game whose milestones can be claimed: how each claim stands, and how to start or look at one.
@@ -24,6 +26,8 @@ export function MilestoneList({
   readonly milestones: readonly GameMilestone[];
   // How often each was earned and the total toward each target, when the player's records say.
   readonly progress?: MilestoneProgress;
+  // A control to share one milestone, for the ones the player holds.
+  readonly shareOf?: (milestone: GameMilestone) => ReactNode;
   readonly unlocked: Readonly<Record<string, string>> | null;
 }) {
   const views: readonly MilestoneView[] | null =
@@ -58,7 +62,14 @@ export function MilestoneList({
             data-state={view?.state}
             key={milestone.id}
           >
-            <MilestoneCard claiming={claim} milestone={milestone} view={view} />
+            <MilestoneCard
+              claiming={claim}
+              milestone={milestone}
+              share={
+                view?.state === "earned" ? shareOf?.(milestone) : undefined
+              }
+              view={view}
+            />
           </li>
         ))}
       </ul>

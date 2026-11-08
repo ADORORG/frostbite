@@ -1,0 +1,112 @@
+/* A game's public gallery of mints, in the dock: milestone counts as chips, then the mints as lit cards. */
+.mint-gallery {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+.mint-gallery__intro {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+.mint-gallery__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mint-gallery__counts li {
+  display: grid;
+  gap: 0.125rem;
+  padding: var(--arcade-space-2) var(--arcade-space-3);
+  border: 0.125rem solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-medium);
+  background: rgb(255 210 63 / 8%);
+}
+.mint-gallery__counts strong {
+  font-size: var(--arcade-text-sm);
+}
+.mint-gallery__counts span {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.mint-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--arcade-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mint-gallery-card {
+  display: grid;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+.mint-gallery-card__art {
+  container-type: inline-size;
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  margin-block-end: var(--arcade-space-2);
+  border: 0.1875rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow: 0 0.75rem 1.25rem -0.75rem var(--arcade-cyan);
+}
+.mint-gallery-card strong,
+.mint-gallery-card small,
+.mint-gallery-card__tx {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mint-gallery-card small {
+  color: var(--arcade-text-muted);
+}
+.mint-gallery-card__level {
+  justify-self: start;
+  margin-block-start: 0.125rem;
+  padding: 0.125rem var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 999px;
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.5rem;
+  text-transform: uppercase;
+}
+.mint-gallery-card__level[data-level="replay-verified"] {
+  border-color: var(--arcade-mint);
+  color: var(--arcade-mint);
+}
+.mint-gallery-card__tx {
+  font-family: var(--arcade-font-mono, ui-monospace, monospace);
+  font-size: var(--arcade-label-size);
+}
+.mint-gallery-card__tx a {
+  color: var(--arcade-cyan);
+}
+.mint-gallery__more {
+  display: grid;
+  justify-items: center;
+  gap: var(--arcade-space-2);
+}
+.mint-gallery__more button {
+  min-block-size: 2.75rem;
+  padding: 0 var(--arcade-space-5);
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+  color: var(--arcade-cyan);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.mint-gallery__more button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
