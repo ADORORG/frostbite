@@ -40,13 +40,11 @@ describe("how many players minted each milestone", () => {
 
   it("is what the service gives a public page", async () => {
     const gameId = freshGame();
-    await database
-      .insert(gameMilestoneClaims)
-      .values(
-        claim(await seedUser(), gameId, "complete", {
-          milestoneId: "first-win",
-        }),
-      );
+    await database.insert(gameMilestoneClaims).values(
+      claim(await seedUser(), gameId, "complete", {
+        milestoneId: "first-win",
+      }),
+    );
     expect(await service.mintCounts(gameId)).toEqual(
       new Map([["first-win", 1]]),
     );
