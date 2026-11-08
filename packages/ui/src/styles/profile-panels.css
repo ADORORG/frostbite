@@ -1,0 +1,96 @@
+/* The notices of the setup page: the loading state, a failure, the "you're on the map" panel after saving, and taking a profile down. */
+.profile-skeleton {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+.profile-skeleton__block {
+  block-size: 9rem;
+  border-radius: var(--arcade-radius-medium);
+  background: linear-gradient(
+    100deg,
+    var(--arcade-surface) 30%,
+    var(--arcade-surface-raised) 50%,
+    var(--arcade-surface) 70%
+  );
+  background-size: 250% 100%;
+  animation: profile-skeleton 1.4s linear infinite;
+}
+.profile-saved {
+  display: grid;
+  gap: var(--arcade-space-3);
+  padding: var(--arcade-space-5);
+  border: var(--arcade-border-width) solid var(--arcade-mint);
+  border-radius: var(--arcade-radius-medium);
+  background: color-mix(in srgb, var(--arcade-mint) 10%, var(--arcade-surface));
+  box-shadow: 0 0 2rem color-mix(in srgb, var(--arcade-mint) 22%, transparent);
+  animation: profile-pop 320ms ease-out;
+}
+h2.profile-saved__title {
+  margin: 0;
+  color: var(--arcade-mint);
+  font-family: var(--arcade-font-display);
+  font-size: var(--arcade-text-lg);
+}
+.profile-saved__link {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-text-xs);
+}
+.profile-saved__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3);
+}
+.profile-danger {
+  display: grid;
+  gap: var(--arcade-space-3);
+  padding: var(--arcade-space-4) var(--arcade-space-5);
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+}
+h2.profile-danger__title {
+  margin: 0;
+  font-family: var(--arcade-font-body);
+  font-size: var(--arcade-text-md);
+  text-transform: none;
+  color: var(--arcade-text-muted);
+  font-weight: 700;
+}
+.profile-danger__lead {
+  margin: 0;
+  color: var(--arcade-text-subtle);
+  font-size: var(--arcade-text-sm);
+}
+.profile-danger__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3);
+}
+.profile-notice {
+  margin: 0;
+  padding: var(--arcade-space-3) var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+}
+.profile-notice[data-tone="bad"] {
+  border-color: var(--arcade-red);
+}
+@keyframes profile-skeleton {
+  to {
+    background-position: -150% 0;
+  }
+}
+@keyframes profile-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-skeleton__block,
+  .profile-saved {
+    animation: none;
+  }
+}
