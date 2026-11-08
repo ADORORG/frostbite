@@ -247,7 +247,7 @@ prize) may depend on a self-reported milestone.**
 A game can offer a stronger level, `replay-verified`, for milestones its rules can decide. It needs no platform change:
 
 1. Write the rules as a pure state machine (`GameVerifier`, `@frostbite/game-sdk/run-record`: `init(seed, config)`,
-   `step(state, input)`, `earned(state)`; no clock, no `Math.random`, no I/O) and play through the same module.
+   `step(state, input)`, `earned(state)` and, to be ranked on a leaderboard, `score(state)` (the number the screen shows, once the run has ended, otherwise `null`; test it with `expectVerifiedScore` from `@frostbite/test-kit/verified-score`); no clock, no `Math.random`, no I/O) and play through the same module.
 2. Add `src/replay.ts` to the game: a default export of the verifier and a named export `sample()` returning one legal
    run. `pnpm game:build` (the SDK's build) emits `verifier.js` and `verifier.json` beside the game.
 3. In the manifest, declare the `run:submit` capability, `verification: { replay: { id, sha256, version } }` with the

@@ -23,6 +23,8 @@ const rules: GameVerifier<Counter> = {
         : ["reached"]
       : [],
   id: "counter",
+  // The run has ended once the count reaches the target, and scores that count.
+  score: ({ count, target }) => (count >= target ? count : null),
   init: (seed, config) => {
     const { target } = config;
     if (typeof target !== "number" || target < 1)
@@ -58,17 +60,20 @@ describe("replaying a record with a game's rules", () => {
     expect(replayRecord(rules, record())).toEqual({
       earned: ["reached", "exact"],
       ok: true,
+      score: 5,
     });
     // Seed 1 starts the count at 1, so 3 + 2 overshoots the target: reached, not exact.
     expect(replayRecord(rules, record({ seed: 1 }))).toEqual({
       earned: ["reached"],
       ok: true,
+      score: 6,
     });
     expect(
       replayRecord(rules, record({ inputs: [{ data: 1, type: "add" }] })),
     ).toEqual({
       earned: [],
       ok: true,
+      score: null,
     });
   });
 
@@ -122,6 +127,7 @@ describe("replaying from text", () => {
       {
         earned: ["reached", "exact"],
         ok: true,
+        score: 5,
       },
     );
   });
@@ -163,6 +169,7 @@ describe("publishing the rules as an artifact", () => {
       ).toEqual({
         earned: ["reached", "exact"],
         ok: true,
+        score: 5,
       });
     } finally {
       for (const name of [replayGlobal, sampleGlobal, metaGlobal])

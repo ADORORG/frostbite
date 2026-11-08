@@ -111,6 +111,10 @@ export interface GameVerifier<State> {
     seed: number,
     config: Readonly<Record<string, JsonValue>>,
   ): Stepped<State>;
+  // What the run scored, once it has ended; null while it is still going, or for a game that keeps no score. It is read from the same
+  // replayed state as `earned`, so a score is something the rules reached, never something the record says. A score is a whole number
+  // from 0 up; anything else is read as none.
+  score?(state: State): number | null;
   step(state: State, input: RunInput): Stepped<State>;
   // The version of these rules; a record made under another version is not replayed.
   readonly version: number;

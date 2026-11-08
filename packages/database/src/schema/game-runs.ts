@@ -46,10 +46,17 @@ export const gameRuns = platformSchema.table(
     earned: jsonb("earned"),
     recordDigest: text("record_digest"),
     recordText: text("record_text"),
+    // What the replay scored, for a verified run of a game that keeps a score and when the run had ended. This is the number a board ranks:
+    // it comes from the platform's replay of the record, never from the record or the game.
+    score: bigint("score", { mode: "number" }),
   },
   (table) => [
     // The open runs of a player in a game are counted on every start.
     index("game_runs_open_idx").on(table.userId, table.gameId, table.state),
+    // A board is a game's best verified scores, highest first.
+    index("game_runs_board_idx")
+      .on(table.gameId, table.score.desc())
+      .where(sql`${table.score} is not null`),
     check(
       "game_runs_state_known",
       sql`${table.state} in ('issued', 'submitted', 'expired')`,
@@ -74,6 +81,11 @@ export const gameRuns = platformSchema.table(
     check(
       "game_runs_record_bounded",
       sql`${table.recordText} is null or char_length(${table.recordText}) <= 65536`,
+    ),
+    // Only a verified run has a score, and a score is never negative.
+    check(
+      "game_runs_score_coherent",
+      sql`${table.score} is null or (${table.verdict} is not distinct from 'verified' and ${table.score} >= 0)`,
     ),
     check(
       "game_runs_digest_shape",

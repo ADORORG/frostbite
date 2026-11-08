@@ -39,7 +39,7 @@ const registryFor = (...gameIds: string[]) =>
       },
       verifier: {
         id: "rules",
-        replay: () => ({ earned: [], ok: true }),
+        replay: () => ({ earned: [], ok: true, score: null }),
         version: 1,
       },
     })),

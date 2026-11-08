@@ -8,7 +8,7 @@ import { jumpSpeed, maxTicks, tile } from "../src/rules/constants.ts";
 import { broRules } from "../src/rules/index.ts";
 import { sample } from "../src/replay.ts";
 import { sampleRun } from "../src/sample-run.ts";
-import { scoreOf } from "../src/score.ts";
+import { scoreOf } from "../src/rules/score.ts";
 import { onFlat, withHero } from "./support/states.ts";
 
 const base = onFlat();
@@ -118,7 +118,7 @@ describe("the verifier's sample run", () => {
     const record = sample();
     expect(record).toEqual(sampleRun());
     const outcome = replayRecord(broRules, record);
-    expect(outcome).toEqual({ earned: record.claims, ok: true });
+    expect(outcome).toMatchObject({ earned: record.claims, ok: true });
     expect(record.claims).toContain("finish");
     expect(tile).toBe(256);
   });

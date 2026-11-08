@@ -35,7 +35,7 @@ describe("a session", () => {
     for (const { cell, to } of play(5, greedyPlayer, 40).swaps)
       session.swap(cell, to);
     const record = session.record();
-    expect(replayRecord(matchRules, record)).toEqual({
+    expect(replayRecord(matchRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
@@ -61,7 +61,7 @@ describe("a session", () => {
 describe("the sample run", () => {
   it("is accepted by the rules and earns the milestones it claims", () => {
     const record = sampleRun();
-    expect(replayRecord(matchRules, record)).toEqual({
+    expect(replayRecord(matchRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

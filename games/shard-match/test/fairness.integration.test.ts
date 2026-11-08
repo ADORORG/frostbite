@@ -107,7 +107,7 @@ describe("the game, played whole", () => {
       if (result === undefined || seed === undefined)
         throw new Error("no result");
       const made = record(result, seed);
-      expect(replayRecord(matchRules, made)).toEqual({
+      expect(replayRecord(matchRules, made)).toMatchObject({
         earned: made.claims,
         ok: true,
       });

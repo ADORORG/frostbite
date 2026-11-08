@@ -51,7 +51,11 @@ export interface LoadVerifiersOptions {
 }
 
 const outcomeSchema = z.union([
-  z.strictObject({ earned: z.array(z.string()), ok: z.literal(true) }),
+  z.strictObject({
+    earned: z.array(z.string()),
+    ok: z.literal(true),
+    score: z.int().min(0).nullable(),
+  }),
   z.strictObject({
     detail: z.string(),
     index: z.int().min(0).nullable(),

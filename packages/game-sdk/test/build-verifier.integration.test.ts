@@ -92,6 +92,7 @@ describe("publishing a game's rules", () => {
     expect(run(artifact.code, sample)).toEqual({
       earned: ["reached"],
       ok: true,
+      score: null,
     });
     expect(
       run(artifact.code, { ...sample, inputs: [{ type: "fly" }] }),

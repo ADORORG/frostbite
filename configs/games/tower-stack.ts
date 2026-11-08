@@ -155,7 +155,7 @@ export const towerStackGame = defineGame({
     replay: {
       id: "tower-stack",
       sha256:
-        "e819de285c8d1d63bf4bbb0eea69641688fdcfb8aa38f35be8764ffbbde67ad7",
+        "b81e60caeb09c3143c7e4e2c6cf55332fdfce27487d8b6408b4cd38e251740a8",
       version: 1,
     },
   },

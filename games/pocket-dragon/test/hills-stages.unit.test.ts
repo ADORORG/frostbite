@@ -137,7 +137,7 @@ describe("Egg Hills' milestones", () => {
   it("are what the sample run claims, and what replaying it through the published rules gives", () => {
     const sample = sampleRun();
     expect(sample.config).toEqual({ cabinet: "hills" });
-    expect(replayRecord(pocketDragonRules, sample)).toEqual({
+    expect(replayRecord(pocketDragonRules, sample)).toMatchObject({
       earned: sample.claims,
       ok: true,
     });

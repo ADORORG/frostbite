@@ -30,7 +30,8 @@
     "./simulated-chain-config": "./src/simulated-chain/config.ts",
     "./simulated-chain-transaction": "./src/simulated-chain/transaction.ts",
     "./simulated-game-host": "./src/simulated-game-host.ts",
-    "./storage-registry": "./src/storage-registry.ts"
+    "./storage-registry": "./src/storage-registry.ts",
+    "./verified-score": "./src/verified-score.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

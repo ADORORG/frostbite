@@ -63,7 +63,7 @@ describe("whether the game can be played", () => {
         verifier: "tower-stack",
         verifierVersion: 1,
       });
-      expect(outcome).toEqual({ earned: earnedBy(state), ok: true });
+      expect(outcome).toMatchObject({ earned: earnedBy(state), ok: true });
     }
   });
 });

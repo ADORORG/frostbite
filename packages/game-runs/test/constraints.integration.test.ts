@@ -42,6 +42,23 @@ describe("what the game_runs table refuses by itself", () => {
     );
   });
 
+  it("refuses a score on a run that is not verified, and a score below nothing", async () => {
+    const settled = { state: "submitted", submittedAt: new Date() };
+    await refused(
+      insert({ ...settled, score: 10, verdict: "rejected" }),
+      "game_runs_score_coherent",
+    );
+    await refused(
+      insert({ ...settled, score: 10, state: "issued", submittedAt: null }),
+      "game_runs_score_coherent",
+    );
+    await refused(
+      insert({ ...settled, score: -1, verdict: "verified" }),
+      "game_runs_score_coherent",
+    );
+    await insert({ ...settled, score: 0, verdict: "verified" });
+  });
+
   it("refuses a verdict that is not verified or rejected, and a digest that is not a SHA-256", async () => {
     await refused(
       insert({ state: "submitted", submittedAt: new Date(), verdict: "maybe" }),

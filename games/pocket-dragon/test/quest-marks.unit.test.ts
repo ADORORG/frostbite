@@ -74,7 +74,7 @@ describe("the whole quest played thoroughly", () => {
     const record = session.record();
     expect(record.claims).toContain("quest-all-eggs");
     expect(record.claims).not.toContain("quest-all-secrets");
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
@@ -88,7 +88,7 @@ describe("the whole quest played thoroughly", () => {
     expect(session.state().finishTick).not.toBeNull();
     const record = session.record();
     expect(record.claims).toContain("quest-all-secrets");
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

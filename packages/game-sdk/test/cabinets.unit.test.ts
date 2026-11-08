@@ -8,6 +8,7 @@ import type { GameVerifier, RunRecord } from "../src/run-record.ts";
 const counter: GameVerifier<number> = {
   earned: (total) => (total >= 2 ? ["counted"] : []),
   id: "counter",
+  score: (total) => total,
   init: (seed, config) =>
     Object.keys(config).length > 0
       ? {
@@ -63,24 +64,25 @@ describe("combined cabinets", () => {
         rules,
         record({ cabinet: "counter" }, [{ type: "add" }, { type: "add" }]),
       ),
-    ).toEqual({ earned: ["counted"], ok: true });
+    ).toEqual({ earned: ["counted"], ok: true, score: 2 });
     expect(
       replayRecord(
         rules,
         record({ cabinet: "words" }, [{ data: "hi", type: "say" }]),
       ),
-    ).toEqual({ earned: ["spoke"], ok: true });
+    ).toEqual({ earned: ["spoke"], ok: true, score: null });
   });
 
   it("starts the cabinet from the record's seed", () => {
     expect(
       replayRecord(rules, record({ cabinet: "counter" }, [{ type: "add" }], 1)),
-    ).toEqual({ earned: ["counted"], ok: true });
+    ).toEqual({ earned: ["counted"], ok: true, score: 2 });
     expect(
       replayRecord(rules, record({ cabinet: "counter" }, [{ type: "add" }], 0)),
     ).toEqual({
       earned: [],
       ok: true,
+      score: 1,
     });
   });
 

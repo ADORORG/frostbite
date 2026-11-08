@@ -12,7 +12,7 @@ import type {
 } from "@frostbite/game-sdk/run-record";
 
 import { maxTicks, verifierId, verifierVersion } from "./constants.ts";
-import { earnedBy } from "./milestones.ts";
+import { earnedBy, metres } from "./milestones.ts";
 import { advanceTo } from "./tick.ts";
 import type { RunnerState } from "./types.ts";
 import { startRunner } from "./world.ts";
@@ -72,6 +72,8 @@ export const runnerRules: GameVerifier<RunnerState> = {
       ? refuse(`no such setting: ${Object.keys(config)[0] ?? ""}`)
       : { ok: true, state: startRunner(seed) };
   },
+  // The run's score, once it has ended: the number the game shows and keeps as the player's best.
+  score: (state) => (state.ended ? metres(state) : null),
   step(state, input: RunInput) {
     if (state.ended) return refuse("the run has ended");
     switch (input.type) {
