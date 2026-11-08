@@ -1,4 +1,7 @@
-import { packageVitestConfig } from "@repo/vitest-config";
+import {
+  databaseTestTimeoutMs,
+  packageVitestConfig,
+} from "@repo/vitest-config";
 
 export default packageVitestConfig({
   coverage: {
@@ -24,6 +27,8 @@ export default packageVitestConfig({
     ],
   },
   environment: "node",
+  // The integration tests run against PostgreSQL, so they get the same allowance as every other database-backed package.
+  integrationTimeoutMs: databaseTestTimeoutMs,
   react: true,
   tsconfigPaths: true,
   tests: { integration: "{ts,tsx}", unit: "{ts,tsx}" },
