@@ -30,8 +30,10 @@ const config = defineShareConfig({
   hashtags: [],
   platforms: [
     {
+      accent: "#000000",
       id: "x",
       label: "X",
+      mark: "X",
       template: "https://x.example/post?text={text}&url={url}",
     },
   ],
@@ -55,9 +57,8 @@ const show = (
     />,
   );
 const shareTrigger = (root: ParentNode) =>
-  [...root.querySelectorAll("button")].find(
-    (b) => b.textContent === shareControlCopy.button,
-  ) ?? null;
+  [...root.querySelectorAll<HTMLButtonElement>("button.share-trigger")][0] ??
+  null;
 
 describe("sharing from the minted milestones page", () => {
   it("shares the shelf: makes the link only when asked, and posts the shelf's words with a link on this site", async () => {
@@ -67,10 +68,10 @@ describe("sharing from the minted milestones page", () => {
     expect(create).not.toHaveBeenCalled();
     click(shareTrigger(container));
     await settle(() =>
-      expect(container.querySelector(".menu-list a")).not.toBeNull(),
+      expect(container.querySelector("a.share-tile")).not.toBeNull(),
     );
     expect(create).toHaveBeenCalledExactlyOnceWith({ kind: "milestones" });
-    const href = (container.querySelector(".menu-list a") as HTMLAnchorElement)
+    const href = (container.querySelector("a.share-tile") as HTMLAnchorElement)
       .href;
     const post = new URL(href).searchParams;
     expect(post.get("text")).toBe(shareCopy.post.collection);
@@ -84,16 +85,21 @@ describe("sharing from the minted milestones page", () => {
       expect(container.querySelector(".trophy__button")).not.toBeNull(),
     );
     click(container.querySelector(".trophy__button"));
-    const dialog =
-      (await settle(() =>
-        expect(container.querySelector("dialog")?.hasAttribute("open")).toBe(
-          true,
-        ),
-      ),
-      container.querySelector("dialog") as HTMLElement);
-    click(shareTrigger(dialog));
+    // The page's own Share sheet is a dialog too, so the close-up is the one that holds the piece's details.
+    const closeUp = () =>
+      [...container.querySelectorAll("dialog")].find((candidate) =>
+        candidate.querySelector(".trophy-detail"),
+      );
+    await settle(() => expect(closeUp()?.hasAttribute("open")).toBe(true));
+    const dialog = closeUp() as HTMLElement;
+    // The button sits on the picture's corner: it is inside the art, so the close-up grows no taller for it.
+    const trigger = dialog.querySelector<HTMLButtonElement>(
+      ".trophy-detail__art .share-trigger",
+    );
+    expect(trigger?.getAttribute("aria-label")).toBe(shareControlCopy.button);
+    click(trigger);
     await settle(() =>
-      expect(dialog.querySelector(".menu-list a")).not.toBeNull(),
+      expect(dialog.querySelector("a.share-tile")).not.toBeNull(),
     );
     expect(create).toHaveBeenCalledExactlyOnceWith({
       gameId: rewardsGame.id,
@@ -101,7 +107,7 @@ describe("sharing from the minted milestones page", () => {
       milestoneId: milestone?.id,
     });
     const post = new URL(
-      (dialog.querySelector(".menu-list a") as HTMLAnchorElement).href,
+      (dialog.querySelector("a.share-tile") as HTMLAnchorElement).href,
     ).searchParams;
     expect(post.get("text")).toBe(
       shareCopy.post.milestone(milestone?.title ?? "", rewardsGame.title),

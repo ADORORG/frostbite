@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   createShareRoute,
   gameSyncRoute,
+  getSharedPictureRoute,
   getMintedPictureRoute,
   listGameClaimsRoute,
   listMintedMilestonesRoute,
@@ -119,6 +120,7 @@ describe("the games feature registration", () => {
         getMintedPictureRoute,
         createShareRoute,
         revokeShareRoute,
+        getSharedPictureRoute,
       ],
     });
     // Only a signed-in player has milestones: the page is not public, so the platform sends everyone else to sign in.

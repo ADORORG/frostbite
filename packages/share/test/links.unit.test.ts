@@ -59,7 +59,13 @@ describe("a configuration", () => {
   const good = {
     hashtags: [],
     platforms: [
-      { id: "a", label: "A", template: "https://a.example/?u={url}" },
+      {
+        accent: "#112233",
+        id: "a",
+        label: "A",
+        mark: "a",
+        template: "https://a.example/?u={url}",
+      },
     ],
   };
 
@@ -73,7 +79,13 @@ describe("a configuration", () => {
       {
         ...good,
         platforms: [
-          { id: "a", label: "A", template: "http://a.example/?u={url}" },
+          {
+            accent: "#112233",
+            id: "a",
+            label: "A",
+            mark: "a",
+            template: "http://a.example/?u={url}",
+          },
         ],
       },
     ],
@@ -82,7 +94,13 @@ describe("a configuration", () => {
       {
         ...good,
         platforms: [
-          { id: "a", label: "A", template: "https://a.example/?t={text}" },
+          {
+            accent: "#112233",
+            id: "a",
+            label: "A",
+            mark: "a",
+            template: "https://a.example/?t={text}",
+          },
         ],
       },
     ],

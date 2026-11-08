@@ -7,13 +7,15 @@ the link (`makeLink`) and supplies the words (`text`).
 ## Public API
 
 - `defineShareConfig({ hashtags, platforms })`: checks a configuration when it is made and returns it. Each platform has an `id`, a
-  `label`, a `template` (an https address with `{url}`, `{text}` or `{textAndUrl}`, filled in percent-encoded) and an optional
+  `label`, an `accent` colour and a short `mark` for its tile, a `template` (an https address with `{url}`, `{text}` or `{textAndUrl}`, filled in percent-encoded) and an optional
   `maxTextLength`. A wrong template stops the platform at start. The platform's own list lives in `configs/share.ts`.
 - `platformLink(platform, { hashtags, text, url })`: the address that opens a destination with the post ready to send.
 - `fitText(content, maxTextLength)`: the words cut to a destination's limit, the link counted at `countedLinkLength` and the hashtags kept whole.
-- `ShareButton` (`@frostbite/share/react`): opens a panel under the button (never a blocking dialog, nothing opens by itself). The panel
-  makes the link when it is opened, then offers the device's own share sheet first on a touch screen, the configured destinations, and
-  a copy-link button that says whether it worked (and shows the address to copy by hand when the browser refuses).
+- `ShareButton` (`@frostbite/share/react`): a small button (or a round one with the mark alone, to sit on a picture) that opens a sheet:
+  a bottom sheet on a phone, a dialog on a desktop, so it never makes the thing it sits on longer, and nothing opens by itself. The
+  sheet says what is being shared (`heading`, `kicker`, an optional picture), shows a coloured tile for each configured destination
+  at once (dimmed while the link is made, then links), the device's own share sheet first on a touch screen, and a link bar with a
+  Copy button that says whether it worked (and the address stays selectable when the browser refuses).
 - `shareControlCopy`: the control's own words.
 
 ## Invariants

@@ -35,8 +35,18 @@ function PieceShare({
   return (
     <ShareControl
       api={api}
+      art={
+        <MintedArt
+          claimId={piece.claimId}
+          cover={shelf.cover?.image ?? null}
+          name={piece.title}
+        />
+      }
       config={config}
+      heading={piece.title}
+      kicker={shelf.gameTitle}
       request={request}
+      variant="icon"
       text={shareCopy.post.milestone(piece.title, shelf.gameTitle)}
     />
   );
@@ -71,6 +81,14 @@ export function TrophyDialog({
               explain
               name={piece.title}
             />
+            <span className="trophy-detail__share">
+              <PieceShare
+                api={sharesApi}
+                config={share}
+                piece={piece}
+                shelf={open.shelf}
+              />
+            </span>
           </div>
           {piece.description === "" ? null : <p>{piece.description}</p>}
           <KeyValueList
@@ -87,12 +105,6 @@ export function TrophyDialog({
               },
             ]}
             label={mintedCopy.title}
-          />
-          <PieceShare
-            api={sharesApi}
-            config={share}
-            piece={piece}
-            shelf={open.shelf}
           />
         </div>
       )}

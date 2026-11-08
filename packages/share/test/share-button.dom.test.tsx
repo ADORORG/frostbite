@@ -6,100 +6,119 @@ import { ShareButton } from "../src/share-button.tsx";
 import { config } from "./fixtures.ts";
 
 const url = "https://play.example/s/abc";
-const triggerOf = (container: HTMLElement) => {
-  const trigger = container.querySelector("button");
-  if (trigger === null) throw new Error("no trigger");
-  return trigger;
-};
-const items = (container: HTMLElement) =>
-  [...container.querySelectorAll(".menu-list .menu-link")].map(
-    (item) => item.textContent,
-  );
+const props = { heading: "Frost Walker", kicker: "Milestone", text: "Look" };
+const trigger = (container: HTMLElement) =>
+  container.querySelector<HTMLButtonElement>("button.share-trigger");
+const tiles = (container: HTMLElement) => [
+  ...container.querySelectorAll(".share-tile"),
+];
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  Reflect.deleteProperty(navigator, "share");
 });
 
 describe("the share control", () => {
-  it("makes no link until it is pressed, then one, and shows the destinations", async () => {
+  it("is a small button that makes no link until it is pressed", async () => {
     const makeLink = vi.fn(async () => url);
     const container = await mount(
-      <ShareButton config={config} makeLink={makeLink} text="Look" />,
+      <ShareButton config={config} makeLink={makeLink} {...props} />,
     );
     expect(makeLink).not.toHaveBeenCalled();
-    expect(textOf(container)).toBe(shareControlCopy.button);
-    await click(triggerOf(container));
-    await settle(() =>
-      expect(items(container)).toEqual(["X", "Chat", shareControlCopy.copy]),
+    expect(textOf(trigger(container) as HTMLElement)).toBe(
+      shareControlCopy.button,
     );
-    expect(makeLink).toHaveBeenCalledTimes(1);
-    const hrefs = [...container.querySelectorAll("a")].map((a) => a.href);
-    expect(new URL(hrefs[0] ?? "").searchParams.get("url")).toBe(url);
-    for (const a of container.querySelectorAll("a")) {
-      expect(a.target).toBe("_blank");
-      expect(a.rel).toBe("noopener noreferrer");
-    }
   });
 
-  it("says so while the link is being made, and when it could not be", async () => {
-    let fail: () => void = () => undefined;
-    const makeLink = vi.fn(
-      () =>
-        new Promise<string | null>(
-          (_ok, reject) => (fail = () => reject(new Error("down"))),
-        ),
-    );
+  it("opens a sheet that says what is shared, shows its tiles at once, and turns them into links when the link is made", async () => {
+    let resolve: (value: string) => void = () => undefined;
+    const makeLink = vi.fn(() => new Promise<string>((ok) => (resolve = ok)));
     const container = await mount(
-      <ShareButton config={config} makeLink={makeLink} text="Look" />,
+      <ShareButton
+        art={<b>art</b>}
+        config={config}
+        makeLink={makeLink}
+        {...props}
+      />,
     );
-    await click(triggerOf(container));
+    click(trigger(container));
+    await settle(() => expect(tiles(container)).toHaveLength(2));
+    expect(textOf(container)).toContain("Frost Walker");
+    expect(textOf(container)).toContain("Milestone");
     expect(textOf(container)).toContain(shareControlCopy.preparing);
-    fail();
+    // Waiting: the tiles are there but are not links yet.
+    expect(container.querySelectorAll("a.share-tile")).toHaveLength(0);
+    expect(makeLink).toHaveBeenCalledTimes(1);
+    resolve(url);
     await settle(() =>
-      expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+      expect(container.querySelectorAll("a.share-tile")).toHaveLength(2),
+    );
+    const first = container.querySelector<HTMLAnchorElement>("a.share-tile");
+    expect(new URL(first?.href ?? "").searchParams.get("url")).toBe(url);
+    expect(first?.target).toBe("_blank");
+    expect(first?.rel).toBe("noopener noreferrer");
+    expect(
+      container.querySelector<HTMLInputElement>(".share-link input")?.value,
+    ).toBe(url);
+  });
+
+  it("gives each tile its colour and a readable mark", async () => {
+    const container = await mount(
+      <ShareButton config={config} makeLink={async () => url} {...props} />,
+    );
+    click(trigger(container));
+    await settle(() => expect(tiles(container)).toHaveLength(2));
+    const marks = [
+      ...container.querySelectorAll<HTMLElement>(".share-tile__mark"),
+    ];
+    expect(marks.map((mark) => mark.textContent)).toEqual(["X", "ch"]);
+    expect(marks.map((mark) => mark.dataset.ink)).toEqual(["light", "dark"]);
+  });
+
+  it("says so when the link could not be made, or came back empty", async () => {
+    const failing = await mount(
+      <ShareButton
+        config={config}
+        makeLink={async () => Promise.reject(new Error("down"))}
+        {...props}
+      />,
+    );
+    click(trigger(failing));
+    await settle(() =>
+      expect(failing.querySelector('[role="alert"]')?.textContent).toBe(
         shareControlCopy.linkFailed,
       ),
     );
-    expect(container.querySelector("a")).toBeNull();
-  });
-
-  it("treats a link that came back empty as a failure", async () => {
-    const container = await mount(
-      <ShareButton config={config} makeLink={async () => null} text="Look" />,
+    const empty = await mount(
+      <ShareButton config={config} makeLink={async () => null} {...props} />,
     );
-    await click(triggerOf(container));
+    click(trigger(empty));
     await settle(() =>
-      expect(textOf(container)).toContain(shareControlCopy.linkFailed),
+      expect(textOf(empty)).toContain(shareControlCopy.linkFailed),
     );
+    expect(empty.querySelector("a.share-tile")).toBeNull();
   });
 
-  it("copies the link and says so; when copying is refused it shows the address to copy by hand", async () => {
+  it("copies the link and says so; when copying is refused it says that instead", async () => {
     const writeText = vi.fn(async () => undefined);
     vi.stubGlobal("navigator", { clipboard: { writeText } });
     const container = await mount(
-      <ShareButton config={config} makeLink={async () => url} text="Look" />,
+      <ShareButton config={config} makeLink={async () => url} {...props} />,
     );
-    await click(triggerOf(container));
-    await settle(() =>
-      expect(items(container)).toContain(shareControlCopy.copy),
-    );
+    click(trigger(container));
     const copy = () =>
-      [...container.querySelectorAll("button")].find(
-        (b) => b.textContent === shareControlCopy.copy,
-      ) ?? null;
-    await click(copy());
+      container.querySelector<HTMLButtonElement>(".share-link button");
+    await settle(() => expect(copy()).not.toBeNull());
+    click(copy());
     await settle(() =>
       expect(textOf(container)).toContain(shareControlCopy.copied),
     );
     expect(writeText).toHaveBeenCalledWith(url);
-
+    expect(copy()?.dataset.copied).toBe("true");
     writeText.mockRejectedValueOnce(new Error("blocked"));
-    await click(copy());
+    click(copy());
     await settle(() =>
       expect(textOf(container)).toContain(shareControlCopy.copyFailed),
     );
-    expect(container.querySelector("input")?.value).toBe(url);
   });
 
   it("offers the device's own sheet first on a touch screen, and shares the words and the link", async () => {
@@ -109,13 +128,14 @@ describe("the share control", () => {
       matches: query === "(pointer: coarse)",
     }));
     const container = await mount(
-      <ShareButton config={config} makeLink={async () => url} text="Look" />,
+      <ShareButton config={config} makeLink={async () => url} {...props} />,
     );
-    await click(triggerOf(container));
+    click(trigger(container));
     await settle(() =>
-      expect(items(container)[0]).toBe(shareControlCopy.nativeTitle),
+      expect(container.querySelector(".share-tile--native")).not.toBeNull(),
     );
-    await click(container.querySelector(".menu-list button"));
+    expect(tiles(container)[0]?.className).toContain("share-tile--native");
+    click(container.querySelector(".share-tile--native"));
     expect(share).toHaveBeenCalledWith({
       text: "Look",
       title: shareControlCopy.nativeTitle,
@@ -123,30 +143,46 @@ describe("the share control", () => {
     });
   });
 
-  it("does not offer the device's sheet on a pointer screen, even when the browser has one", async () => {
+  it("does not offer the device's sheet on a pointer screen, and is quiet when a person closes it", async () => {
     vi.stubGlobal("navigator", { clipboard: {}, share: vi.fn() });
     vi.stubGlobal("matchMedia", () => ({ matches: false }));
-    const container = await mount(
-      <ShareButton config={config} makeLink={async () => url} text="Look" />,
+    const pointer = await mount(
+      <ShareButton config={config} makeLink={async () => url} {...props} />,
     );
-    await click(triggerOf(container));
-    await settle(() => expect(items(container)[0]).toBe("X"));
-  });
+    click(trigger(pointer));
+    await settle(() =>
+      expect(pointer.querySelectorAll("a.share-tile")).toHaveLength(2),
+    );
+    expect(pointer.querySelector(".share-tile--native")).toBeNull();
 
-  it("is quiet when a person closes the device's sheet", async () => {
     const share = vi.fn(async () => {
       throw new DOMException("closed", "AbortError");
     });
     vi.stubGlobal("navigator", { clipboard: {}, share });
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
-    const container = await mount(
-      <ShareButton config={config} makeLink={async () => url} text="Look" />,
+    const touch = await mount(
+      <ShareButton config={config} makeLink={async () => url} {...props} />,
     );
-    await click(triggerOf(container));
+    click(trigger(touch));
     await settle(() =>
-      expect(items(container)[0]).toBe(shareControlCopy.nativeTitle),
+      expect(touch.querySelector(".share-tile--native")).not.toBeNull(),
     );
-    await click(container.querySelector(".menu-list button"));
-    expect(container.querySelector('[role="alert"]')).toBeNull();
+    click(touch.querySelector(".share-tile--native"));
+    expect(touch.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it("can be a round button with the mark alone, named for a screen reader", async () => {
+    const container = await mount(
+      <ShareButton
+        config={config}
+        makeLink={async () => url}
+        variant="icon"
+        {...props}
+      />,
+    );
+    const button = trigger(container);
+    expect(button?.dataset.variant).toBe("icon");
+    expect(button?.getAttribute("aria-label")).toBe(shareControlCopy.button);
+    expect(button?.textContent).toBe("");
   });
 });

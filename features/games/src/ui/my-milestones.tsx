@@ -22,7 +22,7 @@ import {
 import type { MintedApi } from "../client/minted-api.ts";
 import type { SharesApi } from "../client/shares-api.ts";
 import { GamesFrame } from "./games-frame.tsx";
-import { GameShelf } from "./game-shelf.tsx";
+import { Album } from "./album.tsx";
 import { ShelfSummary } from "./shelf-summary.tsx";
 import { TrophyDialog } from "./trophy-dialog.tsx";
 import { ShareControl } from "./share-control.tsx";
@@ -68,6 +68,8 @@ export function MyMilestones({
           <ShareControl
             api={sharesApi}
             config={share}
+            heading={mintedCopy.title}
+            kicker={shareCopy.collectionKicker}
             request={shelfRequest}
             text={shareCopy.post.collection}
           />
@@ -95,13 +97,10 @@ export function MyMilestones({
       ) : (
         <ExplorerBoundary txUrl={explorerTxUrl}>
           <ShelfSummary stats={shelfStats(state.minted, games)} />
-          {shelves(state.minted, games, gameHref).map((shelf) => (
-            <GameShelf
-              key={shelf.gameId}
-              onOpen={(piece) => setOpen({ piece, shelf })}
-              shelf={shelf}
-            />
-          ))}
+          <Album
+            all={shelves(state.minted, games, gameHref)}
+            onOpen={(piece, shelf) => setOpen({ piece, shelf })}
+          />
           <TrophyDialog
             onClose={() => setOpen(null)}
             open={open}

@@ -8,6 +8,9 @@ import { Trophy } from "./trophy.tsx";
 
 // One game's shelf: its cover and name, one segment of progress for each of its milestones, the pieces minted, and what is still to
 // earn kept small and out of the way (open when nothing has been minted yet, so a new player sees what the game offers).
+// The most places still to fill that a shelf draws, so a game with many milestones stays one screen; the rest are counted.
+const lockedLimit = 5;
+
 export function GameShelf({
   onOpen,
   shelf,
@@ -22,6 +25,14 @@ export function GameShelf({
       className="shelf"
     >
       <header className="shelf__head">
+        {cover === null ? null : (
+          <img
+            alt=""
+            aria-hidden="true"
+            className="shelf__banner"
+            src={cover}
+          />
+        )}
         <span className="shelf__cover">
           <ArcadePreview
             alt=""
@@ -30,7 +41,7 @@ export function GameShelf({
             video={null}
           />
         </span>
-        <div>
+        <div className="shelf__title">
           <h3>
             <a href={shelf.gameHref}>{shelf.gameTitle}</a>
           </h3>
@@ -46,29 +57,43 @@ export function GameShelf({
           ))}
         </span>
       </header>
-      {shelf.pieces.length === 0 ? null : (
-        <ul className="shelf__row">
-          {shelf.pieces.map((piece) => (
-            <Trophy
-              cover={cover}
-              gameTitle={shelf.gameTitle}
-              key={piece.claimId}
-              onOpen={(opened) => onOpen(opened, shelf)}
-              piece={piece}
-            />
-          ))}
-        </ul>
-      )}
-      {shelf.missing.length === 0 ? null : (
-        <details className="shelf__locked" open={shelf.pieces.length === 0}>
-          <summary>{mintedCopy.stillToEarn(shelf.missing.length)}</summary>
-          <ul>
-            {shelf.missing.map(({ milestoneId, title }) => (
-              <li key={milestoneId}>{title}</li>
-            ))}
-          </ul>
-        </details>
-      )}
+      <ul className="shelf__row">
+        {shelf.pieces.map((piece) => (
+          <Trophy
+            cover={cover}
+            gameTitle={shelf.gameTitle}
+            key={piece.claimId}
+            onOpen={(opened) => onOpen(opened, shelf)}
+            piece={piece}
+          />
+        ))}
+        {shelf.missing.slice(0, lockedLimit).map(({ milestoneId, title }) => (
+          <li
+            aria-label={mintedCopy.lockedSlot(title)}
+            className="trophy trophy--missing"
+            key={milestoneId}
+          >
+            <span
+              aria-hidden="true"
+              className="trophy__art trophy__art--locked"
+            >
+              <span className="trophy__lock">?</span>
+              <span className="trophy__strip">
+                <strong>{title}</strong>
+              </span>
+            </span>
+          </li>
+        ))}
+        {shelf.missing.length <= lockedLimit ? null : (
+          <li className="trophy trophy--missing trophy--more">
+            <span className="trophy__art trophy__art--locked">
+              <strong>
+                {mintedCopy.moreToEarn(shelf.missing.length - lockedLimit)}
+              </strong>
+            </span>
+          </li>
+        )}
+      </ul>
     </section>
   );
 }

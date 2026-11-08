@@ -16,6 +16,20 @@ export const mintedCopy = {
   minted: (day: string) => `Minted ${day}`,
   mintedProgress: (earned: number, total: number) =>
     `${String(earned)} of ${String(total)} minted`,
+  byGame: "By game",
+  emptyGames: (count: number) =>
+    `Games with nothing minted yet (${String(count)})`,
+  hideEmptyGames: "Hide games with nothing minted",
+  latestRow: "Latest",
+  moreToEarn: (count: number) => `+${String(count)} more to earn`,
+  railLabel: "Choose a game",
+  railTile: (title: string, minted: number, total: number) =>
+    `${title}: ${String(minted)} of ${String(total)} minted`,
+  statGames: (games: number) => (games === 1 ? "game" : "games"),
+  statLatest: "Latest",
+  statMilestones: (pieces: number) =>
+    pieces === 1 ? "milestone" : "milestones",
+  lockedSlot: (title: string) => `${title}: not minted yet`,
   stillToEarn: (count: number) => `${String(count)} still to earn`,
   standIn: "No picture",
   openGame: "Open game",

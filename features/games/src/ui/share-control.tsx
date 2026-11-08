@@ -3,7 +3,7 @@
 import type { ShareConfig } from "@frostbite/share";
 import { ShareButton } from "@frostbite/share/react";
 import type { CreateShareInput } from "@frostbite/shared/games";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 
 import { createSharesApi, type SharesApi } from "../client/shares-api.ts";
 
@@ -15,14 +15,23 @@ const absolute = (path: string) => new URL(path, window.location.origin).href;
 // is switched on by supplying one.
 export function ShareControl({
   api,
+  art,
   config,
+  heading,
+  kicker,
   request,
   text,
+  variant,
 }: {
   readonly api?: SharesApi | undefined;
+  // A picture of what is shared, and what it is called, for the sheet's header.
+  readonly art?: ReactNode;
   readonly config?: ShareConfig | undefined;
+  readonly heading: string;
+  readonly kicker: string;
   readonly request: CreateShareInput;
   readonly text: string;
+  readonly variant?: "button" | "icon";
 }) {
   const shares = useMemo(() => api ?? createSharesApi(), [api]);
   // The control asks for its link when it opens, and again if this function changes, so `request` must be the same object for the same
@@ -32,5 +41,15 @@ export function ShareControl({
     return answer.status === "shared" ? absolute(answer.path) : null;
   }, [request, shares]);
   if (config === undefined) return null;
-  return <ShareButton config={config} makeLink={makeLink} text={text} />;
+  return (
+    <ShareButton
+      {...(art === undefined ? {} : { art })}
+      config={config}
+      heading={heading}
+      kicker={kicker}
+      makeLink={makeLink}
+      text={text}
+      {...(variant === undefined ? {} : { variant })}
+    />
+  );
 }

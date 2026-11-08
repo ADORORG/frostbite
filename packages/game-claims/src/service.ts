@@ -257,6 +257,9 @@ export function createGameClaimsService(dependencies: GameClaimsDependencies) {
 
     picture: (userId: string, claimId: string) => readPicture(userId, claimId),
 
+    // How many players have minted each of a game's milestones (completed claims only), for a public page to say how rare one is.
+    mintCounts: (gameId: string) => repository.completeCounts(gameId),
+
     // What the player has minted across games: only claims the network's records show complete.
     async minted(userId: string): Promise<readonly MintedClaim[]> {
       return (await repository.listComplete(userId)).flatMap((claim) =>

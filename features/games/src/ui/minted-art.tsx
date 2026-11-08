@@ -14,13 +14,16 @@ export function MintedArt({
   cover,
   explain = false,
   name,
+  src: given,
 }: {
   readonly claimId: string;
   readonly cover: string | null;
   readonly explain?: boolean;
   readonly name: string;
+  // Where the picture is, when it is not the player's own (a shared page asks through the link, not the account).
+  readonly src?: string;
 }) {
-  const src = mintedPictureHref(claimId);
+  const src = given ?? mintedPictureHref(claimId);
   const { onError, onLoad, state } = useImageState(src);
   return (
     <div className="minted-art" data-picture={state}>

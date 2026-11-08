@@ -90,6 +90,9 @@ export interface GameClaimRepository {
   list(userId: string, gameId: string): Promise<readonly StoredClaim[]>;
   // Every claim of the player's that the network's records show complete, in any game, the most recently completed first.
   listComplete(userId: string): Promise<readonly StoredClaim[]>;
+  // How many claims of each of a game's milestones the network's records show complete, across all players: only milestones with at
+  // least one appear.
+  completeCounts(gameId: string): Promise<ReadonlyMap<string, number>>;
   update(
     userId: string,
     claimId: string,

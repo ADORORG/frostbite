@@ -25,7 +25,13 @@ describe("a deployment's share configuration", () => {
       defineShareConfig({
         hashtags: [],
         platforms: [
-          { id: "a", label: "A", template: "https://a.example/?t={text}" },
+          {
+            accent: "#112233",
+            id: "a",
+            label: "A",
+            mark: "a",
+            template: "https://a.example/?t={text}",
+          },
         ],
       }),
     ).toThrow(/must carry the link/u);

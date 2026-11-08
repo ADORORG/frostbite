@@ -74,6 +74,28 @@ export const revokeShareRoute = {
   path: "/api/v1/games/shares/revoke",
 } as const;
 
+// The picture of one of the sharer's minted milestones, for the public page of a link that shows it. It is asked with the link's own
+// identifier, and answers only for a claim that is the sharer's and that the link shows; anything else is "not found". A file, not JSON.
+export const sharedPictureContentTypes = ["image/svg+xml"] as const;
+export const getSharedPictureInputSchema = z
+  .object({ claimId: z.uuid(), id: shareIdSchema })
+  .strict();
+export const getSharedPictureFileSchema = z
+  .object({
+    bytes: z.custom<Uint8Array>((value) => value instanceof Uint8Array),
+    contentType: z.enum(sharedPictureContentTypes),
+  })
+  .strict();
+export type GetSharedPictureInput = z.infer<typeof getSharedPictureInputSchema>;
+export type GetSharedPictureFile = z.infer<typeof getSharedPictureFileSchema>;
+export const getSharedPictureRoute = {
+  method: "GET",
+  operationId: "getSharedPicture",
+  path: "/api/v1/games/shares/picture",
+} as const;
+export const sharedPictureHref = (id: string, claimId: string) =>
+  `${getSharedPictureRoute.path}?${new URLSearchParams({ claimId, id }).toString()}`;
+
 // A shared page, and the picture its link preview shows. The platform path is one source for the page registration, the manifest and
 // the browser tests; `id` is the link's identifier.
 export const sharedPagePath = "/s/[id]";

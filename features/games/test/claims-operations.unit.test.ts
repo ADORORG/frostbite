@@ -27,6 +27,7 @@ function stub(overrides: Partial<GameClaimsService> = {}) {
   const service: GameClaimsService = {
     list: vi.fn(async () => [view()]),
     minted: vi.fn(async () => []),
+    mintCounts: vi.fn(async () => new Map<string, number>()),
     picture: vi.fn(async () => ({
       code: "no-picture" as const,
       ok: false as const,

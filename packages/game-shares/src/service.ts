@@ -20,6 +20,11 @@ export interface GameSharesService {
   create(userId: string, request: ShareRequest): Promise<ShareOutcome>;
   // The public view of a live share, or null for one that never was, was ended, or is not an identifier.
   get(id: string): Promise<SharedThing | null>;
+  // The same, with whose it is, for the server that builds the page: the owner is what its pictures and counts are read for, and is never
+  // sent to a visitor.
+  find(
+    id: string,
+  ): Promise<{ readonly owner: string; readonly thing: SharedThing } | null>;
   revoke(userId: string, id: string): Promise<boolean>;
 }
 
@@ -80,6 +85,12 @@ export function createGameSharesService(options: {
       };
     },
     get: async (id) => (await options.repository.get(id))?.thing ?? null,
+    find: async (id) => {
+      const share = await options.repository.get(id);
+      return share === null
+        ? null
+        : { owner: share.userId, thing: share.thing };
+    },
     revoke: (userId, id) =>
       options.repository.revoke(userId, id, options.clock()),
   };

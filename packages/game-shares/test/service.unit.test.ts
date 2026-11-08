@@ -123,6 +123,34 @@ describe("sharing a score and the case", () => {
   });
 });
 
+describe("finding a share for the server", () => {
+  it("gives the thing with its owner, and nothing for a share that is not live", async () => {
+    const stored = {
+      createdAt: now,
+      id: "x",
+      thing: { kind: "milestones" as const },
+      userId: owner,
+    };
+    const repository: GameShareRepository = {
+      createOrGet: vi.fn(),
+      get: vi.fn(async (id: string) => (id === "x" ? stored : null)),
+      revoke: vi.fn(),
+    };
+    const service = createGameSharesService({
+      clock: () => now,
+      games: new Map(),
+      level: async () => null,
+      newId: () => "y",
+      repository,
+    });
+    expect(await service.find("x")).toEqual({
+      owner,
+      thing: { kind: "milestones" },
+    });
+    expect(await service.find("gone")).toBeNull();
+  });
+});
+
 describe("reading and ending a share", () => {
   it("passes the clock to a revoke and answers with the thing alone", async () => {
     const { repository, service } = setup(null);

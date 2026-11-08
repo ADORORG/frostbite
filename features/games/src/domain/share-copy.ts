@@ -23,6 +23,37 @@ export const shareCopy = {
   scoreKicker: "Score",
   scoreSubtitle: "Can you beat it?",
   scoreTitle: (score: string, game: string) => `${score} in ${game}`,
+  // The page a link opens.
+  page: {
+    criteria: "How it is earned",
+    description: "What it is",
+    mintCountLabel: (count: number) =>
+      count === 1 ? "player has minted this" : "players have minted this",
+    minted: (day: string) => `Minted ${day}`,
+    moreOnShelf: (count: number) =>
+      `+${count.toLocaleString("en-US")} more on this shelf`,
+    mintedBadge: "Minted",
+    milestoneKicker: "Milestone unlocked",
+    milestoneCta: {
+      body: "Play it, earn it, and make it yours.",
+      title: "Think you can earn it?",
+    },
+    scoreCta: {
+      body: "Take the same game for a run and see where you land.",
+      title: "Think you can beat it?",
+    },
+    scoreKicker: "High score",
+    scoreLabel: "points",
+    shelfCta: {
+      button: "Start playing",
+      body: "Play games, earn milestones, and mint them to a shelf of your own.",
+      title: "Build a shelf of your own",
+    },
+    shelfKicker: "Trophy shelf",
+    shelfTitle: (pieces: number, games: number) =>
+      `${pieces.toLocaleString("en-US")} ${pieces === 1 ? "milestone" : "milestones"} from ${games.toLocaleString("en-US")} ${games === 1 ? "game" : "games"}`,
+    inGame: "in",
+  },
   verification: {
     "replay-verified": "Verified by replay",
     "self-reported": "Self-reported",
