@@ -265,8 +265,8 @@ marks on the way (the same as each level played alone) and six of its own: winni
 one heart left, winning in ten minutes or less, winning with every egg (Egg Hills' three golden eggs, all eight of the castle's night eggs
 saved and every egg of the woods' maze), and winning after visiting all six of Egg Hills' secret areas. Some are earned on the same tick as
 a level's clear, but each asks for something more than the clear. The words are in the manifest, and the drawing each becomes on chain
-is in `milestone-drawings.md`, after the admins' guide to what a drawing may hold (`milestone-drawings.svg` shows all 40 framed, for
-review). The list and the drawings are a draft for the owner to approve.
+is in `milestone-arts/`, numbered in the manifest's order (`1.svg` is First egg, `40.svg` is Metaplasma). The list and the drawings are a
+draft for the owner to approve.
 
 ## Fairness
 

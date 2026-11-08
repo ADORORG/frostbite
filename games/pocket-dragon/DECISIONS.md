@@ -74,8 +74,8 @@ playing through. On a touch screen the title is hidden, so for now it opens only
 ## 3. The milestones (wanted: sign-off)
 
 There are forty milestones, the platform's most, all decided by run state alone. They are listed in `configs/games/pocket-dragon.ts`
-and described in the README, and `milestone-drawings.md` has the drawing each becomes on chain (each passes the platform's drawing check
-unchanged; the largest is 3,765 bytes). The titles, the summary and the drawings are a draft. **Wanted:** the owner's sign-off on the
+and described in the README, and `milestone-arts/` has the drawing each becomes on chain, numbered in the manifest's order (each passes
+the platform's drawing check unchanged; the largest is 3,765 bytes). The titles, the summary and the drawings are a draft. **Wanted:** the owner's sign-off on the
 list, its titles, its words and its drawings once the game has been played on a phone. Changing a milestone after it is published is not
 allowed, and a defined milestone's drawing never changes, so this has to happen first.
 
