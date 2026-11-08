@@ -1,3 +1,4 @@
+import type { ShareConfig } from "@frostbite/share";
 import { gamesPath } from "@frostbite/shared/games";
 import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import {
@@ -26,10 +27,13 @@ import { WalletGamePlayer } from "./wallet-game-player.tsx";
 export function GameDetail({
   game,
   navigation,
+  share,
   wallet,
 }: {
   readonly game: PublicGame;
   readonly navigation: readonly NavigationItem[];
+  // Where a link can be shared; without it nothing in the page can be.
+  readonly share?: ShareConfig;
   readonly wallet: GameWalletConfig;
 }) {
   const about = (
@@ -92,6 +96,7 @@ export function GameDetail({
       : []),
   ];
   const player = {
+    ...(share === undefined ? {} : { share }),
     back: (
       <a className="arcade-stage__back" href={gamesPath}>
         ← All games

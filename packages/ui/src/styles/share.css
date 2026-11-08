@@ -51,6 +51,19 @@
   box-shadow: 0 0 1.5rem rgb(255 210 63 / 65%);
 }
 
+/* In a thin bar: the words, small, on one line. */
+.share-trigger[data-variant="chip"] {
+  min-block-size: 1.75rem;
+  padding: 0.125rem var(--arcade-space-3);
+  box-shadow: 0.125rem 0.125rem 0 var(--arcade-ink);
+  font-size: 0.5625rem;
+  white-space: nowrap;
+}
+.share-trigger[data-variant="chip"] .share-glyph {
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+}
+
 .share-sheet {
   display: grid;
   gap: var(--arcade-space-4);

@@ -31,7 +31,7 @@ export function ShareControl({
   readonly kicker: string;
   readonly request: CreateShareInput;
   readonly text: string;
-  readonly variant?: "button" | "icon";
+  readonly variant?: "button" | "chip" | "icon";
 }) {
   const shares = useMemo(() => api ?? createSharesApi(), [api]);
   // The control asks for its link when it opens, and again if this function changes, so `request` must be the same object for the same

@@ -14,6 +14,7 @@ export function GameBar({
   immersive,
   meta,
   saveText,
+  share,
   theatre,
   title,
 }: {
@@ -29,6 +30,8 @@ export function GameBar({
   readonly meta?: ReactNode;
   // Where the progress is, said only as far as it is true.
   readonly saveText: string;
+  // What the player may share right now (a new best), as a small control; none when there is nothing to share.
+  readonly share?: ReactNode;
   readonly theatre: Theatre;
   readonly title: string;
 }) {
@@ -49,6 +52,7 @@ export function GameBar({
         {saveText}
       </span>
       <span className="arcade-stage__bar-end">
+        {share}
         {fullscreen.refused ? (
           <span role="status">
             The browser did not allow full screen. Try again, or use the

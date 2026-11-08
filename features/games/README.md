@@ -47,6 +47,15 @@ picture a link preview shows. Both are made from the same `sharedView` (`domain/
 ended, never was, names a game that is no longer listed or a milestone it no longer declares, shows "not shared" and gives previews no
 metadata. A preview picture is cached for up to an hour at the edge, so an ended link's picture can be seen for that long.
 
+### Sharing a new best and a held milestone (SHARE-1d)
+
+In a game, the platform reads the best score from the progress the game saves (`{ best }`, the SDK's `Progress`), so no game has to say it:
+the best the game loaded is the bar, and a save that beats it is a new best (`domain/best-score.ts`, watched in `use-game-session.ts`).
+A signed-in player whose progress is on their account (`sync === "account"`) then gets a small **Share** chip in the game's top bar, outside
+the picture and never over the play area, that shares that score; the page it opens calls it self-reported, because no replay verifier
+returns a score. A milestone the player holds has the same chip on its card in the game's milestone list. A player with no account sees
+neither, because a link is made from the account's own records.
+
 ## The Minted gallery (M2)
 
 A game that mints milestones has a **Minted** section in its dock: how many players minted each milestone, then every mint, newest first, a

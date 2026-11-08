@@ -190,7 +190,12 @@ export function createGamesEntrypoint(
           const game = catalog.find(params.slug);
           if (game !== null)
             return (
-              <GameDetail game={game} navigation={navigation} wallet={wallet} />
+              <GameDetail
+                game={game}
+                navigation={navigation}
+                {...(share === undefined ? {} : { share })}
+                wallet={wallet}
+              />
             );
           return (
             <GameNotFound
