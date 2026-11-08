@@ -1,0 +1,241 @@
+/* The scoreboard above the shelves: big numerals, lit like a cabinet's display. */
+.shelf-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--arcade-space-3);
+  margin: 0 0 var(--arcade-space-6);
+}
+.shelf-stat {
+  display: grid;
+  align-content: center;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  padding: var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background:
+    linear-gradient(160deg, rgb(43 231 255 / 8%), transparent 60%),
+    var(--arcade-surface);
+  box-shadow: var(--arcade-shadow-depth) var(--arcade-shadow-depth) 0
+    var(--arcade-ink);
+}
+.shelf-stat strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1;
+  text-shadow: 0 0 1rem rgb(255 210 63 / 40%);
+}
+.shelf-stat span,
+.shelf-stat small {
+  color: var(--arcade-text-muted);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.shelf-stat--latest {
+  grid-column: span 2;
+}
+.shelf-stat--latest strong {
+  color: var(--arcade-text);
+  font-size: clamp(1.125rem, 3.5vw, 1.5rem);
+  text-shadow: none;
+}
+/* A game's shelf is a cabinet: its own cover as the marquee behind the name, and a row of pieces and the places still to fill. */
+.shelf {
+  padding: var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+}
+.shelf__head {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: calc(var(--arcade-space-4) * -1) calc(var(--arcade-space-4) * -1)
+    var(--arcade-space-4);
+  padding: var(--arcade-space-4);
+  border-block-end: 0.125rem solid var(--arcade-border-strong);
+}
+.shelf__banner {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  filter: blur(1rem) brightness(0.32) saturate(1.3);
+  transform: scale(1.3);
+}
+.shelf__title h3 {
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.125rem, 3.5vw, 1.5rem);
+  text-shadow: 0.125rem 0.125rem 0 var(--arcade-ink);
+}
+.shelf__title h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.shelf__row {
+  border-block-end: 0;
+}
+.trophy:not(.trophy--missing) .trophy__button:hover .trophy__art {
+  transform: translateY(-0.25rem);
+}
+.trophy__art {
+  transition:
+    transform var(--arcade-transition-fast),
+    border-color var(--arcade-transition-fast);
+}
+/* A place not yet filled: a dark slot with the milestone's name, so a player sees what there is to chase. */
+.trophy--missing .trophy__art--locked {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--arcade-ink),
+    var(--arcade-ink) 0.5rem,
+    var(--arcade-surface-recessed) 0.5rem,
+    var(--arcade-surface-recessed) 1rem
+  );
+}
+.trophy__lock {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border: 0.1875rem dashed var(--arcade-border-strong);
+  border-radius: 50%;
+  color: var(--arcade-text-subtle);
+  font-family: var(--arcade-font-display);
+  font-size: 1.5rem;
+}
+.trophy--missing .trophy__strip strong {
+  color: var(--arcade-text-subtle);
+}
+@media (prefers-reduced-motion: reduce) {
+  .trophy__art {
+    transition: none;
+  }
+}
+/* The Share button rides on the picture's corner, so the close-up does not grow taller for it. */
+.trophy-detail__share {
+  position: absolute;
+  inset-block-end: var(--arcade-space-3);
+  inset-inline-end: var(--arcade-space-3);
+  z-index: 4;
+}
+
+/* The latest mints, big, then the games as cartridges in one sideways row, then only the picked game's shelf. */
+.latest {
+  margin-block-end: var(--arcade-space-6);
+}
+.latest__title,
+.album__heading {
+  margin: 0 0 var(--arcade-space-3);
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.shelf__row--latest {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  padding-block-end: 0;
+  border-block-end: 0;
+}
+.rail-games {
+  display: grid;
+  gap: var(--arcade-space-2);
+  margin-block-end: var(--arcade-space-4);
+}
+.rail-games__row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 8rem;
+  gap: var(--arcade-space-3);
+  margin: 0;
+  padding: var(--arcade-space-2) var(--arcade-space-1) var(--arcade-space-3);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  list-style: none;
+}
+.rail-games__row li {
+  scroll-snap-align: start;
+  min-inline-size: 0;
+}
+.rail-game {
+  display: grid;
+  gap: 0.25rem;
+  inline-size: 100%;
+  padding: var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  color: var(--arcade-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    transform var(--arcade-transition-fast),
+    border-color var(--arcade-transition-fast);
+}
+.rail-game:hover {
+  transform: translateY(-0.1875rem);
+  border-color: var(--arcade-cyan);
+}
+.rail-game:focus-visible {
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.125rem;
+}
+.rail-game[aria-pressed="true"] {
+  border-color: var(--arcade-yellow);
+  background: rgb(255 210 63 / 10%);
+  box-shadow: 0 0 1.25rem rgb(255 210 63 / 25%);
+}
+.rail-game[data-empty] {
+  opacity: 0.6;
+}
+.rail-game__cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--arcade-radius-small);
+}
+.rail-game strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--arcade-text-sm);
+}
+.rail-game small {
+  color: var(--arcade-cyan);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+}
+.rail-games__toggle {
+  justify-self: start;
+  padding: var(--arcade-space-1) var(--arcade-space-3);
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--arcade-text-muted);
+  font: inherit;
+  font-size: var(--arcade-text-sm);
+  cursor: pointer;
+}
+.trophy--more .trophy__art--locked strong {
+  padding: var(--arcade-space-3);
+  color: var(--arcade-text-subtle);
+  text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rail-game {
+    transition: none;
+  }
+}

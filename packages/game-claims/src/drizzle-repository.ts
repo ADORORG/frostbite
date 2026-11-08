@@ -149,6 +149,25 @@ export function createDrizzleGameClaimRepository(
           .orderBy(gameMilestoneClaims.createdAt)
       ).map(toClaim),
 
+    completeCounts: async (gameId) =>
+      new Map(
+        (
+          await database
+            .select({
+              count: sql<number>`count(*)::int`,
+              milestoneId: gameMilestoneClaims.milestoneId,
+            })
+            .from(gameMilestoneClaims)
+            .where(
+              and(
+                eq(gameMilestoneClaims.gameId, gameId),
+                eq(gameMilestoneClaims.state, "complete"),
+              ),
+            )
+            .groupBy(gameMilestoneClaims.milestoneId)
+        ).map(({ count, milestoneId }) => [milestoneId, count]),
+      ),
+
     listComplete: async (userId) =>
       (
         await database

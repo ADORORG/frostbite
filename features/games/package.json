@@ -9,7 +9,10 @@
     "./claims-runtime": "./src/claims-runtime.ts",
     "./entrypoint": "./src/entrypoint.tsx",
     "./runs-operations": "./src/application/runs-operations.ts",
-    "./runs-runtime": "./src/runs-runtime.ts"
+    "./runs-runtime": "./src/runs-runtime.ts",
+    "./shared-view": "./src/domain/shared-view.ts",
+    "./shares-operations": "./src/application/shares-operations.ts",
+    "./shares-runtime": "./src/shares-runtime.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -29,10 +32,12 @@
     "@frostbite/game-runs": "workspace:*",
     "@frostbite/game-saves": "workspace:*",
     "@frostbite/game-sdk": "workspace:*",
+    "@frostbite/game-shares": "workspace:*",
     "@frostbite/game-verification": "workspace:*",
     "@frostbite/http": "workspace:*",
     "@frostbite/plugin-kit": "workspace:*",
     "@frostbite/scenes": "workspace:*",
+    "@frostbite/share": "workspace:*",
     "@frostbite/shared": "workspace:*",
     "@frostbite/wallet": "workspace:*",
     "@repo/ui": "workspace:*",

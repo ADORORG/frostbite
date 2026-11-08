@@ -38,6 +38,12 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // One request per picture on the page, a few dozen at once for a player with many mints, each a read of the chain; a browser keeps
     // the answer for a day, so a second visit asks for none. Counted apart so they do not use up the allowance for everything else read.
     getMintedPicture: perMinute(300),
+    // A shared page asks for one picture per milestone it shows, from anyone with the link, each a read of the chain (and kept by the
+    // browser and the edge): counted apart, like the player's own pictures.
+    getSharedPicture: perMinute(300),
+    // Making a link is a write of the player's own, and a few a minute is a person pressing Share; ending one is rarer.
+    createShare: perMinute(20),
+    revokeShare: perMinute(30),
     findPlatformRoleCandidates: perMinute(30),
     grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),

@@ -1,13 +1,18 @@
 import { defineFeature } from "@frostbite/plugin-kit";
+import type { ShareConfig } from "@frostbite/share";
 import type { ChainOption } from "@frostbite/shared/chain";
 import {
   gamePagePath,
   gameSyncRoute,
+  createShareRoute,
   getMintedPictureRoute,
+  getSharedPictureRoute,
   listGameClaimsRoute,
   listMintedMilestonesRoute,
   myMilestonesPath,
   refreshGameClaimRoute,
+  revokeShareRoute,
+  sharedPagePath,
   startGameClaimRoute,
   startGameRunRoute,
   submitGameClaimRoute,
@@ -34,6 +39,7 @@ export function createGamesFeature(
   wallet: GameWalletConfig,
   runs: GameRunsConfig,
   claims: GameClaimsConfig,
+  share?: ShareConfig,
 ) {
   return defineFeature({
     manifest: {
@@ -59,6 +65,7 @@ export function createGamesFeature(
         { access: { kind: "public" }, path: gamesPath },
         { access: { kind: "authenticated" }, path: myMilestonesPath },
         { access: { kind: "public" }, path: gamePagePath },
+        { access: { kind: "public" }, path: sharedPagePath },
       ],
       requiredDecisionGates: [],
       requiredProviderCapabilities: [],
@@ -72,13 +79,16 @@ export function createGamesFeature(
         listGameClaimsRoute,
         listMintedMilestonesRoute,
         getMintedPictureRoute,
+        createShareRoute,
+        revokeShareRoute,
+        getSharedPictureRoute,
       ],
       version: "1.0.0",
     },
     load: async () =>
       import("@frostbite/feature-games/entrypoint").then(
         ({ createGamesEntrypoint }) =>
-          createGamesEntrypoint(games, chains, wallet, runs, claims),
+          createGamesEntrypoint(games, chains, wallet, runs, claims, share),
       ),
   });
 }

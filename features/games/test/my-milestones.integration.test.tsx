@@ -83,7 +83,7 @@ describe("the player's minted milestones page", () => {
       expect(container.querySelector(".shelf")).not.toBeNull(),
     );
     expect(container.querySelector(".shelf-summary")?.textContent).toBe(
-      `${mintedCopy.piecesCount(1)} ${mintedCopy.gamesCount(1)}${mintedCopy.firstMinted("17 Oct 2026")}${mintedCopy.latestMinted(milestone?.title ?? "", "17 Oct 2026")}`,
+      `1${mintedCopy.statMilestones(1)}1${mintedCopy.statGames(1)}${mintedCopy.statLatest}${milestone?.title ?? ""}17 Oct 2026`,
     );
     expect(textOf(container)).toContain(mintedCopy.mintedProgress(1, 2));
     // One segment for each milestone of the game, one of them lit.
@@ -96,28 +96,34 @@ describe("the player's minted milestones page", () => {
     ]);
   });
 
-  it("folds what is still to earn away once something is minted, and shows it when nothing is", async () => {
+  it("fills the places still to earn with locked slots, and keeps games with nothing minted out of the row until asked", async () => {
     const container = await show(async () => ({ minted: [mint] }));
     await settle(() =>
       expect(container.querySelector(".shelf")).not.toBeNull(),
     );
-    const [mine, untouched] = [
-      ...container.querySelectorAll<HTMLDetailsElement>(".shelf__locked"),
-    ];
-    expect(mine?.open).toBe(false);
-    expect(textOf(mine as HTMLElement)).toContain(mintedCopy.stillToEarn(1));
-    expect(textOf(mine as HTMLElement)).toContain(second?.title);
-    expect(textOf(mine as HTMLElement)).not.toContain(milestone?.title);
-    // The other game that can mint milestones has its own shelf: nothing minted, so everything it offers is in view.
-    expect(container.querySelectorAll(".shelf")).toHaveLength(2);
-    expect(untouched?.open).toBe(true);
-    // No row of pieces for a game with none.
-    const rows = container.querySelectorAll(".shelf__row");
-    expect(rows).toHaveLength(1);
-    expect(textOf(untouched as HTMLElement)).toContain(
-      mintedCopy.stillToEarn(2),
+    // Only the picked game's shelf is drawn, with a locked slot for what it still offers and none for what is minted.
+    expect(container.querySelectorAll(".shelf")).toHaveLength(1);
+    const locked = [...container.querySelectorAll(".trophy--missing")];
+    expect(locked.map((slot) => slot.getAttribute("aria-label"))).toEqual([
+      mintedCopy.lockedSlot(second?.title ?? ""),
+    ]);
+    // The other game has nothing minted: it is behind the toggle, not in the row.
+    const tiles = () => [...container.querySelectorAll(".rail-game")];
+    expect(tiles()).toHaveLength(1);
+    const toggle = container.querySelector<HTMLButtonElement>(
+      ".rail-games__toggle",
     );
-    expect(textOf(container)).toContain(mintedCopy.mintedProgress(0, 2));
+    expect(toggle?.textContent).toBe(mintedCopy.emptyGames(1));
+    click(toggle);
+    await settle(() => expect(tiles()).toHaveLength(2));
+    // Picking it shows its own shelf: nothing minted, everything it offers is in view as places to fill.
+    click(tiles()[1] ?? null);
+    await settle(() =>
+      expect(textOf(container)).toContain(mintedCopy.mintedProgress(0, 2)),
+    );
+    expect(container.querySelectorAll(".shelf")).toHaveLength(1);
+    expect(container.querySelectorAll(".trophy--missing")).toHaveLength(2);
+    expect(container.querySelectorAll(".trophy__button")).toHaveLength(0);
   });
 
   it("opens a piece up close with what it is, the day and its transaction on the explorer, and closes it", async () => {
@@ -177,7 +183,7 @@ describe("the player's minted milestones page", () => {
     ).toEqual([mintedCopy.ribbon.latest, mintedCopy.ribbon.first]);
   });
 
-  it("draws no still-to-earn fold, and a full meter, for a game with every milestone minted", async () => {
+  it("draws no locked slot, and a full meter, for a game with every milestone minted", async () => {
     const both = rewardsGame.milestones.map((item, at) => ({
       ...mint,
       claimId: `0198f2a4-7b3c-7d1e-8a5f-3c2b1d0e9f0${String(at)}`,
@@ -188,7 +194,7 @@ describe("the player's minted milestones page", () => {
       expect(container.querySelectorAll(".trophy__button")).toHaveLength(2),
     );
     const shelf = container.querySelector(".shelf") as HTMLElement;
-    expect(shelf.querySelector(".shelf__locked")).toBeNull();
+    expect(shelf.querySelector(".trophy--missing")).toBeNull();
     expect(textOf(shelf)).toContain(mintedCopy.mintedProgress(2, 2));
     expect(
       [...shelf.querySelectorAll(".shelf__segments span")].every(

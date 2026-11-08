@@ -33,6 +33,20 @@ platform learns the item's id from the network when the claim's transaction is s
 says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the piece shows no picture, and
 never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
 
+## Sharing (SHARE-1)
+
+A signed-in player can make a link to something they earned: a milestone they hold, their shelf of milestones, or a score. The link is
+`/s/<id>` (`POST /api/v1/games/shares`, authenticated; `POST /api/v1/games/shares/revoke` ends the player's own link). The service and
+table are `@frostbite/game-shares`; the rules it enforces are in that package's README. A milestone share takes its level
+(`replay-verified` or `self-reported`) from the account, never from the request, and a score is always `self-reported`, because no replay
+verifier returns a score.
+
+`/s/<id>` is a public page (`ui/shared-page.tsx`) and `/s/<id>/share-image` (in the web app, built with `shareCardResponse`) is the
+picture a link preview shows. Both are made from the same `sharedView` (`domain/shared-view.ts`) and the same wording
+(`domain/share-copy.ts`), so they cannot disagree. Neither carries anything about who shared: no name, wallet or email. A link that is
+ended, never was, names a game that is no longer listed or a milestone it no longer declares, shows "not shared" and gives previews no
+metadata. A preview picture is cached for up to an hour at the edge, so an ended link's picture can be seen for that long.
+
 ## Searching the games page
 
 `/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it

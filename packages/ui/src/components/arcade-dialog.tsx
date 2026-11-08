@@ -10,6 +10,7 @@ export function ArcadeDialog({
   footer,
   onClose,
   open,
+  sheet = false,
   title,
   wide = false,
 }: {
@@ -18,6 +19,8 @@ export function ArcadeDialog({
   readonly footer?: ReactNode;
   readonly onClose: () => void;
   readonly open: boolean;
+  // On a narrow screen, rises from the bottom edge as a sheet instead of floating in the middle (for a short list of choices).
+  readonly sheet?: boolean;
   readonly title: string;
   // For a dialog with a summary to read, not a short choice.
   readonly wide?: boolean;
@@ -33,7 +36,13 @@ export function ArcadeDialog({
   return (
     <dialog
       aria-labelledby={titleId}
-      className={wide ? "arcade-modal arcade-modal--wide" : "arcade-modal"}
+      className={[
+        "arcade-modal",
+        wide ? "arcade-modal--wide" : "",
+        sheet ? "arcade-modal--sheet" : "",
+      ]
+        .filter((name) => name !== "")
+        .join(" ")}
       onClose={onClose}
       ref={dialog}
     >

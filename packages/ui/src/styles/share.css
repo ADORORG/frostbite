@@ -1,0 +1,241 @@
+/* The Share control: an arcade button, and a sheet of big colourful tiles with the link to copy under them. */
+.share-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--arcade-space-2);
+  min-block-size: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 0.125rem solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-surface-recessed);
+  box-shadow: var(--arcade-shadow-depth) var(--arcade-shadow-depth) 0
+    var(--arcade-ink);
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform var(--arcade-transition-fast),
+    box-shadow var(--arcade-transition-fast),
+    background var(--arcade-transition-fast);
+}
+.share-trigger:hover,
+.share-trigger:focus-visible {
+  background: var(--arcade-yellow);
+  color: var(--arcade-ink);
+  box-shadow: 0.125rem 0.125rem 0 var(--arcade-ink);
+  transform: translate(0.25rem, 0.25rem);
+}
+.share-trigger:focus-visible {
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.25rem;
+}
+.share-glyph {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+}
+/* On a picture: round, and big enough for a thumb, so it adds no height to what it sits on. */
+.share-trigger[data-variant="icon"] {
+  inline-size: 2.75rem;
+  padding: 0;
+  border-radius: 50%;
+  background: rgb(6 3 15 / 78%);
+  box-shadow: 0 0 1.25rem rgb(255 210 63 / 35%);
+  backdrop-filter: blur(0.25rem);
+}
+.share-trigger[data-variant="icon"]:hover,
+.share-trigger[data-variant="icon"]:focus-visible {
+  transform: scale(1.08);
+  box-shadow: 0 0 1.5rem rgb(255 210 63 / 65%);
+}
+
+.share-sheet {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+/* What is being shared, in a plate, so the sheet says what the link is for. */
+.share-ticket {
+  display: flex;
+  align-items: center;
+  gap: var(--arcade-space-3);
+  padding: var(--arcade-space-3);
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.share-ticket__art {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+}
+.share-ticket__words {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.125rem;
+}
+.share-ticket__words small {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.share-ticket__words strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--arcade-text-lg);
+}
+.share-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--arcade-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.share-tiles li {
+  min-inline-size: 0;
+}
+.share-tile {
+  display: grid;
+  justify-items: center;
+  gap: var(--arcade-space-2);
+  inline-size: 100%;
+  min-block-size: 5.5rem;
+  padding: var(--arcade-space-3) var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+  color: var(--arcade-text);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--arcade-transition-fast),
+    border-color var(--arcade-transition-fast);
+}
+a.share-tile:hover,
+button.share-tile:hover,
+a.share-tile:focus-visible,
+button.share-tile:focus-visible {
+  border-color: var(--arcade-yellow);
+  transform: translateY(-0.1875rem);
+}
+a.share-tile:active,
+button.share-tile:active {
+  transform: translateY(0.0625rem);
+}
+.share-tile:focus-visible {
+  outline: 0.1875rem solid var(--arcade-focus);
+  outline-offset: 0.125rem;
+}
+.share-tile__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-raised);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+  color: #fff;
+  font-family: var(--arcade-font-display);
+  font-size: 1.125rem;
+  line-height: 1;
+}
+.share-tile__mark[data-ink="dark"] {
+  color: var(--arcade-ink);
+}
+.share-tile__label {
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+/* Waiting for the link: the tiles are there at once, dimmed, so the sheet does not change shape when it arrives. */
+.share-tile[data-waiting] {
+  opacity: 0.45;
+  cursor: progress;
+  animation: share-wait 1.2s ease-in-out infinite;
+}
+.share-tiles[aria-busy="true"] .share-tile:hover {
+  transform: none;
+  border-color: var(--arcade-border-strong);
+}
+@keyframes share-wait {
+  50% {
+    opacity: 0.25;
+  }
+}
+/* The phone's own sheet, when it has one: the first and the loudest tile. */
+.share-tile--native {
+  border-color: var(--arcade-yellow);
+  background: rgb(255 210 63 / 10%);
+}
+.share-tile--native .share-tile__mark {
+  background: var(--arcade-yellow);
+  color: var(--arcade-ink);
+}
+.share-link {
+  display: flex;
+  overflow: hidden;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  background: var(--arcade-ink);
+}
+.share-link input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: 0 var(--arcade-space-3);
+  border: 0;
+  background: none;
+  color: var(--arcade-text-muted);
+  font: inherit;
+  font-size: var(--arcade-text-sm);
+  text-overflow: ellipsis;
+}
+.share-link button {
+  min-inline-size: 5rem;
+  min-block-size: 2.75rem;
+  padding: 0 var(--arcade-space-4);
+  border: 0;
+  border-inline-start: 0.125rem solid var(--arcade-border-strong);
+  background: var(--arcade-cyan);
+  color: var(--arcade-ink);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.share-link button[data-copied] {
+  background: var(--arcade-mint);
+}
+.share-note {
+  min-block-size: 1.25rem;
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+  text-align: center;
+}
+@media (min-width: 40.0625rem) {
+  .share-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .share-trigger,
+  .share-tile,
+  .share-tile[data-waiting] {
+    animation: none;
+    transition: none;
+  }
+}

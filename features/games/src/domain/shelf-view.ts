@@ -141,3 +141,19 @@ export function shelfStats(
     pieces: minted.length,
   };
 }
+
+// The newest pieces across all shelves, newest first, each with the shelf it sits on: what the page leads with, so a collection of any size
+// opens on the latest thing that happened.
+export function latestPieces(
+  all: readonly Shelf[],
+  limit: number,
+): readonly { readonly piece: ShelfPiece; readonly shelf: Shelf }[] {
+  return all
+    .flatMap((shelf) => shelf.pieces.map((piece) => ({ piece, shelf })))
+    .sort(
+      (a, b) =>
+        b.piece.mintedAt.localeCompare(a.piece.mintedAt) ||
+        a.piece.claimId.localeCompare(b.piece.claimId),
+    )
+    .slice(0, limit);
+}
