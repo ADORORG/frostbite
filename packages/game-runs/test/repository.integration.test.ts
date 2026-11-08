@@ -124,6 +124,28 @@ describe("submitting a run in PostgreSQL", () => {
     ]);
   });
 
+  it("keeps the score of a verified run, with zero as a score, and none for a run that has no score", async () => {
+    const userId = await seedUser();
+    const [scored, zero, none] = [
+      newRun(userId),
+      newRun(userId),
+      newRun(userId),
+    ];
+    for (const run of [scored, zero, none]) await repository.issue(run, 5);
+    for (const [run, score] of [
+      [scored, 4_210],
+      [zero, 0],
+      [none, null],
+    ] as const)
+      await repository.submit(keyOf(run), () => ({
+        kind: "settle",
+        verdict: verified([], score),
+      }));
+    expect((await runOf(scored.id))?.score).toBe(4_210);
+    expect((await runOf(zero.id))?.score).toBe(0);
+    expect((await runOf(none.id))?.score).toBeNull();
+  });
+
   it("stores a rejection with its reason, and does not call the milestone hook for it or for a run that earned nothing", async () => {
     const userId = await seedUser();
     const [rejected, nothing] = [newRun(userId), newRun(userId)];
@@ -136,6 +158,7 @@ describe("submitting a run in PostgreSQL", () => {
         reason: "illegal-input",
         recordDigest: null,
         recordText: null,
+        score: null,
         status: "rejected",
       },
     }));

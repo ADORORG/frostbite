@@ -37,7 +37,7 @@ describe("the sample run the verifier is registered with", () => {
   });
 
   it("is a legal run that earns exactly the milestones it claims", () => {
-    expect(replayRecord(runnerRules, run)).toEqual({
+    expect(replayRecord(runnerRules, run)).toMatchObject({
       earned: run.claims,
       ok: true,
     });

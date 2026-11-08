@@ -71,6 +71,41 @@ describe("submitting a run", () => {
     );
   });
 
+  it("keeps the score the replay reached on the settled run, and none on a rejected one", async () => {
+    const scored = setup({
+      verify: () => ({
+        digest: recordDigest,
+        earned: ["first-win"],
+        score: 4_210,
+        status: "verified",
+      }),
+    });
+    await scored.service.start("player", "any-game");
+    await scored.service.submit(
+      "player",
+      "any-game",
+      "run-1",
+      recordFor(4_000_000_000),
+    );
+    expect(scored.store.verdicts.get("run-1")?.score).toBe(4_210);
+    const rejected = setup({
+      verify: () => ({
+        detail: "no",
+        digest: recordDigest,
+        reason: "illegal-input",
+        status: "rejected",
+      }),
+    });
+    await rejected.service.start("player", "any-game");
+    await rejected.service.submit(
+      "player",
+      "any-game",
+      "run-1",
+      recordFor(4_000_000_000),
+    );
+    expect(rejected.store.verdicts.get("run-1")?.score).toBeNull();
+  });
+
   it("refuses a second submission, whatever it carries, and does not replay it", async () => {
     const { service, verify } = setup();
     await service.start("player", "any-game");

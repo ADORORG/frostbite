@@ -16,6 +16,7 @@ describe("the in-process runner", () => {
     expect(JSON.parse(loaded.replay(JSON.stringify(sample)))).toEqual({
       earned: ["reached"],
       ok: true,
+      score: null,
     });
   });
 

@@ -33,7 +33,7 @@ describe("a session", () => {
       ).toEqual({ ok: true });
     const record = session.record();
     expect(record.inputs).toEqual(inputs);
-    expect(replayRecord(dropRules, record)).toEqual({
+    expect(replayRecord(dropRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
@@ -64,7 +64,7 @@ describe("the sample run the verifier is registered with", () => {
   });
 
   it("is a legal run that earns exactly the milestones it claims", () => {
-    expect(replayRecord(dropRules, run)).toEqual({
+    expect(replayRecord(dropRules, run)).toMatchObject({
       earned: run.claims,
       ok: true,
     });

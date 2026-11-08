@@ -284,7 +284,7 @@ describe("the guild's milestones", () => {
       verifier: verifierId,
       verifierVersion,
     };
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: castleMilestones,
       ok: true,
     });

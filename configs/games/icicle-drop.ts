@@ -186,7 +186,7 @@ export const icicleDropGame = defineGame({
     replay: {
       id: "icicle-drop",
       sha256:
-        "17133b2afdb15a2a60c78f66785887c5d28444f332d61540ca279ce6add81934",
+        "cec65347beb0ac33d2a6088ff0a742e92f0390cbadc35d8711436cf50f24a7e8",
       version: 1,
     },
   },

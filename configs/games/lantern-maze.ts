@@ -117,7 +117,7 @@ export const lanternMazeGame = defineGame({
     replay: {
       id: "lantern-maze",
       sha256:
-        "47e85a8b3a1a108fde0dc22a1bf0c482296c33e0145eb8ed938032d60f37bb89",
+        "b377745641762483917bbc3756c80b6fe7203153b5e9b38588df513eeaa6bf72",
       version: 1,
     },
   },

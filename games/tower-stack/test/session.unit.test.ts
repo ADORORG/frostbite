@@ -60,7 +60,7 @@ describe("a session", () => {
     );
     const record = session.record();
     const outcome = replayRecord(towerRules, record);
-    expect(outcome).toEqual({ earned: record.claims, ok: true });
+    expect(outcome).toMatchObject({ earned: record.claims, ok: true });
     expect(onEarned.mock.calls.map(([id]) => id).sort()).toEqual(
       [...record.claims].sort(),
     );

@@ -96,7 +96,7 @@ describe("the game, played whole", () => {
         verifier: "aurora-pulse",
         verifierVersion: 1,
       };
-      expect(replayRecord(pulseRules, record)).toEqual({
+      expect(replayRecord(pulseRules, record)).toMatchObject({
         earned: record.claims,
         ok: true,
       });

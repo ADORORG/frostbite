@@ -29,7 +29,7 @@ describe("the verifier the game publishes", () => {
     if (typeof replay !== "function") throw new Error("no replay");
     const verdict = (record: RunRecord): unknown =>
       JSON.parse(String(replay(JSON.stringify(record))));
-    expect(verdict(sampleRun())).toEqual({
+    expect(verdict(sampleRun())).toMatchObject({
       earned: sampleRun().claims,
       ok: true,
     });

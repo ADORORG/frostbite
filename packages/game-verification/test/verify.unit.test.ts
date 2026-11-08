@@ -52,8 +52,24 @@ describe("verifying a run record", () => {
     expect(result).toEqual({
       digest: createHash("sha256").update(canonicalJson(record)).digest("hex"),
       earned: ["reached", "exact"],
+      score: null,
       status: "verified",
     });
+  });
+
+  it("returns the score the replay reached, and none for a run that has not ended", () => {
+    const ended = verifyRun(
+      registry,
+      good({
+        inputs: [
+          { data: 3, type: "add" },
+          { data: 2, type: "add" },
+          { type: "stop" },
+        ],
+      }),
+    );
+    expect(ended).toMatchObject({ score: 5, status: "verified" });
+    expect(verifyRun(registry, good())).toMatchObject({ score: null });
   });
 
   it("verifies a run that claims less than it earned, and one that claims nothing", () => {
@@ -62,6 +78,7 @@ describe("verifying a run record", () => {
     );
     expect(verifyRun(registry, good({ claims: [] }))).toMatchObject({
       earned: ["reached", "exact"],
+      score: null,
       status: "verified",
     });
   });

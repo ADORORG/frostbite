@@ -22,7 +22,7 @@ import {
 } from "@frostbite/game-sdk/best-progress";
 import { stages, ticksPerSecond } from "./rules/constants.ts";
 import { coinsTaken } from "./rules/milestones.ts";
-import { scoreOf } from "./score.ts";
+import { scoreOf } from "./rules/score.ts";
 import { draw, screenHeight, screenWidth } from "./screen/draw.ts";
 import { attachHands } from "./screen/controls.ts";
 import { attachThumbs } from "./screen/thumbs.ts";

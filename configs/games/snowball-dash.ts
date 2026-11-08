@@ -178,7 +178,7 @@ export const snowballDashGame = defineGame({
     replay: {
       id: "snowball-dash",
       sha256:
-        "0e1b4f8509ca89c037522d74b1947a4019d4ee2a91b403a6ab3618f128a6acaf",
+        "937152d76b9bf722a53cad0641e231267029ea4812747e9a8fd05c004096c4eb",
       version: 2,
     },
   },

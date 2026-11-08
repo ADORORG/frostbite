@@ -104,7 +104,7 @@ describe("the Whispering Woods' milestones", () => {
       verifier: verifierId,
       verifierVersion,
     };
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: woodsMilestones,
       ok: true,
     });

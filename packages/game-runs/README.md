@@ -22,6 +22,9 @@ replay-verifiable), supplied by the caller.
 
 - A run is settled once. Submitting takes a row lock (`FOR UPDATE`) on the run, so concurrent submissions
   settle exactly one; the rest see `already-submitted`.
+- A verified run keeps the score its replay reached (`game_runs.score`; `null` when the run had not ended or the game keeps none). It comes
+  from the platform's replay, never from the record, and only a verified run can have one (`game_runs_score_coherent`). Boards read it
+  through `game_runs_board_idx`.
 - Every submission that reaches a verdict spends the run, including a rejected one. A record for another seed
   is rejected without a replay. A claim the manifest does not declare replay-verifiable is rejected without a
   replay, and a verdict never grants a milestone the manifest does not declare.

@@ -286,7 +286,7 @@ describe("the rules as a verifier", () => {
       verifier: "icicle-drop",
       verifierVersion: 1,
     });
-    expect(outcome).toEqual({ earned: earnedBy(state), ok: true });
+    expect(outcome).toMatchObject({ earned: earnedBy(state), ok: true });
     for (const id of earnedBy(state)) expect(milestoneIds).toContain(id);
     expect(earnedBy(state).length).toBeGreaterThan(8);
   });

@@ -22,6 +22,8 @@ export interface RunVerdict {
   readonly reason: string | null;
   readonly recordDigest: string | null;
   readonly recordText: string | null;
+  // What the replay scored: only a verified run has one, and only when the game keeps a score and the run had ended.
+  readonly score: number | null;
   readonly status: "rejected" | "verified";
 }
 

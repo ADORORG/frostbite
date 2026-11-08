@@ -18,6 +18,8 @@ export const counterRules: GameVerifier<Counter> = {
         : ["reached"]
       : [],
   id: "counter",
+  // The run scores its count once it has been stopped; until then it has no score.
+  score: ({ count, stopped }) => (stopped ? count : null),
   init: (seed, config) => {
     const { target } = config;
     if (

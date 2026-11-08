@@ -154,7 +154,7 @@ describe("replaying a played run", () => {
   it("gives the state the player had, and the marks it earned, from the record alone", () => {
     const record = sampleRun();
     const outcome = replayRecord(broRules, record);
-    expect(outcome).toEqual({ earned: record.claims, ok: true });
+    expect(outcome).toMatchObject({ earned: record.claims, ok: true });
     expect(record.claims).toContain("finish");
   });
 });

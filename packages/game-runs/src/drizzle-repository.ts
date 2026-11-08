@@ -126,6 +126,7 @@ const settled = (verdict: RunVerdict, at: Date) => ({
   earned: [...verdict.earned],
   recordDigest: verdict.recordDigest,
   recordText: verdict.recordText,
+  score: verdict.score,
   state: "submitted",
   submittedAt: at,
   verdict: verdict.status,

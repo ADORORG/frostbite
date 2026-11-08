@@ -28,16 +28,45 @@ describe("replaying a run with a game's rules", () => {
     expect(verifier.replay(record({ inputs: [add(3), add(2)] }))).toEqual({
       earned: ["reached", "exact"],
       ok: true,
+      score: null,
     });
     expect(verifier.replay(record({ inputs: [add(3), add(3)] }))).toEqual({
       earned: ["reached"],
       ok: true,
+      score: null,
     });
     expect(verifier.replay(record({ inputs: [add(1)] }))).toEqual({
       earned: [],
       ok: true,
+      score: null,
     });
   });
+
+  it("reports the score the rules reach once the run has ended, and none while it is still going", () => {
+    const stop = { type: "stop" };
+    expect(
+      verifier.replay(record({ inputs: [add(3), add(2), stop] })),
+    ).toMatchObject({ ok: true, score: 5 });
+    expect(verifier.replay(record({ inputs: [add(3), add(2)] }))).toMatchObject(
+      { ok: true, score: null },
+    );
+    // A run that scores nothing at its end has a score of 0, which is a score.
+    expect(verifier.replay(record({ inputs: [stop] }))).toMatchObject({
+      ok: true,
+      score: 0,
+    });
+  });
+
+  it.each([-1, 1.5, Number.MAX_SAFE_INTEGER + 2, Number.NaN])(
+    "reads a score the platform cannot rank (%s) as none",
+    (score) => {
+      const odd = defineVerifier({ ...counterRules, score: () => score });
+      expect(odd.replay(record({ inputs: [add(1)] }))).toMatchObject({
+        ok: true,
+        score: null,
+      });
+    },
+  );
 
   it("starts from the seed, so the same inputs under another seed can end differently", () => {
     const inputs = [add(2), add(2)];
@@ -45,12 +74,17 @@ describe("replaying a run with a game's rules", () => {
     const odd = verifier.replay(
       record({ config: { target: 5 }, inputs, seed: 1 }),
     );
-    expect(odd).toEqual({ earned: ["reached", "exact"], ok: true });
+    expect(odd).toEqual({
+      earned: ["reached", "exact"],
+      ok: true,
+      score: null,
+    });
     expect(
       verifier.replay(record({ config: { target: 5 }, inputs, seed: 0 })),
     ).toEqual({
       earned: [],
       ok: true,
+      score: null,
     });
   });
 

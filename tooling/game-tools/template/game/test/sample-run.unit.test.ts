@@ -8,7 +8,7 @@ import { sampleRun } from "../src/sample-run.ts";
 describe("the run the verifier is shown with", () => {
   it("is legal, and earns exactly the milestones it claims, every one of them a real milestone", () => {
     const record = sampleRun();
-    expect(replayRecord(starterRules, record)).toEqual({
+    expect(replayRecord(starterRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
