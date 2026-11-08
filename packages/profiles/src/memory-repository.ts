@@ -1,6 +1,7 @@
 import type { ProfileRepository, StoredProfile } from "../src/repository.ts";
 
-// The profiles in a map, for the service's unit tests: it keeps the one rule the table keeps (a name key belongs to one player).
+// The profiles in a map, for tests of the service and of what is built on it (`@frostbite/profiles/memory`): it keeps the one rule the table
+// keeps (a name key belongs to one player). It is not a storage for the platform; the PostgreSQL adapter is.
 export function memoryRepository(): ProfileRepository & {
   readonly rows: Map<string, StoredProfile>;
 } {

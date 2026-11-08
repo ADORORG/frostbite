@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createProfilesService } from "../src/service.ts";
-import { memoryRepository } from "./memory-repository.ts";
+import { memoryRepository } from "../src/memory-repository.ts";
 import { policy } from "./policy.ts";
 
 const start = new Date("2026-11-08T12:00:00.000Z");

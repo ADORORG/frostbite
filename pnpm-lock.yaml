@@ -985,9 +985,6 @@ importers:
       '@frostbite/feature-games':
         specifier: workspace:*
         version: link:../games
-      '@frostbite/game-claims':
-        specifier: workspace:*
-        version: link:../../packages/game-claims
       '@frostbite/game-runs':
         specifier: workspace:*
         version: link:../../packages/game-runs
@@ -1012,6 +1009,9 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      drizzle-orm:
+        specifier: 1.0.0-rc.4
+        version: 1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.0)(valibot@1.4.2(typescript@5.9.3))(zod@4.5.4)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -1031,6 +1031,9 @@ importers:
       '@types/jsdom':
         specifier: 30.0.0
         version: 30.0.0
+      '@types/node':
+        specifier: 26.4.0
+        version: 26.4.0
       '@types/react':
         specifier: ^19
         version: 19.2.18
