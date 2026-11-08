@@ -4,6 +4,7 @@ import {
   check,
   index,
   integer,
+  primaryKey,
   text,
   uniqueIndex,
   uuid,
@@ -81,6 +82,26 @@ export const gameMintTotals = platformSchema.table(
     check(
       "game_mint_totals_not_negative",
       sql`${table.completed} >= 0 and ${table.feesSats} >= 0`,
+    ),
+  ],
+);
+
+// How many mints each milestone of each game has completed, kept by triggers on `game_milestone_claims` exactly as `game_mint_totals` is (see
+// the migration that made them): a claim becoming complete adds one, and one leaving `complete` takes it away, so reading how many players
+// minted a milestone costs a row however many mints there are. Deleting a claim (its player's account was deleted) takes nothing away: the
+// mint happened. A milestone whose mints have all left `complete` keeps a row of 0; one never minted has none.
+export const gameMilestoneMintTotals = platformSchema.table(
+  "game_milestone_mint_totals",
+  {
+    completed: bigint("completed", { mode: "number" }).notNull(),
+    gameId: text("game_id").notNull(),
+    milestoneId: text("milestone_id").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.gameId, table.milestoneId] }),
+    check(
+      "game_milestone_mint_totals_not_negative",
+      sql`${table.completed} >= 0`,
     ),
   ],
 );

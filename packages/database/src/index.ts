@@ -117,7 +117,11 @@ export {
 } from "./schema/game-saves.ts";
 export { gameAdminSteps } from "./schema/game-admin.ts";
 export { gameContracts, publishedTemplates } from "./schema/game-contracts.ts";
-export { gameMilestoneClaims, gameMintTotals } from "./schema/game-claims.ts";
+export {
+  gameMilestoneClaims,
+  gameMilestoneMintTotals,
+  gameMintTotals,
+} from "./schema/game-claims.ts";
 export { platformFeeSettings } from "./schema/platform-fee.ts";
 export { gameRuns } from "./schema/game-runs.ts";
 export { gameShares } from "./schema/game-shares.ts";
