@@ -830,6 +830,9 @@ importers:
       '@frostbite/game-sdk':
         specifier: workspace:*
         version: link:../../packages/game-sdk
+      '@frostbite/game-shares':
+        specifier: workspace:*
+        version: link:../../packages/game-shares
       '@frostbite/game-verification':
         specifier: workspace:*
         version: link:../../packages/game-verification

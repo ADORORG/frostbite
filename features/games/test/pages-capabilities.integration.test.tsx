@@ -3,12 +3,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import {
+  createShareRoute,
   gameSyncRoute,
   getMintedPictureRoute,
   listGameClaimsRoute,
   listMintedMilestonesRoute,
   myMilestonesPath,
   refreshGameClaimRoute,
+  revokeShareRoute,
   startGameClaimRoute,
   startGameRunRoute,
   submitGameClaimRoute,
@@ -115,6 +117,8 @@ describe("the games feature registration", () => {
         listGameClaimsRoute,
         listMintedMilestonesRoute,
         getMintedPictureRoute,
+        createShareRoute,
+        revokeShareRoute,
       ],
     });
     // Only a signed-in player has milestones: the page is not public, so the platform sends everyone else to sign in.

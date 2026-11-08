@@ -7,6 +7,8 @@ import {
   gamePagePath,
   gamesPath,
   myMilestonesPath,
+  shareIdSchema,
+  sharedPagePath,
   type GameManifest,
 } from "@frostbite/shared/games";
 
@@ -21,6 +23,10 @@ import {
   createListMintedMilestonesOperation,
 } from "./application/minted-operation.ts";
 import {
+  createCreateShareOperation,
+  createRevokeShareOperation,
+} from "./application/shares-operations.ts";
+import {
   createStartGameRunOperation,
   createSubmitGameRunOperation,
 } from "./application/runs-operations.ts";
@@ -32,15 +38,19 @@ import { createGameClaimsResolver } from "./claims-runtime.ts";
 import type { GameRunsConfig } from "./runs-config.ts";
 import { createGameRunsResolver } from "./runs-runtime.ts";
 import { createGameSyncResolver } from "./runtime.ts";
+import { sharesResolverFor } from "./shares-runtime.ts";
+import { sharedView } from "./domain/shared-view.ts";
 import {
   gameMetadata,
   gameSitemapPaths,
   gamesIndexMetadata,
+  sharedMetadata,
 } from "./metadata.ts";
 import { GameDetail } from "./ui/game-detail.tsx";
 import { GamesIndex } from "./ui/games-index.tsx";
 import { GamesRail } from "./ui/games-rail.tsx";
 import { MyMilestones } from "./ui/my-milestones.tsx";
+import { SharedNotFound, SharedPage } from "./ui/shared-page.tsx";
 import type { GameWalletConfig } from "./wallet-config.ts";
 import { GameNotFound, NoGames } from "./ui/states.tsx";
 
@@ -54,6 +64,14 @@ export function createGamesEntrypoint(
   const catalog = createGameCatalog(games, chains);
   const runsService = createGameRunsResolver(games, runs);
   const claimsService = createGameClaimsResolver(games, claims);
+  const sharesService = sharesResolverFor(games);
+  // The thing a link shows, or null for an identifier that is not one, a link that was ended, or one that never was.
+  const sharedThing = async (id: string | undefined) => {
+    const parsed = shareIdSchema.safeParse(id);
+    return parsed.success
+      ? await (await sharesService()).get(parsed.data)
+      : null;
+  };
   const access = { kind: "public" } as const;
   return {
     capabilities: [
@@ -76,6 +94,8 @@ export function createGamesEntrypoint(
       registerHttpOperation(createListGameClaimsOperation(claimsService)),
       registerHttpOperation(createListMintedMilestonesOperation(claimsService)),
       registerHttpOperation(createGetMintedPictureOperation(claimsService)),
+      registerHttpOperation(createCreateShareOperation(sharesService)),
+      registerHttpOperation(createRevokeShareOperation(sharesService)),
     ],
     homeSections: [
       {
@@ -131,6 +151,21 @@ export function createGamesEntrypoint(
                 catalog.isValidSlug(params.slug) ? (params.slug ?? null) : null
               }
             />
+          );
+        },
+      },
+      {
+        access,
+        metadata: async ({ params }) =>
+          sharedMetadata(params.id ?? "", await sharedThing(params.id), games),
+        path: sharedPagePath,
+        render: async ({ navigation, params }) => {
+          const thing = await sharedThing(params.id);
+          const view = thing === null ? null : sharedView(thing, games);
+          return view === null ? (
+            <SharedNotFound navigation={navigation} />
+          ) : (
+            <SharedPage navigation={navigation} view={view} />
           );
         },
       },

@@ -31,9 +31,29 @@ export type ShareVerification = (typeof shareVerifications)[number];
 export const shareIdSchema = z.uuid();
 
 export const createShareInputSchema = shareRequestSchema;
-export const createShareResponseSchema = z
-  .object({ id: shareIdSchema, path: z.string().min(1).max(64) })
-  .strict();
+// Why a share could not be made: the same few reasons the service gives, as a value the page can say in words.
+export const shareUnavailableReasons = [
+  "not-earned",
+  "unknown-game",
+  "unknown-milestone",
+] as const;
+export type ShareUnavailableReason = (typeof shareUnavailableReasons)[number];
+export const createShareResponseSchema = z.discriminatedUnion("status", [
+  z
+    .object({
+      id: shareIdSchema,
+      path: z.string().min(1).max(64),
+      status: z.literal("shared"),
+    })
+    .strict(),
+  z
+    .object({
+      reason: z.enum(shareUnavailableReasons),
+      status: z.literal("unavailable"),
+    })
+    .strict(),
+]);
+export type CreateShareInput = z.infer<typeof createShareInputSchema>;
 export type CreateShareResponse = z.infer<typeof createShareResponseSchema>;
 export const createShareRoute = {
   method: "POST",
@@ -42,12 +62,21 @@ export const createShareRoute = {
 } as const;
 
 export const revokeShareInputSchema = z.object({ id: shareIdSchema }).strict();
-export const revokeShareResponseSchema = z.object({}).strict();
+// Whether a live share of the player's own was ended; a share that is not theirs, or is already ended, answers the same.
+export const revokeShareResponseSchema = z
+  .object({ revoked: z.boolean() })
+  .strict();
+export type RevokeShareInput = z.infer<typeof revokeShareInputSchema>;
+export type RevokeShareResponse = z.infer<typeof revokeShareResponseSchema>;
 export const revokeShareRoute = {
   method: "POST",
   operationId: "revokeShare",
   path: "/api/v1/games/shares/revoke",
 } as const;
 
-// Where a shared page is: a path on the platform, which the caller makes absolute on the public address.
-export const sharePath = (id: string) => `/s/${id}`;
+// A shared page, and the picture its link preview shows. The platform path is one source for the page registration, the manifest and
+// the browser tests; `id` is the link's identifier.
+export const sharedPagePath = "/s/[id]";
+export const sharePath = (id: string): `/${string}` => `/s/${id}`;
+export const shareImagePath = (id: string): `/${string}` =>
+  `${sharePath(id)}/share-image`;
