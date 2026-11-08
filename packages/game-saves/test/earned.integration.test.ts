@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { authUsers, gameMilestoneUnlocks } from "@frostbite/database";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { hasEarnedMilestone } from "../src/earned.ts";
+import { hasEarnedMilestone, milestoneLevel } from "../src/earned.ts";
 import { database, environment, pool } from "./support/account-database.ts";
 import { runMigrations } from "@frostbite/database";
 
@@ -44,5 +44,21 @@ describe("whether a milestone is on the account", () => {
     expect(await asks(nobody)).toBe(false);
     expect(await asks(reported, "another-game")).toBe(false);
     expect(await asks(reported, "arcade", "first-glacier")).toBe(false);
+  });
+});
+
+describe("how a milestone is on the account", () => {
+  it("is the level the account holds, and null when it is not there", async () => {
+    const reported = await player();
+    const verified = await player();
+    const nobody = await player();
+    await earnedBy(reported, "self-reported");
+    await earnedBy(verified, "replay-verified");
+    const level = (userId: string, gameId = "arcade") =>
+      milestoneLevel(database, { gameId, milestoneId: "first-win", userId });
+    expect(await level(reported)).toBe("self-reported");
+    expect(await level(verified)).toBe("replay-verified");
+    expect(await level(nobody)).toBeNull();
+    expect(await level(verified, "another-game")).toBeNull();
   });
 });
