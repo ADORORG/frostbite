@@ -12,10 +12,12 @@ import {
 } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";
+import { galleryCopy } from "../domain/gallery-copy.ts";
 import type { GameWalletConfig } from "../wallet-config.ts";
 import { GamePlayer } from "./game-player.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
+import { MintedGallery } from "./minted-gallery.tsx";
 import { WalletGamePlayer } from "./wallet-game-player.tsx";
 
 // One game as its manifest declares it, with the game itself as the main thing on the page when the platform
@@ -75,6 +77,19 @@ export function GameDetail({
   const sections: DockSection[] = [
     { badge: null, content: about, id: "about", label: "About" },
     { badge: null, content: asks, id: "asks", label: "What it asks for" },
+    // Anyone may see what has been minted of a game that mints milestones.
+    ...(game.claimable
+      ? [
+          {
+            badge: null,
+            content: (
+              <MintedGallery explorerTxUrl={wallet.explorerTxUrl} game={game} />
+            ),
+            id: "minted",
+            label: galleryCopy.title,
+          },
+        ]
+      : []),
   ];
   const player = {
     back: (

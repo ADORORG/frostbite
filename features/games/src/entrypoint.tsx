@@ -20,6 +20,11 @@ import {
   createSubmitGameClaimOperation,
 } from "./application/claims-operations.ts";
 import {
+  createGetGalleryPictureOperation,
+  createListGalleryMintsOperation,
+} from "./application/gallery-operations.ts";
+import { createGalleryResolver } from "./gallery-runtime.ts";
+import {
   createGetMintedPictureOperation,
   createListMintedMilestonesOperation,
 } from "./application/minted-operation.ts";
@@ -68,6 +73,8 @@ export function createGamesEntrypoint(
   const runsService = createGameRunsResolver(games, runs);
   const claimsService = createGameClaimsResolver(games, claims);
   const sharesService = sharesResolverFor(games);
+  const galleryService = createGalleryResolver();
+  const listedGames: ReadonlySet<string> = new Set(games.map(({ id }) => id));
   // The thing a link shows, or null for an identifier that is not one, a link that was ended, or one that never was.
   const sharedThing = async (id: string | undefined) => {
     const parsed = shareIdSchema.safeParse(id);
@@ -125,6 +132,16 @@ export function createGamesEntrypoint(
       registerHttpOperation(createRevokeShareOperation(sharesService)),
       registerHttpOperation(
         createGetSharedPictureOperation(sharesService, claimsService),
+      ),
+      registerHttpOperation(
+        createListGalleryMintsOperation(galleryService, listedGames),
+      ),
+      registerHttpOperation(
+        createGetGalleryPictureOperation(
+          galleryService,
+          claimsService,
+          listedGames,
+        ),
       ),
     ],
     homeSections: [

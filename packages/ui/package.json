@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./arcade": "./src/arcade.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./shorten-middle": "./src/components/shorten-middle.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
