@@ -18,6 +18,7 @@
     "./http": "./src/http/index.ts",
     "./identifiers": "./src/identifiers/uuid-v7.ts",
     "./platform": "./src/platform/status.ts",
+    "./profiles": "./src/profiles/index.ts",
     "./uploads": "./src/uploads/index.ts",
     "./providers": "./src/features/manifest.ts",
     "./collections": "./src/collections/index.ts",

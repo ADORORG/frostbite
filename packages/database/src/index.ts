@@ -125,6 +125,7 @@ export {
 export { platformFeeSettings } from "./schema/platform-fee.ts";
 export { gameRuns } from "./schema/game-runs.ts";
 export { gameShares } from "./schema/game-shares.ts";
+export { playerProfiles } from "./schema/player-profiles.ts";
 export {
   releasedWallets,
   type ReleasedWallet,
