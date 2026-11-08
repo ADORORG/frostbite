@@ -48,6 +48,13 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // Making a link is a write of the player's own, and a few a minute is a person pressing Share; ending one is rarer.
     createShare: perMinute(20),
     revokeShare: perMinute(30),
+    // A profile is made once and changed rarely; the name check runs as a player types (after a pause), so it gets room, and a public page is
+    // opened by anyone, so it is counted apart from the rest of what a visitor does.
+    getMyProfile: perMinute(60),
+    checkProfileName: perMinute(120),
+    saveProfile: perMinute(20),
+    deleteProfile: perMinute(10),
+    getPublicProfile: perMinute(120),
     findPlatformRoleCandidates: perMinute(30),
     grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),

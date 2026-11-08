@@ -34,4 +34,8 @@
 @import "./styles/share.css";
 @import "./styles/shared.css";
 @import "./styles/shared-sections.css";
+@import "./styles/player-card.css";
+@import "./styles/profile-setup.css";
+@import "./styles/profile-panels.css";
+@import "./styles/profile-page.css";
 @import "./styles/rail.css";

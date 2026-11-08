@@ -1,0 +1,250 @@
+/* The public profile page: the player card as a hero, then their high scores as little cabinets, then what they have minted, then a call to play. */
+.profile-page {
+  display: grid;
+  gap: var(--arcade-space-6);
+}
+.profile-page__hero {
+  display: grid;
+  gap: var(--arcade-space-5);
+  padding-block: var(--arcade-space-3);
+}
+@media (min-width: 52rem) {
+  .profile-page__hero {
+    grid-template-columns: minmax(0, 40rem) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+.profile-page__intro {
+  display: grid;
+  gap: var(--arcade-space-3);
+  align-content: center;
+}
+.profile-page__intro p {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+.profile-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3);
+}
+.profile-section {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+.profile-section__head {
+  display: grid;
+  gap: var(--arcade-space-1);
+}
+h2.profile-section__title {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+}
+.profile-section__lead {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+/* A high score, as the screen of a cabinet: the game's picture behind the number, the number lit up, and one way to answer it. */
+.score-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--arcade-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.score-tile {
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: end;
+  gap: var(--arcade-space-2);
+  overflow: hidden;
+  min-block-size: 13rem;
+  padding: var(--arcade-space-4);
+  border: var(--arcade-border-width) solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+  box-shadow: 0.375rem 0.375rem 0 var(--arcade-ink);
+}
+.score-tile__cover {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  filter: saturate(1.15) brightness(0.62);
+}
+.score-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgb(6 3 15 / 94%) 18%,
+    rgb(6 3 15 / 55%) 55%,
+    rgb(6 3 15 / 20%)
+  );
+}
+.score-tile__game {
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+  font-weight: 700;
+}
+.score-tile__score {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: clamp(1rem, 9cqw, 2rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-shadow:
+    0.1875rem 0.1875rem 0 var(--arcade-ink),
+    0 0 1.25rem rgb(255 210 63 / 45%);
+}
+.score-tile__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arcade-space-2) var(--arcade-space-3);
+}
+.score-tile__when {
+  color: var(--arcade-text-subtle);
+  font-size: var(--arcade-text-xs);
+}
+.score-tile__verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem var(--arcade-space-2);
+  border-radius: 999px;
+  background: var(--arcade-mint);
+  color: var(--arcade-ink);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+/* The milestones: a shelf of squares, each its minted picture, named under it. */
+.mint-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  gap: var(--arcade-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mint-shelf__item {
+  display: grid;
+  gap: var(--arcade-space-2);
+  min-inline-size: 0;
+}
+.mint-shelf__frame {
+  /* The picture fills the square it is given, so the square is its positioned container. */
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 0.1875rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow:
+    0 0 1.25rem rgb(43 231 255 / 28%),
+    0.25rem 0.25rem 0 var(--arcade-ink);
+}
+.mint-shelf__name {
+  margin: 0;
+  font-size: var(--arcade-text-sm);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.mint-shelf__game {
+  margin: 0;
+  color: var(--arcade-text-subtle);
+  font-size: var(--arcade-text-xs);
+}
+.profile-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--arcade-space-2);
+  padding: var(--arcade-space-5);
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  color: var(--arcade-text-muted);
+}
+.profile-empty strong {
+  color: var(--arcade-text);
+}
+.profile-empty p {
+  margin: 0;
+}
+.profile-missing {
+  display: grid;
+  justify-items: center;
+  gap: var(--arcade-space-4);
+  padding: var(--arcade-space-7) var(--arcade-space-4);
+  text-align: center;
+}
+.profile-missing .profile-avatar {
+  opacity: 0.7;
+  filter: drop-shadow(0 0 1rem rgb(43 231 255 / 45%));
+  animation: profile-float 2.4s ease-in-out infinite;
+}
+.profile-missing h1 {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.75rem, 6vw, 2.75rem);
+  text-transform: uppercase;
+}
+.profile-missing p {
+  max-inline-size: 34rem;
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+@keyframes profile-float {
+  50% {
+    transform: translateY(-0.5rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-missing .profile-avatar {
+    animation: none;
+  }
+}
+/* The most recent high score, set apart beside the card: the thing a visitor is asked to answer. */
+.profile-highlight {
+  display: grid;
+  gap: var(--arcade-space-2);
+  padding: var(--arcade-space-4) var(--arcade-space-5);
+  border: var(--arcade-border-width) solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-medium);
+  background: color-mix(
+    in srgb,
+    var(--arcade-yellow) 8%,
+    var(--arcade-surface)
+  );
+}
+.profile-highlight__kicker {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.profile-highlight__score {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: clamp(1.25rem, 5vw, 2rem);
+  overflow-wrap: anywhere;
+  text-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+}
+.profile-highlight__game {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}

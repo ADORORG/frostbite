@@ -5,9 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/registration.ts",
+    "./catalog": "./src/domain/catalog.ts",
     "./claims-operations": "./src/application/claims-operations.ts",
     "./claims-runtime": "./src/claims-runtime.ts",
     "./entrypoint": "./src/entrypoint.tsx",
+    "./game-cover": "./src/ui/game-cover.tsx",
+    "./minted-art": "./src/ui/minted-art.tsx",
     "./runs-operations": "./src/application/runs-operations.ts",
     "./runs-runtime": "./src/runs-runtime.ts",
     "./shared-view": "./src/domain/shared-view.ts",

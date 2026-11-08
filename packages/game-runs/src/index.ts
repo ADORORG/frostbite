@@ -1,3 +1,4 @@
+export { bestsOf, type RunBest } from "./bests.ts";
 export { createDrizzleGameRunRepository } from "./drizzle-repository.ts";
 export {
   defaultGameRunPolicy,

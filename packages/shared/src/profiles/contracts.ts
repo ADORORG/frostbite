@@ -39,6 +39,8 @@ export const profilePolicySchema = z
   .strict();
 export type ProfilePolicyView = z.infer<typeof profilePolicySchema>;
 
+export const getMyProfileInputSchema = z.object({}).strict();
+export type GetMyProfileInput = z.infer<typeof getMyProfileInputSchema>;
 export const getMyProfileResponseSchema = z
   .object({ policy: profilePolicySchema, profile: profileSchema.nullable() })
   .strict();
@@ -53,6 +55,7 @@ export const getMyProfileRoute = {
 export const checkProfileNameInputSchema = z
   .object({ name: profileNameSchema })
   .strict();
+export type CheckProfileNameInput = z.infer<typeof checkProfileNameInputSchema>;
 export const checkProfileNameResponseSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("available") }).strict(),
   z.object({ status: z.literal("yours") }).strict(),
@@ -110,6 +113,8 @@ export const saveProfileRoute = {
   path: "/api/v1/profile",
 } as const;
 
+export const deleteProfileInputSchema = z.object({}).strict();
+export type DeleteProfileInput = z.infer<typeof deleteProfileInputSchema>;
 export const deleteProfileResponseSchema = z
   .object({ deleted: z.boolean() })
   .strict();
@@ -150,6 +155,7 @@ export type PublicProfileView = z.infer<typeof publicProfileSchema>;
 export const getPublicProfileInputSchema = z
   .object({ name: profileNameSchema })
   .strict();
+export type GetPublicProfileInput = z.infer<typeof getPublicProfileInputSchema>;
 export const getPublicProfileRoute = {
   method: "GET",
   operationId: "getPublicProfile",

@@ -7,6 +7,12 @@ export type { StatusCardTone } from "./components/arcade-status-card.tsx";
 export { ArcadeSignButton } from "./components/arcade-sign-button.tsx";
 export { Avatar } from "./components/avatar.tsx";
 export {
+  avatarAccent,
+  avatarSpriteIds,
+  ProfileAvatar,
+  type AvatarSpriteId,
+} from "./components/profile-avatar.tsx";
+export {
   ShellSlotsProvider,
   ShellStatusProvider,
 } from "./patterns/shell-slots.tsx";
