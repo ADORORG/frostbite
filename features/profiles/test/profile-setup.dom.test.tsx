@@ -293,3 +293,43 @@ describe("the profile setup page when something goes wrong", () => {
     await settle(() => expect(api.getMine).toHaveBeenCalledTimes(2));
   });
 });
+
+describe("the profile setup page when a request fails", () => {
+  it("says a name could not be checked, and still lets the player try to save it", async () => {
+    const api = fakeApi();
+    api.checkName.mockRejectedValue(new Error("offline"));
+    const { container } = await open(api);
+    await type(container, "IceAda");
+    await settle(() =>
+      expect(textOf(container)).toContain("Couldn't check that name."),
+    );
+    expect(saveButton(container)?.disabled).toBe(false);
+  });
+
+  it("says the profile could not be taken down, and keeps it", async () => {
+    const api = fakeApi({ mine: { policy, profile: saved } });
+    api.remove.mockRejectedValue(new Error("offline"));
+    const { container } = await open(api);
+    await click(button(container, "Take my profile down"));
+    await click(button(container, "Yes, delete it"));
+    await settle(() =>
+      expect(textOf(container)).toContain("We couldn't take it down."),
+    );
+    expect(button(container, "Yes, delete it")).not.toBeNull();
+  });
+
+  it("gives the share sheet the page's own address on the origin the page is on", async () => {
+    const { container } = await open(fakeApi(), share);
+    await type(container, "IceAda");
+    await settle(() => expect(saveButton(container)?.disabled).toBe(false));
+    await click(saveButton(container));
+    await settle(() => expect(button(container, "Share")).not.toBeNull());
+    await click(button(container, "Share"));
+    await settle(() => {
+      const link = document.querySelector<HTMLInputElement>(
+        "dialog input[readonly]",
+      );
+      expect(link?.value).toBe(`${window.location.origin}/p/IceAda`);
+    });
+  });
+});
