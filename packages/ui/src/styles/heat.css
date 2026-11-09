@@ -1,0 +1,102 @@
+/* Heat: the sticker on a hot game's cover, the rim around a hot card, and the meter that says how hot. Ember colours only; the rest is the arcade's. */
+.hot-sticker {
+  position: absolute;
+  top: var(--arcade-space-2);
+  right: var(--arcade-space-2);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--arcade-space-1);
+  padding: var(--arcade-space-1) var(--arcade-space-2);
+  border-radius: var(--arcade-radius-small);
+  background: linear-gradient(
+    135deg,
+    var(--arcade-yellow),
+    var(--arcade-ember) 55%,
+    var(--arcade-red)
+  );
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--arcade-ember) 55%, transparent);
+  color: var(--arcade-ink);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  transform: rotate(3deg);
+}
+.hot-sticker__flame {
+  width: 0.75em;
+  height: 0.95em;
+  fill: currentColor;
+  transform-origin: 50% 100%;
+}
+/* A glowing edge on a hot card, in place of the cyan one the others have; still when the person asked for less motion. */
+.cover-card[data-hot="true"] .cover-card__link {
+  border-color: var(--arcade-ember);
+  box-shadow: 0 0 1.5rem
+    color-mix(in srgb, var(--arcade-ember) 30%, transparent);
+}
+.cover-card[data-hot="true"] .cover-card__link:hover,
+.cover-card[data-hot="true"] .cover-card__link:focus-visible {
+  box-shadow: 0 0 2.25rem
+    color-mix(in srgb, var(--arcade-ember) 55%, transparent);
+}
+.heat {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: var(--arcade-space-2);
+}
+.heat__meter {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.2rem;
+  height: 1.1rem;
+}
+/* Each bar is taller than the last, so the meter reads as a rising level before any bar is lit. */
+.heat__meter > i {
+  width: 0.5rem;
+  height: calc(0.35rem + var(--heat-step) * 0.19rem);
+  border: 0.0625rem solid var(--arcade-border-strong);
+  background: var(--arcade-surface-raised);
+}
+.heat__meter > i[data-lit="true"] {
+  border-color: transparent;
+  background: var(--arcade-yellow);
+}
+.heat__meter > i[data-lit="true"]:nth-child(n + 3) {
+  background: var(--arcade-ember);
+}
+.heat__meter > i[data-lit="true"]:nth-child(n + 5) {
+  background: var(--arcade-red);
+  box-shadow: 0 0 0.5rem var(--arcade-red);
+}
+.heat__word {
+  color: var(--arcade-ember);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  line-height: 1;
+  text-transform: uppercase;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hot-sticker__flame {
+    animation: hot-flame 1s steps(4) infinite;
+  }
+  .cover-card[data-hot="true"] .cover-card__link {
+    animation: hot-rim 2.4s ease-in-out infinite;
+  }
+}
+@keyframes hot-flame {
+  25% {
+    transform: scaleY(1.15) skewX(-5deg);
+  }
+  50% {
+    transform: scaleY(0.92);
+  }
+  75% {
+    transform: scaleY(1.1) skewX(5deg);
+  }
+}
+@keyframes hot-rim {
+  50% {
+    box-shadow: 0 0 2.25rem
+      color-mix(in srgb, var(--arcade-ember) 50%, transparent);
+  }
+}

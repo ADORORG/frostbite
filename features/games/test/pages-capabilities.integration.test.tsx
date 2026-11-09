@@ -8,6 +8,7 @@ import {
   getGalleryPictureRoute,
   getLeaderboardRoute,
   getMyRankRoute,
+  recordGamePlayRoute,
   getSharedPictureRoute,
   listGalleryMintsRoute,
   getMintedPictureRoute,
@@ -129,6 +130,7 @@ describe("the games feature registration", () => {
         getGalleryPictureRoute,
         getLeaderboardRoute,
         getMyRankRoute,
+        recordGamePlayRoute,
       ],
     });
     // Only a signed-in player has milestones: the page is not public, so the platform sends everyone else to sign in.

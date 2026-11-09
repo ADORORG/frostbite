@@ -54,3 +54,9 @@ submissions), `test:coverage` (100% of statements, branches, functions and lines
 ## Ownership
 
 The games platform owner. A change to the table is a migration.
+
+## Hot games (HOT-1)
+
+`recordPlay` adds one to `game_play_days` (game, UTC day, count) in the database, so two starts at once are two; `playsInWindow` sums the days in the policy's
+window; `rankGames` (pure) ranks them under `defaultHotPolicy` (window, minimum plays, how many are hot) and gives each ranked game a heat from 1 to
+`heatLevels` (`@frostbite/shared/games`). A row names no player.

@@ -29,6 +29,8 @@ import {
 } from "./application/leaderboard-operations.ts";
 import { createGalleryResolver } from "./gallery-runtime.ts";
 import { createLeaderboardResolver } from "./leaderboard-runtime.ts";
+import { createPlaysResolver } from "./plays-runtime.ts";
+import { createRecordGamePlayOperation } from "./application/plays-operations.ts";
 import {
   createGetMintedPictureOperation,
   createListMintedMilestonesOperation,
@@ -80,6 +82,7 @@ export function createGamesEntrypoint(
   const sharesService = sharesResolverFor(games);
   const galleryService = createGalleryResolver();
   const boards = createLeaderboardResolver();
+  const { hot, plays } = createPlaysResolver();
   // A game has a board when the platform replays its runs, because only a replay yields a score it can trust.
   const scoredGames: ReadonlySet<string> = new Set(
     catalog
@@ -158,12 +161,17 @@ export function createGamesEntrypoint(
       ),
       registerHttpOperation(createGetLeaderboardOperation(boards, scoredGames)),
       registerHttpOperation(createGetMyRankOperation(boards, scoredGames)),
+      registerHttpOperation(
+        createRecordGamePlayOperation(async () => plays(), listedGames),
+      ),
     ],
     homeSections: [
       {
         id: "games",
         order: homeSectionOrder.games,
-        render: () => <GamesRail games={catalog.list()} />,
+        render: async () => (
+          <GamesRail games={catalog.list()} hot={await hot()} />
+        ),
       },
     ],
     pages: [
@@ -172,13 +180,14 @@ export function createGamesEntrypoint(
         metadata: () =>
           catalog.list().length === 0 ? privatePage : gamesIndexMetadata,
         path: gamesPath,
-        render: ({ navigation, searchParams = {} }) => {
+        render: async ({ navigation, searchParams = {} }) => {
           const list = catalog.list();
           return list.length === 0 ? (
             <NoGames navigation={navigation} />
           ) : (
             <GamesIndex
               games={list}
+              hot={await hot()}
               initial={parseGameQuery(searchParamsOf(searchParams))}
               navigation={navigation}
             />
