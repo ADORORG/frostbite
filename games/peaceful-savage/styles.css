@@ -1,0 +1,215 @@
+@import "@frostbite/game-sdk/audio/panel.css";
+@import "@frostbite/game-sdk/phone.css";
+@import "./overlay.css";
+
+/* The book's colours: a deep night purple, gold line-work, warm cream for words, and teal for what grows. */
+:root {
+  color-scheme: dark;
+  --night: #120b2e;
+  --deep: #1d1347;
+  --edge: #4a3592;
+  --gold: #ffc74a;
+  --cream: #fff3dc;
+  --lavender: #c7b8f2;
+  --teal: #4fd6c8;
+}
+body {
+  margin: 0;
+  background: radial-gradient(120% 90% at 50% 0%, #2a1a63, var(--night));
+  color: var(--cream);
+  font-family: system-ui, sans-serif;
+}
+/* The page is the whole frame: a slim bar above, the screen filling what is left, the controls and the skills below. */
+main {
+  display: grid;
+  /* One column that may be narrower than what is in it: a long row scrolls inside its box and never widens the page. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  block-size: 100dvh;
+  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+}
+.bar,
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.foot #note {
+  flex: 1 1 14rem;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.03em;
+  background: linear-gradient(90deg, var(--cream), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+h2 {
+  font-size: 1rem;
+}
+#status {
+  color: var(--lavender);
+  font-size: 0.875rem;
+}
+.score {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.375rem;
+  overflow: hidden;
+  color: var(--lavender);
+  font-size: 0.875rem;
+}
+.score span {
+  padding: 0.125rem 0.625rem;
+  border: 0.125rem solid #2c1f66;
+  border-radius: 999px;
+  background: #160d38;
+  white-space: nowrap;
+}
+.score strong {
+  display: inline-block;
+  min-inline-size: 2.5em;
+  color: var(--gold);
+  text-align: end;
+}
+/* The screen: the three-dimensional view, and over it the screen's own canvas (the flat map where there is no WebGL), and over both the
+   page's words. All three fill the same box. */
+.stage {
+  display: grid;
+  position: relative;
+  min-block-size: 0;
+  overflow: hidden;
+  border: 0.1875rem solid var(--edge);
+  border-radius: 0.75rem;
+  background: linear-gradient(#0c0620, #2a1a63);
+  box-shadow:
+    0 0 2.5rem rgb(255 199 74 / 0.16),
+    inset 0 0 0 0.125rem var(--night);
+}
+.stage canvas {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  object-fit: contain;
+  background: none;
+  touch-action: none;
+}
+.stage canvas[hidden] {
+  display: none;
+}
+/* Everything that changes while a run is played has a place of its own that never grows, so nothing under the player's thumb moves:
+   the note holds two lines, the rows of skills and of milestones scroll sideways, the readouts do not wrap. */
+#note {
+  block-size: 3rem;
+  overflow-y: auto;
+  color: var(--lavender);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+button {
+  min-height: 2.75rem;
+  /* A label may change ("Start run", "Go again"); the width does not, so the button beside it stays put. */
+  min-inline-size: 7rem;
+  padding: 0.5rem 1rem;
+  border: 0.125rem solid var(--gold);
+  border-radius: 0.5rem;
+  background: var(--deep);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 0.25rem 0 #6b4a12;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background 120ms ease;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* A button that is not offered keeps its place, so the one beside it does not slide into it. */
+button[hidden] {
+  display: inline-block;
+  visibility: hidden;
+}
+button:hover:not(:disabled),
+button:focus-visible {
+  background: #2c1f66;
+}
+button:active:not(:disabled) {
+  transform: translateY(0.125rem);
+  box-shadow: 0 0.125rem 0 #6b4a12;
+}
+button:focus-visible {
+  outline: 0.1875rem solid var(--teal);
+  outline-offset: 0.125rem;
+}
+/* The skills to practise and the milestones earned share the last row, side by side, so the screen keeps as much height as it can. */
+.lists {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1rem;
+}
+.skills,
+.earned {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+#skills,
+#earned {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#skills li {
+  display: grid;
+  gap: 0.125rem;
+}
+#skills button {
+  min-inline-size: 5.5rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.85rem;
+}
+#skills meter {
+  inline-size: 100%;
+  block-size: 0.375rem;
+}
+#earned {
+  block-size: 2.25rem;
+}
+#earned li {
+  padding: 0.25rem 0.625rem;
+  border: 0.125rem solid var(--teal);
+  border-radius: 999px;
+  color: var(--teal);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

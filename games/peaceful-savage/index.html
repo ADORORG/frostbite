@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Peaceful Savage: Light the Tree</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="main" data-phase="ready">
+      <div class="bar">
+        <header>
+          <h1>Peaceful Savage: Light the Tree</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Colour <strong id="colour">8%</strong></span>
+          <span>Family <strong id="family">0 of 4</strong></span>
+          <span>Threads <strong id="threads">0 of 6</strong></span>
+          <span>Level <strong id="level">1</strong></span>
+          <span>Score <strong id="score">0</strong></span>
+          <span class="best">Best <strong id="best">0</strong></span>
+        </p>
+      </div>
+      <div id="stage" class="stage">
+        <canvas
+          id="world"
+          width="640"
+          height="360"
+          aria-hidden="true"
+          hidden
+        ></canvas>
+        <canvas
+          id="screen"
+          width="640"
+          height="360"
+          role="img"
+          aria-label="The game screen: the Savage family's home and meadow by night, grey until the family brings its colour back"
+        ></canvas>
+        <div class="overlay">
+          <div
+            id="spark"
+            class="spark"
+            role="meter"
+            aria-label="Spark"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="60"
+          >
+            <span id="spark-fill"></span>
+          </div>
+          <p id="toast" class="toast" aria-live="polite"></p>
+          <p id="prompt" class="prompt"></p>
+          <div id="hero" class="hero" hidden>
+            <h2 id="hero-name"></h2>
+            <p id="hero-tag" class="hero-tag"></p>
+            <dl id="hero-stats" class="hero-stats"></dl>
+            <p id="hero-ability" class="hero-ability"></p>
+            <p id="hero-lesson" class="hero-lesson"></p>
+            <p id="hero-story" class="hero-story"></p>
+          </div>
+          <div
+            id="card-panel"
+            class="card-panel"
+            role="dialog"
+            aria-labelledby="card-title"
+            hidden
+          >
+            <h2 id="card-title">Share cards</h2>
+            <img id="card-image" alt="" />
+            <p id="card-hint" class="card-hint"></p>
+            <div class="card-row">
+              <button id="card-previous" type="button">Previous</button>
+              <span id="card-count"></span>
+              <button id="card-next" type="button">Next</button>
+            </div>
+            <div class="card-row">
+              <button type="button" data-shape="square" aria-pressed="true">
+                Post
+              </button>
+              <button type="button" data-shape="story" aria-pressed="false">
+                Story
+              </button>
+            </div>
+            <div class="card-row">
+              <button id="card-download" type="button">Download</button>
+              <button id="card-share" type="button">Share</button>
+              <button id="card-close" type="button">Close</button>
+            </div>
+          </div>
+          <div id="moment" class="moment" hidden>
+            <h2 id="moment-title"></h2>
+            <p id="moment-said" class="moment-said"></p>
+            <p id="moment-hint" class="moment-hint"></p>
+            <div id="beat" class="beat" hidden>
+              <span class="beat-mark"></span><span id="beat-ring"></span>
+            </div>
+            <div id="breath" class="breath" hidden>
+              <span id="breath-fill"></span>
+            </div>
+            <div id="choices" class="choices" hidden>
+              <button id="choice-0" type="button"></button>
+              <button id="choice-1" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+          <button id="previous" type="button">Previous</button>
+          <button id="next" type="button">Next</button>
+          <button id="act" type="button" disabled>Act</button>
+          <button id="vision" type="button" disabled>Vision</button>
+          <button id="end" type="button" disabled>End run</button>
+          <button id="cards" type="button" disabled>Cards</button>
+        </div>
+      </div>
+      <section class="lists">
+        <div class="skills">
+          <h2 id="skills-title">Practise</h2>
+          <ul id="skills" aria-labelledby="skills-title"></ul>
+        </div>
+        <div class="earned">
+          <h2 id="earned-title">Earned this run</h2>
+          <ul id="earned" aria-label="Milestones earned this run"></ul>
+        </div>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
