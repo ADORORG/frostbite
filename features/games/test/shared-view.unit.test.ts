@@ -91,9 +91,9 @@ describe("a shared link's page metadata", () => {
     verification: "self-reported",
   } as const;
 
-  it("names the thing, says how it is known, and points at the picture made for this link", () => {
+  it("names the thing, says nothing about how a reported one is known, and points at the picture made for this link", () => {
     expect(sharedMetadata(id, score, games)).toEqual({
-      description: "Can you beat it? Self-reported.",
+      description: "Can you beat it?",
       image: { alt: "90 in Template game", path: `/s/${id}/share-image` },
       kind: "shared",
       title: "90 in Template game",

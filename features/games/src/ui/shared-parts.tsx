@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { shareCopy } from "../domain/share-copy.ts";
 import type { SharedGameInfo } from "../domain/shared-model.ts";
+import { verificationLabel } from "../domain/verification-label.ts";
 import type { ShareVerification } from "@frostbite/shared/games";
 
 // The big picture-and-words block at the top of a shared page, over the game's own cover, blurred and darkened, so the page feels like the
@@ -72,11 +73,11 @@ export function SharedChips({
   );
 }
 
-export const verificationChip = (verification: ShareVerification) => ({
-  label: shareCopy.verification[verification],
-  tone:
-    verification === "replay-verified" ? ("good" as const) : ("plain" as const),
-});
+// The chip that says a thing was verified by replay: one chip for a verified thing and none for any other, so spread it into a list.
+export const verificationChips = (verification: ShareVerification | null) => {
+  const label = verificationLabel(verification);
+  return label === null ? [] : [{ label, tone: "good" as const }];
+};
 
 // The call to action every shared page ends with: a reason to play, and the way in.
 export function SharedCall({

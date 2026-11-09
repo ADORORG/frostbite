@@ -7,6 +7,7 @@ import type { ShareVerification } from "@frostbite/shared/games";
 import type { SharedThing } from "@frostbite/game-shares";
 
 import { shareCopy } from "./share-copy.ts";
+import { verificationLabel } from "./verification-label.ts";
 
 // What a shared page and its preview picture show for a share: the words, how it is known, and where to go and play. Built from the
 // listed games, so a share of a game that is no longer listed (or a milestone it no longer declares) has no view and shows nothing.
@@ -68,9 +69,8 @@ export function sharedView(
   };
 }
 
-// The line above a preview picture's title: what it is and, when the platform has a level for it, how it is known, so a card never
-// reads as proof of more than it is.
-export const cardKicker = (view: SharedView) =>
-  view.verification === null
-    ? view.kicker
-    : `${view.kicker} · ${shareCopy.verification[view.verification]}`;
+// The line above a preview picture's title: what it is and, when the platform has proof for it, that it is verified.
+export const cardKicker = (view: SharedView) => {
+  const label = verificationLabel(view.verification);
+  return label === null ? view.kicker : `${view.kicker} · ${label}`;
+};

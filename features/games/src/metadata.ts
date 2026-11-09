@@ -12,8 +12,8 @@ import {
 import type { SharedThing } from "@frostbite/game-shares";
 
 import type { GameCatalog, PublicGame } from "./domain/catalog.ts";
-import { shareCopy } from "./domain/share-copy.ts";
 import { sharedView } from "./domain/shared-view.ts";
+import { verificationLabel } from "./domain/verification-label.ts";
 
 // Where a game's share picture is served (see `apps/web/src/app/share/games`). The address is the game's own identifier, which
 // is a validated slug, so it needs no escaping.
@@ -64,11 +64,10 @@ export function sharedMetadata(
 ): PageMetadata {
   const view = thing === null ? null : sharedView(thing, games);
   if (view === null) return privatePage;
+  const label = verificationLabel(view.verification);
   return {
     description: clipDescription(
-      view.verification === null
-        ? view.subtitle
-        : `${view.subtitle} ${shareCopy.verification[view.verification]}.`,
+      label === null ? view.subtitle : `${view.subtitle} ${label}.`,
     ),
     image: { alt: view.title, path: shareImagePath(id) },
     kind: "shared",

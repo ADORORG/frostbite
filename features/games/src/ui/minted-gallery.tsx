@@ -11,6 +11,7 @@ import type { GalleryApi } from "../client/gallery-api.ts";
 import type { PublicGame } from "../domain/catalog.ts";
 import { galleryCopy } from "../domain/gallery-copy.ts";
 import { mintedDay } from "../domain/minted-view.ts";
+import { verificationLabel } from "../domain/verification-label.ts";
 import { MintedArt } from "./minted-art.tsx";
 import { useGallery } from "./use-gallery.ts";
 
@@ -69,12 +70,14 @@ export function MintedGallery({
                 <strong>{title(mint.milestoneId)}</strong>
                 <small>{galleryCopy.mintedTo(mint.wallet)}</small>
                 <small>{mintedDay(mint.mintedAt)}</small>
-                <span
-                  className="mint-gallery-card__level"
-                  data-level={mint.verification}
-                >
-                  {galleryCopy.verification[mint.verification]}
-                </span>
+                {verificationLabel(mint.verification) === null ? null : (
+                  <span
+                    className="mint-gallery-card__level"
+                    data-level={mint.verification}
+                  >
+                    {verificationLabel(mint.verification)}
+                  </span>
+                )}
                 <span className="mint-gallery-card__tx">
                   <TransactionLink id={mint.transactionId} />
                 </span>

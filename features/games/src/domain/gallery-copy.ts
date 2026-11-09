@@ -13,8 +13,4 @@ export const galleryCopy = {
   minted: (count: number) =>
     count === 1 ? "1 minted" : `${count.toLocaleString("en-US")} minted`,
   title: "Minted",
-  verification: {
-    "replay-verified": "Verified by replay",
-    "self-reported": "Self-reported",
-  },
 } as const;

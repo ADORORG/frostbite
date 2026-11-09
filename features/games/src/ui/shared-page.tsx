@@ -10,7 +10,7 @@ import {
   SharedChips,
   SharedGameLine,
   SharedHero,
-  verificationChip,
+  verificationChips,
 } from "./shared-parts.tsx";
 
 function MilestoneBody({
@@ -19,7 +19,7 @@ function MilestoneBody({
   readonly model: Extract<SharedModel, { kind: "milestone" }>;
 }) {
   const chips = [
-    verificationChip(model.verification),
+    ...verificationChips(model.verification),
     ...(model.mint === null
       ? []
       : [
@@ -100,7 +100,7 @@ function ScoreBody({
           {model.score}
         </p>
         <SharedGameLine game={model.game} />
-        <SharedChips items={[verificationChip(model.verification)]} />
+        <SharedChips items={verificationChips(model.verification)} />
       </SharedHero>
       <SharedCall
         body={shareCopy.page.scoreCta.body}

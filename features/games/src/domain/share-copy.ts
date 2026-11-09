@@ -55,8 +55,5 @@ export const shareCopy = {
     inGame: "in",
     newBest: (game: string) => `New best in ${game}`,
   },
-  verification: {
-    "replay-verified": "Verified by replay",
-    "self-reported": "Self-reported",
-  },
+  verification: "Verified by replay",
 } as const;
