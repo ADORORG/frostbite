@@ -51,6 +51,13 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // A start is counted for the games that are hot. A person starts a run every few seconds at the very most, so six a minute counts every
     // real start and stops one visitor from raising a game's count by scripting it; a visitor over it is answered 429, which the page ignores.
     recordGamePlay: perMinute(6),
+    // Each of these reaches the chain. A start builds a transaction and asks the chain to simulate it (and asks the fee source); a look at a
+    // claim in progress asks the chain what became of it. A person presses Claim a few times, and the page looks at each claim in progress
+    // every four seconds, so a few starts and a look a second cover real use, and a script is stopped from using the shared chain
+    // connection as its own: without these they would count in the shared write allowance (120 a minute for everything a person does).
+    startGameClaim: perMinute(10),
+    submitGameClaim: perMinute(20),
+    refreshGameClaim: perMinute(90),
     // Making a link is a write of the player's own, and a few a minute is a person pressing Share; ending one is rarer.
     createShare: perMinute(20),
     revokeShare: perMinute(30),
@@ -92,6 +99,6 @@ export const rateLimits = rateLimitConfigSchema.parse({
     verifyWalletStepUp: perMinute(20),
   },
   read: perMinute(600),
-  version: 2,
+  version: 3,
   write: perMinute(120),
 });
