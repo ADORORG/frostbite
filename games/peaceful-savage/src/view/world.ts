@@ -146,7 +146,8 @@ export function buildWorld(amount: number, lights: boolean): World {
       const vision = state.tick < state.visionUntil;
       greys.update(state, vision, time, dt);
       gathered.update(state, vision, time);
-      // The snake gathers when the finale begins, warms to gold through it, and lets its figures go when the tree is lit.
+      // The snake sleeps on the hill until the finale begins; then it wakes and rises, warms to gold through it, and lets its figures go
+      // when the tree is lit.
       const finale = state.moment?.kind === "finale";
       const steps =
         finale && state.moment !== null ? state.moment.step / 11 : 0;
@@ -162,6 +163,7 @@ export function buildWorld(amount: number, lights: boolean): World {
         gold,
         ending.kind === "lit" ? ending.since : 0,
         time,
+        vision,
       );
       // The ones it let go come home to the tree, and greet the family; and then the show, with them all round the stage.
       const lit = ending.kind === "lit" ? ending.since : null;

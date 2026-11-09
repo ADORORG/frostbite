@@ -65,10 +65,23 @@ const furniture: readonly Box[] = [
   box(-3_500, -2_800, -2_100, -2_300),
 ];
 
+// The giant sly snake, asleep round the hilltop from the start: nobody walks through its coil, nor under its chin (three boxes, near
+// enough the round of it).
+export const snakeCoil: readonly Box[] = [
+  box(-4_300, -19_700, 4_300, -16_300),
+  box(-1_700, -22_300, 1_700, -12_800),
+  box(-3_200, -21_200, 3_200, -14_800),
+];
+
 // The front door. It stands open: the porch and the meadow are part of home from the start.
 export const frontDoor: Box = box(-900, -100, 900, 100);
 
-export const walls: readonly Box[] = [...shell, ...field, ...furniture];
+export const walls: readonly Box[] = [
+  ...shell,
+  ...field,
+  ...furniture,
+  ...snakeCoil,
+];
 
 // Where a run begins, before anyone is chosen: the hall, just inside the front door, facing the tree. Once chosen, the lead begins at
 // their own place (below).
@@ -82,7 +95,8 @@ export const places = {
   // The ancestor tree, in the hall. Its trunk is the box above; a hand on it reaches from about a metre away.
   deck: { x: 2_550, z: 6_000 },
   drawer: { x: 8_400, z: 3_200 },
-  // Where the giant snake rises, on the hill in the meadow, and how near the family must come.
+  // Where the giant snake sleeps and rises, on the hill in the meadow; and how near the family must come to wake it (just short of its
+  // coil, which nobody can walk into).
   hill: { x: 0, z: -18_000 },
   lamp: { x: 2_050, z: 11_800 },
   loom: { x: 5_200, z: 13_200 },
@@ -90,7 +104,7 @@ export const places = {
   tree: { x: 0, z: 6_000 },
 } as const satisfies Record<string, Point>;
 
-export const hillRadius = 3_500;
+export const hillRadius = 6_500;
 
 // Zora's garden: three beds of earth in the meadow near where she plays, to plant and tend.
 export const gardenBeds: readonly Point[] = [

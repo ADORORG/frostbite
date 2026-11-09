@@ -1,12 +1,12 @@
 import type { ZoneId } from "./constants.ts";
-import { blocked, type Point } from "./geometry.ts";
-import { frontDoor, walls } from "./layout.ts";
+import { blocked, type Point, within } from "./geometry.ts";
+import { frontDoor, hillRadius, places, walls } from "./layout.ts";
 
 // What a curious lead gathers: tiny plasma (energy, picked up by walking through it), clues left by the ancestors (seen only in Savage
 // Vision), and the house's relics, the named heirlooms of the book (each one a true fact about the person it is named after).
 
-// Where tiny plasma may lie: points on a grid over each room's open floor, clear of every wall and piece of furniture. The seed chooses
-// `plasmaPerZone` of them in each room.
+// Where tiny plasma may lie: points on a grid over each room's open floor, clear of every wall and piece of furniture (and of the hilltop,
+// where the giant snake sleeps). The seed chooses `plasmaPerZone` of them in each room.
 interface Floor {
   readonly step: number;
   readonly x0: number;
@@ -56,15 +56,17 @@ export const plasmaSpots: readonly (readonly Point[])[] = floors.map(
     for (let z = floor.z0; z <= floor.z1; z += floor.step)
       for (let x = floor.x0; x <= floor.x1; x += floor.step) {
         const point = { x, z };
-        const clear = !blocked(
-          point,
-          [...walls, frontDoor].map((wall) => ({
-            x0: wall.x0 - 200,
-            x1: wall.x1 + 200,
-            z0: wall.z0 - 200,
-            z1: wall.z1 + 200,
-          })),
-        );
+        const clear =
+          !within(point, places.hill, hillRadius) &&
+          !blocked(
+            point,
+            [...walls, frontDoor].map((wall) => ({
+              x0: wall.x0 - 200,
+              x1: wall.x1 + 200,
+              z0: wall.z0 - 200,
+              z1: wall.z1 + 200,
+            })),
+          );
         if (clear) spots.push(point);
       }
     return spots;

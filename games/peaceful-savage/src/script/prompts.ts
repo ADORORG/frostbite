@@ -1,5 +1,8 @@
 import type { Target } from "../rules/act.ts";
-import type { HeroId } from "../rules/constants.ts";
+import { type HeroId, heroIds } from "../rules/constants.ts";
+import { within } from "../rules/geometry.ts";
+import { hillRadius, places } from "../rules/layout.ts";
+import { family } from "../rules/state.ts";
 import type { PlayState } from "../rules/types.ts";
 
 // What the act key would do, as the prompt over the screen says it before a press: "Open the fridge", "Go to Mama". The rules decide
@@ -102,4 +105,15 @@ export function promptFor(
     case "thing":
       return thingWords[thingIds[target.index] ?? ""] ?? "Touch it";
   }
+}
+
+// Beside the giant snake asleep on the hill, before the family can wake it: what it waits for. Nothing to say once it can be woken.
+export function hillHint(state: PlayState): string | null {
+  if (state.lead === null || state.moment !== null || state.ended) return null;
+  if (!within(state, places.hill, hillRadius + 4_000)) return null;
+  if (!state.jackets)
+    return "A giant sly snake sleeps here. It wakes for the family in maridium jackets.";
+  return family(state).length < heroIds.length
+    ? "A giant sly snake sleeps here. Bring the whole family to wake it."
+    : null;
 }

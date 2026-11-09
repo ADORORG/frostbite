@@ -8,57 +8,40 @@ import {
   Matrix4,
   Mesh,
   MeshStandardMaterial,
-  type MeshToonMaterial,
   Quaternion,
   SphereGeometry,
-  TorusGeometry,
   Vector3,
 } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 import { taperedTube } from "../body/tube.ts";
-import { noise, texture } from "../palette.ts";
+import { noise } from "../palette.ts";
 import { inkMaterial, toon } from "../toon.ts";
 import { groundAt } from "./meadow.ts";
+import { head, scales } from "./serpent-head.ts";
 
-// The giant sly snake on the hill, made of every feeling the bloodline was told to put away: a great body coiled round the hilltop and
-// rising in an S to a head that looks down at the family with heavy, sorrowful eyes (no fangs, nothing to fear: it is grief, not
-// menace), and all along it the small curled figures of the ancestors trapped in it. It grows out of the grass from the tail up as the
-// finale begins, and as the family works the moment through it warms to gold from the tail up. When the tree is lit it lets them go:
-// the body fades, and the ancestors light up gold and rise out of it, home (they come to the tree in the hall: see ancestors.ts).
+// The giant sly snake on the hill, made of every feeling the bloodline was told to put away. From the start it lies asleep round the
+// hilltop, grey, breathing slow and deep, its chin on its own coil and its heavy eyes shut; all along it lie the small curled figures of
+// the ancestors trapped in it (Savage Vision makes them glow). When the family comes in their jackets it wakes and rises in an S to a
+// head that looks down at them with sorrowful eyes (no fangs, nothing to fear: it is grief, not menace); as the family works the moment
+// through it warms to gold from the tail up; and when the tree is lit it lets them go: the body fades, and the ancestors light up gold
+// and rise out of it, home (they come to the tree in the hall: see ancestors.ts).
 export interface Serpent {
   readonly group: Group;
-  // `rise` 0 to 1 as it gathers, `gold` 0 to 1 as it is healed, and the seconds since the tree was lit (0 before).
-  update(rise: number, gold: number, release: number, time: number): void;
+  // `wake` 0 asleep to 1 risen, `gold` 0 to 1 as it is healed, the seconds since the tree was lit (0 before), and whether Savage
+  // Vision is open.
+  update(
+    wake: number,
+    gold: number,
+    release: number,
+    time: number,
+    vision: boolean,
+  ): void;
 }
 
 const centre = new Vector3(0, groundAt(0, -18), -18);
 const rows = 140;
 const sides = 14;
-
-// Coiled once and a half round the hilltop, then up in an S toward the house, where the family comes from.
-function path(): CatmullRomCurve3 {
-  const points: Vector3[] = [];
-  for (let at = 0; at <= 16; at += 1) {
-    const t = at / 16;
-    const angle = Math.PI * 0.5 + t * Math.PI * 3;
-    const radius = 4.2 - t * 1.6;
-    points.push(
-      new Vector3(
-        Math.cos(angle) * radius,
-        0.45 + t * 1.2,
-        Math.sin(angle) * radius,
-      ),
-    );
-  }
-  points.push(
-    new Vector3(-1.2, 1.6, 2.4),
-    new Vector3(0.6, 3.2, 2.2),
-    new Vector3(0.2, 4.6, 1.2),
-    new Vector3(0, 5.3, 2.4),
-  );
-  return new CatmullRomCurve3(points.map((point) => point.add(centre)));
-}
 
 const smooth = (from: number, to: number, value: number): number => {
   const t = Math.max(0, Math.min(1, (value - from) / (to - from)));
@@ -69,64 +52,72 @@ const smooth = (from: number, to: number, value: number): number => {
 const girth = (t: number): number =>
   0.12 + 0.68 * smooth(0, 0.3, t) - 0.18 * smooth(0.82, 1, t);
 
-// Scales: rows of overlapping half-circles, each edged in a fine line that glows gold once healed.
-function scales() {
-  return texture(
-    64,
-    (x, y) => {
-      const row = Math.floor(y / 16);
-      const shift = row % 2 === 0 ? 0 : 8;
-      const cx = Math.floor((x + shift) / 16) * 16 + 8 - shift;
-      const d = Math.hypot(x - cx, (y % 16) - 2);
-      const edge = Math.abs(d - 9) < 1.1;
-      return edge ? [255, 215, 120, 255] : [0, 0, 0, 255];
-    },
-    1,
-  );
+// A point round the hilltop (measured from its middle), `lift` over the ground there.
+const over = (x: number, z: number, lift: number): Vector3 =>
+  new Vector3(x, groundAt(x, centre.z + z) - centre.y + lift, z);
+
+// Coiled once and a half round the hilltop on the ground, each turn lying a little on the one outside it; then the neck. Asleep, it is
+// laid across the hilltop with the chin on the coil and the face to the house; awake, it rises in an S toward the house, where the
+// family comes from.
+function path(awake: boolean): CatmullRomCurve3 {
+  const points: Vector3[] = [];
+  for (let at = 0; at <= 16; at += 1) {
+    const t = at / 16;
+    const angle = Math.PI * 0.5 + t * Math.PI * 3;
+    const radius = 4.2 - t * 1.6;
+    const lift = girth(t * 0.8) * 0.85 + t * (awake ? 1.1 : 0.75);
+    points.push(over(Math.cos(angle) * radius, Math.sin(angle) * radius, lift));
+  }
+  const neck = awake
+    ? [
+        [-1.2, 1.6, 2.4],
+        [0.6, 3.1, 2.4],
+        [0.2, 4.4, 1.8],
+        [0, 4.9, 3.1],
+      ]
+    : [
+        [-0.9, 0.7, -0.9],
+        [-0.45, 0.7, 0.7],
+        [0.15, 1.3, 2],
+        [0, 2, 2.9],
+      ];
+  for (const [x = 0, y = 0, z = 0] of neck) points.push(new Vector3(x, y, z));
+  return new CatmullRomCurve3(points);
 }
 
-function head(skin: MeshToonMaterial): Group {
-  const made = new Group();
-  const skull = new Mesh(new SphereGeometry(1, 28, 18), skin);
-  skull.scale.set(0.95, 0.62, 1.35);
-  const snout = new Mesh(new SphereGeometry(1, 24, 14), skin);
-  snout.scale.set(0.7, 0.42, 0.7);
-  snout.position.set(0, -0.12, 0.95);
-  made.add(skull, snout);
-  for (const s of [1, -1]) {
-    const eye = new Mesh(
-      new SphereGeometry(0.24, 16, 12),
-      new MeshStandardMaterial({ color: "#f4eedf", roughness: 0.35 }),
-    );
-    eye.position.set(s * 0.55, 0.22, 0.78);
-    const iris = new Mesh(
-      new SphereGeometry(0.13, 12, 10),
-      new MeshStandardMaterial({ color: "#5a4a7a", roughness: 0.2 }),
-    );
-    iris.position.set(s * 0.02, -0.04, 0.16);
-    eye.add(iris);
-    // A heavy upper lid, half shut and tipped down at the outer corner: sorrowful, not fierce.
-    const lid = new Mesh(
-      new SphereGeometry(0.27, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.55),
-      skin,
-    );
-    lid.position.copy(eye.position);
-    lid.rotation.set(0.75, 0, s * -0.35);
-    const brow = new Mesh(new TorusGeometry(0.22, 0.04, 6, 16, Math.PI), skin);
-    brow.position.set(s * 0.55, 0.47, 0.82);
-    brow.rotation.set(0, 0, s * 0.3);
-    made.add(eye, lid, brow);
-  }
-  return made;
+// Where one of the curled ancestors lies on the body, on its top or its sides: `around` 0 is one side, a half turn the top.
+function lying(curve: CatmullRomCurve3, t: number, around: number): Vector3 {
+  const along = curve.getTangentAt(t);
+  const side = along.clone().cross(new Vector3(0, 1, 0));
+  if (side.lengthSq() < 1e-6) side.set(1, 0, 0);
+  side.normalize();
+  const top = side.clone().cross(along).normalize();
+  const r = girth(t) + 0.03;
+  return curve
+    .getPointAt(t)
+    .addScaledVector(side, Math.cos(around) * r)
+    .addScaledVector(top, Math.sin(around) * r);
 }
 
 export function buildSerpent(count: number): Serpent {
   const random = noise(2_027);
   const group = new Group();
-  const curve = path();
-  const spine = curve.getSpacedPoints(rows - 1);
-  const shape = taperedTube(spine, { radius: girth, sides });
-  const shades = new Float32Array(shape.getAttribute("position").count * 3);
+  // Everything is placed from the hilltop, so the whole of it can breathe.
+  const coil = new Group();
+  coil.position.copy(centre);
+  group.add(coil);
+  const asleep = path(false);
+  const awake = path(true);
+  const rest = asleep.getSpacedPoints(rows - 1);
+  const risen = awake.getSpacedPoints(rows - 1);
+  const shape = taperedTube(rest, { radius: girth, sides });
+  const positions = Float32Array.from(shape.getAttribute("position").array);
+  const normals = Float32Array.from(shape.getAttribute("normal").array);
+  const placed = new BufferAttribute(positions, 3);
+  const turned = new BufferAttribute(normals, 3);
+  shape.setAttribute("position", placed);
+  shape.setAttribute("normal", turned);
+  const shades = new Float32Array(placed.count * 3);
   shape.setAttribute("color", new BufferAttribute(shades, 3));
   const skin = toon(
     { value: 1 },
@@ -143,7 +134,7 @@ export function buildSerpent(count: number): Serpent {
   const body = new Mesh(shape, skin);
   const ink = new Mesh(shape, inkMaterial(0.03));
   body.add(ink);
-  group.add(body);
+  coil.add(body);
   // The head has no colours of its own along it: it turns gold all at once, last.
   const headSkin = toon(
     { value: 1 },
@@ -157,7 +148,7 @@ export function buildSerpent(count: number): Serpent {
     },
   );
   const face = head(headSkin);
-  group.add(face);
+  coil.add(face.made);
   // The ancestors, curled small along the body.
   const figure = mergeGeometries([
     new CapsuleGeometry(0.07, 0.1, 4, 8).rotateX(1.2),
@@ -175,36 +166,55 @@ export function buildSerpent(count: number): Serpent {
     count,
   );
   figures.frustumCulled = false;
-  group.add(figures);
-  const along = new Vector3();
+  coil.add(figures);
   const slots = Array.from({ length: count }, () => {
     const t = random();
-    const around = random() * Math.PI * 2;
-    const start = new Vector3(
-      (random() - 0.5) * 22,
-      0,
-      -18 + (random() - 0.5) * 16,
-    );
-    start.y = groundAt(start.x, start.z);
-    return { around, spin: random() * Math.PI * 2, start, t };
+    const around = (random() * 1.6 - 0.3) * Math.PI;
+    return {
+      awake: lying(awake, t, around),
+      rest: lying(asleep, t, around),
+      spin: random() * Math.PI * 2,
+      t,
+    };
   });
   const matrix = new Matrix4();
+  const here = new Vector3();
+  const size = new Vector3();
+  const turn = new Quaternion();
   const spinAxis = new Vector3(0, 1, 0);
   const grey = new Color("#8f8ea8");
   const golden = new Color("#f0b84c");
   const shade = new Color();
-  const indexCount = shape.getIndex()?.count ?? 0;
+  const end = new Vector3();
+  // How far awake the body was last laid out, the figures last placed, and the gold last painted (-1: not yet).
+  let built = 0;
+  let laid = -1;
   let painted = -1;
+  // The body laid out between asleep and awake: the spine eased from one to the other, the tube made again round it.
+  const layOut = (wake: number): void => {
+    const spine = rest.map((point, row) =>
+      point.clone().lerp(risen[row] ?? point, wake),
+    );
+    const next = taperedTube(spine, { radius: girth, sides });
+    positions.set(next.getAttribute("position").array);
+    normals.set(next.getAttribute("normal").array);
+    next.dispose();
+    placed.needsUpdate = true;
+    turned.needsUpdate = true;
+    shape.computeBoundingSphere();
+    built = wake;
+  };
   return {
     group,
-    update(rise, gold, release, time) {
+    update(wake, gold, release, time, vision) {
       // Gone once the last of them has risen out of it.
-      group.visible = rise > 0.001 && release < 2.5;
+      group.visible = release < 2.5;
       if (!group.visible) return;
       const fade = smooth(0, 1.6, release);
-      // It grows out of the grass from the tail; the head comes last.
-      const shown = Math.min(1, rise * 1.15);
-      shape.setDrawRange(0, Math.floor((indexCount * shown) / 6) * 6);
+      // Asleep it breathes, slow and deep; awake it holds its breath.
+      const breath = Math.sin(time * 0.55) * (1 - wake);
+      coil.scale.set(1 + breath * 0.012, 1 + breath * 0.02, 1 + breath * 0.012);
+      if (Math.abs(wake - built) > 0.002) layOut(wake);
       if (Math.abs(gold - painted) > 0.005) {
         painted = gold;
         for (let row = 0; row < rows; row += 1) {
@@ -217,10 +227,16 @@ export function buildSerpent(count: number): Serpent {
         shade.copy(gold >= 1 ? golden : grey);
         shades.set([shade.r, shade.g, shade.b], rows * sides * 3);
         shades.set([shade.r, shade.g, shade.b], rows * sides * 3 + 3);
-        const colours = shape.getAttribute("color");
-        colours.needsUpdate = true;
+        shape.getAttribute("color").needsUpdate = true;
+        slots.forEach((slot, index) => {
+          figures.setColorAt(index, slot.t < gold ? golden : grey);
+        });
+        if (figures.instanceColor !== null)
+          figures.instanceColor.needsUpdate = true;
       }
-      skin.emissiveIntensity = 0.1 + gold * 1.4 + fade;
+      // Savage Vision shows who is curled up inside it while it sleeps.
+      const seen = vision ? (1 - wake) * (0.8 + Math.sin(time * 2.2) * 0.2) : 0;
+      skin.emissiveIntensity = 0.1 + gold * 1.4 + fade + seen * 0.35;
       skin.opacity = 1 - fade;
       body.visible = fade < 0.999;
       headSkin.color.copy(grey).lerp(golden, smooth(0.9, 1, gold));
@@ -228,38 +244,39 @@ export function buildSerpent(count: number): Serpent {
       headSkin.opacity = skin.opacity;
       ink.visible = fade < 0.2;
       // The ancestors light up as they are let go.
-      figureSkin.emissiveIntensity = gold * 0.8 + smooth(0, 1.2, release) * 0.6;
-      curve.getPointAt(1, along);
-      face.position.copy(along).add(new Vector3(0, Math.sin(time) * 0.08, 0.5));
-      face.scale.setScalar(smooth(0.82, 1, rise) * (1 - fade));
-      face.rotation.set(
-        0.35 + Math.sin(time * 0.5) * 0.05,
-        Math.sin(time * 0.4) * 0.2,
+      figureSkin.emissiveIntensity =
+        gold * 0.8 + smooth(0, 1.2, release) * 0.6 + seen * 0.7;
+      // The head rests on the coil, eyes shut, rising and falling with the breath; awake, it looks down at the family.
+      const last = rows - 1;
+      end.copy(rest[last] ?? end).lerp(risen[last] ?? end, wake);
+      face.made.position
+        .copy(end)
+        .add(new Vector3(0, Math.sin(time * 0.55) * 0.04 * (1 - wake), 0.5));
+      face.made.position.y += Math.sin(time) * 0.08 * wake;
+      face.made.scale.setScalar(1 - fade);
+      face.made.rotation.set(
+        0.12 + wake * (0.43 + Math.sin(time * 0.5) * 0.05),
+        Math.sin(time * 0.4) * 0.2 * wake,
         0,
       );
+      const open = smooth(0.35, 0.9, wake);
+      for (const lid of face.lids) lid.rotation.x = 1.5 - open * 0.75;
+      for (const iris of face.irises) iris.visible = open > 0.25;
+      // The figures lie still while it sleeps; they are placed again only while it wakes, sways awake, or lets them go.
+      if (laid >= 0 && wake < 0.001 && laid < 0.001 && release === 0) return;
+      laid = wake;
       slots.forEach((slot, index) => {
-        curve.getPointAt(slot.t, along);
-        const r = girth(slot.t) + 0.03;
-        along.x += Math.cos(slot.around) * r;
-        along.y += Math.sin(slot.around) * r;
-        const settled = smooth(slot.t * 0.6, slot.t * 0.6 + 0.4, rise);
-        const here = slot.start.clone().lerp(along, settled);
-        here.y += Math.sin(time * 1.5 + slot.t * 12) * 0.03;
+        here.copy(slot.rest).lerp(slot.awake, wake);
+        here.y += Math.sin(time * 1.5 + slot.t * 12) * 0.03 * wake;
         // Let go, the tail first: each lights up and rises out of the body, home.
         const going = smooth(slot.t * 0.5, slot.t * 0.5 + 1.5, release);
         here.y += going * 6;
-        const scale = settled * (1 - going);
-        matrix.compose(
-          here,
-          new Quaternion().setFromAxisAngle(spinAxis, slot.spin + time * 0.2),
-          new Vector3(scale, scale, scale),
-        );
+        size.setScalar(1 - going);
+        turn.setFromAxisAngle(spinAxis, slot.spin + time * 0.2 * wake);
+        matrix.compose(here, turn, size);
         figures.setMatrixAt(index, matrix);
-        figures.setColorAt(index, slot.t < gold ? golden : grey);
       });
       figures.instanceMatrix.needsUpdate = true;
-      if (figures.instanceColor !== null)
-        figures.instanceColor.needsUpdate = true;
     },
   };
 }

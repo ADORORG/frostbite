@@ -123,7 +123,7 @@ export const clueLines: readonly string[] = [
   "Hold the act key while you breathe in for four, then let go for six.",
   "Daddy keeps a drawer locked. Bring him home before you knock on it.",
   "Six threads, one loom: Mama weaves the jackets.",
-  "Before the hill, practise the huddle until it is strong.",
+  "Something sleeps on the hill. Go there in your jackets, all four of you together.",
 ];
 
 // The relics, one in each room: inventors whose work is still in every home.

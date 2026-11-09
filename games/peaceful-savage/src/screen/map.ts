@@ -5,7 +5,7 @@ import {
   type ZoneId,
 } from "../rules/constants.ts";
 import { greyAt, greyHomes } from "../rules/greys.ts";
-import { familySpots, places, walls } from "../rules/layout.ts";
+import { familySpots, places, snakeCoil, walls } from "../rules/layout.ts";
 import { family } from "../rules/state.ts";
 import type { PlayState } from "../rules/types.ts";
 
@@ -123,6 +123,7 @@ export function drawMap(
   }
   context.fillStyle = "#2a1d4f";
   for (const wall of walls) {
+    if (snakeCoil.includes(wall)) continue;
     const from = toMap(wall.x0, wall.z0);
     const to = toMap(wall.x1, wall.z1);
     context.fillRect(
@@ -136,7 +137,16 @@ export function drawMap(
   const lit =
     state.cause === "lit" ? 100 : (state.colour[zoneIds.indexOf("hall")] ?? 0);
   dot(context, 0, 6_000, 10, shade("#ffc74a", lit));
+  // The giant snake asleep round the hilltop, until the tree is lit.
   dot(context, places.hill.x, places.hill.z, 6, "#ffffff33");
+  if (state.cause !== "lit") {
+    const hill = toMap(places.hill.x, places.hill.z);
+    context.strokeStyle = "#a9a7bf";
+    context.lineWidth = 5;
+    context.beginPath();
+    context.arc(hill.x, hill.y, 3.6 * scale, 0, Math.PI * 2);
+    context.stroke();
+  }
   state.greys.forEach((grey, index) => {
     const home = greyHomes[index];
     if (home === undefined || !grey.seen || grey.healed) return;

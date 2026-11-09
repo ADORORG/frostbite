@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { walls } from "../src/rules/layout.ts";
+import { snakeCoil, walls } from "../src/rules/layout.ts";
 import { startRun } from "../src/rules/state.ts";
 import {
   drawMap,
@@ -11,10 +11,11 @@ import {
 } from "../src/screen/map.ts";
 import { led } from "./support/states.ts";
 
-// A stand-in for a 2D canvas context: it notes each shape filled and the colour it was filled in.
+// A stand-in for a 2D canvas context: it notes each shape filled (or ring drawn) and the colour it was drawn in.
 function recorder() {
   const fills: { colour: string; kind: string }[] = [];
   let colour = "";
+  let line = "";
   const context = {
     arc: () => undefined,
     beginPath: () => undefined,
@@ -25,6 +26,14 @@ function recorder() {
     },
     set fillStyle(value: string) {
       colour = value;
+    },
+    lineWidth: 1,
+    stroke: () => fills.push({ colour: line, kind: "ring" }),
+    get strokeStyle() {
+      return line;
+    },
+    set strokeStyle(value: string) {
+      line = value;
     },
   };
   return {
@@ -57,9 +66,13 @@ describe("the flat map, for a device with no WebGL 2", () => {
     const dots = choosing.fills.filter((fill) => fill.kind === "dot");
     // The tree, the hill, and the four of the family.
     expect(dots).toHaveLength(6);
+    // The meadow and six rooms, and every wall but the boxes the sleeping snake's coil blocks, which is drawn as a ring instead.
     expect(choosing.fills.filter((fill) => fill.kind === "box").length).toBe(
-      1 + 6 + walls.length,
+      1 + 6 + walls.length - snakeCoil.length,
     );
+    expect(choosing.fills.filter((fill) => fill.kind === "ring")).toEqual([
+      { colour: "#a9a7bf", kind: "ring" },
+    ]);
     const state = led();
     const seen = {
       ...state,
@@ -80,5 +93,7 @@ describe("the flat map, for a device with no WebGL 2", () => {
     expect(lit.fills.find((fill) => fill.kind === "dot")?.colour).toBe(
       "#ffc74a",
     );
+    // Once the tree is lit the snake has let its ancestors go.
+    expect(lit.fills.some((fill) => fill.kind === "ring")).toBe(false);
   });
 });

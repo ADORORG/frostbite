@@ -13,9 +13,7 @@ import { stepToward, within, zoneAt } from "./geometry.ts";
 import { greyAt, greyHomes } from "./greys.ts";
 import {
   greyAura,
-  huddleSkill,
   light,
-  mastered,
   spark,
   sparkEvery,
   warmRoom,
@@ -138,7 +136,7 @@ function drift(state: PlayState): PlayState {
 }
 
 // One tick of the world: a moment's clock, or else the lead's walk, what they gather, how their spark drifts, what vision shows, and
-// the hill calling the whole family once the jackets are on and the huddle is mastered.
+// the hill calling the whole family once the jackets are on (the huddle is learnt there, in the finale, if it was not practised).
 export function tickOnce(state: PlayState): PlayState {
   const next = { ...state, tick: state.tick + 1 };
   if (next.lead === null || next.ended) return next;
@@ -153,7 +151,6 @@ export function tickOnce(state: PlayState): PlayState {
   if (
     seen.jackets &&
     family(seen).length === 4 &&
-    mastered(seen, huddleSkill) &&
     within(seen, places.hill, hillRadius)
   )
     return withNews(beginMoment(seen, "finale"), "rise");

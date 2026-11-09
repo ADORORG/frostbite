@@ -266,7 +266,7 @@ export const peacefulSavageGame = defineGame({
     replay: {
       id: "peaceful-savage",
       sha256:
-        "e579fe1dd22fcfd4a1fc30bd97b46192253472a5cfbda617429813b9d727d5f7",
+        "a4887ff3a2ae984000bf2ec18b6e221fb9b1fdc4345cb082f663a4c2ecbec100",
       version: 1,
     },
   },

@@ -2,11 +2,12 @@ import { aimOf } from "../rules/act.ts";
 import { things } from "../rules/things.ts";
 import type { News, PlayState } from "../rules/types.ts";
 import { toastOf } from "../script/news.ts";
-import { promptFor } from "../script/prompts.ts";
+import { hillHint, promptFor } from "../script/prompts.ts";
 import { element } from "./elements.ts";
 
-// The two lines over the screen: what the act key would do where the lead stands ("E: open the fridge"), and a toast when something
-// happens (Sparky found, a skill mastered), which stays a few seconds and goes.
+// The two lines over the screen: what the act key would do where the lead stands ("E: open the fridge") or, by the giant snake asleep
+// on the hill, what it waits for; and a toast when something happens (Sparky found, a skill mastered), which stays a few seconds and
+// goes.
 export interface Overlay {
   readonly show: (state: PlayState, now: number) => void;
   readonly hear: (news: News, now: number) => void;
@@ -30,7 +31,7 @@ export function createOverlay(actWord: () => string): Overlay {
       const aim = aimOf(state);
       prompt.textContent =
         aim === null
-          ? ""
+          ? (hillHint(state) ?? "")
           : `${actWord()}: ${promptFor(aim.target, state, thingIds)}`;
       if (now >= until) toast.textContent = "";
     },

@@ -3,8 +3,7 @@ import { breathSkill, huddleSkill, mastered } from "../rules/growth.ts";
 import type { PlayState } from "../rules/types.ts";
 
 // The skill most worth practising now, for the one Practise button a touch screen has: the huddle once the jackets are woven and the
-// family is together (the hill will not call without it), otherwise the hand-key practised least, and the breath once every key is
-// mastered.
+// family is together (the hill asks for it), otherwise the hand-key practised least, and the breath once every key is mastered.
 export function suggestedSkill(state: PlayState): number {
   if (state.jackets && state.party.length > 0 && !mastered(state, huddleSkill))
     return huddleSkill;
