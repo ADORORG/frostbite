@@ -12,7 +12,7 @@ same steps (`packages/chain/src/bitcoin-alkanes/admin`).
 `createGameAdminService(dependencies)` returns:
 
 - `start({ staffId, gameId, action, wallet, authTokenOutput? })`: builds the transaction and stores the step as
-  `awaiting_signature` with the summary to show. Asking again for a step in progress returns it (`resumed: true`). Refuses with
+  `awaiting_signature` with the summary to show. Asking again for a step in progress returns it (`resumed: true`), unless the step is still unsigned and the drawing asked for is different (or none): then that step expires and a new one takes its place, so the drawing staff typed last is the one that goes on the chain. A step already signed or sent is returned as it is. Refuses with
   `not-administered`, `unavailable`, `wrong-chain`, `bad-drawing` (+reason), `already-defined`, `could-not-build` (+reason), and for
   the two new steps `unknown-template`, `already-published`, `address-taken`, `template-not-published`, `already-created`.
   Actions: `publish-template` (the address staff chose, for no game), `deploy` (the drawing size the new contract accepts),

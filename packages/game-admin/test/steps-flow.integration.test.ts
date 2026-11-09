@@ -103,6 +103,51 @@ describe("defining a milestone from the start to complete", () => {
     ).toMatchObject({ ok: true, resumed: false });
   });
 
+  it("replaces a step still waiting for a signature when a different drawing is asked for, and keeps one that was sent", async () => {
+    const staff = await seedStaff();
+    const withoutDrawing = {
+      action: { milestoneId: "first-win", operation: "define-milestone" },
+    } as const;
+    const plain = await service.start(defineInput(staff, withoutDrawing));
+    if (!plain.ok) throw new Error("not started");
+    expect(plain.step.summary.drawing).toBeUndefined();
+
+    // The drawing typed afterwards is the one that goes on the chain, not the step that was built without it.
+    const drawn = await service.start(defineInput(staff));
+    expect(drawn).toMatchObject({ ok: true, resumed: false });
+    if (!drawn.ok) throw new Error("not started");
+    expect(drawn.step.id).not.toBe(plain.step.id);
+    expect(drawn.step.summary).toMatchObject({ drawing: { bytes: 6 } });
+    expect((await service.list("arcade")).map((step) => step.state)).toEqual([
+      "expired",
+      "awaiting_signature",
+    ]);
+
+    // The same drawing is the step already in progress; a different one, or none, replaces it while it is unsigned.
+    const same = await service.start(defineInput(staff));
+    expect(same).toMatchObject({ ok: true, resumed: true });
+    if (!same.ok) throw new Error("not started");
+    expect(same.step.id).toBe(drawn.step.id);
+    const removed = await service.start(defineInput(staff, withoutDrawing));
+    expect(removed).toMatchObject({ ok: true, resumed: false });
+    if (!removed.ok) throw new Error("not started");
+    expect(removed.step.summary.drawing).toBeUndefined();
+
+    // Once a step has been sent it cannot be changed: asking for another drawing returns it as it is.
+    const sent = await startAndSign(defineInput(staff));
+    expect(sent.step.summary).toMatchObject({ drawing: { bytes: 6 } });
+    await service.submitSigned({
+      signed: sent.signed,
+      staffId: staff,
+      stepId: sent.step.id,
+    });
+    const late = await service.start(defineInput(staff, withoutDrawing));
+    expect(late).toMatchObject({ ok: true, resumed: true });
+    if (!late.ok) throw new Error("not started");
+    expect(late.step.id).toBe(sent.step.id);
+    expect(late.step.summary).toMatchObject({ drawing: { bytes: 6 } });
+  });
+
   it("makes one step when two starts arrive together", async () => {
     const staff = await seedStaff();
     const results = await Promise.all([

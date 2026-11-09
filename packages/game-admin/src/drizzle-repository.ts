@@ -4,6 +4,7 @@ import {
   readTracked,
   sentAtAfter,
   trackedValues,
+  type UnsignedTransaction,
 } from "@frostbite/shared/chain";
 import { and, eq, inArray, lte, notInArray, sql } from "drizzle-orm";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
@@ -72,6 +73,10 @@ const lockName = (step: {
 }) =>
   `game-admin:${step.gameId ?? ""}:${step.operation}:${step.milestoneId ?? ""}:${step.templateRef ?? ""}`;
 
+// The drawing a step carries, by its hash; none for a step that carries no drawing.
+const drawingOf = (step: { readonly unsigned: UnsignedTransaction }) =>
+  step.unsigned.summary.drawing?.sha256 ?? null;
+
 export function createDrizzleGameAdminRepository(
   database: DatabaseClient,
   options: { readonly clock: () => Date },
@@ -99,8 +104,20 @@ export function createDrizzleGameAdminRepository(
           .select()
           .from(gameAdminSteps)
           .where(and(same, notInArray(gameAdminSteps.state, [...settled])));
-        if (open !== undefined)
-          return { kind: "in-progress", step: toStep(open) } as const;
+        if (open !== undefined) {
+          const waiting = toStep(open);
+          // A step still waiting for a signature was built for the drawing it was asked with. A request for another drawing (or none)
+          // is not that step: it takes its place, so what staff type last is what goes on the chain. A step already signed or sent
+          // cannot be changed, so it is returned as it is.
+          const replaced =
+            (unsigned as readonly string[]).includes(waiting.state) &&
+            drawingOf(waiting) !== drawingOf(step);
+          if (!replaced) return { kind: "in-progress", step: waiting } as const;
+          await transaction
+            .update(gameAdminSteps)
+            .set({ state: "expired", updatedAt: now })
+            .where(eq(gameAdminSteps.id, open.id));
+        }
         // The contract defines a milestone once and never edits it, so a definition that completed stands.
         if (step.operation === "define-milestone") {
           const [done] = await transaction
