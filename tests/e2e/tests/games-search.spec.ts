@@ -82,7 +82,10 @@ test("kinds of game filter the wall, and an empty answer says so and offers the 
   await expect(kind).toHaveAttribute("aria-pressed", "true");
   await expect(cardFor(page, fixtureGame.title)).toBeVisible();
   // Other kinds of game are hidden: the platform's own test games (the SDK explorer is one) are the only ones of this kind.
-  expect(await page.locator(".cover-card").count()).toBeLessThan(all);
+  // The wall follows the query a moment after the button shows pressed (it renders a deferred copy), so the count is awaited.
+  await expect
+    .poll(() => page.locator(".cover-card").count())
+    .toBeLessThan(all);
   await expect(page).toHaveURL(new RegExp(`tag=${fixtureGame.tag}`, "u"));
 
   await searchBox(page).fill("zzzzz");
