@@ -91,7 +91,11 @@ element or attribute (for example "Attribute role is not allowed."); it does not
    `role` and `aria-label`, every `href`, and every `<use>`, `<text>` and `<style>`.
 4. Check the root has `xmlns` and a `viewBox`, that every `url(#id)` has a matching `id`, and that colours are hex.
 5. Check the size against the limit. A drawing is also measured after cleaning, so leave some room.
-6. Try it in the staff page's define-milestone step before you sign anything. A refused drawing stops before a transaction is built, so
+6. Type or paste the drawing into the milestone's field on the staff page. The field is always open, and **Define** is available only once there is a
+   drawing; **Without a drawing** is the separate, deliberate choice (the collectibles then show a generated picture, for good). After the
+   step confirms, the platform reads the drawing back from the contract and compares it with what you signed: a milestone shows
+   "Defined with a drawing" only when the contract holds exactly that, and the step fails with an explanation when it does not.
+7. Try it in the staff page's define-milestone step before you sign anything. A refused drawing stops before a transaction is built, so
    it costs nothing. A drawing that passes is written to the chain once: the platform refuses to define the same milestone again
    ("This milestone is already defined on the contract and cannot be defined again."), so **check it before you sign.**
 

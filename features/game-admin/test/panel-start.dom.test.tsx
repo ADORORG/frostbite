@@ -56,7 +56,7 @@ describe("starting a step", () => {
     });
     const container = await panel(api);
     await enterWallet(container);
-    await click(byName(container, "Define First win"));
+    await click(byName(container, "Define First win without a drawing"));
     expect(api.start).toHaveBeenLastCalledWith({
       action: {
         drawing: undefined,

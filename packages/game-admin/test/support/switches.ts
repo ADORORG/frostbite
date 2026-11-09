@@ -1,4 +1,5 @@
 import type { TransactionIntent } from "@frostbite/shared/chain";
+import type { RewardsReader } from "@frostbite/chain/ports";
 
 // The switches a test flips to make the simulated chain and its node misbehave. The fixture reads them on every call and puts them back
 // before each test.
@@ -29,3 +30,20 @@ export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
   held: [],
 };
+
+// What the contract holds for a defined milestone's drawing: the chain's own answer, or (for a test) none, or a different drawing.
+export const heldDrawing: {
+  mode: "chain" | "different" | "down" | "none";
+} = { mode: "chain" };
+
+// The chain's rewards reader, but answering the drawing as `heldDrawing` says.
+export const withHeldDrawing = (rewards: RewardsReader): RewardsReader => ({
+  ...rewards,
+  drawing: async (...asked) => {
+    if (heldDrawing.mode === "down") throw new Error("the node is down");
+    if (heldDrawing.mode === "none") return null;
+    if (heldDrawing.mode === "different")
+      return { bytes: 1, sha256: "0".repeat(64) };
+    return rewards.drawing(...asked);
+  },
+});

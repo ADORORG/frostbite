@@ -55,12 +55,11 @@ describe("an action pressed on a game's page", () => {
     const slow = slowStart();
     const container = await panel(fakeApi({ start: slow.start }));
     await enterWallet(container);
-    await click(byName(container, "Define Streak"));
+    const streak = "Define Streak without a drawing";
+    await click(byName(container, streak));
     expect(sheetTitle(container)).toBe("Define milestone streak");
-    expect(byName(container, "Define Streak")?.getAttribute("aria-busy")).toBe(
-      "true",
-    );
-    expect(byName(container, "Define Streak")?.textContent).toBe("Preparing…");
+    expect(byName(container, streak)?.getAttribute("aria-busy")).toBe("true");
+    expect(byName(container, streak)?.textContent).toBe("Preparing…");
     expect(
       byName(container, "Define First win")?.hasAttribute("aria-busy"),
     ).toBe(false);

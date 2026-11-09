@@ -8,7 +8,7 @@ import {
 import { useState } from "react";
 
 import type { AdminGameInfo } from "../game-info.ts";
-import { stateTone, stepCopy } from "../domain/copy.ts";
+import { milestoneCopy, stateTone, stepCopy } from "../domain/copy.ts";
 
 type Milestone = AdminGameInfo["milestones"][number];
 
@@ -71,6 +71,13 @@ export function MilestoneList({
                   <small>
                     {`Up to ${milestone.claimLimit} claim${milestone.claimLimit === 1 ? "" : "s"} per wallet`}
                   </small>
+                  {done ? (
+                    <small data-drawing={step.summary.drawing ? "yes" : "no"}>
+                      {step.summary.drawing
+                        ? milestoneCopy.drawn(step.summary.drawing.bytes)
+                        : milestoneCopy.undrawn}
+                    </small>
+                  ) : null}
                 </div>
                 <ArcadeBadge
                   tone={
@@ -89,36 +96,46 @@ export function MilestoneList({
                 </ArcadeBadge>
                 {done ? null : (
                   <div className="milestones__define">
-                    <details>
-                      <summary>Add a drawing (optional)</summary>
-                      <ArcadeTextField
-                        hint="Optional SVG drawing. Without one the contract draws a generated picture."
-                        label={`Drawing for ${milestone.title}`}
-                        multiline
-                        onChange={(value) =>
-                          setDrawings((held) => ({
-                            ...held,
-                            [milestone.id]: value,
-                          }))
-                        }
-                        value={drawing}
-                      />
-                    </details>
-                    <ArcadeActionButton
-                      ariaLabel={`Define ${milestone.title}`}
-                      busy={preparing === milestone.id}
-                      disabled={busy}
-                      onClick={() =>
-                        onDefine(
-                          milestone.id,
-                          drawing.trim() === "" ? undefined : drawing,
-                        )
+                    <ArcadeTextField
+                      hint={
+                        drawing.trim() === ""
+                          ? `${milestoneCopy.drawingHint} ${milestoneCopy.defineWithoutHint}`
+                          : milestoneCopy.drawingHint
                       }
-                      size="small"
-                      tone="mint"
-                    >
-                      {preparing === milestone.id ? "Preparing…" : "Define"}
-                    </ArcadeActionButton>
+                      label={`Drawing for ${milestone.title}`}
+                      multiline
+                      onChange={(value) =>
+                        setDrawings((held) => ({
+                          ...held,
+                          [milestone.id]: value,
+                        }))
+                      }
+                      value={drawing}
+                    />
+                    <div className="milestones__actions">
+                      <ArcadeActionButton
+                        ariaLabel={`Define ${milestone.title}`}
+                        busy={preparing === milestone.id}
+                        disabled={busy || drawing.trim() === ""}
+                        onClick={() => onDefine(milestone.id, drawing)}
+                        size="small"
+                        tone="mint"
+                      >
+                        {preparing === milestone.id ? "Preparing…" : "Define"}
+                      </ArcadeActionButton>
+                      <ArcadeActionButton
+                        ariaLabel={`Define ${milestone.title} without a drawing`}
+                        busy={preparing === milestone.id}
+                        disabled={busy || drawing.trim() !== ""}
+                        onClick={() => onDefine(milestone.id, undefined)}
+                        size="small"
+                        tone="yellow"
+                      >
+                        {preparing === milestone.id
+                          ? "Preparing…"
+                          : milestoneCopy.defineWithout}
+                      </ArcadeActionButton>
+                    </div>
                   </div>
                 )}
               </li>

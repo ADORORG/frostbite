@@ -35,7 +35,7 @@ repository writes to in the same transaction that completes the step.
   `null`). Who may use the service is the caller's check (the web route requires the admin capability).
 - At most one step per game, operation and milestone is in progress; pausing and resuming are one operation, so only one change of
   the pause state is in flight. A milestone whose definition completed cannot be defined again (the contract refuses it too).
-- A step is complete when the network confirms it; the observer says confirmed only once the indexer has run the call.
+- A step is complete when the network confirms it; the observer says confirmed only once the indexer has run the call. A definition that carried a drawing is complete only when the contract also holds it (`held-drawing.ts`: the chain's stored drawing, by its SHA-256, against what staff signed); if it does not, the step is `indexed_failure` and says so, because a milestone cannot be defined again. A chain that cannot be asked leaves the step confirmed to be looked at again.
 - **What a step made is recorded with it or not at all.** Completing a publication records the template at the address staff chose;
   completing a creation records the contract the chain reported (the first contract its trace created), in the same transaction. A
   creation the chain says nothing about fails to index and records nothing, until staff enter the address (`recordCreated`): it is

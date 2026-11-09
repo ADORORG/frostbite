@@ -145,7 +145,19 @@ export interface AddressBalance {
 // How many times an address has claimed a milestone from a game's rewards contract, as the chain's indexed state says. It is
 // how the platform tells that a claim it watched confirm has also been indexed (state `complete`, never earlier); it
 // reads only what the platform itself performs a claim for.
+// The drawing a game's contract keeps for a milestone, by what can be compared with what staff signed: its size and SHA-256.
+export interface StoredDrawing {
+  readonly bytes: number;
+  readonly sha256: string;
+}
+
 export interface RewardsReader {
+  // The drawing the contract keeps for a milestone, or null when it keeps none (the collectible then shows a generated picture).
+  // Throws when the chain cannot be asked.
+  drawing(
+    contract: ContractRef,
+    milestoneId: string,
+  ): Promise<StoredDrawing | null>;
   claimed(
     contract: ContractRef,
     holder: Address,
