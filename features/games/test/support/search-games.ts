@@ -87,7 +87,10 @@ export const shelf: readonly PublicGame[] = createGameCatalog(
     game("strategy-rush-hour", "Strategy Rush Hour", "Beat the clock.", [
       "action",
     ]),
-    game("strategy-rush", "Strategy Rush", "Beat the clock twice.", ["action"]),
+    // A platformer: no tag of its own says "action", only the kind its tag falls under does.
+    game("strategy-rush", "Strategy Rush", "Beat the clock twice.", [
+      "platformer",
+    ]),
     // One letter from "puzz": a slip in a title must rank below a plain start of a tag word, though it comes after.
     game("pizza-party", "Pizza Party", "Slice and serve.", ["action"]),
   ],

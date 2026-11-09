@@ -51,7 +51,9 @@ describe("searching the games", () => {
       "grand-strategy",
       "frost-breaker",
     ]);
+    // Frost Runner is tagged endless and reflex, which fall under the Arcade kind, so it ranks with the two games tagged arcade.
     expect(find("arcade")).toEqual([
+      "frost-runner",
       "snowball-dash",
       "icicle-drop",
       "frost-breaker",
@@ -131,12 +133,12 @@ describe("searching the games", () => {
     ]);
   });
 
-  it("keeps the games with any chosen tag", () => {
-    expect(find("", { tags: ["puzzle"] })).toEqual([
+  it("keeps the games of any chosen kind", () => {
+    expect(find("", { kinds: ["puzzle"] })).toEqual([
       "shard-match",
       "icicle-drop",
     ]);
-    expect(find("", { tags: ["puzzle", "strategy"] })).toEqual([
+    expect(find("", { kinds: ["puzzle", "strategy"] })).toEqual([
       "frost-breaker",
       "shard-match",
       "icicle-drop",
@@ -144,17 +146,41 @@ describe("searching the games", () => {
     ]);
   });
 
+  it("counts a game under the kind its tags fall under: endless and reflex are arcade, a platformer is action", () => {
+    // Frost Runner is tagged endless and reflex, and has no arcade tag of its own.
+    expect(find("", { kinds: ["arcade"] })).toEqual([
+      "frost-runner",
+      "snowball-dash",
+      "icicle-drop",
+    ]);
+    // Strategy Rush is tagged platformer alone.
+    expect(find("", { kinds: ["action"] })).toEqual([
+      "strategy-rush-hour",
+      "strategy-rush",
+      "pizza-party",
+    ]);
+  });
+
+  it("finds a game by the name of its kind, though no tag of its own says it", () => {
+    expect(find("action")).toEqual([
+      "strategy-rush-hour",
+      "strategy-rush",
+      "pizza-party",
+    ]);
+    expect(find("platformer")).toEqual(["strategy-rush"]);
+  });
+
   it("keeps only the playable games when asked", () => {
     expect(find("", { playable: true })).not.toContain("icicle-drop");
     expect(find("", { playable: false })).toContain("icicle-drop");
   });
 
-  it("combines words, tags and playable, each narrowing the last", () => {
-    expect(find("ice", { tags: ["puzzle"] })).toEqual(["icicle-drop"]);
-    expect(find("ice", { playable: true, tags: ["puzzle"] })).toEqual([]);
+  it("combines words, kinds and playable, each narrowing the last", () => {
+    expect(find("ice", { kinds: ["puzzle"] })).toEqual(["icicle-drop"]);
+    expect(find("ice", { kinds: ["puzzle"], playable: true })).toEqual([]);
   });
 
-  it("returns nothing, not everything, for a tag nobody has", () => {
-    expect(find("", { tags: ["rhythm"] })).toEqual([]);
+  it("returns nothing, not everything, for a kind nobody has", () => {
+    expect(find("", { kinds: ["rhythm"] })).toEqual([]);
   });
 });
