@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { productName } from "../brand.ts";
+import { builderCredit, productName } from "../brand.ts";
 import { BrandMark } from "../components/brand-mark.tsx";
 import { AccountMenu } from "./account-menu.tsx";
 import { AreaSidebar } from "./area-sidebar.tsx";
@@ -102,7 +102,16 @@ export function AppShell({
         </main>
       </div>
       <footer className="app-footer">
-        <span>{productName}</span>
+        <div className="app-footer__about">
+          <span>{productName}</span>
+          <a
+            className="app-footer__credit"
+            href={builderCredit.href}
+            rel="noopener"
+          >
+            {builderCredit.label}
+          </a>
+        </div>
         <nav aria-label="More">
           {model.footer.map((item) => (
             <a href={item.href} key={item.href}>
