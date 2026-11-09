@@ -2,6 +2,7 @@
   "name": "@frostbite/test-kit",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./adder-game": "./src/adder-game.ts",
@@ -19,7 +20,6 @@
     "./memory-game-backend": "./src/memory-game-backend.ts",
     "./png": "./src/png.ts",
     "./race": "./src/race.ts",
-    "./s3-durable": "./src/s3-durable.ts",
     "./s3-durable": "./src/s3-durable.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",

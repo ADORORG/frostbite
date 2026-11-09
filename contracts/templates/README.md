@@ -113,3 +113,9 @@ A deployed template's code hash must not change. Any change to contract code, `r
 new ABI files, and run `build.sh --write`. `pnpm contracts:hashes` (on the release machine) fails on a changed hash.
 
 Owners: product and contract engineering.
+
+## Licence
+
+The contract source here and the released WASM built from it (`released/`) are under the repository's licence, the Functional Source License
+(FSL-1.1-ALv2, see `LICENSE` at the repository root). The released files are what the platform publishes on chain; a published contract
+is public by nature, so the licence governs copying the source and building a competing service from it, not reading the chain.

@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { collectViolations } from "../src/collect-violations.ts";
+import { repositoryLicense } from "../src/license-policy.ts";
 import { maximumParentSegments } from "../src/import-policy.ts";
 import { minimumReadmeLines } from "../src/readme-policy.ts";
 import { requiredWorkspaceScripts } from "../src/script-policy.ts";
@@ -28,6 +29,7 @@ const scripts = Object.fromEntries(
 );
 const packageJson = (omit?: string) =>
   JSON.stringify({
+    license: repositoryLicense.spdx,
     name: packageName,
     scripts: Object.fromEntries(
       Object.entries(scripts).filter(([name]) => name !== omit),
@@ -43,7 +45,11 @@ async function repository(changes: Record<string, string | null> = {}) {
   const files: Files = {
     ".github/workflows/ci.yml": `jobs:\n  upload:\n    path: ${workspace}/coverage\n`,
     "contracts/templates/release.json": "{}",
-    "package.json": "{}",
+    LICENSE: `${repositoryLicense.title}\n\nCopyright ${String(repositoryLicense.year)} ${repositoryLicense.holder}\n`,
+    NOTICE: "Artwork and the name: all rights reserved.\n",
+    "README.md": `Licensed under ${repositoryLicense.spdx}.\n`,
+    "deploy/Dockerfile": `LABEL org.opencontainers.image.licenses="${repositoryLicense.spdx}"\n`,
+    "package.json": JSON.stringify({ license: repositoryLicense.spdx }),
     "pnpm-workspace.yaml": 'packages:\n  - "packages/*"\n',
     [`${workspace}/README.md`]: readme,
     [`${workspace}/package.json`]: packageJson(),
@@ -67,7 +73,9 @@ const stubReadme = "Run test:unit.\n\n## Ownership\n";
 
 // One way to break each policy, and the words that policy uses about it. Each is applied alone to the clean repository, so the one
 // violation found says which policy ran.
-const breakages: ReadonlyArray<readonly [string, Files, string]> = [
+const breakages: ReadonlyArray<
+  readonly [string, Readonly<Record<string, string | null>>, string]
+> = [
   [
     "the workspace script policy",
     { [`${workspace}/package.json`]: packageJson("test:unit") },
@@ -121,6 +129,7 @@ const breakages: ReadonlyArray<readonly [string, Files, string]> = [
     },
     "contracts/templates/released/rewards.wasm is missing",
   ],
+  ["the licence policy", { LICENSE: null }, "LICENSE is missing."],
   [
     "the coverage upload policy",
     { ".github/workflows/ci.yml": "jobs: {}\n" },

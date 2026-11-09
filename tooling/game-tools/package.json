@@ -2,6 +2,7 @@
   "name": "@repo/game-tools",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./scaffold": "./src/scaffold.ts"

@@ -1,6 +1,7 @@
 {
-  "name": "the-well",
+  "name": "frostbite",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "dependencies": {
     "@frostbite/cache": "workspace:*",
@@ -58,7 +59,7 @@
     "test:visual:update": "pnpm build && pnpm --filter @repo/e2e test:visual:update",
     "ci:local": "pnpm --filter @repo/repository-policy ci:local --",
     "hooks:install": "git config core.hooksPath .githooks",
-    "repository:check": "pnpm --filter @repo/repository-policy check",
+    "repository:check": "pnpm --filter @repo/repository-policy check && pnpm --filter @repo/repository-policy check:licenses",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
     "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",
     "game:dev": "pnpm --filter @repo/game-tools dev",
