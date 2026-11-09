@@ -48,6 +48,9 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // A board is read by anyone and cached for a minute; the player's own place is a small read of an index, once per period switch.
     getLeaderboard: perMinute(120),
     getMyRank: perMinute(120),
+    // A start is counted for the games that are hot. A person starts a run every few seconds at the very most, so six a minute counts every
+    // real start and stops one visitor from raising a game's count by scripting it; a visitor over it is answered 429, which the page ignores.
+    recordGamePlay: perMinute(6),
     // Making a link is a write of the player's own, and a few a minute is a person pressing Share; ending one is rarer.
     createShare: perMinute(20),
     revokeShare: perMinute(30),

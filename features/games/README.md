@@ -147,3 +147,11 @@ reduced-motion and visual behavior is covered by Playwright.
 ## Ownership
 
 Platform games team.
+
+## Hot games (HOT-1)
+
+The platform counts a run started in a game (the page counts it, when the game asks for a run, signed in or not: `client/plays-api.ts`, called from
+`client/runs-port.ts`) through the public `POST /api/v1/games/play` (`application/plays-operations.ts`, limited per address) into `game_play_days`. The
+ranking (`rankGames` in `@frostbite/game-runs`) is read per page view through `plays-runtime.ts` (kept 60 s) and drawn by `GamesRail` (the "Hot right now"
+rail), `GamesBrowser` (ranked games first, `domain/heat-order.ts`) and every card (`ui/heat-badges.tsx`: sticker, rim, meter). See
+`docs/product/hot-games.md` for what counts, what is hot and the design.

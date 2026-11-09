@@ -23,6 +23,8 @@ export function CoverCard({
   badges,
   cta,
   featured = false,
+  heat,
+  hot,
   href,
   label,
   media,
@@ -37,6 +39,10 @@ export function CoverCard({
   readonly cta: string;
   // The first card of a wall, drawn larger.
   readonly featured?: boolean;
+  // How hot the item is, drawn in the body above the call to action (a `HeatMeter`); none for an item that is not ranked.
+  readonly heat?: ReactNode;
+  // The sticker of a hot item (a `HotSticker`), drawn on the picture's corner; its presence also lights the card's rim.
+  readonly hot?: ReactNode;
   readonly href: string;
   // The link's name for someone who cannot see the card.
   readonly label: string;
@@ -52,11 +58,13 @@ export function CoverCard({
     <li
       className="cover-card"
       data-featured={featured ? "true" : undefined}
+      data-hot={hot === undefined ? undefined : "true"}
       data-ratio={ratio}
     >
       <a aria-label={label} className="cover-card__link" href={href}>
         <div className="cover-card__media">
           {media}
+          {hot}
           {rank === undefined ? null : (
             <span aria-hidden="true" className="cover-card__rank">
               {String(rank).padStart(2, "0")}
@@ -69,6 +77,7 @@ export function CoverCard({
           {summary === "" ? null : (
             <p className="cover-card__summary">{summary}</p>
           )}
+          {heat}
           <span aria-hidden="true" className="cover-card__cta">
             {cta}
           </span>

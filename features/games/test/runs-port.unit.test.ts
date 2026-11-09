@@ -30,7 +30,9 @@ describe("starting a run from the page", () => {
     expect(await createRunsService("tap-tower", fetchImpl).start()).toEqual(
       started,
     );
-    const [path, init] = fetchImpl.mock.calls[0] ?? [];
+    const [path, init] =
+      fetchImpl.mock.calls.find(([p]) => p === "/api/v1/games/runs/start") ??
+      [];
     expect(path).toBe("/api/v1/games/runs/start");
     expect(init?.method).toBe("POST");
     expect(JSON.parse(init?.body ?? "")).toEqual({ gameId: "tap-tower" });
@@ -62,6 +64,58 @@ describe("starting a run from the page", () => {
       },
     ] as FetchLike[])
       await expect(createRunsService("g", fetchImpl).start()).rejects.toThrow();
+  });
+});
+
+describe("counting the runs that are started", () => {
+  const playCalls = (fetchImpl: ReturnType<typeof vi.fn<FetchLike>>) =>
+    fetchImpl.mock.calls.filter(([path]) => path === "/api/v1/games/play");
+
+  it("tells the platform each start, for the game that was started and with no player in it", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async (path) =>
+      path === "/api/v1/games/play" ? json({ counted: true }) : json(started),
+    );
+    await createRunsService("tap-tower", fetchImpl).start();
+    const [call] = playCalls(fetchImpl);
+    expect(playCalls(fetchImpl)).toHaveLength(1);
+    expect(call?.[1]?.method).toBe("POST");
+    expect(JSON.parse(call?.[1]?.body ?? "")).toEqual({ gameId: "tap-tower" });
+  });
+
+  it("counts a start by a visitor who is not signed in, whose run the platform then refuses", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async (path) =>
+      path === "/api/v1/games/play"
+        ? json({ counted: true })
+        : denied("unauthorized", 401),
+    );
+    expect(await createRunsService("g", fetchImpl).start()).toEqual({
+      reason: "signed-out",
+      status: "unavailable",
+    });
+    expect(playCalls(fetchImpl)).toHaveLength(1);
+  });
+
+  it("does not let a start that cannot be counted get in the way of the run", async () => {
+    for (const failing of [
+      () => denied("rate_limited", 429),
+      () => {
+        throw new TypeError("offline");
+      },
+    ]) {
+      const fetchImpl = vi.fn<FetchLike>(async (path) => {
+        if (path === "/api/v1/games/play") return failing();
+        return json(started);
+      });
+      expect(await createRunsService("g", fetchImpl).start()).toEqual(started);
+    }
+  });
+
+  it("does not count a submission", async () => {
+    const fetchImpl = vi.fn<FetchLike>(async () =>
+      json({ earned: [], status: "verified" }),
+    );
+    await createRunsService("g", fetchImpl).submit(runId, { inputs: [] });
+    expect(playCalls(fetchImpl)).toHaveLength(0);
   });
 });
 

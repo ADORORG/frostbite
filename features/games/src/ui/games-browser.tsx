@@ -1,5 +1,6 @@
 "use client";
 
+import type { GameHeat } from "@frostbite/shared/games";
 import { ArcadeActionButton, ArcadeEmptyState } from "@repo/ui/arcade";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
@@ -10,6 +11,7 @@ import {
   isEmptyQuery,
   type GameQuery,
 } from "../domain/game-query.ts";
+import { hotFirst } from "../domain/heat-order.ts";
 import {
   countText,
   foundText,
@@ -42,12 +44,16 @@ function writeAddress(query: GameQuery): void {
 // The games page: a search box and filters over the wall of covers. The whole catalog is already here (a short list), so every keystroke
 // answers at once with nothing to wait for. `initial` is the query the address carried, so a shared link opens already narrowed.
 export function GamesBrowser({
-  games,
+  games: listed,
+  hot = [],
   initial,
 }: {
   readonly games: readonly PublicGame[];
+  // The ranked games; the wall puts them first.
+  readonly hot?: readonly GameHeat[];
   readonly initial: GameQuery;
 }) {
+  const games = useMemo(() => hotFirst(listed, hot), [listed, hot]);
   const [query, setQuery] = useState(initial);
   // The server sends a new `initial` each time it draws the page afresh (a link pressed while narrowed, a refresh): that query came from
   // the address now showing, so it replaces what is on the screen. The page's own typing never reaches the server, so it is never undone.
@@ -114,7 +120,7 @@ export function GamesBrowser({
           {missing.body}
         </ArcadeEmptyState>
       ) : (
-        <GamesWall games={found} whole={!narrowed} />
+        <GamesWall games={found} hot={hot} whole={!narrowed} />
       )}
     </>
   );

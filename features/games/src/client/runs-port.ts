@@ -12,6 +12,8 @@ import {
   submitGameRunRoute,
 } from "@frostbite/shared/games";
 
+import { recordPlay } from "./plays-api.ts";
+
 // How long a request for a run, and a submission, may take. A submission waits for a replay on the server, so it is given
 // longer; both are well inside the ten seconds a game waits on the platform.
 export const startRunTimeoutMs = 5_000;
@@ -29,6 +31,8 @@ export function createRunsService(
     error instanceof ApiError && error.code === "unauthorized";
   return {
     start: async () => {
+      // Every start counts, for a visitor who is not signed in and for a game that has no verifier too: this is the page's own count.
+      recordPlay(gameId, fetchImpl);
       try {
         return await request(startGameRunRoute, startGameRunResponseSchema, {
           body: { gameId },

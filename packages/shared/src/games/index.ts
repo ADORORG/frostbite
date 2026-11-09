@@ -6,6 +6,7 @@ export * from "./leaderboard.ts";
 export * from "./manifest.ts";
 export * from "./minted.ts";
 export * from "./pages.ts";
+export * from "./plays.ts";
 export * from "./runs.ts";
 export * from "./shares.ts";
 export * from "./sync.ts";
