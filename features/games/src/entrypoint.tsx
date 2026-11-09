@@ -23,7 +23,12 @@ import {
   createGetGalleryPictureOperation,
   createListGalleryMintsOperation,
 } from "./application/gallery-operations.ts";
+import {
+  createGetLeaderboardOperation,
+  createGetMyRankOperation,
+} from "./application/leaderboard-operations.ts";
 import { createGalleryResolver } from "./gallery-runtime.ts";
+import { createLeaderboardResolver } from "./leaderboard-runtime.ts";
 import {
   createGetMintedPictureOperation,
   createListMintedMilestonesOperation,
@@ -74,6 +79,14 @@ export function createGamesEntrypoint(
   const claimsService = createGameClaimsResolver(games, claims);
   const sharesService = sharesResolverFor(games);
   const galleryService = createGalleryResolver();
+  const boards = createLeaderboardResolver();
+  // A game has a board when the platform replays its runs, because only a replay yields a score it can trust.
+  const scoredGames: ReadonlySet<string> = new Set(
+    catalog
+      .list()
+      .filter(({ scored }) => scored)
+      .map(({ id }) => id),
+  );
   const listedGames: ReadonlySet<string> = new Set(games.map(({ id }) => id));
   // The thing a link shows, or null for an identifier that is not one, a link that was ended, or one that never was.
   const sharedThing = async (id: string | undefined) => {
@@ -143,6 +156,8 @@ export function createGamesEntrypoint(
           listedGames,
         ),
       ),
+      registerHttpOperation(createGetLeaderboardOperation(boards, scoredGames)),
+      registerHttpOperation(createGetMyRankOperation(boards, scoredGames)),
     ],
     homeSections: [
       {

@@ -11,6 +11,7 @@ import {
   rewardsGame,
   coveredGame,
   embeddedGame,
+  replayedGame,
   templateGame,
   walletGame,
 } from "./support/template-game.ts";
@@ -43,6 +44,7 @@ describe("the game catalog", () => {
       hash: gameManifestHash(templateGame),
       id: "template-game",
       milestones: templateGame.milestones,
+      scored: false,
       networkLabel: "Bitcoin signet",
       playable: true,
       playUrl: "https://play.example.test/template",
@@ -176,5 +178,15 @@ describe("whether a game's milestones can be claimed", () => {
     expect(claimable({ ...rewardsGame, launch: templateGame.launch })).toBe(
       false,
     );
+  });
+});
+
+describe("whether a game has a leaderboard", () => {
+  it("is so for a game the platform replays, and for no other", () => {
+    const scored = (game: Parameters<typeof createGameCatalog>[0][number]) =>
+      createGameCatalog([game], chains).list()[0]?.scored;
+    expect(scored(replayedGame)).toBe(true);
+    expect(scored(rewardsGame)).toBe(false);
+    expect(scored(templateGame)).toBe(false);
   });
 });

@@ -69,6 +69,17 @@ paid may not be the player); only claims the network's records show complete. Co
 milestone from `game_milestone_mint_totals`, kept by triggers on the claims table, so it costs the same however many mints there are; the
 answer is still cached for a minute, which only spares the database a repeated read.
 
+## The Leaderboard (LB-1)
+
+A game the platform replays (it publishes a `verification.replay` verifier, so `PublicGame.scored`) has a **Leaderboard** section in its
+dock (`ui/leaderboard.tsx`): the best **verified** score of each signed-in player for all time, this month or this week (UTC), 25 places,
+a podium for the top three, and the signed-in player's own place underneath. Nothing a game merely reports is ranked. It is read from
+`GET /api/v1/games/leaderboard?gameId=&window=` (public, cached 60 s) and `GET /api/v1/games/leaderboard/me?...` (the session's own
+place; never a player named in the request). A row names a player only when they switched their public profile on (name, picture, a link
+to `/p/<name>`); otherwise it is "A player" with no identifier. Ties share a rank and the player who reached the score first is listed
+first. The numbers come from `game_score_bests`, kept by a trigger on `game_runs` (see `@frostbite/game-runs`), so a read costs the same
+however many runs there are. A game with no replay verifier has no board (the route answers "not found").
+
 ## Searching the games page
 
 `/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it

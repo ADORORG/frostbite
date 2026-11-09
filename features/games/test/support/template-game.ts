@@ -109,6 +109,20 @@ export const rewardsGame = defineGame({
   title: "Rewards game",
 });
 
+// The same game with its runs replayed by the platform, so it has verified scores to rank.
+export const replayedGame = {
+  ...rewardsGame,
+  capabilities: [
+    ...new Set([...rewardsGame.capabilities, "run:submit" as const]),
+  ],
+  milestones: rewardsGame.milestones.map((milestone, index) =>
+    index === 0 && milestone.claimPolicy === "once"
+      ? { ...milestone, verification: "replay-verified" as const }
+      : milestone,
+  ),
+  verification: { replay: { id: "x", sha256: "a".repeat(64), version: 1 } },
+};
+
 export const walletConfig = {
   network: "signet",
   explorerTxUrl: "https://explorer.test/tx/{id}",

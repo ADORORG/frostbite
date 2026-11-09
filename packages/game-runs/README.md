@@ -18,6 +18,11 @@ replay-verifiable), supplied by the caller.
 - `resolveGameRunPolicy(overrides?)`: `maxOpenRuns` (1-20, default 3), `runLifetimeMs` (1 minute to 7 days,
   default 24 hours).
 
+- `topScores(database, period, limit)`, `rankOf(database, period, userId)`, `playersOnBoard(database, period)`, `windowStartOf(kind, at)`,
+  `windowEndsAt(kind, start)`: reads of `game_score_bests`, the best verified score of each player per game and period (`all`, `month`,
+  `week`, UTC; weeks start on Monday). A trigger on `game_runs` keeps the table, so the reads never scan runs; ties share a rank and
+  the earlier run is listed first. `topScores` returns a name and picture only for a player whose public profile is switched on.
+
 ## Invariants
 
 - A run is settled once. Submitting takes a row lock (`FOR UPDATE`) on the run, so concurrent submissions
