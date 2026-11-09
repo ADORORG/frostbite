@@ -184,8 +184,7 @@ export function createSimulatedChain(
         )
         .at(-1);
       return Promise.resolve(
-        defined?.drawingBytes === undefined ||
-          defined.drawingSha === undefined
+        defined?.drawingBytes === undefined || defined.drawingSha === undefined
           ? null
           : { bytes: defined.drawingBytes, sha256: defined.drawingSha },
       );

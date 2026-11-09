@@ -54,6 +54,8 @@ describe("defining a milestone with or without a drawing", () => {
     await enterWallet(container);
     await typeInto(fieldByLabel(container, "Drawing for Streak"), "   ");
     expect(disabled(container, "Define Streak")).toBe(true);
+    // Pressing it anyway starts nothing.
+    await click(byName(container, "Define Streak"));
     expect(start).not.toHaveBeenCalled();
   });
 

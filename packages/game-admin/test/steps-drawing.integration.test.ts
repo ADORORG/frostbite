@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { drawingNotHeld } from "../src/held-drawing.ts";
 import {
   chain,
+  contract,
   defineInput,
   heldDrawing,
   network,
@@ -79,5 +80,19 @@ describe("a definition is complete when the contract holds the drawing that was 
     expect(await service.refresh(id)).toMatchObject({
       step: { state: "complete" },
     });
+  });
+
+  it("is read for the milestone and the contract it was defined on, and for no other", async () => {
+    const id = await confirmed(defineInput(await seedStaff()));
+    await service.refresh(id);
+    const rewards = network.adapter.ports.rewards;
+    if (rewards === undefined) throw new Error("no rewards reader");
+    const held = await rewards.drawing(contract, "first-win");
+    expect(held).toMatchObject({ bytes: 6 });
+    // Another milestone of the same contract, and the same milestone of another contract, have none.
+    expect(await rewards.drawing(contract, "streak")).toBeNull();
+    expect(
+      await rewards.drawing({ ...contract, id: "rewards-2" }, "first-win"),
+    ).toBeNull();
   });
 });

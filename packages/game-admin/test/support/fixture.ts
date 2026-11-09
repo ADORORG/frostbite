@@ -41,7 +41,7 @@ import {
   indexer,
   lostSend,
   broadcastGate,
-  heldDrawing,
+  withHeldDrawing,
 } from "./switches.ts";
 
 export * from "./switches.ts";
@@ -165,16 +165,7 @@ function ports(): AdminChainPorts {
         return rest;
       },
     },
-    rewards: {
-      ...rewards,
-      drawing: async (...asked) => {
-        if (heldDrawing.mode === "down") throw new Error("the node is down");
-        if (heldDrawing.mode === "none") return null;
-        if (heldDrawing.mode === "different")
-          return { bytes: 1, sha256: "0".repeat(64) };
-        return rewards.drawing(...asked);
-      },
-    },
+    rewards: withHeldDrawing(rewards),
   };
 }
 
