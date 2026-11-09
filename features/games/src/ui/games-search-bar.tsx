@@ -1,6 +1,11 @@
 "use client";
 
-import { gameTagLabels, gameTags, type GameTag } from "@frostbite/shared/games";
+import {
+  gameFilterKinds,
+  gameKindsOf,
+  gameTagLabels,
+  type GameFilterKind,
+} from "@frostbite/shared/games";
 import {
   ArcadeActionButton,
   ArcadeTextField,
@@ -13,7 +18,7 @@ import {
   emptyGameQuery,
   isEmptyQuery,
   queryTextLimit,
-  tagsInOrder,
+  kindsInOrder,
   type GameQuery,
 } from "../domain/game-query.ts";
 import { searchCopy } from "../domain/search-copy.ts";
@@ -33,8 +38,8 @@ export function GamesSearchBar({
   readonly query: GameQuery;
 }) {
   // Only kinds some game has: a filter that can never show anything is noise.
-  const kinds = gameTags.filter((tag) =>
-    games.some((game) => game.tags.includes(tag)),
+  const kinds = gameFilterKinds.filter((kind) =>
+    games.some((game) => gameKindsOf(game.tags).includes(kind)),
   );
   return (
     <form
@@ -63,26 +68,27 @@ export function GamesSearchBar({
         type="search"
         value={query.text}
       />
-      <ArcadeToggleTabs<GameTag>
+      <ArcadeToggleTabs<GameFilterKind>
         label={searchCopy.kinds}
-        onChange={(tag, on) =>
+        onChange={(kind, on) =>
           onChange({
             ...query,
-            tags: tagsInOrder(
+            kinds: kindsInOrder(
               new Set(
                 on
-                  ? [...query.tags, tag]
-                  : query.tags.filter((each) => each !== tag),
+                  ? [...query.kinds, kind]
+                  : query.kinds.filter((each) => each !== kind),
               ),
             ),
           })
         }
-        options={kinds.map((tag) => ({
-          count: games.filter((game) => game.tags.includes(tag)).length,
-          label: gameTagLabels[tag],
-          value: tag,
+        options={kinds.map((kind) => ({
+          count: games.filter((game) => gameKindsOf(game.tags).includes(kind))
+            .length,
+          label: gameTagLabels[kind],
+          value: kind,
         }))}
-        selected={query.tags}
+        selected={query.kinds}
       />
       <ArcadeToggleTabs<typeof playableValue>
         label={searchCopy.show}

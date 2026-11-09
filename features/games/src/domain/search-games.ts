@@ -1,4 +1,4 @@
-import { gameTagLabels } from "@frostbite/shared/games";
+import { gameKindsOf, gameTagLabels } from "@frostbite/shared/games";
 
 import type { PublicGame } from "./catalog.ts";
 import { isEmptyQuery, type GameQuery } from "./game-query.ts";
@@ -55,7 +55,10 @@ function placesOf(game: PublicGame): readonly Place[] {
     {
       forgiving: true,
       weight: worth.tags,
-      words: game.tags.flatMap((tag) => wordsOf(gameTagLabels[tag])),
+      // The game's own tags and the kinds they fall under, so "action" finds a platformer.
+      words: [...game.tags, ...gameKindsOf(game.tags)].flatMap((tag) =>
+        wordsOf(gameTagLabels[tag]),
+      ),
     },
     { forgiving: false, weight: worth.summary, words: wordsOf(game.summary) },
     {
@@ -100,8 +103,8 @@ function scoreGame(game: PublicGame, words: readonly string[]): number {
 
 const keeps = (game: PublicGame, query: GameQuery): boolean =>
   (!query.playable || game.playable) &&
-  (query.tags.length === 0 ||
-    query.tags.some((tag) => game.tags.includes(tag)));
+  (query.kinds.length === 0 ||
+    gameKindsOf(game.tags).some((kind) => query.kinds.includes(kind)));
 
 // The games for a query, best first. The empty query is every game in the order given.
 export function searchGames(

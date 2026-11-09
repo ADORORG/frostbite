@@ -34,7 +34,8 @@ export const fixtureTapsGame = defineGame({
   network: betaTarget.chainId,
   schemaVersion: 1,
   summary: "A tapping game the platform's own tests play.",
-  tags: ["developer"],
+  // A kind of game as well, so the browser tests have a filter chip that finds it.
+  tags: ["developer", "puzzle"],
   title: "Tap Counter",
   version: "0.1.0",
 });

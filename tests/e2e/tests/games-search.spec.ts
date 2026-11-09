@@ -76,17 +76,17 @@ test("kinds of game filter the wall, and an empty answer says so and offers the 
   await page.goto("/games");
   const all = await page.locator(".cover-card").count();
   const kind = page.getByRole("button", {
-    name: new RegExp(`^${fixtureGame.tag}`, "iu"),
+    name: new RegExp(`^${fixtureGame.kind}`, "iu"),
   });
   await kind.click();
   await expect(kind).toHaveAttribute("aria-pressed", "true");
   await expect(cardFor(page, fixtureGame.title)).toBeVisible();
-  // Other kinds of game are hidden: the platform's own test games (the SDK explorer is one) are the only ones of this kind.
+  // Other kinds of game are hidden: the games of other kinds drop off the wall.
   // The wall follows the query a moment after the button shows pressed (it renders a deferred copy), so the count is awaited.
   await expect
     .poll(() => page.locator(".cover-card").count())
     .toBeLessThan(all);
-  await expect(page).toHaveURL(new RegExp(`tag=${fixtureGame.tag}`, "u"));
+  await expect(page).toHaveURL(new RegExp(`kind=${fixtureGame.kind}`, "u"));
 
   await searchBox(page).fill("zzzzz");
   await expect(
@@ -165,7 +165,7 @@ test("the controls never push the page wider than the screen, and a result opens
 }) => {
   // Two kinds chosen at once (a game matches either), so the row of chosen filters is as wide as it gets.
   await page.goto(
-    `/games?q=${fixtureGame.id.slice(0, 3)}&tag=${fixtureGame.tag}&tag=arcade&playable=1`,
+    `/games?q=${fixtureGame.id.slice(0, 3)}&kind=${fixtureGame.kind}&kind=arcade&playable=1`,
   );
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,

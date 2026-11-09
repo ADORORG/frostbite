@@ -12,10 +12,10 @@ import {
 const parse = (search: string) => parseGameQuery(new URLSearchParams(search));
 
 describe("reading a games address", () => {
-  it("reads words, tags and playable", () => {
-    expect(parse("q=snow+dash&tag=puzzle&tag=arcade&playable=1")).toEqual({
+  it("reads words, kinds and playable", () => {
+    expect(parse("q=snow+dash&kind=puzzle&kind=arcade&playable=1")).toEqual({
+      kinds: ["arcade", "puzzle"],
       playable: true,
-      tags: ["arcade", "puzzle"],
       text: "snow dash",
     });
   });
@@ -45,14 +45,23 @@ describe("reading a games address", () => {
     );
   });
 
-  it("drops a tag the platform does not have, and a tag given twice", () => {
+  it("drops a kind the platform does not have, and a kind given twice", () => {
     expect(
-      parse("tag=nope&tag=puzzle&tag=puzzle&tag=%3Cscript%3E").tags,
+      parse("kind=nope&kind=puzzle&kind=puzzle&kind=%3Cscript%3E").kinds,
     ).toEqual(["puzzle"]);
   });
 
-  it("puts tags in the platform's order, whatever order they came in", () => {
-    expect(parse("tag=rhythm&tag=action").tags).toEqual(["action", "rhythm"]);
+  it("drops a tag that is not a kind of game to filter by, though the platform has it", () => {
+    expect(parse("kind=endless&kind=developer&kind=platformer").kinds).toEqual(
+      [],
+    );
+  });
+
+  it("puts kinds in the platform's order, whatever order they came in", () => {
+    expect(parse("kind=rhythm&kind=action").kinds).toEqual([
+      "action",
+      "rhythm",
+    ]);
   });
 
   it("is playable only for exactly 1", () => {
@@ -75,14 +84,14 @@ describe("writing a games address", () => {
     expect(gameQueryString(emptyGameQuery)).toBe("");
   });
 
-  it("writes words, tags and playable, escaped", () => {
+  it("writes words, kinds and playable, escaped", () => {
     expect(
       gameQueryString({
+        kinds: ["arcade", "puzzle"],
         playable: true,
-        tags: ["arcade", "puzzle"],
         text: "a&b=c d",
       }),
-    ).toBe("q=a%26b%3Dc+d&tag=arcade&tag=puzzle&playable=1");
+    ).toBe("q=a%26b%3Dc+d&kind=arcade&kind=puzzle&playable=1");
   });
 
   it("writes no words for spaces alone, and counts a box of spaces as empty", () => {
@@ -94,8 +103,8 @@ describe("writing a games address", () => {
 
   it("reads back what it wrote", () => {
     const query = {
+      kinds: ["arcade" as const],
       playable: true,
-      tags: ["endless" as const],
       text: "café ☃",
     };
     expect(parse(gameQueryString(query))).toEqual(query);
@@ -108,11 +117,11 @@ describe("the framework's query record", () => {
       playable: "1",
       q: "snow",
       skipped: undefined,
-      tag: ["puzzle", "arcade"],
+      kind: ["puzzle", "arcade"],
     });
     expect(parseGameQuery(params)).toEqual({
+      kinds: ["arcade", "puzzle"],
       playable: true,
-      tags: ["arcade", "puzzle"],
       text: "snow",
     });
   });
