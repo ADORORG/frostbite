@@ -33,6 +33,9 @@ to keep:
   https://github.com/cmdruid.
 - caniuse-lite (CC-BY-4.0): browser support data by Alexis Deveria and contributors, https://github.com/browserslist/caniuse-lite.
 - spdx-exceptions (CC-BY-3.0): by Kyle E. Mitchell, https://github.com/kemitchell/spdx-exceptions.json.
+- @sats-connect/ui and @sats-connect/make-default-provider-config (the Xverse wallet library): by Secret Key Labs, MIT, from
+  https://github.com/secretkeylabs/sats-connect-ui and https://github.com/secretkeylabs/sats-connect. Their npm packages omit the licence
+  text; the upstream repositories carry it.
 - lightningcss (MPL-2.0) is used unmodified as a build tool; its source is at https://github.com/parcel-bundler/lightningcss.
 
 Contributions
