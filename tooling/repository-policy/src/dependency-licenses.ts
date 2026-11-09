@@ -78,13 +78,13 @@ export const dependencyLicensePolicy = {
       license: "Unknown",
       package: "@sats-connect/ui",
       reason:
-        "NEEDS THE OWNER: declares no licence and ships no LICENSE file. Its parent, sats-connect, is ISC. Ask the publisher to state a licence, or replace it, before the platform is distributed.",
+        "Third-party (Secret Key Labs, the Xverse wallet library). The npm package omits its licence field and file, but it is published from github.com/secretkeylabs/sats-connect-ui, which is MIT; credited in NOTICE. Ask the publisher to add the licence to the package.",
     },
     {
       license: "Unknown",
       package: "@sats-connect/make-default-provider-config",
       reason:
-        "NEEDS THE OWNER: the same publisher and the same gap as @sats-connect/ui.",
+        "Third-party, the same publisher as @sats-connect/ui. Built from github.com/secretkeylabs/sats-connect, which is MIT; the npm package omits its licence field and file. Credited in NOTICE.",
     },
   ],
   version: 1,
