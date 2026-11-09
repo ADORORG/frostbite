@@ -15,7 +15,7 @@ import {
   createPlatformFeeReader,
   type ClaimableGame,
 } from "@frostbite/game-claims";
-import { hasEarnedMilestone } from "@frostbite/game-saves";
+import { milestoneLevel } from "@frostbite/game-saves";
 import { memoizeUntilFailure } from "@frostbite/plugin-kit/lazy";
 import { chainRefSchema, contractRefSchema } from "@frostbite/shared/chain";
 import {
@@ -24,6 +24,7 @@ import {
 } from "@frostbite/shared/games";
 
 import type { GameClaimsConfig } from "./claims-config.ts";
+import { claimableAt } from "./domain/claim-eligibility.ts";
 
 // What the claims service may know of a game, read from its manifest and the record of its contract: the chain it is on, the
 // contract made for it (none until the step that makes it completes), and each milestone's claim limit. A game that declares no
@@ -65,6 +66,12 @@ export function createGameClaimsResolver(
   environment: NodeJS.ProcessEnv = process.env,
 ) {
   const clock = config.clock ?? (() => new Date());
+  const byGame = new Map(
+    games.map((game) => [
+      game.id,
+      new Map(game.milestones.map((milestone) => [milestone.id, milestone])),
+    ]),
+  );
   return memoizeUntilFailure(async () => {
     const database = createDatabaseClient(
       createDatabasePool(parseDatabaseEnvironment(environment)),
@@ -73,8 +80,17 @@ export function createGameClaimsResolver(
     return createGameClaimsService({
       clock,
       delay: config.delay,
-      earned: (userId, gameId, milestoneId) =>
-        hasEarnedMilestone(database, { gameId, milestoneId, userId }),
+      // Held at the level the milestone's manifest asks for: a milestone only a replay can prove is not claimable on the game's word.
+      earned: async (userId, gameId, milestoneId) => {
+        const milestone = byGame.get(gameId)?.get(milestoneId);
+        return (
+          milestone !== undefined &&
+          claimableAt(
+            milestone,
+            await milestoneLevel(database, { gameId, milestoneId, userId }),
+          )
+        );
+      },
       funding: (chain) => {
         const offered = config.chain(chain);
         if (offered === null)
