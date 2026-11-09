@@ -1,6 +1,7 @@
 import { findBoundaryViolations } from "./boundary-policy.ts";
 import { listSourceFiles } from "./files.ts";
 import { findDeepRelativeImports } from "./import-policy.ts";
+import { findLicenseViolations } from "./license-policy.ts";
 import { findOversizedFiles } from "./line-policy.ts";
 import { findReadmeViolations } from "./readme-policy.ts";
 import { readSentenceBaseline } from "./sentence-baseline.ts";
@@ -42,6 +43,7 @@ export async function collectViolations(
       await readSentenceBaseline(root),
     ),
     ...(await findTemplateReleaseViolations(root)),
+    ...(await findLicenseViolations(root, workspaces)),
     ...findCoverageUploadViolations(
       root,
       workspaces,

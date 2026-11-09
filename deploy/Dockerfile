@@ -39,6 +39,8 @@ RUN rm -rf apps/web/.next/standalone/apps/web/.next/static apps/web/.next/standa
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store CI=true pnpm install --frozen-lockfile --prod
 
 FROM base AS runtime
+# The licence of what is in the image, for anything that reads image labels; the repository policy checks it against LICENSE.
+LABEL org.opencontainers.image.licenses="FSL-1.1-ALv2"
 ENV NODE_ENV=production
 # Where the platform reads game-rewards.wasm and milestone-collectible.wasm (the released ones, checked in the build). A deployment may set
 # the variable to something else (or to nothing, which turns template publishing off); local runs and tests point it at their own build.

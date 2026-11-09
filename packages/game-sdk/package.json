@@ -2,6 +2,7 @@
   "name": "@frostbite/game-sdk",
   "version": "0.1.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./attach": "./src/attach.ts",
@@ -72,7 +73,6 @@
     "vitest": "4.1.11"
   },
   "description": "Build a game that runs on the platform: the client for the game, the protocol, and the host side for testing it.",
-  "license": "UNLICENSED",
   "sideEffects": false,
   "bin": {
     "frostbite-game-dev": "./dist/dev-host/bin.js",

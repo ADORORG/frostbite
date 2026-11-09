@@ -79,3 +79,11 @@ source and test files must remain at or below 300 physical lines.
 
 GitHub Actions runs the complete environment, formatting, repository-policy, type, migration,
 unit, integration, merged-coverage, build, and Playwright matrix on pull requests and `main`.
+
+## Licence
+
+Frostbite is published under the **Functional Source License, Version 1.1, ALv2 Future License** (`FSL-1.1-ALv2`, see `LICENSE`): the source is
+public, you may use it for any purpose except a competing product or service, and each release becomes Apache-2.0 two years after it is
+published. Artwork, scene videos, the name and the logo are not covered, and a few third-party notices are kept (`NOTICE`). To contribute, see
+`CONTRIBUTING.md`. `pnpm repository:check` fails when a package, the Dockerfile label or `LICENSE` drifts from this, or when a production
+dependency has a licence the policy does not allow (`tooling/repository-policy/src/dependency-licenses.ts`).
