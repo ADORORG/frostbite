@@ -26,11 +26,10 @@ describe("defining a milestone with or without a drawing", () => {
     await enterWallet(container);
     const field = () => fieldByLabel(container, "Drawing for Streak");
 
-    // Nothing typed: only the explicit choice to define without a drawing is open, and the field says what that means.
+    // Nothing typed: only the explicit choice to define without a drawing is open.
     expect(field().isConnected).toBe(true);
     expect(disabled(container, "Define Streak")).toBe(true);
     expect(disabled(container, "Define Streak without a drawing")).toBe(false);
-    expect(textOf(container)).toContain(milestoneCopy.defineWithoutHint);
 
     await typeInto(field(), "<svg/>");
     expect(disabled(container, "Define Streak")).toBe(false);
@@ -46,6 +45,19 @@ describe("defining a milestone with or without a drawing", () => {
         },
       }),
     );
+  });
+
+  it("says what a drawing is once for the whole list, not under every milestone", async () => {
+    const container = await panel(fakeApi());
+    await enterWallet(container);
+    // Two milestones are waiting to be defined, each with its own field.
+    expect(container.querySelectorAll("textarea")).toHaveLength(2);
+    const text = textOf(container);
+    const said = text.split("A drawing becomes the collectible.").length - 1;
+    expect(said).toBe(1);
+    expect(text).toContain(milestoneCopy.intro(0, 2));
+    // The fields themselves carry no hint.
+    expect(container.querySelector("textarea[aria-describedby]")).toBeNull();
   });
 
   it("does not start a definition from a drawing that is only spaces", async () => {

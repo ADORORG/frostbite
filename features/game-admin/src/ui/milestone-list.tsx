@@ -49,7 +49,7 @@ export function MilestoneList({
   ).length;
   return (
     <SectionBlock
-      description={`Each is defined on the contract once, with a drawing that becomes the collectible. ${String(defined)} of ${String(milestones.length)} defined.`}
+      description={milestoneCopy.intro(defined, milestones.length)}
       title="Milestones"
     >
       <div
@@ -97,11 +97,6 @@ export function MilestoneList({
                 {done ? null : (
                   <div className="milestones__define">
                     <ArcadeTextField
-                      hint={
-                        drawing.trim() === ""
-                          ? `${milestoneCopy.drawingHint} ${milestoneCopy.defineWithoutHint}`
-                          : milestoneCopy.drawingHint
-                      }
                       label={`Drawing for ${milestone.title}`}
                       multiline
                       onChange={(value) =>
