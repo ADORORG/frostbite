@@ -18,7 +18,9 @@ import type { GameWalletConfig } from "../wallet-config.ts";
 import { GamePlayer } from "./game-player.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
+import { Leaderboard } from "./leaderboard.tsx";
 import { MintedGallery } from "./minted-gallery.tsx";
+import { leaderboardCopy } from "../domain/leaderboard-copy.ts";
 import { WalletGamePlayer } from "./wallet-game-player.tsx";
 
 // One game as its manifest declares it, with the game itself as the main thing on the page when the platform
@@ -81,6 +83,17 @@ export function GameDetail({
   const sections: DockSection[] = [
     { badge: null, content: about, id: "about", label: "About" },
     { badge: null, content: asks, id: "asks", label: "What it asks for" },
+    // A game the platform replays has verified scores to rank.
+    ...(game.scored
+      ? [
+          {
+            badge: null,
+            content: <Leaderboard gameId={game.id} />,
+            id: "leaderboard",
+            label: leaderboardCopy.title,
+          },
+        ]
+      : []),
     // Anyone may see what has been minted of a game that mints milestones.
     ...(game.claimable
       ? [

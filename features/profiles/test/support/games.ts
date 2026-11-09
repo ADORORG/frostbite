@@ -24,6 +24,7 @@ export const game = (
   playable: true,
   playUrl: null,
   scene: null,
+  scored: false,
   summary: `${title} summary.`,
   tags: [],
   title,

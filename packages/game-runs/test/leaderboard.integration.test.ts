@@ -1,9 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
-import { authUsers, gameRuns, gameScoreBests } from "@frostbite/database";
-import { and, eq, sql } from "drizzle-orm";
+import { authUsers, gameRuns } from "@frostbite/database";
+import { eq, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -12,8 +10,8 @@ import {
   topScores,
   windowEndsAt,
   windowStartOf,
-  type BoardWindow,
 } from "../src/leaderboard.ts";
+import { at, freshGame, rowOf, runBackfill, settle } from "./support/board.ts";
 import {
   database,
   digest,
@@ -22,49 +20,6 @@ import {
 } from "./support/database.ts";
 
 registerDatabase();
-
-let counter = 0;
-// Each test works on a game of its own: the database lasts for the whole file.
-const freshGame = () => `board-game-${String((counter += 1))}`;
-const at = (iso: string) => new Date(iso);
-async function settle(
-  userId: string,
-  gameId: string,
-  score: number | null,
-  when: string,
-  verdict: "rejected" | "verified" = "verified",
-) {
-  await database.insert(gameRuns).values({
-    expiresAt: at("2030-01-01T00:00:00.000Z"),
-    gameId,
-    id: randomUUID(),
-    issuedAt: at("2026-01-01T00:00:00.000Z"),
-    score,
-    seed: 1,
-    state: "submitted",
-    submittedAt: at(when),
-    userId,
-    verdict,
-    verifierDigest: digest,
-  });
-}
-const rowOf = async (gameId: string, kind: BoardWindow, userId: string) =>
-  (
-    await database
-      .select()
-      .from(gameScoreBests)
-      .where(
-        and(
-          eq(gameScoreBests.gameId, gameId),
-          eq(gameScoreBests.windowKind, kind),
-          eq(gameScoreBests.userId, userId),
-        ),
-      )
-  ).map(({ achievedAt, score, windowStart }) => ({
-    achievedAt,
-    score,
-    windowStart,
-  }));
 
 describe("the periods a board is kept for", () => {
   it.each([
@@ -205,28 +160,7 @@ describe("the best scores kept as runs settle", () => {
       );
     }
     expect(await rowOf(gameId, "all", userId)).toEqual([]);
-    const migrations = resolve(
-      import.meta.dirname,
-      "../../database/migrations",
-    );
-    const file = readdirSync(migrations).find((name) =>
-      name.endsWith("_game_score_bests"),
-    );
-    const script = readFileSync(
-      resolve(migrations, file ?? "missing", "migration.sql"),
-      "utf8",
-    );
-    const backfill = script.slice(
-      script.lastIndexOf('INSERT INTO "frostbite"."game_score_bests"'),
-    );
-    await database.execute(
-      sql.raw(
-        backfill.replace(
-          "WHERE r.state = 'submitted'",
-          `WHERE r.game_id = '${gameId}' AND r.state = 'submitted'`,
-        ),
-      ),
-    );
+    await runBackfill(gameId);
     expect((await rowOf(gameId, "all", userId))[0]).toMatchObject({
       score: 90,
     });

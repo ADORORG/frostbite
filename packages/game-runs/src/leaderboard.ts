@@ -1,5 +1,6 @@
 import type { DatabaseClient } from "@frostbite/database/connection";
 import { gameScoreBests } from "@frostbite/database/schema/game-score-bests";
+import { playerProfiles } from "@frostbite/database/schema/player-profiles";
 import { and, asc, count, eq, gt, sql } from "drizzle-orm";
 
 // The periods a board is kept for (see `game_score_bests`): one for all time, then each month and each week, in UTC.
@@ -34,6 +35,11 @@ export function windowEndsAt(kind: BoardWindow, start: string): Date | null {
 
 export interface BoardRow {
   readonly achievedAt: Date;
+  // The name and picture the player chose, only when they switched their public page on; otherwise null and the row is anonymous.
+  readonly profile: {
+    readonly avatar: string;
+    readonly name: string;
+  } | null;
   // 1 plus the number of players with a higher score: players with the same score share a rank.
   readonly rank: number;
   readonly score: number;
@@ -54,11 +60,20 @@ export async function topScores(
   const rows = await database
     .select({
       achievedAt: gameScoreBests.achievedAt,
+      avatar: playerProfiles.avatar,
+      name: playerProfiles.name,
       rank: sql<number>`rank() over (order by ${gameScoreBests.score} desc)::int`,
       score: gameScoreBests.score,
       userId: gameScoreBests.userId,
     })
     .from(gameScoreBests)
+    .leftJoin(
+      playerProfiles,
+      and(
+        eq(playerProfiles.userId, gameScoreBests.userId),
+        eq(playerProfiles.visible, true),
+      ),
+    )
     .where(inPeriod(period))
     .orderBy(
       // The index is built `desc nulls last`; asking for the same order lets it be read as it is, with no sort.
@@ -66,7 +81,10 @@ export async function topScores(
       asc(gameScoreBests.achievedAt),
     )
     .limit(limit);
-  return rows;
+  return rows.map(({ avatar, name, ...row }) => ({
+    ...row,
+    profile: avatar === null || name === null ? null : { avatar, name },
+  }));
 }
 
 // One player's place in a period, or null when they have no score in it.

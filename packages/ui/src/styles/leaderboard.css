@@ -1,0 +1,115 @@
+/* A game's leaderboard, in the dock: period switch, a podium for the top three, then ranked rows. */
+.board {
+  display: grid;
+  gap: var(--arcade-space-4);
+}
+.board__intro,
+.board__mine {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+.board__mine {
+  color: var(--arcade-yellow);
+}
+.board__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+}
+.board__tab {
+  min-block-size: 2.75rem;
+  padding: var(--arcade-space-2) var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-medium);
+  background: transparent;
+  color: var(--arcade-text);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.board__tab[aria-pressed="true"] {
+  background: var(--arcade-cyan);
+  color: var(--arcade-ink, #07121f);
+}
+.board__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3);
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-sm);
+}
+.board-who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--arcade-space-2);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  color: inherit;
+}
+.board-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.board-podium__step {
+  display: grid;
+  gap: var(--arcade-space-2);
+  justify-items: center;
+  padding: var(--arcade-space-3) var(--arcade-space-2);
+  border: 0.125rem solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-medium);
+  background: rgb(255 210 63 / 8%);
+  text-align: center;
+}
+/* The champion stands in the middle and tallest: the DOM order is 1, 2, 3. */
+.board-podium__step[data-rank="1"] {
+  order: 2;
+  padding-block: var(--arcade-space-5);
+  box-shadow: 0 0 1.5rem rgb(255 210 63 / 35%);
+}
+.board-podium__step[data-rank="2"] {
+  order: 1;
+}
+.board-podium__step[data-rank="3"] {
+  order: 3;
+}
+.board-podium__rank {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-display);
+  font-size: var(--arcade-text-lg);
+}
+.board-podium__score {
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-text-sm);
+}
+.board__rows {
+  display: grid;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.board__row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--arcade-space-3);
+  padding: var(--arcade-space-2) var(--arcade-space-3);
+  border: 0.0625rem solid var(--arcade-border, rgb(255 255 255 / 15%));
+  border-radius: var(--arcade-radius-medium);
+}
+.board__rank {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+}
+@media (prefers-reduced-motion: reduce) {
+  .board__tab {
+    transition: none;
+  }
+}

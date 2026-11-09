@@ -1,3 +1,4 @@
+import { getTableName } from "drizzle-orm";
 import { getTableConfig } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 
@@ -23,5 +24,12 @@ describe("the best scores kept for each game, player and period", () => {
       "game_score_bests_kind_known",
       "game_score_bests_not_negative",
     ]);
+  });
+
+  it("goes with the player's account", () => {
+    const [key] = config.foreignKeys;
+    if (key === undefined) throw new Error("no foreign key");
+    expect(getTableName(key.reference().foreignTable)).toBe("auth_users");
+    expect(key.onDelete).toBe("cascade");
   });
 });
