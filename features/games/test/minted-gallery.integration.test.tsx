@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { GalleryApi } from "../src/client/gallery-api.ts";
 import { createGameCatalog } from "../src/domain/catalog.ts";
 import { galleryCopy } from "../src/domain/gallery-copy.ts";
+import { shareCopy } from "../src/domain/share-copy.ts";
 import { MintedGallery } from "../src/ui/minted-gallery.tsx";
 import { chains, rewardsGame } from "./support/template-game.ts";
 
@@ -64,12 +65,15 @@ describe("a game's gallery of mints", () => {
     expect(textOf(cards[0] as HTMLElement)).toContain(
       galleryCopy.mintedTo("tb1pj0…mhkvgx"),
     );
-    expect(textOf(cards[0] as HTMLElement)).toContain(
-      galleryCopy.verification["replay-verified"],
+    expect(textOf(cards[0] as HTMLElement)).toContain(shareCopy.verification);
+    // A mint the game reported says nothing about how it is known.
+    expect(textOf(cards[1] as HTMLElement)).not.toContain(
+      shareCopy.verification,
     );
-    expect(textOf(cards[1] as HTMLElement)).toContain(
-      galleryCopy.verification["self-reported"],
+    expect(textOf(cards[1] as HTMLElement).toLowerCase()).not.toContain(
+      "self-reported",
     );
+    expect(cards[1]?.querySelector(".mint-gallery-card__level")).toBeNull();
     expect(cards[0]?.querySelector("img")?.getAttribute("src")).toBe(
       galleryPictureHref(mint(1).claimId),
     );

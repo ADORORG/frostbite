@@ -39,7 +39,7 @@ describe("a shared milestone", () => {
     expect(out).toContain("You outran the cold.");
     expect(out).toContain("128");
     expect(out).toContain(shareCopy.page.mintCountLabel(128));
-    expect(out).toContain(shareCopy.verification["replay-verified"]);
+    expect(out).toContain(shareCopy.verification);
     expect(out).toContain(shareCopy.page.minted("17 Oct 2026"));
     expect(out).toContain('href="/games/arcade"');
     expect(out).toContain(shareCopy.play("Arcade"));
@@ -54,8 +54,8 @@ describe("a shared milestone", () => {
     });
     expect(out).not.toContain(shareCopy.page.mintedBadge);
     expect(out).not.toContain("players have minted");
-    expect(out).not.toContain(shareCopy.verification["replay-verified"]);
-    expect(out).toContain(shareCopy.verification["self-reported"]);
+    expect(out).not.toContain(shareCopy.verification);
+    expect(out.toLowerCase()).not.toContain("self-reported");
   });
 });
 
@@ -70,8 +70,8 @@ describe("a shared score", () => {
     expect(out).toContain("4,210");
     expect(out).toContain(shareCopy.page.scoreKicker);
     expect(out).toContain(shareCopy.page.scoreCta.title);
-    expect(out).toContain(shareCopy.verification["self-reported"]);
-    expect(out).not.toContain(shareCopy.verification["replay-verified"]);
+    expect(out).not.toContain(shareCopy.verification);
+    expect(out.toLowerCase()).not.toContain("self-reported");
   });
 });
 

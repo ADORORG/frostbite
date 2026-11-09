@@ -18,6 +18,9 @@ an address is now exposed; keys, signatures, wallet objects, transactions and co
    declared.
 3. **Self-reported stays labelled.** Anything a game reports (milestones, scores) is shown as reported by the
    game. Nothing of value depends on it until a verified level exists (G6).
+   _Amended 2026-11-09 (owner): shared milestone and score pages, their link previews and the Minted gallery no longer print
+   "Self-reported"; they say "Verified by replay" for a replayed milestone and nothing for any other. The level is still stored and
+   still decides what can be minted. The game page's milestone dock keeps its own labels._
 4. **Rate-limited and size-limited** by typed policy, like saves and unlocks.
 5. **Validated in both directions**, and unknown messages are ignored, so an older game is never broken by a
    newer page.
