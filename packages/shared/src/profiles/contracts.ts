@@ -164,5 +164,7 @@ export const getPublicProfileRoute = {
 
 // The pages: where a player sets theirs up, and the public one. The name is already URL-safe (letters, digits, `_` and `-`).
 export const profileSetupPath = "/profile";
+// What the account menu calls the link to it.
+export const profileNavigationLabel = "My profile";
 export const profilePagePath = "/p/[name]";
 export const profilePath = (name: string): `/${string}` => `/p/${name}`;

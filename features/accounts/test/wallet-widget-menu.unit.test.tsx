@@ -130,6 +130,9 @@ describe("the wallet widget: the button", () => {
     expect(
       container.querySelector('a[href="/games/milestones"]')?.textContent,
     ).toBe("My milestones");
+    expect(container.querySelector('a[href="/profile"]')?.textContent).toBe(
+      "My profile",
+    );
     await click("Disconnect wallet");
     expect(connection.disconnect).toHaveBeenCalledTimes(1);
     await click("Switch wallet");
