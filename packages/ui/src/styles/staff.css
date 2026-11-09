@@ -126,10 +126,13 @@
   gap: var(--arcade-space-2);
   justify-items: start;
 }
-.milestones__define summary {
-  color: var(--arcade-cyan);
-  font-size: var(--arcade-text-xs);
-  cursor: pointer;
+.milestones__define > * {
+  width: min(100%, 36rem);
+}
+.milestones__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
 }
 @media (max-width: 36rem) {
   .activity li,

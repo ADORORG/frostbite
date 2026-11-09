@@ -147,6 +147,7 @@ function ports(): ClaimChainPorts {
       tip: (...asked) => observer.tip(...asked),
     },
     rewards: {
+      drawing: async () => null,
       claimed: async (...asked) =>
         Math.max(
           0,

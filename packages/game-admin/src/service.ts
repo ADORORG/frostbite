@@ -8,6 +8,7 @@ import {
 } from "@frostbite/shared/chain";
 
 import { completing } from "./completion.ts";
+import { drawingProblem } from "./held-drawing.ts";
 import { refOf } from "./plan.ts";
 import { recordCreated } from "./record.ts";
 import { startStep } from "./start.ts";
@@ -156,8 +157,18 @@ export function createGameAdminService(dependencies: GameAdminDependencies) {
                 : null,
             ),
           );
-        if (step.state === "confirmed")
-          return view(await repository.update(stepId, completing));
+        if (step.state === "confirmed") {
+          // A definition is complete only when the contract holds the drawing that was signed.
+          const problem = await drawingProblem(step, chain);
+          return view(
+            await repository.update(
+              stepId,
+              problem === null
+                ? completing
+                : (held) => moveTo("confirmed", problem)(held),
+            ),
+          );
+        }
         if (step.transactionId === null || !isObservable(step.state))
           return view(step);
         const from = step.state;

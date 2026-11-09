@@ -29,3 +29,8 @@ export const broadcastGate: { enabled: boolean; held: (() => void)[] } = {
   enabled: false,
   held: [],
 };
+
+// What the contract holds for a defined milestone's drawing: the chain's own answer, or (for a test) none, or a different drawing.
+export const heldDrawing: {
+  mode: "chain" | "different" | "down" | "none";
+} = { mode: "chain" };

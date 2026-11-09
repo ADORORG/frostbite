@@ -171,6 +171,25 @@ export function createSimulatedChain(
   // The simulated family mints no collectibles, so it truthfully has nothing to preview.
   const rewards: RewardsReader = {
     preview: () => Promise.resolve(null),
+    // The drawing the last effective definition of the milestone carried; none if it carried none.
+    drawing: (contract, milestoneId) => {
+      const defined = ledger(contract.chain)
+        .effective()
+        .map(decodeSimulated)
+        .filter(
+          (body) =>
+            body?.operation === "define-milestone" &&
+            body.contract === contract.id &&
+            body.milestoneId === milestoneId,
+        )
+        .at(-1);
+      return Promise.resolve(
+        defined?.drawingBytes === undefined ||
+          defined.drawingSha === undefined
+          ? null
+          : { bytes: defined.drawingBytes, sha256: defined.drawingSha },
+      );
+    },
     claimed: (contract, holder, milestoneId) =>
       Promise.resolve(
         ledger(contract.chain)

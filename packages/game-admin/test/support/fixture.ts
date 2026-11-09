@@ -41,6 +41,7 @@ import {
   indexer,
   lostSend,
   broadcastGate,
+  heldDrawing,
 } from "./switches.ts";
 
 export * from "./switches.ts";
@@ -90,9 +91,16 @@ export const rewards: RewardsPlan = {
 };
 export const contracts = createDrizzleContractStore(database);
 function ports(): AdminChainPorts {
-  const { addressCodec, broadcaster, builder, contracts, observer } =
+  const { addressCodec, broadcaster, builder, contracts, observer, rewards } =
     network.adapter.ports;
-  if (!addressCodec || !broadcaster || !builder || !contracts || !observer)
+  if (
+    !addressCodec ||
+    !broadcaster ||
+    !builder ||
+    !contracts ||
+    !observer ||
+    !rewards
+  )
     throw new Error("The simulated adapter lacks a port a step needs.");
   return {
     addressCodec,
@@ -155,6 +163,16 @@ function ports(): AdminChainPorts {
         const { created, ...rest } = seen;
         void created;
         return rest;
+      },
+    },
+    rewards: {
+      ...rewards,
+      drawing: async (...asked) => {
+        if (heldDrawing.mode === "down") throw new Error("the node is down");
+        if (heldDrawing.mode === "none") return null;
+        if (heldDrawing.mode === "different")
+          return { bytes: 1, sha256: "0".repeat(64) };
+        return rewards.drawing(...asked);
       },
     },
   };

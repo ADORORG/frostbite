@@ -21,7 +21,7 @@ bridge, `providers/chain/`, conformance tests, and the recorded `packages/auth/`
 
 - `@frostbite/chain/bitcoin-alkanes` — `createBitcoinAlkanesAdapter`, the `bitcoin-alkanes` family adapter, and what a caller needs to
   wire it to a node (`createRpcNode`, `createJsonRpc`, `AlkanesNode`, `TransactionOptions`). It always provides the address codec.
-  Given a node per chain (`BitcoinAlkanesNodes`) it also provides the **rewards reader**: `claimed` (how many times a holder claimed
+  Given a node per chain (`BitcoinAlkanesNodes`) it also provides the **rewards reader**: `drawing` (the size and SHA-256 of the drawing a game's contract keeps for a milestone, or none), `claimed` (how many times a holder claimed
   a milestone) and `preview` (the picture, content type, issuer and edition of a collectible). Given transaction options as well
   it provides the **milestone-claim path**: the builder (a PSBT the player's wallet signs, with a summary of what it does), the
   signed-transaction check, the broadcaster, the observer (Bitcoin confirmation plus the indexer's trace), and the contract gateway
