@@ -7,10 +7,6 @@ import {
 } from "../src/application/plays-operations.ts";
 
 const listed = new Set(["arcade"]);
-const context = {} as Parameters<
-  ReturnType<typeof createRecordGamePlayOperation>["execute"]
->[1];
-
 describe("counting a run started in a game", () => {
   it("is open to anyone, a write, and answers in the contract's shape", async () => {
     const record = vi.fn(async () => undefined);
@@ -20,7 +16,7 @@ describe("counting a run started in a game", () => {
     );
     expect(operation.access).toEqual({ kind: "public" });
     expect(operation.method).toBe("POST");
-    const answer = await operation.execute({ gameId: "arcade" }, context);
+    const answer = await operation.execute({ gameId: "arcade" });
     expect(answer).toEqual({ ok: true, value: { counted: true } });
     expect(
       recordGamePlayResponseSchema.safeParse(answer.ok ? answer.value : null)
@@ -35,7 +31,7 @@ describe("counting a run started in a game", () => {
       async (): Promise<Plays> => ({ record }),
       listed,
     );
-    const answer = await operation.execute({ gameId: "made-up" }, context);
+    const answer = await operation.execute({ gameId: "made-up" });
     expect(answer).toMatchObject({ error: "not_found", ok: false });
     expect(record).not.toHaveBeenCalled();
   });
@@ -43,7 +39,7 @@ describe("counting a run started in a game", () => {
   it("does not reach for the database until a listed game is counted", async () => {
     const getPlays = vi.fn(async (): Promise<Plays> => ({ record: vi.fn() }));
     const operation = createRecordGamePlayOperation(getPlays, listed);
-    await operation.execute({ gameId: "made-up" }, context);
+    await operation.execute({ gameId: "made-up" });
     expect(getPlays).not.toHaveBeenCalled();
   });
 });
