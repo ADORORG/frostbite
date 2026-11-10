@@ -66,7 +66,7 @@ describe("defining many milestones from a folder of drawings", () => {
     expect(button(container, "Define 1 milestone")).not.toBeNull();
   });
 
-  it("starts the first, waits for it to be signed and seen on the network, then starts the next, each with its own drawing", async () => {
+  it("starts the first, waits for it to be signed and confirmed on the network, then starts the next, each with its own drawing", async () => {
     let log = [] as ReturnType<typeof stepFor>[];
     const start = vi.fn(async ({ action }) => {
       const milestoneId = (action as { milestoneId: string }).milestoneId;
@@ -100,7 +100,7 @@ describe("defining many milestones from a folder of drawings", () => {
     // It is waiting to be signed: the second is not started, however long it waits.
     await new Promise((resolve) => setTimeout(resolve, 60));
     expect(start).toHaveBeenCalledTimes(1);
-    // The first is seen on the network; now the second.
+    // The first is confirmed on the network; now the second.
     log = [stepFor("first-win", "complete")];
     await settle(() => expect(start).toHaveBeenCalledTimes(2));
     expect(start.mock.calls[1]?.[0]).toMatchObject({

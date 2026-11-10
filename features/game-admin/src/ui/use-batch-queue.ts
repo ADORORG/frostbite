@@ -11,7 +11,7 @@ export interface BatchItem {
 }
 
 // Walks a batch of milestones one at a time: it asks for the next definition only when nothing else is under way, so a step has been
-// signed, sent and seen on the network (the chain will not build the next from an output it has not seen) before the next is built.
+// signed, sent and confirmed on the network, when its step shows Complete (the chain will not build the next from an output it has not confirmed) before the next is built.
 // Where it stands is read from the log of steps, not kept here, so a reload loses nothing: choose the drawings again and the milestones
 // the contract already has are skipped, and a step still waiting to be signed is simply waited for.
 //

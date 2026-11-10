@@ -110,8 +110,8 @@ A game with many milestones can be done from a folder instead of one field at a 
    it met. Files that match no milestone are named. Two files for one milestone are refused rather than guessed between. A milestone
    the contract already has is left out, and a milestone with no file is left alone (define it on its own, with or without a drawing).
 3. **Press "Define N milestones".** The platform then defines them one at a time, in the manifest's order. Each becomes an ordinary step
-   that you review and sign in the wallet that holds the game's auth token. The next is not built until the last has been sent and seen
-   on the network, because the chain will not build a step from an output it has not seen. So expect one signature per milestone and
+   that you review and sign in the wallet that holds the game's auth token. The next is not built until the last has been confirmed
+   on the network (its step shows Complete), because the chain will not build a step from an output it has not confirmed. So expect one signature per milestone and
    about one block between them. **Pause after this step** stops the run; the step already under way carries on.
 4. **If a step fails, or the platform refuses to build one,** the run stops at that milestone and says so; fix what the step shows and
    press **Continue**. A step that failed before the run began is tried again when you start.
