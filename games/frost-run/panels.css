@@ -1,0 +1,279 @@
+/* The panels over the screen: the hero select, the card after a run and the share card. Frosted glass, sharp text. */
+.panel {
+  position: absolute;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 45%);
+}
+.panel[hidden] {
+  display: none;
+}
+/* The hero select keeps its place while a run goes (hidden, not gone), so nothing under a thumb moves when a run starts. */
+main:not(.choosing) .select {
+  visibility: hidden;
+}
+.panel h2 {
+  font: 700 clamp(1.6rem, 3.4vw, 2.3rem) var(--display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.panel .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.select {
+  inset-block: 1rem;
+  inset-inline-end: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  inline-size: min(24rem, 42%);
+  padding: 1.1rem 1.2rem;
+  overflow-y: auto;
+}
+@media (max-height: 640px) {
+  .select .story {
+    display: none;
+  }
+}
+@media (max-height: 440px) {
+  .select {
+    gap: 0.35rem;
+    padding: 0.55rem 0.8rem;
+  }
+  .select h2 {
+    font-size: 1.3rem;
+  }
+  .select .nav {
+    min-block-size: 2.4rem;
+  }
+  .stats {
+    gap: 0.15rem;
+  }
+  .signature {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.74rem;
+  }
+  .select .primary {
+    min-block-size: 2.6rem;
+  }
+}
+.select .eyebrow {
+  color: var(--dim);
+  font: 700 0.75rem var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.select .picker {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+.select .who {
+  text-align: center;
+}
+.select .kind {
+  color: var(--frost);
+  font-size: 0.85rem;
+}
+.select .nav {
+  inline-size: 2.75rem;
+  padding: 0;
+  font: 700 1.4rem var(--display);
+}
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+}
+.dots .dot {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border: 1px solid var(--frost);
+  border-radius: 50%;
+}
+.dots .dot.on {
+  border-color: var(--ice);
+  background: var(--ice);
+}
+/* What a touch screen is told in place of the buttons it does not have (touch.css shows them). */
+.select .swipe,
+.result .tap {
+  display: none;
+  color: var(--dim);
+  font-size: 0.72rem;
+  text-align: center;
+}
+.stats {
+  display: grid;
+  gap: 0.35rem;
+}
+.stat {
+  display: grid;
+  grid-template-columns: 6.2rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--dim);
+  font-size: 0.78rem;
+}
+.bar-track {
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: rgb(234 246 255 / 10%);
+  overflow: hidden;
+}
+.bar-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--frost), var(--key));
+  transition: inline-size 300ms ease;
+}
+.signature {
+  padding: 0.55rem 0.7rem;
+  border-inline-start: 3px solid var(--mint);
+  border-radius: 0.4rem;
+  background: rgb(63 224 160 / 8%);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.story {
+  color: var(--dim);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.select .primary {
+  min-block-size: 3.2rem;
+  font: 700 1rem var(--display);
+  letter-spacing: 0.04em;
+}
+
+.result {
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  display: grid;
+  gap: 0.8rem;
+  inline-size: min(30rem, 92%);
+  max-block-size: 92%;
+  padding: 1.3rem 1.4rem;
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  animation: rise 400ms ease both;
+}
+.result .verdict {
+  color: var(--frost);
+  text-align: center;
+}
+.result[data-won="true"] .verdict {
+  color: var(--mint);
+  text-shadow: 0 0 1.2rem rgb(63 224 160 / 45%);
+}
+.result .who {
+  color: var(--dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.haul,
+.rounds,
+.chips {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.haul-row {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+}
+.haul-row .icon {
+  display: inline-block;
+  inline-size: 0.8rem;
+  block-size: 1rem;
+}
+.haul-row[data-kind="crystal"] .icon {
+  background: var(--mint);
+  clip-path: polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%);
+}
+.haul-row[data-kind="egg"] .icon {
+  border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+  background: var(--egg);
+}
+.haul-row[data-kind="key"] .icon {
+  background: var(--key);
+  clip-path: polygon(
+    30% 0,
+    70% 0,
+    70% 34%,
+    58% 34%,
+    58% 62%,
+    90% 62%,
+    90% 74%,
+    58% 74%,
+    58% 84%,
+    80% 84%,
+    80% 96%,
+    42% 100%,
+    42% 34%,
+    30% 34%
+  );
+}
+.haul-row .got {
+  font: 700 1rem var(--display);
+}
+.haul-row .need {
+  color: var(--dim);
+  font-size: 0.75rem;
+}
+.haul-row.met .need::after {
+  content: " ✓";
+  color: var(--mint);
+}
+.haul-row.short .need::after {
+  content: " ✗";
+  color: var(--danger);
+}
+.round-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto;
+  gap: 0.6rem;
+  color: var(--dim);
+  font-size: 0.78rem;
+}
+.round-row .tag {
+  color: var(--mint);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+.chip {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--mint);
+  border-radius: 999px;
+  color: var(--mint);
+  font-size: 0.72rem;
+}
+.result .row {
+  justify-content: center;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -44%);
+  }
+}
