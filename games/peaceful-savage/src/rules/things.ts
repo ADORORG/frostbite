@@ -9,12 +9,12 @@ export interface Thing extends Point {
 
 export const things: readonly Thing[] = [
   // The kitchen.
-  { id: "fridge", x: -11_500, z: 1_300 },
+  { id: "fridge", x: -11_450, z: 2_600 },
   { id: "tap", x: -9_600, z: 900 },
   { id: "ice", x: -10_600, z: 900 },
   { id: "juice", x: -7_200, z: 4_000 },
   { id: "toaster", x: -6_200, z: 900 },
-  { id: "chair", x: -5_100, z: 4_700 },
+  { id: "chair", x: -6_400, z: 5_600 },
   // The children's room.
   { id: "rocket", x: -8_800, z: 9_600 },
   { id: "projector", x: -6_800, z: 10_400 },
@@ -24,10 +24,10 @@ export const things: readonly Thing[] = [
   { id: "zorabed", x: -10_800, z: 12_400 },
   // The office.
   { id: "monitor", x: 7_400, z: 3_200 },
-  { id: "globe", x: 5_600, z: 1_200 },
+  { id: "globe", x: 5_200, z: 600 },
   { id: "books", x: 11_300, z: 3_400 },
   { id: "whiteboard", x: 3_200, z: 1_400 },
-  { id: "records", x: 5_600, z: 6_400 },
+  { id: "records", x: 6_300, z: 6_500 },
   { id: "armchair", x: 5_000, z: 5_900 },
   // The parents' room.
   { id: "wardrobe", x: 11_300, z: 8_400 },
@@ -45,7 +45,7 @@ export const things: readonly Thing[] = [
   { id: "clock", x: 2_700, z: 8_600 },
   // The meadow.
   { id: "trafficlight", x: -8_000, z: -9_000 },
-  { id: "swing", x: 10_000, z: -7_400 },
+  { id: "swing", x: 10_600, z: -7_000 },
   { id: "bench", x: -3_200, z: -4_150 },
   { id: "postbox", x: 6_000, z: -3_000 },
   { id: "bluebells", x: -14_000, z: -6_000 },

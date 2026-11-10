@@ -40,11 +40,13 @@ export interface Motion {
 const ease = (current: number, target: number, rate: number, dt: number) =>
   current + (target - current) * (1 - Math.exp(-rate * dt));
 
+// `free` is how freely the legs swing (1, or less in a long skirt, which shortens the stride).
 export function createMotion(
   rig: Rig,
   face: Face,
   hair: Hair,
   seed: number,
+  free = 1,
 ): Motion {
   const random = noise(seed);
   const current: Record<string, number> = {};
@@ -83,9 +85,10 @@ export function createMotion(
     };
     for (const side of sides) {
       const s = side === "L" ? 1 : -1;
-      pose[`leg.front${side}`] = s * swing * (0.5 + run * 0.22) * amount;
+      pose[`leg.front${side}`] = s * swing * (0.5 + run * 0.22) * amount * free;
       pose[`knee${side}`] =
-        0.1 + Math.max(0, s * Math.cos(t)) * (1.05 + run * 0.55) * amount;
+        0.1 +
+        Math.max(0, s * Math.cos(t)) * (1.05 + run * 0.55) * amount * free;
       pose[`ankle${side}`] = -s * swing * 0.18 * amount;
       if (!arms) {
         pose[`arm.front${side}`] = -s * swing * (0.42 + run * 0.3) * amount;

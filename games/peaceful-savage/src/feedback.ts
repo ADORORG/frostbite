@@ -19,6 +19,7 @@ const sounds: Readonly<Partial<Record<NewsKind, EffectName>>> = {
   lamp: "lamp",
   level: "level",
   lit: "lit",
+  made: "made",
   mastered: "level",
   mirror: "healed",
   pancakes: "gather",

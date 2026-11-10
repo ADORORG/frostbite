@@ -1,5 +1,4 @@
 import {
-  Color,
   CylinderGeometry,
   Group,
   InstancedMesh,
@@ -13,12 +12,17 @@ import {
 } from "three";
 
 import { clues, clueSpot, mirrors, relics } from "../../rules/collect.ts";
+import { zoneAt } from "../../rules/geometry.ts";
 import { plasmaAt } from "../../rules/tick.ts";
 import type { PlayState } from "../../rules/types.ts";
 import { glowing } from "../palette.ts";
-import { groundAt } from "./meadow.ts";
+import { lookingGlass, stillPond } from "./glass.ts";
+import { groundAt, pond } from "./meadow.ts";
 import { metres } from "./rooms.ts";
-import { ball, block, drum, ring } from "./shapes.ts";
+import { ball, block, drum } from "./shapes.ts";
+
+// How near (millimetres, in the same room) the lead must be for a glass to show the world.
+const glassReach = 12_000;
 
 // What there is to gather and where to stand still: tiny plasma motes bobbing in the air; clues (rolled parchment glowing gold, seen only
 // in Savage Vision); the relics on their little stands, each glowing softly; the mirrors (oval and silver, warming once used); and the
@@ -72,7 +76,8 @@ function relic(id: string): Group {
   return group;
 }
 
-export function buildGathered(): Gathered {
+// `pixels` is how fine the pictures in the looking glasses and the pond are.
+export function buildGathered(pixels: number): Gathered {
   const group = new Group();
   const plasma = new InstancedMesh(
     new SphereGeometry(0.06, 10, 8),
@@ -100,34 +105,26 @@ export function buildGathered(): Gathered {
     group.add(made);
     return made;
   });
-  const silverGlow = new Color("#b8c2ff");
-  const usedGlow = new Color("#ffd27a");
-  const mirrorGlass = mirrors.map((each) => {
-    const holder = new Group();
-    const glass = new Mesh(
-      new SphereGeometry(1, 24, 16),
-      new MeshStandardMaterial({
-        color: "#dfe6ff",
-        emissive: "#b8c2ff",
-        emissiveIntensity: 0.3,
-        metalness: 0.25,
-        roughness: 0.2,
-      }),
-    );
-    const pond = each.id === "pond";
-    glass.scale.set(pond ? 2.4 : 0.55, pond ? 0.02 : 0.85, pond ? 1.6 : 0.03);
-    glass.position.y = pond
-      ? groundAt(metres(each.x), metres(each.z)) + 0.02
-      : 1.35;
-    holder.add(glass);
-    if (!pond) {
-      const frame = ring(glowing("#e0b04a", 0.6), 0.6, 0.04, [0, 1.35, 0]);
-      frame.scale.set(0.95, 1.45, 1);
-      holder.add(frame);
+  // The looking glasses, each hung on the wall beside where the rules have it (and the way it faces); the pond lies in the meadow.
+  const hung: Readonly<Record<string, readonly [number, number, number]>> = {
+    "hall-mirror": [2.86, 2.2, -Math.PI / 2],
+    "kids-mirror": [-3.14, 12.6, -Math.PI / 2],
+    "office-mirror": [8, 6.86, Math.PI],
+    "parents-mirror": [3.14, 8.2, Math.PI / 2],
+  };
+  const glasses = mirrors.map((each) => {
+    const wall = hung[each.id];
+    const made =
+      wall === undefined
+        ? stillPond(pond.wide, pond.deep, pixels)
+        : lookingGlass(0.5, 0.8, pixels);
+    if (wall === undefined) made.group.position.set(pond.x, pond.level, pond.z);
+    else {
+      made.group.position.set(wall[0], 1.2, wall[1]);
+      made.group.rotation.y = wall[2];
     }
-    holder.position.set(metres(each.x), 0, metres(each.z));
-    group.add(holder);
-    return glass;
+    group.add(made.group);
+    return made;
   });
   const threads = Array.from({ length: 6 }, () => {
     const coil = new Mesh(
@@ -185,13 +182,14 @@ export function buildGathered(): Gathered {
         made.visible = state.relicsTaken[index] !== true;
         made.rotation.y = Math.sin(time * 0.6 + index) * 0.2;
       });
-      // A mirror is silver until it has shown someone themself; then it holds a warm gold.
-      mirrorGlass.forEach((glass, index) => {
-        const used = state.mirrorsUsed[index] === true;
-        glass.material.emissive.copy(used ? usedGlow : silverGlow);
-        glass.material.emissiveIntensity = used
-          ? 0.55 + Math.sin(time * 2) * 0.12
-          : 0.3 + Math.sin(time * 0.8 + index) * 0.06;
+      // A glass is silver until it has shown someone themself; then it holds a warm gold.
+      glasses.forEach((glass, index) => {
+        const at = mirrors[index];
+        const near =
+          at !== undefined &&
+          zoneAt(at) === zoneAt(state) &&
+          Math.hypot(at.x - state.x, at.z - state.z) < glassReach;
+        glass.update(state.mirrorsUsed[index] === true, time, near);
       });
       threads.forEach((coil, index) => {
         const grey = state.greys[index];

@@ -11,6 +11,7 @@ import {
 } from "../src/page/hud.ts";
 import { breathOf, createMomentPanel, ringOf } from "../src/page/moment.ts";
 import { createOverlay, toastMs } from "../src/page/overlay.ts";
+import { tugWords } from "../src/script/prompts.ts";
 import { createSelect } from "../src/page/select.ts";
 import { huddleSkill } from "../src/rules/growth.ts";
 import { beginMoment } from "../src/rules/moment.ts";
@@ -29,6 +30,7 @@ const handsWith = (): Hands => ({
   choosing: () => false,
   end: vi.fn(),
   inMoment: () => false,
+  jump: vi.fn(),
   pause: vi.fn(),
   practise: vi.fn(),
   running: () => true,
@@ -214,6 +216,11 @@ describe("the prompt and the toasts over the screen", () => {
     expect(byId("prompt").textContent).toBe("E: Touch the ancestor tree");
     overlay.show(led({ x: -9_000, z: -25_000 }), 0);
     expect(byId("prompt").textContent).toBe("");
+    // With nothing in reach and the story stalled, the line says Sparky is tugging; the act key still comes first.
+    overlay.show(led({ x: -9_000, z: -25_000 }), 0, true);
+    expect(byId("prompt").textContent).toBe(tugWords);
+    overlay.show(state, 0, true);
+    expect(byId("prompt").textContent).toBe("E: Touch the ancestor tree");
     overlay.hear({ detail: "", kind: "sparky", tick: 1 }, 100);
     overlay.show(state, 200);
     expect(byId("toast").textContent).toContain("Sparky");

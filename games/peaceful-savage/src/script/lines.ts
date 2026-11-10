@@ -1,4 +1,5 @@
 import type { ChoiceId, MomentKind } from "../rules/moments.ts";
+import { creationWords } from "./creations.ts";
 
 // Every word the story says, once: the moments' titles, what each step asks of the player, the two things on offer at each choice, and
 // the clues and relics. The sly snakes are ancestors with feelings nobody listened to; what they whisper is a trick, and the true answer
@@ -12,9 +13,13 @@ export const momentTitles: Readonly<Record<MomentKind, string>> = {
   forge: "The lamp that would not go out",
   grey: "A sly snake whispers",
   heerah: "Mama by the tree",
+  hologram: creationWords.hologram.title,
+  masterpiece: creationWords.masterpiece.title,
   kai: "Kai's cracked tower",
   mirror: "At the mirror",
   practice: "Practice",
+  release: creationWords.release.title,
+  song: creationWords.song.title,
   weave: "Weaving the jackets",
   zora: "Zora's silly cube",
 };

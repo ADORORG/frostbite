@@ -4,10 +4,11 @@ import { targetOf } from "../../src/rules/act.ts";
 import { type HeroId, heroIds } from "../../src/rules/constants.ts";
 import { bodyRadius } from "../../src/rules/constants.ts";
 import {
+  blocked,
+  headings,
   headingTo,
   hits,
   type Point,
-  stepToward,
   within,
   zoneAt,
 } from "../../src/rules/geometry.ts";
@@ -15,7 +16,7 @@ import { walkSpeed } from "../../src/rules/state.ts";
 import { savageRules } from "../../src/rules/index.ts";
 import { stepOf } from "../../src/rules/moment.ts";
 import { choiceIds } from "../../src/rules/moments.ts";
-import { walls } from "../../src/rules/layout.ts";
+import { solids } from "../../src/rules/solids.ts";
 import { advanceTo } from "../../src/rules/tick.ts";
 import type { PlayState } from "../../src/rules/types.ts";
 import { route } from "./routes.ts";
@@ -69,31 +70,45 @@ export class Bot {
     if (this.state.moving !== way) this.send("move", { way });
   }
 
-  // The way toward a point, or the nearest way to it that a wall does not stop (kept for a few ticks, to get round the corner).
-  private detour = { until: 0, way: 0 };
+  // The way toward a point; or, where something stands in that way, the nearest way round it, kept going round the same side until the
+  // straight way is clear again (so a small thing dead ahead is walked round, not danced before).
+  private side = 0;
   private wayTo(to: Point): number {
-    if (this.state.tick < this.detour.until) return this.detour.way;
     const straight = headingTo(this.state, to);
-    const moves = (way: number): boolean => {
-      const next = stepToward(this.state, way, walkSpeed(this.state), walls);
-      return next.x !== this.state.x || next.z !== this.state.z;
+    const speed = walkSpeed(this.state);
+    const walls = solids(this.state);
+    const clear = (way: number): boolean => {
+      const [hx, hz] = headings[(way + 16) % 16] ?? [0, 0];
+      return !blocked(
+        {
+          x: this.state.x + Math.trunc((speed * hx) / 1000),
+          z: this.state.z + Math.trunc((speed * hz) / 1000),
+        },
+        walls,
+      );
     };
-    // A way one sixteenth off the straight one is kept while it still gets somewhere: fewer turns, fewer inputs.
-    const current = this.state.moving;
-    if (
-      current >= 0 &&
-      Math.min(
+    if (clear(straight)) {
+      this.side = 0;
+      // A way one sixteenth off the straight one is kept while it is clear: fewer turns, fewer inputs.
+      const current = this.state.moving;
+      const off = Math.min(
         (current - straight + 16) % 16,
         (straight - current + 16) % 16,
-      ) <= 1 &&
-      moves(current)
-    )
-      return current;
-    for (const turn of [0, 1, -1, 2, -2, 3, -3, 4, -4]) {
+      );
+      return current >= 0 && off <= 1 && clear(current) ? current : straight;
+    }
+    const turns = [1, 2, 3, 4, 5, 6];
+    const order =
+      this.side === 0
+        ? turns.flatMap((turn) => [turn, -turn])
+        : [
+            ...turns.map((turn) => turn * this.side),
+            ...turns.map((turn) => -turn * this.side),
+          ];
+    for (const turn of order) {
       const way = (straight + turn + 16) % 16;
-      const next = stepToward(this.state, way, walkSpeed(this.state), walls);
-      if (next.x === this.state.x && next.z === this.state.z) continue;
-      if (turn !== 0) this.detour = { until: this.state.tick + 10, way };
+      if (!clear(way)) continue;
+      this.side = Math.sign(turn);
       return way;
     }
     return straight;
@@ -129,7 +144,7 @@ export class Bot {
     const far = (point: Point) =>
       Math.hypot(point.x - from.x, point.z - from.z);
     for (let pass = 0; pass < 4; pass += 1) {
-      const wall = walls.find((each) => hits(at, each));
+      const wall = solids(this.state).find((each) => hits(at, each));
       if (wall === undefined) return at;
       const out = bodyRadius + 40;
       const pushes: readonly Point[] = [

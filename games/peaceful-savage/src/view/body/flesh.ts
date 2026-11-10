@@ -6,9 +6,9 @@ import type { Look } from "./looks.ts";
 import { applyPose, fingerNames, type Rig, type Side, sides } from "./rig.ts";
 import { armRings, legRings, neckRings, torsoRings } from "./rings.ts";
 
-// Skin grown over the skeleton and bound to it: the bare parts of a body (neck, hands and feet always; arms, torso and legs where the
-// clothes leave them bare), a palm and fingers of three bones each, a foot with a heel, an arch and toes. Clothes are grown the same way,
-// a little larger, on the same bones, so cloth and body move as one.
+// Skin grown over the skeleton and bound to it: the bare parts of a body (neck and hands always; arms, torso and legs where the clothes
+// leave them bare), a palm and fingers of three bones each. Clothes and shoes are grown the same way, a little larger, on the same
+// bones, so cloth and body move as one.
 
 function hand(
   builder: SkinBuilder,
@@ -66,54 +66,6 @@ function hand(
   }
 }
 
-function foot(builder: SkinBuilder, rig: Rig, side: Side): void {
-  const b = rig.build;
-  const at = (name: string) =>
-    rig.joint(`${name}${side}`).getWorldPosition(new Vector3());
-  const ankle = at("ankle");
-  const toes = at("toes");
-  const ankleBone = rig.boneIndex(`ankle${side}`);
-  const toeBone = rig.boneIndex(`toes${side}`);
-  const keys = [
-    [
-      ankle.clone().add(new Vector3(0, -b.foot * 0.2, -b.foot * 0.14)),
-      0.17,
-      0.15,
-      ankleBone,
-    ],
-    [
-      ankle.clone().add(new Vector3(0, -b.foot * 0.22, b.foot * 0.12)),
-      0.23,
-      0.17,
-      ankleBone,
-    ],
-    [
-      toes.clone().add(new Vector3(0, -b.foot * 0.02, -b.foot * 0.1)),
-      0.27,
-      0.1,
-      toeBone,
-    ],
-    [
-      toes.clone().add(new Vector3(0, -b.foot * 0.03, b.foot * 0.18)),
-      0.2,
-      0.065,
-      toeBone,
-    ],
-  ] as const;
-  builder.sweep(
-    keys.map(([centre, wide, high, bone]) => ({
-      bones: [[bone, 1]],
-      centre,
-      round: 2.5,
-      runs: "z" as const,
-      rx: b.foot * wide,
-      rz: b.foot * high,
-    })),
-    14,
-    { end: true, start: true },
-  );
-}
-
 // One skinned mesh from a builder, bound to the rig as it stands at rest.
 export function skinned(
   builder: SkinBuilder,
@@ -137,7 +89,7 @@ export function atRest(rig: Rig): void {
   rig.skeleton.calculateInverses();
 }
 
-// The bare skin of a body: neck, hands and feet always; arms, torso and legs where the clothes leave them bare. Bare arms that carry
+// The bare skin of a body: neck and hands always; arms, torso and legs where the clothes leave them bare. Bare arms that carry
 // markings (Mama's) are grown apart, so their gold can light on its own.
 export interface Skin {
   readonly marked: SkinBuilder | null;
@@ -151,7 +103,6 @@ export function skinOf(rig: Rig, look: Look): Skin {
   plain.sweep(neckRings(rig, look), 20, { end: false, start: false }, 1);
   for (const side of sides) {
     hand(plain, rig, side, look.build.torso < 0.5 ? 1.15 : 1);
-    foot(plain, rig, side);
     (marked ?? plain).sweep(
       armRings(rig, look, side, {
         from: look.sleeves === "none" ? 0 : 0.84,

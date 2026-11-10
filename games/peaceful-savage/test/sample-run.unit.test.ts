@@ -16,7 +16,7 @@ describe("the sample run the verifier is shown with", () => {
     if (!outcome.ok) return;
     expect([...outcome.earned].sort()).toEqual([...sample.claims].sort());
     expect(sample.claims.every((id) => milestoneIds.includes(id))).toBe(true);
-    expect(sample.claims).toHaveLength(32);
+    expect(sample.claims).toHaveLength(36);
   });
 
   it("plays out the same way every time", () => {

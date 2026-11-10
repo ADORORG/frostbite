@@ -20,8 +20,9 @@ import {
   withLight,
   withSpark,
 } from "./growth.ts";
-import { hillRadius, places, walls } from "./layout.ts";
+import { hillRadius, places } from "./layout.ts";
 import { beginMoment, momentTick } from "./moment.ts";
+import { solids } from "./solids.ts";
 import {
   family,
   visionRadius,
@@ -143,7 +144,7 @@ export function tickOnce(state: PlayState): PlayState {
   if (next.moment !== null) return momentTick(next);
   let walked = next;
   if (next.moving >= 0) {
-    const to = stepToward(next, next.moving, walkSpeed(next), walls);
+    const to = stepToward(next, next.moving, walkSpeed(next), solids(next));
     walked = gatherPlasma({ ...next, x: to.x, z: to.z });
   }
   const felt = drift(walked);

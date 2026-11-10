@@ -35,9 +35,9 @@ interface Room {
 const rooms: readonly Room[] = [
   {
     paint: "#4f8f45",
-    x0: -26_000,
-    x1: 26_000,
-    z0: -30_000,
+    x0: -16_000,
+    x1: 16_000,
+    z0: -27_000,
     z1: 0,
     zone: "meadow",
   },

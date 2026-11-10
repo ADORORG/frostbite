@@ -9,7 +9,7 @@ import {
 import type { HeroId } from "../rules/constants.ts";
 import { mirrors } from "../rules/collect.ts";
 import { greyAt, greyHomes } from "../rules/greys.ts";
-import { familySpots, places, shell } from "../rules/layout.ts";
+import { familySpots, field, places, shell } from "../rules/layout.ts";
 import { isHero, stepOf } from "../rules/moment.ts";
 import type { PlayState } from "../rules/types.ts";
 import { dancing } from "./acting.ts";
@@ -30,9 +30,13 @@ export interface ViewFrame {
   readonly previous: PlayState;
   // The one shown in front on the turntable while nobody leads.
   readonly select: HeroId;
+  // The seconds since the player last jumped (null before any jump); a jump is only seen.
+  readonly jumped?: number | null;
   // The show at the end: who the player moves on the stage, and where.
   readonly stage?: StageControl | null;
   readonly state: PlayState;
+  // Whether Sparky tugs the lead on, the story having stalled.
+  readonly tugging?: boolean;
 }
 
 export interface DepthView {
@@ -40,6 +44,9 @@ export interface DepthView {
   forward(): { readonly x: number; readonly z: number };
   show(frame: ViewFrame): void;
 }
+
+// What the camera stays inside: the house's walls, and the hedge round the meadow (beyond it are the trees).
+const bounds = [...shell, ...field];
 
 const grounded = (one: Placed): Placed => ({
   ...one,
@@ -111,7 +118,11 @@ export function createDepthView(
   if (quality === undefined) return null;
   const stage: Stage | null = createStage(canvas, quality);
   if (stage === null) return null;
-  const world = buildWorld(quality.amount, quality.lights);
+  const world = buildWorld(
+    quality.amount,
+    quality.lights,
+    quality.shadows > 0 ? 512 : 256,
+  );
   const family = buildFamily(quality.detail, quality.amount);
   stage.scene.add(world.group, family.group);
   const rig = createCameraRig();
@@ -159,6 +170,7 @@ export function createDepthView(
         time,
       });
       const lead = family.lead();
+      const sitting = family.sitting();
       const hands =
         lead === null
           ? []
@@ -174,13 +186,20 @@ export function createDepthView(
         marked: family.played()?.marked ?? null,
         sparkyAt: family.played()?.sparky ?? null,
         state,
+        swing: sitting?.angle ?? 0,
         time,
+        tugging: frame.tugging === true,
       });
       // The farewell is filmed at home whatever happened on the hill: the camera cuts there as it begins.
       const farewelling = ending.kind === "lit";
       if (farewelling !== wasFarewell) rig.cut();
       wasFarewell = farewelling;
-      const intent = farewelling ? "farewell" : intentOf(state);
+      // Sitting down, the camera comes round to the front; on the swing it stands off to the side to see the whole arc.
+      const intent = farewelling
+        ? "farewell"
+        : sitting === null
+          ? intentOf(state)
+          : sitting.seat.kind;
       // On the hill the camera cuts, on the beat, between the hands and the snake.
       const pair = [intent, wasIntent];
       if (pair.includes("hands") && pair.includes("finale")) rig.cut();
@@ -215,7 +234,7 @@ export function createDepthView(
             : left.clone().lerp(right, 0.5),
         intent,
         lead: framed,
-        walls: shell,
+        walls: bounds,
       });
       stage.lens(stage.camera.fov);
       // The one who would lead stands in a ring of gold on the lawn.

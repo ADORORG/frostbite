@@ -12,6 +12,7 @@ const handsOf = (): Hands => ({
   choosing: () => false,
   end: vi.fn(),
   inMoment: () => false,
+  jump: vi.fn(),
   pause: vi.fn(),
   practise: vi.fn(),
   running: () => false,

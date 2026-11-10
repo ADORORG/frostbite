@@ -22,55 +22,66 @@ export const shell: readonly Box[] = [
   box(3_000, 6_900, 12_000, 7_100),
 ];
 
-// The meadow's edges: hedges along the house's front either side of it, and the far edges of the field.
-const field: readonly Box[] = [
-  box(-30_100, -100, -12_100, 100),
-  box(12_100, -100, 30_100, 100),
-  box(-30_100, -30_100, 30_100, -29_900),
-  box(-30_100, -30_100, -29_900, 0),
-  box(29_900, -30_100, 30_100, 0),
+// The meadow's edges: hedges along the house's front either side of it, and a hedge round the rest of the field, where the trees begin.
+export const field: readonly Box[] = [
+  box(-16_100, -100, -12_100, 100),
+  box(12_100, -100, 16_100, 100),
+  box(-16_100, -27_100, 16_100, -26_900),
+  box(-16_100, -27_100, -15_900, 0),
+  box(15_900, -27_100, 16_100, 0),
 ];
 
 // Furniture too big to step over, room by room.
 const furniture: readonly Box[] = [
-  // The kitchen: the long counter (stove, sink, the cold box), the island, the table.
+  // The kitchen: the long counter (stove, sink), the cold box against the west wall, the island, the table and the chair drawn up to
+  // it.
   box(-11_800, 100, -5_200, 900),
+  box(-11_900, 2_150, -11_200, 3_050),
   box(-9_000, 3_000, -6_400, 4_000),
   box(-6_000, 5_000, -4_200, 6_200),
-  // The children's room: two beds, the toy chest, the workbench.
+  box(-6_630, 5_370, -6_170, 5_830),
+  // The children's room: two beds, the toy chest, the workbench, the drum.
   box(-11_800, 7_400, -9_800, 8_600),
   box(-11_800, 12_400, -9_800, 13_800),
   box(-8_000, 7_300, -7_000, 7_900),
   box(-6_000, 13_000, -3_800, 13_800),
-  // The office: the desk, the shelves of books, the armchair.
+  box(-4_420, 8_180, -3_980, 8_620),
+  // The office: the desk, the shelves of books, the armchair, and the stands the globe and the record player sit on.
   box(7_000, 2_400, 9_800, 3_200),
   box(11_300, 600, 11_900, 6_200),
   box(4_000, 5_400, 5_000, 6_400),
-  // The parents' room: the round bed, the loom, the wardrobe.
+  box(5_000, 400, 5_400, 800),
+  box(6_100, 6_300, 6_500, 6_700),
+  // The parents' room: the round bed, the loom, the wardrobe, the vanity, the music box's stand and the plant.
   box(8_200, 10_000, 11_400, 13_200),
   box(4_200, 12_800, 6_200, 13_600),
   box(11_300, 7_400, 11_900, 9_400),
-  // The hall: the trunk of the tree, the couch, the little table the lamp stands on, the shelf the deck sits on.
+  box(3_100, 12_150, 3_550, 13_050),
+  box(9_000, 7_300, 9_400, 7_700),
+  box(6_400, 7_300, 6_800, 7_700),
+  // The hall: the trunk of the tree, the couch, the little table the lamp stands on, the shelf the deck sits on, the plant.
   box(-700, 5_300, 700, 6_700),
   box(-2_400, 12_900, 2_400, 13_700),
   box(1_700, 11_500, 2_400, 12_100),
   box(2_300, 5_600, 2_800, 6_400),
-  // The meadow: the post of the traffic light, the two legs of the swing's frame (the seat hangs between them), the bench, the post box.
+  box(-2_700, 11_600, -2_300, 12_000),
+  // The meadow: the post of the traffic light, the swing's seat and the trunk of the tree it hangs from, the bench, the post box.
   box(-8_150, -9_150, -7_850, -8_850),
-  box(9_000, -7_600, 9_300, -7_200),
-  box(10_700, -7_600, 11_000, -7_200),
+  box(10_300, -7_200, 10_900, -6_800),
+  box(11_650, -7_250, 12_150, -6_750),
   box(-4_000, -4_400, -2_400, -3_900),
   box(5_850, -3_150, 6_150, -2_850),
   // On the porch: Kai's workbench, where he is building something.
   box(-3_500, -2_800, -2_100, -2_300),
 ];
 
-// The giant sly snake, asleep round the hilltop from the start: nobody walks through its coil, nor under its chin (three boxes, near
-// enough the round of it).
+// The giant sly snake, asleep round the hilltop from the start: nobody walks through its coil, nor under its chin, nor over the tip of
+// its tail (three boxes, near enough the round of it, and one for the tail).
 export const snakeCoil: readonly Box[] = [
   box(-4_300, -19_700, 4_300, -16_300),
   box(-1_700, -22_300, 1_700, -12_800),
   box(-3_200, -21_200, 3_200, -14_800),
+  box(-3_000, -14_800, -1_700, -13_800),
 ];
 
 // The front door. It stands open: the porch and the meadow are part of home from the start.
@@ -119,7 +130,7 @@ export const treeReach = 1_900;
 // something, Zora out in the meadow, Mama at the ancestor tree. The lead starts at their own place; the others are found there.
 export const familySpots = {
   ali: { x: 8_400, z: 3_900 },
-  heerah: { x: 1_500, z: 6_600 },
+  heerah: { x: 1_200, z: 6_600 },
   kai: { x: -2_700, z: -1_800 },
   zora: { x: 6_500, z: -7_000 },
 } as const satisfies Record<string, Point>;

@@ -1,4 +1,11 @@
-import { beatLead, type HeroId, ticksPerSecond } from "../rules/constants.ts";
+import {
+  beatLead,
+  breathInTicks,
+  breathOutTicks,
+  type HeroId,
+  ticksPerSecond,
+} from "../rules/constants.ts";
+import { creationOf } from "../rules/create.ts";
 import { stepOf } from "../rules/moment.ts";
 import type { NewsKind, PlayState } from "../rules/types.ts";
 import type { Expression } from "./body/face.ts";
@@ -13,6 +20,7 @@ import {
   lean,
 } from "./body/poses.ts";
 import type { Pose } from "./body/rig.ts";
+import type { Drawing } from "./world/holograms.ts";
 
 // What each of the family is doing in a frame, read from the state: the pose they hold (none while they walk), whether it wants their
 // arms, and their face. The lead plays each step of a moment (a hand-key landing on its beat, a breath in and out, a lean, a huddle, a
@@ -23,7 +31,8 @@ export interface Acting {
   readonly pose: Pose | null;
 }
 
-const glad: readonly NewsKind[] = [
+// The news that moves the story on, and makes the family glad.
+export const gladNews: readonly NewsKind[] = [
   "found",
   "healed",
   "jackets",
@@ -42,7 +51,7 @@ function moodOf(
   spark: number,
   news: NewsKind | null,
 ): Expression {
-  if (news !== null && glad.includes(news)) return "smile";
+  if (news !== null && gladNews.includes(news)) return "smile";
   if (news === "tricked") return "worry";
   if (news === "vision" || news === "rise") return "open";
   if (spark < 25) return "worry";
@@ -128,14 +137,18 @@ export function companionActing(
   const step = stepOf(state);
   if (step?.kind === "huddle")
     return { arms: true, expression: "smile", pose: huddle };
-  if (state.moment?.kind === "finale" && step?.kind === "beat")
+  // In the finale everyone plays the keys; making something, its maker plays them beside the lead.
+  const moment = state.moment;
+  const making = creationOf(moment?.kind ?? "")?.hero === hero;
+  if (
+    moment !== null &&
+    (moment.kind === "finale" || making) &&
+    step?.kind === "beat"
+  )
     return {
       arms: true,
       expression: "calm",
-      pose: handKey(
-        step.key,
-        1 - (state.moment.target - state.tick) / beatLead,
-      ),
+      pose: handKey(step.key, 1 - (moment.target - state.tick) / beatLead),
     };
   const mood = moodOf(hero, state.spark, fresh(state));
   return {
@@ -158,4 +171,45 @@ export function lostActing(
     expression: talking ? "calm" : "worry",
     pose: talking ? idle(hero, time, false) : busy(hero, time, legLength),
   };
+}
+
+// The shape of light the lead is drawing, if any, and how much of it is drawn: a hand-key as it rises to its beat, a held breath its
+// shield, a breath let go its field, the centring its flower, a dance its star.
+export function drawingOf(state: PlayState): Drawing | null {
+  const step = stepOf(state);
+  const moment = state.moment;
+  if (step === null || moment === null) {
+    const news = state.news;
+    if (news === null || !dancing(state)) return null;
+    return {
+      drawn: (state.tick - news.tick) / (ticksPerSecond * 1.2),
+      sigil: "star",
+    };
+  }
+  switch (step.kind) {
+    case "beat":
+      return {
+        drawn: 1 - (moment.target - state.tick) / beatLead,
+        sigil: step.key,
+      };
+    case "breath":
+      if (moment.holding >= 0)
+        return {
+          drawn: (state.tick - moment.holding) / breathInTicks,
+          sigil: "shield",
+        };
+      if (moment.exhaleUntil >= 0)
+        return {
+          drawn: 1 - (moment.exhaleUntil - state.tick) / breathOutTicks,
+          sigil: "field",
+        };
+      return null;
+    case "centre":
+      return {
+        drawn: (state.tick - moment.since) / (ticksPerSecond * 2),
+        sigil: "flower",
+      };
+    default:
+      return null;
+  }
 }

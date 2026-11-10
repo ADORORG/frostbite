@@ -1,21 +1,16 @@
 import { Group, Vector3 } from "three";
 
 import { type HeroId, heroIds } from "../rules/constants.ts";
-import { headings } from "../rules/geometry.ts";
-import { familyFacing, familySpots } from "../rules/layout.ts";
-import { stepOf } from "../rules/moment.ts";
 import type { PlayState } from "../rules/types.ts";
-import {
-  type Acting,
-  companionActing,
-  leadActing,
-  lostActing,
-} from "./acting.ts";
+import type { Acting } from "./acting.ts";
 import { buildCharacter, type Character } from "./body/character.ts";
 import { idle } from "./body/poses.ts";
-import { placeWith, walkingPlaces } from "./beside.ts";
 import { playFarewell, type Played } from "./family-farewell.ts";
+import { createLed } from "./family-led.ts";
+export { yawOf } from "./family-led.ts";
+import type { Shown } from "./family-seat.ts";
 import { farewell } from "./farewell.ts";
+import type { Sitting } from "./seats.ts";
 import type { StageControl } from "./show.ts";
 import type { Ending } from "./world.ts";
 import { groundAt } from "./world/meadow.ts";
@@ -35,6 +30,8 @@ export interface FamilyFrame {
   readonly dt: number;
   // How the run ended, if it has, and the seconds since.
   readonly ending: Ending;
+  // The seconds since the player last jumped (null before any jump).
+  readonly jumped?: number | null;
   readonly lookAt: Vector3 | null;
   readonly previous: PlayState;
   // The one stepped out of the line-up while nobody leads.
@@ -57,18 +54,35 @@ export interface Family {
   middle(): Vector3;
   // What the farewell did this frame (where Sparky is, who the player moves on the stage), while it plays.
   played(): Played | null;
+  // The seat the lead sits on this frame, if any (see seats.ts).
+  sitting(): Sitting | null;
   chosen(hero: HeroId): Placed;
   update(frame: FamilyFrame): void;
 }
 
+// Where one of the family is and faces, eased frame by frame.
+export interface Spot {
+  readonly at: Vector3;
+  set: boolean;
+  yaw: number;
+}
+
+// Puts one of the family at a place, facing a way, doing something (see `move` below).
+export type Move = (
+  hero: HeroId,
+  to: Vector3,
+  yaw: number,
+  acting: Acting,
+  frame: FamilyFrame,
+  how: "ease" | "follow" | "snap",
+  more?: Pick<Shown, "after" | "ground" | "lean" | "lift" | "still">,
+) => Placed;
+
+const origin = new Vector3();
+
 const ease = (from: number, to: number, value: number): number => {
   const t = Math.max(0, Math.min(1, (value - from) / (to - from)));
   return t * t * (3 - 2 * t);
-};
-
-export const yawOf = (facing: number): number => {
-  const [x, z] = headings[((facing % 16) + 16) % 16] ?? [0, 1000];
-  return Math.atan2(x, z);
 };
 
 const turnToward = (
@@ -103,21 +117,14 @@ export function buildFamily(detail: number, hairAmount: number): Family {
   // Where each is and faces, eased frame by frame.
   const spots = Object.fromEntries(
     heroIds.map((hero) => [hero, { at: new Vector3(), set: false, yaw: 0 }]),
-  ) as Record<HeroId, { at: Vector3; set: boolean; yaw: number }>;
-  const trail: Vector3[] = [];
+  ) as Record<HeroId, Spot>;
   let leadPlaced: Placed | null = null;
-  let walking: Placed[] = [];
+  let walking: readonly Placed[] = [];
   let played: Played | null = null;
+  let sat: Sitting | null = null;
   // Puts one of the family at a place and a facing: `ease` glides both there, `follow` takes the place as it is (already eased between
-  // ticks) and turns toward the facing, `snap` jumps to both.
-  const move = (
-    hero: HeroId,
-    to: Vector3,
-    yaw: number,
-    acting: Acting,
-    frame: FamilyFrame,
-    how: "ease" | "follow" | "snap",
-  ): Placed => {
+  // ticks) and turns toward the facing, `snap` jumps to both. `more` is what a seat, the swing or a jump adds (see family-seat.ts).
+  const move: Move = (hero, to, yaw, acting, frame, how, more) => {
     const spot = spots[hero];
     const was = spot.at.clone();
     const known = spot.set;
@@ -134,14 +141,17 @@ export function buildFamily(detail: number, hairAmount: number): Family {
     character.update({
       dt: frame.dt,
       expression: acting.expression,
-      ground: groundAt,
+      ground: more?.ground ?? groundAt,
       lookAt: frame.lookAt ?? frame.camera,
       pose: acting.pose,
       poseArms: acting.arms,
-      speed: Math.min(4, speed),
+      speed: more?.still === true ? 0 : Math.min(4, speed),
       time: frame.time,
       turn: (spot.yaw - before) / Math.max(1e-3, frame.dt),
     });
+    // On the ground and upright, unless a seat, the swing or a jump says otherwise (the farewell lifts them itself, after this).
+    character.fly(more?.lift ?? origin, null, more?.lean ?? 0);
+    more?.after?.(character);
     // The ancestors pour into the family's jackets once the tree is lit, and light them up.
     const lit = frame.ending.kind === "lit";
     const shine = lit
@@ -156,12 +166,14 @@ export function buildFamily(detail: number, hairAmount: number): Family {
       yaw: spot.yaw,
     };
   };
+  const led = createLed(characters, spots, move);
   return {
     characters,
     companions: () => walking,
     group,
     lead: () => leadPlaced,
     played: () => played,
+    sitting: () => sat,
     middle: () =>
       heroIds
         .reduce((sum, hero) => sum.add(spots[hero].at), new Vector3())
@@ -185,7 +197,7 @@ export function buildFamily(detail: number, hairAmount: number): Family {
       };
     },
     update(frame) {
-      const { state, previous } = frame;
+      const { state } = frame;
       const lead = state.lead;
       played = null;
       if (lead === null) {
@@ -204,96 +216,27 @@ export function buildFamily(detail: number, hairAmount: number): Family {
         });
         leadPlaced = null;
         walking = [];
-        trail.length = 0;
+        sat = null;
+        led.reset();
         return;
       }
       if (frame.ending.kind === "lit") {
         played = playFarewell(lead, frame, characters, move);
         leadPlaced = played.lead;
         walking = [];
+        sat = null;
         return;
       }
-      const x = (previous.x + (state.x - previous.x) * frame.alpha) / 1000;
-      const z = (previous.z + (state.z - previous.z) * frame.alpha) / 1000;
-      const here = new Vector3(x, 0, z);
-      const last = trail[0];
-      if (last === undefined || last.distanceTo(here) > 0.2)
-        trail.unshift(here.clone());
-      if (trail.length > 80) trail.length = 80;
-      const moving = state.moving >= 0 && state.moment === null;
-      // The lead's own colour, greyed a step for each poor choice, and all of it when they have gone grey.
+      // Each of the family has their own colour: the lead's is greyed a step for each poor choice, and all of it when they have gone grey.
       for (const hero of heroIds) tones[hero].value = 1;
       tones[lead].value =
         frame.ending.kind === "grey"
           ? 1 - ease(0, 2.5, frame.ending.since) * 0.95
           : 1 - state.greyed * 0.27;
-      leadPlaced = move(
-        lead,
-        here,
-        yawOf(state.facing),
-        leadActing(lead, state, frame.time, moving),
-        frame,
-        previous.lead === null ? "snap" : "follow",
-      );
-      const party = state.party.filter((hero) => hero !== lead);
-      const huddling =
-        stepOf(state)?.kind === "huddle" || state.moment?.kind === "finale";
-      const facing = leadPlaced?.yaw ?? 0;
-      const besides = walkingPlaces(lead, here, facing, party);
-      walking = party.map((hero, order) => {
-        let to: Vector3;
-        let yaw: number;
-        if (huddling) {
-          const angle =
-            facing + ((order + 1) / (party.length + 1)) * Math.PI * 2;
-          to = here
-            .clone()
-            .add(
-              new Vector3(Math.sin(angle) * 0.75, 0, Math.cos(angle) * 0.75),
-            );
-          yaw = Math.atan2(here.x - to.x, here.z - to.z);
-        } else {
-          // At the lead's side (beside.ts), or close on their path where there is no room.
-          const place = Math.max(0, placeWith(lead, hero));
-          const side = besides.get(hero) ?? null;
-          const behind =
-            trail[Math.min(trail.length - 1, (place + 1) * 3)] ?? here;
-          to = (side ?? behind).clone();
-          const away = here.clone().sub(spots[hero].at);
-          yaw =
-            side !== null && moving
-              ? facing
-              : away.lengthSq() > 0.01
-                ? Math.atan2(away.x, away.z)
-                : spots[hero].yaw;
-        }
-        const strolling = spots[hero].at.distanceTo(to) > 0.05;
-        return move(
-          hero,
-          to,
-          yaw,
-          companionActing(hero, state, frame.time, strolling),
-          frame,
-          "ease",
-        );
-      });
-      for (const hero of heroIds) {
-        if (hero === lead || party.includes(hero)) continue;
-        const home = familySpots[hero];
-        const at = new Vector3(home.x / 1000, 0, home.z / 1000);
-        const talking = state.moment?.kind === hero;
-        const facing = talking
-          ? Math.atan2(here.x - at.x, here.z - at.z)
-          : yawOf(familyFacing[hero]);
-        move(
-          hero,
-          at,
-          facing,
-          lostActing(hero, state, frame.time, characters[hero].height * 0.48),
-          frame,
-          "ease",
-        );
-      }
+      const shown = led.play(lead, frame);
+      leadPlaced = shown.lead;
+      walking = shown.walking;
+      sat = shown.sitting;
     },
   };
 }

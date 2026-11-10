@@ -9,7 +9,7 @@ import { walls } from "../rules/layout.ts";
 // others leading, the same shape: the youngest close behind at the left, Mama (or the other child) beside them, Daddy (or Kai) on the
 // right. A place in a wall, or with a wall between it and the lead (along a wall, in a doorway), is no place: they take the same place
 // on the other side, or else close behind, and only where none of those is clear fall in on the lead's own path for a moment.
-const company: Readonly<Record<HeroId, readonly HeroId[]>> = {
+export const company: Readonly<Record<HeroId, readonly HeroId[]>> = {
   ali: ["zora", "heerah", "kai"],
   heerah: ["zora", "kai", "ali"],
   kai: ["zora", "heerah", "ali"],

@@ -6,6 +6,7 @@ import {
   type ZoneId,
   zoneIds,
 } from "./constants.ts";
+import { isCreation, make } from "./create.ts";
 import { zoneAt } from "./geometry.ts";
 import {
   mirrorForceCap,
@@ -79,6 +80,7 @@ export function finish(state: PlayState, moment: Moment): PlayState {
       "tower",
     );
   if (kind === "finale") return lit(state);
+  if (isCreation(kind)) return make(state, kind);
   const hero = heroIds.find((each) => each === kind);
   if (hero === undefined) return state;
   const joined = withSpark(

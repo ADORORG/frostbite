@@ -39,6 +39,7 @@ export type NewsKind =
   | "breath-miss"
   | "drawer"
   | "door"
+  | "made"
   | "found"
   | "healed"
   | "jackets"
@@ -105,6 +106,8 @@ export interface PlayState {
   readonly lamps: readonly boolean[];
   readonly lampsAllOn: boolean;
   readonly lead: HeroId | null;
+  // Who of the family has made their creation (Kai's hologram, Zora's masterpiece, Mama's song, Daddy's relic), in the order made.
+  readonly made: readonly HeroId[];
   readonly level: number;
   readonly light: number;
   readonly mastery: readonly number[];

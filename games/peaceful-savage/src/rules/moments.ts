@@ -45,6 +45,10 @@ export const momentKinds = [
   "practice",
   "mirror",
   "build",
+  "hologram",
+  "masterpiece",
+  "song",
+  "release",
 ] as const;
 export type MomentKind = (typeof momentKinds)[number];
 
@@ -96,6 +100,18 @@ export function script(kind: MomentKind, arg = 0): readonly Step[] {
     // At the loom, with all six threads: the jackets are woven.
     case "weave":
       return [beat("comb"), beat("knot"), beat("cup")];
+    // What each makes, once their lesson is learned. Kai's hologram: the base, the frame, open it out, hold it in the light.
+    case "hologram":
+      return [beat("knot"), beat("comb"), beat("split"), beat("cup")];
+    // Zora's masterpiece: split the colours, swirl them, breathe, and let them go onto the canvas.
+    case "masterpiece":
+      return [beat("split"), beat("knot"), breath, beat("letgo")];
+    // Mama's song: breathe in deep, hold the note, and let it go.
+    case "song":
+      return [breath, beat("cup"), beat("letgo")];
+    // Daddy's relic: knock, hold what the drawer kept, breathe, and let it go.
+    case "release":
+      return [beat("knock"), beat("cup"), breath, beat("letgo")];
     // Daddy's locked drawer: knock, and let go of what was put away in it.
     case "drawer":
       return [beat("knock"), beat("letgo")];

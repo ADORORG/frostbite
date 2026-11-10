@@ -19,6 +19,8 @@ import type { Framing } from "./farewell.ts";
 // - vision: lifted and pulled back, so the gold thread ahead can be seen;
 // - finale: low and wide on the hill, looking up at the giant snake (it cuts between this and the hands on the six keys);
 // - farewell: the farewell's own shots (see farewell.ts);
+// - seat: round to the front of the lead sat down, and whoever sits beside them;
+// - swing: off to one side of the swing, to see its whole arc;
 // - select: in front of the one on the turntable.
 //
 // The boom never passes through a wall: where one stands between the lead's head and the camera, the camera comes in to this side of it
@@ -32,7 +34,9 @@ export type Intent =
   | "group"
   | "hands"
   | "lean"
+  | "seat"
   | "select"
+  | "swing"
   | "talk"
   | "vision";
 
@@ -85,6 +89,30 @@ function shotFor(frame: CameraFrame): Shot {
         height: h * 0.62,
         look: lead.at.clone().add(new Vector3(0, h * 0.5, 0)),
         swing: Math.PI,
+      };
+    // Sat down: from the front and a little to one side, far enough back to see whoever sits beside them.
+    case "seat": {
+      const spread = frame.group.reduce(
+        (far, one) => Math.max(far, one.at.distanceTo(lead.at)),
+        0,
+      );
+      return {
+        distance: h * 1.5 + 1.1 + Math.min(1.6, spread) * 0.9,
+        flex: true,
+        fov: 46,
+        height: h * 0.72,
+        look: lead.at.clone().add(new Vector3(0, h * 0.45, 0)),
+        swing: Math.PI - 0.5,
+      };
+    }
+    // On the swing: off to the side, still, to see the whole of its arc under the tree.
+    case "swing":
+      return {
+        distance: 6.4,
+        fov: 50,
+        height: 1.35,
+        look: lead.at.clone().add(new Vector3(0, 1.45, 0)),
+        swing: -Math.PI / 2,
       };
     case "group": {
       const middle = frame.group
@@ -243,12 +271,13 @@ export function createCameraRig(): CameraRig {
       const yaw = boom + swing;
       let wanted = head.clone().sub(forward(yaw).multiplyScalar(shot.distance));
       const clear = clearance(head, wanted, frame.walls);
-      // Brought in on this side of a wall, the camera keeps its height, so it still looks over the family rather than into them.
+      // Brought in on this side of a wall, the camera keeps its height and climbs a little more the nearer it is brought, so it looks
+      // down over the family rather than into the backs of them.
       if (clear < 1)
         wanted = head
           .clone()
           .lerp(wanted, Math.max(0.15, clear - 0.08))
-          .setY(wanted.y);
+          .setY(wanted.y + (1 - clear) * 1.1);
       // Never under the hill, nor looking through it: lifted over the ground, where it stands and as it eases there.
       const ground = frame.ground ?? (() => 0);
       wanted.y += overGround(wanted, head, ground);

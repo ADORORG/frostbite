@@ -2,6 +2,7 @@ import { refuse } from "@frostbite/game-sdk/run-inputs";
 import type { Stepped } from "@frostbite/game-sdk/run-record";
 
 import { clues, clueSpot, mirrors, relics } from "./collect.ts";
+import { canMake, type CreationId, creations, isCreation } from "./create.ts";
 import { type HeroId, heroIds, points, reach, talkReach } from "./constants.ts";
 import {
   distanceSquared,
@@ -11,12 +12,12 @@ import {
   zoneAt,
 } from "./geometry.ts";
 import { greyAt, greyHomes } from "./greys.ts";
-import { light, spark, withLight, withSpark } from "./growth.ts";
 import { bare, plant, sprouted, tend } from "./garden.ts";
 import { familySpots, gardenBeds, places, treeReach } from "./layout.ts";
 import { beginMoment } from "./moment.ts";
 import { family, has, withColour, withNews, withPoints } from "./state.ts";
 import { lamps, things } from "./things.ts";
+import { gather, pickThread } from "./take.ts";
 import { touchTree } from "./tree.ts";
 import type { PlayState } from "./types.ts";
 
@@ -39,7 +40,7 @@ export type Target =
     };
 
 export type StoryId =
-  "bench" | "deck" | "drawer" | "lamp" | "loom" | "stove" | "tree";
+  "bench" | "deck" | "drawer" | "lamp" | "loom" | "stove" | "tree" | CreationId;
 
 export interface Candidate {
   readonly at: Point;
@@ -58,7 +59,11 @@ const indexed = (
 ): Candidate => ({ at, pull: lean, reach: far, target: { index, kind } });
 
 function storyCandidates(state: PlayState): Candidate[] {
-  const story = (id: StoryId, open: boolean, far = reach): Candidate[] =>
+  const story = (
+    id: Exclude<StoryId, CreationId>,
+    open: boolean,
+    far = reach,
+  ): Candidate[] =>
     open
       ? [{ at: places[id], pull, reach: far, target: { id, kind: "story" } }]
       : [];
@@ -73,6 +78,12 @@ function storyCandidates(state: PlayState): Candidate[] {
     ),
     ...story("drawer", !state.drawer && has(state, "ali")),
     ...story("bench", !state.tower && family(state).includes("kai")),
+    ...creations
+      .filter((creation) => canMake(state, creation))
+      .map((creation): Candidate => {
+        const target = { id: creation.id, kind: "story" } as const;
+        return { at: creation.at, pull, reach, target };
+      }),
     ...heroIds
       .filter((hero) => !family(state).includes(hero))
       .map((id): Candidate => ({
@@ -154,7 +165,7 @@ export function aimOf(state: PlayState): Candidate | null {
 export const targetOf = (state: PlayState): Target | null =>
   aimOf(state)?.target ?? null;
 
-function story(state: PlayState, id: StoryId): PlayState {
+function story(state: PlayState, id: Exclude<StoryId, CreationId>): PlayState {
   switch (id) {
     case "tree":
       return touchTree(state);
@@ -217,49 +228,6 @@ function touchThing(state: PlayState, index: number): PlayState {
   );
 }
 
-function pickThread(state: PlayState, index: number): PlayState {
-  const grey = state.greys[index];
-  const picked = withPoints(
-    {
-      ...state,
-      greys: state.greys.map((each, at) =>
-        at === index ? { ...each, thread: 2 as const } : each,
-      ),
-      threads: state.threads + 1,
-    },
-    points.thread,
-  );
-  return withNews(
-    withColour(
-      picked,
-      zoneAt({ x: grey?.dropX ?? 0, z: grey?.dropZ ?? 0 }),
-      10,
-    ),
-    "thread",
-    String(index),
-  );
-}
-
-// A clue or a relic taken: light, a little spark, and (for a relic) something true to know.
-function gather(
-  state: PlayState,
-  kind: "clue" | "relic",
-  index: number,
-): PlayState {
-  const taken =
-    kind === "clue"
-      ? {
-          ...state,
-          cluesTaken: state.cluesTaken.map((was, at) => was || at === index),
-        }
-      : {
-          ...state,
-          relicsTaken: state.relicsTaken.map((was, at) => was || at === index),
-        };
-  const grown = withSpark(withLight(taken, light[kind]), spark[kind]);
-  return withNews(grown, kind, String(index));
-}
-
 // The act key, outside a moment: whatever `targetOf` names. The lead turns to what they reach for.
 export function act(state: PlayState): Stepped<PlayState> {
   const aimed = aimOf(state);
@@ -272,7 +240,11 @@ export function act(state: PlayState): Stepped<PlayState> {
   });
   switch (target.kind) {
     case "story":
-      return done(story(facing, target.id));
+      return done(
+        isCreation(target.id)
+          ? beginMoment(facing, target.id)
+          : story(facing, target.id),
+      );
     case "family":
       return done(beginMoment(facing, target.id));
     case "grey":

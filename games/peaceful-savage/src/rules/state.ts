@@ -107,6 +107,7 @@ export function startRun(seed: number): PlayState {
     hurrying: false,
     news: null,
     pancakes: false,
+    made: [],
     party: [],
     plasma: 0,
     plasmaAt,

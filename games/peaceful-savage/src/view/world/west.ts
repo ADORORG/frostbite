@@ -6,7 +6,7 @@ import type { Rooms } from "./rooms.ts";
 import { ball, block, drum, ring } from "./shapes.ts";
 
 // The west wing's furniture. The kitchen: a long counter with a stove (and pancakes once they are made) and a sink, the island with
-// Zora's galaxy bowl, the round table. The children's room: two beds and Kai's desk. Out front, the porch: a deck of boards, a lantern
+// Zora's galaxy bowl, the oval table. The children's room: two beds and Kai's desk. Out front, the porch: a deck of boards, a lantern
 // either side of the door, and Kai's workbench with his crystal tower (in pieces until it is built again, a level a step).
 export interface Wing {
   readonly group: Group;
@@ -70,9 +70,16 @@ export function buildWest(rooms: Rooms): Wing {
   );
   const goo = drum(glowing("#7a4fd8", 0.8), 0.19, 0.02, [-7.7, 1.09, 3.6], 24);
   group.add(goo);
-  group.add(
-    drum(wood("kitchen", "#b07a44", 53), 0.95, 0.06, [-5.1, 0.78, 5.6], 28),
+  // The table: an oval, as long and as wide as the rules keep clear for it.
+  const table = drum(
+    wood("kitchen", "#b07a44", 53),
+    1,
+    0.06,
+    [-5.1, 0.78, 5.6],
+    32,
   );
+  table.scale.set(0.9, 1, 0.6);
+  group.add(table);
   group.add(
     drum(wood("kitchen", "#8a5a33", 54), 0.08, 0.76, [-5.1, 0.38, 5.6], 8),
   );

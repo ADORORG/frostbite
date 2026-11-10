@@ -27,7 +27,7 @@ const nodes = {
   offNorth: { x: 6_000, z: 1_300 },
   offNE: { x: 10_400, z: 1_300 },
   offSouth: { x: 8_000, z: 6_200 },
-  parWest: { x: 3_700, z: 12_800 },
+  parWest: { x: 4_050, z: 12_250 },
   mEast: { x: 8_000, z: -6_000 },
   mFarEast: { x: 12_000, z: -10_000 },
   mFarWest: { x: -12_000, z: -8_000 },
@@ -49,7 +49,9 @@ const nodes = {
   parHub: { x: 6_800, z: 10_300 },
   parNorth: { x: 9_800, z: 8_600 },
   parSouth: { x: 7_000, z: 12_200 },
-  treeE: { x: 1_700, z: 6_000 },
+  // East of the tree, between Mama (who stands at its bark until she is found) and the shelf the deck sits on.
+  treeE: { x: 1_820, z: 5_900 },
+  treeSE: { x: 1_820, z: 7_300 },
   treeW: { x: -1_800, z: 6_000 },
 } as const satisfies Record<string, Point>;
 
@@ -83,7 +85,8 @@ const lines: readonly (readonly [Node, Node])[] = [
   ["hallDoorW", "treeW"],
   ["hallDoorE", "treeE"],
   ["treeW", "hallS"],
-  ["treeE", "hallS"],
+  ["treeE", "treeSE"],
+  ["treeSE", "hallS"],
   ["hallS", "hallDoorSW"],
   ["hallS", "hallDoorSE"],
   ["hallDoorSW", "hallDoorSE"],

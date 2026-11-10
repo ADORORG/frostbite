@@ -20,6 +20,7 @@ const hands = (): Hands => ({
   choosing: () => choosing,
   end: vi.fn(),
   inMoment: () => inMoment,
+  jump: vi.fn(),
   pause: vi.fn(),
   practise: vi.fn(),
   running: () => running,
@@ -71,7 +72,7 @@ describe("the keys", () => {
     expect(held.start).toHaveBeenCalledOnce();
   });
 
-  it("walk with the arrows or WASD, act on E or Space (held, it breathes in), and open vision, pause and practise", () => {
+  it("walk with the arrows or WASD, act on E (held, it breathes in), jump on Space (in a moment it acts), and open vision, pause and practise", () => {
     running = true;
     const held = hands();
     detach = attachKeyboard(held);
@@ -90,10 +91,22 @@ describe("the keys", () => {
     key("keyup", "ShiftLeft");
     expect(held.steer).toHaveBeenLastCalledWith({ x: 0, y: 1 }, false);
     key("keyup", "KeyW");
+    // Walking about, Space jumps and acts on nothing; in a moment it is the act key, down and up.
     key("keydown", "Space");
     key("keyup", "Space");
+    expect(held.jump).toHaveBeenCalledOnce();
+    expect(held.act).not.toHaveBeenCalled();
+    inMoment = true;
+    key("keydown", "Space");
+    key("keyup", "Space");
+    inMoment = false;
     expect(held.act).toHaveBeenNthCalledWith(1, true);
     expect(held.act).toHaveBeenNthCalledWith(2, false);
+    expect(held.jump).toHaveBeenCalledOnce();
+    key("keydown", "KeyE");
+    key("keyup", "KeyE");
+    expect(held.act).toHaveBeenNthCalledWith(3, true);
+    expect(held.act).toHaveBeenNthCalledWith(4, false);
     press("KeyQ");
     press("KeyP");
     press("Digit3");
@@ -190,12 +203,12 @@ describe("a finger on the screen", () => {
     expect(held.act).toHaveBeenCalledTimes(2);
   });
 
-  it("has four buttons in the corner: act (held), vision, practise and the share cards", () => {
+  it("has four buttons in the corner: jump (in a moment, act, held), vision, practise and the share cards", () => {
     running = true;
     const { held } = attach();
     const buttons = [...byId("main").querySelectorAll(".touch-buttons button")];
     expect(buttons.map((button) => button.textContent)).toEqual([
-      "Act",
+      "Jump",
       "Vision",
       "Practise",
       "Cards",
@@ -213,6 +226,11 @@ describe("a finger on the screen", () => {
     expect(held.cards).toHaveBeenCalledOnce();
     pointer(act, "pointerdown");
     pointer(act, "pointerup");
+    expect(held.jump).toHaveBeenCalledOnce();
+    inMoment = true;
+    pointer(act, "pointerdown");
+    pointer(act, "pointerup");
+    inMoment = false;
     pointer(vision, "pointerdown");
     pointer(vision, "pointerup");
     pointer(practise, "pointerdown");

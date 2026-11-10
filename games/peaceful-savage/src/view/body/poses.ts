@@ -49,18 +49,36 @@ export const lean: Pose = {
   "hips.roll": 0.06,
 };
 
-// Sitting: on a bed, a chair, the floor beside someone.
-export const sit = (legLength: number): Pose => ({
+// Sitting on something `seat` metres high (a chair, a bed's edge, the couch, a stool): the hips rest on it, the thighs lie level, the
+// shins hang (a child's feet dangle), the hands rest on the knees.
+export const sit = (legLength: number, seat: number): Pose => ({
   ...both({
-    "leg.front": 1.45,
+    "leg.front": 1.48,
     knee: 1.5,
-    ankle: 0.1,
-    "arm.front": 0.55,
-    elbow: 0.9,
+    ankle: 0.08,
+    "arm.front": 0.5,
+    elbow: 0.85,
     ...hand(0.4),
   }),
-  "hips.drop": -legLength * 0.52,
-  "spine.bend": 0.12,
+  "hips.drop": seat + 0.07 - legLength,
+  "spine.bend": 0.1,
+});
+
+// Riding the swing: the hands up on the ropes, and the legs pumping: stretched out and the body laid back as it swings forward (`swung`
+// 1), tucked under and the body leant in as it swings back (-1).
+export const ride = (legLength: number, seat: number, swung: number): Pose => ({
+  ...both({
+    "leg.front": 1.45 + swung * 0.22,
+    knee: 1.15 - swung * 0.85,
+    ankle: -swung * 0.25,
+    "arm.front": 1.05,
+    "arm.side": 0.3,
+    elbow: 1.25 + swung * 0.35,
+    ...hand(1.3, 0.9),
+  }),
+  "hips.drop": seat + 0.07 - legLength,
+  "spine.bend": -swung * 0.22,
+  "head.nod": swung * 0.12,
 });
 
 // The huddle: arms round the ones either side, everyone leaning in.
@@ -200,8 +218,11 @@ export function idle(hero: HeroId, time: number, found: boolean): Pose {
   }
 }
 
+// The height of the stool Daddy sits on at his desk.
+export const stool = 0.44;
+
 // What each is busy with where they are found: Kai on the porch fitting his crystal tower together, Zora in the meadow reaching up after
-// the fireflies, Mama at the tree with her hands on its bark, Daddy at his desk with his fists shut.
+// the fireflies, Mama at the tree with her hands on its bark, Daddy on the stool at his desk with his fists shut.
 export function busy(hero: HeroId, time: number, legLength: number): Pose {
   const turn = time * 2.2;
   switch (hero) {
@@ -238,7 +259,7 @@ export function busy(hero: HeroId, time: number, legLength: number): Pose {
       };
     case "ali":
       return {
-        ...sit(legLength),
+        ...sit(legLength, stool),
         ...both({
           ...hand(1.6, 1.2),
           "arm.front": 0.95,

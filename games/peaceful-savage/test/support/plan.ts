@@ -1,5 +1,6 @@
 import { targetOf } from "../../src/rules/act.ts";
 import { clues, clueSpot, mirrors, relics } from "../../src/rules/collect.ts";
+import { canMake, creations } from "../../src/rules/create.ts";
 import type { HeroId, ZoneId } from "../../src/rules/constants.ts";
 import { within, zoneAt } from "../../src/rules/geometry.ts";
 import { greyAt, greyHomes } from "../../src/rules/greys.ts";
@@ -18,8 +19,8 @@ import type { PlayState } from "../../src/rules/types.ts";
 import { Bot, careful, type Style } from "./bot.ts";
 
 // A whole run, room by room: the tree, Savage Vision, the deck and the lamp that would not go out; then in each room the family member
-// found there, its story things, its grey one and thread, its clue, relic and mirror, its lamp, everything else a hand can touch and its
-// tiny plasma; then practice to mastery, a climb up the levels at the tree, the jackets at the loom, the huddle, and the hill in the
+// found there, its story things and what they make, its grey one and thread, its clue, relic and mirror, its lamp, everything else a hand
+// can touch and its tiny plasma; then practice to mastery, a climb up the levels at the tree, the jackets at the loom, the huddle, and the hill in the
 // meadow. `skip` leaves parts out, for runs that should fall short.
 export interface Plan {
   readonly lead: HeroId;
@@ -102,7 +103,7 @@ function room(bot: Bot, zone: ZoneId, skip: ReadonlySet<string>): void {
       !family(bot.state).includes(hero) &&
       !skip.has(hero)
     )
-      bot.reach(familySpots[hero], is("family", hero), 400);
+      bot.reach(familySpots[hero], is("family", hero), 300);
   if (zone === "kitchen" && !skip.has("pancakes"))
     bot.reach(places.stove, is("story", "stove"));
   // Kai's lesson on the porch, and Zora's in the meadow: the tower built again, the garden planted.
@@ -124,6 +125,14 @@ function room(bot: Bot, zone: ZoneId, skip: ReadonlySet<string>): void {
     family(bot.state).includes("ali")
   )
     bot.reach(places.drawer, is("story", "drawer"));
+  // What each of the family makes, once their lesson is learned: Kai's hologram, Zora's masterpiece, Mama's song, Daddy's relic.
+  for (const creation of creations)
+    if (
+      zoneAt(creation.at) === zone &&
+      !skip.has(creation.id) &&
+      canMake(bot.state, creation)
+    )
+      bot.reach(creation.at, is("story", creation.id));
   greyHomes.forEach((home, index) => {
     if (home.zone === zone && !skip.has(`grey-${String(index)}`))
       heal(bot, index);

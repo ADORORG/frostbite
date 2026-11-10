@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { heroIds } from "../src/rules/constants.ts";
 import { expressions } from "../src/view/body/head.ts";
+import { headOf } from "../src/view/body/head-shape.ts";
 import { looks } from "../src/view/body/looks.ts";
 import { buildPortrait } from "../src/view/body/portrait.ts";
 import { paint, painted } from "../src/view/palette.ts";
@@ -48,8 +49,13 @@ describe("the painted faces", () => {
       () => context as unknown as CanvasRenderingContext2D,
     );
     for (const [index, hero] of heroIds.entries()) {
-      const young = hero === "kai" || hero === "zora" ? 1 : 0;
-      const portrait = buildPortrait(looks[hero], young, index + 1);
+      const look = looks[hero];
+      const portrait = buildPortrait(
+        look,
+        headOf(look.face).layout,
+        look.face.young,
+        index + 1,
+      );
       expect(portrait.texture).toBeInstanceOf(CanvasTexture);
       for (const expression of expressions) {
         const before = calls.count;
@@ -66,7 +72,12 @@ describe("the painted faces", () => {
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(
       () => null,
     );
-    const portrait = buildPortrait(looks.kai, 1, 3);
+    const portrait = buildPortrait(
+      looks.kai,
+      headOf(looks.kai.face).layout,
+      1,
+      3,
+    );
     expect(portrait.texture).not.toBeInstanceOf(CanvasTexture);
     portrait.paint("smile", 0);
   });

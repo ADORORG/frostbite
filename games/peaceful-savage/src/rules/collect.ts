@@ -19,8 +19,8 @@ interface Floor {
 const floors: readonly Floor[] = [
   {
     step: 3_000,
-    x0: -24_000,
-    x1: 24_000,
+    x0: -15_000,
+    x1: 15_000,
     z0: -26_000,
     z1: -2_000,
     zone: "meadow",
@@ -120,7 +120,7 @@ export const clues: readonly Clue[] = [
   {
     spots: [
       { x: 15_000, z: -20_000 },
-      { x: -16_000, z: -16_000 },
+      { x: -14_000, z: -16_000 },
     ],
     zone: "meadow",
   },

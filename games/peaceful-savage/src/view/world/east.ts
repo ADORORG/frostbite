@@ -9,14 +9,16 @@ import {
   Vector3,
 } from "three";
 
+import { stool } from "../body/poses.ts";
 import { glowing, noise, painted } from "../palette.ts";
+import { groundAt } from "./meadow.ts";
 import type { Rooms } from "./rooms.ts";
 import { ball, block, drum } from "./shapes.ts";
 import { type Wing, woodFor } from "./west.ts";
 
 // The east wing's furniture and the hall's. The office: Daddy's desk and its locked drawer, the shelves of books, the armchair. The
 // parents' room: the round bed and Mama's loom (strung with each thread as it is gathered). The hall: the couch, the little table with the
-// Latimer lamp (the light that would not go out), the deck of a hundred cards by the tree. In the meadow, the swing's frame and the bench.
+// Latimer lamp (the light that would not go out), the deck of a hundred cards by the tree. In the meadow, the bench.
 const bookColours = [
   "#7a2f3a",
   "#2f5a7a",
@@ -162,16 +164,29 @@ export function buildEast(rooms: Rooms, lights: boolean): Wing {
     [2.3, 1.35, 6.0],
   );
   group.add(card);
-  const post = painted(t.meadow, { color: "#7a5030" });
-  for (const x of [9.15, 10.85])
-    group.add(block(post, [0.12, 2.4, 0.12], [x, 1.2, -7.4]));
-  group.add(block(post, [1.9, 0.1, 0.1], [10, 2.4, -7.4]));
+  // The bench in the meadow, on the ground as it lies there, its back to the house.
+  const lawn = groundAt(-3.2, -4.15);
+  const planks = wood("meadow", "#8a5a33", 65);
   group.add(
-    block(wood("meadow", "#8a5a33", 65), [1.6, 0.45, 0.5], [-3.2, 0.22, -4.15]),
+    block(planks, [1.6, 0.45, 0.5], [-3.2, lawn + 0.225, -4.15]),
+    block(planks, [1.6, 0.42, 0.06], [-3.2, lawn + 0.66, -3.93]),
   );
+  // Daddy's stool: under him at his desk until he is found (or leads), pushed in under the desk after.
+  const stoolWood = wood("office", "#7a5030", 66);
+  const seat = new Group();
+  seat.add(
+    drum(stoolWood, 0.19, 0.04, [0, stool - 0.02, 0], 16),
+    drum(stoolWood, 0.03, stool - 0.04, [0, (stool - 0.04) / 2, 0], 8),
+    drum(stoolWood, 0.14, 0.03, [0, 0.015, 0], 12),
+  );
+  seat.position.set(8.4, 0, 3.9);
+  group.add(seat);
   return {
     group,
-    update(state, time) {
+    update(state, time, dt) {
+      const sat = state.lead !== "ali" && !state.party.includes("ali");
+      seat.position.z +=
+        ((sat ? 3.9 : 2.95) - seat.position.z) * (1 - Math.exp(-6 * dt));
       drawer.position.z = 2.8 + (state.drawer ? 0.45 : 0);
       lock.emissiveIntensity = state.drawer
         ? 3

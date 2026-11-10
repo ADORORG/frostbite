@@ -57,6 +57,7 @@ export const points = {
   jackets: 200,
   lamp: 10,
   lit: 1_000,
+  made: 150,
   pancakes: 50,
   planted: 20,
   sparky: 200,

@@ -71,6 +71,10 @@ export function createStageHands(
           if (touch) next(1);
           moveAt = now();
         },
+        jump: () => {
+          if (showing()) moveAt = now();
+          else hands.jump();
+        },
         running: () => showing() || hands.running(),
         steer: (to, fast) => {
           if (showing()) push = to;

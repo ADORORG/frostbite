@@ -6,6 +6,7 @@ import type { PlayState } from "../rules/types.ts";
 import { drawMap, mapHeight, mapWidth } from "../screen/map.ts";
 import { startingQuality } from "../view/stage.ts";
 import type { StageControl } from "../view/show.ts";
+import { createNudge } from "../view/nudge.ts";
 import { createDepthView, type DepthView } from "../view/view.ts";
 import type { Card, CardMaker } from "./cards.ts";
 import { element } from "./elements.ts";
@@ -37,7 +38,12 @@ export interface Screen {
   readonly draw: (frame: ScreenFrame) => void;
   // The way the camera looks, for steering by the screen.
   readonly forward: () => Ground;
+  // The lead jumps (a thing only seen), unless they are still in the air from the last one; whether they did.
+  readonly jump: (time: number) => boolean;
 }
+
+// How long one jump must be over before the next may begin, in milliseconds.
+export const jumpMs = 800;
 
 export interface ScreenParts {
   readonly cards: CardMaker;
@@ -56,6 +62,9 @@ export function createScreen(parts: ScreenParts): Screen {
   screen.height = mapHeight;
   let depth: DepthView | null = null;
   let flat: CanvasRenderingContext2D | null = null;
+  let jumpedAt: number | null = null;
+  // Sparky's tug when the story stalls, worked out once a frame for both the picture and the line over it.
+  const nudge = createNudge();
   return {
     build() {
       depth = createDepthView(
@@ -69,13 +78,16 @@ export function createScreen(parts: ScreenParts): Screen {
     draw(frame) {
       const { state } = frame;
       const chosen = parts.select.chosen();
+      const tugging = nudge.update(state);
       if (depth !== null)
         depth.show({
           alpha: frame.alpha,
           previous: frame.previous,
+          jumped: jumpedAt === null ? null : (frame.time - jumpedAt) / 1000,
           select: chosen,
           stage: frame.stage ?? null,
           state,
+          tugging,
         });
       else if (flat !== null) drawMap(flat, state, chosen, frame.time / 1000);
       // The picture for a share card is taken straight after the screen is drawn, while the frame is still there to copy.
@@ -84,11 +96,16 @@ export function createScreen(parts: ScreenParts): Screen {
         frame.time,
       );
       if (card !== null) parts.onCard(card);
-      parts.overlay.show(state, frame.time);
+      parts.overlay.show(state, frame.time, tugging);
       parts.moment.show(state);
       parts.hud.show(state, frame.best, frame.running);
       layer.show(frame.card);
     },
     forward: () => depth?.forward() ?? north,
+    jump(time) {
+      if (jumpedAt !== null && time - jumpedAt < jumpMs) return false;
+      jumpedAt = time;
+      return true;
+    },
   };
 }

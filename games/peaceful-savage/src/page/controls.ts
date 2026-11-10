@@ -3,10 +3,11 @@ import { attachTouchButtons } from "@frostbite/game-sdk/touch-buttons";
 
 import { type Held, pushOf } from "./steer.ts";
 
-// The player's hands. On a keyboard: the arrows or WASD walk (and, before a run, turn to who leads), Shift held runs, E or Space acts
-// (held, it breathes in), Q opens Savage Vision, 1 to 8 practise a skill (1 and 2 answer, when there is a choice), Enter starts and P
-// pauses. On a touch screen: a swipe turns to who leads and a tap starts; in a run a finger dragged on the screen walks (dragged further,
-// it runs), a tap acts (held, it breathes in), and four buttons in the corner act, open vision, practise and open the share cards.
+// The player's hands. On a keyboard: the arrows or WASD walk (and, before a run, turn to who leads), Shift held runs, E acts (held, it
+// breathes in), Space jumps (in a moment it acts, as E does: a beat lands easier under the big key), Q opens Savage Vision, 1 to 8
+// practise a skill (1 and 2 answer, when there is a choice), Enter starts and P pauses. On a touch screen: a swipe turns to who leads and
+// a tap starts; in a run a finger dragged on the screen walks (dragged further, it runs), a tap acts (held, it breathes in), and four
+// buttons in the corner jump, open vision, practise and open the share cards.
 export interface Hands {
   readonly act: (down: boolean) => void;
   // Opens the run's share cards.
@@ -16,6 +17,8 @@ export interface Hands {
   // Ends the run where it stands.
   readonly end: () => void;
   readonly inMoment: () => boolean;
+  // A jump, which is only seen: it changes nothing in the run.
+  readonly jump: () => void;
   readonly pause: () => void;
   // A skill by its number, or -1 for the one most worth practising now.
   readonly practise: (skill: number) => void;
@@ -33,6 +36,7 @@ export interface Hands {
 type Action =
   | "act"
   | "down"
+  | "jump"
   | "left"
   | "pause"
   | "right"
@@ -59,7 +63,7 @@ const keys: Readonly<Record<string, Action>> = {
   NumpadEnter: "start",
   ShiftLeft: "run",
   ShiftRight: "run",
-  Space: "act",
+  Space: "jump",
   ...Object.fromEntries(
     Array.from({ length: 8 }, (_, at) => [
       `Digit${String(at + 1)}`,
@@ -70,6 +74,21 @@ const keys: Readonly<Record<string, Action>> = {
 
 const ways = ["up", "down", "left", "right"] as const;
 
+// The jump key (and the Jump button): walking about, it jumps; in a moment it is the act key, down and up.
+export function leaper(hands: Hands): (down: boolean) => void {
+  let acting = false;
+  return (down) => {
+    if (!down) {
+      if (acting) hands.act(false);
+      acting = false;
+      return;
+    }
+    acting = hands.inMoment();
+    if (acting) hands.act(true);
+    else hands.jump();
+  };
+}
+
 export function attachKeyboard(hands: Hands): () => void {
   const held: Record<(typeof ways)[number], boolean> = {
     down: false,
@@ -78,6 +97,7 @@ export function attachKeyboard(hands: Hands): () => void {
     up: false,
   };
   let fast = false;
+  const leap = leaper(hands);
   const steer = (): void => {
     const push = pushOf(held satisfies Held);
     hands.steer(push.x === 0 && push.y === 0 ? null : push, fast);
@@ -98,8 +118,10 @@ export function attachKeyboard(hands: Hands): () => void {
         hands.turn(way === "left" ? -1 : 1);
       return;
     }
-    if (action === "act") {
-      if (hands.running()) hands.act(down);
+    if (action === "act" || action === "jump") {
+      if (!hands.running()) return;
+      if (action === "act") hands.act(down);
+      else leap(down);
       return;
     }
     if (!down) return;
@@ -117,7 +139,7 @@ export function attachKeyboard(hands: Hands): () => void {
 // How far a finger must travel to be a drag or a swipe, and how long a still finger takes to be a hold, not a tap.
 export const dragPixels = 14;
 // A finger dragged this far from where it went down runs.
-export const runPixels = 90;
+export const runPixels = 70;
 export const swipePixels = 40;
 export const holdMs = 250;
 
@@ -190,14 +212,15 @@ export function attachTouch(
   screen.addEventListener("pointermove", move);
   screen.addEventListener("pointerup", up);
   screen.addEventListener("pointercancel", up);
+  const leap = leaper(hands);
   const buttons = attachTouchButtons(main, [
     {
-      label: "Act",
+      label: "Jump",
       press: () => {
-        hands.act(true);
+        leap(true);
       },
       release: () => {
-        hands.act(false);
+        leap(false);
       },
     },
     {

@@ -8,9 +8,11 @@ if (betaTarget === undefined) throw new Error("No target chain is configured.");
 // PEACEFUL SAVAGE: LIGHT THE TREE: a story game in a real-time 3D world, from the book A Spark in the Dark. One level, three subplots that
 // interleave (find Sparky; find the six maridium threads; weave the jackets and face the giant sly snake), and a finale that needs all
 // three. The player chooses who leads (Kai, Zora, Mama Heerah or Dr. Ali) and finds the others where they start; the house greys and
-// colours by room as the story goes. Every milestone is decided by the rules alone (`src/rules/milestones.ts`) and replay-checked by the
-// verifier; the digest pins the built file, so a change to the rules is a change here. Nobody is harmed: the sly snakes are ancestors
-// with feelings nobody listened to, and they are healed. The title, summary, words and milestone list are a draft for the owner.
+// colours by room as the story goes, and each of the family makes something the family keeps (Kai's hologram, Zora's masterpiece, Mama's
+// song, Daddy's relic). Every milestone is decided by the rules alone (`src/rules/milestones.ts`) and replay-checked by the verifier;
+// the digest pins the built file, so a change to the rules is a change here. Each milestone's drawing is in the game's milestone-arts/
+// folder, named for its id. Nobody is harmed: the sly snakes are ancestors with feelings nobody listened to, and they are healed. The
+// title, summary, words, milestone list and drawings are a draft for the owner.
 const once = (
   id: string,
   title: string,
@@ -34,7 +36,7 @@ export const peacefulSavageGame = defineGame({
     video: null,
   },
   description:
-    "Choose who leads the Savage family through one night in their futuristic home and the meadow outside: Kai, eleven, who can build anything; Zora, eight, who makes and mixes anything; Mama Heerah, who senses what is coming; or Dr. Ali, Daddy, who leads. The house has gone grey and the ancestor tree in the hall has nearly gone out; the third strand of its trunk pulses, fades and has lost its balance. Find the others where they are (Daddy in the office fog, Kai on the porch, Zora in the meadow, Mama at the tree) and sit with them. Each has a lesson to live: Zora plants a garden and tends it into bloom, Kai rebuilds his tower a step at a time with a breath in the middle, Mama learns to say what she needs, and Daddy learns it is safe to be soft and turns what was handed down in pain into joy. Sly snakes, ancestors with feelings nobody listened to, whisper tricks; answer them truly and they turn gold and drop the maridium threads. Believe too many tricks with your spark low and you go grey and join them, for now. Play the six hand-keys on the beat, take the Savage Breath, open Savage Vision, gather tiny plasma, clues and relics, practise until you master each key and the family huddle, weave the jackets, and answer the ancestors' call to the hill together. When the tree is lit the giant sly snake lets the ancestors go, and at home the tree's third strand lights fully: the ancestors fade in round it, the family turns to you for the big hug, dances out to the drums and onto a stage for a sixty-second show with a band of ancestors (move each of them about the stage in turn), holds hands as their jackets light gold, and lifts off one by one. Share cards are made at every turning point. Thirty-six milestones, each checked by replaying your run.",
+    "Choose who leads the Savage family through one night in their futuristic home and the meadow outside: Kai, eleven, who can build anything; Zora, eight, who makes and mixes anything; Mama Heerah, who senses what is coming; or Dr. Ali, Daddy, who leads. The house has gone grey and the ancestor tree in the hall has nearly gone out; the third strand of its trunk pulses, fades and has lost its balance. Find the others where they are (Daddy in the office fog, Kai on the porch, Zora in the meadow, Mama at the tree) and sit with them. Each has a lesson to live: Zora plants a garden and tends it into bloom, Kai rebuilds his tower a step at a time with a breath in the middle, Mama learns to say what she needs, and Daddy learns it is safe to be soft and turns what was handed down in pain into joy. Sly snakes, ancestors with feelings nobody listened to, whisper tricks; answer them truly and they turn gold and drop the maridium threads. Believe too many tricks with your spark low and you go grey and join them, for now. Play the six hand-keys on the beat, take the Savage Breath, open Savage Vision, gather tiny plasma, clues and relics, practise until you master each key and the family huddle, weave the jackets, and answer the ancestors' call to the hill together. When the tree is lit the giant sly snake lets the ancestors go, and at home the tree's third strand lights fully: the ancestors fade in round it, the family turns to you for the big hug, dances out to the drums and onto a stage for a sixty-second show with a band of ancestors (move each of them about the stage in turn), holds hands as their jackets light gold, and lifts off one by one. Once their lessons are learned, each makes something the family keeps: Kai builds a brilliant holographic structure, Zora mixes a masterpiece, Mama sings her song, and Daddy releases a relic. Share cards are made at every turning point. Forty milestones, each checked by replaying your run.",
   id: "peaceful-savage",
   launch: { mode: "embedded" },
   milestones: [
@@ -231,6 +233,30 @@ export const peacefulSavageGame = defineGame({
       "Fully empowered by the ancestor tree.",
     ),
     once(
+      "kai-hologram",
+      "Kai's hologram",
+      "Build a holographic structure with Kai on his workbench, once his tower stands again.",
+      "Line by line of light, Kai built something brilliant, and the family keeps it.",
+    ),
+    once(
+      "zora-masterpiece",
+      "Zora's masterpiece",
+      "Mix a masterpiece with Zora where she was playing in the meadow.",
+      "Every colour split, swirled and let go: Zora made a masterpiece, and the family keeps it.",
+    ),
+    once(
+      "heerah-song",
+      "Mama's song",
+      "Sing Mama's song with her where she stood by the tree.",
+      "Mama breathed in deep and let her song go, and the family keeps it.",
+    ),
+    once(
+      "ali-relic",
+      "Daddy's relic",
+      "Release the relic from Daddy's drawer, once it is open.",
+      "What the drawer kept is let go as a relic of light, and the family keeps it.",
+    ),
+    once(
       "light-as-kai",
       "Lit by Kai",
       "Light the ancestor tree with Kai leading.",
@@ -266,7 +292,7 @@ export const peacefulSavageGame = defineGame({
     replay: {
       id: "peaceful-savage",
       sha256:
-        "a4887ff3a2ae984000bf2ec18b6e221fb9b1fdc4345cb082f663a4c2ecbec100",
+        "36051ee69cacc0a1616229dfdbd385d02f6cd53debdaf923945e645916f7a888",
       version: 1,
     },
   },

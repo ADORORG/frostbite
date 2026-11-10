@@ -4,19 +4,20 @@ import { within } from "../rules/geometry.ts";
 import { hillRadius, places } from "../rules/layout.ts";
 import { family } from "../rules/state.ts";
 import type { PlayState } from "../rules/types.ts";
+import { creationWords } from "./creations.ts";
 
 // What the act key would do, as the prompt over the screen says it before a press: "Open the fridge", "Go to Mama". The rules decide
 // what is in reach (`aimOf`); this only names it.
 const thingWords: Readonly<Record<string, string>> = {
   armchair: "Sit in the armchair",
   bench: "Sit on the bench",
-  bigbed: "Fluff the pillows",
+  bigbed: "Sit on the big bed",
   bluebells: "Smell the bluebells",
   books: "Pull out a book",
-  chair: "Pull out a chair",
+  chair: "Sit at the table",
   clock: "Wind the clock",
   coats: "Hang up the coats",
-  couch: "Plump the cushions",
+  couch: "Sit on the couch",
   curtain: "Open the curtains",
   drum: "Play the drum",
   fridge: "Open the fridge",
@@ -24,7 +25,7 @@ const thingWords: Readonly<Record<string, string>> = {
   hallplant: "Water the fern",
   ice: "Get some ice",
   juice: "Pour some juice",
-  kaibed: "Make Kai's bed",
+  kaibed: "Sit on Kai's bed",
   monitor: "Wake the monitor",
   musicbox: "Wind the music box",
   photos: "Look at the family photos",
@@ -34,7 +35,7 @@ const thingWords: Readonly<Record<string, string>> = {
   projector: "Switch on the star projector",
   records: "Play a record",
   rocket: "Launch the toy rocket",
-  swing: "Have a swing",
+  swing: "Ride the swing",
   tap: "Run the tap",
   toaster: "Pop the toaster",
   toychest: "Open the toy chest",
@@ -43,8 +44,11 @@ const thingWords: Readonly<Record<string, string>> = {
   wardrobe: "Open the wardrobe",
   whiteboard: "Draw on the whiteboard",
   window: "Open the window",
-  zorabed: "Make Zora's bed",
+  zorabed: "Sit on Zora's bed",
 };
+
+// What the act key does once sat down: on a seat, and on the swing (each push sends it higher).
+export const seatedWords = { seat: "Stand up", swing: "Swing higher" } as const;
 
 const familyWords: Readonly<Record<HeroId, string>> = {
   ali: "Go to Daddy",
@@ -73,6 +77,10 @@ export function promptFor(
         bench: "Build the tower again with Kai",
         deck: "Pick up the family card deck",
         drawer: "Knock on Daddy's drawer",
+        hologram: creationWords.hologram.prompt,
+        masterpiece: creationWords.masterpiece.prompt,
+        release: creationWords.release.prompt,
+        song: creationWords.song.prompt,
         lamp: "Help the lamp that would not go out",
         loom: "Weave the jackets with Mama",
         stove: "Make pancakes",
@@ -106,6 +114,9 @@ export function promptFor(
       return thingWords[thingIds[target.index] ?? ""] ?? "Touch it";
   }
 }
+
+// When the story has stalled and Sparky tugs the lead on.
+export const tugWords = "Sparky tugs you on: follow his gold thread.";
 
 // Beside the giant snake asleep on the hill, before the family can wake it: what it waits for. Nothing to say once it can be woken.
 export function hillHint(state: PlayState): string | null {

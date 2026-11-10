@@ -2,17 +2,21 @@ import { Mesh, Object3D, SphereGeometry, Vector3 } from "three";
 
 import type { Tone } from "../palette.ts";
 import { toon } from "../toon.ts";
-import { beads, headband, pick } from "./adornments.ts";
+import { beads, headband } from "./adornments.ts";
+import { beard } from "./beard.ts";
 import { curls, stars } from "./coils.ts";
+import { headOf } from "./head-shape.ts";
+import { locs } from "./locs.ts";
 import type { Look } from "./looks.ts";
 import type { Rig } from "./rig.ts";
 
 // Coily and kinky hair grows out, not down, and its outline is soft. So it is never a smooth cap: it is thousands of tight curls packed
 // densest at the outer shell, so the silhouette reads as coils, over a dark core so no light shows through. A puff or an afro is a
 // volume of them on a joint of its own that bounces as the body moves; under it, a dark cap and a close layer of short coils cover the
-// whole scalp to a real hairline, so the hair always touches the head and no skin shows through. Galaxy hair (Mama's and Zora's) carries stars in it; Daddy's afro is deep brown-black with his gold pick in it.
+// whole scalp to a real hairline, so the hair always touches the head and no skin shows through. Galaxy hair (Mama's and Zora's) carries
+// stars in it. Daddy's is freeform locs standing up like a crown, as on the cover, with his goatee and the close beard along his jaw.
 export interface Hair {
-  // The joints a bounce moves (a puff, an afro), each with where it rests.
+  // The joints a bounce moves (a puff, an afro, the locs), each with where it rests.
   readonly springs: readonly {
     readonly joint: Object3D;
     readonly rest: Vector3;
@@ -28,6 +32,12 @@ export function buildHair(
 ): Hair {
   const head = rig.joint("head");
   const r = rig.build.head;
+  const shape = headOf(look.face);
+  const L = shape.layout;
+  const skull = shape.skull;
+  // From the head's own units (its middle, its own size) to the head joint's space, where the face is set.
+  const place = (at: Vector3): Vector3 =>
+    new Vector3(at.x * r, (at.y + 0.88) * r, at.z * r + 0.005);
   const material = toon(tone, { color: "#ffffff", rim: 0.32 });
   const core = toon(tone, {
     color: look.galaxy ? "#1b1240" : look.hairColour,
@@ -36,7 +46,7 @@ export function buildHair(
   const springs: { joint: Object3D; rest: Vector3 }[] = [];
   const holder = (x: number, y: number, z: number): Object3D => {
     const joint = new Object3D();
-    joint.position.set(x, y, z);
+    joint.position.copy(place(new Vector3(x, y, z)));
     head.add(joint);
     springs.push({ joint, rest: joint.position.clone() });
     return joint;
@@ -63,20 +73,21 @@ export function buildHair(
     parent.add(new Mesh(geometry, core));
   };
   const count = (n: number) => Math.max(40, Math.round(n * amount));
-  // Bare below the hairline, at the ears and low at the nape.
-  const keep = (at: Vector3): boolean => {
-    const y = at.y / r;
-    const z = at.z / r;
-    const x = Math.abs(at.x / r);
-    if (z > 0.15 && y < 1.62 - x * 0.25) return false;
-    if (x > 0.8 && y < 1.15 && z > -0.5) return false;
-    return y > 0.55 || z < -0.2;
+  // Where hair grows, for a point in the head joint's space: not on the face below the hairline, not at or in front of the ears, and
+  // down the back of the head to the nape.
+  const growsAt = (x: number, y: number, z: number): boolean => {
+    const across = Math.abs(x);
+    if (z > 0.15 && y < L.brow + 0.42 - across * 0.22) return false;
+    if (across > 0.55 && y < L.eyes + 0.12 && z > -0.45) return false;
+    return y > L.nose + 0.1 || (z < -0.2 && y > L.mouth);
   };
+  const keep = (at: Vector3): boolean =>
+    growsAt(at.x / r, at.y / r - 0.88, (at.z - 0.005) / r);
   const anywhere = () => true;
   // The close layer touches the scalp everywhere hair grows (the back and sides too, between and under puffs): a dark cap just over the
   // skin, so no skin shows between the coils, and the short coils packed on it.
-  const scalp = holder(0, r * 0.98, -r * 0.04);
-  const close = new Vector3(r * 1.06, r * 1.12, r * 1.08);
+  const scalp = holder(skull.centre.x, skull.centre.y, skull.centre.z);
+  const close = skull.radii.clone().multiplyScalar(1.07 * r);
   fill(scalp, close, 0.95, keep);
   curls(
     scalp,
@@ -87,8 +98,8 @@ export function buildHair(
     detail,
   );
   if (look.hair === "coils") {
-    const radii = new Vector3(r * 1.3, r * 1.36, r * 1.28);
-    const top = holder(0, r * 1.1, -r * 0.06);
+    const radii = new Vector3(r * 1.2, r * 1.3, r * 1.22);
+    const top = holder(0, 0.3, -0.1);
     fill(top, radii, 0.86, keep);
     curls(
       top,
@@ -100,7 +111,7 @@ export function buildHair(
     );
   } else if (look.hair === "puffs") {
     for (const s of [1, -1]) {
-      const puff = holder(s * r * 0.86, r * 1.78, -r * 0.1);
+      const puff = holder(s * 0.84, 0.92, -0.12);
       const radii = new Vector3(r * 0.95, r * 0.88, r * 0.9);
       fill(puff, radii, 0.84, anywhere);
       curls(
@@ -119,10 +130,25 @@ export function buildHair(
       );
       beads(puff, r, s);
     }
-  } else if (look.galaxy) {
-    // Mama's galaxy afro, wide and high, with planets in it.
-    const crown = holder(0, r * 1.55, -r * 0.4);
-    const radii = new Vector3(r * 2.3, r * 1.95, r * 2.05);
+  } else if (look.hair === "locs") {
+    const crown = holder(0, 0, 0);
+    locs(
+      crown,
+      {
+        centre: skull.centre,
+        grows: (at) => growsAt(at.x, at.y, at.z),
+        place: (at) => place(at).sub(crown.position),
+        radii: skull.radii,
+        size: r,
+      },
+      Math.max(28, Math.round(78 * Math.min(1, amount * 1.5))),
+      toon(tone, { color: "#ffffff", rim: 0.3, vertexColors: true }),
+      41,
+    );
+  } else {
+    // Mama's galaxy afro, wide and high, with planets in it, and her headband with its feather.
+    const crown = holder(0, 0.72, -0.62);
+    const radii = new Vector3(r * 2.3, r * 1.95, r * 1.9);
     fill(crown, radii, 0.86, keep);
     curls(
       crown,
@@ -138,37 +164,28 @@ export function buildHair(
       29,
       true,
     );
-    headband(head, r);
-  } else {
-    // Daddy's afro: round and full, a crisp hairline, his gold pick standing in it.
-    const crown = holder(0, r * 1.5, -r * 0.22);
-    const radii = new Vector3(r * 1.68, r * 1.52, r * 1.62);
-    fill(crown, radii, 0.86, keep);
-    curls(
-      crown,
-      { count: count(3800), keep, radii, size: r * 0.14 },
-      material,
-      look,
-      41,
-      detail,
+    const band = L.brow + 0.33;
+    const across = Math.sqrt(
+      Math.max(0, 1 - ((band - skull.centre.y) / skull.radii.y) ** 2),
     );
-    pick(crown, r);
+    headband(head, r, {
+      at: place(new Vector3(0, band, skull.centre.z)),
+      deep: skull.radii.z * across * 1.05 * r,
+      wide: skull.radii.x * across * 1.06 * r,
+    });
   }
-  if (look.beard) {
-    const beard = (at: Vector3) => at.z > r * 0.1 && at.y < r * 0.3;
-    curls(
-      rig.joint("jaw"),
+  if (look.beard)
+    beard(
+      head,
+      shape,
+      place,
       {
-        count: count(320),
-        keep: beard,
-        radii: new Vector3(r * 0.56, r * 0.32, r * 0.52),
-        size: r * 0.065,
+        colour: look.hairColour,
+        count: count(420),
+        detail,
+        size: r * 0.06,
       },
       material,
-      look,
-      37,
-      detail,
     );
-  }
   return { springs };
 }

@@ -92,3 +92,21 @@ export function routeOf(from: Point, to: Point, height = 0.15): Vector3[] {
     (point) => new Vector3(point.x / 1000, height, point.z / 1000),
   );
 }
+
+// The point a distance along a route from its start (its end, if the route is shorter).
+export function alongRoute(
+  route: readonly Vector3[],
+  distance: number,
+): Vector3 {
+  let left = distance;
+  for (let index = 1; index < route.length; index += 1) {
+    const from = route[index - 1];
+    const to = route[index];
+    if (from === undefined || to === undefined) break;
+    const length = from.distanceTo(to);
+    if (left <= length)
+      return from.clone().lerp(to, length === 0 ? 0 : left / length);
+    left -= length;
+  }
+  return (route[route.length - 1] ?? new Vector3()).clone();
+}

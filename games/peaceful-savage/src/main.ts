@@ -239,6 +239,9 @@ const hands: Hands = {
     void finish(run);
   },
   inMoment: () => shownState().moment !== null,
+  jump: () => {
+    if (playing() && !pause.paused() && screen.jump(now())) sound.sfx("jump");
+  },
   pause: () => void (loop.running() && pause.toggle()),
   practise: (skill) => {
     if (playing()) current?.practise(skill);
@@ -272,12 +275,8 @@ async function connect(): Promise<void> {
     progress = restore(await client.progress.load());
     sound.apply(progress.sound);
     play = await connectToPlatform(client);
-    titles = new Map(
-      (await client.milestones.list().catch(() => [])).map(({ id, title }) => [
-        id,
-        title,
-      ]),
-    );
+    const listed = await client.milestones.list().catch(() => []);
+    titles = new Map(listed.map(({ id, title }) => [id, title]));
     connected = "Connected.";
   } catch (error) {
     connected =

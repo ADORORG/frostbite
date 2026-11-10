@@ -1,5 +1,6 @@
 import { gardenBeds } from "../rules/layout.ts";
 import type { News, PlayState } from "../rules/types.ts";
+import { madeWords } from "./creations.ts";
 
 // The words on a share card, made at each turning point of the story: a title and a line. The lit tree's card is the last. Every word
 // here is a draft for the owner.
@@ -49,6 +50,8 @@ export function cardFor(news: News, state: PlayState): CardWords | null {
             title: "Zora's garden blooms",
           }
         : null;
+    case "made":
+      return madeWords(news.detail)?.card ?? null;
     case "drawer":
       return {
         line: "What was handed down in pain is passed on as joy.",

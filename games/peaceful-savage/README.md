@@ -39,13 +39,36 @@ meadow and tends them into bloom); Kai can build anything and learns structure, 
 a step at a time, with a breath in the middle); Daddy leads and learns that it is safe to be soft, turning what was handed down in pain
 into joy; Mama senses what is coming and learns to say what she needs, as the ancestors call the family together.
 
+**What the family makes and keeps.** Once their lesson is learned, each of the family makes something the family keeps (and each is a
+milestone, so a collectible): Kai builds a brilliant holographic structure on his workbench over the tower he built again (a helix of
+light with turning rings and a crystal at the top), Zora mixes a masterpiece where she was playing in the meadow (a swirl of every colour
+on a little easel), Mama sings her song where she stood by the tree (gold notes that rise and circle), and Daddy releases a relic from the
+drawer he opened (a gold amulet with a teal heart that floats free over his desk). Each is a short moment of hand-keys and breath that its
+maker plays beside the lead; each stays where it was made for the rest of the run.
+
+**Shapes of light.** The family's moves draw thin holographic shapes in the air, as the cover draws gold rings round Daddy's palm: each
+hand-key its own (the Cup a bowl of light, the Comb its teeth, the Knot a loop that never ends, the Knock rings spreading from the palm,
+the Split two circles parting, the Let-Go a spiral unwinding), a held breath a shield of light round the body, the breath let go a field
+of loops through it, the centring at a mirror a flower of circles on the floor, and a dance a turning star. Each is drawn line by line
+with a bright pen at its end, and fades when the move is done.
+
+**Sparky's tug.** When the story stalls (twenty seconds with nothing found, healed, woven, learned or lit, and no moment under way),
+Sparky flies on ahead along a gold thread to where the story goes next and tugs, and the line over the screen says to follow him. It
+reads the state only and changes nothing in the run.
+
+**Sitting, swinging, jumping, running.** E sits on what can be sat on (the couch, the beds, the chairs, the bench) and acting again
+stands up; the swing in the meadow is ridden, each act a push higher, with the family watching from beyond the tree. Space jumps (it is
+only seen); Shift, or a drag further, runs. The looking glasses and the pond show the world in them (the one in the lead's room at a
+time, so the house is drawn again for one glass, not five).
+
 On the way: the family moments (sit with Kai at his cracked tower, split Zora's silly cube, breathe with Mama, sit with Daddy in the
 fog and knock), Daddy's locked drawer, pancakes, the card deck, the lamps, clues and inventors' relics in every room, tiny plasma to
 gather, the lead's spark (their own light, dimmed near an unhealed snake and by a believed trick, filled by a breath and the truth), and
 practice, which raises each hand-key, the breath and the huddle from new to mastered and the lead's level at the tree. Believe too many
 tricks with the spark low and the lead goes grey and is taken gently into a coil of grey figures, for now: the next run begins in colour.
 
-**Share cards.** At each turning point (Sparky, each one found, the tower, the garden in bloom, the drawer, the jackets, and three times
+**Share cards.** At each turning point (Sparky, each one found, the tower, the garden in bloom, the drawer, each of the family's
+creations, the jackets, and three times
 when the tree is lit: the big hug, the show, and the lift-off) the page keeps a picture of the moment with its words, as a square post or
 a tall story.
 The Cards button shows them. The platform's frame blocks downloads and the share sheet, so the panel says how to save a card by hand;
@@ -61,12 +84,13 @@ its line to the lead clear of the ground and of the walls.
 ## Controls
 
 - **Keyboard.** Left and right choose who leads; Enter starts. Arrows or WASD walk (seen from the camera), and with Shift held, run;
-  E or Space acts on what the prompt names, and held, it breathes in (let go after four counts, then six out); Q opens Savage Vision;
+  E acts on what the prompt names (or sits, or stands up), and held, it breathes in (let go after four counts, then six out); Space
+  jumps, and in a moment it is the act key too; Q opens Savage Vision;
   1 to 8 practise (1 and 2 answer, when there is a choice); P pauses. The buttons under the screen do the same, and End run sends the
   run as it stands.
 - **Touch.** A swipe chooses who leads and a tap starts. In a run, a finger dragged on the screen walks (dragged further, it runs), a
   tap acts, and a finger held still breathes in; in a moment, the finger down is the act key, on time for the beat. Four buttons in the
-  corner act, open vision, practise the skill most worth practising, and show the share cards.
+  corner jump (in a moment, act), open vision, practise the skill most worth practising, and show the share cards.
 
 The family found walks close at the lead's sides, not in single file (on the lead's own path through a doorway), and the camera rises
 and pulls back a little for each of them, so nobody stands between it and the lead.
@@ -74,7 +98,8 @@ and pulls back a little for each of them, so nobody stands between it and the le
 ## Layout of the source
 
 - `src/rules/`: the rules, a pure, seeded, whole-number state machine (millimetres, sixteen headings written out, axis-aligned walls),
-  the story's moments, the garden and the tower, greying, growth (spark, light, levels, mastery) and the 36 milestones.
+  the story's moments, the garden and the tower, what the family makes (`create.ts`), greying, growth (spark, light, levels, mastery)
+  and the 40 milestones.
 - `src/session.ts`: one run as the player plays it, and its record. `src/page/run.ts` turns the player's hands into the rules' inputs.
 - `src/page/`: the parts of the page (who leads, the readouts and spark bar, the moment panel, the prompt and toasts, the buttons, the
   keys and the touch screen, the share cards and their panel, and the end of a run played out before the result).
@@ -82,10 +107,12 @@ and pulls back a little for each of them, so nobody stands between it and the le
 - `src/view/`: the 3D view (three.js on WebGL 2), which reads the rules' state and changes nothing: the stage and its light, the
   storybook toon look (painted bands, a gold rim, ink lines, a moonlit duotone for grey rooms), the sky, the camera that knows the
   characters (`camera.ts`, kept out of walls and the hill by `clearance.ts`), where the found walk beside the lead (`beside.ts`), the
-  family's procedural bodies (skinned, about sixty joints, painted faces, coily hair on a full scalp, and a two-bone reach for a hand
+  family's procedural bodies (skinned, about sixty joints; sculpted human heads with a skull, cheekbones, a jaw, a chin, a nose and lips,
+  their features painted on and real eyes in their sockets; coily hair on a full scalp and Daddy's freeform locs; and a two-bone reach for a hand
   laid exactly, as on a shoulder in the hug), the farewell (`farewell.ts`, `family-farewell.ts`) and its show (`show.ts`), the world
   (`world/`: the house, the meadow, the garden, the tree and its three strands, the giant sly snake, the ancestors who come home, the
-  stage, the band's instruments and the dancing crowd, Sparky) and the gold line-work of the magic.
+  stage, the band's instruments and the dancing crowd, Sparky, the looking glasses and the pond, the swing, what the family makes) and
+  the gold line-work of the magic, with its holographic shapes (`world/holograms.ts`, `world/sigils.ts`).
 - `src/screen/`: the flat map for a device with no WebGL 2, and the card after a run. `src/guide.ts` is the first-screen card.
 - `src/audio.ts`, `src/concert.ts`, `src/feedback.ts`: a lullaby, the show's groove and the effects, as data, and which effect each kind
   of news plays.
@@ -99,13 +126,18 @@ a practice, vision, the end). The platform gives a run its seed and replays the 
 milestone is decided by the state the run ends in. The verifier is the rules alone (`src/replay.ts`); its digest is pinned in
 `configs/games/peaceful-savage.ts`, so a change to the rules is a change there.
 
-## Milestones (36)
+## Milestones (40)
 
 A hand on the tree, Savage Vision, Sparky, the Savage Breath; Kai, Zora, Mama Heerah and Dr. Ali found; a snake turns gold, six
 threads, not fooled once; the jackets, the locked drawer, the card deck, Zora's garden, Kai's tower, pancakes, every lamp, curious hands,
 every corner; six perfect keys; fifty motes and all the plasma; a relic and every relic, every clue; mirror force; a key mastered, six
-keys mastered, the family huddle; level 3 and fully lit; and the tree lit with each of the four leading. No two are earned by the same
-event.
+keys mastered, the family huddle; level 3 and fully lit; Kai's hologram, Zora's masterpiece, Mama's song and Daddy's relic; and the tree
+lit with each of the four leading. No two are earned by the same event.
+
+Each milestone's drawing (what it becomes on chain, and shows on pages) is in `milestone-arts/`, one file named for each milestone's id
+(`found-kai.svg` is Kai found, `kai-hologram.svg` is Kai's hologram), so the staff page's "Define many milestones" takes the whole folder
+at once. A test keeps the names and the milestones matched, and every drawing passing the platform's own check unchanged. The drawings
+are a draft for the owner, like the list.
 
 ## Fairness
 

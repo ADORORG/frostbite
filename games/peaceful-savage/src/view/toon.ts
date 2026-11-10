@@ -6,6 +6,7 @@ import {
   MeshBasicMaterial,
   MeshToonMaterial,
   type MeshToonMaterialParameters,
+  LinearFilter,
   NearestFilter,
   RedFormat,
   type Skeleton,
@@ -20,20 +21,23 @@ import type { Tone } from "./palette.ts";
 // edge turned from the eye (the book's gold key light), and a soft brown ink line runs round each shape. A toon material still greys
 // with its room, as every painted material does.
 
-// Four painted bands: deep shade, shade, light, full light.
-let bands: DataTexture | null = null;
-export function ramp(): DataTexture {
-  if (bands === null) {
+// Four painted bands: deep shade, shade, light, full light. Skin of the face takes the same four blended into each other, as an oil
+// painter models a face, so a cheek or a jaw turns softly rather than in steps.
+const ramps = new Map<boolean, DataTexture>();
+export function ramp(soft = false): DataTexture {
+  let bands = ramps.get(soft);
+  if (bands === undefined) {
     bands = new DataTexture(
       new Uint8Array([92, 150, 214, 255]),
       4,
       1,
       RedFormat,
     );
-    bands.minFilter = NearestFilter;
-    bands.magFilter = NearestFilter;
+    bands.minFilter = soft ? LinearFilter : NearestFilter;
+    bands.magFilter = soft ? LinearFilter : NearestFilter;
     bands.generateMipmaps = false;
     bands.needsUpdate = true;
+    ramps.set(soft, bands);
   }
   return bands;
 }
@@ -55,12 +59,17 @@ const rimAndGrey = `
 export interface ToonOptions extends MeshToonMaterialParameters {
   // How strongly the gold rim shows (0 for none).
   readonly rim?: number;
+  // Shading blended softly between the bands (for faces).
+  readonly soft?: boolean;
 }
 
 // A painted toon material tied to a room's colour.
 export function toon(tone: Tone, options: ToonOptions): MeshToonMaterial {
-  const { rim = 0.22, ...parameters } = options;
-  const material = new MeshToonMaterial({ gradientMap: ramp(), ...parameters });
+  const { rim = 0.22, soft = false, ...parameters } = options;
+  const material = new MeshToonMaterial({
+    gradientMap: ramp(soft),
+    ...parameters,
+  });
   const rimColour = new Color("#ffc66b").multiplyScalar(rim);
   material.onBeforeCompile = (shader) => {
     shader.uniforms.savageColour = tone;

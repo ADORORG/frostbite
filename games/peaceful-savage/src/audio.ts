@@ -100,6 +100,7 @@ export const effects = {
   found: [...bell(523), ...bell(659, 0.12), ...bell(784, 0.24)],
   gather: [...bell(988), ...bell(1319, 0.1, 0.2)],
   good: bell(659),
+  jump: [tone("sine", 330, 660, 0.16, 0.14)],
   healed: [
     tone("sine", 523, 1047, 0.5, 0.25),
     ...bell(1319, 0.3, 0.2),
@@ -113,6 +114,13 @@ export const effects = {
     ...bell(659, 0.3),
     ...bell(784, 0.45),
     ...bell(1047, 0.6, 0.35),
+  ],
+  // Something made and kept: a little sung phrase, rising and coming home.
+  made: [
+    tone("sine", 523, 523, 0.3, 0.16),
+    tone("sine", 659, 659, 0.3, 0.16, 0.3),
+    tone("sine", 784, 880, 0.45, 0.16, 0.6),
+    ...bell(1047, 1.05, 0.2),
   ],
   milestone: commonEffects.win,
   miss: [tone("triangle", 262, 196, 0.25, 0.2)],

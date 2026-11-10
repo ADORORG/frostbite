@@ -1,7 +1,7 @@
 import {
   AdditiveBlending,
   Color,
-  MeshToonMaterial,
+  type MeshToonMaterial,
   Object3D,
   Sprite,
   SpriteMaterial,
@@ -16,6 +16,7 @@ import { buildClothes } from "./clothes.ts";
 import { buildFace } from "./face.ts";
 import { atRest, skinned, skinOf } from "./flesh.ts";
 import { buildHair } from "./hair.ts";
+import { headOf } from "./head-shape.ts";
 import { heightOf, type Look, looks } from "./looks.ts";
 import { createMotion, type MotionInput } from "./motion.ts";
 import { markings } from "./patterns.ts";
@@ -27,6 +28,8 @@ import { buildRig } from "./rig.ts";
 export interface Character {
   readonly hero: HeroId;
   readonly height: number;
+  // How high the hips stand over the feet.
+  readonly legs: number;
   // Where a hand is in the world (for the gold line-work a hand-key draws).
   hand(side: "L" | "R"): Vector3;
   // Where one of its joints is in the world (a shoulder, say), for another's hand to find.
@@ -86,7 +89,7 @@ export function buildCharacter(
       skinned(skin.marked, rig, skinMaterial(look, options.tone, true)),
     );
   // The ink line round the bare skin, as round the clothes and the face.
-  const ink = look.build.torso < 0.5 ? 0.003 : 0.0035;
+  const ink = look.build.torso < 0.5 ? 0.0052 : 0.006;
   for (const mesh of meshes)
     mesh.add(inkedSkin(mesh.geometry, rig.skeleton, ink));
   const clothes = buildClothes(rig, look, options.tone);
@@ -98,8 +101,14 @@ export function buildCharacter(
     options.detail,
     options.hairAmount,
   );
-  earrings(rig.joint("head"), hero, look.build.head);
-  const motion = createMotion(rig, face, hair, hero.length * 977);
+  earrings(rig.joint("head"), hero, look.build.head, headOf(look.face).ear(1));
+  const motion = createMotion(
+    rig,
+    face,
+    hair,
+    hero.length * 977,
+    look.skirt ? 0.7 : 1,
+  );
   const root = new Object3D();
   root.name = hero;
   root.add(rig.root);
@@ -120,10 +129,7 @@ export function buildCharacter(
   rig.joint("chest").add(aura);
   return {
     dress(jacket, shine = 0) {
-      clothes.jacket.visible = jacket;
-      const cloth = clothes.jacket.material;
-      if (cloth instanceof MeshToonMaterial)
-        cloth.emissiveIntensity = 1.1 + shine * 2.6;
+      clothes.dress(jacket, shine);
     },
     glow(amount) {
       aura.material.opacity = Math.max(0, Math.min(1, amount)) * 0.35;
@@ -134,6 +140,7 @@ export function buildCharacter(
     },
     height: heightOf(look.build),
     hero,
+    legs: rig.legLength,
     joint(name) {
       return rig.joint(name).getWorldPosition(new Vector3());
     },

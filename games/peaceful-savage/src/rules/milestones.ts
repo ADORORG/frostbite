@@ -11,6 +11,8 @@ import type { PlayState } from "./types.ts";
 // No two are earned by the same event: each names a different thing the player does.
 const found = (hero: HeroId) => (state: PlayState) =>
   state.party.includes(hero);
+const madeBy = (hero: HeroId) => (state: PlayState) =>
+  state.made.includes(hero);
 const litAs = (hero: HeroId) => (state: PlayState) =>
   state.cause === "lit" && state.lead === hero;
 const keysMastered = (state: PlayState): number =>
@@ -72,6 +74,10 @@ export const milestones: readonly {
   { earned: (state) => mastered(state, huddleSkill), id: "huddle-master" },
   { earned: (state) => state.level >= 3, id: "level-3" },
   { earned: (state) => state.level >= 7, id: "level-7" },
+  { earned: madeBy("kai"), id: "kai-hologram" },
+  { earned: madeBy("zora"), id: "zora-masterpiece" },
+  { earned: madeBy("heerah"), id: "heerah-song" },
+  { earned: madeBy("ali"), id: "ali-relic" },
   { earned: litAs("kai"), id: "light-as-kai" },
   { earned: litAs("zora"), id: "light-as-zora" },
   { earned: litAs("heerah"), id: "light-as-heerah" },

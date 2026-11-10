@@ -1,6 +1,7 @@
 import { heroIds } from "../rules/constants.ts";
 import type { News } from "../rules/types.ts";
 import { heroCards, skillCards } from "./cast.ts";
+import { madeWords } from "./creations.ts";
 import { clueLines, relicLines } from "./lines.ts";
 
 // The line over the screen when something happens: Sparky found, a sly snake healed, a skill mastered. Small, frequent things (a gathered
@@ -62,6 +63,8 @@ export function toastOf(news: News): string | null {
       return "The bed blooms! Love the land, and it loves you back.";
     case "tower":
       return "Kai's tower stands again: a step at a time, with a breath in the middle.";
+    case "made":
+      return madeWords(news.detail)?.toast ?? null;
     case "sensed":
       return "Mama senses a sly snake close by.";
     case "greying":

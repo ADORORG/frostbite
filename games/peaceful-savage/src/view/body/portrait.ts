@@ -8,7 +8,8 @@ import {
 
 import { noise, srgb } from "../palette.ts";
 import { at, css, faceSize, glow, type Ink, softLine, span } from "./brush.ts";
-import { type Expression, eyeApart, eyeLine } from "./head.ts";
+import type { Expression } from "./head.ts";
+import type { Layout } from "./head-shape.ts";
 import type { Look } from "./looks.ts";
 import { paintMouth } from "./mouth.ts";
 
@@ -34,6 +35,21 @@ function brow(
   const inner = [side * 0.13, eyes + 0.25 + raise + worry * 0.08] as const;
   const peak = [side * 0.38, eyes + 0.34 + raise - worry * 0.02] as const;
   const outer = [side * 0.57, eyes + 0.24 + raise - worry * 0.04] as const;
+  // A soft body of colour first, thick at the inner end, then the hairs over it.
+  const half = [
+    (inner[0] + peak[0]) / 2,
+    (inner[1] + peak[1]) / 2 + 0.012,
+  ] as const;
+  softLine(ink, inner, half, peak, 0.034 * weight, colour, 0.55);
+  softLine(
+    ink,
+    peak,
+    [(peak[0] + outer[0]) / 2, (peak[1] + outer[1]) / 2 + 0.01],
+    outer,
+    0.02 * weight,
+    colour,
+    0.45,
+  );
   for (let step = 0; step <= 40; step += 1) {
     const t = step / 40;
     const x =
@@ -42,11 +58,11 @@ function brow(
       (1 - t) ** 2 * inner[1] + 2 * (1 - t) * t * peak[1] + t * t * outer[1];
     const thick = weight * (0.055 - t * 0.04);
     const [px, py] = at(x, y);
-    ink.strokeStyle = css(colour, 0.55 + (1 - t) * 0.35);
+    ink.strokeStyle = css(colour, 0.4 + (1 - t) * 0.3);
     ink.lineWidth = Math.max(1.2, span(thick) * 0.35);
     ink.beginPath();
-    ink.moveTo(px - side * span(thick) * 0.5, py + span(thick) * 0.7);
-    ink.lineTo(px + side * span(thick) * 0.6, py - span(thick) * 0.6);
+    ink.moveTo(px - side * span(thick) * 0.35, py + span(thick) * 0.4);
+    ink.lineTo(px + side * span(thick) * 0.45, py - span(thick) * 0.4);
     ink.stroke();
   }
 }
@@ -54,17 +70,18 @@ function brow(
 // The nose: a soft shade down the side of the bridge, curved wings round the nostrils, the shadow beneath, a touch of light on the tip.
 function nose(
   ink: Ink,
-  eyes: number,
+  layout: Layout,
   young: number,
   shade: Color,
   line: Color,
 ): void {
+  const base = layout.nose;
   const wide = 0.1 + (1 - young) * 0.015;
   softLine(
     ink,
-    [-0.07, eyes + 0.06],
-    [-0.075, eyes - 0.1],
-    [-0.06, eyes - 0.24],
+    [-0.07, layout.eyes + 0.06],
+    [-0.08, (layout.eyes + base) / 2],
+    [-0.06, base + 0.115],
     0.02,
     shade,
     0.22,
@@ -72,25 +89,25 @@ function nose(
   for (const side of [1, -1]) {
     softLine(
       ink,
-      [side * wide * 0.7, eyes - 0.26],
-      [side * wide * 1.15, eyes - 0.31],
-      [side * wide * 0.55, eyes - 0.355],
+      [side * wide * 0.7, base + 0.095],
+      [side * wide * 1.15, base + 0.045],
+      [side * wide * 0.55, base],
       0.011,
       line,
       0.5,
     );
-    glow(ink, side * 0.055, eyes - 0.35, 0.022, line, 0.7);
+    glow(ink, side * 0.055, base + 0.005, 0.022, line, 0.7);
   }
   softLine(
     ink,
-    [-wide * 0.6, eyes - 0.36],
-    [0, eyes - 0.395],
-    [wide * 0.6, eyes - 0.36],
+    [-wide * 0.6, base - 0.005],
+    [0, base - 0.04],
+    [wide * 0.6, base - 0.005],
     0.018,
     shade,
     0.4,
   );
-  glow(ink, 0.012, eyes - 0.25, 0.045, new Color("#ffffff"), 0.16);
+  glow(ink, 0.012, base + 0.105, 0.045, new Color("#ffffff"), 0.16);
 }
 
 // A close beard's shadow round the mouth and jaw, and the moustache over the lip.
@@ -102,7 +119,7 @@ function beard(
 ): void {
   for (let hair = 0; hair < 900; hair += 1) {
     const x = (random() - 0.5) * 1.15;
-    const y = centre + 0.1 - random() * 0.5;
+    const y = centre + 0.1 - random() * 0.56;
     if (Math.abs(x) > 0.58 - (centre - y) * 0.2) continue;
     const [px, py] = at(x, y);
     ink.fillStyle = css(colour, 0.18 + random() * 0.2);
@@ -122,6 +139,7 @@ function beard(
 
 export function buildPortrait(
   look: Look,
+  layout: Layout,
   young: number,
   seed: number,
 ): Portrait {
@@ -140,7 +158,7 @@ export function buildPortrait(
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
   texture.anisotropy = 4;
-  const eyes = eyeLine(young);
+  const eyes = layout.eyes;
   const feminine = look.skirt || look.hair === "puffs";
   const lips = skin
     .clone()
@@ -164,9 +182,9 @@ export function buildPortrait(
       ink.fillStyle = css(skin);
       ink.fillRect(0, 0, faceSize, faceSize);
       // Oil-paint unevenness, kept off the edges so the painted face meets the plain skin without a seam.
-      for (let dab = 0; dab < 90; dab += 1) {
+      for (let dab = 0; dab < 40; dab += 1) {
         const x = (random() - 0.5) * 1.2;
-        const y = eyes + (random() - 0.55) * 1.4;
+        const y = eyes + 0.6 - random() * (0.6 - layout.chin + eyes);
         const light = random() > 0.5;
         glow(
           ink,
@@ -174,19 +192,19 @@ export function buildPortrait(
           y,
           0.04 + random() * 0.08,
           light ? new Color("#ffffff") : shade,
-          (light ? 0.03 : 0.04) + random() * 0.04,
+          (light ? 0.02 : 0.02) + random() * 0.025,
         );
       }
-      glow(ink, 0, eyes - 0.28, 0.12, new Color("#c0452f"), 0.1);
+      glow(ink, 0, layout.nose + 0.08, 0.12, new Color("#c0452f"), 0.1);
       for (const side of [1, -1] as const) {
-        glow(ink, side * eyeApart, eyes, 0.26, shade, 0.28);
+        glow(ink, side * layout.apart, eyes + 0.07, 0.22, shade, 0.18);
         // The crease of the upper lid, gold-touched on Mama.
         const gold = look.marks ? new Color("#e2a63c") : line;
         softLine(
           ink,
-          [side * (eyeApart - 0.17), eyes + 0.1],
-          [side * eyeApart, eyes + 0.245],
-          [side * (eyeApart + 0.19), eyes + 0.11],
+          [side * (layout.apart - 0.17), eyes + 0.1],
+          [side * layout.apart, eyes + 0.245],
+          [side * (layout.apart + 0.19), eyes + 0.11],
           0.01,
           gold,
           look.marks ? 0.6 : 0.3,
@@ -194,8 +212,8 @@ export function buildPortrait(
         if (feminine || young > 0)
           glow(
             ink,
-            side * 0.42,
-            eyes - 0.28,
+            side * 0.43,
+            layout.nose + 0.1,
             0.14,
             new Color("#ff5f55"),
             young > 0 ? 0.22 : 0.15,
@@ -209,14 +227,14 @@ export function buildPortrait(
           look.hair === "afro" && !look.galaxy ? 1.25 : 1,
         );
       }
-      nose(ink, eyes, young, shade, line);
-      const centre = eyes - (young > 0 ? 0.47 : 0.5);
+      nose(ink, layout, young, shade, line);
+      const centre = layout.mouth;
       if (look.beard) beard(ink, centre, hair, random);
       paintMouth(
         ink,
         expression,
         centre,
-        young > 0 ? 0.13 : feminine ? 0.135 : 0.15,
+        layout.mouthWide * (feminine && young === 0 ? 0.92 : 0.95),
         lips,
         line,
       );
