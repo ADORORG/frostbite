@@ -99,6 +99,27 @@ element or attribute (for example "Attribute role is not allowed."); it does not
    it costs nothing. A drawing that passes is written to the chain once: the platform refuses to define the same milestone again
    ("This milestone is already defined on the contract and cannot be defined again."), so **check it before you sign.**
 
+## Defining many milestones at once
+
+A game with many milestones can be done from a folder instead of one field at a time. On the staff page, **Define many milestones**:
+
+1. **Name each file for its milestone.** `first-win.svg` is the drawing of the milestone `first-win` (the id on the milestone list, case of
+   the `.svg` ending does not matter). Choose the whole folder in one go, or drop the files on the box.
+2. **Read the list before anything starts.** Every drawing is checked now, against the same rules and the same limits the platform holds a
+   single drawing to (this contract's own size limit included), so each refusal shows beside its milestone with the first problem
+   it met. Files that match no milestone are named. Two files for one milestone are refused rather than guessed between. A milestone
+   the contract already has is left out, and a milestone with no file is left alone (define it on its own, with or without a drawing).
+3. **Press "Define N milestones".** The platform then defines them one at a time, in the manifest's order. Each becomes an ordinary step
+   that you review and sign in the wallet that holds the game's auth token. The next is not built until the last has been confirmed
+   on the network (its step shows Complete), because the chain will not build a step from an output it has not confirmed. So expect one signature per milestone and
+   about one block between them. **Pause after this step** stops the run; the step already under way carries on.
+4. **If a step fails, or the platform refuses to build one,** the run stops at that milestone and says so; fix what the step shows and
+   press **Continue**. A step that failed before the run began is tried again when you start.
+5. **After a reload** nothing is lost: choose the folder again. Milestones already defined are skipped, and a step still waiting to be
+   signed is waited for (open it from the log).
+
+The drawing rules above are unchanged: a refused drawing is refused here too, and a drawing that is signed is written to the chain once.
+
 ## Who can define a milestone
 
 Defining a milestone spends the game's auth token, which is held by the wallet that created the game's contract. Sign with that wallet.

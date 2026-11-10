@@ -153,6 +153,15 @@ export const listGameAdminStepsResponseSchema = z
       .nullable(),
     // The most a new contract may be created to accept, in bytes.
     drawingCeiling: z.number().int().positive(),
+    // How complex a drawing may be, besides its size. The page checks a drawing against the same limits the platform will (a batch
+    // of drawings is checked before any step is started), so the limits travel with the log and are written down once, in configuration.
+    drawingLimits: z
+      .object({
+        maxAttributeLength: z.number().int().positive(),
+        maxDepth: z.number().int().positive(),
+        maxElements: z.number().int().positive(),
+      })
+      .strict(),
     steps: z.array(gameAdminStepSchema).max(500),
     // Whether both templates a game's contract is made from have been published.
     templatesReady: z.boolean(),

@@ -1,28 +1,17 @@
 import type { GameAdminStep } from "@frostbite/shared/games";
 import {
   ArcadeActionButton,
-  ArcadeBadge,
   ArcadeTextField,
   SectionBlock,
 } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import type { AdminGameInfo } from "../game-info.ts";
-import { milestoneCopy, stateTone, stepCopy } from "../domain/copy.ts";
+import { milestoneCopy } from "../domain/copy.ts";
+import { latestDefinition } from "../domain/definitions.ts";
+import { DefinitionBadge } from "./definition-badge.tsx";
 
 type Milestone = AdminGameInfo["milestones"][number];
-
-const latestDefinition = (
-  steps: readonly GameAdminStep[],
-  milestoneId: string,
-) =>
-  [...steps]
-    .reverse()
-    .find(
-      (step) =>
-        step.operation === "define-milestone" &&
-        step.summary.milestoneId === milestoneId,
-    );
 
 // The game's milestones with their claim limits (from the manifest), where each stands on the contract (from the log), and a way to
 // define each with its drawing. A milestone with no drawing gets the contract's generated picture. A milestone that is defined cannot
@@ -79,21 +68,7 @@ export function MilestoneList({
                     </small>
                   ) : null}
                 </div>
-                <ArcadeBadge
-                  tone={
-                    step === undefined
-                      ? "yellow"
-                      : done
-                        ? "mint"
-                        : stateTone[step.state]
-                  }
-                >
-                  {step === undefined
-                    ? "Not defined"
-                    : done
-                      ? "Defined"
-                      : stepCopy(step).label}
-                </ArcadeBadge>
+                <DefinitionBadge step={step} />
                 {done ? null : (
                   <div className="milestones__define">
                     <ArcadeTextField

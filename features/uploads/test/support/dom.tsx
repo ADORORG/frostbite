@@ -1,4 +1,4 @@
-import { act } from "react";
+import { chooseFiles } from "@frostbite/test-kit/dom";
 import { vi, type Mock } from "vitest";
 
 import type { UploadsApi } from "../../src/client/api-client.ts";
@@ -9,6 +9,7 @@ import { assetId, intentId } from "./library-fixtures.ts";
 
 export {
   button,
+  chooseFiles,
   chooseOption,
   click,
   mount,
@@ -16,19 +17,6 @@ export {
   textOf,
   unmountAll,
 } from "@frostbite/test-kit/dom";
-
-export async function chooseFiles(
-  container: HTMLElement,
-  files: readonly File[],
-) {
-  const input = container.querySelector('input[type="file"]');
-  if (!(input instanceof HTMLInputElement))
-    throw new Error("file input is missing");
-  Object.defineProperty(input, "files", { configurable: true, value: files });
-  await act(() => {
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  });
-}
 
 export const chooseFile = (container: HTMLElement, file: File) =>
   chooseFiles(container, [file]);
