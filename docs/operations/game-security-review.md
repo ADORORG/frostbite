@@ -34,9 +34,9 @@ Reproduced first: the new test `apps/web/test/game-claims-trust.integration.test
 
 `startGameClaim` simulates a transaction and asks the fee source; `refreshGameClaim` asks the network; `submitGameClaim` broadcasts. All three rode the shared write allowance (120 a minute per person for everything), so one account could spend about 120 chain calls a minute, and many accounts proportionally more. They now have their own buckets (10, 20 and 90 a minute; the page looks at each unsettled claim every 4 seconds) and the rate-limit record is version 3. `apps/web/test/rate-limits.unit.test.ts` pins that each has its own bucket under the shared one.
 
-### F-3 Open, needs the owner. `TRUSTED_PROXY_HOPS=0` switches off every per-address limit
+### F-3 Fixed as a safety net. `TRUSTED_PROXY_HOPS=0` switches off every per-address limit
 
-With no trusted proxy the client address is unknown, and the address checks return "allowed" (`packages/http/src/rate-limit.ts`). The production template leaves the value blank (which means 1), but nothing stops `0` in a preview or production environment, where it would silently remove the limit on sign-in guesses, wallet challenges and the public play counter. Proposed: refuse `0` when `APP_ENV` is `preview` or `production`. It was not changed here because it could stop a deployment that already runs with an explicit `0`; the owner should confirm none does.
+With no trusted proxy the client address is unknown, and the address checks return "allowed" (`packages/http/src/rate-limit.ts`). No deployment is affected: preview and production leave the value blank, which means one proxy, and `0` is used only by the local and test stacks (`pnpm stack:https`, `APP_ENV=test`). The configuration now refuses an explicit `0` when `APP_ENV` is `preview` or `production` (`packages/config/src/env/runtime.ts`), so a later typo cannot remove the limits on sign-in guesses, wallet challenges and the public play counter without anyone noticing.
 
 ### F-4 Accepted, to revisit for partner games. A game can navigate its own frame away
 
@@ -46,9 +46,9 @@ With no trusted proxy the client address is unknown, and the address checks retu
 
 The run service replays inside the settling transaction (`packages/game-runs/src/drizzle-repository.ts`), so a slow replay (up to the 2 s limit) holds a connection and the run's row lock. It is bounded by the per-person limit of 30 a minute, but many accounts could tie up the pool. Covered by the sandboxed worker pool planned in ADR-024 (task #153): the replay moves out of the transaction.
 
-### F-6 Open question for the owner. What a self-reported milestone may mint
+### F-6 Closed by the owner. What a self-reported milestone may mint
 
-ADR-018 Amendment 2 lets a self-reported milestone mint "within limits" and says the policy values are the owner's to set. No typed policy that limits what a self-reported milestone can mint was found in `configs/`; a claim is bounded only by the milestone's own claim limit per account. A player can therefore claim every milestone a game leaves self-reported by syncing them, paying the chain and platform fees. That is the documented design; this finding records that the limit the amendment promises is not in the code, and that F-1 is what keeps replay-verified milestones out of that path.
+ADR-018 Amendment 2 let a self-reported milestone mint "within limits". The owner confirmed on 2026-11-10 that a self-reported milestone may mint as many times as the game permits (the milestone's own claim limit, held per account by the platform and per address by the contract). There is no further platform policy to add. F-1 is what keeps milestones that a manifest declares `replay-verified` out of that path.
 
 ## Not covered by this review
 

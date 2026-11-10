@@ -53,6 +53,34 @@ describe("parseSecurityEnvironment", () => {
     expect(() => parseSecurityEnvironment(source)).toThrow();
   });
 
+  it.each(["preview", "production"])(
+    "refuses no trusted proxy in %s, where every per-address limit would be switched off",
+    (APP_ENV) => {
+      expect(() =>
+        parseSecurityEnvironment({ APP_ENV, TRUSTED_PROXY_HOPS: "0" }),
+      ).toThrow("TRUSTED_PROXY_HOPS=0");
+      // Left blank it is one proxy, and a real number of proxies is accepted.
+      expect(
+        parseSecurityEnvironment({ APP_ENV, TRUSTED_PROXY_HOPS: "" })
+          .trustedProxyHops,
+      ).toBe(1);
+      expect(
+        parseSecurityEnvironment({ APP_ENV, TRUSTED_PROXY_HOPS: "2" })
+          .trustedProxyHops,
+      ).toBe(2);
+    },
+  );
+
+  it.each(["local", "test"])(
+    "allows no trusted proxy in %s, a developer's own machine",
+    (APP_ENV) => {
+      expect(
+        parseSecurityEnvironment({ APP_ENV, TRUSTED_PROXY_HOPS: "0" })
+          .trustedProxyHops,
+      ).toBe(0);
+    },
+  );
+
   it("has no storage origin when the endpoint is not an address", () => {
     expect(
       parseSecurityEnvironment({ R2_ENDPOINT: "not a url" }).storageOrigin,
