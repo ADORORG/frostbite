@@ -114,6 +114,15 @@ export function parseSecurityEnvironment(
     SECURITY_CSP_MODE: blankAsUnset(source.SECURITY_CSP_MODE),
     TRUSTED_PROXY_HOPS: blankAsUnset(source.TRUSTED_PROXY_HOPS),
   });
+  // With no trusted proxy the client's address is unknown, and every per-address limit then lets the request through. That is right on
+  // a developer's own machine (the local and test stacks set 0), and a mistake where the app sits behind a proxy and is public.
+  if (
+    parsed.TRUSTED_PROXY_HOPS === 0 &&
+    (source.APP_ENV === "preview" || source.APP_ENV === "production")
+  )
+    throw new Error(
+      "TRUSTED_PROXY_HOPS=0 switches off every per-address rate limit; leave it blank (one proxy) or set the number of proxies in front of the app.",
+    );
   const endpoint = blankAsUnset(source.R2_ENDPOINT);
   return {
     cspMode: parsed.SECURITY_CSP_MODE,

@@ -14,9 +14,11 @@
     "./minted-art": "./src/ui/minted-art.tsx",
     "./runs-operations": "./src/application/runs-operations.ts",
     "./runs-runtime": "./src/runs-runtime.ts",
+    "./runtime": "./src/runtime.ts",
     "./shared-view": "./src/domain/shared-view.ts",
     "./shares-operations": "./src/application/shares-operations.ts",
-    "./shares-runtime": "./src/shares-runtime.ts"
+    "./shares-runtime": "./src/shares-runtime.ts",
+    "./sync-operation": "./src/application/sync-operation.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

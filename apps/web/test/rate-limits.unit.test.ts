@@ -63,3 +63,23 @@ describe("the limit on counting a started run", () => {
     expect(resolved.policy.windowMs).toBe(60_000);
   });
 });
+
+// A claim reaches the chain (a simulation and a fee quote to start, a look at the network for each refresh), so each step has a bucket of its
+// own, well under the shared allowance for writes: a script cannot spend the platform's chain connection through a player's account.
+describe("the limits on the claim path", () => {
+  it.each([
+    ["startGameClaim", 10],
+    ["submitGameClaim", 20],
+    ["refreshGameClaim", 90],
+  ])("%s has its own bucket of at most %i a minute", (id, most) => {
+    const resolved = resolveRateLimit(rateLimits, {
+      authenticated: true,
+      method: "POST",
+      operationId: id,
+    });
+    expect(resolved.bucket).toBe(id);
+    expect(resolved.policy.limit).toBeLessThanOrEqual(most);
+    expect(resolved.policy.limit).toBeLessThan(rateLimits.write.limit);
+    expect(resolved.policy.windowMs).toBe(60_000);
+  });
+});
