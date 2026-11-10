@@ -220,6 +220,11 @@ describe("the staff administration contract", () => {
     const empty = {
       contract: null,
       drawingCeiling: 16_384,
+      drawingLimits: {
+        maxAttributeLength: 4096,
+        maxDepth: 8,
+        maxElements: 200,
+      },
       steps: [step],
       templatesReady: false,
     };

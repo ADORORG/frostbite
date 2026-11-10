@@ -3,6 +3,7 @@ import type { GameAdminStep } from "@frostbite/shared/games";
 import { vi } from "vitest";
 
 import type { GameAdminApi } from "../../src/client/api.ts";
+import { drawingLimits } from "./fixtures.ts";
 
 export const stepId = "5b0c1e7a-6d52-4c0f-9a43-7a3e2f1d8b60";
 export const step = (over: Partial<GameAdminStep> = {}): GameAdminStep => ({
@@ -91,6 +92,7 @@ export const publishable = [
 export const listing = (steps: GameAdminStep[]) => ({
   contract: { address: "rewards-1", maxDrawingBytes: 4096 },
   drawingCeiling: 8192,
+  drawingLimits,
   steps,
   templatesReady: true,
 });

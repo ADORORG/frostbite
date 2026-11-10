@@ -104,6 +104,7 @@ export function mintsStub(
   };
   const resolve = async (): Promise<GameAdminRuntime> => ({
     fees,
+    drawingLimits: config().drawingLimits,
     games: info(),
     mints,
     names: async () =>

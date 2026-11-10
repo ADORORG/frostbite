@@ -212,7 +212,7 @@ export function createListStepsOperation(resolve: Resolve) {
     ...base,
     execute: async (input, context) => {
       if (context.actorUserId === null) return unauthenticated;
-      const { names, service } = await resolve();
+      const { drawingLimits, names, service } = await resolve();
       // A game the platform does not administer has no contract, no templates ready and no steps.
       const status = (await service.status(input.gameId)) ?? {
         contract: null,
@@ -226,6 +226,7 @@ export function createListStepsOperation(resolve: Resolve) {
         value: {
           contract: status.contract,
           drawingCeiling: status.drawingCeiling,
+          drawingLimits,
           steps: steps.map((step) => toWireStep(step, known)),
           templatesReady: status.templatesReady,
         },

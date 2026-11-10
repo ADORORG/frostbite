@@ -6,7 +6,12 @@ import {
 } from "@frostbite/shared/games";
 import { describe, expect, it, vi } from "vitest";
 
-import { publishSummary, staffId, view } from "./support/fixtures.ts";
+import {
+  publishSummary,
+  staffId,
+  view,
+  drawingLimits,
+} from "./support/fixtures.ts";
 import {
   anonymous,
   context,
@@ -173,6 +178,7 @@ describe("sending, looking at and listing steps", () => {
       value: {
         contract: { address: "rewards-1", maxDrawingBytes: 4096 },
         drawingCeiling: 8192,
+        drawingLimits,
         steps: [{ createdBy: "Ada" }],
         templatesReady: true,
       },
@@ -190,6 +196,7 @@ describe("sending, looking at and listing steps", () => {
       value: {
         contract: null,
         drawingCeiling: 1,
+        drawingLimits,
         steps: [],
         templatesReady: false,
       },

@@ -15,6 +15,12 @@ export const contract: ContractRef = {
 };
 export const staffId = "0198a000-0000-7000-8000-000000000001";
 export const otherStaffId = "0198a000-0000-7000-8000-000000000002";
+// How complex a drawing may be, as configuration states it and as the log reports it.
+export const drawingLimits = {
+  maxAttributeLength: 4096,
+  maxDepth: 8,
+  maxElements: 200,
+};
 
 export const game = defineGame({
   capabilities: ["milestone:claim"],
@@ -76,7 +82,7 @@ export const config = (): GameAdminConfig => ({
     defaultSpeed: "slow",
     polling: { forgetAfterMs: 600_000, refreshMs: 60_000 },
   },
-  drawingLimits: { maxAttributeLength: 4096, maxDepth: 8, maxElements: 200 },
+  drawingLimits,
   rewards: {
     chain,
     collectibleTemplate,

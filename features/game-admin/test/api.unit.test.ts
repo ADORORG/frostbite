@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createGameAdminApi } from "../src/client/api.ts";
 import { step, stepId } from "./support/fake-api.ts";
+import { drawingLimits } from "./support/fixtures.ts";
 
 const json = (body: object) =>
   new Response(JSON.stringify(body), {
@@ -21,6 +22,7 @@ describe("the administration routes as the page reaches them", () => {
       json({
         contract: { address: "2:7", maxDrawingBytes: 4096 },
         drawingCeiling: 8192,
+        drawingLimits,
         steps: [step()],
         templatesReady: true,
       }),

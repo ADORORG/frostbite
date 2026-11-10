@@ -116,6 +116,7 @@ export function createGameAdminResolver(
     });
     return {
       fees,
+      drawingLimits: config.drawingLimits,
       games,
       mints: createMintReport(database),
       names,

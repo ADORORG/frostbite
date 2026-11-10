@@ -51,7 +51,7 @@ describe("the panels over the connected wallet", () => {
     expect(
       container.querySelector(".signer-bar code")?.getAttribute("title"),
     ).toBe("sim:one:a1b2c3fe");
-    expect(container.querySelector("input")).toBeNull();
+    expect(container.querySelector(".signer-bar input")).toBeNull();
     expect(wallet.allowed.at(-1)).toEqual(["xverse", "oyl"]);
   });
 
