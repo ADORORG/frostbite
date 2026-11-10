@@ -141,15 +141,20 @@ export function buildWest(rooms: Rooms): Wing {
         ? 1.5 + Math.sin(time * 9) * 0.3
         : 0.1;
       goo.rotation.y += dt * 1.5;
-      // Kai's tower: in pieces on the boards until it is built again, a level for each step of the building, and glowing once whole.
+      // Kai's tower: in pieces on the boards until it is built again, a level for each step of the building, and glowing once whole;
+      // its light goes into his hologram while he builds it over the tower, and glows softer under it once it is made.
       const building = state.moment?.kind === "build" ? state.moment.step : -1;
       const stacked = state.tower ? 5 : ([1, 3, 3, 4][building] ?? 0);
       const kaiHere = state.party.includes("kai") || state.lead === "kai";
-      crystal.emissiveIntensity = state.tower
-        ? 1.8 + Math.sin(time * 2) * 0.3
-        : kaiHere
-          ? 0.5
-          : 0.15;
+      const crowned = state.made.includes("kai") ? 0.9 : 1.8;
+      crystal.emissiveIntensity =
+        state.moment?.kind === "hologram"
+          ? 0.4
+          : state.tower
+            ? crowned + Math.sin(time * 2) * 0.3
+            : kaiHere
+              ? 0.5
+              : 0.15;
       tower.children.forEach((piece, level) => {
         const up = level < stacked;
         piece.position.x = up ? 0 : Math.sin(level * 2.1) * 0.35;
