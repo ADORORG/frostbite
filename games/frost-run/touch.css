@@ -1,0 +1,270 @@
+/* A touch screen. The page keeps to the SDK's three icons, so the hero select has no buttons of its own here: a swipe turns the ring and a
+   tap on the screen starts the run, and the card says so. The card is a sheet of a set height along the bottom (held upright) or down the
+   right side (held on its side), the readouts ride the bar along the top with the gauges under them, and the four thumb buttons (hop,
+   duck, shoot and a power) are the SDK's cluster in the bottom right. The thumb buttons are there from the start, so nothing moves when a
+   run begins: they are only out of sight until then, and a button the round has not taught yet is dimmed. */
+@media (pointer: coarse) {
+  :root {
+    --top: calc(max(0.25rem, env(safe-area-inset-top)) + 3.1rem);
+    --sheet: 10.25rem;
+  }
+  :root body main .bar .read-best {
+    display: none;
+  }
+  :root body main:not(.running) > .touch-buttons {
+    visibility: hidden;
+  }
+  :root body main > .touch-buttons button[aria-disabled="true"] {
+    opacity: 0.35;
+  }
+  /* While a run goes, a note keeps to the left of the thumb buttons. */
+  :root body main.running #note {
+    justify-self: start;
+    max-inline-size: calc(100% - 13.5rem);
+    margin-inline-start: max(0.5rem, env(safe-area-inset-left));
+    text-align: start;
+  }
+  .powers,
+  .select .nav,
+  .select .primary,
+  .select .story,
+  .select .eyebrow,
+  .result [data-part="again"] {
+    display: none;
+  }
+  .select .swipe,
+  .result .tap {
+    display: block;
+  }
+  .gauges {
+    inset-block: var(--top) auto;
+    inset-inline-start: max(0.5rem, env(safe-area-inset-left));
+    padding: 0.35rem 0.5rem;
+  }
+  .gauge {
+    grid-template-columns: 0.7rem 4.6rem 2.8rem;
+    font-size: 0.62rem;
+  }
+  .select {
+    justify-content: space-between;
+    gap: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    overflow: hidden;
+    touch-action: none;
+  }
+  .select .picker {
+    display: block;
+  }
+  .select h2 {
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+  .select .kind {
+    font-size: 0.8rem;
+  }
+  .signature {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.76rem;
+  }
+  .result {
+    inline-size: min(28rem, 94%);
+  }
+  /* The share card keeps clear of the icons along the top. */
+  .share {
+    inset-block-start: var(--top);
+  }
+}
+
+/* Held upright: the sheet lies along the bottom, and shows the five bars where the screen is tall enough for them. */
+@media (pointer: coarse) and (orientation: portrait) {
+  .select {
+    inset-block: auto max(0.5rem, env(safe-area-inset-bottom));
+    inset-inline: max(0.5rem, env(safe-area-inset-left))
+      max(0.5rem, env(safe-area-inset-right));
+    inline-size: auto;
+    block-size: var(--sheet);
+  }
+  .select .stats {
+    display: none;
+  }
+  .gauges {
+    inset-block-start: calc(var(--top) + 2.9rem);
+  }
+  .banner {
+    inset-block-start: 30%;
+  }
+}
+@media (pointer: coarse) and (orientation: portrait) and (min-height: 40rem) {
+  :root {
+    --sheet: 17rem;
+  }
+  .select .stats {
+    display: grid;
+  }
+}
+/* A narrow phone: the signature runs to a third line, and the five readouts are set a little closer so the last is not cut off. */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 23rem) {
+  :root {
+    --sheet: 11.25rem;
+  }
+  :root body main .score {
+    gap: 0.2rem;
+  }
+  :root body main .score span {
+    gap: 0.25rem;
+    padding-inline: 0.3rem;
+  }
+}
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 23rem) and (min-height: 40rem) {
+  :root {
+    --sheet: 18rem;
+  }
+}
+@media (pointer: coarse) and (max-width: 21.5rem) {
+  :root body main .score {
+    font-size: 0.68rem;
+  }
+  :root body main .score strong {
+    font-size: 0.75rem;
+  }
+}
+
+/* Held on its side: the sheet stands down the right, under the icons. */
+@media (pointer: coarse) and (orientation: landscape) {
+  .select {
+    inset-block: var(--top) max(0.5rem, env(safe-area-inset-bottom));
+    inset-inline: auto max(0.75rem, env(safe-area-inset-right));
+    inline-size: min(19rem, 42%);
+    max-block-size: none;
+  }
+  .select .stats {
+    gap: 0.2rem;
+  }
+  .share {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: 0.9rem;
+  }
+  .share img {
+    grid-row: 1 / 3;
+  }
+  .share .hint {
+    align-self: end;
+    max-inline-size: 16rem;
+  }
+}
+/* A phone on its side inside the platform's page, where the frame is under 200 pixels high: the sheet is narrower and says less. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 16.25rem) {
+  .select {
+    inline-size: min(15.5rem, 36%);
+    gap: 0.25rem;
+    padding: 0.45rem 0.7rem;
+  }
+  .select .who {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    column-gap: 0.4rem;
+  }
+  .select h2 {
+    font-size: 1.1rem;
+  }
+  .select .kind {
+    font-size: 0.7rem;
+  }
+  .select .stats {
+    display: none;
+  }
+  .signature {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.68rem;
+    line-height: 1.35;
+  }
+  .select .swipe {
+    font-size: 0.64rem;
+  }
+}
+/* On its side and short (inside the page, or a small phone's whole screen): the card after a run is set in two columns, so its buttons
+   stay in sight without scrolling. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 26.25rem) {
+  .result {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "verdict haul"
+      "who haul"
+      "rounds haul"
+      "chips chips"
+      "tap row";
+    gap: 0.25rem 0.9rem;
+    /* Narrow enough to clear the icons in the top right corner. */
+    inline-size: min(42rem, calc(100% - 7rem));
+    max-block-size: 96%;
+    padding: 0.5rem 0.9rem;
+  }
+  .result .verdict {
+    grid-area: verdict;
+    font-size: 1.15rem;
+    text-align: start;
+  }
+  .result .who {
+    grid-area: who;
+    text-align: start;
+  }
+  .result .rounds {
+    grid-area: rounds;
+  }
+  .result .haul {
+    grid-area: haul;
+    align-self: center;
+    gap: 0.2rem;
+  }
+  .result .chips {
+    grid-area: chips;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .result .chips:empty {
+    display: none;
+  }
+  .result .tap {
+    grid-area: tap;
+    align-self: center;
+    text-align: start;
+  }
+  .result .row {
+    grid-area: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+  .haul-row {
+    padding: 0.15rem 0.5rem;
+  }
+  .round-row {
+    font-size: 0.7rem;
+  }
+}
+
+/* Reduced motion: no fades, no flashes that move, no throbbing clock; what was animated is simply shown. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+  .banner.on,
+  .toast.on {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .banner.on {
+    transform: none;
+  }
+  .flash.on {
+    animation: none;
+    opacity: 0.4;
+  }
+  .read-time.low strong,
+  .result {
+    animation: none;
+  }
+}

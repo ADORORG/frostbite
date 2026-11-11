@@ -1,0 +1,194 @@
+@import "@frostbite/game-sdk/audio/panel.css";
+@import "@frostbite/game-sdk/phone.css";
+@import "./stage.css";
+@import "./panels.css";
+@import "./share.css";
+@import "./touch.css";
+
+/* Frost Run: a cold night, frosted glass, and three treasure colours. Orange appears once, for the flash of a crystal's take. */
+:root {
+  color-scheme: dark;
+  --night: #0b0a08;
+  --ice: #eaf6ff;
+  --frost: #9fd8f2;
+  --dim: #8fb3c9;
+  --glass: rgb(9 18 26 / 74%);
+  --glass-strong: rgb(9 18 26 / 90%);
+  --line: rgb(159 216 242 / 26%);
+  --mint: #3fe0a0;
+  --egg: #c9bdea;
+  --key: #bfeaff;
+  --danger: #ff6b81;
+  --confirm: #f7931a;
+  --display: ui-monospace, "Cascadia Mono", Menlo, "Courier New", monospace;
+  --mono: ui-monospace, "Cascadia Mono", Menlo, "Courier New", monospace;
+}
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--ice);
+  font-family: var(--mono);
+}
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  block-size: 100dvh;
+  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+button {
+  min-block-size: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: rgb(159 216 242 / 8%);
+  color: inherit;
+  font: 600 0.9rem var(--mono);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    transform 80ms ease,
+    border-color 120ms ease;
+}
+button:hover:not(:disabled) {
+  border-color: var(--frost);
+  background: rgb(159 216 242 / 16%);
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:focus-visible {
+  outline: 2px solid var(--key);
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* A button that is not offered keeps its place, so the one beside it does not slide into it. */
+button[hidden] {
+  display: inline-block;
+  visibility: hidden;
+}
+button.primary {
+  border-color: var(--mint);
+  background: linear-gradient(
+    180deg,
+    rgb(63 224 160 / 30%),
+    rgb(63 224 160 / 12%)
+  );
+  color: #effff8;
+}
+
+/* The bar: the title, the platform's word, and the readouts. The run's readouts keep their room while no run goes, so nothing moves
+   when one starts; each number has room for its widest value. */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+.bar header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+}
+h1 {
+  font: 700 1.3rem var(--display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--ice), var(--frost) 60%, var(--mint));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#status {
+  color: var(--dim);
+  font-size: 0.8rem;
+}
+.score {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  color: var(--dim);
+  font-size: 0.8rem;
+}
+.score span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--glass);
+}
+.score strong {
+  min-inline-size: 3ch;
+  color: var(--ice);
+  font: 700 0.85rem var(--display);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+main:not(.running) .read-run {
+  visibility: hidden;
+}
+.read-time.low strong {
+  color: var(--danger);
+  animation: throb 0.5s ease-in-out infinite alternate;
+}
+.read-crystal.struck {
+  border-color: var(--confirm);
+  box-shadow: 0 0 0.8rem var(--confirm);
+}
+.read-crystal.struck strong {
+  color: var(--confirm);
+}
+
+/* Small drawn marks for each treasure, so a count is never told by colour alone. */
+.glyph {
+  display: inline-block;
+  inline-size: 0.7rem;
+  block-size: 0.9rem;
+  flex: none;
+}
+.glyph[data-kind="crystal"] {
+  background: var(--mint);
+  clip-path: polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%);
+}
+.glyph[data-kind="egg"] {
+  border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+  background: var(--egg);
+}
+.glyph[data-kind="key"] {
+  background: var(--key);
+  clip-path: polygon(
+    30% 0,
+    70% 0,
+    70% 34%,
+    58% 34%,
+    58% 62%,
+    90% 62%,
+    90% 74%,
+    58% 74%,
+    58% 84%,
+    80% 84%,
+    80% 96%,
+    42% 100%,
+    42% 34%,
+    30% 34%
+  );
+}
+
+@keyframes throb {
+  to {
+    opacity: 0.55;
+  }
+}

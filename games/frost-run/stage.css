@@ -1,0 +1,269 @@
+/* The stage: the 3D screen with everything that floats over it. */
+.stage {
+  position: relative;
+  min-block-size: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: radial-gradient(ellipse at 50% 30%, #12202b, var(--night) 70%);
+}
+.stage > #screen {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+.stage.ready > #screen {
+  opacity: 1;
+}
+.stage.paused > #screen {
+  filter: saturate(0.4) brightness(0.6);
+}
+.flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 45%,
+    rgb(247 147 26 / 55%) 100%
+  );
+}
+.flash.on {
+  animation: flash 260ms ease-out;
+}
+.frost {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      transparent 50%,
+      rgb(108 196 238 / 38%) 100%
+    ),
+    repeating-linear-gradient(
+      60deg,
+      rgb(191 234 255 / 4%) 0 2px,
+      transparent 2px 22px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      rgb(191 234 255 / 4%) 0 2px,
+      transparent 2px 22px
+    );
+}
+.stage.frosted .frost {
+  opacity: 1;
+}
+.stick {
+  position: absolute;
+  inline-size: 7rem;
+  block-size: 7rem;
+  margin: -3.5rem 0 0 -3.5rem;
+  border: 2px solid rgb(234 246 255 / 35%);
+  border-radius: 50%;
+  background: rgb(9 18 26 / 25%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.stick.on {
+  opacity: 1;
+}
+.stick .knob {
+  position: absolute;
+  inset: calc(50% - 1.5rem);
+  border-radius: 50%;
+  background: rgb(234 246 255 / 55%);
+  box-shadow: 0 0 1rem rgb(159 216 242 / 60%);
+}
+
+/* What floats over a run. */
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+main.running .hud {
+  opacity: 1;
+}
+.gauges {
+  position: absolute;
+  inset-block-end: 0.8rem;
+  inset-inline-start: 0.8rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--glass);
+}
+.gauge {
+  display: grid;
+  grid-template-columns: 0.8rem 7.5rem 3.2rem;
+  align-items: center;
+  gap: 0.5rem;
+  font: 700 0.72rem var(--display);
+}
+.gauge .track {
+  position: relative;
+  block-size: 0.45rem;
+  border-radius: 999px;
+  background: rgb(234 246 255 / 12%);
+  overflow: visible;
+}
+.gauge .fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 0;
+  border-radius: 999px;
+  background: var(--frost);
+  transition: inline-size 200ms ease;
+}
+.gauge[data-kind="crystal"] .fill {
+  background: var(--mint);
+}
+.gauge[data-kind="egg"] .fill {
+  background: var(--egg);
+}
+.gauge[data-kind="key"] .fill {
+  background: var(--key);
+}
+.gauge .goal {
+  position: absolute;
+  inset-block: -0.2rem;
+  inline-size: 2px;
+  background: var(--ice);
+}
+.gauge.met .count::after {
+  content: " ✓";
+  color: var(--mint);
+}
+.powers {
+  position: absolute;
+  inset-block-end: 0.8rem;
+  inset-inline-end: 0.8rem;
+  display: flex;
+  gap: 0.4rem;
+}
+.power {
+  --wait: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: var(--glass);
+  font-size: 0.75rem;
+}
+.power[hidden] {
+  display: none;
+}
+.power::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 55%);
+  transform: scaleX(var(--wait));
+  transform-origin: right;
+}
+.power.active {
+  border-color: var(--key);
+  box-shadow: 0 0 0.8rem rgb(191 234 255 / 45%);
+}
+.power kbd {
+  padding: 0 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  font: 700 0.65rem var(--display);
+}
+.banner {
+  position: absolute;
+  inset-block-start: 18%;
+  inset-inline: 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  text-align: center;
+  text-shadow: 0 0.2rem 1.2rem rgb(0 0 0 / 80%);
+}
+.banner.on {
+  animation: banner 2.8s ease both;
+}
+.banner .title {
+  font: 700 clamp(1.3rem, 4.2vw, 2.4rem) var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.banner .line {
+  color: var(--frost);
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
+}
+.toast {
+  position: absolute;
+  inset-block-start: 0.8rem;
+  inset-inline-start: 50%;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--mint);
+  border-radius: 999px;
+  background: var(--glass-strong);
+  color: var(--mint);
+  font: 700 0.8rem var(--display);
+  opacity: 0;
+  transform: translate(-50%, -0.5rem);
+  white-space: nowrap;
+}
+.toast.on {
+  animation: toast 2.6s ease both;
+}
+
+@keyframes flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes banner {
+  0% {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.96);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+}
+@keyframes toast {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  82% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -0.3rem);
+  }
+}
