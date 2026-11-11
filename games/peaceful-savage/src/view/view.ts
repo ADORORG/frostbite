@@ -118,12 +118,14 @@ export function createDepthView(
   if (quality === undefined) return null;
   const stage: Stage | null = createStage(canvas, quality);
   if (stage === null) return null;
+  // Drawn in software, the glasses and the pond show no reflection (each would draw the whole scene again).
+  const drawn = stage.quality;
   const world = buildWorld(
-    quality.amount,
-    quality.lights,
-    quality.shadows > 0 ? 512 : 256,
+    drawn.amount,
+    drawn.lights,
+    stage.software ? 0 : drawn.shadows > 0 ? 512 : 256,
   );
-  const family = buildFamily(quality.detail, quality.amount);
+  const family = buildFamily(drawn.detail, drawn.amount);
   stage.scene.add(world.group, family.group);
   const rig = createCameraRig();
   const chosenRing = new Mesh(
@@ -138,6 +140,7 @@ export function createDepthView(
   chosenRing.rotation.x = Math.PI / 2;
   stage.scene.add(chosenRing);
   let last: number | null = null;
+  let restUntil = 0;
   let leading = false;
   let wasFarewell = false;
   let wasIntent: Intent = "select";
@@ -149,6 +152,10 @@ export function createDepthView(
       return { x: looking.x, z: looking.z };
     },
     show(frame) {
+      // A slow picture (one drawn in software, where a frame can take a second) is drawn at most a third of the time, resting twice as
+      // long as the last one took, so the page always has time to answer the player.
+      const started = now();
+      if (started < restUntil) return;
       stage.fit();
       const time = now() / 1000;
       const dt =
@@ -246,6 +253,8 @@ export function createDepthView(
       stage.follow(framed.at);
       stage.warm(world.warmth);
       stage.render();
+      const took = now() - started;
+      restUntil = took > 40 ? now() + took * 2 : 0;
     },
   };
 }

@@ -57,6 +57,38 @@ export const qualities: readonly Quality[] = [
   { amount: 1, bloom: true, detail: 2, lights: true, pixels: 2, shadows: 2048 },
 ];
 
+// A machine with no graphics card draws in software, a frame at a time on the processor, so it gets the lightest picture of all: half the
+// pixels, no shadows, no bloom, no reflections and little of the small things, so the page stays quick to answer.
+export const softwareQuality: Quality = {
+  amount: 0.12,
+  bloom: false,
+  detail: 1,
+  lights: false,
+  pixels: 0.45,
+  shadows: 0,
+};
+
+// Whether the picture is drawn in software (SwiftShader, llvmpipe, the basic render driver), by what the graphics context says it runs on.
+interface Describes {
+  getExtension(
+    name: "WEBGL_debug_renderer_info",
+  ): { readonly UNMASKED_RENDERER_WEBGL: number } | null;
+  getParameter(name: number): unknown;
+}
+export function isSoftware(context: Describes): boolean {
+  try {
+    const info = context.getExtension("WEBGL_debug_renderer_info");
+    const name =
+      info === null
+        ? ""
+        : String(context.getParameter(info.UNMASKED_RENDERER_WEBGL));
+    return /swiftshader|llvmpipe|software|basic render/i.test(name);
+  } catch {
+    // A context that cannot say what it runs on is taken to be a graphics card.
+    return false;
+  }
+}
+
 interface Glow {
   render(): void;
   resize(width: number, height: number, ratio: number): void;
@@ -96,6 +128,9 @@ export function startingQuality(coarse: boolean, cores: number): number {
 
 export interface Stage {
   readonly camera: PerspectiveCamera;
+  // The quality it draws at: the one asked for, or the software one where there is no graphics card.
+  readonly quality: Quality;
+  readonly software: boolean;
   // Fits the picture to its box, filling it.
   fit(): void;
   // Sets the lens for a shot framed at 16 by 9: on a box narrower than that the view widens, so the sides of the shot stay in.
@@ -112,14 +147,16 @@ export const aspect = 16 / 9;
 
 export function createStage(
   canvas: HTMLCanvasElement,
-  quality: Quality,
+  asked: Quality,
 ): Stage | null {
   if (typeof WebGL2RenderingContext === "undefined") return null;
   const context = canvas.getContext("webgl2", {
-    antialias: quality.pixels < 2,
+    antialias: asked.pixels < 2,
     powerPreference: "high-performance",
   });
   if (!(context instanceof WebGL2RenderingContext)) return null;
+  const software = isSoftware(context);
+  const quality = software ? softwareQuality : asked;
   let renderer: WebGLRenderer;
   try {
     renderer = new WebGLRenderer({ canvas, context });
@@ -162,6 +199,8 @@ export function createStage(
   let fitted = "";
   return {
     camera,
+    quality,
+    software,
     fit() {
       const boxWidth = canvas.clientWidth > 0 ? canvas.clientWidth : 640;
       const boxHeight = canvas.clientHeight > 0 ? canvas.clientHeight : 360;

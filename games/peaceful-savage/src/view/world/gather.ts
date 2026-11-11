@@ -76,7 +76,7 @@ function relic(id: string): Group {
   return group;
 }
 
-// `pixels` is how fine the pictures in the looking glasses and the pond are.
+// `pixels` is how fine the pictures in the looking glasses and the pond are (0 for none: they show a plain sheen).
 export function buildGathered(pixels: number): Gathered {
   const group = new Group();
   const plasma = new InstancedMesh(
@@ -188,6 +188,7 @@ export function buildGathered(pixels: number): Gathered {
         const near =
           at !== undefined &&
           zoneAt(at) === zoneAt(state) &&
+          pixels > 0 &&
           Math.hypot(at.x - state.x, at.z - state.z) < glassReach;
         glass.update(state.mirrorsUsed[index] === true, time, near);
       });

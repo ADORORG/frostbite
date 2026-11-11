@@ -59,10 +59,12 @@ const ellipsoid = (p: Point, c: Point, r: Point): number => {
 const ball = (p: Point, c: Point, radius: number): number =>
   Math.hypot(p.x - c.x, p.y - c.y, p.z - c.z) - radius;
 const rod = (p: Point, a: Point, b: Point, radius: number): number => {
-  const ab = new Vector3(b.x - a.x, b.y - a.y, b.z - a.z);
-  const ap = new Vector3(p.x - a.x, p.y - a.y, p.z - a.z);
-  const h = Math.min(1, Math.max(0, ap.dot(ab) / ab.lengthSq()));
-  return ap.sub(ab.multiplyScalar(h)).length() - radius;
+  const [abx, aby, abz] = [b.x - a.x, b.y - a.y, b.z - a.z];
+  const [apx, apy, apz] = [p.x - a.x, p.y - a.y, p.z - a.z];
+  const along =
+    (apx * abx + apy * aby + apz * abz) / (abx * abx + aby * aby + abz * abz);
+  const h = Math.min(1, Math.max(0, along));
+  return Math.hypot(apx - abx * h, apy - aby * h, apz - abz * h) - radius;
 };
 // Two solids melted together over a seam k wide, and one carved softly out of another.
 const melt = (a: number, b: number, k: number): number => {
@@ -89,7 +91,17 @@ export interface Head {
 // The middle that the skin is found from: low and forward, so the long face is reached as evenly as the skull.
 const middle = new Vector3(0, -0.25, 0.08);
 
+// Each head is worked out once (the face, the hair and the earrings all ask for it).
+const heads = new WeakMap<HeadShape, Head>();
 export function headOf(shape: HeadShape): Head {
+  const known = heads.get(shape);
+  if (known !== undefined) return known;
+  const made = sculpt(shape);
+  heads.set(shape, made);
+  return made;
+}
+
+function sculpt(shape: HeadShape): Head {
   const L = layoutOf(shape);
   const young = shape.young;
   const centre = new Vector3(0, 0.22 - young * 0.04, -0.08);
@@ -200,7 +212,7 @@ export function headOf(shape: HeadShape): Head {
     let inside = 0;
     let outside = 2.6;
     const at = new Vector3();
-    for (let step = 0; step < 30; step += 1) {
+    for (let step = 0; step < 18; step += 1) {
       const mid = (inside + outside) / 2;
       at.copy(middle).addScaledVector(d, mid);
       if (distance(at, plain) < 0) inside = mid;

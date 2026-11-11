@@ -25,7 +25,7 @@ export const faceCentre = -0.3;
 
 // The head's skin; or, `plain`, the head without its hollows, for the ink line round it.
 export function headGeometry(head: Head, plain = false): BufferGeometry {
-  const sphere = new SphereGeometry(1, 96, 72).rotateY(-Math.PI / 2);
+  const sphere = new SphereGeometry(1, 80, 60).rotateY(-Math.PI / 2);
   sphere.deleteAttribute("uv");
   sphere.deleteAttribute("normal");
   const geometry = mergeVertices(sphere);
