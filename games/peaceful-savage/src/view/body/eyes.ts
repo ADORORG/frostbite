@@ -47,10 +47,13 @@ export function irisTexture(seed: number): Texture {
           .lerp(brown, Math.min(1, t * 1.3))
           .multiplyScalar(ray);
       } else if (fromFront < 0.218) colour = rim;
+      // The white shades off round the sides of the eye, as it turns away from the light, so it never glares from the side.
       else
         colour = white
           .clone()
-          .multiplyScalar(1 - Math.min(0.12, (fromFront - 0.218) * 0.2));
+          .multiplyScalar(
+            1 - Math.min(0.55, Math.max(0, fromFront - 0.24) * 2.2),
+          );
       return [...srgb(colour), 255];
     },
     1,

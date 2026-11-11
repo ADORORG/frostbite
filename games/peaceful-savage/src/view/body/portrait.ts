@@ -196,8 +196,11 @@ export function buildPortrait(
         );
       }
       glow(ink, 0, layout.nose + 0.08, 0.12, new Color("#c0452f"), 0.1);
+      const warm = new Color("#ffe0b8");
       for (const side of [1, -1] as const) {
-        glow(ink, side * layout.apart, eyes + 0.07, 0.22, shade, 0.18);
+        // Light on the lid under the brow and on the top of the cheek, so the eyes sit bright in the face.
+        glow(ink, side * layout.apart, eyes + 0.16, 0.16, warm, 0.1);
+        glow(ink, side * (layout.apart + 0.06), eyes - 0.24, 0.14, warm, 0.1);
         // The crease of the upper lid, gold-touched on Mama.
         const gold = look.marks ? new Color("#e2a63c") : line;
         softLine(

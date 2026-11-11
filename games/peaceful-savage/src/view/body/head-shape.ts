@@ -38,7 +38,7 @@ export function layoutOf(shape: HeadShape): Layout {
     apart: 0.355 + shape.young * 0.02,
     brow: eyes + 0.27,
     chin: eyes - shape.chin,
-    eye: 0.188 + shape.young * 0.055,
+    eye: 0.198 + shape.young * 0.052,
     eyes,
     mouth: eyes - shape.chin * 0.58,
     mouthWide: 0.16 - shape.young * 0.025,
@@ -147,7 +147,7 @@ export function headOf(shape: HeadShape): Head {
   const wing = v(0.1 - young * 0.015, L.nose + 0.04, tip.z - 0.11);
   const lips = front(0, L.mouth);
   const eyeAt = (side: 1 | -1): Vector3 =>
-    new Vector3(side * L.apart, L.eyes, front(L.apart, L.eyes) - L.eye * 0.78);
+    new Vector3(side * L.apart, L.eyes, front(L.apart, L.eyes) - L.eye * 0.72);
   const sockets = [eyeAt(1), eyeAt(-1)];
   const distance = (p: Point, plain = false): number => {
     const q = v(Math.abs(p.x), p.y, p.z);
@@ -172,8 +172,28 @@ export function headOf(shape: HeadShape): Head {
       ),
       0.05,
     );
-    for (const socket of sockets)
-      d = carve(d, ball(p, socket, L.eye * 1.1), 0.07);
+    // Each eye sits in a shallow seat, and the skin closes over it at the corners, so its opening is an almond, not a slit round it.
+    for (const socket of sockets) {
+      d = carve(d, ball(p, socket, L.eye * 1.02), 0.04);
+      const side = Math.sign(socket.x);
+      for (const [out, down, ahead, size] of [
+        [0.98, 0.03, 0.08, 0.24],
+        [-0.98, 0.04, 0.06, 0.2],
+      ] as const)
+        d = melt(
+          d,
+          ball(
+            p,
+            v(
+              socket.x + side * out * L.eye,
+              socket.y - down * L.eye,
+              socket.z + ahead * L.eye,
+            ),
+            size * L.eye,
+          ),
+          0.05,
+        );
+    }
     return d;
   };
   const surface = (d: Vector3, out = new Vector3(), plain = false): Vector3 => {

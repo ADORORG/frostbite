@@ -81,7 +81,7 @@ function shapeOf(sigil: Sigil): Mesh<BufferGeometry, MeshBasicMaterial> {
       const tint = gold
         .clone()
         .lerp(cool, 0.1 + 0.32 * Math.sin(t * 9) ** 2)
-        .multiplyScalar(1.6);
+        .multiplyScalar(bodyShapes.includes(sigil) ? 0.85 : 1.6);
       colours.push(tint.r, tint.g, tint.b);
     }
     done += stroke.length;
@@ -106,6 +106,10 @@ function shapeOf(sigil: Sigil): Mesh<BufferGeometry, MeshBasicMaterial> {
   mesh.visible = false;
   return mesh;
 }
+
+// The shapes drawn round the whole body are big and often close to the camera, so they are drawn fainter than the small ones at the
+// hands, a veil of light rather than a glare.
+const bodyShapes: readonly Sigil[] = ["field", "flower", "shield", "star"];
 
 const handKeys: readonly Sigil[] = [
   "comb",
@@ -202,15 +206,19 @@ export function buildHolograms(): Holograms {
         line.visible = shape.fade > 0.01 && shape.drawn > 0.002;
         if (!line.visible) continue;
         if (bearer !== null) pose(line, sigil, bearer, time);
-        const count = line.geometry.getAttribute("position").count;
-        const shown = Math.floor((count * shape.drawn) / 2) * 2;
+        // Drawn so far: the first part of its triangles, which run in drawing order.
+        const index = line.geometry.getIndex();
+        const count = index?.count ?? 0;
+        const shown = Math.floor((count * shape.drawn) / 3) * 3;
         line.geometry.setDrawRange(0, shown);
         line.material.opacity =
-          shape.fade * (0.78 + 0.22 * Math.sin(time * 19 + count));
+          shape.fade *
+          (0.8 + 0.2 * Math.sin(time * 19 + count)) *
+          (bodyShapes.includes(sigil) ? 0.7 : 1);
         // The pen: a bright point where the line is being drawn, while it is still being drawn.
-        if (current && shape.drawn < 0.985 && shown > 1) {
+        if (current && index !== null && shape.drawn < 0.985 && shown > 2) {
           const position = line.geometry.getAttribute("position");
-          tip.fromBufferAttribute(position, shown - 1);
+          tip.fromBufferAttribute(position, index.getX(shown - 1));
           line.updateMatrixWorld();
           pen.position.copy(tip.applyMatrix4(line.matrixWorld));
           pen.visible = true;

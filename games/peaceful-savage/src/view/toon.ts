@@ -21,14 +21,14 @@ import type { Tone } from "./palette.ts";
 // edge turned from the eye (the book's gold key light), and a soft brown ink line runs round each shape. A toon material still greys
 // with its room, as every painted material does.
 
-// Four painted bands: deep shade, shade, light, full light. Skin of the face takes the same four blended into each other, as an oil
-// painter models a face, so a cheek or a jaw turns softly rather than in steps.
+// Four painted bands: deep shade, shade, light, full light. Skin of the face takes four lighter bands blended into each other, as an
+// oil painter models a face in warm half-tones, so a cheek or a jaw turns softly rather than in steps and no face sinks into shadow.
 const ramps = new Map<boolean, DataTexture>();
 export function ramp(soft = false): DataTexture {
   let bands = ramps.get(soft);
   if (bands === undefined) {
     bands = new DataTexture(
-      new Uint8Array([92, 150, 214, 255]),
+      new Uint8Array(soft ? [136, 184, 228, 255] : [92, 150, 214, 255]),
       4,
       1,
       RedFormat,

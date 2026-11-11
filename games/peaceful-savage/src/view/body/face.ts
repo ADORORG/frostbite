@@ -23,11 +23,11 @@ export interface Face {
 
 // How open the upper lid sits for each feeling, and where the lower lid rests (smiles lift it).
 const lidsFor: Readonly<Record<Expression, readonly [number, number]>> = {
-  calm: [-0.42, 0.74],
-  open: [-0.85, 0.8],
-  smile: [-0.5, 0.5],
-  smirk: [-0.48, 0.62],
-  worry: [-0.62, 0.72],
+  calm: [-0.6, 0.8],
+  open: [-0.92, 0.84],
+  smile: [-0.62, 0.56],
+  smirk: [-0.58, 0.66],
+  worry: [-0.74, 0.76],
 };
 
 export function buildFace(rig: Rig, look: Look, tone: Tone): Face {
