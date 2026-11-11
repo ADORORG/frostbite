@@ -64,8 +64,10 @@ lines, on a phone held either way.
 - `src/session.ts`: one run as the player plays it, and the run record its hands make (a change of the hands is recorded only when it
   changes, at least three ticks apart, so the busiest run stays inside what a record may hold).
 - `src/screen/`: the 3D screen (three.js): the stage and its quality ladder, the three arenas, the heroes and their clips, what is thrown,
-  the treasure, the effects, the snow and the camera. `flat.ts` draws the same run from above with a 2D canvas where there is no WebGL 2.
-  `models/packed.ts` is the models as text, written by `art/blender/pack.py`.
+  the treasure, the effects, the snow and the camera. The ladder steps down after two seconds of slow frames and back up after eight
+  quick ones, counted in time; where the browser draws in software (SwiftShader, llvmpipe), the stage starts at its lowest step with no
+  edge smoothing. `flat.ts` draws the same run from above with a 2D canvas where there is no WebGL 2. `models/packed.ts` is the models as
+  text, written by `art/blender/pack.py`.
 - `src/ui/`: the hero select, the readouts, the first-screen card (on the SDK's guide layer), the card after a run, the share card, and
   the hands (keys, drag, thumb buttons, gamepad).
 - `src/platform.ts`, `src/view.ts`, `src/page.ts`, `src/main.ts`: what the page asks of the platform, which screen draws, the page's

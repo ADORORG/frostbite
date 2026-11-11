@@ -62,33 +62,70 @@ export interface Stage {
   readonly resize: () => void;
 }
 
+// What the browser says draws the screen. A software renderer (SwiftShader, llvmpipe, the basic display driver) draws every pixel on the
+// processor, so the stage starts at its lowest step there instead of finding out from two seconds of slow frames.
+export type RendererInfo = Pick<
+  WebGL2RenderingContext,
+  "RENDERER" | "getParameter"
+> & {
+  getExtension(
+    name: "WEBGL_debug_renderer_info",
+  ): WEBGL_debug_renderer_info | null;
+};
+
+export function rendererName(context: RendererInfo): string {
+  const info = context.getExtension("WEBGL_debug_renderer_info");
+  const name: unknown = context.getParameter(
+    info === null ? context.RENDERER : info.UNMASKED_RENDERER_WEBGL,
+  );
+  return typeof name === "string" ? name : "";
+}
+
+export const drawsInSoftware = (name: string): boolean =>
+  /swiftshader|llvmpipe|softpipe|software|basic render/iu.test(name);
+
+// Asks a scratch canvas what would draw the screen, then lets that context go, so the real one can be made to suit it: no smoothing of
+// edges where every pixel is drawn on the processor.
+function probeRenderer(): string {
+  const probe = document.createElement("canvas").getContext("webgl2");
+  if (!(probe instanceof WebGL2RenderingContext)) return "";
+  const name = rendererName(probe);
+  probe.getExtension("WEBGL_lose_context")?.loseContext();
+  return name;
+}
+
 export function createStage(
   canvas: HTMLCanvasElement,
   touch: boolean,
 ): Stage | null {
   if (typeof WebGL2RenderingContext === "undefined") return null;
+  const software = drawsInSoftware(probeRenderer());
+  const smooth = !touch && !software;
   const context = canvas.getContext("webgl2", {
     alpha: false,
-    antialias: !touch,
+    antialias: smooth,
     powerPreference: "high-performance",
   });
   if (!(context instanceof WebGL2RenderingContext)) return null;
   try {
     return buildStage(
-      new WebGLRenderer({ antialias: !touch, canvas, context }),
+      new WebGLRenderer({ antialias: smooth, canvas, context }),
       touch,
       window.location.search,
+      software || drawsInSoftware(rendererName(context)),
     );
   } catch {
     return null;
   }
 }
 
-// The stage around a renderer: `ask` is the page's query, where `?quality=0` to `3` asks for a quality.
+// The stage around a renderer: `ask` is the page's query, where `?quality=0` to `3` asks for a quality, and `software` says the screen is
+// drawn without a graphics chip.
 export function buildStage(
   renderer: StageRenderer,
   touch: boolean,
   ask: string,
+  software = false,
 ): Stage {
   renderer.setClearColor(night);
   renderer.outputColorSpace = SRGBColorSpace;
@@ -121,14 +158,17 @@ export function buildStage(
   const flash = new PointLight("#F7931A", 0, 7, 1.6);
   scene.add(flash);
 
-  // A page can ask for a quality (`?quality=0` to `3`); otherwise a phone starts one step down, and the ladder moves from there.
+  // A page can ask for a quality (`?quality=0` to `3`); otherwise a screen drawn in software starts at the bottom, a phone one step down,
+  // and the ladder moves from there.
   const asked = Number(new URLSearchParams(ask).get("quality") ?? "-1");
   let level =
     Number.isInteger(asked) && asked >= 0 && asked < ladder.length
       ? asked
-      : touch
-        ? 2
-        : 3;
+      : software
+        ? 0
+        : touch
+          ? 2
+          : 3;
   let slow = 0;
   let quick = 0;
   let average = 16;
@@ -171,16 +211,18 @@ export function buildStage(
     },
     camera,
     flash,
-    // Every frame says how long it took. Two slow seconds step down; eight quick ones step back up.
+    // Every frame says how long it took. Two slow seconds step down; eight quick ones step back up. Time is counted, not frames, so a slow
+    // device (whose frames are few) steps down as soon as a quick one would; one long pause (a hidden tab) counts as half a second at most.
     frameTook(ms) {
+      const took = Math.min(ms, 500);
       average += (Math.min(ms, 100) - average) * 0.05;
-      slow = average > 22 ? slow + 1 : 0;
-      quick = average < 12 ? quick + 1 : 0;
-      if (slow > 120 && level > 0) {
+      slow = average > 22 ? slow + took : 0;
+      quick = average < 12 ? quick + took : 0;
+      if (slow > 2000 && level > 0) {
         level -= 1;
         slow = 0;
         apply();
-      } else if (quick > 480 && level < ladder.length - 1 && !touch) {
+      } else if (quick > 8000 && level < ladder.length - 1 && !touch) {
         level += 1;
         quick = 0;
         apply();
