@@ -2,6 +2,7 @@
   "name": "@frostbite/test-kit",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./adder-game": "./src/adder-game.ts",
@@ -20,7 +21,6 @@
     "./png": "./src/png.ts",
     "./race": "./src/race.ts",
     "./s3-durable": "./src/s3-durable.ts",
-    "./s3-durable": "./src/s3-durable.ts",
     "./s3-runtime": "./src/s3-runtime.ts",
     "./serve-fetch-handler": "./src/serve-fetch-handler.ts",
     "./service-process": "./src/service-process.ts",
@@ -30,7 +30,8 @@
     "./simulated-chain-config": "./src/simulated-chain/config.ts",
     "./simulated-chain-transaction": "./src/simulated-chain/transaction.ts",
     "./simulated-game-host": "./src/simulated-game-host.ts",
-    "./storage-registry": "./src/storage-registry.ts"
+    "./storage-registry": "./src/storage-registry.ts",
+    "./verified-score": "./src/verified-score.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

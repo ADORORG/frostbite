@@ -1,0 +1,123 @@
+/* The rest of a shared page: the facts under the hero, a shelf of pieces, and the call to play. */
+.shared-facts {
+  display: grid;
+  gap: var(--arcade-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+.shared-fact,
+.shared-stat {
+  padding: var(--arcade-space-4);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface);
+}
+.shared-fact h2 {
+  margin: 0 0 var(--arcade-space-2);
+  color: var(--arcade-cyan);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.shared-fact p {
+  margin: 0;
+  font-size: var(--arcade-text-lg);
+}
+.shared-stat {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--arcade-space-2);
+  border-color: var(--arcade-yellow);
+  text-align: center;
+}
+.shared-stat strong {
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1;
+}
+.shared-stat span {
+  color: var(--arcade-text-muted);
+}
+/* A shelf: the pieces in a grid, each lit like a trophy. */
+.shared-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--arcade-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shared-piece {
+  display: grid;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+.shared-piece__art {
+  container-type: inline-size;
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  margin-block-end: var(--arcade-space-2);
+  border: 0.1875rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow: 0 0.75rem 1.25rem -0.75rem var(--arcade-cyan);
+}
+.shared-piece strong,
+.shared-piece small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shared-piece small {
+  color: var(--arcade-text-muted);
+}
+.shared-piece--more {
+  place-content: center;
+  border: 0.125rem dashed var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  color: var(--arcade-text-muted);
+  text-align: center;
+}
+.shared-call {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arcade-space-4);
+  padding: var(--arcade-space-5);
+  border: var(--arcade-border-width) solid var(--arcade-yellow);
+  border-radius: var(--arcade-radius-medium);
+  background:
+    linear-gradient(135deg, rgb(255 210 63 / 12%), transparent 70%),
+    var(--arcade-surface);
+}
+.shared-call h2 {
+  margin: 0 0 var(--arcade-space-1);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+}
+.shared-call p {
+  margin: 0;
+  color: var(--arcade-text-muted);
+}
+.shared-call__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-3);
+}
+@media (max-width: 40rem) {
+  .shared-call__buttons {
+    inline-size: 100%;
+  }
+  .shared-call__buttons > * {
+    flex: 1 1 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shared-frame {
+    animation: none;
+  }
+}

@@ -112,8 +112,8 @@ describe("searching the games page", () => {
 
   it("opens already narrowed from an address, with the box filled in", async () => {
     const container = await browser({
+      kinds: ["puzzle"],
       playable: false,
-      tags: ["puzzle"],
       text: "ice",
     });
     expect(box(container).value).toBe("ice");
@@ -155,21 +155,35 @@ describe("searching the games page", () => {
     const container = await browser();
     await click(toggle(container, "Puzzle"));
     expect(cards(container)).toHaveLength(2);
-    expect(window.location.search).toBe("?tag=puzzle");
+    expect(window.location.search).toBe("?kind=puzzle");
     await click(toggle(container, "Strategy"));
     expect(cards(container)).toHaveLength(4);
     // Kinds are written in the platform's order, not the order they were switched on.
-    expect(window.location.search).toBe("?tag=puzzle&tag=strategy");
+    expect(window.location.search).toBe("?kind=puzzle&kind=strategy");
     await click(toggle(container, searchCopy.playableOnly));
     expect(cards(container)).toHaveLength(3);
     expect(textOf(container)).not.toContain("Icicle Drop");
     await click(toggle(container, "Puzzle"));
-    expect(window.location.search).toBe("?tag=strategy&playable=1");
+    expect(window.location.search).toBe("?kind=strategy&playable=1");
   });
 
-  it("offers only the kinds some game has, each with how many", async () => {
+  it("offers only the kinds some game has, each with how many, and no tag that is only a way a game plays", async () => {
     const container = await browser();
     expect(toggle(container, "Puzzle").textContent).toBe("Puzzle2");
+    // Frost Runner (endless, reflex) is counted under Arcade, Strategy Rush (platformer) under Action; neither tag has a chip.
+    expect(toggle(container, "Arcade").textContent).toBe("Arcade3");
+    expect(toggle(container, "Action").textContent).toBe("Action3");
+    expect(
+      [...container.querySelectorAll("button[aria-pressed]")].map((each) =>
+        each.textContent?.replace(/\d+$/u, ""),
+      ),
+    ).toEqual([
+      "Action",
+      "Arcade",
+      "Puzzle",
+      "Strategy",
+      searchCopy.playableOnly,
+    ]);
     expect(
       [...container.querySelectorAll("button[aria-pressed]")].some((each) =>
         each.textContent?.startsWith("Rhythm"),
@@ -263,8 +277,8 @@ describe("searching the games page", () => {
 
   it("says no game fits the filters when only filters are set and nothing matches", async () => {
     const container = await browser({
+      kinds: ["rhythm"],
       playable: false,
-      tags: ["rhythm"],
       text: "",
     });
     expect(cards(container)).toHaveLength(0);

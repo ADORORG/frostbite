@@ -13,6 +13,10 @@ import {
   myMilestonesNavigationLabel,
   myMilestonesPath,
 } from "@frostbite/shared/games";
+import {
+  profileNavigationLabel,
+  profileSetupPath,
+} from "@frostbite/shared/profiles";
 import { networkName, shortAddress } from "./format.ts";
 import type { SessionState } from "./session-state.ts";
 
@@ -98,6 +102,11 @@ export function WalletMenu({
             <li>
               <a className="menu-link" href={myMilestonesPath}>
                 {myMilestonesNavigationLabel}
+              </a>
+            </li>
+            <li>
+              <a className="menu-link" href={profileSetupPath}>
+                {profileNavigationLabel}
               </a>
             </li>
             <li>

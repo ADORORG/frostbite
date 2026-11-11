@@ -276,7 +276,7 @@ export const broMariaGame = defineGame({
     replay: {
       id: "bro-maria",
       sha256:
-        "b201ef464c81f96beea4605f3b391ecc1bf22e22475c9a3bc9c6135275db878d",
+        "6994c933319103ac04d0cd67d36d8db6315b0883b3e01e7087414bc8869f3043",
       version: 2,
     },
   },

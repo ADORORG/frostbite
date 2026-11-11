@@ -25,6 +25,8 @@ export type VerificationResult =
       readonly earned: readonly string[];
       // The record's identity: SHA-256 of its canonical text, so the same run is the same digest.
       readonly digest: string;
+      // What the replay scored, or null when the run had not ended or the game keeps no score.
+      readonly score: number | null;
       readonly status: "verified";
     }
   | {
@@ -94,5 +96,10 @@ export function verifyRun(
       `The run did not earn ${missing}.`,
       digest,
     );
-  return { digest, earned: replayed.earned, status: "verified" };
+  return {
+    digest,
+    earned: replayed.earned,
+    score: replayed.score,
+    status: "verified",
+  };
 }

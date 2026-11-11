@@ -22,6 +22,7 @@
 @import "./styles/section.css";
 @import "./styles/staff.css";
 @import "./styles/cover.css";
+@import "./styles/heat.css";
 @import "./styles/showcase.css";
 @import "./styles/sign-in.css";
 @import "./styles/sign-in-intro.css";
@@ -29,4 +30,14 @@
 @import "./styles/list-row.css";
 @import "./styles/minted.css";
 @import "./styles/shelf.css";
+@import "./styles/album.css";
+@import "./styles/leaderboard.css";
+@import "./styles/mint-gallery.css";
+@import "./styles/share.css";
+@import "./styles/shared.css";
+@import "./styles/shared-sections.css";
+@import "./styles/player-card.css";
+@import "./styles/profile-setup.css";
+@import "./styles/profile-panels.css";
+@import "./styles/profile-page.css";
 @import "./styles/rail.css";

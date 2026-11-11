@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { builderCredit } from "../src/brand.ts";
 import { AppShell } from "../src/patterns/app-shell.tsx";
 import { Breadcrumbs } from "../src/patterns/breadcrumbs.tsx";
 import type { ShellNavigationItem } from "../src/patterns/navigation-model.ts";
@@ -197,5 +198,36 @@ describe("breadcrumbs", () => {
     expect(markup).toContain('<span aria-current="page">Here</span>');
     expect(markup).toContain('<a href="/studio">Studio</a>');
     expect(renderToStaticMarkup(<Breadcrumbs crumbs={[]} />)).toBe("");
+  });
+});
+
+describe("the builder's credit in the footer", () => {
+  const footerOf = (navigation: readonly ShellNavigationItem[]) => {
+    const footer = /<footer class="app-footer">(.*?)<\/footer>/su.exec(
+      render(navigation),
+    )?.[1];
+    if (footer === undefined) throw new Error("no footer");
+    return footer;
+  };
+
+  it("is a link to the builder's site, with its words, drawn beside the product's name and not among the navigation links", () => {
+    const footer = footerOf(visitor);
+    const credit = `<a class="app-footer__credit" href="${builderCredit.href}" rel="noopener">${builderCredit.label}</a>`;
+    expect(builderCredit).toEqual({
+      href: "https://xpldevelopers.org",
+      label: "Built by XPL Developers",
+    });
+    expect(footer).toContain(credit);
+    expect(footer.indexOf(credit)).toBeLessThan(
+      footer.indexOf('aria-label="More"'),
+    );
+    expect(
+      /<nav aria-label="More">.*<\/nav>/su.exec(footer)?.[0],
+    ).not.toContain("XPL");
+  });
+
+  it("is on every page, whoever is looking and whatever the page's navigation", () => {
+    for (const navigation of [visitor, creator, []])
+      expect(footerOf(navigation)).toContain(builderCredit.label);
   });
 });

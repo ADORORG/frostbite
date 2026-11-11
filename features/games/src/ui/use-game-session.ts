@@ -30,6 +30,7 @@ import {
 } from "react";
 
 import { createAccountPort } from "../client/account-sync.ts";
+import { newBestWatcher } from "../domain/best-score.ts";
 import { createClaimsService } from "../client/claims-port.ts";
 import { createRunsService } from "../client/runs-port.ts";
 import { useHostEvents } from "./use-host-events.ts";
@@ -105,6 +106,8 @@ export function useGameSession(
   const [kept, setKept] = useState(true);
   const [sync, setSync] = useState<SyncStatus>("local");
   const [toast, setToast] = useState<string | null>(null);
+  // The best score the player has just beaten, kept until they beat it again; none until they do.
+  const [newBest, setNewBest] = useState<number | null>(null);
   const { capabilities, id, milestones } = game;
   const { connectWallet, title, wallet } = page;
   // Whether the page can open the chooser at all is fixed for the page; the function itself is read when asked.
@@ -195,8 +198,23 @@ export function useGameSession(
         },
       );
     refresh();
+    // The game's best is read from the progress it loads and saves (no game has to say it): a save that beats the one loaded is a new best.
+    const watcher = newBestWatcher();
+    const watched: typeof backend = {
+      ...backend,
+      loadProgress: async () => {
+        const loaded = await backend.loadProgress();
+        watcher.loaded(loaded);
+        return loaded;
+      },
+      saveProgress: async (state, now) => {
+        const best = watcher.saved(state);
+        if (best !== null) setNewBest(best);
+        return backend.saveProgress(state, now);
+      },
+    };
     const hosted = createGameHost({
-      backend,
+      backend: watched,
       game: { capabilities, id, milestones },
       onEvent: (event) => {
         if (event.type === "ready") setConnected(true);
@@ -248,5 +266,14 @@ export function useGameSession(
       host.current?.emit("claim.changed", { id: milestoneId, state }),
     [],
   );
-  return { connected, emitClaim, kept, progress, sync, toast, unlocked };
+  return {
+    connected,
+    emitClaim,
+    kept,
+    newBest,
+    progress,
+    sync,
+    toast,
+    unlocked,
+  };
 }

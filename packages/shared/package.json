@@ -2,6 +2,7 @@
   "name": "@frostbite/shared",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./account-outcomes": "./src/accounts/outcomes.ts",
@@ -18,6 +19,7 @@
     "./http": "./src/http/index.ts",
     "./identifiers": "./src/identifiers/uuid-v7.ts",
     "./platform": "./src/platform/status.ts",
+    "./profiles": "./src/profiles/index.ts",
     "./uploads": "./src/uploads/index.ts",
     "./providers": "./src/features/manifest.ts",
     "./collections": "./src/collections/index.ts",

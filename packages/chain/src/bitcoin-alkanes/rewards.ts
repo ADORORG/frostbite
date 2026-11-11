@@ -6,6 +6,7 @@ import type {
 } from "@frostbite/shared/chain";
 
 import type { RewardsReader } from "../ports.ts";
+import { sha256Hex } from "./admin/data.ts";
 import { servedChain, type ServedChain } from "./chains.ts";
 import { collectibleOpcodes, gameRewardsOpcodes } from "./abi.ts";
 import { holderHalves } from "./holder.ts";
@@ -63,6 +64,18 @@ export function createRewardsReader(
   }
   const decoder = new TextDecoder();
   return {
+    drawing: async (contract: ContractRef, milestoneId) => {
+      const { node } = servedChain(options.chains, contract.chain);
+      const answer = await node.view(
+        contractId(contract),
+        gameRewardsOpcodes.getMilestoneArt,
+        [milestoneKey(milestoneId)],
+      );
+      if (!answer.ok) throw new ContractAnswerError(answer.error);
+      return answer.data.length === 0
+        ? null
+        : { bytes: answer.data.length, sha256: sha256Hex(answer.data) };
+    },
     claimed: async (contract: ContractRef, holder: Address, milestoneId) => {
       const { network, node } = servedChain(options.chains, contract.chain);
       if (holder.chain !== contract.chain) {

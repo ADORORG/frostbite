@@ -1,0 +1,43 @@
+Frostbite
+Copyright 2026 ADORORG
+
+The source code in this repository is licensed under the Functional Source License, Version 1.1, ALv2 Future License (FSL-1.1-ALv2): see
+LICENSE. In short: you may read, run, copy and modify it for any purpose except a Competing Use (a commercial product or service that
+substitutes for the Software or offers substantially the same functionality), and each release becomes available under the Apache License,
+Version 2.0 on the second anniversary of the day it was published. LICENSE is the text that binds; this is only a summary.
+
+What the licence does not cover (all rights reserved)
+-----------------------------------------------------
+The licence is for the source code. These are not licensed to you, and all rights in them are reserved by ADORORG, whether or not they are
+in this repository:
+
+- The name "Frostbite" and "Frostbit", the logo and the brand's look (including the arcade design's artwork), as trademarks and as works.
+- Game artwork: covers, previews, scene videos and still images, and the drawings of milestone collectibles (games/*/assets, the scenes
+  and milestone-art packages' pictures, apps/web/src/app/icon.svg).
+- The text of the games' on-screen stories and guides, as works apart from the code that shows them.
+
+Documentation (docs/, README files) is published with the code and is licensed with it.
+
+The released contract templates (contracts/templates/released/*.wasm) are built from the source in contracts/templates and are licensed
+with it.
+
+Third-party software
+--------------------
+The platform depends on open-source packages, each under its own licence (the production ones are checked by `pnpm repository:check`; the
+allowed licences and the few accepted exceptions are in tooling/repository-policy/src/dependency-licenses.ts). Notices the licences ask us
+to keep:
+
+- sharp's prebuilt libvips (@img/sharp-libvips-*) is LGPL-3.0-or-later. It is used as an unmodified shared library, supplied by the
+  package, and can be replaced by another build of libvips. Its source is at https://github.com/lovell/sharp-libvips.
+- @cmdcode/tapscript, @cmdcode/crypto-utils and @cmdcode/buff-utils (CC-BY-1.0): by Christopher Scott (cmdruid),
+  https://github.com/cmdruid.
+- caniuse-lite (CC-BY-4.0): browser support data by Alexis Deveria and contributors, https://github.com/browserslist/caniuse-lite.
+- spdx-exceptions (CC-BY-3.0): by Kyle E. Mitchell, https://github.com/kemitchell/spdx-exceptions.json.
+- @sats-connect/ui and @sats-connect/make-default-provider-config (the Xverse wallet library): by Secret Key Labs, MIT, from
+  https://github.com/secretkeylabs/sats-connect-ui and https://github.com/secretkeylabs/sats-connect. Their npm packages omit the licence
+  text; the upstream repositories carry it.
+- lightningcss (MPL-2.0) is used unmodified as a build tool; its source is at https://github.com/parcel-bundler/lightningcss.
+
+Contributions
+-------------
+See CONTRIBUTING.md.

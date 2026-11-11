@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { gameId } from "./support/fixtures.ts";
+import { gameId, drawingLimits } from "./support/fixtures.ts";
 import {
   createContract,
   creation,
@@ -56,6 +56,7 @@ describe("publishing templates and creating a game's contract through the operat
       value: {
         contract: null,
         drawingCeiling: 8192,
+        drawingLimits,
         steps: [],
         templatesReady: false,
       },
@@ -73,6 +74,7 @@ describe("publishing templates and creating a game's contract through the operat
       value: {
         contract: { address: made.createdContracts[0], maxDrawingBytes: 4096 },
         drawingCeiling: 8192,
+        drawingLimits,
         templatesReady: true,
       },
     });

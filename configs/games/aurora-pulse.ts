@@ -117,7 +117,7 @@ export const auroraPulseGame = defineGame({
     replay: {
       id: "aurora-pulse",
       sha256:
-        "ffae75e641eacec2574d683a7448faa57ca1cd96f9ccad5a43d1382d7f0d82cf",
+        "f0cae55aa043fc4adc0b43ac7f00c3312541290683c97f54b84c637610f36549",
       version: 1,
     },
   },

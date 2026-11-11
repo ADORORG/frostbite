@@ -85,7 +85,7 @@ describe("a session", () => {
       session.tap();
     }
     const record = session.record();
-    expect(replayRecord(starterRules, record)).toEqual({
+    expect(replayRecord(starterRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

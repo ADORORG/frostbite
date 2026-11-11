@@ -124,7 +124,7 @@ export const shardMatchGame = defineGame({
     replay: {
       id: "shard-match",
       sha256:
-        "4a72fd410fe0e55d95ac3d522605fc44a545085934a30da546e1bb0cf118ed5c",
+        "f15faf9df6df1caebef62727b7f6d9e16e244dbb38300715671541bab30105e5",
       version: 2,
     },
   },

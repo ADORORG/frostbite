@@ -14,6 +14,7 @@ import { creating, defining, fakeApi, step } from "./support/fake-api.ts";
 import { byName } from "./support/find.ts";
 import { enterWallet, panel } from "./support/panel.tsx";
 import { sheetTitle, slowStart } from "./support/slow-start.ts";
+import { drawingLimits } from "./support/fixtures.ts";
 
 describe("an action pressed on a game's page", () => {
   it("shows pause being prepared on the pause button only", async () => {
@@ -55,12 +56,11 @@ describe("an action pressed on a game's page", () => {
     const slow = slowStart();
     const container = await panel(fakeApi({ start: slow.start }));
     await enterWallet(container);
-    await click(byName(container, "Define Streak"));
+    const streak = "Define Streak without a drawing";
+    await click(byName(container, streak));
     expect(sheetTitle(container)).toBe("Define milestone streak");
-    expect(byName(container, "Define Streak")?.getAttribute("aria-busy")).toBe(
-      "true",
-    );
-    expect(byName(container, "Define Streak")?.textContent).toBe("Preparing…");
+    expect(byName(container, streak)?.getAttribute("aria-busy")).toBe("true");
+    expect(byName(container, streak)?.textContent).toBe("Preparing…");
     expect(
       byName(container, "Define First win")?.hasAttribute("aria-busy"),
     ).toBe(false);
@@ -79,6 +79,7 @@ describe("an action pressed on a game's page", () => {
         list: vi.fn(async () => ({
           contract: null,
           drawingCeiling: 8192,
+          drawingLimits,
           steps: [],
           templatesReady: true,
         })),
@@ -122,11 +123,8 @@ describe("the line that says who signs", () => {
       "sim:on…c3fe",
     );
     await click(button(container, "Done"));
-    expect(
-      container.querySelector(
-        'input[aria-label="Wallet address"], label input',
-      ),
-    ).toBeNull();
+    // No field asking for the address in the signer bar (the drawings' file picker, further down, is an input of its own).
+    expect(container.querySelector(".signer-bar input")).toBeNull();
     await click(button(container, "Change"));
     expect(fieldByLabel(container, "Wallet address")).not.toBeNull();
   });

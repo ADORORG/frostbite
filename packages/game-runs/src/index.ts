@@ -1,3 +1,20 @@
+export {
+  boardWindows,
+  playersOnBoard,
+  rankOf,
+  topScores,
+  windowEndsAt,
+  windowStartOf,
+  type BoardRow,
+  type BoardWindow,
+} from "./leaderboard.ts";
+export { playsInWindow, rankGames, recordPlay, type PlayCount } from "./hot.ts";
+export {
+  defaultHotPolicy,
+  hotPolicySchema,
+  type HotPolicy,
+} from "./hot-policy.ts";
+export { bestsOf, type RunBest } from "./bests.ts";
 export { createDrizzleGameRunRepository } from "./drizzle-repository.ts";
 export {
   defaultGameRunPolicy,

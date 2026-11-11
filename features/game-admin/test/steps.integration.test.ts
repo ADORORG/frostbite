@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { describe, expect, it } from "vitest";
 
-import { gameId } from "./support/fixtures.ts";
+import { gameId, drawingLimits } from "./support/fixtures.ts";
 import {
   advance,
   createContract,
@@ -77,6 +77,7 @@ describe("administering a game through the operations", () => {
       value: {
         contract: { address: expect.any(String), maxDrawingBytes: 4096 },
         drawingCeiling: 8192,
+        drawingLimits,
         templatesReady: true,
       },
     });

@@ -49,11 +49,18 @@ export const advance = (blocks: number) =>
   network.controls.advance(chain, blocks);
 
 const ports = () => {
-  const { addressCodec, broadcaster, builder, contracts, observer } =
+  const { addressCodec, broadcaster, builder, contracts, observer, rewards } =
     network.adapter.ports;
-  if (!addressCodec || !broadcaster || !builder || !contracts || !observer)
+  if (
+    !addressCodec ||
+    !broadcaster ||
+    !builder ||
+    !contracts ||
+    !observer ||
+    !rewards
+  )
     throw new Error("The simulated adapter lacks a port.");
-  return { addressCodec, broadcaster, builder, contracts, observer };
+  return { addressCodec, broadcaster, builder, contracts, observer, rewards };
 };
 
 const configured = (): GameAdminConfig => ({

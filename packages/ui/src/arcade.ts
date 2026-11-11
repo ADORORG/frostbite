@@ -1,4 +1,4 @@
-export { productName } from "./brand.ts";
+export { builderCredit, productName } from "./brand.ts";
 export { ArcadePanel } from "./arcade/arcade-panel.tsx";
 export { ArcadeModal } from "./components/arcade-modal.tsx";
 export { ArcadeDialog } from "./components/arcade-dialog.tsx";
@@ -6,6 +6,12 @@ export { ArcadeStatusCard } from "./components/arcade-status-card.tsx";
 export type { StatusCardTone } from "./components/arcade-status-card.tsx";
 export { ArcadeSignButton } from "./components/arcade-sign-button.tsx";
 export { Avatar } from "./components/avatar.tsx";
+export {
+  avatarAccent,
+  avatarSpriteIds,
+  ProfileAvatar,
+  type AvatarSpriteId,
+} from "./components/profile-avatar.tsx";
 export {
   ShellSlotsProvider,
   ShellStatusProvider,
@@ -61,6 +67,7 @@ export { StatusDot } from "./primitives/status-dot.tsx";
 export { SectionBlock, Tile, TileGrid } from "./components/section-block.tsx";
 export { shortenMiddle } from "./components/shorten-middle.ts";
 export { CoverCard, CoverGrid } from "./patterns/cover-grid.tsx";
+export { HeatMeter, HotSticker } from "./patterns/heat.tsx";
 export { HomeRail, homeRailLimit } from "./patterns/home-rail.tsx";
 export { HomeShelf, ShelfTile } from "./patterns/home-shelf.tsx";
 export {

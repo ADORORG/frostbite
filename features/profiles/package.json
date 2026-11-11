@@ -1,0 +1,55 @@
+{
+  "name": "@frostbite/feature-profiles",
+  "version": "0.0.0",
+  "private": true,
+  "license": "FSL-1.1-ALv2",
+  "type": "module",
+  "exports": {
+    ".": "./src/registration.ts",
+    "./entrypoint": "./src/entrypoint.tsx",
+    "./profile-operations": "./src/application/profile-operations.ts",
+    "./public-operation": "./src/application/public-operation.ts",
+    "./runtime": "./src/runtime.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "env:check": "node --experimental-strip-types ../../packages/config/src/env/check-files.ts",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --config vitest.config.ts --project unit --project unit-dom",
+    "test:integration": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts integration",
+    "test:coverage": "node --experimental-strip-types ../../packages/database/test/support/run-postgres.ts coverage"
+  },
+  "dependencies": {
+    "@frostbite/client-http": "workspace:*",
+    "@frostbite/database": "workspace:*",
+    "@frostbite/feature-games": "workspace:*",
+    "@frostbite/game-runs": "workspace:*",
+    "@frostbite/http": "workspace:*",
+    "@frostbite/plugin-kit": "workspace:*",
+    "@frostbite/profiles": "workspace:*",
+    "@frostbite/scenes": "workspace:*",
+    "@frostbite/share": "workspace:*",
+    "@frostbite/shared": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "drizzle-orm": "1.0.0-rc.4",
+    "react": "19.2.8"
+  },
+  "devDependencies": {
+    "@frostbite/test-kit": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/vitest-config": "workspace:*",
+    "@types/jsdom": "30.0.0",
+    "@types/node": "26.4.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "4.1.11",
+    "eslint": "10.9.1",
+    "jsdom": "30.0.1",
+    "react-dom": "19.2.8",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

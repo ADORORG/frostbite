@@ -33,7 +33,7 @@ describe("page frame", () => {
   it("sits in the platform shell, with the platform's name in the footer and the navigation given, and no strip of notices above the header", () => {
     const markup = render();
     expect(markup).toContain(
-      `<footer class="app-footer"><span>${productName}</span>`,
+      `<footer class="app-footer"><div class="app-footer__about"><span>${productName}</span>`,
     );
     expect(markup).not.toContain("arcade-marquee");
     expect(markup).toContain('href="/collections"');

@@ -1,3 +1,4 @@
+import type { ShareConfig } from "@frostbite/share";
 import { gamesPath } from "@frostbite/shared/games";
 import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
 import {
@@ -12,10 +13,14 @@ import {
 } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";
+import { galleryCopy } from "../domain/gallery-copy.ts";
 import type { GameWalletConfig } from "../wallet-config.ts";
 import { GamePlayer } from "./game-player.tsx";
 import { GamesFrame } from "./games-frame.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
+import { Leaderboard } from "./leaderboard.tsx";
+import { MintedGallery } from "./minted-gallery.tsx";
+import { leaderboardCopy } from "../domain/leaderboard-copy.ts";
 import { WalletGamePlayer } from "./wallet-game-player.tsx";
 
 // One game as its manifest declares it, with the game itself as the main thing on the page when the platform
@@ -24,10 +29,13 @@ import { WalletGamePlayer } from "./wallet-game-player.tsx";
 export function GameDetail({
   game,
   navigation,
+  share,
   wallet,
 }: {
   readonly game: PublicGame;
   readonly navigation: readonly NavigationItem[];
+  // Where a link can be shared; without it nothing in the page can be.
+  readonly share?: ShareConfig;
   readonly wallet: GameWalletConfig;
 }) {
   const about = (
@@ -75,8 +83,33 @@ export function GameDetail({
   const sections: DockSection[] = [
     { badge: null, content: about, id: "about", label: "About" },
     { badge: null, content: asks, id: "asks", label: "What it asks for" },
+    // A game the platform replays has verified scores to rank.
+    ...(game.scored
+      ? [
+          {
+            badge: null,
+            content: <Leaderboard gameId={game.id} />,
+            id: "leaderboard",
+            label: leaderboardCopy.title,
+          },
+        ]
+      : []),
+    // Anyone may see what has been minted of a game that mints milestones.
+    ...(game.claimable
+      ? [
+          {
+            badge: null,
+            content: (
+              <MintedGallery explorerTxUrl={wallet.explorerTxUrl} game={game} />
+            ),
+            id: "minted",
+            label: galleryCopy.title,
+          },
+        ]
+      : []),
   ];
   const player = {
+    ...(share === undefined ? {} : { share }),
     back: (
       <a className="arcade-stage__back" href={gamesPath}>
         ← All games

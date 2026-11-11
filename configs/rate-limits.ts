@@ -38,6 +38,36 @@ export const rateLimits = rateLimitConfigSchema.parse({
     // One request per picture on the page, a few dozen at once for a player with many mints, each a read of the chain; a browser keeps
     // the answer for a day, so a second visit asks for none. Counted apart so they do not use up the allowance for everything else read.
     getMintedPicture: perMinute(300),
+    // A shared page asks for one picture per milestone it shows, from anyone with the link, each a read of the chain (and kept by the
+    // browser and the edge): counted apart, like the player's own pictures.
+    getSharedPicture: perMinute(300),
+    // A gallery is read by anyone, a page at a time, and a page asks for one picture per mint (each a read of the chain, kept by the
+    // browser and the edge): counted apart from the rest of what a visitor does.
+    getGalleryPicture: perMinute(300),
+    listGalleryMints: perMinute(120),
+    // A board is read by anyone and cached for a minute; the player's own place is a small read of an index, once per period switch.
+    getLeaderboard: perMinute(120),
+    getMyRank: perMinute(120),
+    // A start is counted for the games that are hot. A person starts a run every few seconds at the very most, so six a minute counts every
+    // real start and stops one visitor from raising a game's count by scripting it; a visitor over it is answered 429, which the page ignores.
+    recordGamePlay: perMinute(6),
+    // Each of these reaches the chain. A start builds a transaction and asks the chain to simulate it (and asks the fee source); a look at a
+    // claim in progress asks the chain what became of it. A person presses Claim a few times, and the page looks at each claim in progress
+    // every four seconds, so a few starts and a look a second cover real use, and a script is stopped from using the shared chain
+    // connection as its own: without these they would count in the shared write allowance (120 a minute for everything a person does).
+    startGameClaim: perMinute(10),
+    submitGameClaim: perMinute(20),
+    refreshGameClaim: perMinute(90),
+    // Making a link is a write of the player's own, and a few a minute is a person pressing Share; ending one is rarer.
+    createShare: perMinute(20),
+    revokeShare: perMinute(30),
+    // A profile is made once and changed rarely; the name check runs as a player types (after a pause), so it gets room, and a public page is
+    // opened by anyone, so it is counted apart from the rest of what a visitor does.
+    getMyProfile: perMinute(60),
+    checkProfileName: perMinute(120),
+    saveProfile: perMinute(20),
+    deleteProfile: perMinute(10),
+    getPublicProfile: perMinute(120),
     findPlatformRoleCandidates: perMinute(30),
     grantPlatformRole: perMinute(20),
     importCollectionItems: perMinute(20),
@@ -69,6 +99,6 @@ export const rateLimits = rateLimitConfigSchema.parse({
     verifyWalletStepUp: perMinute(20),
   },
   read: perMinute(600),
-  version: 2,
+  version: 3,
   write: perMinute(120),
 });

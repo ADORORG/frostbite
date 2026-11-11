@@ -16,6 +16,7 @@ import {
   step,
 } from "./support/fake-api.ts";
 import { panel } from "./support/panel.tsx";
+import { drawingLimits } from "./support/fixtures.ts";
 
 const unreadable = () =>
   creating({
@@ -31,6 +32,7 @@ async function opened(api = fakeApi()) {
   api.list = vi.fn(async () => ({
     contract: null,
     drawingCeiling: 8192,
+    drawingLimits,
     steps: [failed],
     templatesReady: true,
   }));
@@ -144,6 +146,7 @@ describe("entering the address of a contract the platform could not read", () =>
     api.list = vi.fn(async () => ({
       contract: null,
       drawingCeiling: 8192,
+      drawingLimits,
       steps: [creating({ state: "failed", toSign: null })],
       templatesReady: true,
     }));

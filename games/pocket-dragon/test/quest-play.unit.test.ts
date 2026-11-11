@@ -50,7 +50,7 @@ describe("a quest as the player plays it", () => {
     expect(record.claims).toContain("hills-clear");
     expect(record.claims).toContain("guild-castle");
     expect(record.claims).toContain("woods-escape");
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

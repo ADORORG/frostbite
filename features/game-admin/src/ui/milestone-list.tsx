@@ -1,28 +1,17 @@
 import type { GameAdminStep } from "@frostbite/shared/games";
 import {
   ArcadeActionButton,
-  ArcadeBadge,
   ArcadeTextField,
   SectionBlock,
 } from "@repo/ui/arcade";
 import { useState } from "react";
 
 import type { AdminGameInfo } from "../game-info.ts";
-import { stateTone, stepCopy } from "../domain/copy.ts";
+import { milestoneCopy } from "../domain/copy.ts";
+import { latestDefinition } from "../domain/definitions.ts";
+import { DefinitionBadge } from "./definition-badge.tsx";
 
 type Milestone = AdminGameInfo["milestones"][number];
-
-const latestDefinition = (
-  steps: readonly GameAdminStep[],
-  milestoneId: string,
-) =>
-  [...steps]
-    .reverse()
-    .find(
-      (step) =>
-        step.operation === "define-milestone" &&
-        step.summary.milestoneId === milestoneId,
-    );
 
 // The game's milestones with their claim limits (from the manifest), where each stands on the contract (from the log), and a way to
 // define each with its drawing. A milestone with no drawing gets the contract's generated picture. A milestone that is defined cannot
@@ -49,7 +38,7 @@ export function MilestoneList({
   ).length;
   return (
     <SectionBlock
-      description={`Each is defined on the contract once, with a drawing that becomes the collectible. ${String(defined)} of ${String(milestones.length)} defined.`}
+      description={milestoneCopy.intro(defined, milestones.length)}
       title="Milestones"
     >
       <div
@@ -71,54 +60,52 @@ export function MilestoneList({
                   <small>
                     {`Up to ${milestone.claimLimit} claim${milestone.claimLimit === 1 ? "" : "s"} per wallet`}
                   </small>
+                  {done ? (
+                    <small data-drawing={step.summary.drawing ? "yes" : "no"}>
+                      {step.summary.drawing
+                        ? milestoneCopy.drawn(step.summary.drawing.bytes)
+                        : milestoneCopy.undrawn}
+                    </small>
+                  ) : null}
                 </div>
-                <ArcadeBadge
-                  tone={
-                    step === undefined
-                      ? "yellow"
-                      : done
-                        ? "mint"
-                        : stateTone[step.state]
-                  }
-                >
-                  {step === undefined
-                    ? "Not defined"
-                    : done
-                      ? "Defined"
-                      : stepCopy(step).label}
-                </ArcadeBadge>
+                <DefinitionBadge step={step} />
                 {done ? null : (
                   <div className="milestones__define">
-                    <details>
-                      <summary>Add a drawing (optional)</summary>
-                      <ArcadeTextField
-                        hint="Optional SVG drawing. Without one the contract draws a generated picture."
-                        label={`Drawing for ${milestone.title}`}
-                        multiline
-                        onChange={(value) =>
-                          setDrawings((held) => ({
-                            ...held,
-                            [milestone.id]: value,
-                          }))
-                        }
-                        value={drawing}
-                      />
-                    </details>
-                    <ArcadeActionButton
-                      ariaLabel={`Define ${milestone.title}`}
-                      busy={preparing === milestone.id}
-                      disabled={busy}
-                      onClick={() =>
-                        onDefine(
-                          milestone.id,
-                          drawing.trim() === "" ? undefined : drawing,
-                        )
+                    <ArcadeTextField
+                      label={`Drawing for ${milestone.title}`}
+                      multiline
+                      onChange={(value) =>
+                        setDrawings((held) => ({
+                          ...held,
+                          [milestone.id]: value,
+                        }))
                       }
-                      size="small"
-                      tone="mint"
-                    >
-                      {preparing === milestone.id ? "Preparing…" : "Define"}
-                    </ArcadeActionButton>
+                      value={drawing}
+                    />
+                    <div className="milestones__actions">
+                      <ArcadeActionButton
+                        ariaLabel={`Define ${milestone.title}`}
+                        busy={preparing === milestone.id}
+                        disabled={busy || drawing.trim() === ""}
+                        onClick={() => onDefine(milestone.id, drawing)}
+                        size="small"
+                        tone="mint"
+                      >
+                        {preparing === milestone.id ? "Preparing…" : "Define"}
+                      </ArcadeActionButton>
+                      <ArcadeActionButton
+                        ariaLabel={`Define ${milestone.title} without a drawing`}
+                        busy={preparing === milestone.id}
+                        disabled={busy || drawing.trim() !== ""}
+                        onClick={() => onDefine(milestone.id, undefined)}
+                        size="small"
+                        tone="yellow"
+                      >
+                        {preparing === milestone.id
+                          ? "Preparing…"
+                          : milestoneCopy.defineWithout}
+                      </ArcadeActionButton>
+                    </div>
                   </div>
                 )}
               </li>

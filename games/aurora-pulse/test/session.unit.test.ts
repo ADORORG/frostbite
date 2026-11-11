@@ -63,7 +63,7 @@ describe("a session", () => {
     const session = replayInto(5, taps, 40_000, onEarned);
     expect(session.state()).toEqual(state);
     const record = session.record();
-    expect(replayRecord(pulseRules, record)).toEqual({
+    expect(replayRecord(pulseRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
@@ -77,7 +77,7 @@ describe("a session", () => {
 describe("the sample run", () => {
   it("is accepted by the rules and earns the milestones it claims", () => {
     const record = sampleRun();
-    expect(replayRecord(pulseRules, record)).toEqual({
+    expect(replayRecord(pulseRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

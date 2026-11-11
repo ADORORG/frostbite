@@ -1,4 +1,5 @@
 import { chainFeesRoute, chainIndexingRoute } from "@frostbite/shared/chain";
+import { recordGamePlayRoute } from "@frostbite/shared/games";
 import { resolveRateLimit } from "@frostbite/shared/http";
 import { describe, expect, it } from "vitest";
 
@@ -45,4 +46,40 @@ describe("the limits on the public chain status", () => {
       expect(resolved.policy.limit).toBeGreaterThan(rateLimits.anonymous.limit);
     },
   );
+});
+
+// A start is counted for anyone, so what keeps a visitor from raising a game's count is this limit: its own bucket, well under the anonymous
+// default, and only a few starts a minute (a person starts a run every few seconds at the very most).
+describe("the limit on counting a started run", () => {
+  it("has its own bucket, a few a minute, below the anonymous default", () => {
+    const resolved = resolveRateLimit(rateLimits, {
+      authenticated: false,
+      method: recordGamePlayRoute.method,
+      operationId: recordGamePlayRoute.operationId,
+    });
+    expect(resolved.bucket).toBe(recordGamePlayRoute.operationId);
+    expect(resolved.policy.limit).toBeLessThanOrEqual(10);
+    expect(resolved.policy.limit).toBeLessThan(rateLimits.anonymous.limit);
+    expect(resolved.policy.windowMs).toBe(60_000);
+  });
+});
+
+// A claim reaches the chain (a simulation and a fee quote to start, a look at the network for each refresh), so each step has a bucket of its
+// own, well under the shared allowance for writes: a script cannot spend the platform's chain connection through a player's account.
+describe("the limits on the claim path", () => {
+  it.each([
+    ["startGameClaim", 10],
+    ["submitGameClaim", 20],
+    ["refreshGameClaim", 90],
+  ])("%s has its own bucket of at most %i a minute", (id, most) => {
+    const resolved = resolveRateLimit(rateLimits, {
+      authenticated: true,
+      method: "POST",
+      operationId: id,
+    });
+    expect(resolved.bucket).toBe(id);
+    expect(resolved.policy.limit).toBeLessThanOrEqual(most);
+    expect(resolved.policy.limit).toBeLessThan(rateLimits.write.limit);
+    expect(resolved.policy.windowMs).toBe(60_000);
+  });
 });

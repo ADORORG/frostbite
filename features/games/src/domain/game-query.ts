@@ -1,7 +1,11 @@
-import { gameTags, gameTagSchema, type GameTag } from "@frostbite/shared/games";
+import {
+  gameFilterKindSchema,
+  gameFilterKinds,
+  type GameFilterKind,
+} from "@frostbite/shared/games";
 
 // What a person asked the games page for: words to look for, kinds of game, and whether only playable ones. It lives in the address
-// (`?q=snow&tag=puzzle&playable=1`) so a result can be shared and survives a reload. This module is the
+// (`?q=snow&kind=puzzle&playable=1`) so a result can be shared and survives a reload. This module is the
 // one place that reads and writes that address, on the server and in the browser alike.
 
 // A search is a few words, not a document: past this the rest is dropped, so an address cannot make the page work on a book.
@@ -10,24 +14,25 @@ export const queryTextLimit = 64;
 export interface GameQuery {
   // Only games that can be opened.
   readonly playable: boolean;
-  // Games with any of these tags (a person ticking Puzzle and Arcade wants either, not only both).
-  readonly tags: readonly GameTag[];
+  // Games of any of these kinds (a person ticking Puzzle and Arcade wants either, not only both).
+  readonly kinds: readonly GameFilterKind[];
   readonly text: string;
 }
 
 export const emptyGameQuery: GameQuery = Object.freeze({
   playable: false,
-  tags: [],
+  kinds: [],
   text: "",
 });
 
 // The kinds in the platform's order, whatever order they were chosen in, so one choice is always one address.
-export const tagsInOrder = (wanted: ReadonlySet<GameTag>): GameTag[] =>
-  gameTags.filter((tag) => wanted.has(tag));
+export const kindsInOrder = (
+  wanted: ReadonlySet<GameFilterKind>,
+): GameFilterKind[] => gameFilterKinds.filter((kind) => wanted.has(kind));
 
 // Spaces alone are no text, so a box holding only spaces asks for nothing.
-export const isEmptyQuery = ({ playable, tags, text }: GameQuery): boolean =>
-  !playable && tags.length === 0 && text.trim() === "";
+export const isEmptyQuery = ({ kinds, playable, text }: GameQuery): boolean =>
+  !playable && kinds.length === 0 && text.trim() === "";
 
 // The address's query string as the framework hands it to a page: one value, several, or none per name.
 export type RawQuery = Readonly<
@@ -42,17 +47,17 @@ export function searchParamsOf(raw: RawQuery): URLSearchParams {
   return params;
 }
 
-// Reads an address, trusting none of it: text is trimmed, spaces collapsed and cut to the limit, a tag that is not on the platform's
+// Reads an address, trusting none of it: text is trimmed, spaces collapsed and cut to the limit, a kind that is not on the platform's
 // list is dropped, and anything else in the address is ignored. The same address always gives the same query.
 export function parseGameQuery(params: URLSearchParams): GameQuery {
-  const asked = new Set<GameTag>();
-  for (const value of params.getAll("tag")) {
-    const tag = gameTagSchema.safeParse(value);
-    if (tag.success) asked.add(tag.data);
+  const asked = new Set<GameFilterKind>();
+  for (const value of params.getAll("kind")) {
+    const kind = gameFilterKindSchema.safeParse(value);
+    if (kind.success) asked.add(kind.data);
   }
   return {
+    kinds: kindsInOrder(asked),
     playable: params.get("playable") === "1",
-    tags: tagsInOrder(asked),
     // Cut by characters, not by the UTF-16 units `slice` counts, so a picture or an accented letter is never split in half.
     text: Array.from((params.get("q") ?? "").replace(/\s+/gu, " ").trim())
       .slice(0, queryTextLimit)
@@ -65,7 +70,7 @@ export function parseGameQuery(params: URLSearchParams): GameQuery {
 export function gameQueryString(query: GameQuery): string {
   const params = new URLSearchParams();
   if (query.text.trim() !== "") params.set("q", query.text);
-  for (const tag of query.tags) params.append("tag", tag);
+  for (const kind of query.kinds) params.append("kind", kind);
   if (query.playable) params.set("playable", "1");
   return params.toString();
 }

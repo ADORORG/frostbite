@@ -7,6 +7,7 @@ import { creatorAdmissionFeature } from "@frostbite/feature-creator-admission";
 import { platformShellFeature } from "@frostbite/feature-platform-shell";
 import { createGameAdminFeature } from "@frostbite/feature-game-admin";
 import { createGamesFeature } from "@frostbite/feature-games";
+import { createProfilesFeature } from "@frostbite/feature-profiles";
 import {
   creatorsFeature,
   launchesFeature,
@@ -22,8 +23,10 @@ import { emailCodePolicy } from "./email-code.ts";
 import { targetChains } from "./chains.ts";
 import { gameAdminConfig } from "./game-admin.ts";
 import { gameClaimsConfig } from "./game-claims.ts";
+import { shareConfig } from "./share.ts";
 import { gameRunsConfig } from "./game-runs.ts";
 import { games } from "./games.ts";
+import { profilePolicy } from "./profiles.ts";
 import { mailSettings } from "./mail.ts";
 import { providerRegistry } from "./providers.ts";
 import { setupLinkPolicy } from "./setup-link.ts";
@@ -56,7 +59,9 @@ export const featureRegistry = createFeatureRegistry([
     gameWalletConfig,
     gameRunsConfig,
     gameClaimsConfig,
+    shareConfig,
   ),
+  createProfilesFeature(games, targetChains, profilePolicy, shareConfig),
   createGameAdminFeature(games, gameAdminConfig),
   createUploadsFeature(providerRegistry),
   createCollectionStudioFeature(providerRegistry, targetChains),

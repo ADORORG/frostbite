@@ -18,6 +18,8 @@ export const dropRules: GameVerifier<DropState> = {
       ? refuse(`no such setting: ${Object.keys(config)[0] ?? ""}`)
       : { ok: true, state: startDrop(seed) };
   },
+  // The run's score, once it has ended: the number the game shows and keeps as the player's best.
+  score: (state) => (state.ended ? state.score : null),
   step(state, input: RunInput) {
     if (state.ended) return refuse("the run has ended");
     if (state.over && input.type !== "end") return refuse("no move is left");

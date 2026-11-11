@@ -15,7 +15,6 @@ import type {
 import {
   ArcadeActionButton,
   ArcadeDock,
-  ArcadeInfoCard,
   ArcadeStage,
   type DockSection,
 } from "@repo/ui/arcade";
@@ -24,12 +23,14 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ClaimsApi } from "../client/claims-api.ts";
 import { ClaimDialog } from "./claim-dialog.tsx";
 import type { ClaimFeeSettings } from "../wallet-config.ts";
-import { ClaimFeesBeside } from "./claim-fees.tsx";
 import { claimsDockSection } from "./claims-card.tsx";
-import { MilestoneList } from "./milestone-list.tsx";
 import type { ClaimSigner } from "./use-claims.ts";
 import { usePlayerClaims } from "./use-player-claims.ts";
 import { GameBar } from "./game-bar.tsx";
+import { milestonesSection } from "./milestones-section.tsx";
+import { ScoreShare } from "./score-share.tsx";
+import type { SharesApi } from "../client/shares-api.ts";
+import type { ShareConfig } from "@frostbite/share";
 import { useFullscreen } from "./use-fullscreen.ts";
 import { useImmersive } from "./use-immersive.ts";
 import { touchScreenQuery, useMediaQuery } from "./use-media-query.ts";
@@ -61,15 +62,7 @@ const keptCopy: Record<SyncStatus, string> = {
     "Your progress is kept in this browser. Saving it to your account is waiting for a connection.",
 };
 
-// What the player is told about how these milestones are known. A game that declared none replay-verifiable is told only
-// that the game reports them; one that did is told the platform may check those, and that nothing is claimed until it has.
-export function milestoneCopy(milestones: readonly GameMilestone[]): string {
-  return milestones.some(
-    ({ verification }) => verification === "replay-verified",
-  )
-    ? "Some of these can be replay-checked by the platform when you are signed in: it replays a run under the game's published rules. The rest the game reports itself and the platform cannot check. Nothing that carries value depends on any of them yet."
-    : "The game reports these itself and the platform cannot check them yet, so nothing that carries value depends on them.";
-}
+export { milestoneCopy } from "./milestones-section.tsx";
 
 export function GamePlayer({
   accountFor,
@@ -80,6 +73,8 @@ export function GamePlayer({
   meta,
   runsFor,
   sections = [],
+  share,
+  sharesApi,
   src,
   title,
   wallet,
@@ -111,6 +106,10 @@ export function GamePlayer({
   readonly runsFor?: (gameId: string) => RunsService;
   // More sections for the dock under the stage, after the player's milestones.
   readonly sections?: readonly DockSection[];
+  // Where a link can be shared; without it nothing here can be. Sharing needs the player's account, so it is offered only to a signed-in
+  // player whose progress is on it.
+  readonly share?: ShareConfig;
+  readonly sharesApi?: SharesApi;
   readonly src: string;
   readonly title: string;
   // Set only for a game that declared the wallet capability: what the player has connected, how to ask for the
@@ -129,16 +128,24 @@ export function GamePlayer({
     titles,
     ui: claimUi,
   } = usePlayerClaims(game.milestones, game.id, claims, claimsFor);
-  const { connected, emitClaim, kept, progress, sync, toast, unlocked } =
-    useGameSession(
-      game,
-      frame,
-      src,
-      accountFor,
-      { connectWallet: wallet?.connect, title, wallet: wallet?.current },
-      runsFor,
-      claimsOf,
-    );
+  const {
+    connected,
+    emitClaim,
+    kept,
+    newBest,
+    progress,
+    sync,
+    toast,
+    unlocked,
+  } = useGameSession(
+    game,
+    frame,
+    src,
+    accountFor,
+    { connectWallet: wallet?.connect, title, wallet: wallet?.current },
+    runsFor,
+    claimsOf,
+  );
   useEffect(() => {
     bindTelling(emitClaim);
   }, [bindTelling, emitClaim]);
@@ -150,39 +157,21 @@ export function GamePlayer({
   const phoneLandscape = usePhoneLandscape();
   const [promptDismissed, setPromptDismissed] = useState(false);
   const prompt = phoneLandscape && !theatre.on && !promptDismissed;
+  // Sharing makes a link from the player's account, so it is offered once their progress is on it.
+  const canShare = share !== undefined && sync === "account";
   const dock: DockSection[] = [
     ...(game.milestones.length === 0
       ? []
       : [
-          {
-            badge:
-              unlocked === null
-                ? null
-                : `${String(game.milestones.filter(({ id }) => unlocked[id] !== undefined).length)}/${String(game.milestones.length)}`,
-            content: (
-              <ArcadeInfoCard title="Your milestones">
-                <MilestoneList
-                  claim={
-                    claims === undefined
-                      ? undefined
-                      : {
-                          message: claimUi.message,
-                          latestOf: claimUi.latestOf,
-                          review: claimUi.reopen,
-                          start: (id) => void claimUi.start(id),
-                        }
-                  }
-                  milestones={game.milestones}
-                  progress={progress}
-                  unlocked={unlocked}
-                />
-                <ClaimFeesBeside fees={claims?.fees} ui={claimUi} />
-                <p>{milestoneCopy(game.milestones)}</p>
-              </ArcadeInfoCard>
-            ),
-            id: "milestones",
-            label: "Milestones",
-          },
+          milestonesSection({
+            claimUi,
+            claims,
+            game,
+            progress,
+            share: canShare ? { api: sharesApi, config: share } : undefined,
+            title,
+            unlocked,
+          }),
         ]),
     ...(claims === undefined
       ? []
@@ -229,6 +218,19 @@ export function GamePlayer({
             {...(touch ? { immersive } : {})}
             meta={meta}
             saveText={kept ? keptCopy[sync] : blockedCopy[sync]}
+            {...(canShare && newBest !== null
+              ? {
+                  share: (
+                    <ScoreShare
+                      api={sharesApi}
+                      config={share}
+                      gameId={game.id}
+                      gameTitle={title}
+                      score={newBest}
+                    />
+                  ),
+                }
+              : {})}
             theatre={theatre}
             title={title}
           />

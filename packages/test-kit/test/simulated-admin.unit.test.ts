@@ -166,4 +166,29 @@ describe("administration on the simulated chain", () => {
     expect(made.created?.[0]).toMatch(/^sim-game-\d+$/u);
     expect((await observer.observe(pause)).created).toBeUndefined();
   });
+  it("reports the drawing a confirmed definition carried, and none for a definition without one", async () => {
+    const ports = simulatedPorts();
+    const define = async (milestoneId: string, drawing?: string) => {
+      const unsigned = await ports.need("builder").build(
+        {
+          ...base(ports),
+          claimLimit: 1,
+          contract: ports.contract,
+          drawing,
+          milestoneId,
+          operation: "define-milestone",
+        },
+        funding,
+      );
+      await ports.need("broadcaster").broadcast(signSimulated(unsigned));
+      return unsigned.summary.drawing;
+    };
+    const drawn = await define("drawn", "<svg/>");
+    await define("plain");
+    const rewards = ports.need("rewards");
+    expect(await rewards.drawing(ports.contract, "drawn")).toBeNull();
+    ports.controls.advance(ports.contract.chain, 10);
+    expect(await rewards.drawing(ports.contract, "drawn")).toEqual(drawn);
+    expect(await rewards.drawing(ports.contract, "plain")).toBeNull();
+  });
 });

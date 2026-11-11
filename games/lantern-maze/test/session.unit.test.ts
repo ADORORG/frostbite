@@ -38,7 +38,7 @@ describe("a session", () => {
     expect(record.inputs).toHaveLength(
       steps.length + (session.state().cause === "escaped" ? 0 : 1),
     );
-    expect(replayRecord(mazeRules, record)).toEqual({
+    expect(replayRecord(mazeRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });
@@ -60,7 +60,7 @@ describe("a session", () => {
 describe("the sample run", () => {
   it("is accepted by the rules and earns the milestones it claims", () => {
     const record = sampleRun();
-    expect(replayRecord(mazeRules, record)).toEqual({
+    expect(replayRecord(mazeRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

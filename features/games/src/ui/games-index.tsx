@@ -1,4 +1,5 @@
 import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
+import type { GameHeat } from "@frostbite/shared/games";
 import { ArcadeTicker } from "@repo/ui/arcade";
 
 import type { PublicGame } from "../domain/catalog.ts";
@@ -10,10 +11,13 @@ import { GamesFrame } from "./games-frame.tsx";
 // it. A game with no play address says it cannot be played yet, and one with no picture gets a stand-in drawn from its name.
 export function GamesIndex({
   games,
+  hot = [],
   initial,
   navigation,
 }: {
   readonly games: readonly PublicGame[];
+  // The ranked games, hottest first; none on a platform where nothing has been played enough.
+  readonly hot?: readonly GameHeat[];
   // What the address asked for, so a shared link opens already narrowed.
   readonly initial: GameQuery;
   readonly navigation: readonly NavigationItem[];
@@ -23,7 +27,7 @@ export function GamesIndex({
       <ArcadeTicker
         items={["Insert coin", ...games.map(({ title }) => title)]}
       />
-      <GamesBrowser games={games} initial={initial} />
+      <GamesBrowser games={games} hot={hot} initial={initial} />
     </GamesFrame>
   );
 }

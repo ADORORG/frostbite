@@ -10,12 +10,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import { creating, fakeApi, listing, step } from "./support/fake-api.ts";
 import { enterWallet, panel } from "./support/panel.tsx";
+import { drawingLimits } from "./support/fixtures.ts";
 
 const noContract = (templatesReady: boolean) =>
   fakeApi({
     list: vi.fn(async () => ({
       contract: null,
       drawingCeiling: 8192,
+      drawingLimits,
       steps: [],
       templatesReady,
     })),
@@ -127,6 +129,7 @@ describe("a game with no contract yet", () => {
       list: vi.fn(async () => ({
         contract: null,
         drawingCeiling: 8192,
+        drawingLimits,
         steps: [made],
         templatesReady: true,
       })),
@@ -161,6 +164,7 @@ describe("a game with no contract yet", () => {
       .mockResolvedValueOnce({
         contract: null,
         drawingCeiling: 8192,
+        drawingLimits,
         steps: [pending],
         templatesReady: true,
       })

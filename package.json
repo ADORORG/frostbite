@@ -1,6 +1,7 @@
 {
-  "name": "the-well",
+  "name": "frostbite",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "dependencies": {
     "@frostbite/cache": "workspace:*",
@@ -13,6 +14,7 @@
     "@frostbite/feature-game-admin": "workspace:*",
     "@frostbite/feature-games": "workspace:*",
     "@frostbite/feature-platform-shell": "workspace:*",
+    "@frostbite/feature-profiles": "workspace:*",
     "@frostbite/feature-public-collections": "workspace:*",
     "@frostbite/feature-public-products": "workspace:*",
     "@frostbite/feature-uploads": "workspace:*",
@@ -22,6 +24,7 @@
     "@frostbite/provider-media-processing-sharp": "workspace:*",
     "@frostbite/provider-object-storage-r2": "workspace:*",
     "@frostbite/provider-workflows-inngest": "workspace:*",
+    "@frostbite/share": "workspace:*",
     "@frostbite/shared": "workspace:*",
     "@frostbite/wallet": "workspace:*",
     "@repo/config": "workspace:*"
@@ -56,7 +59,7 @@
     "test:visual:update": "pnpm build && pnpm --filter @repo/e2e test:visual:update",
     "ci:local": "pnpm --filter @repo/repository-policy ci:local --",
     "hooks:install": "git config core.hooksPath .githooks",
-    "repository:check": "pnpm --filter @repo/repository-policy check",
+    "repository:check": "pnpm --filter @repo/repository-policy check && pnpm --filter @repo/repository-policy check:licenses",
     "repository:coverage": "pnpm --filter @repo/repository-policy check:coverage",
     "scenes:render": "pnpm --filter @repo/scene-render render --out ../../apps/web/public/scenes",
     "game:dev": "pnpm --filter @repo/game-tools dev",

@@ -2,6 +2,7 @@
   "name": "@frostbite/database",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -22,6 +23,10 @@
     "./schema/platform-fee": "./src/schema/platform-fee.ts",
     "./schema/game-runs": "./src/schema/game-runs.ts",
     "./schema/game-saves": "./src/schema/game-saves.ts",
+    "./schema/game-play-days": "./src/schema/game-play-days.ts",
+    "./schema/game-score-bests": "./src/schema/game-score-bests.ts",
+    "./schema/game-shares": "./src/schema/game-shares.ts",
+    "./schema/player-profiles": "./src/schema/player-profiles.ts",
     "./schema/passkey-sign-in": "./src/schema/passkey-sign-in.ts",
     "./schema/platform": "./src/schema/platform.ts",
     "./schema/rate-limit": "./src/schema/rate-limit.ts",

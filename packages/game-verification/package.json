@@ -2,6 +2,7 @@
   "name": "@frostbite/game-verification",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./conformance": "./src/conformance.ts",

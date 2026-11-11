@@ -40,7 +40,7 @@ export const myGame = defineGame({
   id: "my-game",
   title: "My game",
   summary: "One sentence for the list.",
-  tags: ["arcade"], // one to four kinds from the platform's list (`gameTags` in `@frostbite/shared/games`); the games page searches and filters by them
+  tags: ["arcade"], // one to four kinds from the platform's list (`gameTags` in `@frostbite/shared/games`); the games page searches by them and filters by the kind each falls under (`gameTagKind`: action, arcade, puzzle, rhythm, strategy; `platformer` counts as action, `endless` and `reflex` as arcade, `developer` as none)
   description: "A longer text for the game's page.",
   version: "0.1.0", // the game's own release; a change to a milestone is a new version, never an edit
   network: "bip122:00000008819873e925422c1ff0f99f7c", // must be a chain the platform is configured for
@@ -247,7 +247,7 @@ prize) may depend on a self-reported milestone.**
 A game can offer a stronger level, `replay-verified`, for milestones its rules can decide. It needs no platform change:
 
 1. Write the rules as a pure state machine (`GameVerifier`, `@frostbite/game-sdk/run-record`: `init(seed, config)`,
-   `step(state, input)`, `earned(state)`; no clock, no `Math.random`, no I/O) and play through the same module.
+   `step(state, input)`, `earned(state)` and, to be ranked on a leaderboard, `score(state)` (the number the screen shows, once the run has ended, otherwise `null`; test it with `expectVerifiedScore` from `@frostbite/test-kit/verified-score`); no clock, no `Math.random`, no I/O) and play through the same module.
 2. Add `src/replay.ts` to the game: a default export of the verifier and a named export `sample()` returning one legal
    run. `pnpm game:build` (the SDK's build) emits `verifier.js` and `verifier.json` beside the game.
 3. In the manifest, declare the `run:submit` capability, `verification: { replay: { id, sha256, version } }` with the

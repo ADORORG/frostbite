@@ -124,3 +124,17 @@ export function fieldByLabel(
     throw new Error(`no field labelled "${label}"`);
   return control;
 }
+
+// Chooses files in the page's file picker, as a person would: the input's list is replaced and it reports a change.
+export async function chooseFiles(
+  container: HTMLElement,
+  files: readonly File[],
+) {
+  const input = container.querySelector('input[type="file"]');
+  if (!(input instanceof HTMLInputElement))
+    throw new Error("file input is missing");
+  Object.defineProperty(input, "files", { configurable: true, value: files });
+  await act(() => {
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}

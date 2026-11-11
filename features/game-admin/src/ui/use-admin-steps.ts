@@ -40,7 +40,7 @@ export interface StartContext {
 export type Overview =
   | ({ readonly kind: "game" } & Pick<
       ListGameAdminStepsResponse,
-      "contract" | "drawingCeiling" | "templatesReady"
+      "contract" | "drawingCeiling" | "drawingLimits" | "templatesReady"
     >)
   | ({ readonly kind: "templates" } & Pick<
       ListGameAdminTemplatesResponse,
@@ -88,10 +88,17 @@ export function useAdminSteps(options: {
         : api
             .list(gameId)
             .then(
-              ({ contract, drawingCeiling, steps: held, templatesReady }) => ({
+              ({
+                contract,
+                drawingCeiling,
+                drawingLimits,
+                steps: held,
+                templatesReady,
+              }) => ({
                 overview: {
                   contract,
                   drawingCeiling,
+                  drawingLimits,
                   kind: "game",
                   templatesReady,
                 },

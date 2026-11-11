@@ -3,9 +3,17 @@ import {
   privatePage,
   type PageMetadata,
 } from "@frostbite/plugin-kit/page-metadata";
-import { gameHref, gamesPath } from "@frostbite/shared/games";
+import {
+  gameHref,
+  gamesPath,
+  shareImagePath,
+  type GameManifest,
+} from "@frostbite/shared/games";
+import type { SharedThing } from "@frostbite/game-shares";
 
 import type { GameCatalog, PublicGame } from "./domain/catalog.ts";
+import { sharedView } from "./domain/shared-view.ts";
+import { verificationLabel } from "./domain/verification-label.ts";
 
 // Where a game's share picture is served (see `apps/web/src/app/share/games`). The address is the game's own identifier, which
 // is a validated slug, so it needs no escaping.
@@ -45,4 +53,24 @@ export function gameSitemapPaths(
   return games.length === 0
     ? []
     : [gamesPath, ...games.map(({ id }) => gameHref(id) as `/${string}`)];
+}
+
+// A shared link says what it shows and carries a picture made for it. A link that is ended, never was, or shows a game or milestone that
+// is no longer listed says nothing, so a preview cannot outlive the thing it showed.
+export function sharedMetadata(
+  id: string,
+  thing: SharedThing | null,
+  games: readonly GameManifest[],
+): PageMetadata {
+  const view = thing === null ? null : sharedView(thing, games);
+  if (view === null) return privatePage;
+  const label = verificationLabel(view.verification);
+  return {
+    description: clipDescription(
+      label === null ? view.subtitle : `${view.subtitle} ${label}.`,
+    ),
+    image: { alt: view.title, path: shareImagePath(id) },
+    kind: "shared",
+    title: view.title,
+  };
 }

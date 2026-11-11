@@ -35,7 +35,7 @@ describe("a run session", () => {
       { data: { on: 1, tick: 30 }, type: "jump" },
       { data: { tick: 30 }, type: "end" },
     ]);
-    expect(replayRecord(pocketDragonRules, record)).toEqual({
+    expect(replayRecord(pocketDragonRules, record)).toMatchObject({
       earned: record.claims,
       ok: true,
     });

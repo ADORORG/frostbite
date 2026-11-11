@@ -1,0 +1,3 @@
+ALTER TABLE "frostbite"."game_runs" ADD COLUMN "score" bigint;--> statement-breakpoint
+CREATE INDEX "game_runs_board_idx" ON "frostbite"."game_runs" ("game_id","score" DESC NULLS LAST) WHERE "score" is not null;--> statement-breakpoint
+ALTER TABLE "frostbite"."game_runs" ADD CONSTRAINT "game_runs_score_coherent" CHECK ("score" is null or ("verdict" is not distinct from 'verified' and "score" >= 0));

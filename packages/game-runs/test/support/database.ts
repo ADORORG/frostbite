@@ -44,8 +44,12 @@ export const newRun = (
   ...over,
 });
 
-export const verified = (earned: string[] = ["first-win"]): RunVerdict => ({
+export const verified = (
+  earned: string[] = ["first-win"],
+  score: number | null = null,
+): RunVerdict => ({
   earned,
+  score,
   reason: null,
   recordDigest: "b".repeat(64),
   recordText: '{"claims":[]}',

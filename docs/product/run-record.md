@@ -42,7 +42,7 @@ so a game cannot hand over one the platform would refuse for its shape.
 ## The verifier
 
 A verifier is a **pure state machine** (`GameVerifier<State>`, also in the SDK so a game needs nothing from the
-platform to write one): `init(seed, config)`, `step(state, input)` and `earned(state)`. Each step either gives the next
+platform to write one): `init(seed, config)`, `step(state, input)`, `earned(state)` and, for a game that ranks scores, `score(state)`. Each step either gives the next
 state or refuses the input with a reason. It uses its own seeded generator and nothing else: **no clock, no
 `Math.random`, no network, no storage**. It never throws for an input; it refuses.
 
@@ -71,7 +71,7 @@ self-reported, and the loader says so rather than loading them.
    one refused). A verifier that fails is reported as such (`verifier-error`), not as a verdict on the run.
 4. Every claim must have been earned (`claim-not-earned`).
 
-The answer is `verified` (every milestone the replay earned, and the digest) or `rejected` (a reason, a detail and the
+The answer is `verified` (every milestone the replay earned, the digest, and the score the replay reached: a whole number from 0 up once the run has ended, `null` before that or for a game that keeps none; the platform keeps it on the run and a leaderboard ranks only these, never a number the game reports) or `rejected` (a reason, a detail and the
 digest where there is one). A milestone the replay earned that the game did not claim is simply not claimed.
 
 ## Conformance

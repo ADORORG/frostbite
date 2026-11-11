@@ -11,12 +11,14 @@ export const cabinetSetting = "cabinet";
 // functions that work on it instead of being typed away.
 export interface CabinetRun {
   earned(): readonly string[];
+  score(): number | null;
   step(input: RunInput): Stepped<CabinetRun>;
 }
 
 function running<State>(rules: GameVerifier<State>, state: State): CabinetRun {
   return {
     earned: () => rules.earned(state),
+    score: () => rules.score?.(state) ?? null,
     step(input) {
       const stepped = rules.step(state, input);
       return stepped.ok
@@ -58,6 +60,7 @@ export function combineCabinets(
   return {
     earned: (run) => run.earned(),
     id: options.id,
+    score: (run) => run.score(),
     init(seed, config) {
       const { [cabinetSetting]: name, ...settings } = config;
       const chosen =

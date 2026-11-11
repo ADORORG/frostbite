@@ -40,6 +40,9 @@ export function createListMintedMilestonesOperation(
   >;
 }
 
+// What is said when a picture cannot be shown, wherever it is asked for (the player's own, and a shared page's).
+export const pictureUnavailable = "The picture is not available.";
+
 // How long a browser keeps a minted picture. The item a claim minted does not change, so a day is a courtesy to the chain (each
 // picture is a read of it), not a freshness promise; a picture that was not there is never kept (an error is never cached).
 export const mintedPictureCache = {
@@ -66,7 +69,7 @@ export function createGetMintedPictureOperation(
             ok: true,
             value: { bytes: picture.bytes, contentType: picture.contentType },
           } as const)
-        : failure("not_found", "The picture is not available.", picture.code);
+        : failure("not_found", pictureUnavailable, picture.code);
     },
     files: mintedPictureContentTypes,
     idempotency: "none",

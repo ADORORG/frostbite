@@ -23,6 +23,7 @@ export interface RecentMint {
   readonly milestoneId: string;
   readonly platformFeeSats: bigint;
   readonly transactionId: string | null;
+  readonly userId: string;
   readonly walletAddress: string;
 }
 
@@ -74,6 +75,7 @@ export function mintQueries(database: DatabaseClient) {
           milestoneId: gameMilestoneClaims.milestoneId,
           platformFeeSats: gameMilestoneClaims.platformFeeSats,
           transactionId: gameMilestoneClaims.transactionId,
+          userId: gameMilestoneClaims.userId,
           walletAddress: gameMilestoneClaims.walletAddress,
         })
         .from(gameMilestoneClaims)

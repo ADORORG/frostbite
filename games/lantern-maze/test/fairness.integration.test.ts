@@ -70,7 +70,7 @@ describe("the game, played whole", () => {
       if (result === undefined) throw new Error("no result");
       const seed = [seeds[0], seeds[1], seeds[2]][index] ?? 0;
       const made = record(result, seed);
-      expect(replayRecord(mazeRules, made)).toEqual({
+      expect(replayRecord(mazeRules, made)).toMatchObject({
         earned: made.claims,
         ok: true,
       });

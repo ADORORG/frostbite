@@ -155,7 +155,12 @@ export interface GameStatus {
 
 export type AdminChainPorts = Pick<
   ChainPorts,
-  "addressCodec" | "broadcaster" | "builder" | "contracts" | "observer"
+  | "addressCodec"
+  | "broadcaster"
+  | "builder"
+  | "contracts"
+  | "observer"
+  | "rewards"
 >;
 
 export type DrawingCheck =

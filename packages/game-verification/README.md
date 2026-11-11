@@ -20,7 +20,7 @@ specification is `docs/product/run-record.md`.
   `defineVerifier`, which folds the state type away so different games share a registry.
 - `@frostbite/game-verification/registry`: `createVerifierRegistry` (explicit, one verifier per game, found by game id).
 - `@frostbite/game-verification/policy`: typed limits (`maxInputs`, `maxRecordBytes`), never above the SDK's ceilings.
-- `@frostbite/game-verification/verify`: `verifyRun(registry, raw, policy)` answers `verified` (the milestones earned and the
+- `@frostbite/game-verification/verify`: `verifyRun(registry, raw, policy)` answers `verified` (the milestones earned, the replay's `score` or `null`, and the
   record's SHA-256 digest) or `rejected` (a reason), for any input, and never throws.
 
 ## Invariants

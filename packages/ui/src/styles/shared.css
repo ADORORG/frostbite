@@ -1,0 +1,186 @@
+/* The page a shared link opens: a trophy room. What was earned is shown big, over the game it came from, and the visitor is asked to play. */
+.shared {
+  display: grid;
+  gap: var(--arcade-space-5);
+}
+.shared-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: var(--arcade-space-5);
+  overflow: hidden;
+  padding: clamp(1.5rem, 5vw, 3.5rem) clamp(1rem, 4vw, 3rem);
+  border: var(--arcade-border-width) solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-surface-recessed);
+  text-align: center;
+}
+.shared-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  filter: blur(1.5rem) brightness(0.38) saturate(1.2);
+  transform: scale(1.25);
+}
+/* A light that rises from behind the picture, and a floor of the arcade's dark under the words, so text stays easy to read on any cover. */
+.shared-hero__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 30%, rgb(43 231 255 / 28%), transparent 55%),
+    linear-gradient(transparent 40%, rgb(6 3 15 / 75%));
+}
+.shared-hero[data-tone="score"] .shared-hero__glow {
+  background:
+    radial-gradient(circle at 50% 35%, rgb(255 210 63 / 30%), transparent 55%),
+    linear-gradient(transparent 40%, rgb(6 3 15 / 75%));
+}
+.shared-hero[data-tone="shelf"] .shared-hero__glow {
+  background:
+    radial-gradient(circle at 50% 20%, rgb(255 95 210 / 26%), transparent 60%),
+    linear-gradient(transparent 40%, rgb(6 3 15 / 60%));
+}
+.shared-hero__art {
+  inline-size: min(100%, 17rem);
+}
+.shared-hero__body {
+  display: grid;
+  justify-items: center;
+  gap: var(--arcade-space-3);
+  min-inline-size: 0;
+}
+@media (min-width: 52rem) {
+  .shared-hero:has(.shared-hero__art) {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    justify-items: stretch;
+    text-align: start;
+  }
+  .shared-hero:has(.shared-hero__art) .shared-hero__body {
+    justify-items: start;
+  }
+  .shared-hero__art {
+    inline-size: 100%;
+  }
+}
+.shared-kicker {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-pixel);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 0 1rem rgb(255 210 63 / 55%);
+}
+.shared-title {
+  margin: 0;
+  font-family: var(--arcade-font-display);
+  font-size: clamp(2rem, 6.5vw, 3.75rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+}
+/* The picture of what was earned, framed like a cabinet's marquee, lit from within. */
+.shared-frame {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 0.25rem solid var(--arcade-cyan);
+  border-radius: var(--arcade-radius-medium);
+  background: var(--arcade-ink);
+  box-shadow:
+    0 0 0 0.375rem var(--arcade-ink),
+    0 0 2.5rem rgb(43 231 255 / 45%),
+    0.5rem 0.5rem 0 0.375rem var(--arcade-ink);
+  animation: shared-pulse 3.2s ease-in-out infinite;
+}
+.shared-stamp {
+  position: absolute;
+  inset-block-end: var(--arcade-space-3);
+  inset-inline-end: var(--arcade-space-3);
+  z-index: 3;
+  padding: 0.25rem var(--arcade-space-3);
+  background: var(--arcade-mint);
+  color: var(--arcade-ink);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+  transform: rotate(-6deg);
+  box-shadow: 0.1875rem 0.1875rem 0 var(--arcade-ink);
+}
+@keyframes shared-pulse {
+  50% {
+    box-shadow:
+      0 0 0 0.375rem var(--arcade-ink),
+      0 0 3.5rem rgb(43 231 255 / 65%),
+      0.5rem 0.5rem 0 0.375rem var(--arcade-ink);
+  }
+}
+.shared-game {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  color: var(--arcade-text-muted);
+  font-size: var(--arcade-text-lg);
+}
+.shared-game a {
+  color: var(--arcade-text);
+  font-weight: 700;
+}
+.shared-game__cover {
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: var(--arcade-radius-small);
+  object-fit: cover;
+}
+.shared-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arcade-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.shared-hero__body .shared-chips {
+  justify-content: center;
+}
+@media (min-width: 52rem) {
+  .shared-hero:has(.shared-hero__art) .shared-chips {
+    justify-content: flex-start;
+  }
+}
+.shared-chips li {
+  padding: 0.25rem var(--arcade-space-3);
+  border: 0.125rem solid var(--arcade-border-strong);
+  border-radius: 999px;
+  background: rgb(6 3 15 / 60%);
+  font-family: var(--arcade-font-pixel);
+  font-size: var(--arcade-label-size);
+  text-transform: uppercase;
+}
+.shared-chips li[data-tone="good"] {
+  border-color: var(--arcade-mint);
+  color: var(--arcade-mint);
+}
+/* A score, as a scoreboard shows one. */
+.shared-score {
+  margin: 0;
+  color: var(--arcade-yellow);
+  font-family: var(--arcade-font-display);
+  font-size: clamp(3.5rem, 16vw, 8rem);
+  line-height: 1;
+  text-shadow:
+    0.25rem 0.25rem 0 var(--arcade-ink),
+    0 0 2rem rgb(255 210 63 / 55%);
+  font-variant-numeric: tabular-nums;
+}

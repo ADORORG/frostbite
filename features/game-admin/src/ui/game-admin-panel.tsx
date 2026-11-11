@@ -1,18 +1,20 @@
 "use client";
 
 import { ArcadeInfoCard } from "@repo/ui/arcade";
-import { useMemo, type ReactNode } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 
 import { createGameAdminApi, type GameAdminApi } from "../client/api.ts";
 import type { AdminGameInfo } from "../game-info.ts";
 import { ActivityLog } from "./activity-log.tsx";
+import { BatchDrawings } from "./batch-drawings.tsx";
 import { ClaimsSection } from "./claims-section.tsx";
 import { ContractSection } from "./contract-section.tsx";
 import { MilestoneList } from "./milestone-list.tsx";
 import { SignerBar } from "./signer-bar.tsx";
-import { isStarting } from "./starting.ts";
+import { isPreparing, isStarting } from "./starting.ts";
 import { StepSheet } from "./step-sheet.tsx";
 import { useAdminSteps, type StepSigner } from "./use-admin-steps.ts";
+import { useBatchQueue } from "./use-batch-queue.ts";
 import { useSigner } from "./use-signer.ts";
 
 // One game's rewards contract, for staff: create it once the templates are published, then pause and resume claims, define
@@ -43,8 +45,13 @@ export function GameAdminPanel({
     ...(sign === undefined ? {} : { sign }),
   });
   const signer = useSigner(connectedAddress);
-  const ask = (action: Parameters<typeof admin.start>[0]) =>
-    signer.ready ? admin.start(action, signer.context) : Promise.resolve();
+  const { start } = admin;
+  const ask = useCallback(
+    (action: Parameters<typeof start>[0]) =>
+      signer.ready ? start(action, signer.context) : Promise.resolve(),
+    [signer.context, signer.ready, start],
+  );
+  const queue = useBatchQueue({ admin, ask });
   const { overview, starting } = admin;
   if (overview === null || overview.kind !== "game")
     return (
@@ -104,6 +111,19 @@ export function GameAdminPanel({
       ) : null}
       {children}
       <ActivityLog onOpen={admin.reopen} steps={admin.steps} />
+      {overview.contract !== null ? (
+        <BatchDrawings
+          // A run that stopped at a refusal is continued from the batch itself, so only a step being prepared holds it back.
+          busy={!signer.ready || isPreparing(starting)}
+          milestones={game.milestones}
+          policy={{
+            ...overview.drawingLimits,
+            maxBytes: overview.contract.maxDrawingBytes,
+          }}
+          queue={queue}
+          steps={admin.steps}
+        />
+      ) : null}
       {hasContract ? (
         <MilestoneList
           busy={busy}

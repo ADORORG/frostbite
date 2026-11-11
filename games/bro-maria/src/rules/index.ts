@@ -14,6 +14,7 @@ import type {
 import { maxTicks, verifierId, verifierVersion } from "./constants.ts";
 import { pressJump } from "./hero.ts";
 import { earnedBy } from "./milestones.ts";
+import { scoreOf } from "./score.ts";
 import { startRun } from "./state.ts";
 import { advanceTo } from "./tick.ts";
 import type { State } from "./types.ts";
@@ -73,6 +74,8 @@ export const broRules: GameVerifier<State> = {
       ? refuse(`no such setting: ${Object.keys(config)[0] ?? ""}`)
       : { ok: true, state: startRun(seed) };
   },
+  // The run's score, once it has ended: the number the game shows and keeps as the player's best.
+  score: (state) => (state.ended ? scoreOf(state) : null),
   step(state, input: RunInput) {
     if (state.ended) return refuse("the run has ended");
     switch (input.type) {

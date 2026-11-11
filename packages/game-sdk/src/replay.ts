@@ -3,7 +3,12 @@ import type { GameVerifier, RunRecord } from "./run-record.ts";
 // What replaying a record with a game's rules gives: what the run earned, or the first reason it is not a legal run. The
 // same code runs inside a game's verifier artifact (on the platform's server) and in a game's own tests.
 export type ReplayOutcome =
-  | { readonly earned: readonly string[]; readonly ok: true }
+  | {
+      readonly earned: readonly string[];
+      readonly ok: true;
+      // The score the replay reached, or null when the run has not ended or the game keeps none.
+      readonly score: number | null;
+    }
   | {
       readonly detail: string;
       readonly index: number | null;
@@ -38,7 +43,11 @@ export function replayRecord<State>(
         };
       state = next.state;
     }
-    return { earned: [...new Set(rules.earned(state))], ok: true };
+    return {
+      earned: [...new Set(rules.earned(state))],
+      ok: true,
+      score: scoreOf(rules, state),
+    };
   } catch {
     // A bug in the rules must not take a server down or be read as a verdict on the run.
     return {
@@ -48,6 +57,17 @@ export function replayRecord<State>(
       reason: "verifier-error",
     };
   }
+}
+
+// The score the rules report for a state, if it is one the platform can rank: a whole number from 0 up that is exact in a double.
+function scoreOf<State>(
+  rules: GameVerifier<State>,
+  state: State,
+): number | null {
+  const score = rules.score?.(state) ?? null;
+  return score !== null && Number.isSafeInteger(score) && score >= 0
+    ? score
+    : null;
 }
 
 // The names a verifier artifact leaves in its global scope for the platform's runner to find. The artifact is one script

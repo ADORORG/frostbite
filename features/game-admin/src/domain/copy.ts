@@ -203,4 +203,15 @@ export const unconfirmedSendCopy =
 export const noSignerCopy =
   "This version has no wallet connection that signs administration steps. Sign the transaction below with a wallet you trust, and paste the signed result.";
 
+// The milestone list: what the list says once about drawings, the two ways to define, and what a defined milestone says it was defined with.
+export const milestoneCopy = {
+  // Said once, above the list, and not under every milestone: what a drawing is and what cannot be undone.
+  intro: (defined: number, total: number) =>
+    `A drawing becomes the collectible. It is checked before signing, written on the chain once, and cannot be changed. Without one, collectibles show a generated picture, for good. ${String(defined)} of ${String(total)} defined.`,
+  defineWithout: "Without a drawing",
+  drawn: (bytes: number) => `Defined with a drawing (${bytes} bytes)`,
+  undrawn:
+    "Defined without a drawing: its collectibles show a generated picture",
+} as const;
+
 export const shortHash = (hash: string): string => `${hash.slice(0, 12)}…`;

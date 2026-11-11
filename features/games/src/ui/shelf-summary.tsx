@@ -1,20 +1,25 @@
 import { mintedCopy } from "../domain/minted-copy.ts";
 import type { ShelfStats } from "../domain/shelf-view.ts";
 
-// The collection in a few facts: how many milestones in how many games, since when, and the newest. Facts the records do not give (no
-// mints yet) are left out rather than made up.
+// The collection as a scoreboard: how many milestones, in how many games, and the newest. Facts the records do not give (no mints yet) are
+// left out rather than made up.
 export function ShelfSummary({ stats }: { readonly stats: ShelfStats }) {
   return (
     <ul aria-label={mintedCopy.title} className="shelf-summary">
-      <li>
-        <strong>{mintedCopy.piecesCount(stats.pieces)}</strong>{" "}
-        {mintedCopy.gamesCount(stats.games)}
+      <li className="shelf-stat">
+        <strong>{stats.pieces}</strong>
+        <span>{mintedCopy.statMilestones(stats.pieces)}</span>
       </li>
-      {stats.firstDay === null ? null : (
-        <li>{mintedCopy.firstMinted(stats.firstDay)}</li>
-      )}
+      <li className="shelf-stat">
+        <strong>{stats.games}</strong>
+        <span>{mintedCopy.statGames(stats.games)}</span>
+      </li>
       {stats.latest === null ? null : (
-        <li>{mintedCopy.latestMinted(stats.latest.title, stats.latest.day)}</li>
+        <li className="shelf-stat shelf-stat--latest">
+          <small>{mintedCopy.statLatest}</small>
+          <strong>{stats.latest.title}</strong>
+          <span>{stats.latest.day}</span>
+        </li>
       )}
     </ul>
   );

@@ -1,8 +1,9 @@
 import type { EmailAddressesView } from "@frostbite/auth";
 import type { UuidV7 } from "@frostbite/shared/identifiers";
+import { profileSetupPath } from "@frostbite/shared/profiles";
 import type { WalletNetwork } from "@frostbite/wallet/contracts";
 import type { NavigationItem } from "@frostbite/plugin-kit/navigation";
-import { ConsoleCard, ConsolePage } from "@repo/ui/arcade";
+import { ArcadeButton, ConsoleCard, ConsolePage } from "@repo/ui/arcade";
 
 import { EmailPanel } from "./email-panel.tsx";
 import { PasskeyPanel } from "./passkey-panel.tsx";
@@ -36,6 +37,15 @@ export function AccountSurface({
       navigation={navigation}
       status={{ label: "Signed in", tone: "ready" }}
     >
+      <ConsoleCard
+        glyph="*"
+        lead="Pick a fighter and a name. Your page shows your best verified scores and your minted milestones."
+        title="Player profile"
+      >
+        <ArcadeButton href={profileSetupPath} tone="yellow">
+          Set up my profile
+        </ArcadeButton>
+      </ConsoleCard>
       <WalletPanel
         expectedNetwork={expectedNetwork}
         otherWays={

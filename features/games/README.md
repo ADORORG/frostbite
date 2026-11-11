@@ -33,6 +33,53 @@ platform learns the item's id from the network when the claim's transaction is s
 says it was issued by the contract the claim was made against and is an `image/svg+xml`; otherwise the piece shows no picture, and
 never a broken one. It is drawn through an image tag, which cannot run what a drawing holds.
 
+## Sharing (SHARE-1)
+
+A signed-in player can make a link to something they earned: a milestone they hold, their shelf of milestones, or a score. The link is
+`/s/<id>` (`POST /api/v1/games/shares`, authenticated; `POST /api/v1/games/shares/revoke` ends the player's own link). The service and
+table are `@frostbite/game-shares`; the rules it enforces are in that package's README. A milestone share takes its level
+(`replay-verified` or `self-reported`) from the account, never from the request, and a score is always `self-reported`, because no replay
+verifier returns a score.
+
+`/s/<id>` is a public page (`ui/shared-page.tsx`) and `/s/<id>/share-image` (in the web app, built with `shareCardResponse`) is the
+picture a link preview shows. Both are made from the same `sharedView` (`domain/shared-view.ts`) and the same wording
+(`domain/share-copy.ts`), so they cannot disagree. Neither carries anything about who shared: no name, wallet or email. A link that is
+ended, never was, names a game that is no longer listed or a milestone it no longer declares, shows "not shared" and gives previews no
+metadata. A preview picture is cached for up to an hour at the edge, so an ended link's picture can be seen for that long.
+
+### Sharing a new best and a held milestone (SHARE-1d)
+
+In a game, the platform reads the best score from the progress the game saves (`{ best }`, the SDK's `Progress`), so no game has to say it:
+the best the game loaded is the bar, and a save that beats it is a new best (`domain/best-score.ts`, watched in `use-game-session.ts`).
+A signed-in player whose progress is on their account (`sync === "account"`) then gets a small **Share** chip in the game's top bar, outside
+the picture and never over the play area, that shares that score; the page it opens calls it self-reported, because no replay verifier
+returns a score. A milestone the player holds has the same chip on its card in the game's milestone list. A player with no account sees
+neither, because a link is made from the account's own records.
+
+## The Minted gallery (M2)
+
+A game that mints milestones has a **Minted** section in its dock: how many players minted each milestone, then every mint, newest first, a
+page at a time (`ui/minted-gallery.tsx`). It is public. It is read from `GET /api/v1/games/gallery?gameId=` (a page of 24; `cursor` for the
+next; the per-milestone counts only with the first page) and each picture from `GET /api/v1/games/gallery/picture?claimId=`, which reads
+the picture as the player the completed claim belongs to and answers "not found" for a claim that is not complete or is of a game the
+platform does not list. Owner decisions (2026-10-27, confirmed 2026-11-08): every mint appears, the wallet in short form (shortened on the
+server, so the whole address never leaves it), no opt-in; each mint says whether the platform replayed the run (`replay-verified`) or the
+game only reported it (`self-reported`); the words are "minted to", never "owned by" (nothing locks a mint to its wallet, and the wallet
+paid may not be the player); only claims the network's records show complete. Counting (`completeCounts`) reads one row per
+milestone from `game_milestone_mint_totals`, kept by triggers on the claims table, so it costs the same however many mints there are; the
+answer is still cached for a minute, which only spares the database a repeated read.
+
+## The Leaderboard (LB-1)
+
+A game the platform replays (it publishes a `verification.replay` verifier, so `PublicGame.scored`) has a **Leaderboard** section in its
+dock (`ui/leaderboard.tsx`): the best **verified** score of each signed-in player for all time, this month or this week (UTC), 25 places,
+a podium for the top three, and the signed-in player's own place underneath. Nothing a game merely reports is ranked. It is read from
+`GET /api/v1/games/leaderboard?gameId=&window=` (public, cached 60 s) and `GET /api/v1/games/leaderboard/me?...` (the session's own
+place; never a player named in the request). A row names a player only when they switched their public profile on (name, picture, a link
+to `/p/<name>`); otherwise it is "A player" with no identifier. Ties share a rank and the player who reached the score first is listed
+first. The numbers come from `game_score_bests`, kept by a trigger on `game_runs` (see `@frostbite/game-runs`), so a read costs the same
+however many runs there are. A game with no replay verifier has no board (the route answers "not found").
+
 ## Searching the games page
 
 `/games` has a search box and filters over the wall of covers (`ui/games-browser.tsx`). The whole catalog is already on the page, so it
@@ -100,3 +147,11 @@ reduced-motion and visual behavior is covered by Playwright.
 ## Ownership
 
 Platform games team.
+
+## Hot games (HOT-1)
+
+The platform counts a run started in a game (the page counts it, when the game asks for a run, signed in or not: `client/plays-api.ts`, called from
+`client/runs-port.ts`) through the public `POST /api/v1/games/play` (`application/plays-operations.ts`, limited per address) into `game_play_days`. The
+ranking (`rankGames` in `@frostbite/game-runs`) is read per page view through `plays-runtime.ts` (kept 60 s) and drawn by `GamesRail` (the "Hot right now"
+rail), `GamesBrowser` (ranked games first, `domain/heat-order.ts`) and every card (`ui/heat-badges.tsx`: sticker, rim, meter). See
+`docs/product/hot-games.md` for what counts, what is hot and the design.

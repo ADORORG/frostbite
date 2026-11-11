@@ -67,6 +67,7 @@ const rejection = (
   reason,
   recordDigest,
   recordText,
+  score: null,
   status: "rejected",
 });
 
@@ -101,6 +102,7 @@ export function createGameRunsService(dependencies: GameRunsDependencies) {
       reason: null,
       recordDigest: result.digest,
       recordText: kept,
+      score: result.score,
       status: "verified",
     };
   }

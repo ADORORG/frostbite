@@ -10,7 +10,14 @@ import {
   createSubmitStepOperation,
 } from "../../src/application/operations.ts";
 import type { GameAdminRuntime } from "../../src/runtime.ts";
-import { chain, config, info, staffId, view } from "./fixtures.ts";
+import {
+  chain,
+  config,
+  info,
+  staffId,
+  view,
+  drawingLimits,
+} from "./fixtures.ts";
 
 export const context = {
   actorSession: null,
@@ -29,6 +36,7 @@ export function stub(overrides: Partial<GameAdminService> = {}) {
     status: vi.fn(async () => ({
       contract: { address: "rewards-1", maxDrawingBytes: 4096 },
       drawingCeiling: 8192,
+      drawingLimits,
       templatesReady: true,
     })),
     templates: vi.fn(async () => [
@@ -50,6 +58,7 @@ export function stub(overrides: Partial<GameAdminService> = {}) {
   };
   const resolve = async (): Promise<GameAdminRuntime> => ({
     fees: { change: unused, setting: unused, view: unused },
+    drawingLimits: config().drawingLimits,
     games: info(),
     mints: { recent: unused, totalsFor: unused },
     names: async () => new Map([[staffId, "Ada"]]),

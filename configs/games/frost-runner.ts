@@ -188,7 +188,7 @@ export const frostRunnerGame = defineGame({
     replay: {
       id: "frost-runner",
       sha256:
-        "4917c6257ede670603e55120a860e8394a1aefb88efc64fc0659c64a8b20c465",
+        "1a3908d262e47386080318daf804140ff95616bb2cdae5fa1de4c34ba9abeb34",
       version: 1,
     },
   },

@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "scripts": {
     "predev": "node --experimental-strip-types scripts/build-games.ts",
@@ -31,6 +32,7 @@
     "@frostbite/feature-game-admin": "workspace:*",
     "@frostbite/feature-games": "workspace:*",
     "@frostbite/feature-platform-shell": "workspace:*",
+    "@frostbite/feature-profiles": "workspace:*",
     "@frostbite/feature-public-collections": "workspace:*",
     "@frostbite/feature-public-products": "workspace:*",
     "@frostbite/game-admin": "workspace:*",
@@ -40,6 +42,7 @@
     "@frostbite/object-storage": "workspace:*",
     "@frostbite/plugin-kit": "workspace:*",
     "@frostbite/scenes": "workspace:*",
+    "@frostbite/share": "workspace:*",
     "@frostbite/shared": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/configs": "workspace:*",

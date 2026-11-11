@@ -44,6 +44,8 @@ maximumFeeSats, ... })` adds what staff do: `view`, and `change(staffUserId, cha
   grows with the number of mints**: completed mints and fees are a row per game in `frostbite.game_mint_totals`, kept by triggers on
   the claims table (a claim becoming complete adds one and its fee; leaving `complete` takes them away; deleting a claim, which
   happens when its player's account is deleted, takes nothing away, because the fee was paid on the chain); claims still on their way
+  how many players minted each milestone is a row per milestone in `frostbite.game_milestone_mint_totals`, kept by triggers the same
+  way (`completeCounts`; a milestone moved to another game or milestone is counted again where it went); claims still on their way
   are found by `game_milestone_claims_game_state_idx`; and a page of the list is read from the partial index
   `game_milestone_claims_game_recent_idx`, with no sort. The integration tests ask the database for each query's plan (`mintQueries`)
   and fail if it stops using these.

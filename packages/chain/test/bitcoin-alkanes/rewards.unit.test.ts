@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 import {
   chainFamilyIdSchema,
@@ -126,6 +128,40 @@ describe("claimed at the edge of a safe count", () => {
   it("accepts the largest safe count and refuses the next", async () => {
     expect(await claims(largestSafe)).toBe(Number.MAX_SAFE_INTEGER);
     await expect(claims(largestSafe + 1n)).rejects.toThrow("safe integer");
+  });
+});
+
+describe("drawing", () => {
+  it("asks the game for the milestone's art by its key, and answers its size and SHA-256", async () => {
+    const art = "<svg viewBox='0 0 1 1'/>";
+    const { calls, node } = nodeAnswering(() => text(art));
+    const held = await reader(node).drawing(game, "first-frost");
+    expect(calls).toEqual([
+      {
+        inputs: [milestoneKey("first-frost")],
+        opcode: gameRewardsOpcodes.getMilestoneArt,
+        target: { block: 2n, tx: 5n },
+      },
+    ]);
+    expect(held).toEqual({
+      bytes: art.length,
+      sha256: createHash("sha256").update(art).digest("hex"),
+    });
+  });
+
+  it("answers none when the game keeps no art for the milestone, and refuses an answer it cannot trust", async () => {
+    expect(
+      await reader(nodeAnswering(() => text("")).node).drawing(game, "m-1"),
+    ).toBeNull();
+    await expect(
+      reader(nodeAnswering(() => failure).node).drawing(game, "m-1"),
+    ).rejects.toBeInstanceOf(ContractAnswerError);
+    await expect(
+      reader(nodeAnswering(() => text("x")).node).drawing(
+        { ...game, id: "rewards-1" },
+        "m-1",
+      ),
+    ).rejects.toBeInstanceOf(ContractAnswerError);
   });
 });
 

@@ -1,3 +1,4 @@
+import { gameKindsOf } from "@frostbite/shared/games";
 import { fixtureTapsGame } from "@repo/configs/games/fixture-taps";
 
 // The game the browser tests use whenever they need "a game": a small one registered only in a test run (configs/games.ts), so adding or
@@ -20,7 +21,8 @@ export const fixtureGame = {
   searchWord: (fixtureTapsGame.title.split(" ").at(-1) ?? "").toLowerCase(),
   // Taps in the game's page that earn the first milestone (read from the milestone's own criteria in the manifest).
   tapsForFirstMilestone,
-  tag: fixtureTapsGame.tags[0] ?? "",
+  // The filter chip that finds it (its first kind of game).
+  kind: gameKindsOf(fixtureTapsGame.tags)[0] ?? "",
   title: fixtureTapsGame.title,
   version: fixtureTapsGame.version,
 } as const;

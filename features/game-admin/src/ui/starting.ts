@@ -9,11 +9,12 @@ export interface Starting {
   readonly label: string;
 }
 
+// Whether an action is being prepared right now, as opposed to one that was asked for and turned down (which only waits to be read).
+export const isPreparing = (starting: Starting | null): boolean =>
+  starting !== null && starting.failure === null;
+
 // Whether this action is the one being prepared now, for the button that asked for it to show it (and for no other button to).
 export const isStarting = (
   starting: Starting | null,
   action: GameAdminAction,
-): boolean =>
-  starting !== null &&
-  starting.failure === null &&
-  starting.label === actionLabel(action);
+): boolean => isPreparing(starting) && starting?.label === actionLabel(action);

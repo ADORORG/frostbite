@@ -2,10 +2,12 @@
   "name": "@repo/ui",
   "version": "0.0.0",
   "private": true,
+  "license": "FSL-1.1-ALv2",
   "type": "module",
   "exports": {
     "./arcade": "./src/arcade.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./shorten-middle": "./src/components/shorten-middle.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
