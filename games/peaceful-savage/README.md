@@ -37,11 +37,15 @@ a drag) and lift it high over the trees (E, Space or a tap); left alone it cruis
 out and hold hands in a line on the lawn as the jackets light up gold, and lift off one by one, each flying a way of their own.
 
 **The house, and what is under the meadow.** The house is the book's: one wave of a roof in purple scales edged with gold, tall over
-the east wing and dipping to the door, glowing oval windows, the tree's gold in the great west window. Inside nothing has a right
+the east wing and dipping to the door. Its windows are real: ovals of clear glass in gold frames cut through the outer walls (the
+kitchen's great scooped window, the office's three, a round one at the end of the hall, one in each bedroom), so the rooms are seen
+from the grass and the meadow from the rooms. There are five ways in: the front door; the office's tall window, up its round steps; the
+kitchen's side door, at the top of a raised stair that curves round the corner of the house; and a sliding window in each bedroom. Their
+glass panes slide aside as someone comes near. The grass goes all round the house, to a hedge on every side. Inside nothing has a right
 angle: walls roll round at their ends, corners sweep, every room has a vault and every doorway a tall oval arch, and the furniture is
 all pebbles. The swing's seat is a curved cross-section of mahogany. The giant snake is not seen until the end: it moves under the
-meadow, a ridge of turned earth running over it, a loop of its back rolling out of the grass now and then, and rests under a breathing
-mound on the hill. It rises out of the mound, whole for the first time, when the family comes in their jackets.
+meadow, a ridge of turned earth running over it, a loop of its back rolling out of the grass now and then. The hill it rests under is
+plain grass; when the family comes in their jackets the ground there breaks open, clods flying, and it rises whole for the first time.
 
 Each of the family has a lesson, lived rather than told: Zora makes and mixes things and learns to love the land (she plants seeds in the
 meadow and tends them into bloom); Kai can build anything and learns structure, mindfulness and looking after himself (his tower goes up

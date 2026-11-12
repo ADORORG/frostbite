@@ -10,7 +10,7 @@ import type { HeroId } from "../rules/constants.ts";
 import { mirrors } from "../rules/collect.ts";
 import { greyAt, greyHomes } from "../rules/greys.ts";
 import { box } from "../rules/geometry.ts";
-import { familySpots, field, places, shell } from "../rules/layout.ts";
+import { familySpots, field, places, shell, ways } from "../rules/layout.ts";
 import { isHero, stepOf } from "../rules/moment.ts";
 import type { PlayState } from "../rules/types.ts";
 import { dancing } from "./acting.ts";
@@ -54,7 +54,7 @@ const arches = [
   box(-3_100, 9_600, -2_900, 11_000),
   box(2_900, 2_400, 3_100, 3_800),
   box(2_900, 9_600, 3_100, 11_000),
-  box(-900, -100, 900, 100),
+  ...ways,
 ];
 const bounds = [...shell, ...field, ...arches];
 

@@ -12,7 +12,7 @@ import {
 
 import type { ZoneId } from "../../rules/constants.ts";
 import { zoneAt } from "../../rules/geometry.ts";
-import { walls } from "../../rules/layout.ts";
+import { shell, ways } from "../../rules/layout.ts";
 import { taperedTube } from "../body/tube.ts";
 import {
   brushed,
@@ -22,6 +22,7 @@ import {
   starMap,
   tiles,
 } from "../palette.ts";
+import { buildSliders, glazedWall, wayTop } from "./house-glass.ts";
 import { buildOutside } from "./house-outside.ts";
 import { metres, type Rooms } from "./rooms.ts";
 import { archway, prism, roundPlan } from "./shapes.ts";
@@ -48,7 +49,7 @@ const floors: readonly {
   { colour: "#9a4f63", x0: 3, x1: 12, z0: 7, z1: 14, zone: "parents" },
 ];
 
-// The doorways: the four from the hall (in walls running north to south) and the front door (in the wall running east to west).
+// The doorways: the four from the hall (in walls running north to south), and the ways through the outer walls.
 const doorways: readonly {
   readonly along: "x" | "z";
   readonly at: number;
@@ -60,7 +61,16 @@ const doorways: readonly {
   { along: "z", at: -3, from: 9.6, to: 11, top: 2.75 },
   { along: "z", at: 3, from: 2.4, to: 3.8, top: 2.75 },
   { along: "z", at: 3, from: 9.6, to: 11, top: 2.75 },
-  { along: "x", at: 0, from: -0.9, to: 0.9, top: 2.9 },
+  ...ways.map((way, index) => {
+    const flat = way.x1 - way.x0 > way.z1 - way.z0;
+    return {
+      along: flat ? ("x" as const) : ("z" as const),
+      at: flat ? metres(way.z0 + way.z1) / 2 : metres(way.x0 + way.x1) / 2,
+      from: metres(flat ? way.x0 : way.z0),
+      to: metres(flat ? way.x1 : way.z1),
+      top: wayTop(index),
+    };
+  }),
 ];
 
 // How far a room's corner is swept round, and how high its vault rises in the middle.
@@ -69,6 +79,8 @@ const rise = 0.8;
 
 export interface House {
   readonly group: Group;
+  // Where the lead is (metres), for the sliding panes.
+  update(x: number, z: number, dt: number): void;
 }
 
 export function buildHouse(rooms: Rooms): House {
@@ -87,6 +99,7 @@ export function buildHouse(rooms: Rooms): House {
     ),
   );
   const line = glowing("#e7b04a", 0.9);
+  const rib = glowing("#e7b04a", 0.6);
   floors.forEach((floor, index) => {
     const wide = floor.x1 - floor.x0;
     const deep = floor.z1 - floor.z0;
@@ -147,17 +160,22 @@ export function buildHouse(rooms: Rooms): House {
   });
   // The walls of the house (not the meadow's hedges, which the meadow draws), each end rolled round, and a line of gold round each at
   // the top and at hand height: the house's own line-work.
-  for (const wall of walls.slice(0, 13)) {
+  for (const wall of shell) {
     const [x0, z0, x1, z1] = [wall.x0, wall.z0, wall.x1, wall.z1].map(metres);
     const zone = zoneAt({
       x: (wall.x0 + wall.x1) / 2,
       z: Math.max(1, (wall.z0 + wall.z1) / 2),
     });
     const outline = roundPlan(x0 ?? 0, z0 ?? 0, x1 ?? 0, z1 ?? 0, 0.1);
-    const mesh = new Mesh(prism(outline, wallHeight), plaster[zone]);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    group.add(mesh);
+    // An outer wall with windows is built with them cut through it and glazed; any other, plain.
+    const glazed = glazedWall(wall, wallHeight, plaster[zone], rib);
+    if (glazed === null) {
+      const mesh = new Mesh(prism(outline, wallHeight), plaster[zone]);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    } else group.add(glazed);
+    if (glazed !== null) continue;
     const band = roundPlan(
       (x0 ?? 0) - 0.015,
       (z0 ?? 0) - 0.015,
@@ -172,7 +190,6 @@ export function buildHouse(rooms: Rooms): House {
     }
   }
   // Over every doorway, the wall comes down in a tall oval arch, edged in gold on both faces.
-  const rib = glowing("#e7b04a", 0.6);
   for (const door of doorways) {
     const opening = archway(door.from, door.to, door.top);
     const shape = new Shape();
@@ -226,5 +243,8 @@ export function buildHouse(rooms: Rooms): House {
     group.add(ring);
   }
   group.add(buildOutside(rooms, rib));
-  return { group };
+  const sliders = buildSliders(rib);
+  group.add(sliders.group);
+  sliders.update(0, 0, 1);
+  return { group, update: sliders.update };
 }

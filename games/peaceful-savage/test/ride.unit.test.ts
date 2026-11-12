@@ -20,11 +20,9 @@ import {
   breachAt,
   buildBurrow,
   burrowAt,
-  mound,
+  torn,
 } from "../src/view/world/burrow.ts";
 import { buildCar } from "../src/view/world/car.ts";
-import { crownAt } from "../src/view/world/house-outside.ts";
-import { pebble, roundPlan } from "../src/view/world/shapes.ts";
 import { led } from "./support/states.ts";
 
 const handsOf = (): Hands => ({
@@ -176,10 +174,10 @@ describe("the giant snake under the meadow", () => {
     expect(breachAt(-breach.every + breach.lasts / 2)).toBeCloseTo(1);
   });
 
-  it("is a ridge, a loop of back and a mound, until it rises and the mound falls away", () => {
+  it("is a ridge and a loop of back under plain grass, until it rises and breaks the earth open", () => {
     const burrow = buildBurrow({ value: 0.2 });
-    const [ridge, back, pile, light] = burrow.group.children as Mesh[];
-    // A time when its back is out and it is away from the hill.
+    const [ridge, back, scar, burst, light] = burrow.group.children as Mesh[];
+    // A time when its back is out.
     const out = [...Array(200).keys()]
       .map((step) => step * 0.5)
       .find((time) => {
@@ -188,19 +186,22 @@ describe("the giant snake under the meadow", () => {
       });
     expect(out).toBeDefined();
     expect(ridge?.visible).toBe(true);
-    expect(pile?.visible).toBe(true);
-    expect(pile?.scale.y).toBeGreaterThan(mound.high * 0.9);
+    // Nothing marks the hill before it rises: no mound, no torn earth.
+    expect(scar?.visible).toBe(false);
+    expect(burst?.visible).toBe(false);
     burrow.update(true, 0, out ?? 0, true);
     expect(
       (light as unknown as { material: { opacity: number } }).material.opacity,
     ).toBeGreaterThan(0.3);
-    // The finale: nothing under the ground any more, and the mound gone as it comes up.
+    // The finale: nothing under the ground any more; the ground tears open as wide as it has risen, and the clods fly.
     burrow.update(false, 0.5, 3, true);
     expect(ridge?.visible).toBe(false);
     expect(back?.visible).toBe(false);
-    expect(pile?.scale.y).toBeCloseTo(mound.high * 0.5, 0);
+    expect(scar?.visible).toBe(true);
+    expect(scar?.scale.x).toBeCloseTo(torn.wide * 0.5);
+    expect(burst?.visible).toBe(true);
     burrow.update(false, 1, 4, false);
-    expect(pile?.visible).toBe(false);
+    expect(scar?.scale.z).toBeCloseTo(torn.deep);
   });
 
   it("is only hinted at on the hill, until the family can wake it", () => {
@@ -210,39 +211,5 @@ describe("the giant snake under the meadow", () => {
       "whole family",
     );
     expect(hillHint(led({ x: 0, z: 5_000 }))).toBeNull();
-  });
-});
-
-describe("the house of curves", () => {
-  it("has a roof like a wave: tall over the east wing, low by the door, down to the ground at each end", () => {
-    expect(crownAt(11)).toBeGreaterThan(crownAt(0) + 1.5);
-    expect(crownAt(-8)).toBeGreaterThan(crownAt(0) + 0.5);
-    expect(crownAt(0)).toBeGreaterThan(5);
-    expect(crownAt(13.6)).toBeCloseTo(0);
-    expect(crownAt(-14)).toBe(0);
-  });
-
-  it("builds every block as a pebble, rounded whichever way it is thin, and rounds a wall's ends", () => {
-    for (const size of [
-      [1.2, 0.1, 0.8],
-      [0.1, 1.2, 0.8],
-      [1.2, 0.8, 0.1],
-    ] as const) {
-      const made = pebble(size[0], size[1], size[2]);
-      made.computeBoundingBox();
-      const box = made.boundingBox;
-      expect((box?.max.x ?? 0) - (box?.min.x ?? 0)).toBeCloseTo(size[0], 1);
-      expect((box?.max.y ?? 0) - (box?.min.y ?? 0)).toBeCloseTo(size[1], 1);
-      expect((box?.max.z ?? 0) - (box?.min.z ?? 0)).toBeCloseTo(size[2], 1);
-      expect(pebble(size[0], size[1], size[2])).toBe(made);
-    }
-    const plan = roundPlan(0, 0, 4, 0.2, 0.1);
-    expect(plan.every(([x, z]) => x >= 0 && x <= 4 && z >= 0 && z <= 0.2)).toBe(
-      true,
-    );
-    // No point of it is a corner of the rectangle.
-    expect(
-      plan.some(([x, z]) => (x === 0 || x === 4) && (z === 0 || z === 0.2)),
-    ).toBe(false);
   });
 });

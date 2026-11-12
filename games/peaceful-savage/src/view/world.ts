@@ -203,6 +203,7 @@ export function buildWorld(
       const lit = ending.kind === "lit" ? ending.since : null;
       ancestors.update(lit, time);
       stage.update(lit, time, frame.marked ?? null);
+      house.update(state.x / 1000, state.z / 1000, dt);
       const ride = frame.car ?? null;
       car.update(ride, ride === null ? 0 : groundAt(ride.x, ride.z), time);
       crowd.update(lit, time, (time * beatsPerSecond) % 1);

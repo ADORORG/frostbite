@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { snakeCoil, walls } from "../src/rules/layout.ts";
+import { walls } from "../src/rules/layout.ts";
 import { startRun } from "../src/rules/state.ts";
 import {
   drawMap,
@@ -66,13 +66,11 @@ describe("the flat map, for a device with no WebGL 2", () => {
     const dots = choosing.fills.filter((fill) => fill.kind === "dot");
     // The tree, the hill, and the four of the family.
     expect(dots).toHaveLength(6);
-    // The meadow and six rooms, and every wall but the boxes the sleeping snake's coil blocks, which is drawn as a ring instead.
+    // The meadow and six rooms, and every wall; nothing marks the snake, which is under the hill.
     expect(choosing.fills.filter((fill) => fill.kind === "box").length).toBe(
-      1 + 6 + walls.length - snakeCoil.length,
+      1 + 6 + walls.length,
     );
-    expect(choosing.fills.filter((fill) => fill.kind === "ring")).toEqual([
-      { colour: "#a9a7bf", kind: "ring" },
-    ]);
+    expect(choosing.fills.filter((fill) => fill.kind === "ring")).toEqual([]);
     const state = led();
     const seen = {
       ...state,

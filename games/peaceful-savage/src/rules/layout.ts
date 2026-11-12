@@ -4,13 +4,18 @@ import { box, type Box, type Point } from "./geometry.ts";
 // round, and the places the story happens. The house runs from x -12 m to 12 m and z 0 to 14 m; its front door faces north onto the
 // meadow. The three-dimensional view dresses these same boxes; it never adds one a body could walk into.
 
-// The outer walls, with a gap for the front door; the hall's two walls, each with a doorway into the two rooms beside it; and the walls
-// between the rooms of each wing.
+// The outer walls, with their ways in and out: the front door; the tall window of the office, which is a way in too, up its steps; the
+// kitchen's side door at the top of the curved stair; and the sliding windows of the two bedrooms, which open onto the grass. Then the
+// hall's two walls, each with a doorway into the two rooms beside it; and the walls between the rooms of each wing.
 export const shell: readonly Box[] = [
   box(-12_100, -100, -900, 100),
-  box(900, -100, 12_100, 100),
-  box(-12_100, 13_900, 12_100, 14_100),
-  box(-12_100, -100, -11_900, 14_100),
+  box(900, -100, 8_400, 100),
+  box(10_400, -100, 12_100, 100),
+  box(-12_100, 13_900, 6_500, 14_100),
+  box(8_100, 13_900, 12_100, 14_100),
+  box(-12_100, -100, -11_900, 4_200),
+  box(-12_100, 5_800, -11_900, 9_600),
+  box(-12_100, 11_400, -11_900, 14_100),
   box(11_900, -100, 12_100, 14_100),
   box(-3_100, 0, -2_900, 2_400),
   box(-3_100, 3_800, -2_900, 9_600),
@@ -22,13 +27,21 @@ export const shell: readonly Box[] = [
   box(3_000, 6_900, 12_000, 7_100),
 ];
 
-// The meadow's edges: hedges along the house's front either side of it, and a hedge round the rest of the field, where the trees begin.
+// The ways through the outer walls (the front door first), each the gap it stands in: for the view, which arches each one.
+export const ways: readonly Box[] = [
+  box(-900, -100, 900, 100),
+  box(8_400, -100, 10_400, 100),
+  box(-12_100, 4_200, -11_900, 5_800),
+  box(-12_100, 9_600, -11_900, 11_400),
+  box(6_500, 13_900, 8_100, 14_100),
+];
+
+// The grass goes all round the house. Its edge is a hedge on every side, where the trees begin.
 export const field: readonly Box[] = [
-  box(-16_100, -100, -12_100, 100),
-  box(12_100, -100, 16_100, 100),
   box(-16_100, -27_100, 16_100, -26_900),
-  box(-16_100, -27_100, -15_900, 0),
-  box(15_900, -27_100, 16_100, 0),
+  box(-16_100, -27_100, -15_900, 19_100),
+  box(15_900, -27_100, 16_100, 19_100),
+  box(-16_100, 18_900, 16_100, 19_100),
 ];
 
 // Furniture too big to step over, room by room.
@@ -75,24 +88,10 @@ const furniture: readonly Box[] = [
   box(-3_500, -2_800, -2_100, -2_300),
 ];
 
-// The giant sly snake, asleep round the hilltop from the start: nobody walks through its coil, nor under its chin, nor over the tip of
-// its tail (three boxes, near enough the round of it, and one for the tail).
-export const snakeCoil: readonly Box[] = [
-  box(-4_300, -19_700, 4_300, -16_300),
-  box(-1_700, -22_300, 1_700, -12_800),
-  box(-3_200, -21_200, 3_200, -14_800),
-  box(-3_000, -14_800, -1_700, -13_800),
-];
-
 // The front door. It stands open: the porch and the meadow are part of home from the start.
-export const frontDoor: Box = box(-900, -100, 900, 100);
+export const frontDoor: Box = ways[0] ?? box(-900, -100, 900, 100);
 
-export const walls: readonly Box[] = [
-  ...shell,
-  ...field,
-  ...furniture,
-  ...snakeCoil,
-];
+export const walls: readonly Box[] = [...shell, ...field, ...furniture];
 
 // Where a run begins, before anyone is chosen: the hall, just inside the front door, facing the tree. Once chosen, the lead begins at
 // their own place (below).
@@ -106,8 +105,7 @@ export const places = {
   // The ancestor tree, in the hall. Its trunk is the box above; a hand on it reaches from about a metre away.
   deck: { x: 2_550, z: 6_000 },
   drawer: { x: 8_400, z: 3_200 },
-  // Where the giant snake sleeps and rises, on the hill in the meadow; and how near the family must come to wake it (just short of its
-  // coil, which nobody can walk into).
+  // The hill in the meadow that the giant snake rests under and rises out of; `hillRadius` is how near the family must come to wake it.
   hill: { x: 0, z: -18_000 },
   lamp: { x: 2_050, z: 11_800 },
   loom: { x: 5_200, z: 13_200 },

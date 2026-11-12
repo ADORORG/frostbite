@@ -19,43 +19,13 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 import { brushed, noise, painted, type Tone } from "../palette.ts";
 import { blossom, flowerPaint } from "./flowers.ts";
+import { groundAt, rolling } from "./ground.ts";
+
+export { groundAt, pond } from "./ground.ts";
 
 // The meadow at the red rim of town: rolling ground (flat by the house, rising to the hill where the giant sly snake gathers), grass that
 // moves in the wind, the book's wildflowers (lupines, poppies, daisies, bluebells) glowing softly, the winding golden road, the hedges,
 // and round storybook trees standing all along its edges. (The night sky over it is the sky's own.)
-function rolling(x: number, z: number): number {
-  if (z > -0.5) return 0;
-  const away = Math.min(1, (-z - 0.5) / 6);
-  const hill = 2.4 * Math.exp(-((x * x) / 60 + ((z + 18) * (z + 18)) / 40));
-  const roll =
-    0.35 * Math.sin(x * 0.21) * Math.cos(z * 0.17) +
-    0.25 * Math.sin((x + z) * 0.09);
-  return away * (hill + roll + 0.2);
-}
-
-const eased = (from: number, to: number, value: number): number => {
-  const t = Math.max(0, Math.min(1, (value - from) / (to - from)));
-  return t * t * (3 - 2 * t);
-};
-
-// The still pond in the meadow (one of the rules' mirrors): where it lies, how far its water reaches either way, and its level. The
-// ground is laid level round it for a bank and dips under it, so the water has a shore and whoever walks in wades.
-export const pond = {
-  deep: 2.1,
-  level: rolling(-12, -14) - 0.03,
-  wide: 2.9,
-  x: -12,
-  z: -14,
-} as const;
-
-export function groundAt(x: number, z: number): number {
-  const ground = rolling(x, z);
-  const from = Math.hypot((x - pond.x) / pond.wide, (z - pond.z) / pond.deep);
-  if (from >= 1.5) return ground;
-  const bank = ground + (pond.level + 0.015 - ground) * eased(1.5, 1.05, from);
-  return bank - 0.115 * eased(0.78, 0.55, from);
-}
-
 export interface Meadow {
   readonly group: Group;
   // The time, for the wind in the grass.
@@ -63,13 +33,15 @@ export interface Meadow {
 }
 
 function terrain(tone: Tone): Mesh {
-  const geometry = new PlaneGeometry(64, 34, 96, 52);
+  // The grass goes all round the house (and dips out of the way under its floors).
+  const geometry = new PlaneGeometry(64, 58, 96, 88);
   geometry.rotateX(-Math.PI / 2);
   const position = geometry.getAttribute("position");
   for (let at = 0; at < position.count; at += 1) {
     const x = position.getX(at);
-    const z = position.getZ(at) - 16.5;
-    position.setXYZ(at, x, groundAt(x, z), z);
+    const z = position.getZ(at) - 4.5;
+    const under = Math.abs(x) < 11.6 && z > 0.5 && z < 13.5;
+    position.setXYZ(at, x, under ? -0.06 : rolling(x, z), z);
   }
   geometry.computeVertexNormals();
   const ground = new Mesh(
@@ -94,7 +66,7 @@ function forest(tone: Tone): Group {
       side === 2
         ? (random() - 0.5) * 56
         : (side === 0 ? -1 : 1) * (16 + random() * 12);
-    const z = side === 2 ? -27 - random() * 4 : -3 - random() * 25;
+    const z = side === 2 ? -27 - random() * 4 : 21 - random() * 49;
     spots.push([x, z]);
   }
   const trunks = new InstancedMesh(
@@ -142,14 +114,13 @@ function forest(tone: Tone): Group {
   return group;
 }
 
-// The hedge round the meadow, where the rules end the field and the trees begin: along the house's front either side of it, down both
-// sides and across the far end, a row of dark round bushes grown into one another, with nothing to walk between.
+// The hedge round the meadow and the house, where the rules end the field and the trees begin: down both sides, across the far end
+// and behind the house, a row of dark round bushes grown into one another, with nothing to walk between.
 function hedges(tone: Tone): InstancedMesh {
   const random = noise(87);
   const spots: [number, number][] = [];
-  for (let x = 12.9; x <= 16.6; x += 1.5) spots.push([x, 0.8], [-x, 0.8]);
-  for (let z = -0.6; z >= -27.4; z -= 1.5) spots.push([17, z], [-17, z]);
-  for (let x = -15.8; x <= 15.8; x += 1.5) spots.push([x, -27.95]);
+  for (let z = 19.6; z >= -27.4; z -= 1.5) spots.push([17, z], [-17, z]);
+  for (let x = -15.8; x <= 15.8; x += 1.5) spots.push([x, -27.95], [x, 19.95]);
   const bushes = new InstancedMesh(
     new SphereGeometry(1, 12, 8),
     painted(tone, { color: "#ffffff" }),
@@ -204,9 +175,15 @@ function scatter(
   const matrix = new Matrix4();
   for (let at = 0; at < count; at += 1) {
     let x = (random() - 0.5) * 60;
-    const z = -1.5 - random() * 30;
+    // Most of it in the meadow before the house; a quarter round the sides of the house and behind it.
+    let z = -1.5 - random() * 30;
+    if (at % 4 === 3) {
+      z = -1 + random() * 21;
+      if (z < 14.8 && Math.abs(x) < 12.8)
+        x = Math.sign(x || 1) * (12.9 + random() * 4);
+    }
     // The lawn before the front door, where the family stands to be chosen and the camera looks on, is kept short: nothing grows there.
-    if (Math.abs(x) < 4.5 && z > -14) x += Math.sign(x || 1) * 4.5;
+    if (Math.abs(x) < 4.5 && z > -14 && z < 0) x += Math.sign(x || 1) * 4.5;
     const scale = size * (0.6 + random() * 0.8);
     matrix.compose(
       new Vector3(x, groundAt(x, z), z),

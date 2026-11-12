@@ -104,10 +104,11 @@ export function wholeRoot(value: number): number {
 export const within = (a: Point, b: Point, reach: number): boolean =>
   distanceSquared(a, b) <= reach * reach;
 
-// Which room a point is in. Outside the north wall is the meadow; the hall runs down the middle; the kitchen and the children's room are
+// Which room a point is in. Outside the house, on any side, is the meadow; the hall runs down the middle; the kitchen and the children's room are
 // to the west, the office and the parents' room to the east.
 export function zoneAt(point: Point): ZoneId {
-  if (point.z < 0) return "meadow";
+  if (point.z < 0 || point.z > 14_000 || Math.abs(point.x) > 12_000)
+    return "meadow";
   if (point.x >= -3_000 && point.x <= 3_000) return "hall";
   if (point.x < -3_000) return point.z < 7_000 ? "kitchen" : "kids";
   return point.z < 7_000 ? "office" : "parents";
