@@ -27,6 +27,7 @@
     "@frostbite/shared": "workspace:*",
     "@frostbite/test-kit": "workspace:*",
     "@axe-core/playwright": "4.13.0",
+    "@game/permafrost": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@repo/configs": "workspace:*",
     "@repo/eslint-config": "workspace:*",

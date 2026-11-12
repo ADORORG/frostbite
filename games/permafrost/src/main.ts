@@ -28,6 +28,7 @@ import type { Action } from "./rules/types.ts";
 import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { screenHeight, screenWidth } from "./screen/layout.ts";
+import { attachPlacement } from "./screen/phone-layout.ts";
 import { resultOf } from "./screen/result.ts";
 import { attachCornerButtons, attachTouchZones } from "./screen/touch.ts";
 import type { View } from "./screen/view.ts";
@@ -279,6 +280,7 @@ const controls = {
   turnRight: press("turnRight", "turn"),
 };
 attachControls(controls);
+if (page !== null) attachPlacement(page, screen);
 const cornerButtons =
   page === null ? null : attachCornerButtons(page, controls);
 pauseButton.addEventListener("click", controls.pause);

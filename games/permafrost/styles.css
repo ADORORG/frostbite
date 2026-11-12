@@ -1,5 +1,6 @@
 @import "@frostbite/game-sdk/audio/panel.css";
 @import "@frostbite/game-sdk/phone.css";
+@import "./touch-layout.css";
 
 :root {
   color-scheme: dark;
