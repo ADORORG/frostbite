@@ -62,7 +62,7 @@ export function placementOf(
 }
 
 // Keeps the properties on `page` right as the screen's box changes (a rotation, a window resized, the platform's bars coming and going).
-// Returns a function that stops.
+// A page that has no observer of boxes (a test page, an old browser) is followed by the window alone. Returns a function that stops.
 export function attachPlacement(
   page: HTMLElement,
   screen: HTMLElement,
@@ -74,11 +74,12 @@ export function attachPlacement(
       page.style.setProperty(name, value);
   };
   apply();
-  const watcher = new ResizeObserver(apply);
-  watcher.observe(screen);
+  const watcher =
+    typeof ResizeObserver === "undefined" ? null : new ResizeObserver(apply);
+  watcher?.observe(screen);
   window.addEventListener("resize", apply);
   return () => {
-    watcher.disconnect();
+    watcher?.disconnect();
     window.removeEventListener("resize", apply);
   };
 }

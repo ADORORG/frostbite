@@ -76,19 +76,22 @@ describe("keeping the page's properties right", () => {
     vi.unstubAllGlobals();
     disconnected = false;
   });
-  const setup = () => {
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        constructor(on: () => void) {
-          callback = on;
-        }
-        observe = () => undefined;
-        disconnect = () => {
-          disconnected = true;
-        };
-      },
-    );
+  const setup = (observer = true) => {
+    // A page without the observer (the test page of the game is one) has no such name at all.
+    if (observer)
+      vi.stubGlobal(
+        "ResizeObserver",
+        class {
+          constructor(on: () => void) {
+            callback = on;
+          }
+          observe = () => undefined;
+          disconnect = () => {
+            disconnected = true;
+          };
+        },
+      );
+    else vi.stubGlobal("ResizeObserver", undefined);
     const page = document.createElement("main");
     const screen = document.createElement("canvas");
     let box = { ...twice, bottom: 368, right: 288, x: 0, y: 0 };
@@ -129,5 +132,17 @@ describe("keeping the page's properties right", () => {
     resize(144, 184);
     window.dispatchEvent(new Event("resize"));
     expect(page.style.getPropertyValue("--pf-scale")).toBe("2px");
+  });
+
+  it("still follows the window when the page has no observer of boxes", () => {
+    const { page, resize } = setup(false);
+    expect(page.style.getPropertyValue("--pf-scale")).toBe("2px");
+    resize(432, 552);
+    window.dispatchEvent(new Event("resize"));
+    expect(page.style.getPropertyValue("--pf-scale")).toBe("3px");
+    for (const stop of stops.splice(0)) stop();
+    resize(144, 184);
+    window.dispatchEvent(new Event("resize"));
+    expect(page.style.getPropertyValue("--pf-scale")).toBe("3px");
   });
 });
