@@ -61,7 +61,7 @@ const furniture: readonly Box[] = [
   box(-4_420, 8_180, -3_980, 8_620),
   // The office: the desk, the shelves of books, the armchair, and the stands the globe and the record player sit on.
   box(7_000, 2_400, 9_800, 3_200),
-  box(11_300, 600, 11_900, 6_200),
+  box(6_900, 6_600, 11_300, 6_900),
   box(4_000, 5_400, 5_000, 6_400),
   box(5_000, 400, 5_400, 800),
   box(6_100, 6_300, 6_500, 6_700),
@@ -88,7 +88,7 @@ const furniture: readonly Box[] = [
   box(-3_500, -2_800, -2_100, -2_300),
 ];
 
-// The front door. It stands open: the porch and the meadow are part of home from the start.
+// The front door. It is never locked: it slides open for whoever comes near (the porch and the meadow are part of home from the start).
 export const frontDoor: Box = ways[0] ?? box(-900, -100, 900, 100);
 
 export const walls: readonly Box[] = [...shell, ...field, ...furniture];
@@ -105,6 +105,8 @@ export const places = {
   // The ancestor tree, in the hall. Its trunk is the box above; a hand on it reaches from about a metre away.
   deck: { x: 2_550, z: 6_000 },
   drawer: { x: 8_400, z: 3_200 },
+  // Zora's easel, at the meadow's east edge by the swing, out of the way of every view of the house, the tree and the hill.
+  easel: { x: 13_700, z: -8_700 },
   // The hill in the meadow that the giant snake rests under and rises out of; `hillRadius` is how near the family must come to wake it.
   hill: { x: 0, z: -18_000 },
   lamp: { x: 2_050, z: 11_800 },

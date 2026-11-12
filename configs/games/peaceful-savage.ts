@@ -292,7 +292,7 @@ export const peacefulSavageGame = defineGame({
     replay: {
       id: "peaceful-savage",
       sha256:
-        "f599d255fc8db741555d4c0ea6bfe78f0024154f6d4ad447271c3399b0f85823",
+        "813147ec89143e25b932b99e3e2d7e945189a086e37e417124dce8c48eef76bd",
       version: 1,
     },
   },

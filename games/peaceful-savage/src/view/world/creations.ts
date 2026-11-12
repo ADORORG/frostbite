@@ -113,6 +113,8 @@ function masterpiece(): {
   show(made: number, time: number): void;
 } {
   const group = new Group();
+  // The easel stands at the meadow's east edge and faces in, toward the meadow.
+  group.rotation.y = -Math.PI / 2;
   const random = noise(71);
   const blobs = Array.from({ length: 9 }, () => ({
     colour: new Color().setHSL(random(), 0.85, 0.58),

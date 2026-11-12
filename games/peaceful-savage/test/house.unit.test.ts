@@ -4,12 +4,21 @@ import { describe, expect, it } from "vitest";
 import { zoneAt } from "../src/rules/geometry.ts";
 import { field, shell, ways } from "../src/rules/layout.ts";
 import { groundAt } from "../src/view/world/ground.ts";
+import { creations } from "../src/rules/create.ts";
+import { things } from "../src/rules/things.ts";
+import { glassPaint } from "../src/view/world/glass-paint.ts";
+import {
+  buildGreatWindow,
+  great,
+  greatOutline,
+} from "../src/view/world/house-end.ts";
 import {
   buildSliders,
-  glassPaint,
   glazedWall,
   wayTop,
 } from "../src/view/world/house-glass.ts";
+import { roofAt } from "../src/view/world/roof.ts";
+import { createRooms } from "../src/view/world/rooms.ts";
 import { crownAt } from "../src/view/world/house-outside.ts";
 import { pebble, roundPlan } from "../src/view/world/shapes.ts";
 import {
@@ -116,18 +125,50 @@ describe("the ways in and out, and the glass", () => {
     ).toBeGreaterThanOrEqual(6);
     expect(glassPaint().transparent).toBe(true);
     expect(glassPaint().opacity).toBeLessThan(0.3);
-    const sliders = buildSliders(rib);
-    expect(sliders.group.children).toHaveLength(ways.length - 1);
-    const [tall, side] = sliders.group.children;
-    sliders.update(0, 5, 10);
-    // Shut: in its archway. With someone at the office's tall window, that pane slides along the wall; the others stay shut.
+    const sliders = buildSliders(createRooms(), rib);
+    expect(sliders.group.children).toHaveLength(ways.length);
+    const [door, tall, side] = sliders.group.children;
+    sliders.update(0, 9, 10);
+    // Shut: each in its archway, the front door too. It slides aside along the wall for whoever comes near, from either side.
+    expect(door?.position.x).toBeCloseTo(0);
     expect(tall?.position.x).toBeCloseTo(9.4);
+    sliders.update(0, -2, 10);
+    expect(door?.position.x).toBeGreaterThan(1.6);
+    sliders.update(0, 2, 10);
+    expect(door?.position.x).toBeGreaterThan(1.6);
     sliders.update(9.4, -1, 10);
     expect(tall?.position.x).toBeGreaterThan(11);
+    expect(door?.position.x).toBeCloseTo(0);
     expect(side?.position.z).toBeCloseTo(5);
     sliders.update(-13, 5, 10);
     expect(side?.position.z).toBeGreaterThan(6.4);
     expect(tall?.position.x).toBeCloseTo(9.4);
     expect(wayTop(0)).toBeGreaterThan(wayTop(3));
+  });
+
+  it("gives the office's end wall one huge arched window under the roof, with the shelves and the easel out of its way", () => {
+    const rib = new MeshBasicMaterial();
+    const outline = greatOutline();
+    const tops = outline.map(([, up]) => up);
+    // Taller than the other rooms' walls, and under the roof all the way round.
+    expect(Math.max(...tops)).toBeCloseTo(great.top);
+    expect(great.top).toBeGreaterThan(5.5);
+    for (const [along, up] of outline)
+      expect(up).toBeLessThan(roofAt(12, along) - 0.3);
+    expect(great.half * 2).toBeGreaterThan(5);
+    // The glass, its frame, four mullions, two steps, and the office's walls carried up to the roof.
+    expect(buildGreatWindow(createRooms(), rib).children).toHaveLength(10);
+    const east = shell.find((wall) => wall.x0 > 11_500);
+    if (east === undefined) throw new Error("no east wall");
+    // The end wall: the parents' window (glass and frame) and the wall itself, cut for both windows.
+    expect(glazedWall(east, 3.5, rib, rib)?.children).toHaveLength(3);
+    // Nothing solid stands against the window inside: the shelves are along the office's back wall now.
+    const books = things.find((thing) => thing.id === "books");
+    expect(books?.z).toBeGreaterThan(6_000);
+    expect(books?.x).toBeLessThan(11_000);
+    // Zora's easel: out at the meadow's east edge, clear of the house's front and of the way to the tree and the hill.
+    const easel = creations.find((made) => made.id === "masterpiece")?.at;
+    expect(easel?.x).toBeGreaterThan(12_500);
+    expect(zoneAt(easel ?? { x: 0, z: 0 })).toBe("meadow");
   });
 });

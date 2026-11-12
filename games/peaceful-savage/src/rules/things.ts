@@ -25,7 +25,7 @@ export const things: readonly Thing[] = [
   // The office.
   { id: "monitor", x: 7_400, z: 3_200 },
   { id: "globe", x: 5_200, z: 600 },
-  { id: "books", x: 11_300, z: 3_400 },
+  { id: "books", x: 9_100, z: 6_500 },
   { id: "whiteboard", x: 3_200, z: 1_400 },
   { id: "records", x: 6_300, z: 6_500 },
   { id: "armchair", x: 5_000, z: 5_900 },

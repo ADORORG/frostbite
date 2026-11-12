@@ -23,6 +23,7 @@ import {
   tiles,
 } from "../palette.ts";
 import { buildSliders, glazedWall, wayTop } from "./house-glass.ts";
+import { buildGreatWindow } from "./house-end.ts";
 import { buildOutside } from "./house-outside.ts";
 import { metres, type Rooms } from "./rooms.ts";
 import { archway, prism, roundPlan } from "./shapes.ts";
@@ -143,7 +144,7 @@ export function buildHouse(rooms: Rooms): House {
       corner.receiveShadow = true;
       group.add(corner);
     }
-    if (floor.zone === "hall") return;
+    if (floor.zone === "hall" || floor.zone === "office") return;
     // The room's vault: a soft dome that meets every wall, highest in the middle.
     const vault = new PlaneGeometry(wide, deep, 20, 20);
     const position = vault.getAttribute("position");
@@ -242,8 +243,8 @@ export function buildHouse(rooms: Rooms): House {
     ring.position.set(0, wallHeight - 0.3, z);
     group.add(ring);
   }
-  group.add(buildOutside(rooms, rib));
-  const sliders = buildSliders(rib);
+  group.add(buildOutside(rooms, rib), buildGreatWindow(rooms, rib));
+  const sliders = buildSliders(rooms, rib);
   group.add(sliders.group);
   sliders.update(0, 0, 1);
   return { group, update: sliders.update };

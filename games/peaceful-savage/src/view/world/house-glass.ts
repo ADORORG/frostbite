@@ -1,36 +1,29 @@
 import {
   type BufferGeometry,
-  DoubleSide,
   ExtrudeGeometry,
   Group,
   type Material,
   Mesh,
-  MeshStandardMaterial,
   Path,
   Shape,
   ShapeGeometry,
+  Vector2,
   Vector3,
 } from "three";
 
 import type { Box } from "../../rules/geometry.ts";
 import { ways } from "../../rules/layout.ts";
 import { taperedTube } from "../body/tube.ts";
-import { metres } from "./rooms.ts";
+import { doorLeaf } from "./door.ts";
+import { glassPaint } from "./glass-paint.ts";
+import { greatOutline } from "./house-end.ts";
+import { roofAt } from "./roof.ts";
+import { metres, type Rooms } from "./rooms.ts";
 import { archway } from "./shapes.ts";
 
 // The glass of the house: real windows, cut through the outer walls and glazed with clear glass in gold frames, so the rooms are seen
 // from the grass and the meadow from the rooms; and the sliding panes of the ways out (the office's tall window, the kitchen's side
 // door, the two bedrooms' windows), which slide aside as someone comes near and close behind them.
-export const glassPaint = (): MeshStandardMaterial =>
-  new MeshStandardMaterial({
-    color: "#cfeeff",
-    depthWrite: false,
-    opacity: 0.16,
-    roughness: 0.05,
-    side: DoubleSide,
-    transparent: true,
-  });
-
 type Side = "east" | "front" | "south" | "west";
 // Each window, by the wall it is in: where its middle is along the wall and up it, and half its width and height (all ovals).
 const windows: readonly (readonly [Side, number, number, number, number])[] = [
@@ -87,8 +80,20 @@ export function glazedWall(
   const face = new Shape();
   face.moveTo(from ?? 0, 0);
   face.lineTo(to ?? 0, 0);
-  face.lineTo(to ?? 0, height);
-  face.lineTo(from ?? 0, height);
+  if (side === "east") {
+    // The east end runs up to the roof, with the office's great window cut out of it.
+    for (let z = to ?? 0; z > (from ?? 0); z -= 0.25)
+      face.lineTo(z, roofAt(12, z) + 0.06);
+    face.lineTo(from ?? 0, roofAt(12, from ?? 0) + 0.06);
+    face.holes.push(
+      new Path().setFromPoints(
+        greatOutline().map(([along, up]) => new Vector2(along, up)),
+      ),
+    );
+  } else {
+    face.lineTo(to ?? 0, height);
+    face.lineTo(from ?? 0, height);
+  }
   const group = new Group();
   const glass = glassPaint();
   for (const [, at, up, wide, high] of own) {
@@ -150,33 +155,35 @@ export interface Sliders {
 // How high each way's arch is: the front door's, the office's tall window, and the rest.
 export const wayTop = (index: number): number => [2.9, 3.3][index] ?? 2.75;
 
-// The sliding panes: one curved pane of glass the shape of its archway, in a gold frame, for each way out but the front door.
-export function buildSliders(rib: Material): Sliders {
+// The sliding panes: the front door's leaf of wood, and for each other way out one curved pane of glass the shape of its archway in a
+// gold frame. Each is shut until someone comes near.
+export function buildSliders(rooms: Rooms, rib: Material): Sliders {
   const group = new Group();
   const glass = glassPaint();
-  const panes = ways.slice(1).map((way, index) => {
+  const panes = ways.map((way, index) => {
     const flat = way.x1 - way.x0 > way.z1 - way.z0;
     const [from, to] = (flat ? [way.x0, way.x1] : [way.z0, way.z1]).map(metres);
     const wide = (to ?? 0) - (from ?? 0);
-    const outline = archway(-wide / 2, wide / 2, wayTop(index + 1));
+    const outline = archway(-wide / 2, wide / 2, wayTop(index));
     const shape = new Shape();
     outline.forEach(([across, up], at) => {
       if (at === 0) shape.moveTo(across, up);
       else shape.lineTo(across, up);
     });
-    const pane = new Group();
-    pane.add(
-      new Mesh(new ShapeGeometry(shape), glass),
-      new Mesh(
-        taperedTube(
-          outline.map(
-            ([across, up]) => new Vector3(across, Math.max(0.04, up), 0),
+    const pane = index === 0 ? doorLeaf(rooms, wide, wayTop(0)) : new Group();
+    if (index > 0)
+      pane.add(
+        new Mesh(new ShapeGeometry(shape), glass),
+        new Mesh(
+          taperedTube(
+            outline.map(
+              ([across, up]) => new Vector3(across, Math.max(0.04, up), 0),
+            ),
+            { radius: () => 0.045, sides: 6 },
           ),
-          { radius: () => 0.045, sides: 6 },
+          rib,
         ),
-        rib,
-      ),
-    );
+      );
     const middle = {
       x: metres(way.x0 + way.x1) / 2,
       z: metres(way.z0 + way.z1) / 2,

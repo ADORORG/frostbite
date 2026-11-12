@@ -44,9 +44,9 @@ function books(rooms: Rooms): InstancedMesh {
     const row = at % 5;
     const along = Math.floor(at / 5);
     matrix.compose(
-      new Vector3(11.3, 0.45 + row * 0.5, 0.9 + along * 0.29),
+      new Vector3(6.85 + along * 0.25, 0.45 + row * 0.5, 6.58),
       new Quaternion(),
-      new Vector3(0.1, 0.32 + random() * 0.08, 0.06 + random() * 0.04),
+      new Vector3(0.06 + random() * 0.04, 0.32 + random() * 0.08, 0.1),
     );
     shelf.setMatrixAt(at, matrix);
     shelf.setColorAt(
@@ -79,7 +79,7 @@ export function buildEast(rooms: Rooms, lights: boolean): Wing {
   drawer.add(ball(lock, 0.03, [0, 0, 0.36]));
   group.add(drawer);
   group.add(
-    block(wood("office", "#4c2f1a", 60), [0.6, 2.6, 5.6], [11.6, 1.3, 3.4]),
+    block(wood("office", "#4c2f1a", 60), [4.4, 2.6, 0.3], [9.1, 1.3, 6.75]),
   );
   group.add(books(rooms));
   const plum = painted(t.office, { color: "#7a3f6e" });

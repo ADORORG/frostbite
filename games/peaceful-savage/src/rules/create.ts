@@ -6,7 +6,7 @@ import { family, withColour, withNews, withPoints } from "./state.ts";
 import type { PlayState } from "./types.ts";
 
 // What each of the family makes once their lesson is learned, for the family to keep: Kai builds a brilliant holographic structure on his
-// workbench over the tower he built again, Zora mixes a masterpiece where she was playing in the meadow, Mama sings her song where she
+// workbench over the tower he built again, Zora mixes a masterpiece at her easel by the swing, Mama sings her song where she
 // stood by the tree, and Daddy lets a relic go from the drawer he opened. Each is a moment of hand-keys and breath; each, once made, is
 // kept for the rest of the run (and is a milestone of its own).
 export type CreationId = "hologram" | "masterpiece" | "release" | "song";
@@ -28,7 +28,7 @@ export const creations: readonly Creation[] = [
   },
   {
     after: (state) => state.sparky,
-    at: familySpots.zora,
+    at: places.easel,
     hero: "zora",
     id: "masterpiece",
   },
