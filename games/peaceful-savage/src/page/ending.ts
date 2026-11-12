@@ -1,7 +1,7 @@
 import { farewell } from "../view/farewell.ts";
 
 // The end of a run, played out before the card after it: the lit tree's farewell (at the tree, the hug, the dance out to the drums, the
-// show on the stage, the hands held and the jackets lit, the lift-off one by one), or a lead gone grey taken into the coil. A run the
+// show on the stage, the ride in the hover car, the hands held and the jackets lit, the lift-off one by one), or a lead gone grey taken into the coil. A run the
 // player ended goes straight to the card. The player can skip what is left.
 export const endingMs = {
   grey: 6_500,
@@ -11,6 +11,11 @@ export const drumsMs = Math.round(farewell.walk[0] * 1_000);
 // The show's music: a twelve-second groove, played five times through the sixty seconds.
 export const concertMs = [0, 1, 2, 3, 4].map((round) =>
   Math.round((farewell.show[0] + round * 12) * 1_000),
+);
+
+// The ride's music: the same groove, twice more, as the hover car goes round the meadow.
+export const rideMs = [0, 12].map((after) =>
+  Math.round((farewell.ride[0] + after) * 1_000),
 );
 
 // What the ending asks the page to play, and when.
@@ -44,7 +49,7 @@ export function createEnding(
       );
       if (cause === "lit") {
         timers.push(setTimeout(() => cue("drums"), drumsMs));
-        for (const at of concertMs)
+        for (const at of [...concertMs, ...rideMs])
           timers.push(setTimeout(() => cue("concert"), at));
       }
       return true;

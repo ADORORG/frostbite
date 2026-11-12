@@ -3,7 +3,14 @@ import { Vector3 } from "three";
 import { type HeroId, heroIds } from "../rules/constants.ts";
 import type { Acting } from "./acting.ts";
 import type { Character } from "./body/character.ts";
-import { dance, holdHands, idle, portraitHug, soar } from "./body/poses.ts";
+import {
+  dance,
+  holdHands,
+  idle,
+  portraitHug,
+  sit,
+  soar,
+} from "./body/poses.ts";
 import type { FamilyFrame, Placed } from "./family.ts";
 import {
   type Doing,
@@ -14,6 +21,7 @@ import {
   placeIn,
   stageShown,
 } from "./farewell.ts";
+import { carFloor, carSeats, rideIn, type Riding, seatOf } from "./ride.ts";
 import { onStage, type StageControl, stageLift } from "./show.ts";
 import { groundAt } from "./world/meadow.ts";
 
@@ -35,6 +43,10 @@ export type Move = (
   acting: Acting,
   frame: FamilyFrame,
   how: "ease" | "snap",
+  more?: {
+    readonly ground?: (x: number, z: number) => number;
+    readonly still?: boolean;
+  },
 ) => Placed;
 
 const flying: Acting = { arms: true, expression: "smile", pose: soar };
@@ -44,6 +56,7 @@ function actingOf(
   doing: Doing,
   since: number,
   time: number,
+  legs: number,
 ): Acting {
   const line = lineOf[hero];
   switch (doing) {
@@ -59,6 +72,13 @@ function actingOf(
       return { arms: true, expression: "smile", pose: holdHands(line) };
     case "fly":
       return flying;
+    case "ride":
+      // Sat in the car, waving now and then as it goes.
+      return {
+        arms: true,
+        expression: Math.sin(since * 0.9 + line * 2) > 0.6 ? "open" : "smile",
+        pose: sit(legs, carSeats[line]?.high ?? 0.4),
+      };
     case "stand":
       return { arms: false, expression: "smile", pose: idle(hero, time, true) };
     case "sing": {
@@ -139,6 +159,8 @@ const downBehind = new Vector3(0, -1, 0.6);
 const lowBehind = new Vector3(0, -1, 0.9);
 
 export interface Played {
+  // The hover car after the show, where it is (null before it comes).
+  readonly car: Riding | null;
   // Where the lead is, and where Sparky should be (null for the lead's shoulder).
   readonly lead: Placed | null;
   // Where the one the player moves on the stage stands, for the ring under them (null when nobody is moved).
@@ -160,21 +182,36 @@ export function playFarewell(
   const shown = stageShown(since);
   const showing = since >= farewell.walk[1] && since < farewell.show[1];
   const control = showing ? frame.stage : null;
+  // The hover car after the show: where the player has driven it, or its own cruise.
+  const car = rideIn(since, frame.stage?.ride ?? null);
+  const under = car === null ? 0 : groundAt(car.x, car.z);
   for (const hero of heroIds) {
     const line = lineOf[hero];
     const place = placeIn(since, line);
-    // On the stage, where the player has moved them; the one they move dances as they walk.
+    const riding = place.doing === "ride" && car !== null;
+    // On the stage, where the player has moved them; the one they move dances as they walk. In the car, on their own seat.
     const to = place.at.clone().add(movedOn(control, hero));
     const kept = onStage(to.x, to.z);
     if (showing) to.set(kept.x, 0, kept.z);
+    if (riding) {
+      const seat = seatOf(car, line);
+      to.set(seat.x, 0, seat.z);
+    }
     const walking = control?.who === hero && control.walking;
     const placed = move(
       hero,
       to,
-      place.yaw,
-      actingOf(hero, walking ? "dance" : place.doing, since, frame.time),
+      riding ? car.yaw : place.yaw,
+      actingOf(
+        hero,
+        walking ? "dance" : place.doing,
+        since,
+        frame.time,
+        characters[hero].legs,
+      ),
       frame,
-      since < 0.1 ? "snap" : "ease",
+      since < 0.1 || riding ? "snap" : "ease",
+      riding ? { ground: () => under, still: true } : undefined,
     );
     const flown = flownFrom(frame.ending, line, frame.time);
     const aloft = flown.y > 0.01;
@@ -183,13 +220,21 @@ export function playFarewell(
     const up = flown.add(
       new Vector3(
         0,
-        stageLift(placed.at, groundAt, shown) + Math.sin(Math.PI * spin) * 0.45,
+        stageLift(placed.at, groundAt, shown) +
+          Math.sin(Math.PI * spin) * 0.45 +
+          (riding ? car.high + carFloor : 0),
         0,
       ),
     );
     characters[hero].fly(
       up,
-      aloft ? flightWay(line) : spin < 1 ? Math.PI + spin * Math.PI * 2 : null,
+      aloft
+        ? flightWay(line)
+        : riding
+          ? car.yaw
+          : spin < 1
+            ? Math.PI + spin * Math.PI * 2
+            : null,
       aloft ? -0.3 * Math.min(1, up.y / 4) : 0,
     );
     if (control?.who === hero) marked = placed.at.clone().setY(up.y);
@@ -198,7 +243,9 @@ export function playFarewell(
     middle.addScaledVector(placed.at, 1 / heroIds.length);
   }
   embrace(since, characters);
+  if (car?.aboard === true) middle.y += car.high;
   return {
+    car,
     lead: leadPlaced,
     marked,
     sparky: sparkyIn(since, characters.zora, middle),

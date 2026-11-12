@@ -31,8 +31,17 @@ family dances out of the front door to the drums and up onto a stage that fades 
 coloured lamps sweeping the stage, and a band of ancestors at the drums, the keys and the strings. For sixty seconds they sing and dance
 to the screen with the ancestors dancing all round; the player takes one of the family at a time (Q, or a tap on a touch screen, passes
 to the next), walks them about the stage (the arrows or WASD, or a drag) and gives a big move, a spin and a jump (E or Space). Enter
-skips to the card. Then the stage fades, they hold hands in a line on the lawn as the jackets light up gold, and lift off one by one,
-each flying a way of their own.
+skips to the card. Then the stage fades and a hover car, a long open pod with not a straight line on it, glides onto the lawn on three
+rings of gold light. The family climbs in and rides it round the meadow for twenty-six seconds: the same hands drive it (the arrows or
+a drag) and lift it high over the trees (E, Space or a tap); left alone it cruises a figure of eight. It brings them home, they step
+out and hold hands in a line on the lawn as the jackets light up gold, and lift off one by one, each flying a way of their own.
+
+**The house, and what is under the meadow.** The house is the book's: one wave of a roof in purple scales edged with gold, tall over
+the east wing and dipping to the door, glowing oval windows, the tree's gold in the great west window. Inside nothing has a right
+angle: walls roll round at their ends, corners sweep, every room has a vault and every doorway a tall oval arch, and the furniture is
+all pebbles. The swing's seat is a curved cross-section of mahogany. The giant snake is not seen until the end: it moves under the
+meadow, a ridge of turned earth running over it, a loop of its back rolling out of the grass now and then, and rests under a breathing
+mound on the hill. It rises out of the mound, whole for the first time, when the family comes in their jackets.
 
 Each of the family has a lesson, lived rather than told: Zora makes and mixes things and learns to love the land (she plants seeds in the
 meadow and tends them into bloom); Kai can build anything and learns structure, mindfulness and looking after himself (his tower goes up

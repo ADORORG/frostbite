@@ -1,12 +1,28 @@
-import { Color, Group, Mesh, SphereGeometry, Vector3 } from "three";
+import {
+  Color,
+  CylinderGeometry,
+  type DataTexture,
+  Group,
+  Mesh,
+  SphereGeometry,
+  Vector3,
+} from "three";
 
 import { taperedTube } from "../body/tube.ts";
-import { brushed, painted, type Tone } from "../palette.ts";
+import {
+  brushed,
+  noise,
+  painted,
+  srgb,
+  texture,
+  type Tone,
+} from "../palette.ts";
 import { ropeApart, swingHigh, swingRope, swingSeat } from "../seats.ts";
 import { groundAt } from "./meadow.ts";
-import { block, drum } from "./shapes.ts";
+import { drum } from "./shapes.ts";
 
-// The rope swing in the meadow: a round storybook tree with one long bough reaching out, two ropes hung from it, and a board to sit on.
+// The rope swing in the meadow: a round storybook tree with one long bough reaching out, two ropes hung from it, and its seat: a
+// cross-section of mahogany, an oval slice of the trunk with its rings showing, curved up at the ends like a smile.
 // The ropes and the board turn about the bough as the swing swings (see seats.ts: the lead rides it, and each push sends it higher).
 export interface Swing {
   readonly group: Group;
@@ -16,6 +32,56 @@ export interface Swing {
 
 // The trunk stands this far east of the seat (the rules keep both clear).
 const trunkAway = 1.3;
+
+// The growth rings of the slice, painted: dark heartwood in the middle, red-brown rings of uneven width out to the sapwood.
+function ringsMap(): DataTexture {
+  const random = noise(98);
+  // Where each ring ends, from the heart out, and whether it is a dark one.
+  const rings: { dark: boolean; out: number }[] = [];
+  for (let out = 0.06; out < 1.1; out += 0.025 + random() * 0.05)
+    rings.push({ dark: random() > 0.5, out });
+  const tones = ["#4a160c", "#5a1f12", "#a5512f", "#8a3b22"].map((tone) =>
+    srgb(new Color(tone)),
+  );
+  return texture(128, (x, y) => {
+    const [dx, dy] = [(x - 63.5) / 64, (y - 63.5) / 64];
+    const wobble = 1 + 0.04 * Math.sin(Math.atan2(dy, dx) * 5);
+    const from = Math.hypot(dx, dy) * wobble;
+    const ring = rings.findIndex((one) => from < one.out);
+    const edge = ring >= 0 && (rings[ring]?.out ?? 9) - from < 0.012;
+    const [r, g, b] = tones[
+      ring === 0 ? 0 : edge ? 1 : rings[ring]?.dark === true ? 3 : 2
+    ] ?? [138, 59, 34];
+    return [r, g, b, 255];
+  });
+}
+
+function mahoganySeat(tone: Tone): Mesh {
+  const wide = ropeApart + 0.1;
+  const slice = new CylinderGeometry(1, 1, 0.055, 44, 1);
+  const position = slice.getAttribute("position");
+  for (let at = 0; at < position.count; at += 1) {
+    const [x, z] = [position.getX(at), position.getZ(at)];
+    // An oval a little fuller on one side, as a trunk grows, and curved up toward the ropes.
+    const out = 1 + 0.05 * Math.sin(Math.atan2(z, x) * 3 + 0.6);
+    position.setXYZ(
+      at,
+      x * wide * out,
+      position.getY(at) + 0.085 * x * x,
+      z * 0.15 * out,
+    );
+  }
+  slice.computeVertexNormals();
+  const face = painted(tone, { color: "#ffffff", map: ringsMap() });
+  const seat = new Mesh(slice, [
+    painted(tone, { color: "#4a1f14" }),
+    face,
+    face,
+  ]);
+  seat.position.y = -swingRope - 0.03;
+  seat.castShadow = true;
+  return seat;
+}
 
 export function buildSwing(tone: Tone): Swing {
   const group = new Group();
@@ -84,13 +150,7 @@ export function buildSwing(tone: Tone): Swing {
   const rope = painted(tone, { color: "#d9c08a" });
   for (const side of [ropeApart, -ropeApart])
     swinging.add(drum(rope, 0.014, swingRope, [side, -swingRope / 2, 0], 6));
-  swinging.add(
-    block(
-      painted(tone, { color: "#a46b3a", map: brushed("#a46b3a", 98, 2) }),
-      [ropeApart * 2 + 0.14, 0.045, 0.22],
-      [0, -swingRope - 0.0225, 0],
-    ),
-  );
+  swinging.add(mahoganySeat(tone));
   group.add(hung);
   return {
     group,

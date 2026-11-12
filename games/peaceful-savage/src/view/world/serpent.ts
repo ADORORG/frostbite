@@ -49,6 +49,7 @@ export interface Serpent {
     release: number,
     time: number,
     vision: boolean,
+    up?: number,
   ): void;
 }
 
@@ -65,6 +66,9 @@ function lying(curve: CatmullRomCurve3, t: number, around: number): Vector3 {
     .addScaledVector(side, Math.cos(around) * r)
     .addScaledVector(top, Math.sin(around) * r);
 }
+
+// How deep it lies under the hill before it rises.
+const depth = 3.4;
 
 export function buildSerpent(count: number): Serpent {
   const random = noise(2_027);
@@ -200,9 +204,10 @@ export function buildSerpent(count: number): Serpent {
   };
   return {
     group,
-    update(wake, gold, release, time, vision) {
-      // Gone once the last of them has risen out of it.
-      group.visible = release < 4;
+    update(wake, gold, release, time, vision, up = 1) {
+      // Under the ground until it rises (burrow.ts shows where it is); gone once the last of them has risen out of it.
+      group.visible = release < 4 && up > 0.001;
+      group.position.y = -(1 - up) * depth;
       if (!group.visible) return;
       const fade = smooth(0, 1.6, release);
       // Asleep it breathes, slow and deep; awake it holds its breath.

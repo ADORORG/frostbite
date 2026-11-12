@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
 
+import { home, seatOf } from "./ride.ts";
 import { singAt, stage } from "./show.ts";
 import type { Ending } from "./world.ts";
 
@@ -11,21 +12,24 @@ import type { Ending } from "./world.ts";
 //   9.6 to 16.4 they dance out of the front door, across the lawn and up onto a stage that fades in there, to the drums;
 //   16.4 to 76.4 the show (see show.ts): sixty seconds of singing and dancing to the screen, the band of ancestors behind them, the
 //               ancestors dancing all round; the player takes one of the family at a time and moves them about the stage;
-//   76.4 to 81  the stage fades; they step down into a line on the lawn, hand in hand, and the jackets light up gold;
-//   from 81     they lift off one by one, a moment apart, and each flies a way of their own: not in a huddle, each one free.
+//   76.4 to 78.4 the stage fades; a hover car glides onto the lawn and they climb in;
+//   78.4 to 104.4 the ride (see ride.ts): round the meadow in the car, low over the grass or high over the trees, the player driving;
+//   104.4 to 107.6 home on the lawn, they step out into a line, hand in hand, the car lifts away, and the jackets light up gold;
+//   from 111    they lift off one by one, a moment apart, and each flies a way of their own: not in a huddle, each one free.
 // Each of the family has a place in the line, counted from the screen's left as the camera sees them: Daddy, Kai, Zora, Mama.
 export const farewell = {
   appear: [2.6, 4.4],
   apart: 0.8,
-  end: 89.5,
+  end: 119.5,
   fade: [8.2, 9.6],
   flare: [0.4, 2.8],
   flight: 7,
-  hands: 77.6,
+  hands: 107.6,
   hug: [3.4, 4.6],
-  liftOff: 81,
+  liftOff: 111,
   portrait: 6.2,
-  shine: [78.2, 80.2],
+  ride: [78.4, 104.4],
+  shine: [108.2, 110.2],
   show: [16.4, 76.4],
   turn: [2.4, 3.6],
   walk: [9.6, 16.4],
@@ -51,7 +55,8 @@ export const flareOf = (ending: Ending): number =>
       );
 
 // What one of the family is doing in the farewell, and where.
-export type Doing = "dance" | "fly" | "hands" | "hug" | "sing" | "stand";
+export type Doing =
+  "dance" | "fly" | "hands" | "hug" | "ride" | "sing" | "stand";
 
 export interface Place {
   readonly at: Vector3;
@@ -129,10 +134,22 @@ export function placeIn(since: number, line: number): Place {
   if (since < farewell.show[1])
     return { at: singAt(line), doing: "sing", yaw: Math.PI };
   if (since < farewell.hands) {
-    // Down off the stage's back and into the line on the lawn.
-    const down = ease(farewell.show[1], farewell.hands, since);
-    const at = singAt(line).lerp(new Vector3(lawnAt(line), 0, -5), down);
-    return { at, doing: "dance", yaw: Math.PI };
+    // Down off the stage and into the car; the ride (the car carries them: see ride.ts); then out of it into the line on the lawn.
+    const line0 = new Vector3(lawnAt(line), 0, -5);
+    const seat = seatOf(home, line);
+    const inCar = new Vector3(seat.x, 0, seat.z);
+    if (since < farewell.ride[0]) {
+      const down = ease(farewell.show[1], farewell.ride[0], since);
+      return {
+        at: singAt(line).lerp(inCar, down),
+        doing: "dance",
+        yaw: Math.PI,
+      };
+    }
+    if (since < farewell.ride[1] + 0.4)
+      return { at: inCar, doing: "ride", yaw: Math.PI };
+    const out = ease(farewell.ride[1] + 0.4, farewell.hands, since);
+    return { at: inCar.lerp(line0, out), doing: "dance", yaw: Math.PI };
   }
   // Hand in hand in a line on the lawn, facing out over the meadow (and the camera).
   return {
@@ -183,8 +200,12 @@ export interface Framing {
 
 // The farewell's shots: from behind the family at the tree as the strand lights; a family portrait for the hug, the ancestors and the
 // lit tree behind; ahead of them out of the door as they dance, keeping them whole; close along the line of joined hands as the jackets
-// light; then back and low, looking up as they rise.
-export function farewellShot(since: number, middle: Vector3): Framing {
+// light; then back and low, looking up as they rise. `lift` is how high the car carries them on the ride.
+export function farewellShot(
+  since: number,
+  middle: Vector3,
+  lift = 0,
+): Framing {
   if (since < farewell.hug[0])
     return {
       anchor: new Vector3(0, 0, 6),
@@ -201,7 +222,16 @@ export function farewellShot(since: number, middle: Vector3): Framing {
       height: 1.25,
       look: new Vector3(0, 1.55, 4.6),
     };
-  if (since >= farewell.walk[1] + 1.5 && since < farewell.hands - 0.4)
+  if (since >= farewell.show[1] + 0.8 && since < farewell.ride[1] + 0.6)
+    // The ride: behind and above the car wherever it goes, lifting as it lifts.
+    return {
+      anchor: middle.clone().setY(0),
+      distance: 8.5 + lift * 0.5,
+      fov: 54,
+      height: 3.4 + lift * 0.7,
+      look: middle.clone().setY(1.1 + lift * 0.9),
+    };
+  if (since >= farewell.walk[1] + 1.5 && since < farewell.show[1] + 0.8)
     // The show: back and up on the hillside, the whole stage in, drifting a little with the music.
     return {
       anchor: new Vector3(0, 0, -8.9),

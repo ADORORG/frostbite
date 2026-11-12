@@ -9,6 +9,7 @@ import {
 import type { HeroId } from "../rules/constants.ts";
 import { mirrors } from "../rules/collect.ts";
 import { greyAt, greyHomes } from "../rules/greys.ts";
+import { box } from "../rules/geometry.ts";
 import { familySpots, field, places, shell } from "../rules/layout.ts";
 import { isHero, stepOf } from "../rules/moment.ts";
 import type { PlayState } from "../rules/types.ts";
@@ -46,7 +47,16 @@ export interface DepthView {
 }
 
 // What the camera stays inside: the house's walls, and the hedge round the meadow (beyond it are the trees).
-const bounds = [...shell, ...field];
+// What the camera may not look through: the walls, the field's edge, and the wall over each doorway (a body walks under an arch; the
+// camera stays on the body's side of it).
+const arches = [
+  box(-3_100, 2_400, -2_900, 3_800),
+  box(-3_100, 9_600, -2_900, 11_000),
+  box(2_900, 2_400, 3_100, 3_800),
+  box(2_900, 9_600, 3_100, 11_000),
+  box(-900, -100, 900, 100),
+];
+const bounds = [...shell, ...field, ...arches];
 
 const grounded = (one: Placed): Placed => ({
   ...one,
@@ -190,6 +200,7 @@ export function createDepthView(
         ending,
         hands,
         lead,
+        car: family.played()?.car ?? null,
         marked: family.played()?.marked ?? null,
         sparkyAt: family.played()?.sparky ?? null,
         state,
@@ -214,7 +225,13 @@ export function createDepthView(
       // Where the family stands is on the ground, which rises on the hill: the camera's heights are measured from it.
       const placed = grounded(lead ?? family.chosen(frame.select));
       const shot = farewelling
-        ? farewellShot(ending.since, family.middle())
+        ? farewellShot(
+            ending.since,
+            family.middle(),
+            family.played()?.car?.aboard === true
+              ? (family.played()?.car?.high ?? 0)
+              : 0,
+          )
         : null;
       const framed =
         shot === null

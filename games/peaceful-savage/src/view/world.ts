@@ -20,6 +20,9 @@ import { buildCoil } from "./world/coil.ts";
 import { buildGarden } from "./world/garden.ts";
 import { buildMeadow, groundAt } from "./world/meadow.ts";
 import { createRooms } from "./world/rooms.ts";
+import type { Riding } from "./ride.ts";
+import { buildBurrow } from "./world/burrow.ts";
+import { buildCar } from "./world/car.ts";
 import { buildSerpent } from "./world/serpent.ts";
 import { buildSparky } from "./world/sparky.ts";
 import { buildSwing } from "./world/swing.ts";
@@ -47,6 +50,8 @@ export interface WorldFrame {
   readonly sparkyAt: Vector3 | null;
   // Where the one the player moves on the stage stands, for the ring under them.
   readonly marked?: Vector3 | null;
+  // The hover car after the show (null: not there).
+  readonly car?: Riding | null;
   // How far forward the swing in the meadow has swung, in radians (0 at rest).
   readonly swing?: number;
   // Whether Sparky tugs the lead on toward the next step of the story.
@@ -96,6 +101,8 @@ export function buildWorld(
   tree.group.position.set(0, 0, 6);
   const greys = buildGreys();
   const serpent = buildSerpent(Math.round(1200 * amount) + 200);
+  const burrow = buildBurrow(rooms.tones.meadow);
+  const car = buildCar(rooms.tones.meadow);
   const sparky = buildSparky(lights);
   const gathered = buildGathered(glass);
   const effects = buildEffects();
@@ -117,6 +124,8 @@ export function buildWorld(
     tree,
     greys,
     serpent,
+    burrow,
+    car,
     sparky,
     gathered,
     effects,
@@ -167,7 +176,7 @@ export function buildWorld(
       const vision = state.tick < state.visionUntil;
       greys.update(state, vision, time, dt);
       gathered.update(state, vision, time);
-      // The snake sleeps on the hill until the finale begins; then it wakes and rises, warms to gold through it, and lets its figures go
+      // The snake moves under the meadow, and rests under its mound on the hill, until the finale begins; then it wakes and rises, warms to gold through it, and lets its figures go
       // when the tree is lit.
       const finale = state.moment?.kind === "finale";
       const steps =
@@ -179,17 +188,23 @@ export function buildWorld(
         ((state.cause === "lit" ? 1 : steps) - gold) *
         (1 - Math.exp(-1.2 * dt));
       const ending = frame.ending;
+      // It comes up out of its mound as the finale begins, and is seen whole for the first time.
+      const up = Math.min(1, rise * 2.5);
       serpent.update(
         rise,
         gold,
         ending.kind === "lit" ? ending.since : 0,
         time,
         vision,
+        up,
       );
+      burrow.update(!finale && state.cause === null, up, time, vision);
       // The ones it let go come home to the tree, and greet the family; and then the show, with them all round the stage.
       const lit = ending.kind === "lit" ? ending.since : null;
       ancestors.update(lit, time);
       stage.update(lit, time, frame.marked ?? null);
+      const ride = frame.car ?? null;
+      car.update(ride, ride === null ? 0 : groundAt(ride.x, ride.z), time);
       crowd.update(lit, time, (time * beatsPerSecond) % 1);
       // A lead gone grey is taken gently into a coil of grey figures.
       coil.update(

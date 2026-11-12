@@ -118,13 +118,13 @@ export function promptFor(
 // When the story has stalled and Sparky tugs the lead on.
 export const tugWords = "Sparky tugs you on: follow his gold thread.";
 
-// Beside the giant snake asleep on the hill, before the family can wake it: what it waits for. Nothing to say once it can be woken.
+// Beside the mound on the hill, where the giant snake rests under the ground, before the family can wake it: what it waits for. Nothing to say once it can be woken.
 export function hillHint(state: PlayState): string | null {
   if (state.lead === null || state.moment !== null || state.ended) return null;
   if (!within(state, places.hill, hillRadius + 4_000)) return null;
   if (!state.jackets)
-    return "A giant sly snake sleeps here. It wakes for the family in maridium jackets.";
+    return "Something vast stirs under this mound. It rises for the family in maridium jackets.";
   return family(state).length < heroIds.length
-    ? "A giant sly snake sleeps here. Bring the whole family to wake it."
+    ? "Something vast stirs under this mound. Bring the whole family to wake it."
     : null;
 }

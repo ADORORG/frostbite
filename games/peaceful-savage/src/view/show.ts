@@ -1,5 +1,7 @@
 import { Vector3 } from "three";
 
+import type { Ride } from "./ride.ts";
+
 // The show at the end: a stage on the lawn in front of the house, facing out over the meadow (and the camera). The family sings at the
 // front, each at a microphone, the band of ancestors plays behind them, speakers stand either side and a truss of lights overhead. The
 // player takes one of the family at a time and moves them about the stage. Here is where everything stands; the stage is built in
@@ -38,6 +40,8 @@ export interface StageControl {
     Record<string, { readonly x: number; readonly z: number }>
   >;
   readonly moveAt: number;
+  // After the show, where the player has driven the hover car (null while it cruises by itself).
+  readonly ride?: Ride | null;
   readonly walking: boolean;
   readonly who: string;
 }
