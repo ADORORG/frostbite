@@ -166,3 +166,14 @@ button:focus-visible {
     transition: none !important;
   }
 }
+
+/* Four readouts share one row: each pill is as small as its figures, and the row never grows past the page. */
+.score {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+}
+.score span {
+  padding: 0.125rem 0.5rem;
+  white-space: nowrap;
+}

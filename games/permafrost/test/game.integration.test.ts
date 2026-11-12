@@ -12,7 +12,7 @@ describe("Permafrost, bundled and run against a simulated platform", () => {
     await settle();
     expect(byId(window, "status")?.textContent).toBe("Connected.");
     expect(byId(window, "start")?.hasAttribute("disabled")).toBe(false);
-    expect(byId(window, "catch")?.hasAttribute("disabled")).toBe(true);
+    expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(true);
   });
 
   it("carries on from the best the platform hands back", async () => {
@@ -31,18 +31,20 @@ describe("Permafrost, bundled and run against a simulated platform", () => {
     await settle();
     byId(window, "start")?.dispatchEvent(new window.MouseEvent("click"));
     await settle(100);
-    expect(byId(window, "note")?.textContent).toContain("Space catches");
+    expect(byId(window, "note")?.textContent).toContain("Space drops");
     expect(byId(window, "note")?.textContent).not.toMatch(
       /platform|claim|seed/i,
     );
-    expect(byId(window, "catch")?.hasAttribute("disabled")).toBe(false);
-    // Catching on whatever tick the click lands on, a tap soon misses and ends the run.
+    expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(false);
+    // Dropping every piece where it is born stacks them in the middle, and the stack soon reaches the top.
     for (
       let at = 0;
       at < 400 && byId(window, "start")?.hasAttribute("hidden");
       at += 1
     ) {
-      byId(window, "catch")?.dispatchEvent(new window.MouseEvent("click"));
+      window.dispatchEvent(
+        new window.KeyboardEvent("keydown", { code: "Space" }),
+      );
       await settle(35);
     }
     const start = byId(window, "start");
@@ -64,9 +66,10 @@ describe("Permafrost, bundled and run against a simulated platform", () => {
     const recorded = recordingRuns();
     const { window } = await play({ best: 0 }, {}, { runs: recorded.runs });
     await settle();
-    byId(window, "catch")?.dispatchEvent(new window.MouseEvent("click"));
+    window.dispatchEvent(new window.KeyboardEvent("keydown", { code: "KeyC" }));
     await settle(100);
     expect(recorded.submitted).toHaveLength(0);
+    expect(byId(window, "start")?.hasAttribute("hidden")).toBe(false);
   });
 
   it("says so when the platform does not answer, and can still be played", async () => {

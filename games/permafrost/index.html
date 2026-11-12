@@ -14,16 +14,18 @@
           <p id="status">Connecting to the platform…</p>
         </header>
         <p class="score">
-          <span>Caught <strong id="score">0</strong></span>
+          <span>Score <strong id="score">0</strong></span>
+          <span>Rows <strong id="lines">0</strong></span>
+          <span>Level <strong id="level">1</strong></span>
           <span>Best <strong id="best">0</strong></span>
         </p>
       </div>
       <canvas
         id="screen"
-        width="160"
-        height="90"
+        width="144"
+        height="184"
         role="img"
-        aria-label="The game screen: a marker sweeping along a lane with a bright zone to catch it in"
+        aria-label="The game screen: a ten by twenty board where blocks fall, with the piece held on the left and the pieces to come on the right"
       ></canvas>
       <div class="foot">
         <div id="sound"></div>
@@ -31,7 +33,6 @@
         <div class="actions">
           <button id="start" type="button" disabled>Start run</button>
           <button id="pause" type="button" disabled>Pause</button>
-          <button id="catch" type="button" disabled>Catch</button>
         </div>
       </div>
       <section aria-labelledby="earned-title">

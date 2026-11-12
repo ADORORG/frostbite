@@ -34,6 +34,8 @@ export interface PermafrostState {
   readonly lines: number;
   readonly maxCombo: number;
   readonly perfectClears: number;
+  // How many pieces have been set down.
+  readonly pieces: number;
   readonly piece: ActivePiece;
   readonly piecesSinceGarbage: number;
   readonly queue: readonly number[];

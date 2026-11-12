@@ -5,7 +5,7 @@ import {
 } from "@frostbite/game-sdk/audio/effects";
 import type { Track } from "@frostbite/game-sdk/audio/tracks";
 
-// The game's sound, as data: a short steady loop, a chime for a catch and a thud for a miss. Nothing here is a file: the SDK plays it with
+// The game's sound, as data: a short steady loop, a click for each turn, a thud as a piece sets, and chimes for rows. Nothing here is a file: the SDK plays it with
 // the browser's audio.
 const rest = (count: number): null[] =>
   Array.from({ length: count }, () => null);
@@ -47,10 +47,19 @@ export const track: Track = {
 };
 
 export const effects = {
-  catch: [tone("square", 660, 880, 0.12, 0.3)],
-  miss: [tone("sawtooth", 220, 80, 0.4, 0.4), tone("noise", 0, 0, 0.25, 0.2)],
+  clear: [tone("square", 520, 780, 0.14, 0.3)],
+  four: [
+    tone("square", 520, 1040, 0.2, 0.3),
+    tone("triangle", 260, 520, 0.3, 0.3),
+  ],
+  hold: [tone("triangle", 420, 300, 0.07, 0.2)],
+  level: [tone("square", 440, 880, 0.3, 0.3)],
+  lock: [tone("square", 140, 90, 0.08, 0.25)],
   milestone: commonEffects.win,
+  over: [tone("sawtooth", 220, 80, 0.5, 0.4), tone("noise", 0, 0, 0.3, 0.2)],
+  perfect: commonEffects.win,
   start: commonEffects.start,
+  turn: [tone("square", 560, 640, 0.04, 0.15)],
 } as const satisfies Record<string, Effect>;
 
 export type EffectName = keyof typeof effects;

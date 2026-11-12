@@ -15,7 +15,7 @@ describe("the page's keys, pause and sound", () => {
       window.dispatchEvent(new window.KeyboardEvent("keydown", { code }));
     const text = (id: string) => byId(window, id)?.textContent;
     const running = () => byId(window, "start")?.hasAttribute("hidden");
-    // Taps until a miss ends the run.
+    // Drops pieces where they are born until the stack reaches the top.
     const playOut = async () => {
       for (let at = 0; at < 400 && running(); at += 1) {
         press("Space");
@@ -40,7 +40,7 @@ describe("the page's keys, pause and sound", () => {
     press("Enter");
     await settle(100);
     expect(running()).toBe(true);
-    expect(byId(window, "catch")?.hasAttribute("disabled")).toBe(false);
+    expect(byId(window, "pause")?.hasAttribute("disabled")).toBe(false);
   });
 
   it("starts one run for two quick presses of Enter", async () => {
@@ -56,7 +56,7 @@ describe("the page's keys, pause and sound", () => {
     ).toHaveLength(1);
   });
 
-  it("pauses on P: the page says so, a tap is refused, and play carries on after", async () => {
+  it("pauses on P: the page says so, a drop is refused, and play carries on after", async () => {
     const { audio, press, text } = await driver();
     press("Enter");
     await settle(100);
@@ -75,7 +75,7 @@ describe("the page's keys, pause and sound", () => {
     expect(audio.oscillators.length).toBeGreaterThan(before);
   });
 
-  it("pauses from its button, ignores P when no run is going, and Space taps rather than pauses", async () => {
+  it("pauses from its button, ignores P when no run is going, and Space drops rather than pauses", async () => {
     const { audio, press, text, window } = await driver();
     press("KeyP");
     expect(text("pause")).toBe("Pause");
@@ -119,6 +119,25 @@ describe("the page's keys, pause and sound", () => {
     await settle(100);
     expect(running()).toBe(true);
     expect(text("score")).toBe("0");
+  }, 40_000);
+
+  it("does not start the next run on Space, so a player still dropping pieces as the run ends keeps the card that says how they did", async () => {
+    const { playOut, press, running, text } = await driver();
+    press("Enter");
+    await settle(100);
+    await playOut();
+    expect(running()).toBe(false);
+    await settle(100);
+    const score = text("score");
+    for (let at = 0; at < 5; at += 1) {
+      press("Space");
+      await settle(40);
+    }
+    expect(running()).toBe(false);
+    expect(text("score")).toBe(score);
+    press("Enter");
+    await settle(100);
+    expect(running()).toBe(true);
   }, 40_000);
 
   it("pauses when the tab is hidden during a run", async () => {

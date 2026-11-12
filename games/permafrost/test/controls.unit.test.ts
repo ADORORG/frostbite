@@ -3,70 +3,82 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { attachControls } from "../src/screen/controls.ts";
 
-describe("the player's hands", () => {
+describe("the player's hands on a keyboard", () => {
   const stops: (() => void)[] = [];
   afterEach(() => {
     for (const stop of stops.splice(0)) stop();
   });
   const setup = () => {
-    const target = document.createElement("div");
-    document.body.append(target);
-    const catchIt = vi.fn();
-    const pause = vi.fn();
-    const start = vi.fn();
-    stops.push(attachControls(target, { catchIt, pause, start }));
-    return { catchIt, pause, start, target };
+    const controls = {
+      hard: vi.fn(),
+      hold: vi.fn(),
+      left: vi.fn(),
+      pause: vi.fn(),
+      right: vi.fn(),
+      soft: vi.fn(),
+      start: vi.fn(),
+      turnLeft: vi.fn(),
+      turnRight: vi.fn(),
+    };
+    stops.push(attachControls(controls));
+    return controls;
   };
-  const press = (code: string, repeat = false) => {
-    const event = new KeyboardEvent("keydown", {
-      cancelable: true,
-      code,
-      repeat,
-    });
+  const key = (type: "keydown" | "keyup", code: string, repeat = false) => {
+    const event = new KeyboardEvent(type, { cancelable: true, code, repeat });
     window.dispatchEvent(event);
     return event;
   };
 
-  it.each(["Space", "ArrowDown"])(
-    "catches on %s, and the page does not scroll",
-    (code) => {
-      const { catchIt } = setup();
-      expect(press(code).defaultPrevented).toBe(true);
-      expect(catchIt).toHaveBeenCalledTimes(1);
+  it.each([
+    ["ArrowUp", "turnRight"],
+    ["KeyX", "turnRight"],
+    ["KeyZ", "turnLeft"],
+    ["Space", "hard"],
+    ["KeyC", "hold"],
+    ["ShiftLeft", "hold"],
+    ["ShiftRight", "hold"],
+    ["Enter", "start"],
+    ["NumpadEnter", "start"],
+    ["KeyP", "pause"],
+  ] as const)(
+    "does %s on a press, once, and the page does not scroll",
+    (code, action) => {
+      const controls = setup();
+      expect(key("keydown", code).defaultPrevented).toBe(true);
+      expect(controls[action]).toHaveBeenCalledTimes(1);
+      key("keyup", code);
+      expect(controls[action]).toHaveBeenCalledTimes(1);
     },
   );
 
-  it("starts on Enter and pauses on P, and neither catches", () => {
-    const { catchIt, pause, start } = setup();
-    expect(press("Enter").defaultPrevented).toBe(true);
-    press("NumpadEnter");
-    press("KeyP");
-    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
-    expect(start).toHaveBeenCalledTimes(2);
-    expect(pause).toHaveBeenCalledTimes(1);
-    expect(catchIt).not.toHaveBeenCalled();
+  it.each([
+    ["ArrowLeft", "left"],
+    ["ArrowRight", "right"],
+    ["ArrowDown", "soft"],
+  ] as const)("holds %s down until it comes up", (code, action) => {
+    const controls = setup();
+    key("keydown", code);
+    expect(controls[action]).toHaveBeenLastCalledWith(true);
+    key("keyup", code);
+    expect(controls[action]).toHaveBeenLastCalledWith(false);
+    expect(controls[action]).toHaveBeenCalledTimes(2);
   });
 
-  it("ignores a held key, and a key that is not for the game", () => {
-    const { catchIt } = setup();
-    press("Space", true);
-    expect(press("KeyQ").defaultPrevented).toBe(false);
-    expect(catchIt).not.toHaveBeenCalled();
-  });
-
-  it("catches on a touch or a click anywhere on the screen", () => {
-    const { catchIt, target } = setup();
-    target.dispatchEvent(
-      new Event("pointerdown", { bubbles: true, cancelable: true }),
-    );
-    expect(catchIt).toHaveBeenCalledTimes(1);
+  it("does not turn on a key that is only held, and ignores keys that are not for the game", () => {
+    const controls = setup();
+    key("keydown", "ArrowUp", true);
+    key("keydown", "Space", true);
+    expect(controls.turnRight).not.toHaveBeenCalled();
+    expect(controls.hard).not.toHaveBeenCalled();
+    expect(key("keydown", "KeyQ").defaultPrevented).toBe(false);
   });
 
   it("stops listening when it is told to", () => {
-    const { catchIt, target } = setup();
+    const controls = setup();
     for (const stop of stops.splice(0)) stop();
-    press("Space");
-    target.dispatchEvent(new Event("pointerdown"));
-    expect(catchIt).not.toHaveBeenCalled();
+    key("keydown", "Space");
+    key("keydown", "ArrowLeft");
+    expect(controls.hard).not.toHaveBeenCalled();
+    expect(controls.left).not.toHaveBeenCalled();
   });
 });

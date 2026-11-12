@@ -15,7 +15,10 @@ describe("a run's keys, written compactly", () => {
   });
 
   it("knows all eight keys", () => {
-    expect(readKeys("lrabdhsS")?.map?.(({ action }) => action)).toEqual([
+    const keys = readKeys("lrabdhsS");
+    expect(
+      Array.isArray(keys) ? keys.map(({ action }) => action) : keys,
+    ).toEqual([
       "left",
       "right",
       "turnRight",

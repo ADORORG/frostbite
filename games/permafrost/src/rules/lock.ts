@@ -107,6 +107,7 @@ export function lock(state: PermafrostState): PermafrostState {
     lines,
     maxCombo: Math.max(state.maxCombo, combo),
     perfectClears: state.perfectClears + (emptied ? 1 : 0),
+    pieces: state.pieces + 1,
     piecesSinceGarbage: state.piecesSinceGarbage + 1,
     score: state.score + points,
     sprintTick:

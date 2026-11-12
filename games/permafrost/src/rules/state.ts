@@ -26,6 +26,7 @@ export function startRun(seed: number): PermafrostState {
     lines: 0,
     maxCombo: 0,
     perfectClears: 0,
+    pieces: 0,
     piece: newPiece(first),
     piecesSinceGarbage: 0,
     queue,
