@@ -140,23 +140,27 @@ describe("the page's keys, pause and sound", () => {
     expect(running()).toBe(true);
   }, 40_000);
 
-  it("has the touch buttons only while a run goes, so they never cover the first screen or the card after a run", async () => {
+  it("has the touch buttons in the page in their place always, and in sight only while a run goes, so showing them moves nothing and they never cover the cards", async () => {
     const { playOut, press, running, window } = await driver();
-    const buttons = () =>
+    const cluster = () =>
+      window.document.querySelector<HTMLElement>(".touch-buttons");
+    const labels = () =>
       [...window.document.querySelectorAll(".touch-buttons button")].map(
         (found) => found.textContent,
       );
-    expect(buttons()).toEqual([]);
+    expect(labels()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+    expect(cluster()?.style.visibility).toBe("hidden");
     press("Enter");
     await settle(100);
-    expect(buttons()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+    expect(labels()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+    expect(cluster()?.style.visibility).toBe("visible");
     await playOut();
     expect(running()).toBe(false);
     await settle(100);
-    expect(buttons()).toEqual([]);
+    expect(cluster()?.style.visibility).toBe("hidden");
     press("Enter");
     await settle(100);
-    expect(buttons()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+    expect(cluster()?.style.visibility).toBe("visible");
   }, 40_000);
 
   it("pauses when the tab is hidden during a run", async () => {

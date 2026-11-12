@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { attachTouch, zoneAt } from "../src/screen/touch.ts";
+import { attachCornerButtons, zoneAt } from "../src/screen/touch.ts";
 
 describe("the screen as the controller on a phone", () => {
   it("is cut into thirds across: left slides left, right slides right, and the middle turns", () => {
@@ -20,6 +20,7 @@ describe("the screen as the controller on a phone", () => {
       for (const stop of stops.splice(0)) stop();
       document.body.replaceChildren();
     });
+    const cluster = () => document.querySelector<HTMLElement>(".touch-buttons");
     const setup = () => {
       const main = document.createElement("main");
       const screen = document.createElement("canvas");
@@ -36,12 +37,13 @@ describe("the screen as the controller on a phone", () => {
         turnLeft: vi.fn(),
         turnRight: vi.fn(),
       };
-      stops.push(attachTouch(screen, main, controls));
+      const corner = attachCornerButtons(main, controls);
+      stops.push(corner.stop);
       const button = (label: string) =>
         [...main.querySelectorAll("button")].find(
           (found) => found.textContent === label,
         );
-      return { button, controls, main };
+      return { button, controls, corner, main };
     };
 
     it("has four buttons, drop, soft drop, hold and turn back, and no more", () => {
@@ -64,6 +66,23 @@ describe("the screen as the controller on a phone", () => {
       expect(controls.turnLeft).toHaveBeenCalledTimes(1);
       expect(controls.soft.mock.calls).toEqual([[true], [false]]);
       expect(controls.turnRight).not.toHaveBeenCalled();
+    });
+
+    it("keeps the buttons in the page but out of sight until they are shown, so showing them moves nothing", () => {
+      const { corner, main } = setup();
+      expect(main.querySelectorAll(".touch-buttons button")).toHaveLength(4);
+      expect(cluster()?.style.visibility).toBe("hidden");
+      // Only the visibility changes, never the display or the place (the e2e spec measures that the page does not move).
+      const onlyVisibility = () => {
+        const style = cluster()?.style;
+        return [style?.length, style?.display, style?.position];
+      };
+      const resting = onlyVisibility();
+      corner.show(true);
+      expect(cluster()?.style.visibility).toBe("visible");
+      expect(onlyVisibility()).toEqual(resting);
+      corner.show(false);
+      expect(cluster()?.style.visibility).toBe("hidden");
     });
 
     it("takes the buttons away when it is told to stop", () => {

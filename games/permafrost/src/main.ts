@@ -29,7 +29,7 @@ import { attachControls } from "./screen/controls.ts";
 import { draw } from "./screen/draw.ts";
 import { screenHeight, screenWidth } from "./screen/layout.ts";
 import { resultOf } from "./screen/result.ts";
-import { attachTouch } from "./screen/touch.ts";
+import { attachCornerButtons, attachTouchZones } from "./screen/touch.ts";
 import type { View } from "./screen/view.ts";
 import { createRunSession, type RunSession } from "./session.ts";
 
@@ -71,9 +71,9 @@ let view: View = { best: 0, newBest: false, phase: "ready", toast: null };
 let runId: string | null = null;
 let titles = new Map<string, string>();
 let heldNote = "";
-// The touch controls (thumb zones and corner buttons) exist only while a run goes, so the first screen and the card after a run are not
-// covered by buttons, and a tap there starts a run.
-let stopTouch: (() => void) | null = null;
+// The thumb zones are listened to only while a run goes, so a tap on the first screen or the card after a run starts a run. The corner buttons
+// are always in the page, in their place, and shown only while a run goes: showing them moves nothing, and they do not cover the cards.
+let stopZones: (() => void) | null = null;
 
 const pause = createPause();
 const saveProgress = (): void =>
@@ -162,8 +162,9 @@ const loop = createRunLoop({
 });
 
 async function finish(finished: RunSession): Promise<void> {
-  stopTouch?.();
-  stopTouch = null;
+  stopZones?.();
+  stopZones = null;
+  cornerButtons?.show(false);
   releaseAll();
   setRunning(false);
   sound.music(false);
@@ -219,8 +220,9 @@ const begin = (): Promise<void> =>
       seed: ready?.seed ?? localSeed(),
     });
     view = { ...view, newBest: false, phase: "running", toast: null };
-    stopTouch?.();
-    stopTouch = page === null ? null : attachTouch(screen, page, controls);
+    stopZones?.();
+    stopZones = attachTouchZones(screen, controls);
+    cornerButtons?.show(true);
     listEarned([]);
     setRunning(true);
     sound.tempo(1);
@@ -277,6 +279,8 @@ const controls = {
   turnRight: press("turnRight", "turn"),
 };
 attachControls(controls);
+const cornerButtons =
+  page === null ? null : attachCornerButtons(page, controls);
 pauseButton.addEventListener("click", controls.pause);
 attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());

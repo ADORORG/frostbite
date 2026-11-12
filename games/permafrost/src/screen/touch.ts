@@ -13,12 +13,13 @@ const edge = 1 / 3;
 export const zoneAt = (where: Where): Zone =>
   where.x < edge ? "left" : where.x > 1 - edge ? "right" : "turn";
 
-export function attachTouch(
+// The thumb zones: listened to on the screen for as long as the run goes. Returns a function that stops listening and lets go of every
+// zone held.
+export function attachTouchZones(
   screen: HTMLElement,
-  main: HTMLElement,
   controls: Controls,
 ): () => void {
-  const stopZones = attachZones<Zone>(screen, {
+  return attachZones<Zone>(screen, {
     enter: (zone) => {
       if (zone === "turn") controls.turnRight();
       else controls[zone](true);
@@ -30,8 +31,23 @@ export function attachTouch(
     slide: true,
     zoneAt,
   });
+}
+
+export interface CornerButtons {
+  // Whether the buttons can be seen and pressed. They are always in the page, in the same place, so showing them moves nothing; a button that
+  // cannot be seen is not counted among the things to press on the first screen.
+  readonly show: (shown: boolean) => void;
+  readonly stop: () => void;
+}
+
+const hiddenWhenResting = "hidden";
+
+export function attachCornerButtons(
+  main: HTMLElement,
+  controls: Controls,
+): CornerButtons {
   const nothing = (): void => undefined;
-  const stopButtons = attachTouchButtons(main, [
+  const stop = attachTouchButtons(main, [
     { label: "Drop", press: controls.hard, release: nothing },
     {
       label: "Soft",
@@ -41,8 +57,13 @@ export function attachTouch(
     { label: "Hold", press: controls.hold, release: nothing },
     { label: "Turn", press: controls.turnLeft, release: nothing },
   ]);
-  return () => {
-    stopZones();
-    stopButtons();
+  const cluster = main.querySelector<HTMLElement>(".touch-buttons");
+  if (cluster !== null) cluster.style.visibility = hiddenWhenResting;
+  return {
+    show(shown) {
+      if (cluster !== null)
+        cluster.style.visibility = shown ? "visible" : hiddenWhenResting;
+    },
+    stop,
   };
 }
