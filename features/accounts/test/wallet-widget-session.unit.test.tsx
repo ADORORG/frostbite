@@ -42,7 +42,11 @@ describe("the wallet widget: the session it is told of", () => {
     expect(
       requests
         .map(({ path }) => path)
-        .filter((path) => path !== "/api/v1/wallet/balance"),
+        // The balance and where "My profile" leads are asked for, neither of them about the session.
+        .filter(
+          (path) =>
+            path !== "/api/v1/wallet/balance" && path !== "/api/v1/profile",
+        ),
     ).toEqual([]);
   });
 
