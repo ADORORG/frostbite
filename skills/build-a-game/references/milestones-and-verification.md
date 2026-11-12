@@ -78,8 +78,8 @@ So "sending a score" means three things, all of them needed:
 Rules for what the score is:
 
 - It must be **the number the game shows and keeps as the player's best.** Give the rules and the screen one function for it, and
-  prove they agree with `expectVerifiedScore(rules, sampleRun(), shownScore)` from `@frostbite/test-kit/verified-score` (see
-  `games/tower-stack/test/verified-score.unit.test.ts`). It also checks that a run that has not ended has none.
+  prove they agree with `expectVerifiedScore(rules, sampleRun(), shownScore)`. The scaffold's `test/verified-score.unit.test.ts` already
+  does this (`games/tower-stack/test/verified-score.unit.test.ts` is a finished example); keep it and point it at your own function. It also checks that a run that has not ended has none.
 - **One scale per game.** The board compares every score on it, so a game with several modes or levels must give a score only to the
   mode that ranks, and `null` to the others. (Pocket Dragon scores the whole quest and none of its single levels, which are worth less.)
 - It must follow from the inputs alone: the same record always replays to the same score. No clock, no `Math.random`, no I/O.
