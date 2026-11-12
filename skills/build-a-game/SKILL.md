@@ -46,6 +46,8 @@ To check this skill matches the SDK you have, run the SDK's skill command (the e
 6. **Write the manifest** and the milestones. A new game is registered in two places, both written by `game:new`: its manifest
    `configs/games/<id>.ts` and the list in `configs/games.ts`. No test needs its id added; the conformance test fails if a folder
    under `games/` is not registered. See `references/milestones-and-verification.md`.
+   If the game ranks players, its rules also report a score (`score(state)`): the platform reads the score from a replay of the run,
+   and a game cannot send one. See "Scores and the leaderboard" in the same reference.
 7. **Test, run, check.** See `references/test-and-launch.md`. Do not call the game finished until every command listed there has
    run and you have reported what each printed.
 8. **Hand over.** Summarise what was built, what was run and its output, what was not verified (how it looks and sounds, touch on a

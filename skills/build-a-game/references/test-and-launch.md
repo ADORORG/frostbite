@@ -48,6 +48,9 @@ getContext()" when a test draws on a canvas; it is harmless.
   tapping `#screen` after `restartDelayMs` (from `<sdk>/touch-start`), watch only the controls that have a box (`boundingBox() !== null`; Playwright
   calls a `display: contents` element visible), and see a run end from `#pause` going disabled. Show
   each test can fail: break the line it guards and watch it go red.
+- A game that ranks players has a `verified-score.unit.test.ts` that calls `expectVerifiedScore` (`@frostbite/test-kit/verified-score`):
+  the score a replay reports is the one the screen shows, and a run that has not ended has none. Show it can fail by removing `score` from
+  the rules and watching it go red.
 - From `apps/web`: `npx vitest run --project unit test/games`. It runs three files: `games-config.unit.test.ts` (each game is listed once and
   passes the manifest schema; nothing to add for a new game), `games-verifiers.unit.test.ts` (the pinned digest) and
   `games-conformance.unit.test.ts`.

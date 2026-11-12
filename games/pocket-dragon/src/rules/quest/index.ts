@@ -5,6 +5,7 @@ import type {
   Stepped,
 } from "@frostbite/game-sdk/run-record";
 
+import { questScore } from "../../score.ts";
 import { verifierVersion } from "../constants.ts";
 import { noSettings } from "../held.ts";
 import { maxTicks } from "./constants.ts";
@@ -51,6 +52,9 @@ export const questRules: GameVerifier<QuestState> = {
   earned: questEarned,
   id: "quest",
   init: (seed, config) => noSettings(config, () => startQuest(seed)),
+  // The leaderboard ranks the whole quest only, by the score its result card shows. A level played alone has none, because its score
+  // is on another scale and would not rank against a quest's.
+  score: (state) => (state.ended ? questScore(state) : null),
   step: stepQuest,
   version: verifierVersion,
 };
