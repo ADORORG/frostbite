@@ -20,6 +20,7 @@ import { lanternMazeGame } from "./games/lantern-maze.ts";
 import { shardMatchGame } from "./games/shard-match.ts";
 import { auroraPulseGame } from "./games/aurora-pulse.ts";
 import { pocketDragonGame } from "./games/pocket-dragon.ts";
+import { peacefulSavageGame } from "./games/peaceful-savage.ts";
 // game:new adds imports above this line.
 
 // Games that exist to check the platform, listed only where it is run for development or tests.
@@ -47,6 +48,7 @@ export const games = defineGames([
   lanternMazeGame,
   shardMatchGame,
   auroraPulseGame,
+  peacefulSavageGame,
   // game:new adds games above this line.
 ]);
 
