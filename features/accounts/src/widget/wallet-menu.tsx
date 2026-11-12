@@ -13,12 +13,10 @@ import {
   myMilestonesNavigationLabel,
   myMilestonesPath,
 } from "@frostbite/shared/games";
-import {
-  profileNavigationLabel,
-  profileSetupPath,
-} from "@frostbite/shared/profiles";
+import { profileNavigationLabel } from "@frostbite/shared/profiles";
 import { networkName, shortAddress } from "./format.ts";
 import type { SessionState } from "./session-state.ts";
+import { useProfileHref } from "./use-profile-href.ts";
 
 const statusText = {
   "signed-in": "Signed in.",
@@ -50,6 +48,7 @@ export function WalletMenu({
   readonly session: SessionState;
   readonly wallet: WalletConnectionClient;
 }) {
+  const profileHref = useProfileHref(session === "signed-in");
   return (
     <div className="wallet-menu">
       {wallet.connected ? (
@@ -105,7 +104,7 @@ export function WalletMenu({
               </a>
             </li>
             <li>
-              <a className="menu-link" href={profileSetupPath}>
+              <a className="menu-link" href={profileHref}>
                 {profileNavigationLabel}
               </a>
             </li>

@@ -168,3 +168,9 @@ export const profileSetupPath = "/profile";
 export const profileNavigationLabel = "My profile";
 export const profilePagePath = "/p/[name]";
 export const profilePath = (name: string): `/${string}` => `/p/${name}`;
+// Where "My profile" leads: the public page when the player has one and it is shown, otherwise the setup page, where it is made or
+// switched on. A public page that is off answers "not found", so it is never the link.
+export const myProfileHref = (
+  profile: Pick<ProfileView, "name" | "visible"> | null,
+): `/${string}` =>
+  profile?.visible === true ? profilePath(profile.name) : profileSetupPath;
