@@ -1,4 +1,4 @@
-import { fits, resting } from "./board.ts";
+import { resting } from "./board.ts";
 import { softDropPoints, softDropTicksPerRow } from "./constants.ts";
 import { gravityFor, levelOf, lockDelayFor } from "./difficulty.ts";
 import { lock } from "./lock.ts";
@@ -36,6 +36,3 @@ export function advance(state: PermafrostState, tick: number): PermafrostState {
   }
   return now;
 }
-
-export const canFall = (state: PermafrostState): boolean =>
-  fits(state.board, { ...state.piece, y: state.piece.y + 1 });

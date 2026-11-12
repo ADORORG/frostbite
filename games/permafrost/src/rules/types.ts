@@ -31,8 +31,6 @@ export interface PermafrostState {
   readonly hold: number;
   readonly holdUsed: boolean;
   readonly holds: number;
-  // Lines cleared before the first piece was held.
-  readonly holdFreeLines: number;
   readonly lines: number;
   readonly maxCombo: number;
   readonly perfectClears: number;

@@ -42,7 +42,7 @@ export const milestones: readonly (readonly [
   ["perfect-clear", (s) => s.perfectClears >= 1],
   ["sprint-3min", (s) => s.sprintTick !== null && s.sprintTick <= seconds(180)],
   ["sprint-90s", (s) => s.sprintTick !== null && s.sprintTick <= seconds(90)],
-  ["no-hold-30", (s) => s.holdFreeLines >= 30],
+  ["first-hold", (s) => s.holds >= 1],
   ["rising-10", (s) => s.garbageRows >= 10],
   ["rising-25", (s) => s.garbageRows >= 25],
 ];

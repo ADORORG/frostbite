@@ -109,18 +109,13 @@ describe("clearing rows", () => {
     expect(second.score).toBe(200 + 2 * (rows - 2 - newPiece(1).y));
   });
 
-  it("notes the tick of the fortieth line, and the lines cleared before the first hold", () => {
+  it("notes the tick of the fortieth line", () => {
     const board = boardOf([rowWithout(3, 4, 5, 6)]);
     const free = advance(stateWith({ board, lines: 39 }, 1), 100);
-    const done = press(free, "d");
-    expect(done.sprintTick).toBe(100);
-    expect(done.holdFreeLines).toBe(1);
-    const held = press(stateWith({ board, lines: 39 }, 1), "h");
-    expect(held.holds).toBe(1);
+    expect(press(free, "d").sprintTick).toBe(100);
     expect(
-      press({ ...held, piece: newPiece(1), holdUsed: false }, "d")
-        .holdFreeLines,
-    ).toBe(0);
+      press(stateWith({ board, lines: 38 }, 1), "d").sprintTick,
+    ).toBeNull();
   });
 });
 

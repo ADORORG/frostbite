@@ -21,7 +21,6 @@ export function startRun(seed: number): PermafrostState {
     garbageRows: 0,
     gap: -1,
     hold: 0,
-    holdFreeLines: 0,
     holdUsed: false,
     holds: 0,
     lines: 0,

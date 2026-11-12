@@ -135,7 +135,7 @@ describe("the milestones", () => {
     expect(at({ maxCombo: 6 })).toEqual(["combo-3", "combo-6"]);
     expect(at({ backToBackFours: 1 })).toEqual(["back-to-back"]);
     expect(at({ perfectClears: 1 })).toEqual(["perfect-clear"]);
-    expect(at({ holdFreeLines: 30 })).toEqual(["no-hold-30"]);
+    expect(at({ holds: 1 })).toEqual(["first-hold"]);
     expect(at({ garbageRows: 10 })).toEqual(["rising-10"]);
   });
 
@@ -163,7 +163,7 @@ describe("the milestones", () => {
         backToBackFours: 99,
         perfectClears: 9,
         sprintTick: 100,
-        holdFreeLines: 99,
+        holds: 9,
         garbageRows: 99,
       }),
     ];

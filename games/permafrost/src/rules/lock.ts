@@ -103,10 +103,6 @@ export function lock(state: PermafrostState): PermafrostState {
     board: cleared.board,
     combo,
     fours: state.fours + (cleared.cleared === fourLines ? 1 : 0),
-    holdFreeLines:
-      state.holds === 0
-        ? state.holdFreeLines + cleared.cleared
-        : state.holdFreeLines,
     holdUsed: false,
     lines,
     maxCombo: Math.max(state.maxCombo, combo),
