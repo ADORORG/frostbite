@@ -71,6 +71,9 @@ let view: View = { best: 0, newBest: false, phase: "ready", toast: null };
 let runId: string | null = null;
 let titles = new Map<string, string>();
 let heldNote = "";
+// The touch controls (thumb zones and corner buttons) exist only while a run goes, so the first screen and the card after a run are not
+// covered by buttons, and a tap there starts a run.
+let stopTouch: (() => void) | null = null;
 
 const pause = createPause();
 const saveProgress = (): void =>
@@ -159,6 +162,8 @@ const loop = createRunLoop({
 });
 
 async function finish(finished: RunSession): Promise<void> {
+  stopTouch?.();
+  stopTouch = null;
   releaseAll();
   setRunning(false);
   sound.music(false);
@@ -214,6 +219,8 @@ const begin = (): Promise<void> =>
       seed: ready?.seed ?? localSeed(),
     });
     view = { ...view, newBest: false, phase: "running", toast: null };
+    stopTouch?.();
+    stopTouch = page === null ? null : attachTouch(screen, page, controls);
     listEarned([]);
     setRunning(true);
     sound.tempo(1);
@@ -270,7 +277,6 @@ const controls = {
   turnRight: press("turnRight", "turn"),
 };
 attachControls(controls);
-if (page !== null) attachTouch(screen, page, controls);
 pauseButton.addEventListener("click", controls.pause);
 attachTapToStart(screen, startButton);
 startButton.addEventListener("click", () => void begin());

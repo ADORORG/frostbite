@@ -140,6 +140,25 @@ describe("the page's keys, pause and sound", () => {
     expect(running()).toBe(true);
   }, 40_000);
 
+  it("has the touch buttons only while a run goes, so they never cover the first screen or the card after a run", async () => {
+    const { playOut, press, running, window } = await driver();
+    const buttons = () =>
+      [...window.document.querySelectorAll(".touch-buttons button")].map(
+        (found) => found.textContent,
+      );
+    expect(buttons()).toEqual([]);
+    press("Enter");
+    await settle(100);
+    expect(buttons()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+    await playOut();
+    expect(running()).toBe(false);
+    await settle(100);
+    expect(buttons()).toEqual([]);
+    press("Enter");
+    await settle(100);
+    expect(buttons()).toEqual(["Drop", "Soft", "Hold", "Turn"]);
+  }, 40_000);
+
   it("pauses when the tab is hidden during a run", async () => {
     const { press, text, window } = await driver();
     window.document.dispatchEvent(new window.Event("visibilitychange"));
