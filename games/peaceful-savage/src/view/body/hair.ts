@@ -7,6 +7,7 @@ import { beard } from "./beard.ts";
 import { curls, stars } from "./coils.ts";
 import { headOf } from "./head-shape.ts";
 import { locs } from "./locs.ts";
+import { scalp } from "./scalp.ts";
 import type { Look } from "./looks.ts";
 import type { Rig } from "./rig.ts";
 
@@ -86,24 +87,36 @@ export function buildHair(
   const anywhere = () => true;
   // The close layer touches the scalp everywhere hair grows (the back and sides too, between and under puffs): a dark cap just over the
   // skin, so no skin shows between the coils, and the short coils packed on it.
-  const scalp = holder(skull.centre.x, skull.centre.y, skull.centre.z);
-  const close = skull.radii.clone().multiplyScalar(1.07 * r);
-  fill(scalp, close, 0.95, keep);
-  curls(
-    scalp,
-    { count: count(1500), keep, radii: close, size: r * 0.11 },
-    material,
-    look,
-    3,
+  const fade = look.hair === "coils";
+  scalp(head, shape, {
+    cap: core,
+    colour: look.galaxy ? "#3a1f7c" : look.hairColour,
+    count: count(fade ? 5200 : 3800),
     detail,
-  );
+    grows: (at) => growsAt(at.x, at.y, at.z),
+    // A fade: full at the crown, a shadow by the ears and the nape.
+    long: (at) =>
+      fade ? Math.min(1, Math.max(0.05, (at.y - L.eyes) / 0.55)) : 0.7,
+    material,
+    place,
+    size: r * (fade ? 0.055 : 0.06),
+  });
   if (look.hair === "coils") {
-    const radii = new Vector3(r * 1.2, r * 1.3, r * 1.22);
-    const top = holder(0, 0.3, -0.1);
-    fill(top, radii, 0.86, keep);
+    // Kai's: a fade. Close at the sides and the back, and a full top of coils that stands high and comes forward over the hairline.
+    const radii = new Vector3(r * 1.04, r * 1.0, r * 1.16);
+    const top = holder(0, 0.62, -0.02);
+    const crown = (at: Vector3): boolean =>
+      keep(at) && at.y / r - 0.88 > L.brow + 0.36;
+    fill(top, radii, 0.84, crown);
     curls(
       top,
-      { count: count(2600), keep, radii, size: r * 0.14 },
+      {
+        count: count(6200),
+        halo: 0.14,
+        keep: crown,
+        radii,
+        size: r * 0.085,
+      },
       material,
       look,
       5,
@@ -113,10 +126,16 @@ export function buildHair(
     for (const s of [1, -1]) {
       const puff = holder(s * 0.84, 0.92, -0.12);
       const radii = new Vector3(r * 0.95, r * 0.88, r * 0.9);
-      fill(puff, radii, 0.84, anywhere);
+      fill(puff, radii, 0.82, anywhere);
       curls(
         puff,
-        { count: count(1800), keep: anywhere, radii, size: r * 0.13 },
+        {
+          count: count(4200),
+          halo: 0.16,
+          keep: anywhere,
+          radii,
+          size: r * 0.085,
+        },
         material,
         look,
         s > 0 ? 11 : 13,
@@ -149,10 +168,19 @@ export function buildHair(
     // Mama's galaxy afro, wide and high, with planets in it, and her headband with its feather.
     const crown = holder(0, 0.72, -0.62);
     const radii = new Vector3(r * 2.3, r * 1.95, r * 1.9);
-    fill(crown, radii, 0.86, keep);
+    // Out past the sides of the head the afro is whole: only the face itself is left bare.
+    const round = (at: Vector3): boolean =>
+      keep(at) || (Math.abs(at.x) > r * 1.02 && at.z < r * 0.55);
+    fill(crown, radii, 0.82, round);
     curls(
       crown,
-      { count: count(4600), keep, radii, size: r * 0.15 },
+      {
+        count: count(11000),
+        halo: 0.14,
+        keep: round,
+        radii,
+        size: r * 0.1,
+      },
       material,
       look,
       23,

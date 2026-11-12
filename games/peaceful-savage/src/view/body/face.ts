@@ -1,4 +1,4 @@
-import { Mesh, Object3D, Vector3 } from "three";
+import { Color, Mesh, Object3D, Vector3 } from "three";
 
 import type { Tone } from "../palette.ts";
 import { inked, inkMaterial, toon } from "../toon.ts";
@@ -66,6 +66,12 @@ export function buildFace(rig: Rig, look: Look, tone: Tone): Face {
     inked(ear, 0.1);
     frame.add(ear);
   }
+  // The lids: the skin a shade deeper, as it is where it folds, and no gold rim (which would ring each eye).
+  const lid = toon(tone, {
+    color: new Color(look.skin).multiplyScalar(0.86),
+    rim: 0,
+    soft: true,
+  });
   const iris = irisTexture(look.name.length * 7);
   const feminine = look.skirt || look.hair === "puffs";
   const eyes: Eye[] = ([1, -1] as const).map((side) => {
@@ -73,7 +79,7 @@ export function buildFace(rig: Rig, look: Look, tone: Tone): Face {
     const eye = buildEye({
       flick: feminine,
       iris,
-      lid: skin,
+      lid,
       side,
       size: shape.layout.eye,
     });

@@ -32,6 +32,7 @@ export function irisTexture(seed: number): Texture {
   const brown = new Color("#4a2514");
   const rim = new Color("#24120a");
   const white = new Color("#f6eee6");
+  const shade = new Color("#4a2a1e");
   const size = 128;
   return texture(
     size,
@@ -48,12 +49,12 @@ export function irisTexture(seed: number): Texture {
           .multiplyScalar(ray);
       } else if (fromFront < 0.218) colour = rim;
       // The white shades off round the sides of the eye, as it turns away from the light, so it never glares from the side.
+      // The white falls into warm shadow round the sides of the eye, under the lids and the brow, so from the side it is never a
+      // bright wedge.
       else
         colour = white
           .clone()
-          .multiplyScalar(
-            1 - Math.min(0.55, Math.max(0, fromFront - 0.24) * 2.2),
-          );
+          .lerp(shade, Math.min(0.9, Math.max(0, fromFront - 0.25) * 6));
       return [...srgb(colour), 255];
     },
     1,
@@ -99,7 +100,7 @@ export function buildEye(options: EyeOptions): Eye {
   const lid = new Object3D();
   lid.add(
     new Mesh(
-      new SphereGeometry(e * 1.07, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+      new SphereGeometry(e * 1.035, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2),
       options.lid,
     ),
   );
@@ -107,7 +108,7 @@ export function buildEye(options: EyeOptions): Eye {
   for (let at = 0; at <= 16; at += 1) {
     const angle = side * (-1.45 + (2.8 * at) / 16);
     rimPoints.push(
-      new Vector3(Math.sin(angle) * e * 1.08, 0, Math.cos(angle) * e * 1.08),
+      new Vector3(Math.sin(angle) * e * 1.045, 0, Math.cos(angle) * e * 1.045),
     );
   }
   const last = rimPoints[rimPoints.length - 1] ?? new Vector3();
@@ -136,7 +137,7 @@ export function buildEye(options: EyeOptions): Eye {
   // The lower lid: the bottom of a shell, its edge just under the iris.
   const lower = new Mesh(
     new SphereGeometry(
-      e * 1.05,
+      e * 1.025,
       28,
       6,
       0,

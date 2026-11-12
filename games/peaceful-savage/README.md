@@ -39,7 +39,7 @@ out and hold hands in a line on the lawn as the jackets light up gold, and lift 
 **The house, and what is under the meadow.** The house is the book's: one wave of a roof in purple scales edged with gold, tall over
 the east wing and dipping to the door. Its windows are real: ovals of clear glass in gold frames cut through the outer walls (the
 kitchen's great scooped window, the office's three, a round one at the end of the hall, one in each bedroom), so the rooms are seen
-from the grass and the meadow from the rooms. There are five ways in: the front door; the office's tall window, up its round steps; the
+from the grass and the meadow from the rooms. The office's end wall is one huge arched window the height of the house, with leaning gold mullions, and the office is open to the roof behind it; its bookshelves stand along its back wall. There are five ways in: the front door, which is shut and slides open for whoever comes near; the office's tall window, up its round steps; the
 kitchen's side door, at the top of a raised stair that curves round the corner of the house; and a sliding window in each bedroom. Their
 glass panes slide aside as someone comes near. The grass goes all round the house, to a hedge on every side. Inside nothing has a right
 angle: walls roll round at their ends, corners sweep, every room has a vault and every doorway a tall oval arch, and the furniture is
@@ -55,7 +55,7 @@ into joy; Mama senses what is coming and learns to say what she needs, as the an
 **What the family makes and keeps.** Once their lesson is learned, each of the family makes something the family keeps (and each is a
 milestone, so a collectible): Kai builds a brilliant holographic structure on his workbench over the tower he built again (a helix of
 light with turning rings and a crystal at the top), Zora mixes a masterpiece where she was playing in the meadow (a swirl of every colour
-on a little easel), Mama sings her song where she stood by the tree (gold notes that rise and circle), and Daddy releases a relic from the
+on a little easel at the meadow's east edge, by the swing), Mama sings her song where she stood by the tree (gold notes that rise and circle), and Daddy releases a relic from the
 drawer he opened (a gold amulet with a teal heart that floats free over his desk). Each is a short moment of hand-keys and breath that its
 maker plays beside the lead; each stays where it was made for the rest of the run.
 
@@ -121,7 +121,7 @@ and pulls back a little for each of them, so nobody stands between it and the le
   storybook toon look (painted bands, a gold rim, ink lines, a moonlit duotone for grey rooms), the sky, the camera that knows the
   characters (`camera.ts`, kept out of walls and the hill by `clearance.ts`), where the found walk beside the lead (`beside.ts`), the
   family's procedural bodies (skinned, about sixty joints; sculpted human heads with a skull, cheekbones, a jaw, a chin, a nose and lips,
-  their features painted on and real eyes in their sockets; coily hair on a full scalp and Daddy's freeform locs; and a two-bone reach for a hand
+  their features painted on and real eyes in their sockets; coily hair as tens of thousands of tiny tight coils (close hair grown from the skull's own shape to a clean hairline, Kai's fade, puffs and Mama's afro with a soft halo of free coils, dark at the root and lighter at the tip) and Daddy's freeform locs; and a two-bone reach for a hand
   laid exactly, as on a shoulder in the hug), the farewell (`farewell.ts`, `family-farewell.ts`) and its show (`show.ts`), the world
   (`world/`: the house, the meadow, the garden, the tree and its three strands, the giant sly snake, the ancestors who come home, the
   stage, the band's instruments and the dancing crowd, Sparky, the looking glasses and the pond, the swing, what the family makes) and

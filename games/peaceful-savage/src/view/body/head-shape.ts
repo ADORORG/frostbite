@@ -132,7 +132,7 @@ function sculpt(shape: HeadShape): Head {
     );
     return melt(
       d,
-      ellipsoid(q, v(0, L.mouth + 0.03, 0.38), v(0.4, 0.36, 0.5)),
+      ellipsoid(q, v(0, L.mouth + 0.03, 0.36), v(0.4, 0.36, 0.47)),
       0.24,
     );
   };
@@ -150,13 +150,13 @@ function sculpt(shape: HeadShape): Head {
   };
   const browAt = v(0, L.brow, front(0, L.brow) - 0.07);
   const cheekAt = v(0.4, L.eyes - 0.2, front(0.4, L.eyes - 0.2) - 0.07);
-  const bridge = v(0, L.eyes + 0.06, front(0, L.eyes + 0.06) - 0.03);
+  const bridge = v(0, L.eyes + 0.06, front(0, L.eyes + 0.06) - 0.05);
   const tip = v(
     0,
     L.nose + 0.07,
-    front(0, L.nose + 0.07) + 0.17 - young * 0.07,
+    front(0, L.nose + 0.07) + 0.25 - young * 0.09,
   );
-  const wing = v(0.1 - young * 0.015, L.nose + 0.04, tip.z - 0.11);
+  const wing = v(0.125 - young * 0.02, L.nose + 0.035, tip.z - 0.13);
   const lips = front(0, L.mouth);
   const eyeAt = (side: 1 | -1): Vector3 =>
     new Vector3(side * L.apart, L.eyes, front(L.apart, L.eyes) - L.eye * 0.72);
@@ -164,23 +164,27 @@ function sculpt(shape: HeadShape): Head {
   const distance = (p: Point, plain = false): number => {
     const q = v(Math.abs(p.x), p.y, p.z);
     let d = masses(p);
-    d = melt(d, ellipsoid(q, browAt, v(0.5, 0.085, 0.12 - young * 0.05)), 0.12);
+    d = melt(d, ellipsoid(q, browAt, v(0.5, 0.085, 0.14 - young * 0.06)), 0.12);
     d = melt(d, ellipsoid(q, cheekAt, v(0.2, 0.11, 0.1)), 0.1);
-    d = melt(d, rod(p, bridge, tip, 0.05 - young * 0.01), 0.07);
-    d = melt(d, ball(p, tip, 0.095 - young * 0.02), 0.05);
+    d = melt(d, rod(p, bridge, tip, 0.058 - young * 0.012), 0.09);
+    d = melt(d, ball(p, tip, 0.108 - young * 0.022), 0.06);
     if (plain) return d;
-    d = melt(d, ball(q, wing, 0.078 - young * 0.016), 0.05);
+    d = melt(d, ball(q, wing, 0.09 - young * 0.018), 0.06);
     d = melt(
       d,
-      ellipsoid(q, v(0, L.mouth + 0.04, lips), v(L.mouthWide, 0.045, 0.06)),
+      ellipsoid(
+        q,
+        v(0, L.mouth + 0.045, lips + 0.015),
+        v(L.mouthWide, 0.052, 0.08),
+      ),
       0.05,
     );
     d = melt(
       d,
       ellipsoid(
         q,
-        v(0, L.mouth - 0.045, lips - 0.01),
-        v(L.mouthWide * 0.82, 0.055, 0.065),
+        v(0, L.mouth - 0.05, lips + 0.005),
+        v(L.mouthWide * 0.84, 0.062, 0.082),
       ),
       0.05,
     );
