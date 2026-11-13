@@ -43,7 +43,7 @@ Every game on the platform behaves the same way. Use the SDK's pieces; do not wr
   run while the other jumps (`games/bro-maria/src/screen/thumbs.ts`). Name the zones faintly on the first screen of a run, as Bro Maria
   does, so a new player sees what each side does. A game that also needs a few extra buttons (fire, a special move) uses
   `attachTouchButtons` (`<sdk>/touch-buttons`): at most four, drawn over the screen in the bottom right corner by `phone.css`, never a
-  pad under it; a finger on a button never reaches the screen's zones. More actions than that: one button that cycles them, or keys. Call `attachTapToStart(screen, startButton)` so a tap on a waiting game starts a
+  pad under it; a finger on a button never reaches the screen's zones. Two platform tests bear on them: one counts what a thumb can see to press on the page at rest (at most three: the sound and pause controls), and another checks nothing the player touches moves when a run starts. So keep the buttons in the page, in the same place, always, but out of sight (`visibility: hidden`, which keeps their box) until a run starts, and show them then; thumb zones can be listened to only while a run goes. More actions than that: one button that cycles them, or keys. Call `attachTapToStart(screen, startButton)` so a tap on a waiting game starts a
   run, and say "TAP" where a keyboard is told "ENTER" (`byInput`, or `touchLines` and the guide's own touch start line). Keep a button
   only where a gesture cannot do the job, and draw it over the screen, never in rows under it.
 - **The note**: one short line under the screen, worded with `byInput` for a keyboard and for a finger, and never about how a run was

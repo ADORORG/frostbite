@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Permafrost</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="bar">
+        <header>
+          <h1>Permafrost</h1>
+          <p id="status">Connecting to the platform…</p>
+        </header>
+        <p class="score">
+          <span>Score <strong id="score">0</strong></span>
+          <span>Rows <strong id="lines">0</strong></span>
+          <span>Level <strong id="level">1</strong></span>
+          <span>Best <strong id="best">0</strong></span>
+        </p>
+      </div>
+      <canvas
+        id="screen"
+        width="144"
+        height="184"
+        role="img"
+        aria-label="The game screen: a ten by twenty board where blocks fall, with the piece held on the left and the pieces to come on the right"
+      ></canvas>
+      <div class="foot">
+        <div id="sound"></div>
+        <p id="note" aria-live="polite"></p>
+        <div class="actions">
+          <button id="start" type="button" disabled>Start run</button>
+          <button id="pause" type="button" disabled>Pause</button>
+        </div>
+      </div>
+      <section aria-labelledby="earned-title">
+        <h2 id="earned-title">Earned this run</h2>
+        <ul id="earned" aria-label="Milestones earned this run"></ul>
+      </section>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>

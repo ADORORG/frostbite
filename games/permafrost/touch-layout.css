@@ -1,0 +1,113 @@
+/* A phone. The platform lays the readouts, the note and the four buttons over the screen, which here would hide the top of the board (where
+   pieces appear), the first piece to come and the lower right of the stack. So: the readouts are small cards in a column; how to play is on the
+   first-screen card, and over a run the note would lie across the last row of the board, so it goes. Where the cards and the buttons go depends
+   on how the phone is held, and on where the screen's own side columns are, which `src/screen/phone-layout.ts` measures and sets as the
+   `--pf-` properties on `main`. A mouse keeps the platform's layout. The selectors are as strong as the platform's (`:root body main`) and
+   come after them. */
+@media (pointer: coarse) {
+  :root body main #note {
+    display: none;
+  }
+  :root body main .score {
+    flex-direction: column;
+    gap: 0.25rem;
+    overflow: visible;
+  }
+  :root body main .score span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.625rem;
+    line-height: 1.15;
+  }
+  :root body main .score strong {
+    font-size: 0.9rem;
+  }
+}
+
+/* Held upright the screen fills the width, and its side columns are empty below their boxes: the cards go in the left one under the piece held,
+   and the buttons two and two at the foot of each column, clear of the board. */
+@media (pointer: coarse) and (orientation: portrait) {
+  :root body main {
+    position: relative;
+    /* A thumb wide, but never wider than the column it sits in. */
+    --pf-btn: clamp(2.75rem, calc(var(--pf-scale, 2.5px) * 24), 3.5rem);
+    --pf-foot: max(2.5rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+    --pf-row: calc(var(--pf-btn) + 0.5rem);
+  }
+  /* The icons at the top right (three, each a thumb wide) need room above the board and the first box, so the screen starts below them. */
+  :root body main > canvas {
+    margin-block-start: 1rem;
+    block-size: calc(100% - 1rem);
+  }
+  :root body main .bar {
+    position: absolute;
+    inset-block-start: calc(var(--pf-below-hold, 8rem) + 0.5rem);
+    inset-inline-start: var(--pf-hold-x, 0.5rem);
+    inline-size: var(--pf-side-w, 4.5rem);
+    margin: 0;
+    display: block;
+  }
+  /* The buttons: Hold over Turn back on the left, Drop over Soft on the right, each centred in its column. */
+  :root body main > .touch-buttons {
+    position: absolute;
+    inset: 0;
+    /* The platform puts the cluster at the end of its cell; here it is the whole frame, and each button is placed in it. */
+    align-self: stretch;
+    justify-self: stretch;
+    display: block;
+    max-inline-size: none;
+    margin: 0;
+  }
+  :root body main > .touch-buttons button {
+    position: absolute;
+    inline-size: var(--pf-btn);
+    block-size: var(--pf-btn);
+  }
+  :root body main > .touch-buttons button:nth-child(3),
+  :root body main > .touch-buttons button:nth-child(4) {
+    inset-inline-start: calc(
+      var(--pf-hold-x, 0.5rem) + (var(--pf-side-w, 4.5rem) - var(--pf-btn)) / 2
+    );
+  }
+  :root body main > .touch-buttons button:nth-child(1),
+  :root body main > .touch-buttons button:nth-child(2) {
+    inset-inline-start: calc(
+      var(--pf-next-x, 0.5rem) + (var(--pf-side-w, 4.5rem) - var(--pf-btn)) / 2
+    );
+  }
+  :root body main > .touch-buttons button:nth-child(3),
+  :root body main > .touch-buttons button:nth-child(1) {
+    inset-block-end: calc(var(--pf-foot) + var(--pf-row));
+  }
+  :root body main > .touch-buttons button:nth-child(4),
+  :root body main > .touch-buttons button:nth-child(2) {
+    inset-block-end: var(--pf-foot);
+  }
+}
+
+/* On its side the screen is a narrow strip in the middle with wide empty margins, so the cards stack in the left margin (below where the
+   platform's way out sits), and the platform's buttons, at the right foot, are already in the right margin. */
+@media (pointer: coarse) and (orientation: landscape) {
+  :root body main .bar {
+    position: absolute;
+    inset-block-start: max(3.75rem, calc(env(safe-area-inset-top) + 3.25rem));
+    inset-inline-start: max(0.5rem, env(safe-area-inset-left));
+    inline-size: min(5rem, calc(var(--pf-hold-x, 6rem) - 1rem));
+    margin: 0;
+    display: block;
+  }
+}
+
+/* A short frame (the browser's own bars showing) has no height for a column of four: the cards are two and two, in the margin's width. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 320px) {
+  :root body main .bar {
+    inline-size: max(5rem, calc(var(--pf-hold-x, 6rem) - 1rem));
+  }
+  :root body main .score {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
