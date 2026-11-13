@@ -292,8 +292,8 @@ export const pocketDragonGame = defineGame({
     replay: {
       id: "pocket-dragon",
       sha256:
-        "cf56ce14f2e0e42bb1b4996e57442c5fd7fa3a3e8207a919a6c290df13f5140b",
-      version: 1,
+        "db23df69cd92ff47afa25f38c47f5738a5d1caa96cc3cde75a36cff24e3f65c7",
+      version: 2,
     },
   },
   version: "0.1.0",

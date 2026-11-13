@@ -3,7 +3,7 @@
 export const gameId = "pocket-dragon";
 export const verifierId = "pocket-dragon";
 // Raised with any change to any chapter's rules, so a run begun under older rules is never replayed under newer ones.
-export const verifierVersion = 1;
+export const verifierVersion = 2;
 export const ticksPerSecond = 60;
 
 // Hearts: three to start a run (or the quest), at most five. In the quest, each level starts with the hearts the one before ended with.

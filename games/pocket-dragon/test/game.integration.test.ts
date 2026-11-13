@@ -21,7 +21,7 @@ const quickLoss = 6;
 describe("the verifier the game publishes", () => {
   it("is one script with the three levels' rules and the quest's, which replays the sample, a run of the castle and a quest as the source does", async () => {
     const built = await bundleVerifier(join(import.meta.dirname, ".."));
-    expect(built).toMatchObject({ id: "pocket-dragon", version: 1 });
+    expect(built).toMatchObject({ id: "pocket-dragon", version: 2 });
     expect(built?.bytes ?? 0).toBeLessThan(200_000);
     const scope: Record<string, unknown> = {};
     runInNewContext(built?.code ?? "", scope);

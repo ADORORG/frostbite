@@ -251,6 +251,10 @@ verifier's SHA-256 is pinned in `configs/games/pocket-dragon.ts`; changing any l
 the pin and `verifierVersion` are updated together. The metaplasma banked is kept by the page with the rest of the progress; the rules
 count what a run gathers, but the bank is not a milestone and is not checked.
 
+The leaderboard ranks the whole quest only. The quest's rules report `questScore` (the score its result card shows) once the quest has
+ended, and a level played alone reports none, since its score is on another scale. The score is read from the replay, never sent by the
+page. Adding it raised `verifierVersion` to 2.
+
 ## Milestones
 
 Forty, all decided by the state of a run alone (`src/rules/*/milestones.ts`). Egg Hills has eleven of its own: eggs, golden eggs, fire, ice

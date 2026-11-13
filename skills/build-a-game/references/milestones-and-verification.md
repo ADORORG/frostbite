@@ -57,6 +57,34 @@ To make milestones `replay-verified` (only for milestones earned once, with no t
 
 The page then shows the milestone as "Replay-checked". That shows the run followed the rules; it does not show a person played it.
 
+## Scores and the leaderboard
+
+A game gets a leaderboard when it declares `verification` in its manifest. **There is no way for a game, a page or an agent to send a
+score.** The platform never takes a score from a page: it takes the run record, replays it with the game's published rules, and reads
+the score from the replayed state. The board ranks each signed-in player's best such score for all time, the month and the week. A game
+that sends nothing it can replay has no board, and a game whose rules report no score has a board that never fills.
+
+So "sending a score" means three things, all of them needed:
+
+1. **The rules report it.** Add `score(state)` to the `GameVerifier` (`<sdk>/run-record`): `score: (state) => (state.ended ? state.score : null)`.
+   Return a whole number from 0 up, and only once the run has ended (`null` before that and for a game that keeps no score). Anything
+   else is read as none. The scaffold from `pnpm game:new` already has it; a game written by hand, or an older one, may not.
+2. **The page records the run and submits it once at the end**, as in step 4 above (`play.runs.start()`, record, `play.runs.submit()`).
+   A player who is not signed in gets no run and so no ranked score. A test or practice run must submit nothing.
+3. **The published digest matches.** `score` is part of the rules, so adding or changing it changes the verifier's digest: raise
+   `verifierVersion`, rebuild, and re-pin `verification.replay` (`sha256` and `version`) in the manifest. A run recorded under the older
+   version is not replayed under the newer one.
+
+Rules for what the score is:
+
+- It must be **the number the game shows and keeps as the player's best.** Give the rules and the screen one function for it, and
+  prove they agree with `expectVerifiedScore(rules, sampleRun(), shownScore)`. The scaffold's `test/verified-score.unit.test.ts` already
+  does this (`games/tower-stack/test/verified-score.unit.test.ts` is a finished example); keep it and point it at your own function. It also checks that a run that has not ended has none.
+- **One scale per game.** The board compares every score on it, so a game with several modes or levels must give a score only to the
+  mode that ranks, and `null` to the others. (Pocket Dragon scores the whole quest and none of its single levels, which are worth less.)
+- It must follow from the inputs alone: the same record always replays to the same score. No clock, no `Math.random`, no I/O.
+- Higher is better. A game where less is better (a time) must report a number that grows with how well the player did.
+
 ## Making milestones claimable on chain
 
 Declare `rewards: { templateId, templateVersion }` naming the contract template the platform offers (today `game-rewards` at `1.0.0`).
