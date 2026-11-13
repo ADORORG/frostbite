@@ -100,3 +100,14 @@
     display: block;
   }
 }
+
+/* A short frame (the browser's own bars showing) has no height for a column of four: the cards are two and two, in the margin's width. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 320px) {
+  :root body main .bar {
+    inline-size: max(5rem, calc(var(--pf-hold-x, 6rem) - 1rem));
+  }
+  :root body main .score {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
