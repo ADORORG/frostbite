@@ -5,6 +5,7 @@ import { BrandMark } from "../components/brand-mark.tsx";
 import { AccountMenu } from "./account-menu.tsx";
 import { AreaSidebar } from "./area-sidebar.tsx";
 import { Breadcrumbs } from "./breadcrumbs.tsx";
+import { HeaderHeight } from "./header-height.tsx";
 import { NavMenu } from "./nav-menu.tsx";
 import { HeaderSlot, HeaderStatusSlot } from "./shell-slots.tsx";
 import {
@@ -90,6 +91,7 @@ export function AppShell({
           <HeaderSlot />
           <NavMenu model={model} />
         </div>
+        <HeaderHeight />
       </header>
       <div
         className="app-body"
