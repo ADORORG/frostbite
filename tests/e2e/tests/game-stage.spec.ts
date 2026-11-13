@@ -59,6 +59,29 @@ test("the page is the game on nearly the whole screen, with its title in the bar
   await expect(page.locator(".arcade-panel")).toHaveCount(0);
 });
 
+// The header wraps its buttons onto a second row on a narrow phone, so it is taller there than its token, and a stage sized from the token
+// ran under the dock. The stage must end where the dock begins at every phone width, with the page at its top.
+for (const [width, height] of [
+  [320, 568],
+  [360, 640],
+  [375, 667],
+] as const) {
+  test(`the stage ends where the dock begins on a ${String(width)}px phone, whatever height the header has`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ height, width });
+    await page.goto(fixtureGame.href);
+    await expectConnectedToPlatform(page);
+    await expect
+      .poll(async () => {
+        const stage = await box(page, ".arcade-section--stage > .arcade-stage");
+        const dock = await box(page, ".arcade-dock__strip");
+        return stage.y + stage.height - dock.y;
+      })
+      .toBeLessThanOrEqual(1);
+  });
+}
+
 test("the dock is closed until asked, opens one section over the game without moving it, and goes back", async ({
   page,
 }) => {
